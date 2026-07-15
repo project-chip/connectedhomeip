@@ -38,14 +38,8 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-// ---------------------------------------------------------------------------
-// Test doubles
-// ---------------------------------------------------------------------------
-
-// A mock delegate that records how it was called so the tests can assert that
-// the cluster actually drives the hardware abstraction (the delegate) and with
-// which parameters. The result of each call is configurable so we can simulate
-// hardware that reports failure / "movement already in progress".
+// Records how it was called so tests can assert the cluster drives the delegate with the
+// right parameters. Results are configurable to simulate delegate failure / in-progress motion.
 class MockWindowCoveringDelegate : public WindowCoveringDelegate
 {
 public:
@@ -76,47 +70,14 @@ public:
     CHIP_ERROR mHandleStopMotionResult = CHIP_NO_ERROR;
 };
 
-// Exposes the protected `SetType` / `SetEndProductType` setters so the tests can
-// exercise the RAM-backed attributes that are normally only written during
-// application integration (they have no Interaction Model write path).
+// Exposes the protected `SetType` / `SetEndProductType` setters, which otherwise have no
+// Interaction Model write path and are only set during application integration.
 class TestableWindowCoveringCluster : public WindowCoveringCluster
 {
 public:
     using WindowCoveringCluster::SetEndProductType;
     using WindowCoveringCluster::SetType;
     using WindowCoveringCluster::WindowCoveringCluster;
-};
-
-// ---------------------------------------------------------------------------
-// Test harness
-// ---------------------------------------------------------------------------
-//
-// Bundles together the three collaborators every test needs: the mock delegate,
-// the cluster under test, and a ClusterTester.
-//
-// The single most important detail here is Startup(): the cluster is started
-// with the ClusterTester's OWN ServerClusterContext. ClusterTester embeds its
-// own TestServerClusterContext (storage + attribute-change listener). If the
-// cluster were started with a *different* context, then:
-//   * NotifyAttributeChanged() would post dirty paths to a listener the tester
-//     cannot see, so tester.GetDirtyList() would always be empty, and
-//   * setter persistence would write to a different storage than the tester's.
-// Wiring both to the same context is what makes the dirty-list and persistence
-// assertions meaningful.
-struct WindowCoveringHarness
-{
-    MockWindowCoveringDelegate delegate;
-    TestableWindowCoveringCluster cluster;
-    ClusterTester tester;
-
-    WindowCoveringHarness(BitFlags<Feature> features, const WindowCovering::OptionalAttributeSet & optionals = {}) :
-        cluster(kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(features).WithOptionalAttributes(optionals)),
-        tester(cluster)
-    {}
-
-    CHIP_ERROR Startup() { return cluster.Startup(tester.GetServerClusterContext()); }
-
-    ~WindowCoveringHarness() { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 };
 
 struct TestWindowCoveringCluster : public ::testing::Test
@@ -127,38 +88,26 @@ struct TestWindowCoveringCluster : public ::testing::Test
 
 } // namespace
 
-// ===========================================================================
-// 1. Lifecycle
-// ===========================================================================
-
-// The most basic contract: a validly configured cluster starts and stops
-// cleanly. This is also a guard against the constructor's VerifyOrDie feature
-// validation regressing (Lift/Tilt required, PositionAware* imply Lift/Tilt).
 TEST_F(TestWindowCoveringCluster, StartupShutdown)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    EXPECT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 2. Attribute metadata verification (Attributes())
-// ===========================================================================
-//
-// Attributes() must reflect the negotiated feature map and optional-attribute
-// set exactly, because the Interaction Model uses this list to gate every read
-// and write. IsAttributesListEqualTo() automatically folds in the mandatory
-// global attributes (FeatureMap, ClusterRevision, ...), so the expected list
-// only needs to enumerate the cluster-specific mandatory + conditional entries.
-
-// Baseline: with a single feature and no optional attributes, only the five
-// mandatory attributes (plus globals) are exposed. This pins down the floor of
-// the attribute set so accidental additions are caught.
 TEST_F(TestWindowCoveringCluster, AttributesList_LiftOnly)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::Type::kMetadataEntry,
                                             Attributes::ConfigStatus::kMetadataEntry,
@@ -166,16 +115,20 @@ TEST_F(TestWindowCoveringCluster, AttributesList_LiftOnly)
                                             Attributes::EndProductType::kMetadataEntry,
                                             Attributes::Mode::kMetadataEntry,
                                         }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// PositionAwareLift must pull in exactly the lift Percent100ths pair
-// (Target + Current) and nothing on the tilt side.
+// PositionAwareLift pulls in exactly the lift Percent100ths pair (Target + Current), nothing on tilt.
 TEST_F(TestWindowCoveringCluster, AttributesList_PositionAwareLift)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::Type::kMetadataEntry,
                                             Attributes::ConfigStatus::kMetadataEntry,
@@ -185,15 +138,20 @@ TEST_F(TestWindowCoveringCluster, AttributesList_PositionAwareLift)
                                             Attributes::TargetPositionLiftPercent100ths::kMetadataEntry,
                                             Attributes::CurrentPositionLiftPercent100ths::kMetadataEntry,
                                         }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Symmetric case: PositionAwareTilt pulls in the tilt Percent100ths pair only.
 TEST_F(TestWindowCoveringCluster, AttributesList_PositionAwareTilt)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kTilt, Feature::kPositionAwareTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kTilt, Feature::kPositionAwareTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::Type::kMetadataEntry,
                                             Attributes::ConfigStatus::kMetadataEntry,
@@ -203,13 +161,11 @@ TEST_F(TestWindowCoveringCluster, AttributesList_PositionAwareTilt)
                                             Attributes::TargetPositionTiltPercent100ths::kMetadataEntry,
                                             Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry,
                                         }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Fully-loaded case: both position-aware features plus every optional attribute.
-// This verifies that feature-gated attributes and OptionalAttributeSet-gated
-// attributes coexist and that the OptionalAttributeSet is built correctly with
-// the checked `.Set<Id>()` API (passing an Id to the uint32_t constructor would
-// silently be interpreted as a raw bitmask and drop attributes).
+// Both position-aware features plus every optional attribute: feature-gated and
+// OptionalAttributeSet-gated attributes must coexist correctly.
 TEST_F(TestWindowCoveringCluster, AttributesList_AllFeaturesAndOptionals)
 {
     WindowCovering::OptionalAttributeSet optionals;
@@ -219,11 +175,17 @@ TEST_F(TestWindowCoveringCluster, AttributesList_AllFeaturesAndOptionals)
         .Set<Attributes::CurrentPositionTiltPercentage::Id>()
         .Set<Attributes::SafetyStatus::Id>();
 
-    WindowCoveringHarness h(
-        BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift, Feature::kPositionAwareTilt }, optionals);
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate)
+            .WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift,
+                                              Feature::kPositionAwareTilt })
+            .WithOptionalAttributes(optionals));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAttributesListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::Type::kMetadataEntry,
                                             Attributes::ConfigStatus::kMetadataEntry,
@@ -240,51 +202,55 @@ TEST_F(TestWindowCoveringCluster, AttributesList_AllFeaturesAndOptionals)
                                             Attributes::TargetPositionTiltPercent100ths::kMetadataEntry,
                                             Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry,
                                         }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
-
-// ===========================================================================
-// 3. Accepted command verification (AcceptedCommands())
-// ===========================================================================
-//
-// The three motion commands are always accepted. GoToLiftPercentage is only
-// accepted when Lift is present and GoToTiltPercentage only when Tilt is
-// present. Each combination is asserted independently so a wrong gating
-// condition on either command is caught.
 
 TEST_F(TestWindowCoveringCluster, AcceptedCommands_LiftOnly)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
                                                   Commands::UpOrOpen::kMetadataEntry,
                                                   Commands::DownOrClose::kMetadataEntry,
                                                   Commands::StopMotion::kMetadataEntry,
                                                   Commands::GoToLiftPercentage::kMetadataEntry,
                                               }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWindowCoveringCluster, AcceptedCommands_TiltOnly)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
                                                   Commands::UpOrOpen::kMetadataEntry,
                                                   Commands::DownOrClose::kMetadataEntry,
                                                   Commands::StopMotion::kMetadataEntry,
                                                   Commands::GoToTiltPercentage::kMetadataEntry,
                                               }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWindowCoveringCluster, AcceptedCommands_LiftAndTilt)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(h.cluster,
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
                                                   Commands::UpOrOpen::kMetadataEntry,
                                                   Commands::DownOrClose::kMetadataEntry,
@@ -292,314 +258,332 @@ TEST_F(TestWindowCoveringCluster, AcceptedCommands_LiftAndTilt)
                                                   Commands::GoToLiftPercentage::kMetadataEntry,
                                                   Commands::GoToTiltPercentage::kMetadataEntry,
                                               }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 4. Read attribute tests
-// ===========================================================================
-
-// Every mandatory attribute must be readable and return its documented default
-// after a fresh Startup. Reading through ClusterTester also exercises the real
-// IM path (it refuses to read anything absent from Attributes()), so this also
-// confirms the mandatory attributes are actually advertised. FeatureMap is read
-// to confirm the negotiated features round-trip through the encoder.
 TEST_F(TestWindowCoveringCluster, ReadMandatoryDefaults)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     Type type{};
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::Type::Id, type), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Type::Id, type), CHIP_NO_ERROR);
     EXPECT_EQ(type, Type()); // default-constructed enum == kRollerShade (0)
 
     EndProductType productType{};
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::EndProductType::Id, productType), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::EndProductType::Id, productType), CHIP_NO_ERROR);
     EXPECT_EQ(productType, EndProductType());
 
     chip::BitMask<ConfigStatus> configStatus{};
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::ConfigStatus::Id, configStatus), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ConfigStatus::Id, configStatus), CHIP_NO_ERROR);
     EXPECT_EQ(configStatus.Raw(), 0);
 
     chip::BitMask<OperationalStatus> opStatus{};
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::OperationalStatus::Id, opStatus), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::OperationalStatus::Id, opStatus), CHIP_NO_ERROR);
     EXPECT_EQ(opStatus.Raw(), 0);
 
     chip::BitMask<Mode> mode{};
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
     EXPECT_EQ(mode.Raw(), 0);
 
     BitFlags<Feature> featureMap;
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_TRUE(featureMap.HasAll(Feature::kLift, Feature::kTilt));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Optional attributes are readable only when enabled. Here the two
-// NumberOfActuations counters are enabled and must read back their default (0).
 TEST_F(TestWindowCoveringCluster, ReadEnabledOptionalDefaults)
 {
     WindowCovering::OptionalAttributeSet optionals;
     optionals.Set<Attributes::NumberOfActuationsLift::Id>().Set<Attributes::NumberOfActuationsTilt::Id>();
 
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kTilt }, optionals);
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate)
+                             .WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt })
+                             .WithOptionalAttributes(optionals));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint16_t actuationsLift = 0xFFFF;
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift), CHIP_NO_ERROR);
     EXPECT_EQ(actuationsLift, 0u);
 
     uint16_t actuationsTilt = 0xFFFF;
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::NumberOfActuationsTilt::Id, actuationsTilt), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::NumberOfActuationsTilt::Id, actuationsTilt), CHIP_NO_ERROR);
     EXPECT_EQ(actuationsTilt, 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// A disabled optional attribute must not be readable: the IM (and therefore
-// ClusterTester) rejects it as UnsupportedAttribute because it is absent from
-// Attributes(). This is the exact failure mode that the previous test suite hit
-// by trying to read NumberOfActuations without enabling it.
+// A disabled optional attribute is absent from Attributes(), so the IM (and therefore
+// ClusterTester) rejects reading it as UnsupportedAttribute.
 TEST_F(TestWindowCoveringCluster, ReadDisabledOptionalIsUnsupported)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint16_t actuationsLift = 0;
-    EXPECT_EQ(h.tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift), Status::UnsupportedAttribute);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Nullable persistent attributes must round-trip both a concrete value and null
-// through the read path. CurrentPositionLiftPercent100ths starts null, accepts a
-// concrete value, and can be reset back to null.
 TEST_F(TestWindowCoveringCluster, ReadNullablePositionRoundTrip)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     NPercent100ths value;
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
     EXPECT_TRUE(value.IsNull()); // default is null
 
-    h.cluster.SetCurrentPositionLiftPercent100ths(NPercent100ths(4200));
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
+    cluster.SetCurrentPositionLiftPercent100ths(NPercent100ths(4200));
+    ASSERT_EQ(tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
     ASSERT_FALSE(value.IsNull());
     EXPECT_EQ(value.Value(), 4200);
 
-    h.cluster.SetCurrentPositionLiftPercent100ths(NPercent100ths()); // back to null
-    ASSERT_EQ(h.tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
+    cluster.SetCurrentPositionLiftPercent100ths(NPercent100ths()); // back to null
+    ASSERT_EQ(tester.ReadAttribute(Attributes::CurrentPositionLiftPercent100ths::Id, value), CHIP_NO_ERROR);
     EXPECT_TRUE(value.IsNull());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 5. Write / setter boundary tests
-// ===========================================================================
-
-// Mode is the only Interaction-Model-writable attribute. The spec constrains it
-// to the low nibble (bits 0..3), so raw values <= 0x0F are accepted and anything
-// above must be rejected with ConstraintError. Boundary values (0x00 and 0x0F)
-// are explicitly exercised.
+// Mode is constrained to the low nibble (bits 0..3); raw values <= 0x0F are accepted,
+// anything above is rejected with ConstraintError.
 TEST_F(TestWindowCoveringCluster, WriteMode_ValidAndConstraint)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     chip::BitMask<Mode> minValue;
     minValue.SetRaw(0x00);
-    EXPECT_EQ(h.tester.WriteAttribute(Attributes::Mode::Id, minValue), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::Mode::Id, minValue), CHIP_NO_ERROR);
 
     chip::BitMask<Mode> maxValid;
     maxValid.SetRaw(0x0F);
-    EXPECT_EQ(h.tester.WriteAttribute(Attributes::Mode::Id, maxValid), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::Mode::Id, maxValid), CHIP_NO_ERROR);
 
     chip::BitMask<Mode> tooLarge;
     tooLarge.SetRaw(0x10);
-    EXPECT_EQ(h.tester.WriteAttribute(Attributes::Mode::Id, tooLarge), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::Mode::Id, tooLarge), Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Writing Mode derives ConfigStatus (operational + reversal bits). A fresh value
-// marks both Mode and ConfigStatus dirty; re-writing the same value is a no-op
-// that must not mark anything dirty (the SetAttributeValue no-op guard). This is
-// the canonical "new value -> dirty, same value -> clean" pair for the write path.
+// Writing Mode derives ConfigStatus; a changed value marks both dirty, a no-op write marks neither.
 TEST_F(TestWindowCoveringCluster, WriteMode_DirtyAndNoOp)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    auto & dirtyList = h.tester.GetDirtyList();
+    auto & dirtyList = tester.GetDirtyList();
 
     chip::BitMask<Mode> mode;
     mode.Set(Mode::kLedFeedback);
-    ASSERT_EQ(h.tester.WriteAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
 
-    // Mode changed 0 -> kLedFeedback and ConfigStatus changed 0 -> kOperational.
-    EXPECT_TRUE(h.tester.IsAttributeDirty(Attributes::Mode::Id));
-    EXPECT_TRUE(h.tester.IsAttributeDirty(Attributes::ConfigStatus::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::Mode::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ConfigStatus::Id));
     EXPECT_EQ(dirtyList.size(), 2u);
 
     dirtyList.clear();
 
-    // Re-writing the identical value is a no-op and must not re-notify.
-    ASSERT_EQ(h.tester.WriteAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
     EXPECT_TRUE(dirtyList.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// The persistent counters are exposed only via C++ setters (no IM write path).
-// They must follow the same dirty/no-op discipline: a changed value notifies,
-// an unchanged value does not.
 TEST_F(TestWindowCoveringCluster, SetterDirtyAndNoOp)
 {
     WindowCovering::OptionalAttributeSet optionals;
     optionals.Set<Attributes::NumberOfActuationsLift::Id>();
 
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift }, optionals);
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate)
+                             .WithFeatures(BitFlags<Feature>{ Feature::kLift })
+                             .WithOptionalAttributes(optionals));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    auto & dirtyList = h.tester.GetDirtyList();
+    auto & dirtyList = tester.GetDirtyList();
 
-    h.cluster.SetNumberOfActuationsLift(5);
-    EXPECT_TRUE(h.tester.IsAttributeDirty(Attributes::NumberOfActuationsLift::Id));
-    EXPECT_EQ(h.cluster.GetNumberOfActuationsLift(), 5u);
+    cluster.SetNumberOfActuationsLift(5);
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::NumberOfActuationsLift::Id));
+    EXPECT_EQ(cluster.GetNumberOfActuationsLift(), 5u);
 
     dirtyList.clear();
 
-    h.cluster.SetNumberOfActuationsLift(5); // same value -> no-op
+    cluster.SetNumberOfActuationsLift(5); // same value -> no-op
     EXPECT_TRUE(dirtyList.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 6. Command behavior
-// ===========================================================================
-
-// UpOrOpen and DownOrClose must (a) drive the delegate for every enabled axis
-// and (b) drive the position-aware target attributes to the open (0) and closed
-// (10000) extremes respectively.
 TEST_F(TestWindowCoveringCluster, Command_UpOrOpen_DownOrClose)
 {
-    WindowCoveringHarness h(
-        BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift, Feature::kPositionAwareTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(
+            BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift, Feature::kPositionAwareTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // UpOrOpen -> fully open (minimum).
-    h.delegate.Reset();
-    auto up = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
+    delegate.Reset();
+    auto up = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
     ASSERT_TRUE(up.IsSuccess());
-    EXPECT_EQ(h.delegate.mHandleMovementCallCount, 2); // once for Lift, once for Tilt
-    EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMinOpen);
-    EXPECT_EQ(h.cluster.GetTargetPositionTiltPercent100ths().Value(), kWcPercent100thsMinOpen);
+    EXPECT_EQ(delegate.mHandleMovementCallCount, 2); // once for Lift, once for Tilt
+    EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMinOpen);
+    EXPECT_EQ(cluster.GetTargetPositionTiltPercent100ths().Value(), kWcPercent100thsMinOpen);
 
     // DownOrClose -> fully closed (maximum).
-    h.delegate.Reset();
-    auto down = h.tester.Invoke<Commands::DownOrClose::Type>(Commands::DownOrClose::Type());
+    delegate.Reset();
+    auto down = tester.Invoke<Commands::DownOrClose::Type>(Commands::DownOrClose::Type());
     ASSERT_TRUE(down.IsSuccess());
-    EXPECT_EQ(h.delegate.mHandleMovementCallCount, 2);
-    EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
-    EXPECT_EQ(h.cluster.GetTargetPositionTiltPercent100ths().Value(), kWcPercent100thsMaxClosed);
+    EXPECT_EQ(delegate.mHandleMovementCallCount, 2);
+    EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
+    EXPECT_EQ(cluster.GetTargetPositionTiltPercent100ths().Value(), kWcPercent100thsMaxClosed);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// StopMotion must delegate to HandleStopMotion(). On a normal (success) stop the
-// targets are snapped to the current position; the delegate call itself is the
-// primary observable effect here.
 TEST_F(TestWindowCoveringCluster, Command_StopMotion)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    h.delegate.Reset();
-    auto result = h.tester.Invoke<Commands::StopMotion::Type>(Commands::StopMotion::Type());
+    delegate.Reset();
+    auto result = tester.Invoke<Commands::StopMotion::Type>(Commands::StopMotion::Type());
     ASSERT_TRUE(result.IsSuccess());
-    EXPECT_EQ(h.delegate.mHandleStopMotionCallCount, 1);
+    EXPECT_EQ(delegate.mHandleStopMotionCallCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// GoToLiftPercentage on a position-aware lift: a value in [0, 10000] is accepted,
-// drives the delegate, and updates the lift target. The boundary values and an
-// out-of-range value (ConstraintError, no delegate call) are all covered.
 TEST_F(TestWindowCoveringCluster, Command_GoToLiftPercentage)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Mid-range value.
     {
         Commands::GoToLiftPercentage::Type cmd;
         cmd.liftPercent100thsValue = 5000;
-        h.delegate.Reset();
-        auto result = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
+        delegate.Reset();
+        auto result = tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
         ASSERT_TRUE(result.IsSuccess());
-        EXPECT_EQ(h.delegate.mHandleMovementCallCount, 1);
-        EXPECT_EQ(h.delegate.mLastMovementType, WindowCoveringType::Lift);
-        EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), 5000);
+        EXPECT_EQ(delegate.mHandleMovementCallCount, 1);
+        EXPECT_EQ(delegate.mLastMovementType, WindowCoveringType::Lift);
+        EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), 5000);
     }
 
     // Boundaries 0 and 10000 are valid.
     {
         Commands::GoToLiftPercentage::Type cmd;
         cmd.liftPercent100thsValue = kWcPercent100thsMaxClosed;
-        auto result                = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
+        auto result                = tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
         ASSERT_TRUE(result.IsSuccess());
-        EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
+        EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
     }
 
     // Above the maximum -> ConstraintError, target unchanged, delegate untouched.
     {
         Commands::GoToLiftPercentage::Type cmd;
         cmd.liftPercent100thsValue = static_cast<Percent100ths>(kWcPercent100thsMaxClosed + 1);
-        h.delegate.Reset();
-        auto result = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
+        delegate.Reset();
+        auto result = tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
         auto statusCode = result.GetStatusCode();
         ASSERT_TRUE(statusCode.has_value());
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
-        EXPECT_EQ(h.delegate.mHandleMovementCallCount, 0);
-        EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
+        EXPECT_EQ(delegate.mHandleMovementCallCount, 0);
+        EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Symmetric coverage for the tilt axis.
 TEST_F(TestWindowCoveringCluster, Command_GoToTiltPercentage)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kTilt, Feature::kPositionAwareTilt });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kTilt, Feature::kPositionAwareTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     {
         Commands::GoToTiltPercentage::Type cmd;
         cmd.tiltPercent100thsValue = 2500;
-        h.delegate.Reset();
-        auto result = h.tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
+        delegate.Reset();
+        auto result = tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
         ASSERT_TRUE(result.IsSuccess());
-        EXPECT_EQ(h.delegate.mHandleMovementCallCount, 1);
-        EXPECT_EQ(h.delegate.mLastMovementType, WindowCoveringType::Tilt);
-        EXPECT_EQ(h.cluster.GetTargetPositionTiltPercent100ths().Value(), 2500);
+        EXPECT_EQ(delegate.mHandleMovementCallCount, 1);
+        EXPECT_EQ(delegate.mLastMovementType, WindowCoveringType::Tilt);
+        EXPECT_EQ(cluster.GetTargetPositionTiltPercent100ths().Value(), 2500);
     }
 
     {
         Commands::GoToTiltPercentage::Type cmd;
         cmd.tiltPercent100thsValue = static_cast<Percent100ths>(kWcPercent100thsMaxClosed + 500);
-        h.delegate.Reset();
-        auto result = h.tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
+        delegate.Reset();
+        auto result = tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
         auto statusCode = result.GetStatusCode();
         ASSERT_TRUE(statusCode.has_value());
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
-        EXPECT_EQ(h.delegate.mHandleMovementCallCount, 0);
+        EXPECT_EQ(delegate.mHandleMovementCallCount, 0);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 7. Motion-lock behavior (Mode -> ConfigStatus -> command gating)
-// ===========================================================================
-//
-// Mode drives the operational bit of ConfigStatus, which in turn gates motion:
-//   * neither maintenance nor calibration set  -> Success (motion allowed)
-//   * maintenance mode                          -> Busy
-//   * calibration mode                          -> Failure
-// Each transition is asserted through an actual UpOrOpen invocation.
+// Mode drives the operational bit of ConfigStatus, which gates motion:
+//   neither maintenance nor calibration -> Success, maintenance -> Busy, calibration -> Failure.
 TEST_F(TestWindowCoveringCluster, MotionLock)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Default mode -> motion allowed.
     {
-        auto result = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
+        auto result = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         EXPECT_TRUE(result.IsSuccess());
     }
 
@@ -607,9 +591,9 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
     {
         chip::BitMask<Mode> maintenance;
         maintenance.Set(Mode::kMaintenanceMode);
-        h.cluster.SetMode(maintenance);
+        cluster.SetMode(maintenance);
 
-        auto result = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
+        auto result = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
         auto statusCode = result.GetStatusCode();
         ASSERT_TRUE(statusCode.has_value());
@@ -621,79 +605,74 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
     {
         chip::BitMask<Mode> calibration;
         calibration.Set(Mode::kCalibrationMode);
-        h.cluster.SetMode(calibration);
+        cluster.SetMode(calibration);
 
-        auto result = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
+        auto result = tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
         auto statusCode = result.GetStatusCode();
         ASSERT_TRUE(statusCode.has_value());
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 8. Delegate interaction edge cases
-// ===========================================================================
-
-// The cluster forwards a StopMotion to the delegate. When the delegate reports
-// CHIP_ERROR_IN_PROGRESS it is signalling "I am still moving, do not snap the
-// target to current"; the cluster must honor that by leaving the target value
-// untouched. A prior GoTo establishes a known, non-current target so we can
-// observe that it is preserved.
+// A CHIP_ERROR_IN_PROGRESS result from HandleStopMotion means "still moving"; the target must
+// not be snapped to the (still null) current position.
 TEST_F(TestWindowCoveringCluster, Delegate_StopMotionInProgressKeepsTarget)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     Commands::GoToLiftPercentage::Type goTo;
     goTo.liftPercent100thsValue = 3000;
-    ASSERT_TRUE(h.tester.Invoke<Commands::GoToLiftPercentage::Type>(goTo).IsSuccess());
-    ASSERT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), 3000);
+    ASSERT_TRUE(tester.Invoke<Commands::GoToLiftPercentage::Type>(goTo).IsSuccess());
+    ASSERT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), 3000);
 
-    h.delegate.mHandleStopMotionResult = CHIP_ERROR_IN_PROGRESS;
-    auto result                        = h.tester.Invoke<Commands::StopMotion::Type>(Commands::StopMotion::Type());
+    delegate.mHandleStopMotionResult = CHIP_ERROR_IN_PROGRESS;
+    auto result                      = tester.Invoke<Commands::StopMotion::Type>(Commands::StopMotion::Type());
     ASSERT_TRUE(result.IsSuccess());
 
-    // Because the delegate reported "in progress", the target is not snapped to
-    // the (still null) current position and keeps its previous value.
-    ASSERT_FALSE(h.cluster.GetTargetPositionLiftPercent100ths().IsNull());
-    EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), 3000);
+    ASSERT_FALSE(cluster.GetTargetPositionLiftPercent100ths().IsNull());
+    EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), 3000);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Documents actual (legacy-preserved) behavior: a failing HandleMovement is
-// logged via LogErrorOnFailure but is NOT propagated to the command caller, and
-// the target state is still committed. This test guards that contract so any
-// future change to failure propagation is a conscious, reviewed decision rather
-// than an accident.
+// A failing HandleMovement is logged only, not propagated to the command caller, and the
+// target state is still committed. Guards this legacy-preserved contract against regression.
 TEST_F(TestWindowCoveringCluster, Delegate_MovementFailureIsNotPropagated)
 {
-    WindowCoveringHarness h(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
-    ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    h.delegate.mHandleMovementResult = CHIP_ERROR_INTERNAL;
+    delegate.mHandleMovementResult = CHIP_ERROR_INTERNAL;
 
     Commands::GoToLiftPercentage::Type cmd;
     cmd.liftPercent100thsValue = 6000;
-    auto result                = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
+    auto result                = tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
 
-    EXPECT_TRUE(result.IsSuccess());                                         // failure swallowed (logged only)
-    EXPECT_EQ(h.delegate.mHandleMovementCallCount, 1);                       // delegate was still called
-    EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), 6000); // target still committed
+    EXPECT_TRUE(result.IsSuccess());                                       // failure swallowed (logged only)
+    EXPECT_EQ(delegate.mHandleMovementCallCount, 1);                       // delegate was still called
+    EXPECT_EQ(cluster.GetTargetPositionLiftPercent100ths().Value(), 6000); // target still committed
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// ===========================================================================
-// 9. Persistence round-trip (reboot simulation)
-// ===========================================================================
-//
-// Persistent attributes must survive a restart while RAM-only attributes must
-// not. A single TestServerClusterContext (and therefore a single backing
-// storage) outlives two successive cluster instances: the first writes values
-// and shuts down, the second starts up against the same storage and must reload
-// the persisted values. Type is RAM-only and must reset to its default.
+// Persistent attributes survive a restart; RAM-only attributes (Type) reset to default.
+// A single TestServerClusterContext outlives two successive cluster instances.
 TEST_F(TestWindowCoveringCluster, PersistenceRoundTrip)
 {
-    TestServerClusterContext sharedContext; // storage survives the inner cluster scopes
+    TestServerClusterContext sharedContext;
     MockWindowCoveringDelegate delegate;
 
     WindowCoveringCluster::Config config(delegate);
@@ -722,8 +701,7 @@ TEST_F(TestWindowCoveringCluster, PersistenceRoundTrip)
         ASSERT_FALSE(cluster.GetCurrentPositionLiftPercent100ths().IsNull());
         EXPECT_EQ(cluster.GetCurrentPositionLiftPercent100ths().Value(), 2500);
 
-        // Type is not persisted -> reset to its default on restart.
-        EXPECT_EQ(cluster.GetType(), Type());
+        EXPECT_EQ(cluster.GetType(), Type()); // not persisted -> reset to default
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
