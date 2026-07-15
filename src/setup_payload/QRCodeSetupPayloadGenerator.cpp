@@ -74,59 +74,17 @@ static CHIP_ERROR populateTLVBits(uint8_t * bits, size_t & offset, const uint8_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfo & info)
+CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, const OptionalQRCodeInfo & info)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (info.type == optionalQRCodeInfoTypeString)
-    {
-        err = writer.PutString(tag, info.data.c_str());
-    }
-    else if (info.type == optionalQRCodeInfoTypeInt32)
-    {
-        err = writer.Put(tag, info.int32);
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
-
-CHIP_ERROR writeTag(TLV::TLVWriter & writer, TLV::Tag tag, OptionalQRCodeInfoExtension & info)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (info.type == optionalQRCodeInfoTypeString || info.type == optionalQRCodeInfoTypeInt32)
-    {
-        err = writeTag(writer, tag, static_cast<OptionalQRCodeInfo &>(info));
-    }
-    else if (info.type == optionalQRCodeInfoTypeInt64)
-    {
-        err = writer.Put(tag, info.int64);
-    }
-    else if (info.type == optionalQRCodeInfoTypeUInt32)
-    {
-        err = writer.Put(tag, info.uint32);
-    }
-    else if (info.type == optionalQRCodeInfoTypeUInt64)
-    {
-        err = writer.Put(tag, info.uint64);
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
+    return info.visitValue([&](const std::string & v) { return writer.PutString(tag, v.c_str()); },
+                           [&](int64_t v) { return writer.Put(tag, v); }, [&](uint64_t v) { return writer.Put(tag, v); });
 }
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart,
                                                                     uint32_t maxLen, size_t & tlvDataLengthInBytes)
 {
-    std::vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
-    std::vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
+    std::vector<OptionalQRCodeInfo> optionalData          = outPayload.getAllOptionalVendorData();
+    std::vector<OptionalQRCodeInfo> optionalExtensionData = outPayload.getAllOptionalExtensionData();
     VerifyOrReturnError(!optionalData.empty() || !optionalExtensionData.empty(), CHIP_NO_ERROR);
 
     TLV::TLVWriter rootWriter;
@@ -136,12 +94,12 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
 
     ReturnErrorOnFailure(rootWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, innerStructureWriter));
 
-    for (OptionalQRCodeInfo info : optionalData)
+    for (const OptionalQRCodeInfo & info : optionalData)
     {
         ReturnErrorOnFailure(writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info));
     }
 
-    for (OptionalQRCodeInfoExtension info : optionalExtensionData)
+    for (const OptionalQRCodeInfo & info : optionalExtensionData)
     {
         ReturnErrorOnFailure(writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info));
     }
@@ -231,18 +189,21 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38RepresentationWithAutoTLVBu
         // Each data item needs a control byte and a context tag.
         size_t size = 2;
 
-        if (item.type == optionalQRCodeInfoTypeString)
-        {
-            // We'll need to encode the string length and then the string data.
-            // Length is at most 8 bytes.
-            size += 8;
-            size += item.data.size();
-        }
-        else
-        {
-            // Integer.  Assume it might need up to 8 bytes, for simplicity.
-            size += 8;
-        }
+        size += item.visitValue(
+            [](const std::string & v) -> size_t {
+                // We'll need to encode the string length and then the string data.
+                // Length is at most 8 bytes.
+                return 8 + v.size();
+            },
+            [](int64_t) -> size_t {
+                // Integer.  Assume it might need up to 8 bytes, for simplicity.
+                return 8;
+            },
+            [](uint64_t) -> size_t {
+                // Integer.  Assume it might need up to 8 bytes, for simplicity.
+                return 8;
+            });
+
         return size;
     };
 
