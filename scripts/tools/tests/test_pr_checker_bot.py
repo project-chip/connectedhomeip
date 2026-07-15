@@ -29,13 +29,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import (  # noqa: E402
-    ELIGIBILITY_COMMENT_MARKER,
-    PrCheckerBot,
-    PRContext,
-    UnresolvedThread,
-    ValidationCheck,
-)
+from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, UnresolvedThread, ValidationCheck  # noqa: E402
 
 
 class TestPrCheckerBot(unittest.TestCase):
