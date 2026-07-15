@@ -11,7 +11,7 @@
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions o,and
+ *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
 
@@ -32,7 +32,7 @@ namespace {
 /*
  * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
- * Range Out -> from outputLowValue to outputtHighValue
+ * Range Out -> from outputLowValue to outputHighValue
  */
 uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
                       uint16_t value)
@@ -476,21 +476,30 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::GetMotionLoc
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 {
-
     if (limits.open > limits.closed)
+    {
         return LimitStatus::Inverted;
+    }
 
     if (position == limits.open)
+    {
         return LimitStatus::IsUpOrOpen;
+    }
 
     if (position == limits.closed)
+    {
         return LimitStatus::IsDownOrClose;
+    }
 
     if ((limits.open > 0) && (position < limits.open))
+    {
         return LimitStatus::IsPastUpOrOpen;
+    }
 
     if ((limits.closed > 0) && (position > limits.closed))
+    {
         return LimitStatus::IsPastDownOrClose;
+    }
 
     return LimitStatus::Intermediate;
 }

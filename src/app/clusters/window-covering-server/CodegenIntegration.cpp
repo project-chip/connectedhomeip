@@ -364,10 +364,14 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
     configStatus.Set(ConfigStatus::kTiltPositionAware, cluster->GetFeatureMap().Has(Feature::kPositionAwareTilt));
 
     if (!cluster->GetFeatureMap().Has(Feature::kPositionAwareLift))
+    {
         configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
+    }
 
     if (!cluster->GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
         configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
+    }
 
     ConfigStatusSet(endpoint, configStatus);
 }
@@ -410,7 +414,6 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<Operatio
     if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
     {
         status.SetField(field, static_cast<uint8_t>(state));
-        status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
 
         /* Global Always follow Lift by priority or therefore fallback to Tilt */
         chip::BitMask<OperationalStatus> opGlobal =
@@ -566,12 +569,14 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
         }
         break;
     default:
-        // nothing to do we keep previous value, simple passthrought
+        // nothing to do we keep previous value, simple passthrough
         break;
     }
 
     if (percent100ths > kWcPercent100thsMaxClosed)
+    {
         return kWcPercent100thsMaxClosed;
+    }
 
     return percent100ths;
 }
