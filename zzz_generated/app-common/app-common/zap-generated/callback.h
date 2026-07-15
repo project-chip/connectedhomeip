@@ -8155,18 +8155,6 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 /**
- * @brief Dynamic Lighting Cluster StartEffect Command callback (from client)
- */
-bool emberAfDynamicLightingClusterStartEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DynamicLighting::Commands::StartEffect::DecodableType & commandData);
-/**
- * @brief Dynamic Lighting Cluster StopEffect Command callback (from client)
- */
-bool emberAfDynamicLightingClusterStopEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DynamicLighting::Commands::StopEffect::DecodableType & commandData);
-/**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
 bool emberAfChannelClusterChangeChannelCallback(
@@ -8399,6 +8387,12 @@ bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * command
 bool emberAfAccountLoginClusterLogoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
+/**
+ * @brief Account Login Cluster GetDeviceAuthURI Command callback (from client)
+ */
+bool emberAfAccountLoginClusterGetDeviceAuthURICallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::DecodableType & commandData);
 /**
  * @brief Content Control Cluster UpdatePIN Command callback (from client)
  */

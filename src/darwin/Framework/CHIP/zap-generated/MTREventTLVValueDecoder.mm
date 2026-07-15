@@ -3265,6 +3265,33 @@ static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::
 
         return value;
     }
+    case Events::MessageNotPresented::Id: {
+        Events::MessageNotPresented::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMessagesClusterMessageNotPresentedEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.messageID);
+            value.messageID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.removedFromQueue];
+            value.removedFromQueue = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Messages event.
         break;
@@ -5151,17 +5178,17 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     } else {
                         newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                     }
-                    if (entry_0.contributorName.HasValue()) {
+                    if (entry_0.contributorName.IsNull()) {
+                        newElement_0.contributorName = nil;
+                    } else {
                         newElement_0.contributorName = AsString(entry_0.contributorName.Value());
                         if (newElement_0.contributorName == nil) {
                             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                             *aError = err;
                             return nil;
                         }
-                    } else {
-                        newElement_0.contributorName = nil;
                     }
-                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5204,17 +5231,17 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                     } else {
                         newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                     }
-                    if (entry_0.contributorName.HasValue()) {
+                    if (entry_0.contributorName.IsNull()) {
+                        newElement_0.contributorName = nil;
+                    } else {
                         newElement_0.contributorName = AsString(entry_0.contributorName.Value());
                         if (newElement_0.contributorName == nil) {
                             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                             *aError = err;
                             return nil;
                         }
-                    } else {
-                        newElement_0.contributorName = nil;
                     }
-                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5242,32 +5269,14 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
             NSArray * _Nonnull memberValue;
             { // Scope for our temporary variables
                 auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.statusChangedContributor.begin();
+                auto iter_0 = cppValue.contributorStatusChange.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAmbientSensingUnionClusterUnionContributorStruct * newElement_0;
-                    newElement_0 = [MTRAmbientSensingUnionClusterUnionContributorStruct new];
-                    if (entry_0.contributorNodeID.IsNull()) {
-                        newElement_0.contributorNodeID = nil;
-                    } else {
-                        newElement_0.contributorNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.contributorNodeID.Value()];
-                    }
-                    if (entry_0.contributorEndpointID.IsNull()) {
-                        newElement_0.contributorEndpointID = nil;
-                    } else {
-                        newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
-                    }
-                    if (entry_0.contributorName.HasValue()) {
-                        newElement_0.contributorName = AsString(entry_0.contributorName.Value());
-                        if (newElement_0.contributorName == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                            *aError = err;
-                            return nil;
-                        }
-                    } else {
-                        newElement_0.contributorName = nil;
-                    }
-                    newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                    MTRAmbientSensingUnionClusterContributorStatusChangeStruct * newElement_0;
+                    newElement_0 = [MTRAmbientSensingUnionClusterContributorStatusChangeStruct new];
+                    newElement_0.contributorIndex = [NSNumber numberWithUnsignedChar:entry_0.contributorIndex];
+                    newElement_0.previousContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.previousContributorStatus)];
+                    newElement_0.currentContributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.currentContributorStatus)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -5277,7 +5286,7 @@ static id _Nullable DecodeEventPayloadForAmbientSensingUnionCluster(EventId aEve
                 }
                 memberValue = array_0;
             }
-            value.statusChangedContributor = memberValue;
+            value.contributorStatusChange = memberValue;
         } while (0);
 
         return value;

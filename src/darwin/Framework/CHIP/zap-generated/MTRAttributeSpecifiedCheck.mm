@@ -3057,6 +3057,12 @@ static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
     case Attributes::ActiveMessageIDs::Id: {
         return YES;
     }
+    case Attributes::SupportedLanguageCodes::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMimeTypes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6401,6 +6407,9 @@ static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::OAuthLoggedIn::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
