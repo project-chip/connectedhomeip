@@ -83,6 +83,17 @@ realtek:
     - "config/ameba/**"
     - "scripts/tools/realtek/**"
 
+stm32:
+  maintainers:
+    - STYoannZamaron
+    - Pierre-B-GHub
+  paths:
+    - "src/platform/stm32/**"
+    - "examples/platform/stm32/**"
+    - "examples/**/stm32/**"
+    - "config/stm32/**"
+    - "third_party/st/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -143,15 +154,7 @@ realtek:
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
-# 
-# stm32:
-#   maintainers:
-#     - STYoannZamaron
-#   paths:
-#     - "src/platform/stm32/**"
-#     - "examples/platform/stm32/**"
-#     - "examples/**/stm32/**"
-#     - "config/stm32/**"
+#
 # 
 # webos:
 #   maintainers:
