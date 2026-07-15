@@ -299,7 +299,7 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateMatterContributorStatus(NodeId node
     }
 
     auto previousStatus = entry->status;
-    entry->status = status;
+    entry->status       = status;
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorStatusChangedEvent(*entry, previousStatus);
@@ -375,7 +375,7 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateNonMatterContributorStatus(const Ch
     }
 
     auto previousStatus = entry->status;
-    entry->status = status;
+    entry->status       = status;
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorStatusChangedEvent(*entry, previousStatus);
@@ -414,9 +414,8 @@ void AmbientSensingUnionCluster::EmitContributorRemovedEvent(const ContributorEn
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(
-    const ContributorEntry & entry,
-    AmbientSensingUnion::UnionContributorStatusEnum previousStatus)
+void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(const ContributorEntry & entry,
+                                                                   AmbientSensingUnion::UnionContributorStatusEnum previousStatus)
 {
     VerifyOrReturn(mContext != nullptr);
 
@@ -436,7 +435,7 @@ void AmbientSensingUnionCluster::EmitContributorStatusChangedEvent(
     }
 
     AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type statusChange;
-    statusChange.contributorIndex         = contributorIndex;
+    statusChange.contributorIndex          = contributorIndex;
     statusChange.previousContributorStatus = previousStatus;
     statusChange.currentContributorStatus  = entry.status;
 
