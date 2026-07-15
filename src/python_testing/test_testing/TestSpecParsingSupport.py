@@ -587,6 +587,88 @@ class TestSpecParsingSupport(MatterBaseTest):
             asserts.assert_equal(ClusterParser._is_scene_attribute(element), expected,
                                  f"Unexpected scene quality parsed from '{attribute_xml}'")
 
+    def test_command_field_parsing(self):
+        # Synthetic cluster with one command exercising the constraint vocabulary
+        # used by command fields in the spec XML: exact length via <allowed>,
+        # min/max length, between with numeric bounds, and an attribute reference.
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory>'
+            '    <revision revision="1" summary="Initial version"/>'
+            '  </revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="ExactLengthKey" type="octstr">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="BoundedName" type="string">'
+            '        <optionalConform/>'
+            '        <constraint><maxLength value="32"/></constraint>'
+            '      </field>'
+            '      <field id="2" name="BoundedNumber" type="uint16">'
+            '        <mandatoryConform/>'
+            '        <quality nullable="true"/>'
+            '        <constraint><between><from value="1"/><to value="100"/></between></constraint>'
+            '      </field>'
+            '      <field id="3" name="RefBounded" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to><attribute name="MaxThing"/></to></between></constraint>'
+            '      </field>'
+            '      <field id="4" name="Unconstrained" type="uint64">'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        xml_cluster = parse_cluster(command_xml)
+        asserts.assert_in(0x00, xml_cluster.accepted_commands, "Cmd not found in accepted commands")
+        fields = xml_cluster.accepted_commands[0x00].fields
+        asserts.assert_equal(sorted(fields.keys()), [0, 1, 2, 3, 4], "Unexpected command field IDs")
+
+        exact = fields[0]
+        asserts.assert_equal(exact.name, "ExactLengthKey", "Unexpected field name")
+        asserts.assert_equal(exact.type_info, "octstr", "Unexpected field type")
+        asserts.assert_equal(exact.constraints.allowed, ["16"], "Expected exact-length allowed constraint")
+
+        bounded_name = fields[1]
+        asserts.assert_true(bounded_name.is_optional, "BoundedName should be optional")
+        asserts.assert_equal(bounded_name.constraints.max_length, 32, "Unexpected max_length")
+
+        bounded_number = fields[2]
+        asserts.assert_true(bounded_number.is_nullable, "BoundedNumber should be nullable")
+        asserts.assert_equal(bounded_number.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(bounded_number.constraints.max_value, 100, "Unexpected max_value")
+
+        ref_bounded = fields[3]
+        asserts.assert_equal(ref_bounded.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_is_none(ref_bounded.constraints.max_value, "max_value should be unresolved (reference)")
+        asserts.assert_equal(ref_bounded.constraints.max_value_ref.attribute, "MaxThing", "Unexpected max_value_ref")
+
+        asserts.assert_is_none(fields[4].constraints, "Unconstrained field should have no constraints")
+
+    def test_command_field_parsing_prebuilt_data_model(self):
+        # Spot-check two constraints that exist on every root node in the real
+        # data model: TestEventTrigger.EnableKey (exact length 16 octstr) and
+        # SetRegulatoryConfig.CountryCode (exact length 2 string).
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+
+        test_event_trigger = clusters[Clusters.GeneralDiagnostics.id].accepted_commands[
+            Clusters.GeneralDiagnostics.Commands.TestEventTrigger.command_id]
+        enable_key = next(f for f in test_event_trigger.fields.values() if f.name == "EnableKey")
+        asserts.assert_equal(enable_key.type_info, "octstr", "Unexpected EnableKey type")
+        asserts.assert_equal(enable_key.constraints.allowed, ["16"], "Unexpected EnableKey constraint")
+
+        set_regulatory_config = clusters[Clusters.GeneralCommissioning.id].accepted_commands[
+            Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig.command_id]
+        country_code = next(f for f in set_regulatory_config.fields.values() if f.name == "CountryCode")
+        asserts.assert_equal(country_code.type_info, "string", "Unexpected CountryCode type")
+        asserts.assert_equal(country_code.constraints.allowed, ["2"], "Unexpected CountryCode constraint")
+
     def test_scene_attribute_end_to_end(self):
         # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
         # other attributes carry scene="false".
