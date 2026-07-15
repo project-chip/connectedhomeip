@@ -155,7 +155,6 @@ stm32:
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
 #
-# 
 # webos:
 #   maintainers:
 #     - joonhaengHeo
