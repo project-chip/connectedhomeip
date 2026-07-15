@@ -82,7 +82,8 @@ class TC_IDM_4_3(IDMBaseTest):
 
     def steps_TC_IDM_4_3(self):
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     "DUT is commissioned to TH.", is_commissioning=True),
             TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
                      "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
             TestStep(2, "Activate the subscription between the DUT and the TH for an attribute. Change the value of the attribute which has been subscribed on the DUT by sending a Write command from the TH.",
