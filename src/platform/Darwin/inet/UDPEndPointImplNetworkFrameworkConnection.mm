@@ -166,10 +166,10 @@ namespace Inet {
         {
             __auto_type onTimeout = ^{
                 ChipLogDetail(Inet, "Connection: Timeout");
-                nw_connection_cancel(connection);
+                WaitForConnectionStateCancelled(connection);
                 RemoveConnectionWrapper(connection);
             };
-            __auto_type wrapper = new ConnectionWrapper(connection, mConnectionQueue, onTimeout);
+            __auto_type wrapper = new ConnectionWrapper(connection, dispatch_get_current_queue(), onTimeout);
             VerifyOrReturnError(nullptr != wrapper, CHIP_ERROR_NO_MEMORY);
 
             CFDictionarySetValue(mConnections, (__bridge const void *) connection, wrapper);
