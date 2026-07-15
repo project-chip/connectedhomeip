@@ -87,14 +87,15 @@ public:
             {
                 dest.contributorNodeID.SetNonNull(nodeId);
                 dest.contributorEndpointID.SetNonNull(endpointId);
+                dest.contributorName.SetNull();
             }
             else
             {
                 dest.contributorNodeID.SetNull();
                 dest.contributorEndpointID.SetNull();
-                dest.contributorName.SetValue(GetName());
+                dest.contributorName.SetNonNull(GetName());
             }
-            dest.contributorHealth = status;
+            dest.contributorStatus = status;
         }
     };
 
@@ -169,7 +170,8 @@ private:
 
     void EmitContributorAddedEvent(const ContributorEntry & entry);
     void EmitContributorRemovedEvent(const ContributorEntry & entry);
-    void EmitContributorStatusChangedEvent(const ContributorEntry & entry);
+    void EmitContributorStatusChangedEvent(const ContributorEntry & entry,
+                                           AmbientSensingUnion::UnionContributorStatusEnum previousStatus);
 
     CHIP_ERROR EncodeContributorList(AttributeValueEncoder & encoder);
 

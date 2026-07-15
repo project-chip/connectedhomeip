@@ -737,7 +737,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorRemovedEvent)
 
 TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorStatusChangedEvent)
 {
-
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(
         AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
@@ -756,10 +755,19 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionContributorStatusChangedEvent)
     {
         EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
 
-        auto iter = decodedEvent.statusChangedContributor.begin();
+        auto iter = decodedEvent.contributorStatusChange.begin();
         ASSERT_TRUE(iter.Next());
-        const auto & contributor = iter.GetValue();
-        EXPECT_EQ(contributor.contributorHealth, UnionContributorStatusEnum::kUnionContributorOffline);
+        const auto & statusChange = iter.GetValue();
+
+        // Verify contributor index (first and only contributor, so index 0)
+        EXPECT_EQ(statusChange.contributorIndex, 0u);
+
+        // Verify previous status (was Online)
+        EXPECT_EQ(statusChange.previousContributorStatus, UnionContributorStatusEnum::kUnionContributorOnline);
+
+        // Verify current status (now Offline)
+        EXPECT_EQ(statusChange.currentContributorStatus, UnionContributorStatusEnum::kUnionContributorOffline);
+
         EXPECT_FALSE(iter.Next());
     }
     else
@@ -892,7 +900,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyUnionHealth)
 
 TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyContributorList)
 {
-
     auto cluster = std::make_unique<AmbientSensingUnionCluster>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
@@ -900,7 +907,8 @@ TEST_F(TestAmbientSensingUnionCluster, TestWriteReadOnlyContributorList)
     Structs::UnionContributorStruct::Type contributor;
     contributor.contributorNodeID.SetNonNull(kTestNodeId1);
     contributor.contributorEndpointID.SetNonNull(kContributorEp1);
-    contributor.contributorHealth = UnionContributorStatusEnum::kUnionContributorOnline;
+    contributor.contributorName.SetNull();
+    contributor.contributorStatus = UnionContributorStatusEnum::kUnionContributorOnline;
 
     app::DataModel::List<Structs::UnionContributorStruct::Type> contributorList(&contributor, 1);
 
