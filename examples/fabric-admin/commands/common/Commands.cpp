@@ -31,6 +31,10 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(CHIP_CONFIG_KVS_PATH)
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
+#endif
+
 #include "../clusters/JsonParser.h"
 
 namespace {
@@ -64,7 +68,15 @@ template <typename T, std::enable_if_t<HasInitWithString<T>::value, int> = 0>
 static void UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
 {
     std::string platformKVS = std::string(storageDirectory) + "/chip_tool_kvs";
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(CHIP_CONFIG_KVS_PATH)
+    // On Linux, PosixConfig::Init() (called during InitChipStack()) will invoke
+    // KeyValueStoreMgrImpl().Init() with the path from GetStoragePaths(). To avoid a
+    // double-init with a conflicting path (which now returns an error), set the KVS
+    // data file path here so both code paths agree on the same file.
+    chip::DeviceLayer::GetStoragePaths().SetKVSDataFile(platformKVS);
+#else
     TEMPORARY_RETURN_IGNORED storageManagerImpl.Init(platformKVS.c_str());
+#endif
 }
 
 template <typename T, std::enable_if_t<!HasInitWithString<T>::value, int> = 0>
