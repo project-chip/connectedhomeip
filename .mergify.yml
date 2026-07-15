@@ -108,6 +108,17 @@ pull_request_rules:
               labels:
                   - backport-v1.4.2-branch
 
+    - name: Request review for MVE/SVE backports
+      conditions:
+          - author=mergify[bot]
+          - or:
+                - label~=mve-branch
+                - label~=sve-branch
+      actions:
+          request_reviews:
+              users:
+                  - cecille
+
     # Auto-merge backport PRs when CI is green and there are no conflicts.
     # If a cherry-pick has conflicts or CI fails, the PR is left open for manual resolution.
     # WARNING: If the rule name below is changed, you must also update the
@@ -116,7 +127,6 @@ pull_request_rules:
       conditions:
           - or:
                 - label="backport-v1.6.1-branch"
-                - label="backport-v1.6.1-mve-branch"
                 - label="backport-v1.6-branch"
                 - label="backport-v1.5-branch"
                 - label="backport-v1.4.2-branch"
