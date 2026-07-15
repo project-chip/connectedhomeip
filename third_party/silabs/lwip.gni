@@ -17,7 +17,7 @@ import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 declare_args() {
   # Use LwIP from SiSDK if true, otherwise use the modified version from Matter Support.
-  sl_use_sisdk_lwip = false
+  sl_use_sisdk_lwip = true
 }
 
 # Defines a lwIP build target.
