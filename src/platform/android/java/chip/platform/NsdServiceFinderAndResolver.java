@@ -25,7 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.Nullable;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +48,8 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
   private ScheduledFuture<?> stopDiscoveryRunnable;
 
+  private ScheduledExecutorService mBackgroundExecutorService;
+
   public NsdServiceFinderAndResolver(
       final NsdManager nsdManager,
       final NsdServiceInfo targetServiceInfo,
@@ -56,6 +58,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
       final ChipMdnsCallback chipMdnsCallback,
       final MulticastLock multicastLock,
       final ScheduledFuture<?> resolveTimeoutExecutor,
+      final ScheduledExecutorService backgroundExecutorService,
       final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = nsdManager;
     this.targetServiceInfo = targetServiceInfo;
@@ -64,6 +67,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
     this.chipMdnsCallback = chipMdnsCallback;
     this.multicastLock = multicastLock;
     this.resolveTimeoutExecutor = resolveTimeoutExecutor;
+    this.mBackgroundExecutorService = backgroundExecutorService;
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
   }
 
@@ -72,22 +76,20 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
     NsdServiceFinderAndResolver serviceFinderResolver = this;
     this.stopDiscoveryRunnable =
-        Executors.newSingleThreadScheduledExecutor()
-            .schedule(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    Log.d(
-                        TAG,
-                        "Service discovery timed out after " + BROWSE_SERVICE_TIMEOUT_MS + " ms");
-                    nsdManager.stopServiceDiscovery(serviceFinderResolver);
-                    if (multicastLock.isHeld()) {
-                      multicastLock.release();
-                    }
-                  }
-                },
-                BROWSE_SERVICE_TIMEOUT_MS,
-                TimeUnit.MILLISECONDS);
+        mBackgroundExecutorService.schedule(
+            new Runnable() {
+              @Override
+              public void run() {
+                Log.d(
+                    TAG, "Service discovery timed out after " + BROWSE_SERVICE_TIMEOUT_MS + " ms");
+                nsdManager.stopServiceDiscovery(serviceFinderResolver);
+                if (multicastLock.isHeld()) {
+                  multicastLock.release();
+                }
+              }
+            },
+            BROWSE_SERVICE_TIMEOUT_MS,
+            TimeUnit.MILLISECONDS);
 
     this.nsdManager.discoverServices(
         targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
