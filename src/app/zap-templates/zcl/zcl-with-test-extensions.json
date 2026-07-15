@@ -16,6 +16,7 @@
         "ambient-sensing-union-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
+        "audio-control-cluster.xml",
         "audio-output-cluster.xml",
         "av-analysis-cluster.xml",
         "ballast-configuration-cluster.xml",
@@ -34,6 +35,7 @@
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
+        "commissioning-proxy-cluster.xml",
         "commodity-metering-cluster.xml",
         "commodity-price-cluster.xml",
         "commodity-tariff-cluster.xml",
@@ -53,6 +55,7 @@
         "electrical-protection-alarm-cluster.xml",
         "groupcast-cluster.xml",
         "humidistat-cluster.xml",
+        "media-file-management-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "meter-identification-cluster.xml",
@@ -83,6 +86,7 @@
         "joint-fabric-datastore-cluster.xml",
         "joint-fabric-administrator-cluster.xml",
         "keypad-input-cluster.xml",
+        "laundry-washer-controls-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
         "level-control-cluster.xml",
@@ -230,6 +234,12 @@
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
+        "Dynamic Lighting": [
+            "ClusterRevision",
+            "FeatureMap",
+            "CurrentEffectID",
+            "CurrentSpeed"
+        ],
         "Commissioner Control": [
             "SupportedDeviceCategories",
             "FeatureMap",
@@ -260,6 +270,16 @@
             "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
+        ],
+        "Commissioning Proxy": [
+            "Transport",
+            "ScanMaxTime",
+            "MaxSessions",
+            "MaxCachedResults",
+            "NumCachedResults",
+            "CacheTimeout",
+            "CachedResults",
+            "WiFiBand"
         ],
         "Commodity Price": [
             "TariffUnit",
@@ -415,6 +435,13 @@
             "MeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Laundry Washer Controls": [
+            "ClusterRevision",
+            "SpinSpeeds",
+            "SpinSpeedCurrent",
+            "NumberOfRinses",
+            "SupportedRinses"
+        ],
         "Meter Identification": [
             "MeterType",
             "PointOfDelivery",
@@ -582,7 +609,8 @@
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
-            "ActiveTextTrack"
+            "ActiveTextTrack",
+            "ContentInfo"
         ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
@@ -618,6 +646,7 @@
             "ClusterRevision"
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -626,24 +655,30 @@
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "RVC Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [

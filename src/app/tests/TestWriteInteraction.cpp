@@ -169,8 +169,11 @@ public:
     void TestWriteInvalidMessage2();
     void TestWriteInvalidMessage3();
     void TestWriteInvalidMessage4();
+    void TestWriteInvalidMessage5();
+    void TestWriteClientSuppressResponseFlowWithInvalidAttribute();
 
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
+    static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
@@ -242,6 +245,45 @@ void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, Encodi
     attributePathParams.mEndpointId  = kTestEndpointId;
     attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
     attributePathParams.mAttributeId = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+    switch (encoding)
+    {
+    case EncodingMethod::Standard:
+
+        EXPECT_EQ(aWriteClient.EncodeAttribute(attributePathParams, attributeValue), CHIP_NO_ERROR);
+        break;
+
+    case EncodingMethod::PreencodedTLV:
+
+        // Encode AttributeData into TLV
+        uint8_t buffer[5];
+        TLV::TLVWriter writer;
+        writer.Init(buffer, sizeof(buffer));
+        TLV::TLVType outerContainer;
+
+        EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer));
+        EXPECT_EQ(CHIP_NO_ERROR, writer.PutBoolean(TLV::ContextTag(1), attributeValue));
+        EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
+
+        // Put Preencoded Data into AttributeDataIB
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        EXPECT_SUCCESS(reader.Next());
+        EXPECT_EQ(aWriteClient.PutPreencodedAttribute(ConcreteDataAttributePath(attributePathParams.mEndpointId,
+                                                                                attributePathParams.mClusterId,
+                                                                                attributePathParams.mAttributeId),
+                                                      reader),
+                  CHIP_NO_ERROR);
+    }
+}
+
+void TestWriteInteraction::AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding)
+{
+    AttributePathParams attributePathParams;
+    bool attributeValue              = true;
+    attributePathParams.mEndpointId  = kTestEndpointId;
+    attributePathParams.mClusterId   = Clusters::UnitTesting::Id;
+    attributePathParams.mAttributeId = 9999; // Invalid attribute ID
 
     switch (encoding)
     {
@@ -678,6 +720,88 @@ TEST_F(TestWriteInteraction, TestWriteRoundtrip)
         EXPECT_EQ(callback.mOnDoneCalled, 1);
         // By now we should have closed all exchanges and sent all pending acks, so
         // there should be no queued-up things in the retransmit table.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        engine->Shutdown();
+    }
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseFlow)
+{
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+        // Shouldn't have anything in the retransmit table when starting the test.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        TestWriteClientCallback callback;
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
+                  CHIP_NO_ERROR);
+
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                     /* aSuppressResponse = */ true);
+
+        AddAttributeDataIB(writeClient, encodingMethod);
+
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+
+        // Since aSuppressResponse is true, the server will receive the request and suppress the response.
+        // Therefore, no response should be sent back to the client.
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 1);
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        engine->Shutdown();
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseFlowWithInvalidAttribute)
+{
+    for (EncodingMethod encodingMethod : { EncodingMethod::Standard, EncodingMethod::PreencodedTLV })
+    {
+        Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+        // Shouldn't have anything in the retransmit table when starting the test.
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+        TestWriteClientCallback callback;
+        auto * engine = chip::app::InteractionModelEngine::GetInstance();
+        EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()),
+                  CHIP_NO_ERROR);
+
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                     /* aSuppressResponse */ true);
+
+        AddInvalidAttributeDataIB(writeClient, encodingMethod);
+
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+        GetLoopback().mSentMessageCount = 0;
+
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+
+        // Since suppressResponse is true, the server will receive the request, process it, find the attribute is invalid,
+        // but it will suppress any response, including a StatusResponse.
+        // The client's OnDone should be called.
+        EXPECT_EQ(callback.mOnSuccessCalled, 0);
+        EXPECT_EQ(callback.mOnErrorCalled, 0);
+        EXPECT_EQ(callback.mOnDoneCalled, 1);
+
+        // The client sends 1 message (WriteRequest). The server receives it and sends 1 message back (MRP Ack).
+        // No StatusResponse should be sent.
+        EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+
         EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
         engine->Shutdown();
@@ -1128,6 +1252,79 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     // TODO: Check that the server gets the right status..
     // Client sents status report with invalid action, server's exchange has been closed, so it just sends an MRP ack.
     EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+// Write Client sends a chunked write request, receives an unexpected status response message (Busy) after sending the first chunk.
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage5)
+{
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    // Reserve buffer to trigger chunking
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
+
+    app::AttributePathParams attributePath(2, 3, 4);
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
+
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    EXPECT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    EXPECT_SUCCESS(response.Init(&writer));
+    response.Status(Protocols::InteractionModel::Status::Busy);
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+
+    // Since we are dropping packets, things are not getting acked.  Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(*this, writeClient.mExchangeCtx.Get());
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.OnMessageReceived(writeClient.mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
+              CHIP_IM_GLOBAL_STATUS(Busy));
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.mError, CHIP_IM_GLOBAL_STATUS(Busy));
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
 
     engine->Shutdown();
     ExpireSessionAliceToBob();

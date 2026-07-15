@@ -34,6 +34,7 @@ namespace app {
 void WriteClient::Close()
 {
     MoveToState(State::AwaitingDestruction);
+    mExchangeCtx.Release();
 
     if (mpCallback)
     {
@@ -502,7 +503,7 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session->IsGroupSession())
+        if (session->IsGroupSession() || (mSuppressResponse && mState != State::AwaitingTimedStatus))
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");
@@ -533,9 +534,13 @@ CHIP_ERROR WriteClient::SendWriteRequest()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    if (mSuppressResponse)
+    {
+        return mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone);
+    }
+
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
-
     MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }
@@ -545,10 +550,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse &&
-        // We had sent the last chunk of data, and received all responses
-        mChunks.IsNull())
+    if (mState == State::AwaitingResponse)
     {
+        // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
+        //       SendWriteRequest() call below will move back to an AwaitingResponse state
         MoveToState(State::ResponseReceived);
     }
 

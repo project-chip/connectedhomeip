@@ -1811,7 +1811,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2011,7 +2011,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_mounted_dimmable_load_control = 272, version 2;
+  device type ma_mounted_dimmable_load_control = 272, version 3;
 
 
   server cluster Identify {

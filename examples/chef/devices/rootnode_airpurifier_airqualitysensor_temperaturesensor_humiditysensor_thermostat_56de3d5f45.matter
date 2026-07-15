@@ -2763,7 +2763,7 @@ cluster RadonConcentrationMeasurement = 1071 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -2923,7 +2923,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_air_purifier = 45, version 2;
+  device type ma_air_purifier = 45, version 3;
 
 
   server cluster Identify {
@@ -3331,7 +3331,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_thermostat = 769, version 1;
+  device type ma_thermostat = 769, version 7;
 
 
   server cluster Identify {

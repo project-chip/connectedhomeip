@@ -32,9 +32,10 @@ import logging
 import queue
 import threading
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -76,7 +77,7 @@ class EventSubscriptionHandler:
         _q: Internal queue that stores matching EventReadResult objects.
     """
 
-    def __init__(self, *, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
+    def __init__(self, *, expected_cluster: ClusterObjects.Cluster | None = None, expected_cluster_id: int | None = None, expected_event_id: int | None = None):
         is_cluster_mode = expected_cluster is not None
         is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id))
 
@@ -142,7 +143,7 @@ class EventSubscriptionHandler:
         LOGGER.info("Successfully waited for %s", expected_event)
         return res.Data
 
-    def wait_for_event_report_with_duplication(self, expected_event: ClusterObjects.ClusterEvent, current_event_filter_func: Any, previous_event_filter_func: Optional[Any] = None, timeout_sec: float = 10.0) -> Any:
+    def wait_for_event_report_with_duplication(self, expected_event: ClusterObjects.ClusterEvent, current_event_filter_func: Any, previous_event_filter_func: Any | None = None, timeout_sec: float = 10.0) -> Any:
         """
         Blocks waiting for the specific event to arrive within a timeout.
         It filters out leftover events matching previous_event_filter_func until an event
@@ -177,7 +178,7 @@ class EventSubscriptionHandler:
 
         asserts.fail(f"Event reported when not expected {res}")
 
-    def wait_for_event_type_report(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Optional[Any]:
+    def wait_for_event_type_report(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Any | None:
         """
         Waits for a specific event type from the event subscription handler within the timeout period.
 
@@ -203,9 +204,9 @@ class EventSubscriptionHandler:
                 return event.Data
             LOGGER.info("Received other event: %s, ignoring and waiting for %s.", event.Header.EventId, event_type.__name__)
 
-    def get_last_event(self) -> Optional[Any]:
+    def get_last_event(self) -> Any | None:
         """Flush entire queue, returning last (newest) event only."""
-        last_event: Optional[Any] = None
+        last_event: Any | None = None
         while True:
             try:
                 last_event = self._q.get(block=False)
@@ -563,9 +564,9 @@ class AttributeSubscriptionHandler:
         with self._lock:
             return self._attribute_reports.copy()
 
-    def get_last_report(self) -> Optional[Any]:
+    def get_last_report(self) -> Any | None:
         """Flush entire queue, returning last (newest) report only."""
-        last_report: Optional[Any] = None
+        last_report: Any | None = None
         while True:
             try:
                 last_report = self._q.get(block=False)
