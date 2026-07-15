@@ -660,7 +660,6 @@ CHIP_ERROR HumidistatCluster::SetCondPumpEnabled(bool condPumpEnabled)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kCondPump), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
-    const bool wasEnabled = mCondPumpEnabled;
     VerifyOrReturnValue(SetAttributeValue(mCondPumpEnabled, condPumpEnabled, CondPumpEnabled::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
@@ -674,26 +673,45 @@ CHIP_ERROR HumidistatCluster::SetCondPumpEnabled(bool condPumpEnabled)
         mDelegate->OnCondPumpEnabledChanged(mCondPumpEnabled);
     }
 
-    if (!wasEnabled && mCondPumpEnabled)
-    {
-        if (mCondRunCount < std::numeric_limits<uint16_t>::max())
-        {
-            ++mCondRunCount;
-        }
-        if (mContext != nullptr)
-        {
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id),
-                { reinterpret_cast<const uint8_t *>(&mCondRunCount), sizeof(mCondRunCount) }));
-        }
+    return CHIP_NO_ERROR;
+}
 
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnCondRunCountChanged(mCondRunCount);
-        }
+CHIP_ERROR HumidistatCluster::SetCondRunCount(uint16_t condRunCount)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kCondPump), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+    VerifyOrReturnValue(SetAttributeValue(mCondRunCount, condRunCount, CondRunCount::Id), CHIP_NO_ERROR);
+
+    if (mContext != nullptr)
+    {
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id),
+            { reinterpret_cast<const uint8_t *>(&mCondRunCount), sizeof(mCondRunCount) }));
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnCondRunCountChanged(mCondRunCount);
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR HumidistatCluster::ResetCondRunCount()
+{
+    return SetCondRunCount(0);
+}
+
+CHIP_ERROR HumidistatCluster::IncrementCondRunCount()
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kCondPump), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+    if (mCondRunCount == std::numeric_limits<uint16_t>::max())
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    return SetCondRunCount(static_cast<uint16_t>(mCondRunCount + 1));
 }
 
 CHIP_ERROR HumidistatCluster::Attributes(const ConcreteClusterPath & path,
