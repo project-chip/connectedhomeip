@@ -42,19 +42,35 @@ pull_request_rules:
               method: squash
 
     # Backport rules - cherry-pick the squashed master commit after merge.
-    # Apply label request-backport-sve or request-backport-supported on the master PR
-    # (before or after merge) to trigger the corresponding backport.
-    - name: Backport to v1.6-sve-branch
+    # Apply a request-backport-* label (such as request-backport-latest or
+    # request-backport-supported) on the master PR (before or after merge)
+    # to trigger the corresponding backport.
+    - name: Backport to v1.6.1-branch
       conditions:
           - merged
           - base=master
-          - label="request-backport-sve"
+          - or:
+                - label="request-backport-latest"
+                - label="request-backport-latest-mve-sve"
+                - label="request-backport-supported"
       actions:
           backport:
               branches:
-                  - v1.6-sve-branch
+                  - v1.6.1-branch
               labels:
-                  - backport-v1.6-sve-branch
+                  - backport-v1.6.1-branch
+
+    - name: Backport to v1.6.1-mve-branch
+      conditions:
+          - merged
+          - base=master
+          - label="request-backport-latest-mve-sve"
+      actions:
+          backport:
+              branches:
+                  - v1.6.1-mve-branch
+              labels:
+                  - backport-v1.6.1-mve-branch
 
     - name: Backport to v1.6-branch
       conditions:
@@ -99,7 +115,8 @@ pull_request_rules:
     - name: Auto-merge clean backport PRs
       conditions:
           - or:
-                - label="backport-v1.6-sve-branch"
+                - label="backport-v1.6.1-branch"
+                - label="backport-v1.6.1-mve-branch"
                 - label="backport-v1.6-branch"
                 - label="backport-v1.5-branch"
                 - label="backport-v1.4.2-branch"
