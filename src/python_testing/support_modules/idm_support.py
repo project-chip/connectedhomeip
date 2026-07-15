@@ -131,7 +131,7 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # INVALID_COMMAND / NOT_FOUND before TransitionTime is ever consumed. Exercising
     # its constraint therefore requires a stored scene as a precondition.
     # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Scenes.adoc#912-recallscene-command
-    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Commands.RecallScene.command_id),    
+    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Commands.RecallScene.command_id),
     # The Thermostat cluster spec mandates INVALID_COMMAND for a handle that is not
     # present in Presets/Schedules; an out-of-constraint handle is first and foremost
     # an unknown handle, so CONSTRAINT_ERROR cannot be observed without state setup.
