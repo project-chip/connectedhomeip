@@ -65,7 +65,7 @@ class Stream(BaseModel):
     id: int
     strict_mode: bool = True
     interface: SupportedIngestInterface
-    track_name: Optional[str] = None
+    expected_track_names: Optional[list[str]] = None
     # Keep track of the various sessions encountered
     sessions: list[Session] = []
     # tracking uploads with unique file paths
@@ -94,6 +94,6 @@ class SignClientCertificate(BaseModel):
     csr: str
 
 
-class TrackNameRequest(BaseModel):
-    """Request model to update track name for a stream."""
-    track_name: str
+class ExpectedTrackNamesRequest(BaseModel):
+    """Request model to update expected track names for a stream."""
+    expected_track_names: list[str]

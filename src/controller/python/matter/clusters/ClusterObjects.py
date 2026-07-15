@@ -16,9 +16,10 @@
 #
 
 import enum
+import types
 import typing
 from dataclasses import asdict, dataclass, field, make_dataclass
-from typing import Any, ClassVar, Mapping, Union
+from typing import Any, ClassVar, Mapping
 
 from dacite import from_dict  # type: ignore
 
@@ -33,7 +34,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
     '''
-    if typing.get_origin(typeToCheck) != typing.Union:
+    if typing.get_origin(typeToCheck) not in (typing.Union, types.UnionType):
         return None
 
     for t in typing.get_args(typeToCheck):
@@ -158,7 +159,7 @@ class ClusterObjectDescriptor:
                 ret[descriptor.Label] = NullValue
                 continue
 
-            if (typing.get_origin(descriptor.Type) == typing.Union):
+            if (typing.get_origin(descriptor.Type) in (typing.Union, types.UnionType)):
                 realType = GetUnionUnderlyingType(descriptor.Type)
                 if (realType is None):
                     raise ValueError(
@@ -314,7 +315,7 @@ class ClusterAttributeDescriptor:
             ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
 
     @classmethod
-    def ToTLV(cls, tag: Union[int, None], value):
+    def ToTLV(cls, tag: int | None, value):
         writer = tlv.TLVWriter()
         wrapped_value = cls._cluster_object(Value=value)
         cls.attribute_type.PutFieldToTLV(tag,

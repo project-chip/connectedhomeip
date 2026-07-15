@@ -131,11 +131,41 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
+            # CodeQL analyze/filter/upload are inlined here (rather than in a composite
+            # action) so every github/codeql-action pin lives in one Dependabot directory
+            # scope, letting the pins bump together and stay consistent (see lint.yml check).
             - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
+              if: ${{ inputs.run-codeql }}
+              uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
               with:
-                language: cpp
+                  category: "/language:cpp"
+                  upload: False
+                  output: sarif-results
+            - name: Filter SARIF
+              if: ${{ inputs.run-codeql }}
+              uses: advanced-security/filter-sarif@2da736ff05ef065cb2894ac6892e47b5eac2c3c0 # v1.1
+              with:
+                  # Drop generated/third-party code and a couple of noisy checks.
+                  patterns: |
+                      -**/third_party/**
+                      -**/scripts/**
+                      -**/tests/**
+                      -**/*.cpp:cpp/trivial-switch
+                      -**/*.cpp:cpp/empty-block
+                  input: "sarif-results/cpp.sarif"
+                  output: "sarif-results/cpp.sarif"
+            - name: Upload SARIF
+              if: ${{ inputs.run-codeql }}
+              uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+              with:
+                  sarif_file: "sarif-results/cpp.sarif"
+            - name: Upload loc as a Build Artifact
+              if: ${{ inputs.run-codeql }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: sarif-results
+                  path: sarif-results
+                  retention-days: 1
             # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
             # having the job timeout.
             #
@@ -316,10 +346,8 @@ jobs:
             # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
             # deactivate until a better solution is found
             # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
+            #   (if re-enabling, inline the analyze/Filter SARIF/upload-sarif steps used by the
+            #   linux build job above; the perform-codeql-analysis composite action was removed)
 
             - name: Uploading core files
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -534,10 +562,8 @@ jobs:
 
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
+            #   (if re-enabling, inline the analyze/Filter SARIF/upload-sarif steps used by the
+            #   linux build job above; the perform-codeql-analysis composite action was removed)
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

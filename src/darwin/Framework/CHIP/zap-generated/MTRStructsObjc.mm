@@ -10374,6 +10374,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _languageCode = @"";
 
+        _characteristics = nil;
+
         _displayName = nil;
     }
     return self;
@@ -10384,6 +10386,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterTrackAttributesStruct alloc] init];
 
     other.languageCode = self.languageCode;
+    other.characteristics = self.characteristics;
     other.displayName = self.displayName;
 
     return other;
@@ -10391,7 +10394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _displayName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; characteristics:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _characteristics, _displayName];
     return descriptionString;
 }
 
@@ -10422,6 +10425,57 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; trackAttributes:%@; >", NSStringFromClass([self class]), _id, _trackAttributes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaPlaybackClusterContentInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contentType = @(0);
+
+        _title = nil;
+
+        _show = nil;
+
+        _season = nil;
+
+        _episode = nil;
+
+        _provider = nil;
+
+        _artist = nil;
+
+        _album = nil;
+
+        _track = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaPlaybackClusterContentInfoStruct alloc] init];
+
+    other.contentType = self.contentType;
+    other.title = self.title;
+    other.show = self.show;
+    other.season = self.season;
+    other.episode = self.episode;
+    other.provider = self.provider;
+    other.artist = self.artist;
+    other.album = self.album;
+    other.track = self.track;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentType:%@; title:%@; show:%@; season:%@; episode:%@; provider:%@; artist:%@; album:%@; track:%@; >", NSStringFromClass([self class]), _contentType, _title, _show, _season, _episode, _provider, _artist, _album, _track];
     return descriptionString;
 }
 
@@ -10593,6 +10647,114 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic width;
 @dynamic height;
 @dynamic metric;
+@end
+
+@implementation MTRContentLauncherClusterContentAppInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contentAppVendorID = @(0);
+
+        _contentAppProductID = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentLauncherClusterContentAppInfo alloc] init];
+
+    other.contentAppVendorID = self.contentAppVendorID;
+    other.contentAppProductID = self.contentAppProductID;
+    other.data = self.data;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentAppVendorID:%@; contentAppProductID:%@; data:%@; >", NSStringFromClass([self class]), _contentAppVendorID, _contentAppProductID, _data];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterLaunchUrlInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _url = @"";
+
+        _data = nil;
+
+        _contentType = nil;
+
+        _contentHeaders = nil;
+
+        _offsetMillisecs = nil;
+
+        _queueType = nil;
+
+        _nextUrl = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentLauncherClusterLaunchUrlInfo alloc] init];
+
+    other.url = self.url;
+    other.data = self.data;
+    other.contentType = self.contentType;
+    other.contentHeaders = self.contentHeaders;
+    other.offsetMillisecs = self.offsetMillisecs;
+    other.queueType = self.queueType;
+    other.nextUrl = self.nextUrl;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: url:%@; data:%@; contentType:%@; contentHeaders:%@; offsetMillisecs:%@; queueType:%@; nextUrl:%@; >", NSStringFromClass([self class]), _url, _data, _contentType, _contentHeaders, _offsetMillisecs, _queueType, _nextUrl];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterReplicationInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _launchUrlInfo = nil;
+
+        _contentAppInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentLauncherClusterReplicationInfo alloc] init];
+
+    other.launchUrlInfo = self.launchUrlInfo;
+    other.contentAppInfo = self.contentAppInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: launchUrlInfo:%@; contentAppInfo:%@; >", NSStringFromClass([self class]), _launchUrlInfo, _contentAppInfo];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRContentLauncherClusterTrackPreferenceStruct
@@ -10863,6 +11025,63 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic progressBar;
 @dynamic splash;
 @dynamic waterMark;
+@end
+
+@implementation MTRContentLauncherClusterContentPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetID = @(0);
+
+        _presetName = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentLauncherClusterContentPresetStruct alloc] init];
+
+    other.presetID = self.presetID;
+    other.presetName = self.presetName;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; presetName:%@; >", NSStringFromClass([self class]), _presetID, _presetName];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterContentReplicationEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentLauncherClusterContentReplicationEvent alloc] init];
+
+    other.status = self.status;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; >", NSStringFromClass([self class]), _status];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRAudioOutputClusterOutputInfoStruct
@@ -11281,6 +11500,75 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterFileDescriptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fileID = @(0);
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageUri = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaFileManagementClusterFileDescriptionStruct alloc] init];
+
+    other.fileID = self.fileID;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageUri = self.imageUri;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterSharedFilesAddedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _requestID = @(0);
+
+        _responseID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaFileManagementClusterSharedFilesAddedEvent alloc] init];
+
+    other.requestID = self.requestID;
+    other.responseID = self.responseID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; responseID:%@; >", NSStringFromClass([self class]), _requestID, _responseID];
     return descriptionString;
 }
 
