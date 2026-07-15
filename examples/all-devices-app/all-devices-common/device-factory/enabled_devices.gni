@@ -103,6 +103,10 @@ _available_devices = [
     "GENERIC_SWITCH",
   ],
   [
+    "humidity-conditioner",
+    "HUMIDITY_CONDITIONER",
+  ],
+  [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
   ],

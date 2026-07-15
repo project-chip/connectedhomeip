@@ -46,6 +46,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-conditioner:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-dryer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
