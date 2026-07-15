@@ -14,7 +14,6 @@
 
 import logging
 import os
-from typing import Optional
 
 import jinja2
 
@@ -43,7 +42,8 @@ class CodeGenerator:
     write time of files do not change and rebuilds are not triggered).
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl, loader: Optional[jinja2.BaseLoader] = None, fs_loader_searchpath: Optional[str] = None):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, loader: jinja2.BaseLoader | None = None,
+                 fs_loader_searchpath: str | None = None):
         """
         A code generator will render a parsed IDL (a AST) into a given storage.
 

@@ -18,7 +18,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Optional
+from typing import Any
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint, is_variable_aware_constraint
@@ -917,7 +917,7 @@ class TestStep:
                 f"Error: {e}."
             )
 
-    def _get_last_event_number(self, responses) -> Optional[int]:
+    def _get_last_event_number(self, responses) -> int | None:
         if not self.is_event:
             return None
 

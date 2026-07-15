@@ -415,6 +415,10 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::DecodableType & value);
 
@@ -965,6 +969,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Messages::Events::MessageComplete::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Messages::Events::MessageNotPresented::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Events::PowerAdjustStart::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Events::PowerAdjustEnd::DecodableType & value);
@@ -1319,6 +1325,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType & value);
 static CHIP_ERROR

@@ -39,6 +39,8 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build-asr:200
             options: --user root
+            volumes:
+                - "/:/runner-root-volume"
 
         steps:
             - name: Checkout
