@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <lib/support/Span.h>
 #include <access/AccessControl.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
@@ -47,6 +46,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>

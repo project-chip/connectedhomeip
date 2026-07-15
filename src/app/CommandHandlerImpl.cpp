@@ -1024,7 +1024,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory InvokeRequests field missing");
     {
         mNumTargetedEndpoints = 0;
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err        = CHIP_NO_ERROR;
         mDelayReportData.ClearValue();
         InvokeRequestMessage::DelayReportData delayReportData;
         err = invokeRequestMessage.GetDelayReportData(&delayReportData);

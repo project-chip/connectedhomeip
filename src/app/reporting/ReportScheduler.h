@@ -21,8 +21,8 @@
 #include <app/ReadHandler.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/TimerDelegate.h>
 #include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -182,7 +182,7 @@ public:
         mNodesPool.ForEachActiveObject([this, now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
             if (node->IsInterestedInEndpoints(targetedEndpoints))
             {
-                System::Clock::Timeout remaining = GetRemainingTimeout(node->GetMaxTimestamp(), now);
+                System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
                 System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
                 node->SetDeferralEndTimestamp(now + effectiveDelay);
             }

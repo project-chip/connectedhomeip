@@ -509,7 +509,7 @@ private:
     bool mGoneAsync = false;
 
     static constexpr size_t kMaxTargetedEndpoints = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
-    uint8_t mNumTargetedEndpoints = 0;
+    uint8_t mNumTargetedEndpoints                 = 0;
     EndpointId mTargetedEndpoints[kMaxTargetedEndpoints];
     void RecordTargetedEndpoint(EndpointId endpointId);
 };
