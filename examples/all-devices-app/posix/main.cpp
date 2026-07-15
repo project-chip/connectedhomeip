@@ -541,8 +541,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
             paths.SetBaseDir(config.kvsDirectory);
         }
         // --KVS (deprecated) and --kvs-data both set the KVS data file explicitly.
-        // If neither is given but --kvs-directory is, leave the data file empty so
-        // ResolvePath() derives it from baseDir (e.g. /tmp/kvs1/chip_kvs).
+        // If neither is given, leave the data file unset so the platform falls back
+        // to CHIP_CONFIG_KVS_PATH (or derives it from --kvs-directory if provided).
         if (!config.kvsDataFile.empty())
         {
             paths.SetKVSDataFile(config.kvsDataFile);
@@ -550,11 +550,6 @@ CHIP_ERROR Initialize(int argc, char * argv[])
         else if (!config.kvsPath.empty())
         {
             paths.SetKVSDataFile(config.kvsPath);
-        }
-        else if (config.kvsDirectory.empty())
-        {
-            // No KVS path or directory given: fall back to the compile-time default.
-            paths.SetKVSDataFile(CHIP_CONFIG_KVS_PATH);
         }
         if (!config.kvsFactoryFile.empty())
         {

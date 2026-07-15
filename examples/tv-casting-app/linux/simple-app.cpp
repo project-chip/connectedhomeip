@@ -34,7 +34,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -147,13 +146,6 @@ int main(int argc, char * argv[])
         &serverInitParamsProvider);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Creation of AppParameters failed %" CHIP_ERROR_FORMAT, err.Format()));
-
-    // Configure the KVS data file path before CastingApp::Initialize() (which calls
-    // PlatformMgr().InitChipStack() -> PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()).
-    // This ensures the casting app uses its own KVS file, separate from the tv-app.
-#ifdef CHIP_CONFIG_KVS_PATH
-    chip::DeviceLayer::GetStoragePaths().SetKVSDataFile(CHIP_CONFIG_KVS_PATH);
-#endif
 
     // Initialize the CastingApp
     err = CastingApp::GetInstance()->Initialize(appParameters);

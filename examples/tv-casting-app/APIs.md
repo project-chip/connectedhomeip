@@ -447,9 +447,6 @@ int main(int argc, char * argv[]) {
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Initialization of CastingApp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    // Initialize Linux KeyValueStoreMgr
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-
     // Start the CastingApp
     err = CastingApp::GetInstance()->Start();
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,

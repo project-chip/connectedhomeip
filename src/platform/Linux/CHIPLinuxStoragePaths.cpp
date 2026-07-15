@@ -83,7 +83,18 @@ std::string ChipLinuxStoragePaths::ResolvePath(const std::string & path, const s
 // Getter implementations
 std::string ChipLinuxStoragePaths::GetKVSDataFilePath() const
 {
+    // If an explicit KVS data file was set, use it directly.
+    if (!mKVSDataFile.empty())
+    {
+        return mKVSDataFile;
+    }
+    // Otherwise fall back to the compile-time default (CHIP_CONFIG_KVS_PATH),
+    // preserving backward compatibility with apps that rely on it.
+#ifdef CHIP_CONFIG_KVS_PATH
+    return CHIP_CONFIG_KVS_PATH;
+#else
     return ResolvePath(mKVSDataFile, CHIP_DEFAULT_DATA_FILENAME);
+#endif
 }
 
 std::string ChipLinuxStoragePaths::GetFactoryFilePath() const
