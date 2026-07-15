@@ -6482,6 +6482,8 @@ class ChipClusters:
                     "duration": "int",
                     "messageText": "str",
                     "responses": "MessageResponseOptionStruct",
+                    "languageCode": "str",
+                    "messageURI": "str",
                 },
             },
             0x00000001: {
@@ -6503,6 +6505,18 @@ class ChipClusters:
                 "attributeName": "ActiveMessageIDs",
                 "attributeId": 0x00000001,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "SupportedLanguageCodes",
+                "attributeId": 0x00000002,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedMimeTypes",
+                "attributeId": 0x00000003,
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -13806,8 +13820,20 @@ class ChipClusters:
                     "node": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetDeviceAuthURI",
+                "args": {
+                },
+            },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "OAuthLoggedIn",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
