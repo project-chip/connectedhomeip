@@ -29,6 +29,7 @@ config("siwx-ble-config") {
   ]
 
   include_dirs += [
+    "${efr32_sdk_root}/platform_core/platform/service/mem_pool/inc",
     "${silabs_platform_dir}/SiWx/ble",
     "${wifi_sdk_root}/components/common/inc",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
@@ -40,7 +41,6 @@ config("siwx-ble-config") {
     "${wifi_sdk_root}/components/sli_buffer_manager/inc",
     "${wifi_sdk_root}/components/sli_command_engine/inc",
     "${wifi_sdk_root}/components/sli_queue_manager/inc",
-    "${efr32_sdk_root}/platform_core/platform/service/mem_pool/inc",
     "${wifi_sdk_root}/components/sli_routing_utility/inc",
     "${wifi_sdk_root}/components/sli_wifi/inc",
     "${wifi_sdk_root}/components/sli_event_engine/inc",
