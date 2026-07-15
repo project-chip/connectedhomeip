@@ -65,7 +65,10 @@ class PlatformGroup:
         self.maintainers = sorted({m.strip().lower() for m in maintainers})
         self.paths = sorted({p.strip() for p in paths})
         self.spec = pathspec.PathSpec.from_lines("gitignore", self.paths)
-        self.path_specs = {glob: pathspec.PathSpec.from_lines("gitignore", [glob]) for glob in self.paths}
+        self.path_specs = {
+            glob: pathspec.PathSpec.from_lines("gitignore", [glob])
+            for glob in self.paths
+        }
 
     def matches_file(self, filepath: str) -> bool:
         """Checks if a file path matches this group's configured paths."""
@@ -177,6 +180,9 @@ class PRContext:
     def review_states(self) -> ReviewStates:
         approvers = set()
         change_requesters = set()
+        # self.pr.get_reviews() returns reviews in chronological order from GitHub (ordered by review ID ascending).
+        # Iterating in order ensures that newer review states override earlier ones per user
+        # (e.g. APPROVED after CHANGES_REQUESTED removes the user from change_requesters).
         for review in self.pr.get_reviews():
             # review.user can be None if the user account was deleted.
             review_user = getattr(review.user, "login", None)
@@ -251,20 +257,32 @@ class PRContext:
 
         if not self.token:
             if self.dry_run:
-                log.warning("No GitHub token available for GraphQL query; skipping unresolved threads check in dry-run.")
+                log.warning(
+                    "No GitHub token available for GraphQL query; skipping unresolved threads check in dry-run."
+                )
                 return []
-            raise RuntimeError("GitHub token is required for GraphQL unresolved threads query.")
+            raise RuntimeError(
+                "GitHub token is required for GraphQL unresolved threads query."
+            )
 
         unresolved = []
         try:
             with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 if "errors" in res_data:
-                    raise RuntimeError(f"GraphQL API returned errors: {res_data['errors']}")
+                    raise RuntimeError(
+                        f"GraphQL API returned errors: {res_data['errors']}"
+                    )
 
                 data = res_data.get("data")
-                if not data or not data.get("repository") or not data["repository"].get("pullRequest"):
-                    raise RuntimeError(f"GraphQL response missing PR repository/pullRequest data: {res_data}")
+                if (
+                    not data
+                    or not data.get("repository")
+                    or not data["repository"].get("pullRequest")
+                ):
+                    raise RuntimeError(
+                        f"GraphQL response missing PR repository/pullRequest data: {res_data}"
+                    )
                 threads_data = data["repository"]["pullRequest"]["reviewThreads"]
                 if threads_data["pageInfo"]["hasNextPage"]:
                     log.warning(
@@ -282,8 +300,16 @@ class PRContext:
                 threads = threads_data["nodes"]
                 for thread in threads:
                     if not thread["isResolved"]:
-                        first_comment = thread["comments"]["nodes"][0] if thread["comments"]["nodes"] else None
-                        author = first_comment["author"]["login"] if first_comment and first_comment["author"] else "unknown"
+                        first_comment = (
+                            thread["comments"]["nodes"][0]
+                            if thread["comments"]["nodes"]
+                            else None
+                        )
+                        author = (
+                            first_comment["author"]["login"]
+                            if first_comment and first_comment["author"]
+                            else "unknown"
+                        )
                         url = first_comment["url"] if first_comment else ""
                         body_preview = ""
                         if first_comment and first_comment.get("body"):
@@ -403,7 +429,9 @@ class PRContext:
             if not group_approvers:
                 missing_approvals[group_name] = group
             else:
-                valid_approvals[group_name] = GroupApproval(sorted(group_approvers)[0], files)
+                valid_approvals[group_name] = GroupApproval(
+                    sorted(group_approvers)[0], files
+                )
         return ApprovalsAnalysisResult(missing_approvals, valid_approvals)
 
     @property
@@ -629,11 +657,16 @@ def action_merge_platform(context: PRContext) -> None:
 
 
 def action_post_platform_eligibility(context: PRContext) -> None:
-    """Posts or updates a comment stating the platform auto-merge status of the PR."""
+    """Posts or updates a status comment detailing why an eligible PR is not yet ready to merge.
+
+    This function is executed as the `on_failure` action when one or more workflow checks fail.
+    """
     comment_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
     comment_body += "### Platform Maintainers Auto-Merge Info\n"
     comment_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
-    comment_body += "To merge, we require at least one approval from each of these groups:\n"
+    comment_body += (
+        "To merge, we require at least one approval from each of these groups:\n"
+    )
 
     active_groups = context.active_groups
     missing_approvals = context.missing_approvals
@@ -647,45 +680,46 @@ def action_post_platform_eligibility(context: PRContext) -> None:
     for group_name, files in active_groups.items():
         group = context.groups[group_name]
         maintainer_mentions = ", ".join([f"@{m}" for m in group.maintainers])
-        status = "❌ Needs approval" if group_name in missing_approvals else "✅ Approved"
+        status = (
+            "❌ Needs approval" if group_name in missing_approvals else "✅ Approved"
+        )
         comment_body += f"- **{group_name}**: {maintainer_mentions} ({status})\n"
         comment_body += "  *Paths matched:*\n"
         for glob in group.get_matched_globs(files):
             comment_body += f"    * `{glob}`\n"
 
     comment_body += "\n### Merge Requirements Status\n"
+    comment_body += "⚠️ **PR is not ready to merge yet:**\n"
 
-    is_ready = not missing_approvals and not unresolved_threads and (ci_passed or ci_skipped) and mergeable is True
-
-    if is_ready:
-        comment_body += "✅ **All checks passed. PR is ready for merge.**\n"
+    if missing_approvals:
+        comment_body += "- ❌ Needs platform maintainer approvals (see above).\n"
     else:
-        comment_body += "⚠️ **PR is not ready to merge yet:**\n"
-        if missing_approvals:
-            comment_body += "- ❌ Needs platform maintainer approvals (see above).\n"
-        else:
-            comment_body += "- ✅ Has all platform maintainer approvals.\n"
+        comment_body += "- ✅ Has all platform maintainer approvals.\n"
 
-        if unresolved_threads:
-            comment_body += "- ❌ Has unresolved review conversations:\n"
-            for thread in unresolved_threads:
-                link_part = f" ([Link]({thread.url}))" if thread.url else ""
-                comment_preview = f': *"{thread.body_preview}"*' if thread.body_preview else ""
-                comment_body += f"  * Unresolved thread by @{thread.author}{link_part}{comment_preview}\n"
-        else:
-            comment_body += "- ✅ All review conversations resolved.\n"
+    if unresolved_threads:
+        comment_body += "- ❌ Has unresolved review conversations:\n"
+        for thread in unresolved_threads:
+            link_part = f" ([Link]({thread.url}))" if thread.url else ""
+            comment_preview = (
+                f': *"{thread.body_preview}"*' if thread.body_preview else ""
+            )
+            comment_body += f"  * Unresolved thread by @{thread.author}{link_part}{comment_preview}\n"
+    else:
+        comment_body += "- ✅ All review conversations resolved.\n"
 
-        if ci_passed or ci_skipped:
-            comment_body += "- ✅ All CI status and check suites passed.\n"
-        else:
-            comment_body += "- ❌ CI checks are pending or failed.\n"
+    if ci_passed or ci_skipped:
+        comment_body += "- ✅ All CI status and check suites passed.\n"
+    else:
+        comment_body += "- ❌ CI checks are pending or failed.\n"
 
-        if mergeable is True:
-            comment_body += "- ✅ No merge conflicts.\n"
-        elif mergeable is False:
-            comment_body += "- ❌ PR has merge conflicts (resolve conflicts before merge).\n"
-        else:
-            comment_body += "- ⚠️ Mergeability state is computing on GitHub.\n"
+    if mergeable is True:
+        comment_body += "- ✅ No merge conflicts.\n"
+    elif mergeable is False:
+        comment_body += (
+            "- ❌ PR has merge conflicts (resolve conflicts before merge).\n"
+        )
+    else:
+        comment_body += "- ⚠️ Mergeability state is computing on GitHub.\n"
 
     bot_comments = context.bot_comments
     if bot_comments:
@@ -801,28 +835,40 @@ class PrCheckerBot:
             content = yaml.safe_load(f)
 
         if not isinstance(content, dict):
-            raise ValueError("Invalid config file format. Expected a YAML dictionary of groups.")
+            raise ValueError(
+                "Invalid config file format. Expected a YAML dictionary of groups."
+            )
 
         for name, data in content.items():
             if not isinstance(name, str):
                 raise ValueError(f"Group name '{name}' must be a string.")
             if not isinstance(data, dict):
-                raise ValueError(f"Invalid data format for group '{name}'. Expected a dictionary.")
+                raise ValueError(
+                    f"Invalid data format for group '{name}'. Expected a dictionary."
+                )
 
             invalid_keys = set(data.keys()) - {"maintainers", "paths"}
             if invalid_keys:
-                raise ValueError(f"Group '{name}' contains unrecognized keys: {list(invalid_keys)}")
+                raise ValueError(
+                    f"Group '{name}' contains unrecognized keys: {list(invalid_keys)}"
+                )
 
             maintainers = data.get("maintainers")
             paths = data.get("paths")
 
             if not isinstance(maintainers, list) or not maintainers:
-                raise ValueError(f"Group '{name}' must contain a non-empty 'maintainers' list.")
+                raise ValueError(
+                    f"Group '{name}' must contain a non-empty 'maintainers' list."
+                )
             if not isinstance(paths, list) or not paths:
-                raise ValueError(f"Group '{name}' must contain a non-empty 'paths' list.")
+                raise ValueError(
+                    f"Group '{name}' must contain a non-empty 'paths' list."
+                )
 
             if not all(isinstance(m, str) and m.strip() for m in maintainers):
-                raise ValueError(f"Group '{name}' maintainers must be non-empty strings.")
+                raise ValueError(
+                    f"Group '{name}' maintainers must be non-empty strings."
+                )
             if not all(isinstance(p, str) and p.strip() for p in paths):
                 raise ValueError(f"Group '{name}' paths must be non-empty strings.")
 
@@ -830,7 +876,9 @@ class PrCheckerBot:
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
 
-    def check_and_process_pr(self, pr: PullRequest, workflow: Workflow | None = None) -> None:
+    def check_and_process_pr(
+        self, pr: PullRequest, workflow: Workflow | None = None
+    ) -> None:
         """Checks the eligibility and readiness of a PR and runs the appropriate workflow."""
         if pr.user is None or not getattr(pr.user, "login", None):
             log.info(
@@ -1033,7 +1081,9 @@ def main(
                 raise click.ClickException(
                     f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
                 )
-            log.warning("No GitHub token provided. Running in unauthenticated dry-run mode.")
+            log.warning(
+                "No GitHub token provided. Running in unauthenticated dry-run mode."
+            )
 
     bot = PrCheckerBot(
         gh_token,
