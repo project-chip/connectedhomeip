@@ -42,6 +42,7 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo
 
 import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -79,8 +80,8 @@ class TC_IDM_9_1(IDMBaseTest):
         for info in command_field_infos:
             try:
                 result = await self.check_command_constraint(info)
-            except Exception as e:
-                log.warning("Exception testing %s: %s", info.path_str, e)
+            except ChipStackError as e:  # chipstack-ok
+                log.warning("Transport error testing %s: %s", info.path_str, e)
                 commands_skipped_count += 1
                 continue
             if result is None:
