@@ -651,7 +651,7 @@ void NFCCommissioningManagerImpl::_Shutdown()
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
 
-CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
+CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted() CHIP_NO_THREAD_SAFETY_ANALYSIS
 {
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
@@ -675,7 +675,10 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
     }
 
     std::unique_lock<std::mutex> initLock(mWorkerInitMutex);
-    mWorkerInitCondition.wait(initLock, [this]() { return mWorkerInitCompleted; });
+    while (!mWorkerInitCompleted)
+    {
+        mWorkerInitCondition.wait(initLock);
+    }
 
     return mWorkerInitResult;
 }
@@ -830,7 +833,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     return CHIP_NO_ERROR;
 }
 
-void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
+void NFCCommissioningManagerImpl::NfcWorkerThreadMain() CHIP_NO_THREAD_SAFETY_ANALYSIS
 {
     ChipLogProgressNfcDebug(DeviceLayer, "Start NFC Worker Thread");
 
@@ -869,7 +872,10 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         // Wait for a work item to process
         {
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
-            mWorkQueueCondition.wait(lock, [this]() { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
+            while (mWorkQueue.empty() && mNfcWorkerThreadRunning)
+            {
+                mWorkQueueCondition.wait(lock);
+            }
 
             // Exit immediately once the worker is stopped.
             if (!mNfcWorkerThreadRunning)

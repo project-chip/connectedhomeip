@@ -264,10 +264,10 @@ private:
     Nfc::NFCReaderTransportDelegate * mDelegate CHIP_GUARDED_BY(mStateMutex) = nullptr;
 
     // Private methods
-    void NfcWorkerThreadMain();
+    void NfcWorkerThreadMain() CHIP_NO_THREAD_SAFETY_ANALYSIS;
     CHIP_ERROR EnqueueWork(NfcWorkItem && item);
 
-    CHIP_ERROR EnsureWorkerThreadStarted();
+    CHIP_ERROR EnsureWorkerThreadStarted() CHIP_NO_THREAD_SAFETY_ANALYSIS;
     CHIP_ERROR RunSyncOnWorker(NfcWorkItem && item);
     Transport::NFCBase * GetNFCBase();
 
