@@ -428,6 +428,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const Span<Predict
 
     ReturnErrorOnFailure(CheckPredictedActivity(predictedActivityList));
     ReturnErrorOnFailure(mACSDelegate->SetPredictedActivity(predictedActivityList));
+    mPredictedActivityList = Span<PredictActivity>(mACSDelegate->GetPredictedActivityBuf(), predictedActivityList.size());
     NotifyAttributeChanged(Attributes::PredictedActivity::Id);
     return CHIP_NO_ERROR;
 }
@@ -832,8 +833,7 @@ CHIP_ERROR AmbientContextSensingCluster::ReadPredictedActivity(AttributeValueEnc
 {
     VerifyOrDie(mACSDelegate != nullptr);
     return encoder.EncodeList([this](const auto & encode) -> CHIP_ERROR {
-        auto predictedActivityList = mACSDelegate->GetPredictedActivity();
-        for (const auto & item : predictedActivityList)
+        for (const auto & item : mPredictedActivityList)
         {
             ReturnErrorOnFailure(encode.Encode(item.mInfo));
         }

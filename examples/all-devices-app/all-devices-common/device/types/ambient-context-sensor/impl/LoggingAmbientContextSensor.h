@@ -39,7 +39,7 @@ public:
 
     SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) override;
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
-    Span<PredictActivity> & GetPredictedActivity() override { return mPredictedActivityList; };
+    PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
     uint64_t GetEpochNow() override;
@@ -55,7 +55,6 @@ private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForLog];
 
     PredictActivity mPredictActivityBuf[kMaxPredictedActivityForLog];
-    Span<PredictActivity> mPredictedActivityList;
 
     // From spec, constraint of AmbientContextType is 1 to SimultaneousDetectionLimit.
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];

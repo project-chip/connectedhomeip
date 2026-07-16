@@ -115,7 +115,7 @@ public:
     SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) override;
 
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
-    Span<PredictActivity> & GetPredictedActivity() override { return mPredictedActivityList; };
+    PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
 
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
@@ -132,15 +132,12 @@ public:
 
 private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForTest];
-
     PredictActivity mPredictActivityBuf[kMaxPredictedActivityForTest];
-    Span<PredictActivity> mPredictedActivityList;
-
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
 TestACSDelegate::TestACSDelegate() :
-    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
+mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}
 {}
 
 SemanticTagType * TestACSDelegate::GetAmbientContextTypeSupportedBuf(size_t size)
@@ -180,7 +177,6 @@ CHIP_ERROR TestACSDelegate::SetPredictedActivity(const Span<PredictedActivityTyp
         dst.mInfo.ambientContextType.SetValue(
             DataModel::List<const SemanticTagType>(dst.mOwnedTags.get(), static_cast<uint16_t>(tagCount)));
     }
-    mPredictedActivityList = Span<PredictActivity>(mPredictActivityBuf, predictedActivityList.size());
 
     return CHIP_NO_ERROR;
 }

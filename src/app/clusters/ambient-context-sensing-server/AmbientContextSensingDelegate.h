@@ -85,7 +85,7 @@ public:
     virtual CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) = 0;
 
     // Return the stored PredictedActivity
-    virtual Span<PredictActivity> & GetPredictedActivity() = 0;
+    virtual PredictActivity * GetPredictedActivityBuf() = 0;
 
     // Get the pointer of the structure from the delegate module
     virtual AmbientContextSensed * AllocDetection() = 0;

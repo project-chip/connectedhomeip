@@ -31,7 +31,7 @@ LoggingAmbientContextSensor::LoggingAmbientContextSensor(TimerDelegate & timerDe
                                                .holdTimeDefault = 10,
                                            }),
                          timerDelegate, *this),
-    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
+    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}
 {}
 
 CHIP_ERROR LoggingAmbientContextSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -82,7 +82,6 @@ CHIP_ERROR LoggingAmbientContextSensor::SetPredictedActivity(const Span<Predicte
         dst.mInfo.ambientContextType.SetValue(
             DataModel::List<const SemanticTagType>(dst.mOwnedTags.get(), static_cast<uint16_t>(tagCount)));
     }
-    mPredictedActivityList = Span<PredictActivity>(mPredictActivityBuf, predictedActivityList.size());
 
     return CHIP_NO_ERROR;
 }

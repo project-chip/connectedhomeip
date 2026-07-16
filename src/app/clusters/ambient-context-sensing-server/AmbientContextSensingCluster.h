@@ -141,6 +141,8 @@ private:
     IntrusiveList<AmbientContextSensing::AmbientContextSensed> mAmbientContextTypeList;
     uint8_t mAmbientContextTypeListSize = 0;
 
+    Span<AmbientContextSensing::PredictActivity> mPredictedActivityList;
+
     uint8_t mSimultaneousDetectionLimit = AmbientContextSensing::kDefaultSimultaneousDetectionLimit;
     bool mObjectCountThresholdReached   = false;
     AmbientContextSensing::ObjectCountConfigType mObjectCountConfig = {
