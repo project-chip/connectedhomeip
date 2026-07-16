@@ -265,6 +265,8 @@ private:
 
     // Private methods
     void NfcWorkerThreadMain();
+    CHIP_ERROR ProcessScanWorkItem(const NfcWorkItem & item);
+    CHIP_ERROR ProcessSendWorkItem(const NfcWorkItem & item);
     CHIP_ERROR EnqueueWork(NfcWorkItem && item);
 
     CHIP_ERROR EnsureWorkerThreadStarted();
