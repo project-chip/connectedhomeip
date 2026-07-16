@@ -107,9 +107,9 @@ class TestRunConfig:
     app: str
     app_args: str
     script_args: str
-    app_ready_pattern: typing.Optional[str]
+    app_ready_pattern: str | None
     stream_output: typing.BinaryIO
-    app_stdin_pipe: typing.Optional[str] = None
+    app_stdin_pipe: str | None = None
 
 
 class AppProcessManager:

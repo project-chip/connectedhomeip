@@ -17,7 +17,6 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
@@ -61,7 +60,7 @@ _GLOBAL_TYPES = [
 ]
 
 
-def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
+def _UnderlyingType(field: Field, context: TypeLookupContext) -> str | None:
     actual = ParseDataType(field.data_type, context)
     if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
@@ -86,7 +85,7 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
     return None
 
 
-def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Optional[str]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> str | None:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -553,7 +552,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     return EncodableValue(context, field.data_type, attrs)
 
 
-def CreateLookupContext(idl: Idl, cluster: Optional[Cluster]) -> TypeLookupContext:
+def CreateLookupContext(idl: Idl, cluster: Cluster | None) -> TypeLookupContext:
     """
     A filter to mark a lookup context to be within a specific cluster.
 
