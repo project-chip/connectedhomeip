@@ -40,8 +40,6 @@ static constexpr Percent100ths kWcPercent100thsCOEF      = 100;
 
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
-typedef Optional<Percent> OPercent;
-typedef Optional<Percent100ths> OPercent100ths;
 
 using OptionalAttributeSet =
     app::OptionalAttributeSet<Attributes::NumberOfActuationsLift::Id, Attributes::NumberOfActuationsTilt::Id,
@@ -57,24 +55,6 @@ enum class OperationalState : uint8_t
     Reserved          = 0x03, // dont use
 };
 static_assert(sizeof(OperationalState) == sizeof(uint8_t), "OperationalState Size is not correct");
-
-// Declare Position Limit Status
-enum class LimitStatus : uint8_t
-{
-    Intermediate      = 0x00,
-    IsUpOrOpen        = 0x01,
-    IsDownOrClose     = 0x02,
-    Inverted          = 0x03,
-    IsPastUpOrOpen    = 0x04,
-    IsPastDownOrClose = 0x05,
-};
-static_assert(sizeof(LimitStatus) == sizeof(uint8_t), "LimitStatus Size is not correct");
-
-struct AbsoluteLimits
-{
-    uint16_t open;
-    uint16_t closed;
-};
 
 class WindowCoveringCluster : public DefaultServerCluster
 {
@@ -219,9 +199,6 @@ private:
     chip::BitMask<Mode> mMode;
     chip::BitMask<SafetyStatus> mSafetyStatus;
 };
-
-uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
-LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 
 } // namespace WindowCovering
 } // namespace Clusters

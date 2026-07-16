@@ -468,20 +468,6 @@ void ModePrint(const chip::BitMask<Mode> & mode)
                     mode.Has(Mode::kCalibrationMode));
 }
 
-void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status)
-{
-    auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrDie(cluster != nullptr);
-    cluster->SetSafetyStatus(status);
-}
-
-chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
-{
-    auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrDie(cluster != nullptr);
-    return cluster->GetSafetyStatus();
-}
-
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
@@ -540,6 +526,85 @@ OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths c
         return ComputeOperationalState(target.Value(), current.Value());
     }
     return OperationalState::Stall;
+}
+
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
+{
+    if (limits.open > limits.closed)
+    {
+        return LimitStatus::Inverted;
+    }
+
+    if (position == limits.open)
+    {
+        return LimitStatus::IsUpOrOpen;
+    }
+
+    if (position == limits.closed)
+    {
+        return LimitStatus::IsDownOrClose;
+    }
+
+    if ((limits.open > 0) && (position < limits.open))
+    {
+        return LimitStatus::IsPastUpOrOpen;
+    }
+
+    if ((limits.closed > 0) && (position > limits.closed))
+    {
+        return LimitStatus::IsPastDownOrClose;
+    }
+
+    return LimitStatus::Intermediate;
+}
+
+/*
+ * ConvertValue: Converts values from one range to another
+ * Range In  -> from  inputLowValue to   inputHighValue
+ * Range Out -> from outputLowValue to outputHighValue
+ */
+uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
+                      uint16_t value)
+{
+    uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
+    uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
+
+    if (inputLowValue > inputHighValue)
+    {
+        inputMin = inputHighValue;
+        inputMax = inputLowValue;
+    }
+
+    if (outputLowValue > outputHighValue)
+    {
+        outputMin = outputHighValue;
+        outputMax = outputLowValue;
+    }
+
+    inputRange  = static_cast<uint16_t>(inputMax - inputMin);
+    outputRange = static_cast<uint16_t>(outputMax - outputMin);
+
+    if (value < inputMin)
+    {
+        return outputMin;
+    }
+
+    if (value > inputMax)
+    {
+        return outputMax;
+    }
+
+    if (inputRange > 0)
+    {
+        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
+    }
+
+    return outputMax;
+}
+
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, limits.open, limits.closed, relative);
 }
 
 Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)

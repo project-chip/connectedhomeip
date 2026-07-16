@@ -29,50 +29,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-/*
- * ConvertValue: Converts values from one range to another
- * Range In  -> from  inputLowValue to   inputHighValue
- * Range Out -> from outputLowValue to outputHighValue
- */
-uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
-                      uint16_t value)
-{
-    uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
-    uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
-
-    if (inputLowValue > inputHighValue)
-    {
-        inputMin = inputHighValue;
-        inputMax = inputLowValue;
-    }
-
-    if (outputLowValue > outputHighValue)
-    {
-        outputMin = outputHighValue;
-        outputMax = outputLowValue;
-    }
-
-    inputRange  = static_cast<uint16_t>(inputMax - inputMin);
-    outputRange = static_cast<uint16_t>(outputMax - outputMin);
-
-    if (value < inputMin)
-    {
-        return outputMin;
-    }
-
-    if (value > inputMax)
-    {
-        return outputMax;
-    }
-
-    if (inputRange > 0)
-    {
-        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
-    }
-
-    return outputMax;
-}
-
 bool IsPercent100thsValid(Percent100ths percent100ths)
 {
     return (percent100ths >= kWcPercent100thsMinOpen) && (percent100ths <= kWcPercent100thsMaxClosed);
@@ -495,41 +451,6 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::GetMotionLoc
     }
 
     return Status::Success;
-}
-
-LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
-{
-    if (limits.open > limits.closed)
-    {
-        return LimitStatus::Inverted;
-    }
-
-    if (position == limits.open)
-    {
-        return LimitStatus::IsUpOrOpen;
-    }
-
-    if (position == limits.closed)
-    {
-        return LimitStatus::IsDownOrClose;
-    }
-
-    if ((limits.open > 0) && (position < limits.open))
-    {
-        return LimitStatus::IsPastUpOrOpen;
-    }
-
-    if ((limits.closed > 0) && (position > limits.closed))
-    {
-        return LimitStatus::IsPastDownOrClose;
-    }
-
-    return LimitStatus::Intermediate;
-}
-
-uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
-{
-    return ConvertValue(kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, limits.open, limits.closed, relative);
 }
 
 std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOpen()

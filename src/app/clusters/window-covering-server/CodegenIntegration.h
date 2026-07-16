@@ -24,6 +24,24 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
+// Declare Position Limit Status
+enum class LimitStatus : uint8_t
+{
+    Intermediate      = 0x00,
+    IsUpOrOpen        = 0x01,
+    IsDownOrClose     = 0x02,
+    Inverted          = 0x03,
+    IsPastUpOrOpen    = 0x04,
+    IsPastDownOrClose = 0x05,
+};
+static_assert(sizeof(LimitStatus) == sizeof(uint8_t), "LimitStatus Size is not correct");
+
+struct AbsoluteLimits
+{
+    uint16_t open;
+    uint16_t closed;
+};
+
 /**
  * @brief Returns the WindowCoveringCluster instance registered on the given endpoint.
  *
@@ -49,6 +67,11 @@ chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
 OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
 
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
+uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
+                      uint16_t value);
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
+
 Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
 
 // These functions are only kept for backwards compatibility with example apps and should not be used by new code.
@@ -71,9 +94,6 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint);
 
 void ModePrint(const chip::BitMask<Mode> & mode);
 void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & mode);
-
-void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status);
-chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint);
 
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
