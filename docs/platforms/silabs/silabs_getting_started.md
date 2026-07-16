@@ -129,16 +129,6 @@ for the BRD4187C is
 > enables the SiWx NCP bluetooth. The MG24 + SiWx NCP combo does not yet support
 > external flash.
 
-To build the lighting app as an Wi-Fi MG24 + wf200 NCP, the default build
-command for the BRD4187C is
-
-```shell
-$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_wf200 BRD4187C --wifi wf200
-```
-
-> **Note**: The build argument `--wifi wf200` is necessary to build the BRD4187C
-> image with the necessary code for the NCP combo.
-
 #### Build Arguments
 
 The ``gn_silabs_examples.sh` script takes two types of build arguments. The
@@ -158,7 +148,7 @@ Here is a list of some the supported macros and their GN argument equivalent.
 
 |          Macro Name           | Description                                                                                            | GN equivalent                                                                                                                                              |
 | :---------------------------: | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917 or wf200.               | --wifi SiWx917 : use_SiWx917=true<br /> --wifi wf200 : use_wf200=true<br />                                                                                |
+|            --wifi             | Configures an sample app as a Wi-Fi devices.<br /> This macro requires SiWx917               | --wifi SiWx917 : use_SiWx917=true<br />                                                                              |
 |             --icd             | Configures the device as an ICD                                                                        | chip_enable_icd_server=true chip_openthread_ftd=false                                                                                                      |
 |          --low-power          | Configures the most power efficient build.<br /> This is used in tandem with the `--icd` macro         | chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true                                                                  |
 |    --chip_enable_wifi_ipv4    | Enables IPv4 support on Wi-fi configured builds                                                        | chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true                                                                                               |

@@ -20,8 +20,6 @@ import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 declare_args() {
-  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
-  sl_wfx_config_softap = false
 
   #default WiFi SSID
   chip_default_wifi_ssid = ""
@@ -35,12 +33,8 @@ declare_args() {
 
 # Workaround to prevent the assert when we are building the unit tests
 if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
-  assert(use_wf200 || use_SiWx917)
+  assert(use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
-
-  if (use_wf200) {
-    import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
-  }
 }
 
 config("wifi-platform-config") {
@@ -66,9 +60,6 @@ config("wifi-platform-config") {
     defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
-  if (sl_wfx_config_softap) {
-    defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-  }
 
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]

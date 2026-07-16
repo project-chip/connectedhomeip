@@ -685,15 +685,8 @@ void uartSendBytes(uint8_t * data, uint16_t length)
     sl_wfx_host_pre_uart_transfer();
 #endif // SL_UARTCTRL_MUX
 
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
-    // WF200 SPI IRQ
-    UARTDRV_ForceTransmit(vcom_handle, data, length);
-#else
-    // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, data, length, UART_tx_callback);
     osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
-#endif /* EFR32MG24 && WF200_WIFI */
 
 #if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
     sl_wfx_host_post_uart_transfer();

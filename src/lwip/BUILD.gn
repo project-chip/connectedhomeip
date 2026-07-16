@@ -231,7 +231,6 @@ if (current_os == "zephyr") {
 
       sources += [
         "${lwip_platform}/lwipopts-siwx.h",
-        "${lwip_platform}/lwipopts-wf200.h",
       ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
