@@ -165,6 +165,14 @@ groups:
       teams: [reviewers-irobot]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-ikea:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-ikea]
+    reviews:
+      request: 0 # Do not auto-add
   shared-reviewers-lg:
     type: optional
     conditions:
