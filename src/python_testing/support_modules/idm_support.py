@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -61,7 +61,7 @@ class WritableAttributeInfo:
     attribute: type[ClusterObjects.ClusterAttributeDescriptor]
     cluster_class: type[ClusterObjects.Cluster]
     datatype: str
-    constraints: Optional[Constraints]
+    constraints: Constraints | None
 
 
 @dataclass
@@ -249,7 +249,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     async def find_timed_write_attribute(
         self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+    ) -> tuple[int | None, type[ClusterObjects.ClusterAttributeDescriptor] | None]:
         """
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
@@ -408,7 +408,7 @@ class IDMBaseTest(BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> int | None:
         """Resolve a dynamic constraint reference by reading the attribute value."""
         ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
         if not ref_attr:
@@ -776,7 +776,7 @@ class IDMBaseTest(BasicCompositionTests):
         self,
         endpoint_id: int,
         attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
-    ) -> Optional[Status]:
+    ) -> Status | None:
         """
         Attempts to write `attr_class` on `endpoint_id` using a small set
         of dummy values. Returns the resulting Status, or None if no value
