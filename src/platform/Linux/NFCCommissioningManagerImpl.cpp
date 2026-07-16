@@ -125,7 +125,11 @@ public:
         memset(mChainedResponseBuffer, 0, sizeof(mChainedResponseBuffer));
     }
 
-    // TagInstance cannot be copied or moved
+    // TagInstance is non-copyable and non-movable.
+    // Copying would duplicate ownership of resources such as `cardHandle` and `readerName`.
+    // Moving is disallowed because TagInstance objects are shared asynchronously by pointer;
+    // queued work may still access a given instance, and allowing the object itself to be
+    // moved would leave that instance in a moved-from state.
     TagInstance(const TagInstance &)             = delete;
     TagInstance & operator=(const TagInstance &) = delete;
     TagInstance(TagInstance &&)                  = delete;
