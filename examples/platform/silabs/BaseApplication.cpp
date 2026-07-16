@@ -136,8 +136,8 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-bool sIsEnabled  = false;
-bool sIsAttached = false;
+[[maybe_unused]] bool sIsEnabled  = false;
+[[maybe_unused]] bool sIsAttached = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -289,6 +289,8 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
+
+    mIsApplicationInitialized = true;
     return err;
 }
 
@@ -1043,6 +1045,8 @@ bool BaseApplication::GetProvisionStatus()
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    // Verify that the App layer is initialized before propagating attribute changes callback to it.
+    VerifyOrReturn(CustomerAppTask::GetAppTask().IsApplicationInitialized());
     // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
     CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
 }

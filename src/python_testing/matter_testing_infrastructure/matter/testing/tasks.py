@@ -19,9 +19,10 @@ import shlex
 import subprocess
 import sys
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import BinaryIO, Callable, Self
+from typing import BinaryIO, Self
 
 from matter.testing.defaults import TestingDefaults
 

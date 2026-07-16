@@ -95,15 +95,9 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
     }
     else
     {
-        auto status = app->GetApplicationStatus();
-        if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
-        {
-            app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
-            MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
-                                                   ApplicationBasic::Attributes::Status::Id);
-        }
+        app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
+        MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
+                                               ApplicationBasic::Attributes::Status::Id);
         if (app == mCurrentApp)
         {
             mCurrentApp = nullptr;
@@ -131,7 +125,8 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
     {
         auto status = app->GetApplicationStatus();
         if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden)
         {
             app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,

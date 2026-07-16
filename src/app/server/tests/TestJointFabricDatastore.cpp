@@ -507,5 +507,359 @@ TEST(JointFabricDatastoreTest, AddAclDeduplicatesAndRemoveAclSyncsDeletePayload)
     EXPECT_EQ(delegate.lastAclSync.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kDeletePending);
     EXPECT_TRUE(store.GetNodeACLList().empty());
 }
+// Regression for the JointFabricDatastore async-callback iterator use-after-free. Run under ASan
+// (the existing out/asan unit-test config) to catch the heap-use-after-free in the unpatched code.
+
+// Repro: RemoveBindingFromEndpointForNode captures a raw iterator into the async SyncNode
+// completion. SyncNode is an async CASE round-trip; the completion fires later. If a second
+// Invoke (AddBindingToEndpointForNode) grows mEndpointBindingEntries and the std::vector
+// reallocates in the meantime, the captured iterator dangles and erase(it) is a heap UAF.
+// The delegate below defers the completion (modelling the round-trip); the test forces a
+// reallocation and then replays it.
+class DeferringBindingDelegate : public TrackingDelegate
+{
+public:
+    bool deferNext   = false;
+    bool hasDeferred = false;
+    std::function<void()> deferred;
+
+    CHIP_ERROR SyncNode(NodeId nodeId, const BindingEntryType & bindingEntry, std::function<void()> onSuccess) override
+    {
+        if (deferNext)
+        {
+            deferNext   = false;
+            hasDeferred = true;
+            deferred    = std::move(onSuccess);
+            return CHIP_NO_ERROR;
+        }
+        if (onSuccess)
+        {
+            onSuccess();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void RunDeferred()
+    {
+        if (hasDeferred && deferred)
+        {
+            deferred();
+        }
+    }
+};
+
+TEST(JointFabricDatastoreTest, RemoveBindingIteratorUseAfterFree)
+{
+    JointFabricDatastore store;
+    DeferringBindingDelegate delegate;
+
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "controller-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint-a"_span), CHIP_NO_ERROR);
+
+    // Binding that will be removed (entry 0).
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type b0;
+    b0.node.SetValue(0x1000);
+    b0.endpoint.SetValue(2);
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, b0), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 1u);
+    const uint16_t listId0 = store.GetEndpointBindingList()[0].listID;
+
+    // Remove it, but defer the erase callback (models the async SyncNode round-trip).
+    delegate.deferNext = true;
+    ASSERT_EQ(store.RemoveBindingFromEndpointForNode(listId0, 123, 1), CHIP_NO_ERROR);
+    ASSERT_TRUE(delegate.hasDeferred);
+
+    // A second admin Invoke arrives during the round-trip: add more bindings, forcing
+    // mEndpointBindingEntries to reallocate. The captured iterator now dangles.
+    for (uint16_t i = 1; i <= 12; ++i)
+    {
+        JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type bi;
+        bi.node.SetValue(static_cast<NodeId>(0x2000 + i));
+        bi.endpoint.SetValue(2);
+        ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, bi), CHIP_NO_ERROR);
+    }
+
+    // The SyncNode response finally arrives: erase(it) on the dangling iterator.
+    // RED  -> ASan heap-use-after-free at the erase(it) site in RemoveBindingFromEndpointForNode.
+    // GREEN (stable-key re-resolution fix) -> entry listId0 erased correctly, no UAF.
+    delegate.RunDeferred();
+
+    for (const auto & e : store.GetEndpointBindingList())
+    {
+        EXPECT_NE(e.listID, listId0);
+    }
+}
+
+// Regression for the CRITICAL site: RemoveACLFromNode captured a raw iterator
+// [this, it] into the async SyncNode completion and called mACLEntries.erase(it). An interleaved
+// Invoke that reallocates mACLEntries leaves that iterator dangling -> heap use-after-free in
+// erase(). The fix re-resolves the entry by stable key (nodeID + listID) inside the completion.
+class DeferringAclDelegate : public TrackingDelegate
+{
+public:
+    bool deferNext   = false;
+    bool hasDeferred = false;
+    std::function<void()> deferred;
+
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void()> onSuccess) override
+    {
+        if (deferNext)
+        {
+            deferNext   = false;
+            hasDeferred = true;
+            deferred    = std::move(onSuccess);
+            return CHIP_NO_ERROR;
+        }
+        if (onSuccess)
+        {
+            onSuccess();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void RunDeferred()
+    {
+        if (hasDeferred && deferred)
+        {
+            deferred();
+        }
+    }
+};
+
+TEST(JointFabricDatastoreTest, RemoveAclIteratorUseAfterFree)
+{
+    JointFabricDatastore store;
+    DeferringAclDelegate delegate;
+
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "controller-a"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    aclEntry.authMode  = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum::kCase;
+
+    // ACL that will be removed (entry 0, on node 123).
+    ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+    const uint16_t listId0 = store.GetNodeACLList()[0].listID;
+
+    // Remove it, but defer the erase callback (models the async SyncNode round-trip).
+    delegate.deferNext = true;
+    ASSERT_EQ(store.RemoveACLFromNode(listId0, 123), CHIP_NO_ERROR);
+    ASSERT_TRUE(delegate.hasDeferred);
+
+    // A second admin Invoke arrives during the round-trip: register more nodes and add ACLs,
+    // forcing mACLEntries to reallocate. The captured iterator now dangles.
+    for (uint16_t i = 1; i <= 12; ++i)
+    {
+        const NodeId extraNode = static_cast<NodeId>(200 + i);
+        ASSERT_EQ(store.AddPendingNode(extraNode, "controller-b"_span), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddACLToNode(extraNode, aclEntry), CHIP_NO_ERROR);
+    }
+
+    // The SyncNode response finally arrives: erase(it) on the dangling iterator.
+    // RED  -> ASan heap-use-after-free at the erase(it) site in RemoveACLFromNode.
+    // GREEN (stable-key re-resolution fix) -> entry listId0 erased correctly, no UAF.
+    delegate.RunDeferred();
+
+    for (const auto & e : store.GetNodeACLList())
+    {
+        EXPECT_FALSE(e.nodeID == 123u && e.listID == listId0);
+    }
+}
+
+// Regression for a back() site: AddBindingToEndpointForNode marked
+// mEndpointBindingEntries.back() as kCommitted in its async completion. If an interleaved Invoke
+// appends more bindings before the completion fires, back() now refers to the wrong (newest) entry
+// and the binding that was actually synced is left stuck Pending. The fix re-resolves by stable key
+// (nodeID + endpointID + listID). This site is in-bounds (logic corruption), so the assertion checks
+// the correct entry is committed rather than relying on ASan.
+TEST(JointFabricDatastoreTest, AddBindingBackReferenceMarksWrongEntry)
+{
+    JointFabricDatastore store;
+    DeferringBindingDelegate delegate;
+
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "controller-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint-a"_span), CHIP_NO_ERROR);
+
+    // Add the binding whose commit we defer (models the async SyncNode round-trip).
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type b1;
+    b1.node.SetValue(0x1000);
+    b1.endpoint.SetValue(2);
+    delegate.deferNext = true;
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, b1), CHIP_NO_ERROR);
+    ASSERT_TRUE(delegate.hasDeferred);
+    const uint16_t listId1 = store.GetEndpointBindingList().back().listID;
+
+    // A second admin Invoke appends more bindings, reallocating the vector and moving back().
+    for (uint16_t i = 2; i <= 13; ++i)
+    {
+        JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type bi;
+        bi.node.SetValue(static_cast<NodeId>(0x2000 + i));
+        bi.endpoint.SetValue(2);
+        ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, bi), CHIP_NO_ERROR);
+    }
+
+    // The deferred commit arrives. RED (back()) would commit the newest entry, leaving listId1 Pending.
+    // GREEN (stable-key) commits listId1 correctly.
+    delegate.RunDeferred();
+
+    bool found = false;
+    for (const auto & e : store.GetEndpointBindingList())
+    {
+        if (e.listID == listId1)
+        {
+            found = true;
+            EXPECT_EQ(e.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+        }
+    }
+    EXPECT_TRUE(found);
+}
+
+// When removing the anchor fabric, every record must be wiped and the anchor identity must be reset.
+// When other fabrics are removed, nothing should happen (the datastore holds no records owned by other fabrics.)
+TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+
+    constexpr FabricIndex kAnchorFabric = 1;
+    constexpr FabricIndex kOtherFabric  = 2;
+    store.SetAnchorFabricIndex(kAnchorFabric);
+    ASSERT_EQ(store.SetAnchorNodeId(0xABCD), CHIP_NO_ERROR);
+
+    // A spread of records, including the secret-bearing group-key-set and admin (ICAC) entries.
+    uint8_t epoch0[] = { 0x01, 0x02, 0x03 };
+    GroupKeySetType keySet;
+    keySet.groupKeySetID = 11;
+    keySet.epochKey0.SetNonNull(ByteSpan(epoch0));
+    keySet.epochKey1.SetNull();
+    keySet.epochKey2.SetNull();
+    ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+
+    char adminName[] = "admin";
+    uint8_t icac[]   = { 0x0A, 0x0B };
+    AdminEntryType admin;
+    admin.nodeID       = 100;
+    admin.vendorID     = static_cast<VendorId>(7);
+    admin.friendlyName = CharSpan(adminName, sizeof(adminName) - 1);
+    admin.icac         = ByteSpan(icac);
+    ASSERT_EQ(store.AddAdmin(admin), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.AddPendingNode(123, "controller"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "endpoint"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type binding;
+    binding.group.SetValue(10);
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, binding), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum::kView;
+    aclEntry.authMode  = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum::kCase;
+    ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+
+    // Removing a non-anchor fabric leaves everything intact.
+    store.OnFabricRemoved(kOtherFabric);
+    EXPECT_EQ(store.GetGroupKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetAdminEntries().size(), 1u);
+    EXPECT_EQ(store.GetNodeInformationEntries().size(), 1u);
+    EXPECT_EQ(store.GetNodeACLList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointBindingList().size(), 1u);
+    EXPECT_EQ(store.GetNodeEndpointList().size(), 1u);
+    EXPECT_EQ(store.GetAnchorFabricIndex(), kAnchorFabric);
+
+    // Removing the joint (anchor) fabric wipes the datastore and resets anchor identity.
+    store.OnFabricRemoved(kAnchorFabric);
+    EXPECT_TRUE(store.GetGroupKeySetList().empty());
+    EXPECT_TRUE(store.GetAdminEntries().empty());
+    EXPECT_TRUE(store.GetNodeInformationEntries().empty());
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+    EXPECT_TRUE(store.GetEndpointBindingList().empty());
+    EXPECT_TRUE(store.GetNodeEndpointList().empty());
+    EXPECT_EQ(store.GetAnchorFabricIndex(), kUndefinedFabricIndex);
+    EXPECT_EQ(store.GetAnchorNodeId(), kUndefinedNodeId);
+}
+
+// Direct unit tests for the detail::MarkEntryCommittedIfFound helper. It re-resolves an entry by a
+// stable-key predicate (rather than a captured iterator/index) inside an async SyncNode completion
+// and marks the matched entry kCommitted. A minimal fake entry mirrors the only field the helper
+// touches (statusEntry.state), keeping these tests focused on the generic lookup/mutate contract.
+namespace {
+
+struct FakeEntry
+{
+    int key;
+    struct
+    {
+        JointFabricCluster::DatastoreStateEnum state;
+    } statusEntry;
+};
+
+FakeEntry MakePendingEntry(int key)
+{
+    return FakeEntry{ key, { JointFabricCluster::DatastoreStateEnum::kPending } };
+}
+
+auto MatchKey(int key)
+{
+    return [key](const FakeEntry & e) { return e.key == key; };
+}
+
+} // namespace
+
+TEST(MarkEntryCommittedIfFoundTest, MarksMatchingEntryCommitted)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(1));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, LeavesNonMatchingEntriesUntouched)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1), MakePendingEntry(2), MakePendingEntry(3) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(2));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+    EXPECT_EQ(entries[2].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, NoMatchIsNoOp)
+{
+    std::vector<FakeEntry> entries{ MakePendingEntry(1), MakePendingEntry(2) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(99));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+TEST(MarkEntryCommittedIfFoundTest, EmptyVectorIsNoOp)
+{
+    std::vector<FakeEntry> entries;
+
+    // Must not dereference end(); simply does nothing on an empty vector.
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(1));
+
+    EXPECT_TRUE(entries.empty());
+}
+
+TEST(MarkEntryCommittedIfFoundTest, MarksOnlyFirstMatch)
+{
+    // find_if stops at the first match: a duplicate key only commits the earliest entry. Callers are
+    // expected to pass predicates that uniquely identify the synced entry.
+    std::vector<FakeEntry> entries{ MakePendingEntry(7), MakePendingEntry(7) };
+
+    chip::app::detail::MarkEntryCommittedIfFound(entries, MatchKey(7));
+
+    EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
+    EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
 
 } // namespace
