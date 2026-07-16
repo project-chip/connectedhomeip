@@ -423,4 +423,3 @@ def pics(*pics_list):
         fn._pics = list(pics_list)
         return fn
     return decorator
-    

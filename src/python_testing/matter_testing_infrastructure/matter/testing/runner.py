@@ -442,6 +442,7 @@ def _prepopulate_wildcard_via_pase(event_loop, default_controller, node_id, matt
             exc_info=True
         )
 
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
