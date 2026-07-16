@@ -228,8 +228,6 @@ CHIP_ERROR AvAnalysisServerLogic::StoreActiveAmbientContextTriggers()
     ReturnErrorOnFailure(mAttributePersistenceProvider->WriteValue(path, bufferSpan));
 
     return CHIP_NO_ERROR;
-
-    return CHIP_NO_ERROR;
 }
 
 /**
@@ -491,7 +489,14 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 // 
                 if (HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) 
                 {
-                    it2->SetZoneIDs(chip::MakeOptional(DataModel::MakeNullable(zoneIDs)));
+                    if (hasNonNullZoneIDs)
+                    {
+                        it2->SetZoneIDs(chip::MakeOptional(DataModel::MakeNullable(zoneIDs)));
+                    }
+                    else
+                    {
+                        it2->SetZoneIDs(chip::MakeOptional(DataModel::NullNullable));
+                    }
                 }
             }
         }
