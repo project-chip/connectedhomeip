@@ -44,6 +44,9 @@ CHIP_ERROR HumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataMode
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
+    mOnOffCluster.Create(endpoint, OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
+    ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
+
     mHumidistatCluster.Create(endpoint, mFeatures, mOptionalAttributes, mHumidistatConfig);
     ReturnErrorOnFailure(provider.AddCluster(mHumidistatCluster.Registration()));
 
@@ -67,6 +70,11 @@ void HumidityConditioner::Unregister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mHumidistatCluster.Cluster()));
         mHumidistatCluster.Destroy();
+    }
+    if (mOnOffCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+        mOnOffCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {

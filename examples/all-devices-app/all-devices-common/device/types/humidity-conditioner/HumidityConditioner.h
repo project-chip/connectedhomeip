@@ -18,6 +18,7 @@
 
 #include <app/clusters/humidistat-server/HumidistatCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
@@ -39,6 +40,7 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::OnOffCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
     Clusters::HumidistatCluster & HumidistatCluster() { return mHumidistatCluster.Cluster(); }
 
     Clusters::RelativeHumidityMeasurementCluster & RelativeHumidityMeasurementCluster()
@@ -53,6 +55,7 @@ protected:
     const Clusters::HumidistatCluster::StartupConfiguration mHumidistatConfig;
     const Clusters::RelativeHumidityMeasurementCluster::Config mHumidityConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::HumidistatCluster> mHumidistatCluster;
     LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mRelativeHumidityMeasurementCluster;
 };
