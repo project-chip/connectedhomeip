@@ -103,8 +103,7 @@ Humidistat::SystemStateEnum DefaultSystemStateForMode(Humidistat::ModeEnum mode)
     }
 }
 
-CHIP_ERROR EncodeSupportedModes(BitFlags<Humidistat::Feature> features,
-                                const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR EncodeSupportedModes(BitFlags<Humidistat::Feature> features, const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     if (features.Has(Feature::kHumidifier))
     {
@@ -309,9 +308,8 @@ void HumidistatCluster::LoadPersistentAttributes()
         }
 
         const auto defaultCondRunCount = mCondRunCount;
-        if (!attrPersistence.LoadNativeEndianValue<uint16_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id,
-                                                                                   CondRunCount::Id),
-                                                             mCondRunCount, defaultCondRunCount))
+        if (!attrPersistence.LoadNativeEndianValue<uint16_t>(
+                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id), mCondRunCount, defaultCondRunCount))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load CondRunCount attribute, using default");
         }
@@ -357,8 +355,8 @@ bool HumidistatCluster::IsSystemStateSupported(Humidistat::SystemStateEnum syste
     }
 }
 
-bool HumidistatCluster::IsMistTypeConsistentWithMode(
-    Humidistat::ModeEnum mode, DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const
+bool HumidistatCluster::IsMistTypeConsistentWithMode(Humidistat::ModeEnum mode,
+                                                     DataModel::Nullable<chip::BitMask<Humidistat::MistTypeBitmap>> mistType) const
 {
     if (mistType.IsNull())
     {
@@ -715,9 +713,9 @@ CHIP_ERROR HumidistatCluster::SetCondRunCount(uint16_t condRunCount)
 
     if (mContext != nullptr)
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id),
-            { reinterpret_cast<const uint8_t *>(&mCondRunCount), sizeof(mCondRunCount) }));
+        LogErrorOnFailure(
+            mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id),
+                                                  { reinterpret_cast<const uint8_t *>(&mCondRunCount), sizeof(mCondRunCount) }));
     }
 
     if (mDelegate != nullptr)
@@ -749,10 +747,9 @@ CHIP_ERROR HumidistatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     static constexpr DataModel::AttributeEntry kOptionalEntries[] = {
-        UserSetpoint::kMetadataEntry, MinSetpoint::kMetadataEntry,    MaxSetpoint::kMetadataEntry,
-        Step::kMetadataEntry,         TargetSetpoint::kMetadataEntry, MistType::kMetadataEntry,
-        Continuous::kMetadataEntry,   Sleep::kMetadataEntry,          Optimal::kMetadataEntry,
-        CondPumpEnabled::kMetadataEntry, CondRunCount::kMetadataEntry,
+        UserSetpoint::kMetadataEntry,   MinSetpoint::kMetadataEntry,     MaxSetpoint::kMetadataEntry,  Step::kMetadataEntry,
+        TargetSetpoint::kMetadataEntry, MistType::kMetadataEntry,        Continuous::kMetadataEntry,   Sleep::kMetadataEntry,
+        Optimal::kMetadataEntry,        CondPumpEnabled::kMetadataEntry, CondRunCount::kMetadataEntry,
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -774,9 +771,8 @@ DataModel::ActionReturnStatus HumidistatCluster::ReadAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case SupportedModes::Id:
-        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            return EncodeSupportedModes(mFeatures, listEncoder);
-        });
+        return encoder.EncodeList(
+            [this](const auto & listEncoder) -> CHIP_ERROR { return EncodeSupportedModes(mFeatures, listEncoder); });
 
     case Humidistat::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);

@@ -54,8 +54,9 @@ LoggingHumidityConditioner::LoggingHumidityConditioner(TimerDelegate & timerDele
                                                       Humidistat::Feature::kSensor, Humidistat::Feature::kContinuous,
                                                       Humidistat::Feature::kOptimal, Humidistat::Feature::kAuto,
                                                       Humidistat::Feature::kColdMist, Humidistat::Feature::kCondPump),
-                        HumidistatCluster::OptionalAttributeSet().Set<Humidistat::Attributes::Sleep::Id>().Set<
-                            Humidistat::Attributes::TargetSetpoint::Id>(),
+                        HumidistatCluster::OptionalAttributeSet()
+                            .Set<Humidistat::Attributes::Sleep::Id>()
+                            .Set<Humidistat::Attributes::TargetSetpoint::Id>(),
                         kDefaultHumidistatConfig, kDefaultHumidityConfig)
 {}
 

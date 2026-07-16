@@ -221,7 +221,7 @@ private:
     bool mAllowSetSettingsContinuous = true;
     bool mAllowSetSettingsSleep      = true;
     bool mAllowSetSettingsOptimal    = true;
-    HumidistatDelegate * mDelegate = nullptr;
+    HumidistatDelegate * mDelegate   = nullptr;
 
     bool IsModeSupported(Humidistat::ModeEnum mode) const;
     bool IsSystemStateSupported(Humidistat::SystemStateEnum systemState) const;
