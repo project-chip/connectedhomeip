@@ -943,7 +943,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: list[str] | None = None) -> argparse.ArgumentParser::
+def parse_matter_test_args(argv: list[str] | None = None) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
