@@ -134,6 +134,17 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
         mCurrentPositionTiltPercent100ths, mCurrentPositionTiltPercent100ths);
 
+    uint8_t rawMode = mMode.Raw();
+    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id),
+                                               rawMode, rawMode);
+    mMode = chip::BitMask<Mode>(rawMode);
+
+    uint8_t rawConfigStatus = mConfigStatus.Raw();
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id), rawConfigStatus,
+        rawConfigStatus);
+    mConfigStatus = chip::BitMask<ConfigStatus>(rawConfigStatus);
+
     return CHIP_NO_ERROR;
 }
 
@@ -159,7 +170,13 @@ void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
 
 void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
 {
-    SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id);
+    VerifyOrReturn(SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    uint8_t rawConfigStatus = mConfigStatus.Raw();
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&rawConfigStatus), sizeof(rawConfigStatus))));
 }
 
 void WindowCoveringCluster::SetCurrentPositionLiftPercentage(NPercent curLiftPercentage)
@@ -280,6 +297,14 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
     }
 
     VerifyOrReturn(SetAttributeValue(mMode, mode, Attributes::Mode::Id));
+
+    if (mContext != nullptr)
+    {
+        uint8_t rawMode = mMode.Raw();
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id),
+            ByteSpan(reinterpret_cast<const uint8_t *>(&rawMode), sizeof(rawMode))));
+    }
 
     chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
     newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));

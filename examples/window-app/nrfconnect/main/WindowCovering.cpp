@@ -104,7 +104,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
 {
     auto wc = FindClusterOnEndpoint(Endpoint());
-    VerifyOrDie(wc != nullptr);
+    VerifyOrReturn(wc != nullptr, 0);
     chip::Percent100ths percent100ths{};
     NPercent100ths current{};
     OperationalState opState{};

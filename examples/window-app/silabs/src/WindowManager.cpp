@@ -620,7 +620,7 @@ void WindowManager::UpdateLED()
 {
     Cover & cover = GetCover();
     auto wc       = FindClusterOnEndpoint(cover.mEndpoint);
-    VerifyOrDie(wc != nullptr);
+    VerifyOrReturn(wc != nullptr);
     if (mResetWarning)
     {
         mActionLED.Set(false);
@@ -677,7 +677,8 @@ void WindowManager::UpdateLCD()
         chip::app::DataModel::Nullable<uint16_t> tilt;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        auto wc   = FindClusterOnEndpoint(Endpoint());
+        auto wc = FindClusterOnEndpoint(Endpoint());
+        VerifyOrReturn(wc != nullptr);
         Type type = TypeGet(cover.mEndpoint);
 
         lift = wc->GetCurrentPositionLiftPercent100ths();
