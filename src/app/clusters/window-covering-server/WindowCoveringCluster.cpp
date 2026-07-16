@@ -113,8 +113,6 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence attributePersistence(context.attributeStorage);
 
-    // Load persistent attributes from storage. If a value is not present in storage, the
-    // existing member value (set by the constructor) is kept.
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsLift::Id),
         mNumberOfActuationsLift, mNumberOfActuationsLift);
@@ -325,7 +323,7 @@ DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataMod
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(WindowCovering::kRevision);
     case Attributes::FeatureMap::Id:
-        return encoder.Encode(GetFeatureMap());
+        return encoder.Encode(GetFeatureMap().Raw());
     case Attributes::Type::Id:
         return encoder.Encode(GetType());
     case Attributes::NumberOfActuationsLift::Id:
@@ -333,13 +331,13 @@ DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataMod
     case Attributes::NumberOfActuationsTilt::Id:
         return encoder.Encode(GetNumberOfActuationsTilt());
     case Attributes::ConfigStatus::Id:
-        return encoder.Encode(GetConfigStatus());
+        return encoder.Encode(GetConfigStatus().Raw());
     case Attributes::CurrentPositionLiftPercentage::Id:
         return encoder.Encode(GetCurrentPositionLiftPercentage());
     case Attributes::CurrentPositionTiltPercentage::Id:
         return encoder.Encode(GetCurrentPositionTiltPercentage());
     case Attributes::OperationalStatus::Id:
-        return encoder.Encode(GetOperationalStatus());
+        return encoder.Encode(GetOperationalStatus().Raw());
     case Attributes::TargetPositionLiftPercent100ths::Id:
         return encoder.Encode(GetTargetPositionLiftPercent100ths());
     case Attributes::TargetPositionTiltPercent100ths::Id:
@@ -351,9 +349,9 @@ DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataMod
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         return encoder.Encode(GetCurrentPositionTiltPercent100ths());
     case Attributes::Mode::Id:
-        return encoder.Encode(GetMode());
+        return encoder.Encode(GetMode().Raw());
     case Attributes::SafetyStatus::Id:
-        return encoder.Encode(GetSafetyStatus());
+        return encoder.Encode(GetSafetyStatus().Raw());
     default:
         return Status::UnsupportedAttribute;
     }
