@@ -136,9 +136,7 @@ private:
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
-TestACSDelegate::TestACSDelegate() :
-mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}
-{}
+TestACSDelegate::TestACSDelegate() : mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{} {}
 
 SemanticTagType * TestACSDelegate::GetAmbientContextTypeSupportedBuf(size_t size)
 {
