@@ -102,7 +102,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
     
     // Fetch all initialization paramaters for the AV Analysis Server
-    BitFlags<AvAnalysis::Feature, uint32_t> avAnalysisFeatures(AvAnalysis::Feature::kLocalContextDetection);
+    BitFlags<AvAnalysis::Feature, uint32_t> avAnalysisFeatures(AvAnalysis::Feature::kLocalContextDetection, 
+        AvAnalysis::Feature::kPerZoneContextDetection);
     std::vector<Descriptor::Structs::SemanticTagStruct::Type> appSupportedAmbientContexts = 
         mCameraDevice->GetCameraHALInterface().GetSupportedAmbientContexts();
     
