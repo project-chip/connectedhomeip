@@ -181,7 +181,7 @@ extern "C" void sl_ot_create_instance(void)
     // Instance 0: Matter protocol stack
     sOTInstance = otInstanceInitMultiple(0);
 #else
-    if(sOTInstance == NULL)
+    if (sOTInstance == NULL)
     {
         sOTInstance = otInstanceInitSingle();
     }
