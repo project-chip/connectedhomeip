@@ -29,9 +29,7 @@ source_set("matter-shell") {
   defines = [ "ENABLE_CHIP_SHELL" ]
 
   sources = [ "./MatterShell.cpp" ]
-  include_dirs = [
-    "."
-  ]
+  include_dirs = [ "." ]
 
   public_deps = [
     "${chip_root}/examples/shell/shell_common:shell_common",
@@ -49,8 +47,8 @@ source_set("icd") {
   public_configs = [ ":icd-shell-config" ]
 
   deps = [
-    "${chip_root}/src/app/icd/server:notifier",
     ":matter-shell",
+    "${chip_root}/src/app/icd/server:notifier",
   ]
 }
 
@@ -63,8 +61,8 @@ source_set("im") {
   public_configs = [ ":im-shell-config" ]
 
   deps = [
+    ":matter-shell",
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/server:server",
-    ":matter-shell",
   ]
 }
