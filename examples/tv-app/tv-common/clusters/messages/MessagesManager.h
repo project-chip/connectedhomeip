@@ -66,8 +66,8 @@ struct CachedMessage
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
-                  const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText,
-                  std::string languageCode, std::string messageUri) :
+                  const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText, std::string languageCode,
+                  std::string messageUri) :
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
         mLanguageCode(languageCode), mMessageUri(messageUri)
