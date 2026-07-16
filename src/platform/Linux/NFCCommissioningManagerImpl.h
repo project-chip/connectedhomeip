@@ -28,7 +28,6 @@
 #include <lib/core/Global.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
-#include <atomic>
 #include <condition_variable>
 #include <cstring>
 #include <functional>
@@ -36,6 +35,8 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <vector>
+#include <system/SystemMutex.h>
 #ifdef __APPLE__
 #include <PCSC/winscard.h>
 #else
@@ -140,6 +141,35 @@ struct NfcWorkItem
 
 /**
  * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
+ *
+ * Threading model:
+ * - This class is intended to be used by one CHIP/platform event-loop thread plus one NFC worker thread.
+ * - Public API methods are expected to be called from the CHIP thread.
+ * - The NFC worker thread performs blocking PC/SC operations and never directly invokes CHIP transport callbacks;
+ *   instead it dispatches back onto the CHIP thread via PlatformMgr().ScheduleWork(...).
+ *
+ * Locking model:
+ * - mStateMutex protects shared manager state:
+ *   - mNFCBase
+ *   - mDelegate
+ *   - mLastTagInstanceUsed
+ *   - mTagInstances
+ * - mWorkQueueMutex protects the worker queue and worker lifecycle flags:
+ *   - mWorkQueue
+ *   - mNfcWorkerThreadRunning
+ *   - mShuttingDown
+ * - mWorkerInitMutex is used only for the worker initialization handshake.
+ *
+ * Locking rules:
+ * - Do not hold mStateMutex while performing blocking PC/SC operations.
+ * - Do not hold mStateMutex while invoking or scheduling callbacks into CHIP objects.
+ * - Do not hold mWorkQueueMutex while processing a work item.
+ * - Avoid nested locking between mStateMutex and mWorkQueueMutex.
+ *
+ * TagInstance lifetime:
+ * - TagInstance objects are reference-counted via std::shared_ptr.
+ * - Once a work item captures a TagInstance, the instance remains alive until that work item completes,
+ *   even if the manager cache no longer references it.
  */
 class NFCCommissioningManagerImpl final : public NFCCommissioningManager,
                                           public Nfc::NFCReaderTransport,
@@ -192,9 +222,10 @@ private:
 
     static Global<NFCCommissioningManagerImpl> sInstance;
 
-    void EraseAllTagInstancesUsingReaderName(const char * readerName);
-    std::shared_ptr<TagInstance> SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
-    std::shared_ptr<TagInstance> SearchTagInstanceFromDiscriminator(uint16_t discriminator);
+    void EraseAllTagInstancesUsingReaderName(const char * readerName) CHIP_REQUIRES(mStateMutex);
+    std::shared_ptr<TagInstance> SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle)
+        CHIP_REQUIRES(mStateMutex);
+    std::shared_ptr<TagInstance> SearchTagInstanceFromDiscriminator(uint16_t discriminator) CHIP_REQUIRES(mStateMutex);
 
     // Start scan on all available readers and scan for NFC Tags.
     CHIP_ERROR ScanAllReaders(void);
@@ -202,39 +233,35 @@ private:
     // Start scan on a given reader
     CHIP_ERROR ScanReader(char * readerName);
 
-    // Protected by mNFCBaseMutex
-    Transport::NFCBase * mNFCBase = nullptr;
-    std::mutex mNFCBaseMutex;
+    Transport::NFCBase * mNFCBase CHIP_GUARDED_BY(mStateMutex) = nullptr;
 
     // PC/SC context owned by the NFC worker thread.
     SCARDCONTEXT mPcscContext = 0;
 
     // Cache of discovered NFC tag instances.
-    std::shared_ptr<TagInstance> mLastTagInstanceUsed;
-    std::vector<std::shared_ptr<TagInstance>> mTagInstances;
-    std::mutex mTagInstancesMutex;
+    std::shared_ptr<TagInstance> mLastTagInstanceUsed CHIP_GUARDED_BY(mStateMutex);
+    std::vector<std::shared_ptr<TagInstance>> mTagInstances CHIP_GUARDED_BY(mStateMutex);
+
+    // Shared manager state mutex
+    std::mutex mStateMutex;
 
     // NFC worker Thread and synchronization primitives
     std::thread mNfcWorkerThread;
-    std::queue<NfcWorkItem> mWorkQueue;
+    std::queue<NfcWorkItem> mWorkQueue CHIP_GUARDED_BY(mWorkQueueMutex);
     std::mutex mWorkQueueMutex;
     std::condition_variable mWorkQueueCondition;
-    std::atomic<bool> mNfcWorkerThreadRunning{ false };
-    bool mShuttingDown = false;
-
-    // Mutex protecting the worker thread startup sequence
-    std::mutex mWorkerStartMutex;
+    bool mNfcWorkerThreadRunning CHIP_GUARDED_BY(mWorkQueueMutex) = false;
+    bool mShuttingDown CHIP_GUARDED_BY(mWorkQueueMutex) = false;
 
     // Synchronization primitives used to wait until the worker thread has finished
     // its initialization, including PC/SC context creation.
     std::mutex mWorkerInitMutex;
     std::condition_variable mWorkerInitCondition;
-    bool mWorkerInitCompleted    = false;
-    CHIP_ERROR mWorkerInitResult = CHIP_ERROR_INCORRECT_STATE;
+    bool mWorkerInitCompleted CHIP_GUARDED_BY(mWorkerInitMutex)    = false;
+    CHIP_ERROR mWorkerInitResult CHIP_GUARDED_BY(mWorkerInitMutex) = CHIP_ERROR_INCORRECT_STATE;
 
     // NFCReaderTransport state
-    Nfc::NFCReaderTransportDelegate * mDelegate = nullptr;
-    std::mutex mDelegateMutex;
+    Nfc::NFCReaderTransportDelegate * mDelegate CHIP_GUARDED_BY(mStateMutex) = nullptr;
 
     // Private methods
     void NfcWorkerThreadMain();

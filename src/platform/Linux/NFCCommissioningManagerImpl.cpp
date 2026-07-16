@@ -95,8 +95,6 @@ private:
     const SCARD_IO_REQUEST * pioSendPci;
     uint16_t discriminator;
 
-    std::atomic<bool> mIsValid{ true };
-
     // Buffer containing a single APDU command to send to the tag
     uint8_t mAPDUTxBuffer[MAX_APDU_SIZE];
 
@@ -150,10 +148,6 @@ public:
             readerName = nullptr;
         }
     }
-
-    bool IsValid() const { return mIsValid.load(); }
-
-    void Invalidate() { mIsValid.store(false); }
 
     void Print() const
     {
@@ -606,7 +600,7 @@ void NFCCommissioningManagerImpl::DispatchTagDiscovery(intptr_t arg)
     auto * ctx                                 = reinterpret_cast<TagDiscoveryContext *>(arg);
     Nfc::NFCReaderTransportDelegate * delegate = nullptr;
     {
-        std::lock_guard<std::mutex> lock(ctx->manager->mDelegateMutex);
+        std::lock_guard<std::mutex> lock(ctx->manager->mStateMutex);
         delegate = ctx->manager->mDelegate;
     }
     if (delegate != nullptr)
@@ -647,6 +641,12 @@ void NFCCommissioningManagerImpl::_Shutdown()
     {
         mNfcWorkerThread.join();
     }
+
+    {
+        std::lock_guard<std::mutex> lock(mStateMutex);
+        mLastTagInstanceUsed = nullptr;
+        mTagInstances.clear();
+    }
 }
 
 // ===== start implement virtual methods on NfcApplicationDelegate.
@@ -654,7 +654,7 @@ void NFCCommissioningManagerImpl::_Shutdown()
 CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
 {
     {
-        std::lock_guard<std::mutex> lock(mWorkerStartMutex);
+        std::lock_guard<std::mutex> lock(mWorkQueueMutex);
         if (!mNfcWorkerThreadRunning)
         {
             if (mNfcWorkerThread.joinable())
@@ -667,11 +667,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
                 mWorkerInitCompleted = false;
                 mWorkerInitResult    = CHIP_ERROR_INCORRECT_STATE;
             }
-            {
-                std::lock_guard<std::mutex> queueLock(mWorkQueueMutex);
-                mShuttingDown = false;
-                mNfcWorkerThreadRunning = true;
-            }
+            mShuttingDown = false;
+            mNfcWorkerThreadRunning = true;
 
             mNfcWorkerThread = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
         }
@@ -700,13 +697,13 @@ CHIP_ERROR NFCCommissioningManagerImpl::RunSyncOnWorker(NfcWorkItem && item)
 
 Transport::NFCBase * NFCCommissioningManagerImpl::GetNFCBase()
 {
-    std::lock_guard<std::mutex> lock(mNFCBaseMutex);
+    std::lock_guard<std::mutex> lock(mStateMutex);
     return mNFCBase;
 }
 
 void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
 {
-    std::lock_guard<std::mutex> lock(mNFCBaseMutex);
+    std::lock_guard<std::mutex> lock(mStateMutex);
     mNFCBase = nfcBase;
 }
 
@@ -724,7 +721,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     ChipLogProgress(DeviceLayer, "CanSendToPeer? nfcShortId = %d", nfcShortId);
 
     {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+        std::lock_guard<std::mutex> lock(mStateMutex);
 
         // Check if mLastTagInstanceUsed corresponds to the same nfcShortId
         if ((mLastTagInstanceUsed != nullptr) && (mLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
@@ -757,7 +754,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     }
 
     {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+        std::lock_guard<std::mutex> lock(mStateMutex);
 
         // Check again if we now have a TagInstance corresponding to this nfcShortId
         std::shared_ptr<TagInstance> tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
@@ -779,6 +776,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnqueueWork(NfcWorkItem && item)
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
         VerifyOrReturnError(!mShuttingDown, CHIP_ERROR_SHUT_DOWN);
+        VerifyOrReturnError(mNfcWorkerThreadRunning, CHIP_ERROR_INCORRECT_STATE);
         mWorkQueue.push(std::move(item));
     }
     mWorkQueueCondition.notify_one();
@@ -797,7 +795,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     uint16_t nfcShortId = address.GetNFCShortId();
 
     {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+        std::lock_guard<std::mutex> lock(mStateMutex);
 
         // Check if mLastTagInstanceUsed corresponds to the same nfcShortId
         if ((mLastTagInstanceUsed != nullptr) && (mLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
@@ -834,6 +832,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
 
 void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
 {
+    ChipLogProgressNfcDebug(DeviceLayer, "Start NFC Worker Thread");
+
     // Creates an Application Context to the PC/SC Resource Manager.
     LONG result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &mPcscContext);
 
@@ -846,8 +846,11 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         else
         {
             ChipLogError(DeviceLayer, "SCardEstablishContext failed: %s", pcsc_stringify_error(result));
-            mWorkerInitResult       = CHIP_ERROR_INTERNAL;
-            mNfcWorkerThreadRunning = false;
+            mWorkerInitResult = CHIP_ERROR_INTERNAL;
+            {
+                std::lock_guard<std::mutex> queueLock(mWorkQueueMutex);
+                mNfcWorkerThreadRunning = false;
+            }
         }
         mWorkerInitCompleted = true;
     }
@@ -858,7 +861,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         return;
     }
 
-    while (mNfcWorkerThreadRunning)
+    while (true)
     {
         NfcWorkItem item;
         CHIP_ERROR itemResult = CHIP_NO_ERROR;
@@ -881,7 +884,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
 
         if (item.type == NfcWorkType::kScan)
         {
-            // Scan all the readers and tags
+            ChipLogProgressNfcDebug(DeviceLayer, "Scan all the readers and tags");
             itemResult = ScanAllReaders();
 
             // and check if we now have a TagInstance corresponding to wanted discriminator
@@ -889,7 +892,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
             {
                 std::shared_ptr<TagInstance> tagInstance;
                 {
-                    std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+                    std::lock_guard<std::mutex> lock(mStateMutex);
                     tagInstance = SearchTagInstanceFromDiscriminator(item.targetIdentifier.discriminator);
                 }
 
@@ -931,7 +934,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
                 ChipLogProgressNfcDebug(DeviceLayer, "Sending the next NFCMessage from the queue");
 
                 std::shared_ptr<TagInstance> tagInstance = item.message->GetTagInstance();
-                if (tagInstance == nullptr || !tagInstance->IsValid())
+                if (tagInstance == nullptr)
                 {
                     ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message");
                     itemResult = CHIP_ERROR_INCORRECT_STATE;
@@ -963,31 +966,11 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
     }
 
     // Release all TagInstances before releasing the PC/SC context.
-    std::shared_ptr<TagInstance> lastTagInstanceUsed;
-    std::vector<std::shared_ptr<TagInstance>> tagInstancesToRelease;
     {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
-
-        if (mLastTagInstanceUsed != nullptr)
-        {
-            mLastTagInstanceUsed->Invalidate();
-        }
-
-        for (auto & instance : mTagInstances)
-        {
-            instance->Invalidate();
-        }
-
-        // Move manager-owned shared_ptr references to local variables so destruction
-        // happens outside the mutex.
-        lastTagInstanceUsed = std::move(mLastTagInstanceUsed);
-        tagInstancesToRelease.swap(mTagInstances);
+        std::lock_guard<std::mutex> lock(mStateMutex);
+        mLastTagInstanceUsed = nullptr;
+        mTagInstances.clear();
     }
-
-    // Drop the manager-owned shared_ptr references outside the mutex so that
-    // TagInstance destructors can run without holding mTagInstancesMutex.
-    lastTagInstanceUsed.reset();
-    tagInstancesToRelease.clear();
 
     if (mPcscContext != 0)
     {
@@ -1067,7 +1050,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
 
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
     {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+        std::lock_guard<std::mutex> lock(mStateMutex);
         EraseAllTagInstancesUsingReaderName(readerName);
     }
 
@@ -1076,9 +1059,11 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
     switch (result)
     {
     case static_cast<LONG>(SCARD_S_SUCCESS): {
+        ChipLogProgressNfcDebug(DeviceLayer, "SCardConnect succeeded for reader %s, cardHandle: 0x" ChipLogFormatX64,
+                                readerName, ChipLogValueX64(cardHandle));
         // Check if we already have this couple (readerName, cardHandle)
         {
-            std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+            std::lock_guard<std::mutex> lock(mStateMutex);
             tagInstance = SearchTagInstanceFromReaderNameAndCardHandle(readerName, cardHandle);
         }
 
@@ -1101,7 +1086,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
             }
 
             {
-                std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+                std::lock_guard<std::mutex> lock(mStateMutex);
                 mTagInstances.push_back(newTagInstance);
             }
         }
@@ -1164,7 +1149,6 @@ void NFCCommissioningManagerImpl::EraseAllTagInstancesUsingReaderName(const char
     {
         if (strcmp((*it)->GetReaderName(), readerName) == 0)
         {
-            (*it)->Invalidate(); // Mark as invalid before erasing
             // tagInstance will be deleted automatically when both the mTagInstances vector
             //  and the message queue will no more use it.
             it = mTagInstances.erase(it);
@@ -1180,20 +1164,20 @@ void NFCCommissioningManagerImpl::EraseAllTagInstancesUsingReaderName(const char
 
 void NFCCommissioningManagerImpl::SetDelegate(Nfc::NFCReaderTransportDelegate * delegate)
 {
-    std::lock_guard<std::mutex> lock(mDelegateMutex);
+    std::lock_guard<std::mutex> lock(mStateMutex);
     mDelegate = delegate;
 }
 
 CHIP_ERROR NFCCommissioningManagerImpl::StartDiscoveringTagMatchingAddress(const Nfc::NFCTag::Identifier & tagIdentifier)
 {
     {
-        std::lock_guard<std::mutex> lock(mNFCBaseMutex);
+        std::lock_guard<std::mutex> lock(mStateMutex);
         VerifyOrReturnError(mNFCBase != nullptr, CHIP_ERROR_INCORRECT_STATE);
     }
 
     ReturnErrorOnFailure(EnsureWorkerThreadStarted());
 
-    ChipLogProgress(DeviceLayer, "StartDiscoveringTagMatchingAddress discr %d", tagIdentifier.discriminator);
+    ChipLogProgressNfcDebug(DeviceLayer, "StartDiscoveringTagMatchingAddress discr %d", tagIdentifier.discriminator);
 
     NfcWorkItem item;
     item.type             = NfcWorkType::kScan;
@@ -1210,7 +1194,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::StopDiscoveringTags()
 
 bool NFCCommissioningManagerImpl::FindTagMatchingIdentifier(const Nfc::NFCTag::Identifier & tagIdentifier)
 {
-    std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+    std::lock_guard<std::mutex> lock(mStateMutex);
     return SearchTagInstanceFromDiscriminator(tagIdentifier.discriminator) != nullptr;
 }
 
