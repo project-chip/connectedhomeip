@@ -29,6 +29,7 @@ using chip::app::CommandResponseHelper;
 using chip::Platform::CopyString;
 using AccountLoginDelegate      = chip::app::Clusters::AccountLogin::Delegate;
 using GetSetupPINResponse       = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using GetDeviceAuthURIResponse  = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Type;
 using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
 
 class AccountLoginManager : public AccountLoginDelegate
@@ -46,15 +47,18 @@ public:
                            const CharSpan & tempAccountIdentifierString) override;
     void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override;
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
+    void HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper) override;
+    bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     static const size_t kSetupPinSize = 12;
     char mSetupPin[kSetupPinSize];
+    bool mOAuthLoggedIn = false;
 
 private:
     ContentAppCommandDelegate * mCommandDelegate;
     EndpointId mEndpointId;
 
-    static constexpr uint16_t kClusterRevision = 2;
+    static constexpr uint16_t kClusterRevision = 3;
 };
