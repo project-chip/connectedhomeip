@@ -685,14 +685,31 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMaxCoolSetpointLimi
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband(int8_t value)
+Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband(int16_t value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAutoMode), Status::UnsupportedAttribute);
     VerifyOrReturnError(value >= 0 && value <= 127, Status::ConstraintError);
-    SetAttributeValue(mMinSetpointDeadBand, value, MinSetpointDeadBand::Id);
+    SetAttributeValue(mMinSetpointDeadBand, static_cast<int8_t>(value), MinSetpointDeadBand::Id);
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
         { reinterpret_cast<const uint8_t *>(&mMinSetpointDeadBand), sizeof(mMinSetpointDeadBand) }));
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status
+ThermostatCluster::HandleTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
+{
+    if (!value.IsNull())
+    {
+        VerifyOrReturnError(value.Value() >= 1 && value.Value() <= 1440, Status::ConstraintError);
+    }
+    SetAttributeValue(mTemperatureSetpointHoldDuration, value, TemperatureSetpointHoldDuration::Id);
+
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
     return Status::Success;
 }
 
@@ -796,7 +813,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         return HandleMaxCoolSetpointLimit(requested);
     }
     case MinSetpointDeadBand::Id: {
-        int8_t requested;
+        // TODO: should use uint8
+        int16_t requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
         return HandleMinSetpointDeadband(requested);
     }
@@ -823,10 +841,11 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         return NotifyAttributeChangedIfSuccess(
             TemperatureSetpointHold::Id,
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHold));
-    case TemperatureSetpointHoldDuration::Id:
-        return NotifyAttributeChangedIfSuccess(
-            TemperatureSetpointHoldDuration::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHoldDuration));
+    case TemperatureSetpointHoldDuration::Id: {
+        DataModel::Nullable<uint16_t> requested;
+        ReturnErrorOnFailure(decoder.Decode(requested));
+        return HandleTemperatureSetpointHoldDuration(requested);
+    }
     case EmergencyHeatDelta::Id:
         return NotifyAttributeChangedIfSuccess(
             EmergencyHeatDelta::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mEmergencyHeatDelta));
@@ -1418,7 +1437,7 @@ int16_t ThermostatCluster::GetMaxCoolSetpointLimit()
     return mMaxCoolSetpointLimit;
 }
 
-Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadband(int8_t value)
+Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadband(int16_t value)
 {
     return HandleMinSetpointDeadband(value);
 }

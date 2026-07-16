@@ -213,7 +213,7 @@ public:
     int16_t GetMaxCoolSetpointLimit();
 
     // MinSetpointDeadbanc
-    Protocols::InteractionModel::Status SetMinSetpointDeadband(int8_t value);
+    Protocols::InteractionModel::Status SetMinSetpointDeadband(int16_t value);
     int8_t GetMinSetpointDeadband();
 
     // RemoteSensing
@@ -416,7 +416,8 @@ private:
     Protocols::InteractionModel::Status HandleMaxHeatSetpointLimit(int16_t value);
     Protocols::InteractionModel::Status HandleMinCoolSetpointLimit(int16_t value);
     Protocols::InteractionModel::Status HandleMaxCoolSetpointLimit(int16_t value);
-    Protocols::InteractionModel::Status HandleMinSetpointDeadband(int8_t value);
+    Protocols::InteractionModel::Status HandleMinSetpointDeadband(int16_t value);
+    Protocols::InteractionModel::Status HandleTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value);
     Protocols::InteractionModel::Status HandleRemoteSensing(BitMask<RemoteSensingBitmap> value);
     Protocols::InteractionModel::Status HandleControlSequenceOfOperation(ControlSequenceOfOperationEnum value);
     Protocols::InteractionModel::Status HandleSystemMode(SystemModeEnum value);
