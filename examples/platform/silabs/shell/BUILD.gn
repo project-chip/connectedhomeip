@@ -17,18 +17,27 @@ import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-# This is necessary since the BUILD.gn for both platforms are still split
-shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
-if (wifi_soc) {
-  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
-}
-
 config("icd-shell-config") {
   include_dirs = [ "./icd/" ]
 }
 
 config("im-shell-config") {
   include_dirs = [ "./im/" ]
+}
+
+source_set("matter-shell") {
+  defines = [ "ENABLE_CHIP_SHELL" ]
+
+  sources = [ "./MatterShell.cpp" ]
+  include_dirs = [
+    "."
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib/shell:shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 }
 
 source_set("icd") {
@@ -41,7 +50,7 @@ source_set("icd") {
 
   deps = [
     "${chip_root}/src/app/icd/server:notifier",
-    "${shell_dependency_path}:matter-shell",
+    ":matter-shell",
   ]
 }
 
@@ -56,6 +65,6 @@ source_set("im") {
   deps = [
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/server:server",
-    "${shell_dependency_path}:matter-shell",
+    ":matter-shell",
   ]
 }
