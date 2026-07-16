@@ -365,6 +365,7 @@ public:
                            const Commands::AtomicRequest::DecodableType & commandData);
     void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AtomicRequest::DecodableType & commandData);
+
 protected:
     // Attributes
     DataModel::Nullable<int16_t> mLocalTemperature{};
@@ -413,7 +414,6 @@ protected:
     DataModel::Nullable<chip::ByteSpan> mActivePresetHandle{};
     DataModel::Nullable<chip::ByteSpan> mActiveScheduleHandle{};
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
-
 
 private:
     // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
@@ -491,7 +491,6 @@ private:
         EndpointId endpointId = kInvalidEndpointId;
     };
     AtomicWriteSession mAtomicWriteSession;
-
 };
 
 /**
