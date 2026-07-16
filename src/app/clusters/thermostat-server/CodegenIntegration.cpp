@@ -41,7 +41,7 @@ namespace {
 constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kThermostatMaxClusterCount   = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<ThermostatCluster> gServers[kThermostatMaxClusterCount];
+LazyRegisteredServerCluster<CodegenThermostatCluster> gServers[kThermostatMaxClusterCount];
 
 // Delegates set by the application (via SetDefaultDelegate) keyed by cluster instance index. The
 // application may set its delegate before or after the cluster is registered, so the value is
@@ -192,6 +192,215 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+CHIP_ERROR CodegenThermostatCluster::Startup(ServerClusterContext & context)
+{
+    // Load values from ZAP defaults.
+    // LocalTemperatureCalibration
+    int8_t localTemperatureCalibration = mLocalTemperatureCalibration;
+    if (LocalTemperatureCalibration::GetDefault(mPath.mEndpointId, &localTemperatureCalibration) == Status::Success)
+    {
+        mLocalTemperatureCalibration = localTemperatureCalibration;
+    }
+
+    // OccupiedCoolingSetpoint
+    int16_t occupiedCoolingSetpoint = mOccupiedCoolingSetpoint;
+    if (OccupiedCoolingSetpoint::GetDefault(mPath.mEndpointId, &occupiedCoolingSetpoint) == Status::Success)
+    {
+        mOccupiedCoolingSetpoint = occupiedCoolingSetpoint;
+    }
+
+    // OccupiedHeatingSetpoint
+    int16_t occupiedHeatingSetpoint = mOccupiedHeatingSetpoint;
+    if (OccupiedHeatingSetpoint::GetDefault(mPath.mEndpointId, &occupiedHeatingSetpoint) == Status::Success)
+    {
+        mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
+    }
+
+    // UnoccupiedCoolingSetpoint
+    int16_t unoccupiedCoolingSetpoint = mUnoccupiedCoolingSetpoint;
+    if (UnoccupiedCoolingSetpoint::GetDefault(mPath.mEndpointId, &unoccupiedCoolingSetpoint) == Status::Success)
+    {
+        mUnoccupiedCoolingSetpoint = unoccupiedCoolingSetpoint;
+    }
+
+    // UnoccupiedHeatingSetpoint
+    int16_t unoccupiedHeatingSetpoint = mUnoccupiedHeatingSetpoint;
+    if (UnoccupiedHeatingSetpoint::GetDefault(mPath.mEndpointId, &unoccupiedHeatingSetpoint) == Status::Success)
+    {
+        mUnoccupiedHeatingSetpoint = unoccupiedHeatingSetpoint;
+    }
+
+    // MinHeatSetpointLimit
+    int16_t minHeatSetpointLimit = mMinHeatSetpointLimit;
+    if (MinHeatSetpointLimit::GetDefault(mPath.mEndpointId, &minHeatSetpointLimit) == Status::Success)
+    {
+        mMinHeatSetpointLimit = minHeatSetpointLimit;
+    }
+
+    // MaxHeatSetpointLimit
+    int16_t maxHeatSetpointLimit = mMaxHeatSetpointLimit;
+    if (MaxHeatSetpointLimit::GetDefault(mPath.mEndpointId, &maxHeatSetpointLimit) == Status::Success)
+    {
+        mMaxHeatSetpointLimit = maxHeatSetpointLimit;
+    }
+
+    // MinCoolSetpointLimit
+    int16_t minCoolSetpointLimit = mMinCoolSetpointLimit;
+    if (MinCoolSetpointLimit::GetDefault(mPath.mEndpointId, &minCoolSetpointLimit) == Status::Success)
+    {
+        mMinCoolSetpointLimit = minCoolSetpointLimit;
+    }
+
+    // MaxCoolSetpointLimit
+    int16_t maxCoolSetpointLimit = mMaxCoolSetpointLimit;
+    if (MaxCoolSetpointLimit::GetDefault(mPath.mEndpointId, &maxCoolSetpointLimit) == Status::Success)
+    {
+        mMaxCoolSetpointLimit = maxCoolSetpointLimit;
+    }
+
+    // MinSetpointDeadBand
+    int8_t minSetpointDeadBand = mMinSetpointDeadBand;
+    if (MinSetpointDeadBand::GetDefault(mPath.mEndpointId, &minSetpointDeadBand) == Status::Success)
+    {
+        mMinSetpointDeadBand = minSetpointDeadBand;
+    }
+
+    // RemoteSensing
+    BitMask<RemoteSensingBitmap> remoteSensing = mRemoteSensing;
+    if (RemoteSensing::GetDefault(mPath.mEndpointId, &remoteSensing) == Status::Success)
+    {
+        mRemoteSensing = remoteSensing;
+    }
+
+    // ControlSequenceOfOperation
+    ControlSequenceOfOperationEnum controlSequenceOfOperation = mControlSequenceOfOperation;
+    if (ControlSequenceOfOperation::GetDefault(mPath.mEndpointId, &controlSequenceOfOperation) == Status::Success)
+    {
+        mControlSequenceOfOperation = controlSequenceOfOperation;
+    }
+
+    // SystemMode
+    SystemModeEnum systemMode = mSystemMode;
+    if (SystemMode::GetDefault(mPath.mEndpointId, &systemMode) == Status::Success)
+    {
+        mSystemMode = systemMode;
+    }
+
+    // ThermostatRunningMode
+    ThermostatRunningModeEnum thermostatRunningMode = mThermostatRunningMode;
+    if (ThermostatRunningMode::GetDefault(mPath.mEndpointId, &thermostatRunningMode) == Status::Success)
+    {
+        mThermostatRunningMode = thermostatRunningMode;
+    }
+
+    // TemperatureSetpointHold
+    TemperatureSetpointHoldEnum temperatureSetpointHold = mTemperatureSetpointHold;
+    if (TemperatureSetpointHold::GetDefault(mPath.mEndpointId, &temperatureSetpointHold) == Status::Success)
+    {
+        mTemperatureSetpointHold = temperatureSetpointHold;
+    }
+
+    // TemperatureSetpointHoldDuration
+    DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration = mTemperatureSetpointHoldDuration;
+    if (TemperatureSetpointHoldDuration::GetDefault(mPath.mEndpointId, temperatureSetpointHoldDuration) == Status::Success)
+    {
+        mTemperatureSetpointHoldDuration = temperatureSetpointHoldDuration;
+    }
+
+    // ThermostatRunningState
+    BitMask<RelayStateBitmap> thermostatRunningState = mThermostatRunningState;
+    if (ThermostatRunningState::GetDefault(mPath.mEndpointId, &thermostatRunningState) == Status::Success)
+    {
+        mThermostatRunningState = thermostatRunningState;
+    }
+
+    // SetpointChangeSource
+    SetpointChangeSourceEnum setpointChangeSource = mSetpointChangeSource;
+    if (SetpointChangeSource::GetDefault(mPath.mEndpointId, &setpointChangeSource) == Status::Success)
+    {
+        mSetpointChangeSource = setpointChangeSource;
+    }
+
+    // SetpointChangeAmount
+    DataModel::Nullable<int16_t> setpointChangeAmount = mSetpointChangeAmount;
+    if (SetpointChangeAmount::GetDefault(mPath.mEndpointId, setpointChangeAmount) == Status::Success)
+    {
+        mSetpointChangeAmount = setpointChangeAmount;
+    }
+
+    // SetpointChangeSourceTimestamp
+    uint32_t setpointChangeSourceTimestamp = mSetpointChangeSourceTimestamp;
+    if (SetpointChangeSourceTimestamp::GetDefault(mPath.mEndpointId, &setpointChangeSourceTimestamp) == Status::Success)
+    {
+        mSetpointChangeSourceTimestamp = setpointChangeSourceTimestamp;
+    }
+
+    // EmergencyHeatDelta
+    uint8_t emergencyHeatDelta = mEmergencyHeatDelta;
+    if (EmergencyHeatDelta::GetDefault(mPath.mEndpointId, &emergencyHeatDelta) == Status::Success)
+    {
+        mEmergencyHeatDelta = emergencyHeatDelta;
+    }
+
+    // ACType
+    ACTypeEnum acType = mACType;
+    if (ACType::GetDefault(mPath.mEndpointId, &acType) == Status::Success)
+    {
+        mACType = acType;
+    }
+
+    // ACCapacity
+    uint16_t acCapacity = mACCapacity;
+    if (ACCapacity::GetDefault(mPath.mEndpointId, &acCapacity) == Status::Success)
+    {
+        mACCapacity = acCapacity;
+    }
+
+    // ACRefrigerantType
+    ACRefrigerantTypeEnum acRefrigerantType = mACRefrigerantType;
+    if (ACRefrigerantType::GetDefault(mPath.mEndpointId, &acRefrigerantType) == Status::Success)
+    {
+        mACRefrigerantType = acRefrigerantType;
+    }
+
+    // ACCompressorType
+    ACCompressorTypeEnum acCompressorType = mACCompressorType;
+    if (ACCompressorType::GetDefault(mPath.mEndpointId, &acCompressorType) == Status::Success)
+    {
+        mACCompressorType = acCompressorType;
+    }
+
+    // ACErrorCode
+    BitMask<ACErrorCodeBitmap> acErrorCode = mACErrorCode;
+    if (ACErrorCode::GetDefault(mPath.mEndpointId, &acErrorCode) == Status::Success)
+    {
+        mACErrorCode = acErrorCode;
+    }
+
+    // ACLouverPosition
+    ACLouverPositionEnum acLouverPosition = mACLouverPosition;
+    if (ACLouverPosition::GetDefault(mPath.mEndpointId, &acLouverPosition) == Status::Success)
+    {
+        mACLouverPosition = acLouverPosition;
+    }
+
+    // ACCoilTemperature
+    DataModel::Nullable<int16_t> acCoilTemperature = mACCoilTemperature;
+    if (ACCoilTemperature::GetDefault(mPath.mEndpointId, acCoilTemperature) == Status::Success)
+    {
+        mACCoilTemperature = acCoilTemperature;
+    }
+
+    // ACCapacityFormat
+    ACCapacityFormatEnum acCapacityFormat = mACCapacityFormat;
+    if (ACCapacityformat::GetDefault(mPath.mEndpointId, &acCapacityFormat) == Status::Success)
+    {
+        mACCapacityFormat = acCapacityFormat;
+    }
+
+    return ThermostatCluster::Startup(context);
+}
 
 ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {

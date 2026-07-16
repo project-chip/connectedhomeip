@@ -365,6 +365,55 @@ public:
                            const Commands::AtomicRequest::DecodableType & commandData);
     void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AtomicRequest::DecodableType & commandData);
+protected:
+    // Attributes
+    DataModel::Nullable<int16_t> mLocalTemperature{};
+    DataModel::Nullable<int16_t> mOutdoorTemperature{};
+    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> mOccupancy{};
+    int16_t mAbsMinHeatSetpointLimit;
+    int16_t mAbsMaxHeatSetpointLimit;
+    int16_t mAbsMinCoolSetpointLimit;
+    int16_t mAbsMaxCoolSetpointLimit;
+    int8_t mLocalTemperatureCalibration{};
+    int16_t mOccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mOccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
+    int16_t mUnoccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mUnoccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
+    int16_t mMinHeatSetpointLimit;
+    int16_t mMaxHeatSetpointLimit;
+    int16_t mMinCoolSetpointLimit;
+    int16_t mMaxCoolSetpointLimit;
+    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbancDefault };
+    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    SystemModeEnum mSystemMode;
+    ThermostatRunningModeEnum mThermostatRunningMode{};
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold{};
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration{};
+    BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> mThermostatRunningState{};
+    SetpointChangeSourceEnum mSetpointChangeSource{};
+    DataModel::Nullable<int16_t> mSetpointChangeAmount{};
+    uint32_t mSetpointChangeSourceTimestamp{};
+    uint8_t mEmergencyHeatDelta{ kEmergencyHeatDeltaDefault };
+    ACTypeEnum mACType{};
+    uint16_t mACCapacity{};
+    ACRefrigerantTypeEnum mACRefrigerantType{};
+    ACCompressorTypeEnum mACCompressorType{};
+    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> mACErrorCode{};
+    ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
+    DataModel::Nullable<int16_t> mACCoilTemperature{};
+    ACCapacityFormatEnum mACCapacityFormat{};
+    uint8_t mNumberOfSchedules{};
+    uint8_t mNumberOfScheduleTransitions{};
+    DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay{};
+    // mActivePresetHandle and mActiveScheduleHandle hold non-owning ByteSpans; the backing
+    // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
+    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
+    uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
+    DataModel::Nullable<chip::ByteSpan> mActivePresetHandle{};
+    DataModel::Nullable<chip::ByteSpan> mActiveScheduleHandle{};
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
+
 
 private:
     // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
@@ -443,53 +492,6 @@ private:
     };
     AtomicWriteSession mAtomicWriteSession;
 
-    // Attributes
-    DataModel::Nullable<int16_t> mLocalTemperature{};
-    DataModel::Nullable<int16_t> mOutdoorTemperature{};
-    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> mOccupancy{};
-    int16_t mAbsMinHeatSetpointLimit;
-    int16_t mAbsMaxHeatSetpointLimit;
-    int16_t mAbsMinCoolSetpointLimit;
-    int16_t mAbsMaxCoolSetpointLimit;
-    int8_t mLocalTemperatureCalibration{};
-    int16_t mOccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
-    int16_t mOccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
-    int16_t mUnoccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
-    int16_t mUnoccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
-    int16_t mMinHeatSetpointLimit;
-    int16_t mMaxHeatSetpointLimit;
-    int16_t mMinCoolSetpointLimit;
-    int16_t mMaxCoolSetpointLimit;
-    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbancDefault };
-    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
-    SystemModeEnum mSystemMode;
-    ThermostatRunningModeEnum mThermostatRunningMode{};
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold{};
-    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration{};
-    BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> mThermostatRunningState{};
-    SetpointChangeSourceEnum mSetpointChangeSource{};
-    DataModel::Nullable<int16_t> mSetpointChangeAmount{};
-    uint32_t mSetpointChangeSourceTimestamp{};
-    uint8_t mEmergencyHeatDelta{ kEmergencyHeatDeltaDefault };
-    ACTypeEnum mACType{};
-    uint16_t mACCapacity{};
-    ACRefrigerantTypeEnum mACRefrigerantType{};
-    ACCompressorTypeEnum mACCompressorType{};
-    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> mACErrorCode{};
-    ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
-    DataModel::Nullable<int16_t> mACCoilTemperature{};
-    ACCapacityFormatEnum mACCapacityFormat{};
-    uint8_t mNumberOfSchedules{};
-    uint8_t mNumberOfScheduleTransitions{};
-    DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay{};
-    // mActivePresetHandle and mActiveScheduleHandle hold non-owning ByteSpans; the backing
-    // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
-    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
-    uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
-    DataModel::Nullable<chip::ByteSpan> mActivePresetHandle{};
-    DataModel::Nullable<chip::ByteSpan> mActiveScheduleHandle{};
-    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
 };
 
 /**

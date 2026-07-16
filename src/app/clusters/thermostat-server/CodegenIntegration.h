@@ -28,6 +28,17 @@ namespace Thermostat {
 /// Returns the code-driven Thermostat cluster instance registered for the given endpoint, or
 /// nullptr if no cluster is registered there.
 ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
+/*
+ * A Thermostat subclass that performs ZAP readings during Startup.
+ * This ensures that ZAP stored values are loaded as "user default" ones.
+ */
+class CodegenThermostatCluster : public ThermostatCluster
+{
+public:
+    using ThermostatCluster::ThermostatCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
 
 namespace Attributes {
 
