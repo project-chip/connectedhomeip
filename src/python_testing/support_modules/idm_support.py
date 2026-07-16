@@ -139,16 +139,22 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Thermostat.adoc#1091-presethandle-field
     (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActivePresetRequest.command_id),
     (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActiveScheduleRequest.command_id),
-    # TODO: Remove once the Level Control code-driven migration is wired into ZAP/ember
-    # apps (CodegenIntegration). The legacy implementation (codegen/level-control.cpp)
-    # returns INVALID_COMMAND instead of CONSTRAINT_ERROR for an out-of-range Level;
-    # the new LevelControlCluster already returns CONSTRAINT_ERROR.
-    # So all-devices-app with --device dimmable-light:1 passes, but all-clusters-app fails.
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73090
+    # is fixed. The ember implementation (codegen/level-control.cpp) returns
+    # INVALID_COMMAND instead of CONSTRAINT_ERROR for an out-of-range Level; the
+    # code-driven LevelControlCluster already returns CONSTRAINT_ERROR, so
+    # all-devices-app with --device dimmable-light:1 passes, but all-clusters-app
+    # fails. Both implementations are maintained in parallel (there is no plan to
+    # wire the code-driven version into ember apps), so the ember code needs the
+    # direct fix tracked in the issue above.
     (Clusters.LevelControl.id, Clusters.LevelControl.Commands.MoveToLevel.command_id),
-    # TODO: Remove once the On/Off code-driven migration is wired into ZAP/ember apps
-    # (CodegenIntegration). The legacy implementation (codegen/on-off-server.cpp) does
-    # not validate OnTime/OffWaitTime <= 0xFFFE; OnOffLightingCluster already does.
-    # So all-devices-app with --device dimmable-light:1 passes, but all-clusters-app fails.
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/73090
+    # is fixed. The ember implementation (codegen/on-off-server.cpp) does not
+    # validate OnTime/OffWaitTime <= 0xFFFE; the code-driven OnOffLightingCluster
+    # already does, so all-devices-app with --device dimmable-light:1 passes, but
+    # all-clusters-app fails. Both implementations are maintained in parallel
+    # (there is no plan to wire the code-driven version into ember apps), so the
+    # ember code needs the direct fix tracked in the issue above.
     (Clusters.OnOff.id, Clusters.OnOff.Commands.OnWithTimedOff.command_id),
     # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
     # or spec clarification): the data model constraint (maxLength 32) is
