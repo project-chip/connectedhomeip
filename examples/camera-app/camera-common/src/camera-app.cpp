@@ -100,20 +100,19 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
                                                           appMaxUserDefinedZones, appMaxZones, sensitivityMax, appTwoDCartesianMax);
 
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
-    
+
     // Fetch all initialization paramaters for the AV Analysis Server
     BitFlags<AvAnalysis::Feature, uint32_t> avAnalysisFeatures(AvAnalysis::Feature::kLocalContextDetection);
-    std::vector<Descriptor::Structs::SemanticTagStruct::Type> appSupportedAmbientContexts = 
+    std::vector<Descriptor::Structs::SemanticTagStruct::Type> appSupportedAmbientContexts =
         mCameraDevice->GetCameraHALInterface().GetSupportedAmbientContexts();
-    
+
     // Instantiate the AV Analysis Server
     mAVAnalysisServer.Create(mEndpoint, avAnalysisFeatures, appSupportedAmbientContexts, DataModel::MakeNullable(appMaxZones));
     mAVAnalysisServer.Cluster().SetDelegate(&mCameraDevice->GetAVAnalysisDelegate());
     err = CodegenDataModelProvider::Instance().Registry().Register(mAVAnalysisServer.Registration());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to register AVAnalysis on endpoint %u: %" CHIP_ERROR_FORMAT,
-                     mEndpoint, err.Format());
+        ChipLogError(Camera, "Failed to register AVAnalysis on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint, err.Format());
     }
 }
 
@@ -380,7 +379,6 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "CameraAVSettingsUserLevelMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mAVSettingsUserLevelMgmtServer.Destroy();
-    
 
     err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAVAnalysisServer.Cluster());
     if (err != CHIP_NO_ERROR)

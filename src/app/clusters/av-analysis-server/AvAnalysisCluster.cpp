@@ -54,9 +54,8 @@ CHIP_ERROR AvAnalysisCluster::Startup(ServerClusterContext & context)
     return mLogic.Startup(context.attributeStorage);
 }
 
-DataModel::ActionReturnStatus
-AvAnalysisCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                 AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus AvAnalysisCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & aEncoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -79,9 +78,8 @@ AvAnalysisCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request
     return Status::UnsupportedAttribute;
 }
 
-DataModel::ActionReturnStatus 
-AvAnalysisCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                  AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus AvAnalysisCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(request.path.mClusterId == AvAnalysis::Id);
 
@@ -91,12 +89,12 @@ AvAnalysisCluster::WriteAttribute(const DataModel::WriteAttributeRequest & reque
         bool trackingEnabled;
         ReturnErrorOnFailure(aDecoder.Decode(trackingEnabled));
         return mLogic.SetTrackingEnabled(trackingEnabled);
-    }     
-    
+    }
+
     default:
         // Unknown attribute
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }                                      
+    }
 }
 
 CHIP_ERROR AvAnalysisCluster::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
@@ -104,9 +102,9 @@ CHIP_ERROR AvAnalysisCluster::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStre
     return mLogic.SetMaxAnalysisStreamCount(aMaxAnalysisStreamCount);
 }
 
-std::optional<DataModel::ActionReturnStatus>
-AvAnalysisCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                 chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                              chip::TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
     ChipLogProgress(Zcl, "AvAnalysis[ep=%d]: InvokeCommand", request.path.mEndpointId);
 

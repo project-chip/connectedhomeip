@@ -51,11 +51,10 @@ public:
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
-     * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is not set.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
+     * not set. Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    AvAnalysisServerLogic(EndpointId aEndpointId,
-                          BitFlags<AvAnalysis::Feature> aFeatures,
+    AvAnalysisServerLogic(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                           const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
                           DataModel::Nullable<uint8_t> aMaxZones);
     ~AvAnalysisServerLogic();
@@ -74,12 +73,12 @@ public:
     EndpointId mEndpointId = kInvalidEndpointId;
 
     BitFlags<AvAnalysis::Feature> mFeatures;
-    
+
     // Definitions of class variables that represent the Cluster attributes
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> mSupportedAmbientContexts;
     std::vector<AvAnalysis::AmbientContextStorage> mActiveAmbientContextTriggers;
-    uint8_t mMaxAnalysisStreamCount = 0;
-    uint8_t mCurrentAnalysisStreamCount = 0; 
+    uint8_t mMaxAnalysisStreamCount     = 0;
+    uint8_t mCurrentAnalysisStreamCount = 0;
     std::vector<AvAnalysis::Structs::AnalysisStreamStruct::Type> mAnalysisStreams;
     bool mTrackingEnabled = false;
     DataModel::Nullable<uint8_t> mMaxZones;
@@ -112,25 +111,25 @@ public:
     // Command handlers
     std::optional<DataModel::ActionReturnStatus>
     HandleEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+                                const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleDisableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                           const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
+                                 const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleEstablishAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                           const AvAnalysis::Commands::EstablishAnalysisStream::DecodableType & commandData);
+                                  const AvAnalysis::Commands::EstablishAnalysisStream::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                         const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData);
+                                 const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleDeactivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                           const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData);
+                                   const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
+                               const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
 private:
-    AvAnalysisDelegate * mDelegate = nullptr;
+    AvAnalysisDelegate * mDelegate                               = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
 
     MarkDirtyCallback mMarkDirtyCallback;
@@ -139,22 +138,22 @@ private:
      * Helper function for attribute handlers to mark the attribute as dirty
      */
     void MarkDirty(AttributeId aAttributeId);
-    
+
     /**
      * Command sub-handlers
      */
     std::optional<DataModel::ActionReturnStatus>
     HandleLocalEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+                                     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-                          
+                                      const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+
     /*
      * Command handler helper methods
      */
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
-    
+
     /**
      * Helper functions to handle persistent data and the KVS.
      */

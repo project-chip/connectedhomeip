@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "av-analysis-manager.h"
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
@@ -24,7 +25,6 @@
 #include "push-av-stream-manager.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
-#include "av-analysis-manager.h"
 
 #include "default-media-controller.h"
 #include <protocols/interaction_model/StatusCode.h>
@@ -321,7 +321,7 @@ public:
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
-    uint8_t GetMaxAnalysisStreams() override {return mMaxAnalysisStreams;}
+    uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
     std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
 
     // Audio playback pipeline methods

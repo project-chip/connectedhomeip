@@ -51,30 +51,29 @@ static constexpr uint8_t kTestMaxZones            = 5;
 // Test ambient contexts
 // Define the list of semantic tags for the endpoint
 const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> testAmbientContexts = {
-    { .namespaceID = static_cast<uint8_t>(0x49), .tag = static_cast<uint8_t>(0x0B),  
-      .label = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span))},
-    { .namespaceID = static_cast<uint8_t>(0x4B), .tag = static_cast<uint8_t>(0x08),  
-      .label = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Delivery"_span))},
-    { .namespaceID = static_cast<uint8_t>(0x4B), .tag = static_cast<uint8_t>(0x09),  
-      .label = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Retrieval"_span))}
+    { .namespaceID = static_cast<uint8_t>(0x49),
+      .tag         = static_cast<uint8_t>(0x0B),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) },
+    { .namespaceID = static_cast<uint8_t>(0x4B),
+      .tag         = static_cast<uint8_t>(0x08),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Delivery"_span)) },
+    { .namespaceID = static_cast<uint8_t>(0x4B),
+      .tag         = static_cast<uint8_t>(0x09),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Retrieval"_span)) }
 };
 
 const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> testErrorAmbientContext = {
-    { .namespaceID = static_cast<uint8_t>(0x4A), .tag = static_cast<uint8_t>(0x02),  
-      .label = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Sound.Snoring"_span))}
+    { .namespaceID = static_cast<uint8_t>(0x4A),
+      .tag         = static_cast<uint8_t>(0x02),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Sound.Snoring"_span)) }
 };
 
-const std::vector<uint16_t> testZoneIDList = {
-    static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02), static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04)
-};
+const std::vector<uint16_t> testZoneIDList = { static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02),
+                                               static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04) };
 
-const std::vector<uint16_t> testZoneIDDisableList = {
-    static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04)
-};
+const std::vector<uint16_t> testZoneIDDisableList = { static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04) };
 
-const std::vector<uint16_t> testZoneIDRemainingList = {
-    static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02)
-};
+const std::vector<uint16_t> testZoneIDRemainingList = { static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02) };
 
 // Minimal mock delegate for testing
 class MockAvAnalysisDelegate : public AvAnalysisDelegate
@@ -82,47 +81,25 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 public:
     void ShutdownApp() {}
 
-    Protocols::InteractionModel::Status EnableContextTriggers() 
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status EnableContextTriggers() { return Status::Success; }
 
-    Protocols::InteractionModel::Status DisableContextTriggers()
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status DisableContextTriggers() { return Status::Success; }
 
-    Protocols::InteractionModel::Status EstablishAnalysisStream() 
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status EstablishAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status ActivateAnalysisStream()
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status ActivateAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status DeactivateAnalysisStream()
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status DeactivateAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status RemoveAnalysisStream()
-    {
-        return Status::Success;
-    }
-    
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
-    {
-        return CHIP_NO_ERROR;
-    }
+    Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
 
-    bool CanAddContextTriggers() {return true; }
-    
+    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
+
+    bool CanAddContextTriggers() { return true; }
+
     void ActiveAmbientContextTriggersUpdated() {}
-    
-    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 
+    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 };
 
 struct TestLocalAvAnalysisCluster : public ::testing::Test
@@ -131,12 +108,13 @@ struct TestLocalAvAnalysisCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     // We always have to have Zones supplied, they could be Null
-    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>> 
-        CreateCommandData(Globals::Structs::SemanticTagStruct::Type context, DataModel::Nullable<std::vector<uint16_t>> zones, uint8_t * tlvBuffer, size_t tlvBufferSize, bool noZones = false)
+    DataModel::Nullable<DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType>>
+    CreateCommandData(Globals::Structs::SemanticTagStruct::Type context, DataModel::Nullable<std::vector<uint16_t>> zones,
+                      uint8_t * tlvBuffer, size_t tlvBufferSize, bool noZones = false)
     {
         Structs::ContextTriggerStruct::Type cts;
         cts.context = context;
-        
+
         if (!noZones)
         {
             // Convert the zones if we have them to a List (Span)
@@ -146,14 +124,15 @@ struct TestLocalAvAnalysisCluster : public ::testing::Test
             }
             else
             {
-                cts.zoneIDs = MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.Value().data(), zones.Value().size())));
+                cts.zoneIDs = MakeOptional(
+                    DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.Value().data(), zones.Value().size())));
             }
         }
         else
         {
             cts.zoneIDs.ClearValue();
         }
-    
+
         // Encode into a TLV buffer
         TLV::TLVWriter writer;
         writer.Init(tlvBuffer, static_cast<uint32_t>(tlvBufferSize));
@@ -181,55 +160,53 @@ struct TestLocalAvAnalysisCluster : public ::testing::Test
         DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> decodedList;
         err = decodedList.Decode(ctsReader);
         EXPECT_EQ(err, CHIP_NO_ERROR);
-        
+
         return DataModel::MakeNullable(decodedList);
     }
-    
+
     bool EnableAllTestContexts()
     {
         Testing::MockCommandHandler commandHandler;
         commandHandler.SetFabricIndex(1);
         ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
         Commands::EnableContextTriggers::DecodableType commandData;
-  
+
         // Null context triggers, active set is the same as the supported set.
-        commandData.contextTriggers.SetNull();        
-        
+        commandData.contextTriggers.SetNull();
+
         auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
         if (response.has_value())
         {
             return response.value().IsSuccess();
         }
-        
+
         return false;
     }
-    
-    bool EnableSpecificTestContexts(Globals::Structs::SemanticTagStruct::Type context, DataModel::Nullable<std::vector<uint16_t>> zones)
-    {  
+
+    bool EnableSpecificTestContexts(Globals::Structs::SemanticTagStruct::Type context,
+                                    DataModel::Nullable<std::vector<uint16_t>> zones)
+    {
         Testing::MockCommandHandler commandHandler;
         commandHandler.SetFabricIndex(1);
         ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
         Commands::EnableContextTriggers::DecodableType commandData;
         uint8_t tlvBuffer[512];
- 
+
         commandData.contextTriggers = CreateCommandData(context, zones, tlvBuffer, sizeof(tlvBuffer));
-        auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
+        auto response               = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
         if (response.has_value())
         {
             return response.value().IsSuccess();
         }
-        
-        return false;        
+
+        return false;
     }
 
     TestLocalAvAnalysisCluster() :
-        mServer(kTestEndpointId,
-                chip::BitFlags<Feature>(Feature::kLocalContextDetection, 
-                                        Feature::kPerZoneContextDetection),
-                testAmbientContexts, 
-                DataModel::MakeNullable(kTestMaxZones)),
+        mServer(kTestEndpointId, chip::BitFlags<Feature>(Feature::kLocalContextDetection, Feature::kPerZoneContextDetection),
+                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones)),
         mClusterTester(mServer)
     {}
 
@@ -271,7 +248,7 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
 
-    // Verify that the entries in the DecodableList match the entries used in construction of the instance by 
+    // Verify that the entries in the DecodableList match the entries used in construction of the instance by
     // creating a vactor of the values then comparing the two vectors
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readContexts;
     auto aContextIterator = aSupportedAmbientContexts.begin();
@@ -279,9 +256,9 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     {
         readContexts.push_back(aContextIterator.GetValue());
     }
-        
+
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
-    bool are_equal = std::ranges::equal(testAmbientContexts, readContexts, [](const auto& p1, const auto& p2) {
+    bool are_equal = std::ranges::equal(testAmbientContexts, readContexts, [](const auto & p1, const auto & p2) {
         return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
@@ -292,7 +269,7 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED aActiveContextTriggers.ComputeSize(&triggersSize);
     ASSERT_EQ(triggersSize, static_cast<size_t>(0));
-    
+
     bool trackingEnabled = false;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
     ASSERT_FALSE(trackingEnabled);
@@ -322,7 +299,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteActiveAmbientContextsPersistenceTest)
 
     // Provide a context that does exist with test zone ids
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -335,64 +313,64 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteActiveAmbientContextsPersistenceTest)
         // Fail the test case
         FAIL();
     }
-        
+
     // Read our set of active triggers, make sure valid
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     // There is only one test entry, verify that is correct
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     aActiveContextIterator.Next();
 
     auto contextTrigger = aActiveContextIterator.GetValue();
-    
+
     // Are the provided and read active contexts equal
     //
     app::Clusters::Descriptor::Structs::SemanticTagStruct::Type writtenContext = testAmbientContexts.front();
 
     ASSERT_EQ(writtenContext.namespaceID, contextTrigger.context.namespaceID);
     ASSERT_EQ(writtenContext.tag, contextTrigger.context.tag);
-    
+
     // Extract our read ZoneID List
     std::vector<uint16_t> zoneIDs;
-            
+
     ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
     ASSERT_TRUE(!contextTrigger.zoneIDs.Value().IsNull());
-           
+
     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-                
+
     while (zone_iter.Next())
     {
         zoneIDs.push_back(zone_iter.GetValue());
     }
     ASSERT_EQ(testZoneIDList, zoneIDs);
-    
+
     // Shutdown the Server
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Start the Server back up
     EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    
+
     // Re-read our set of active triggers, make sure still valid
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     // There is only one test entry, verify that is correct
     aActiveContextIterator = aActiveContextTriggers.begin();
     aActiveContextIterator.Next();
 
     contextTrigger = aActiveContextIterator.GetValue();
-    
+
     // Are the provided and read active contexts equal
     //
     ASSERT_EQ(writtenContext.namespaceID, contextTrigger.context.namespaceID);
     ASSERT_EQ(writtenContext.tag, contextTrigger.context.tag);
-    
-    // Extract our read ZoneID List         
+
+    // Extract our read ZoneID List
     ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
     ASSERT_TRUE(!contextTrigger.zoneIDs.Value().IsNull());
-           
+
     zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-    
+
     // Reset our local copy of the Zoneids
     zoneIDs.clear();
     while (zone_iter.Next())
@@ -414,7 +392,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
     Commands::EnableContextTriggers::DecodableType commandData;
-  
+
     // Null context triggers, active set is the same as the supported set.
     commandData.contextTriggers.SetNull();
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
@@ -428,7 +406,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
         // Fail the test case
         FAIL();
     }
-    
+
     // Read the supported triggers
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
@@ -439,31 +417,31 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
     {
         readSupportedContexts.push_back(aSupportedContextIterator.GetValue());
     }
-    
+
     // Read the active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readActiveContexts;
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     while (aActiveContextIterator.Next())
     {
         auto contextTrigger = aActiveContextIterator.GetValue();
         readActiveContexts.push_back(contextTrigger.context);
-        
+
         // For each context make sure the ZoneID has a Value and that it is null
         ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
         ASSERT_TRUE(contextTrigger.zoneIDs.Value().IsNull());
     }
-    
+
     // Are the supported and active contexts equal
     //
-    bool are_equal = std::ranges::equal(readSupportedContexts, readActiveContexts, [](const auto& p1, const auto& p2) {
+    bool are_equal = std::ranges::equal(readSupportedContexts, readActiveContexts, [](const auto & p1, const auto & p2) {
         return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
 }
-     
+
 TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContextTriggerDoesNotExist)
 {
     Testing::MockCommandHandler commandHandler;
@@ -473,9 +451,10 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
 
     // Provide a context that doesn't exist, ensure error
     uint8_t tlvBuffer[512];
-    
-    commandData.contextTriggers = CreateCommandData(testErrorAmbientContext.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
-   
+
+    commandData.contextTriggers =
+        CreateCommandData(testErrorAmbientContext.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
+
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
     if (response.has_value())
@@ -498,8 +477,9 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
 
     // Provide a context that does exist but no ZoneIDs, ensure error
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer), true);
-   
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer), true);
+
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
     if (response.has_value())
@@ -522,8 +502,9 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
 
     // Provide a context that does exist, set the zones to null, ensure success and the result also has null zones
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
-    
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
+
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
     if (response.has_value())
@@ -535,16 +516,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
         // Fail the test case
         FAIL();
     }
-    
+
     // Read our set of active triggers, make sure valid
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     while (aActiveContextIterator.Next())
     {
         auto contextTrigger = aActiveContextIterator.GetValue();
-        
+
         // For each context make sure the ZoneID has a Value and that it is null
         ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
         ASSERT_TRUE(contextTrigger.zoneIDs.Value().IsNull());
@@ -560,7 +541,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
 
     // Provide a context that does exist with test zone ids
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -573,32 +555,32 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
         // Fail the test case
         FAIL();
     }
-        
+
     // Read our set of active triggers, make sure valid
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     // There is only one test entry, verify that is correct
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     aActiveContextIterator.Next();
 
     auto contextTrigger = aActiveContextIterator.GetValue();
-    
+
     // Are the provided and read active contexts equal
     //
     app::Clusters::Descriptor::Structs::SemanticTagStruct::Type writtenContext = testAmbientContexts.front();
 
     ASSERT_EQ(writtenContext.namespaceID, contextTrigger.context.namespaceID);
     ASSERT_EQ(writtenContext.tag, contextTrigger.context.tag);
-    
+
     // Extract our read ZoneID List
     std::vector<uint16_t> zoneIDs;
-            
+
     ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
     ASSERT_TRUE(!contextTrigger.zoneIDs.Value().IsNull());
-           
+
     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-                
+
     while (zone_iter.Next())
     {
         zoneIDs.push_back(zone_iter.GetValue());
@@ -620,12 +602,12 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestConte
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     Commands::DisableContextTriggers::DecodableType commandData;
-  
+
     if (!EnableAllTestContexts())
     {
         FAIL();
     }
-    
+
     // Null context triggers, active set is an empty list
     commandData.contextTriggers.SetNull();
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
@@ -639,11 +621,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestConte
         // Fail the test case
         FAIL();
     }
-    
+
     // Read the active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     // It should be an empty list
     size_t size;
     CHIP_ERROR err = aActiveContextTriggers.ComputeSize(&size);
@@ -665,10 +647,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestConte
     {
         FAIL();
     }
-    
+
     // Provide a context that doesn't exist, ensure error
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testErrorAmbientContext.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers =
+        CreateCommandData(testErrorAmbientContext.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -694,10 +677,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestConte
     {
         FAIL();
     }
-    
+
     // Provide a context that does exist but no ZoneIDs, ensure error
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer), true);
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer), true);
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -718,15 +702,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     Commands::DisableContextTriggers::DecodableType commandData;
-  
+
     if (!EnableAllTestContexts())
     {
         FAIL();
     }
-    
+
     // Remove context with only certain zones set
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList), tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -747,15 +732,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     Commands::DisableContextTriggers::DecodableType commandData;
-  
+
     if (!EnableAllTestContexts())
     {
         FAIL();
     }
-    
+
     // Remove context with zones set to Null (all zones)
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers =
+        CreateCommandData(testAmbientContexts.front(), DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -768,31 +754,30 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
         // Fail the test case
         FAIL();
     }
-    
-    // The active context should be the second and third of our test contexts, as we have removed the first 
+
+    // The active context should be the second and third of our test contexts, as we have removed the first
     // context (effectively)
     // Read the active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readActiveContexts;
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     while (aActiveContextIterator.Next())
     {
         auto contextTrigger = aActiveContextIterator.GetValue();
         readActiveContexts.push_back(contextTrigger.context);
-        
+
         // For each context make sure the ZoneID has a Value and that it is null
         ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
         ASSERT_TRUE(contextTrigger.zoneIDs.Value().IsNull());
     }
-    
+
     // Are the active contexts our test contexts minus the first value
     //
-    bool are_equal = std::ranges::equal(
-        std::ranges::subrange(testAmbientContexts.begin()+1, testAmbientContexts.end()), readActiveContexts, [](const auto& p1, const auto& p2) {
-            return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
-    });
+    bool are_equal =
+        std::ranges::equal(std::ranges::subrange(testAmbientContexts.begin() + 1, testAmbientContexts.end()), readActiveContexts,
+                           [](const auto & p1, const auto & p2) { return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag; });
     ASSERT_TRUE(are_equal);
 }
 
@@ -802,18 +787,19 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
     Commands::DisableContextTriggers::DecodableType commandData;
-  
+
     if (!EnableSpecificTestContexts(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDList)))
     {
         FAIL();
     }
-    
+
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType testActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, testActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     // Remove context with zones set to the final two zones of the test set
     uint8_t tlvBuffer[512];
-    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDDisableList), tlvBuffer, sizeof(tlvBuffer));
+    commandData.contextTriggers = CreateCommandData(testAmbientContexts.front(), DataModel::MakeNullable(testZoneIDDisableList),
+                                                    tlvBuffer, sizeof(tlvBuffer));
 
     auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
 
@@ -826,12 +812,12 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
         // Fail the test case
         FAIL();
     }
-    
-    // The first active context should be present, with only Zone IDs 1 and 2 
+
+    // The first active context should be present, with only Zone IDs 1 and 2
     // Read the active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    
+
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     aActiveContextIterator.Next();
 
@@ -840,17 +826,17 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
     // For the first context make sure the ZoneID has a Value and that it is the first two defined IDs only
     ASSERT_TRUE(contextTrigger.zoneIDs.HasValue());
     ASSERT_TRUE(!contextTrigger.zoneIDs.Value().IsNull());
-    
+
     // Extract our read ZoneID List
     std::vector<uint16_t> zoneIDs;
-    
+
     auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-                
+
     while (zone_iter.Next())
     {
         zoneIDs.push_back(zone_iter.GetValue());
     }
-    
+
     ASSERT_EQ(testZoneIDRemainingList, zoneIDs);
 }
 

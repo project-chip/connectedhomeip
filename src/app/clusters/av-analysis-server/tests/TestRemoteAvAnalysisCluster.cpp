@@ -52,12 +52,12 @@ static constexpr uint8_t kTestMaxAnalysisStreams  = 8;
 // Test ambient contexts
 // Define the list of semantic tags for the endpoint
 const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> testAmbientContexts = {
-    { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),  
-      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span))},
-    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x08),  
-      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Delivery"_span))},
-    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x09),  
-      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Retrieval"_span))}
+    { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
+      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x08),
+      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Delivery"_span)) },
+    { std::nullopt, static_cast<uint8_t>(0x4B), static_cast<uint8_t>(0x09),
+      MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.Retrieval"_span)) }
 };
 
 // Minimal mock delegate for testing
@@ -66,35 +66,20 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 public:
     void ShutdownApp() {}
 
-    Protocols::InteractionModel::Status EstablishAnalysisStream() 
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status EstablishAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status ActivateAnalysisStream()
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status ActivateAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status DeactivateAnalysisStream()
-    {
-        return Status::Success;
-    }
+    Protocols::InteractionModel::Status DeactivateAnalysisStream() { return Status::Success; }
 
-    Protocols::InteractionModel::Status RemoveAnalysisStream()
-    {
-        return Status::Success;
-    }
-    
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
-    {
-        return CHIP_NO_ERROR;
-    }
-    
-    bool CanAddContextTriggers() {return true; }
-    
+    Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
+
+    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
+
+    bool CanAddContextTriggers() { return true; }
+
     void ActiveAmbientContextTriggersUpdated() {}
-    
+
     CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 };
 
@@ -104,12 +89,8 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestRemoteAvAnalysisCluster() :
-        mServer(kTestEndpointId,
-                chip::BitFlags<Feature>(Feature::kRemoteContextDetection, 
-                                        Feature::kPerZoneContextDetection),
-                testAmbientContexts,
-                DataModel::MakeNullable(kTestMaxZones)
-            ),
+        mServer(kTestEndpointId, chip::BitFlags<Feature>(Feature::kRemoteContextDetection, Feature::kPerZoneContextDetection),
+                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones)),
         mClusterTester(mServer)
     {}
 
@@ -159,7 +140,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     Attributes::SupportedAmbientContexts::TypeInfo::DecodableType aSupportedAmbientContexts;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::SupportedAmbientContexts::Id, aSupportedAmbientContexts), CHIP_NO_ERROR);
 
-    // Verify that the entries in the DecodableList match the entries used in construction of the instance by 
+    // Verify that the entries in the DecodableList match the entries used in construction of the instance by
     // creating a vactor of the values then comparing the two vectors
     std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> readContexts;
     auto aContextIterator = aSupportedAmbientContexts.begin();
@@ -167,9 +148,9 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     {
         readContexts.push_back(aContextIterator.GetValue());
     }
-    
+
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
-    bool are_equal = std::ranges::equal(testAmbientContexts, readContexts, [](const auto& p1, const auto& p2) {
+    bool are_equal = std::ranges::equal(testAmbientContexts, readContexts, [](const auto & p1, const auto & p2) {
         return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
@@ -195,7 +176,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, aAnalysisStreams), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED aAnalysisStreams.ComputeSize(&streamsSize);
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
-    
+
     bool trackingEnabled = false;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
     ASSERT_FALSE(trackingEnabled);

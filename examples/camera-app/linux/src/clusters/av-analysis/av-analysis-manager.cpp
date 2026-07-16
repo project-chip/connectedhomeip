@@ -26,56 +26,60 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AvAnalysis;
 using namespace chip::app::Clusters::AvAnalysis::Structs;
 
-    /**
-     * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
-     * the destructor, it shall not be invoked as part of the destructor.
-     */
-    void AvAnalysisManager::ShutdownApp() 
-    {}
+/**
+ * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
+ * the destructor, it shall not be invoked as part of the destructor.
+ */
+void AvAnalysisManager::ShutdownApp() {}
 
-    /**
-     * Delegate command handlers
-     */
+/**
+ * Delegate command handlers
+ */
 
-    /**
-     */
-    Protocols::InteractionModel::Status
-    AvAnalysisManager::EstablishAnalysisStream() 
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
+/**
+ */
+Protocols::InteractionModel::Status AvAnalysisManager::EstablishAnalysisStream()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
 
-    /**
-     */
-    Protocols::InteractionModel::Status AvAnalysisManager::ActivateAnalysisStream() 
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
+/**
+ */
+Protocols::InteractionModel::Status AvAnalysisManager::ActivateAnalysisStream()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
 
-    /**
-     */
-    Protocols::InteractionModel::Status AvAnalysisManager::DeactivateAnalysisStream() 
-    {
-        return Protocols::InteractionModel::Status::Success;        
-    }
+/**
+ */
+Protocols::InteractionModel::Status AvAnalysisManager::DeactivateAnalysisStream()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
 
-    /**
-     */
-    Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream() 
-    {
-        return Protocols::InteractionModel::Status::Success;        
-    }
-    
-    /**
-     * Delegate command assists
-     */
-    CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
-    {
-        return CHIP_NO_ERROR;
-    }
-    
-    bool AvAnalysisManager::CanAddContextTriggers() {return true; }
-    
-    void AvAnalysisManager::ActiveAmbientContextTriggersUpdated() {}
-    
-    CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
+/**
+ */
+Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
+/**
+ * Delegate command assists
+ */
+CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
+{
+    return CHIP_NO_ERROR;
+}
+
+bool AvAnalysisManager::CanAddContextTriggers()
+{
+    return true;
+}
+
+void AvAnalysisManager::ActiveAmbientContextTriggersUpdated() {}
+
+CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback()
+{
+    return CHIP_NO_ERROR;
+}

@@ -28,7 +28,7 @@ class AvAnalysisManager : public AvAnalysisDelegate
 {
 
 public:
-    AvAnalysisManager() = default;
+    AvAnalysisManager()  = default;
     ~AvAnalysisManager() = default;
 
     /**
@@ -43,8 +43,7 @@ public:
 
     /**
      */
-    virtual Protocols::InteractionModel::Status
-    EstablishAnalysisStream() override;
+    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
 
     /**
      */
@@ -57,22 +56,20 @@ public:
     /**
      */
     virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-    
+
     /**
      * Delegate command assists
      */
-    
+
     virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override;
-    
+
     virtual bool CanAddContextTriggers() override;
-    
+
     void ActiveAmbientContextTriggersUpdated() override;
-    
+
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-        
 private:
-
 };
 
 } // namespace AvAnalysis
