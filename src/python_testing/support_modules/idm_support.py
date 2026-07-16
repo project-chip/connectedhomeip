@@ -115,6 +115,7 @@ COMMAND_CONSTRAINT_DENIED_CLUSTERS = frozenset({
     Clusters.GroupKeyManagement.id,
     Clusters.OtaSoftwareUpdateProvider.id,
     Clusters.OtaSoftwareUpdateRequestor.id,
+    Clusters.ThreadBorderRouterManagement.id,
 })
 
 # Individual (cluster_id, command_id) pairs to exclude from constraint fuzzing on
