@@ -27,8 +27,8 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-    
-constexpr uint8_t kMaxSpeakerLevel              = 254;
+
+constexpr uint8_t kMaxSpeakerLevel = 254;
 
 class AvAnalysisCluster;
 
@@ -55,11 +55,10 @@ public:
     /**
      * Placeholder method for when the remote context detection feature functionality is implemented.
      */
-    virtual Protocols::InteractionModel::Status
-    EstablishAnalysisStream() = 0;
+    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() = 0;
 
     /**
-     * 
+     *
      * Placeholder method for when the remote context detection feature functionality is implemented.
      */
     virtual Protocols::InteractionModel::Status ActivateAnalysisStream() = 0;
@@ -73,27 +72,27 @@ public:
      * Placeholder method for when the remote context detection feature functionality is implemented.
      */
     virtual Protocols::InteractionModel::Status RemoveAnalysisStream() = 0;
-    
+
     /**
      * Delegate command helpers
      */
-    
-     /**
-      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
-      */
+
+    /**
+     * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
+     */
     virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) = 0;
-    
-    /** 
-     * Allows the delegate to determine whether or not resources exist to add additional context triggers. 
+
+    /**
+     * Allows the delegate to determine whether or not resources exist to add additional context triggers.
      */
     virtual bool CanAddContextTriggers() = 0;
-    
+
     /**
      * Informs the delegate that the set of active Context Triggers has been updated.  The delegate is required to request
-     * the updated set from its server instance, it is not provided in this method. 
+     * the updated set from its server instance, it is not provided in this method.
      */
     virtual void ActiveAmbientContextTriggersUpdated() = 0;
-    
+
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
      *  the Cluster have been loaded from Storage.
@@ -121,12 +120,12 @@ public:
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
-     * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is not set.
-     * 
+     * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
+     * not set.
+     *
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    AvAnalysisCluster(EndpointId aEndpointId,
-                      BitFlags<AvAnalysis::Feature> aFeatures, 
+    AvAnalysisCluster(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                       const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
                       DataModel::Nullable<uint8_t> aMaxZones) :
         DefaultServerCluster({ aEndpointId, AvAnalysis::Id }),
@@ -160,7 +159,7 @@ public:
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-                                                
+
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
@@ -172,10 +171,9 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-    
+
     // Attribute mutators
     CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
-
 
 private:
     AvAnalysisServerLogic mLogic;

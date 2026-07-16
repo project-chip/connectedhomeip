@@ -26,18 +26,17 @@ namespace Clusters {
 namespace AvAnalysis {
 
 // Spec defined max values
-constexpr int8_t kMaxSupportedAmbientContexts      = 50;
-constexpr int8_t kMaxActiveAmbientContextTriggers  = 50;
-constexpr int8_t kMaxContextTriggers               = 50; 
+constexpr int8_t kMaxSupportedAmbientContexts     = 50;
+constexpr int8_t kMaxActiveAmbientContextTriggers = 50;
+constexpr int8_t kMaxContextTriggers              = 50;
 
 // Max size for a TLV encoded Semantic Tag, this is used in calculating the buffer size for Context Triggers
 constexpr size_t kSemanticTagStructSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), 
-        static_cast<size_t>(64)); /* max label length */
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), static_cast<size_t>(64)); /* max label length */
 
 /**
- * Helper Struct to provide memory backing for the stored contexts given that some attributes use 
- * non-owning types (e.g. CharSpan, DataModel::List). 
+ * Helper Struct to provide memory backing for the stored contexts given that some attributes use
+ * non-owning types (e.g. CharSpan, DataModel::List).
  */
 struct AmbientContextStorage
 {
@@ -46,11 +45,11 @@ struct AmbientContextStorage
      */
     enum class LabelState : uint8_t
     {
-        kNoLabel        = 0x00,
-        kNullLabel      = 0x01,
-        kLabelPresent   = 0x02
+        kNoLabel      = 0x00,
+        kNullLabel    = 0x01,
+        kLabelPresent = 0x02
     };
-    
+
 private:
     Globals::Structs::SemanticTagStruct::Type mContext;
     std::string mLabel;
@@ -59,7 +58,7 @@ private:
 
 public:
     virtual ~AmbientContextStorage() = default;
-    AmbientContextStorage() 
+    AmbientContextStorage()
     {
         mZoneIDs.ClearValue();
         mLabelState = LabelState::kNoLabel;
@@ -67,37 +66,39 @@ public:
 
     // Accessors and Mutators
     //
-    Globals::Structs::SemanticTagStruct::Type GetContext() { 
+    Globals::Structs::SemanticTagStruct::Type GetContext()
+    {
         switch (mLabelState)
         {
-            case LabelState::kLabelPresent:
-                mContext.label = MakeOptional(DataModel::MakeNullable(CharSpan(mLabel.c_str(), mLabel.size())));
-                break;
-                
-            case LabelState::kNullLabel:
-                mContext.label = MakeOptional(DataModel::NullNullable);
-                break;
-            
-            case LabelState::kNoLabel:
-                mContext.label = {};
-                break;
+        case LabelState::kLabelPresent:
+            mContext.label = MakeOptional(DataModel::MakeNullable(CharSpan(mLabel.c_str(), mLabel.size())));
+            break;
+
+        case LabelState::kNullLabel:
+            mContext.label = MakeOptional(DataModel::NullNullable);
+            break;
+
+        case LabelState::kNoLabel:
+            mContext.label = {};
+            break;
         }
-        
+
         return mContext;
     }
-    
-    void SetContext(Globals::Structs::SemanticTagStruct::Type aContext) { 
-        mContext = aContext; 
+
+    void SetContext(Globals::Structs::SemanticTagStruct::Type aContext)
+    {
+        mContext = aContext;
         if (aContext.label.HasValue())
         {
             if (!aContext.label.Value().IsNull())
             {
-                mLabel = std::string(aContext.label.Value().Value().begin(), aContext.label.Value().Value().end());
+                mLabel      = std::string(aContext.label.Value().Value().begin(), aContext.label.Value().Value().end());
                 mLabelState = LabelState::kLabelPresent;
             }
             else
             {
-                mLabelState = LabelState::kNullLabel; 
+                mLabelState = LabelState::kNullLabel;
             }
         }
         else
@@ -117,17 +118,14 @@ public:
             }
             else
             {
-                return MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(
-                     mZoneIDs.Value().Value().data(),  mZoneIDs.Value().Value().size())));
+                return MakeOptional(DataModel::MakeNullable(
+                    DataModel::List<const uint16_t>(mZoneIDs.Value().Value().data(), mZoneIDs.Value().Value().size())));
             }
         }
-        
+
         return {};
     }
-    void SetZoneIDs(chip::Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIDs) 
-    {
-        mZoneIDs = aZoneIDs; 
-    }
+    void SetZoneIDs(chip::Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIDs) { mZoneIDs = aZoneIDs; }
 };
 
 } // namespace AvAnalysis
