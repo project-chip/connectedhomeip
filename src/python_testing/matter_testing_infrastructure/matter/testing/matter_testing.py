@@ -506,7 +506,7 @@ class MatterBaseTest(base_test.BaseTestClass):
       or the class sets default_verify_wildcard_subscription = False.
     """
     requires_dut: bool = True
-    
+
     # Runner respects this before the pre-PASE global wildcard read.
     # Set to False in tests that verify the device's own advertising state
     # (e.g. TC_DD_*), because opening a PASE session suppresses
