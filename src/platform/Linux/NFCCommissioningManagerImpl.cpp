@@ -937,73 +937,75 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
     }
 }
 
+// Scan all the readers and tags, and search one with 'item.targetIdentifier.discriminator'
 CHIP_ERROR NFCCommissioningManagerImpl::ProcessScanWorkItem(const NfcWorkItem & item)
 {
-    ChipLogProgressNfcDebug(DeviceLayer, "Scan all the readers and tags");
-    CHIP_ERROR itemResult = ScanAllReaders();
-
-    // and check if we now have a TagInstance corresponding to wanted discriminator
-    if (item.targetIdentifier.IsValid())
+    if (!item.targetIdentifier.IsValid())
     {
-        std::shared_ptr<TagInstance> tagInstance;
-        {
-            std::lock_guard<std::mutex> lock(mStateMutex);
-            tagInstance = SearchTagInstanceFromDiscriminator(item.targetIdentifier.discriminator);
-        }
-
-        if (tagInstance != nullptr)
-        {
-            ChipLogProgressNfcDebug(DeviceLayer, "Tag found");
-
-            auto * ctx = new (std::nothrow) TagDiscoveryContext();
-            if (ctx == nullptr)
-            {
-                ChipLogError(DeviceLayer, "Failed to allocate TagDiscoveryContext");
-            }
-            else
-            {
-                ctx->manager = this;
-                ctx->foundId = item.targetIdentifier;
-
-                CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(DispatchTagDiscovery, reinterpret_cast<intptr_t>(ctx));
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Failed to schedule tag discovery dispatch: %" CHIP_ERROR_FORMAT, err.Format());
-                    delete ctx;
-                }
-            }
-        }
-        else
-        {
-            ChipLogProgressNfcDebug(DeviceLayer, "Tag NOT found!");
-        }
+        ChipLogError(DeviceLayer, "Invalid target identifier for scan work item");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return itemResult;
+    ChipLogProgressNfcDebug(DeviceLayer, "Scan all the readers and tags");
+
+    CHIP_ERROR scanResult = ScanAllReaders();
+
+    std::shared_ptr<TagInstance> tagInstance;
+    {
+        std::lock_guard<std::mutex> lock(mStateMutex);
+        tagInstance = SearchTagInstanceFromDiscriminator(item.targetIdentifier.discriminator);
+    }
+
+    if (tagInstance == nullptr)
+    {
+        ChipLogProgressNfcDebug(DeviceLayer, "Tag NOT found!");
+        return scanResult;
+    }
+
+    ChipLogProgressNfcDebug(DeviceLayer, "Tag found");
+
+    auto * ctx = new (std::nothrow) TagDiscoveryContext();
+    if (ctx == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Failed to allocate TagDiscoveryContext");
+        return scanResult;
+    }
+
+    ctx->manager = this;
+    ctx->foundId = item.targetIdentifier;
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(DispatchTagDiscovery, reinterpret_cast<intptr_t>(ctx));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule tag discovery dispatch: %" CHIP_ERROR_FORMAT, err.Format());
+        delete ctx;
+    }
+
+    return scanResult;
 }
 
 CHIP_ERROR NFCCommissioningManagerImpl::ProcessSendWorkItem(const NfcWorkItem & item)
 {
-    // Process the message
-    if (item.message)
+    if (!item.message)
     {
-        ChipLogProgressNfcDebug(DeviceLayer, "Sending the next NFCMessage from the queue");
-
-        std::shared_ptr<TagInstance> tagInstance = item.message->GetTagInstance();
-        if (tagInstance == nullptr)
-        {
-            ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message");
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        // Send the data to the NFC tag
-        ByteSpan dataToSend = item.message->GetDataToSend();
-        tagInstance->SendChainedAPDUs(dataToSend);
-        return CHIP_NO_ERROR;
+        ChipLogError(DeviceLayer, "Null NFCMessage detected. Skipping");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ChipLogError(DeviceLayer, "Null NFCMessage detected. Skipping");
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    // Process the message
+    ChipLogProgressNfcDebug(DeviceLayer, "Sending the next NFCMessage from the queue");
+
+    std::shared_ptr<TagInstance> tagInstance = item.message->GetTagInstance();
+    if (tagInstance == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Send the data to the NFC tag
+    ByteSpan dataToSend = item.message->GetDataToSend();
+    tagInstance->SendChainedAPDUs(dataToSend);
+    return CHIP_NO_ERROR;
 }
 
 // Start scan on all available readers and scan for NFC Tags.
