@@ -72,7 +72,7 @@ class Subprocess(threading.Thread):
     """Run a subprocess in a thread."""
 
     DEFAULT_TIMEOUT_S: float = 300.0
-    TERMINATION_TIMEOUT_S: float = 5.0
+    TERMINATION_TIMEOUT_S: float = 10.0
 
     def __init__(self, program: str, *args: str, output_cb: Callable[[bytes, bool], bytes] | None = None,
                  f_stdout: BinaryIO = sys.stdout.buffer, f_stderr: BinaryIO = sys.stderr.buffer) -> None:
@@ -218,4 +218,8 @@ class Subprocess(threading.Thread):
     def wait(self, timeout: float = DEFAULT_TIMEOUT_S) -> int | None:
         """Wait for the subprocess to finish."""
         self.join(timeout)
+        # join() does not return a value, so we call is_alive(), if is alive this mean it timed out.
+        if self.is_alive():
+            # Terminate the process to get a returncode
+            self.terminate()
         return self.returncode
