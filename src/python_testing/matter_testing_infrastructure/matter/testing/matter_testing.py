@@ -1672,7 +1672,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Accesses the Test Runner Hooks for external reporting."""
         return global_stash.unstash_globally(self.user_params.get("hooks"))
 
-    def _optional_stored_global_wildcard(self) -> Optional[Attribute.AsyncReadTransaction.ReadResponse]:
+    def _optional_stored_global_wildcard(self) -> Attribute.AsyncReadTransaction.ReadResponse | None:
         """Returns the runner's cached global wildcard read, or None if it was never stashed.
 
         Framework cleanup uses this to skip steps when the wildcard was unavailable. Test bodies and
