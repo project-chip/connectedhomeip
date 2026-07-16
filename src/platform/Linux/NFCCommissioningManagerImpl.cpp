@@ -889,8 +889,8 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         // Wait for a work item to process
         {
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
-            mWorkQueueCondition.wait(lock,
-                                     [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
+            mWorkQueueCondition.wait(
+                lock, [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
 
             // Exit immediately once the worker is stopped.
             if (!mNfcWorkerThreadRunning)
