@@ -46,6 +46,7 @@ _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
     'aggregator',
     'air-purifier',
+    'ambient-context-sensor',
     'bridged-node',
     'chime',
     'contact-sensor',
