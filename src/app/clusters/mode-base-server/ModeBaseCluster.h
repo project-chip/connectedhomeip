@@ -38,7 +38,6 @@ public:
         OptionalAttributeSet optionalAttributeSet;
         ModeBase::AppDelegate & appDelegate;
         bool onOffValueForStartUp = false;
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         uint32_t clusterRevision = 0;
     };
@@ -122,7 +121,6 @@ private:
     const OptionalAttributeSet mOptionalAttributeSet;
     ModeBase::AppDelegate & mAppDelegate;
     bool mOnOffValueForStartUp = false;
-    SafeAttributePersistenceProvider & mSafeAttributePersistenceProvider;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
     uint32_t mClusterRevision = 0;
 
