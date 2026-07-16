@@ -9,7 +9,7 @@ COPY files-slt/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
 # Setup SLT CLI (same as scripts/setup/silabs/install-packages.py)
 RUN set -x \
     && mkdir -p /tmp/slt_install \
-    && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.1.1-linux-x64.zip -O /tmp/slt.zip \
+    && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.1.4-linux-x64.zip -O /tmp/slt.zip \
     && unzip -q /tmp/slt.zip -d /tmp/slt_install \
     && rm /tmp/slt.zip \
     && chmod +x /tmp/slt_install/slt \
@@ -40,7 +40,7 @@ RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep -v '\.a$' | sort -u
     && find /tmp/simplicity_sdk/boards/hardware/board/config -mindepth 1 -maxdepth 1 -type d ! \( -name '*brd4186c*' -o -name '*brd4187c*' -o -name '*brd4186a*' -o -name '*brd4187a*' -o -name '*brd2601b*' -o -name '*brd2703a*' -o -name '*brd2704a*' -o -name '*component*' \
     -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \
     -o -name '*brd1019a*' -o -name '*brd2719a*' -o -name '*brd4407a*' -o -name '*brd4408a*' \) -exec rm -rf {} + \
-    && find /tmp/simplicity_sdk/devices/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' -o -name 'SIMG301' \) -exec rm -rf {} + \
+    && find /tmp/simplicity_sdk/platform_core/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' -o -name 'SIMG301' \) -exec rm -rf {} + \
     && : # last line
 
 # Trim WiSeConnect SDK (from SLT install above) to save space

@@ -628,7 +628,7 @@ void NFCCommissioningManagerImpl::_Shutdown()
     // Stop the NFC worker thread
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
-        mShuttingDown = true;
+        mShuttingDown           = true;
         mNfcWorkerThreadRunning = false;
 
         // Discard all pending work immediately.

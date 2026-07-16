@@ -145,6 +145,10 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(ch
 void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
                                                                                   MatterClusterShutdownType shutdownType);
 
+void MatterLaundryWasherControlsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterLaundryWasherControlsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterRvcRunModeClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

@@ -171,6 +171,7 @@ PyChipError pychip_DeviceController_ResetLocalMRPConfig();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -810,6 +811,16 @@ PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceC
         });
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    // Stop any in-progress PASE/commissioning session with this node and release the associated
+    // commissionee device proxy. Unlike pychip_ExpireSessions, this deliberately does NOT expire
+    // operational (CASE) sessions, so it is safe to call while a CASE session to the node is in use.
+    return ToPyChipError(devCtrl->StopPairing(nodeid));
 }
 
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
