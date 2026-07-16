@@ -442,6 +442,12 @@ int main(int argc, char * argv[]) {
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Creation of AppParameters failed %" CHIP_ERROR_FORMAT, err.Format()));
 
+    // Configure the KVS data file path before CastingApp::Initialize() (which calls
+    // PlatformMgr().InitChipStack() -> PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()).
+#ifdef CHIP_CONFIG_KVS_PATH
+    chip::DeviceLayer::GetStoragePaths().SetKVSDataFile(CHIP_CONFIG_KVS_PATH);
+#endif
+
     // Initialize the CastingApp
     err = CastingApp::GetInstance()->Initialize(appParameters);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
