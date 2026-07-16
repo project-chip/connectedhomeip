@@ -282,15 +282,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+CHIP_ERROR ReadHandler::AcquireExchangeForSend()
 {
-    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
+        // We already hold mExchangeCtx from the inbound request. The underlying
+        // session can be released while a send is pending (e.g. TCP teardown);
+        // guard before grabbing it to avoid crashing in UseSuggestedResponseTimeout.
+        VerifyOrReturnLogError(mExchangeCtx->HasSessionHandle(), CHIP_ERROR_MISSING_SECURE_SESSION);
         mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
     }
     else
     {
+        // For subscription re-reports, the previous exchange was released after
+        // the last send. mExchangeCtx must be null here; open a fresh exchange
+        // from the stored session handle.
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
@@ -302,8 +308,13 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
+    return CHIP_NO_ERROR;
+}
 
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aStatus)
+{
+    VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
     return StatusResponse::Send(aStatus, mExchangeCtx.Get(), /* aExpectResponse = */ false);
 }
 
@@ -311,25 +322,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 {
     VerifyOrReturnLogError(mState == HandlerState::CanStartReporting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(!IsAwaitingReportResponse()); // Should not be reportable!
-    if (IsPriming() || IsChunkedReport())
-    {
-        mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
-    }
-    else
-    {
-        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
-#else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange =
-            mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
-#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mExchangeCtx.Grab(exchange);
-    }
-
-    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(AcquireExchangeForSend());
 
     if (!IsReporting())
     {
@@ -339,7 +332,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
                                                                 : Messaging::SendMessageFlags::kNone);
@@ -421,7 +414,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             if (mSessionHandle)
             {
-                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+                ICDNotifier::GetInstance().NotifySendCheckIn(MakeOptional(GetSubjectDescriptor()));
             }
             else
             {
@@ -773,52 +766,40 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeDuration
-    // defined in the ICD Management Cluster.
-    // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
+    // To optimize ICD sleep/idle cycles, it is preferred to synchronize the subscription report interval
+    // with the IdleModeDuration defined in the ICD Management Cluster.
+    // We aim to use IdleModeDuration, but must respect the Min Interval Floor and Max Interval Ceiling.
+    // Note: This behavior can be overridden using the OnSubscriptionRequested callback defined
+    // in the application.
 
-    // Default Behavior Steps :
-    // If MinInterval > IdleModeDuration, try to set the MaxInterval to the first interval of IdleModeDurations above the
-    // MinInterval.
-    // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
-    // Otherwise, use IdleModeDuration as MaxInterval
+    // Per spec and static checks, GetIdleModeDuration max value fits a uint16_t.
+    // The final selected interval must be a uint16_t but we use a uint32 here during calculation to prevent overflows.
+    uint32_t preferredMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
+    // Determine the max interval ceiling between GetPublisherSelectedIntervalLimit
+    // and the subscriber-requested MaxInterval.
+    uint16_t maxIntervalCeiling = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
 
-    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
-
-    // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
-    if (decidedMaxInterval == 0)
+    // Spec doesn't allow IdleModeDuration of 0 but make sure here to prevent div0
+    if (preferredMaxInterval == 0)
     {
-        decidedMaxInterval = mMaxInterval;
+        preferredMaxInterval = maxIntervalCeiling;
     }
-
-    // If requestedMinInterval is greater than the IdleTimeInterval, select next active up time as max interval
-    if (mMinIntervalFloorSeconds > decidedMaxInterval)
+    else
     {
-        uint16_t ratio = mMinIntervalFloorSeconds / static_cast<uint16_t>(decidedMaxInterval);
-        if (mMinIntervalFloorSeconds % decidedMaxInterval)
+        // Must respect the minimal interval floor
+        if (preferredMaxInterval < mMinIntervalFloorSeconds)
         {
-            ratio++;
+            // Round up to the nearest multiple of IdleModeDuration that is >= mMinIntervalFloorSeconds.
+            const uint32_t remainder = mMinIntervalFloorSeconds % preferredMaxInterval;
+            preferredMaxInterval =
+                remainder == 0 ? mMinIntervalFloorSeconds : (mMinIntervalFloorSeconds + (preferredMaxInterval - remainder));
         }
 
-        decidedMaxInterval *= ratio;
+        // Use the smallest interval between preferredMaxInterval and maxIntervalCeiling.
+        // This also ensure that no overflow occurs when casting to uint16_t below
+        preferredMaxInterval = std::min<uint32_t>(preferredMaxInterval, maxIntervalCeiling);
     }
-
-    // Verify that decidedMaxInterval is an acceptable value (overflow)
-    if (decidedMaxInterval > System::Clock::Seconds16::max().count())
-    {
-        decidedMaxInterval = System::Clock::Seconds16::max().count();
-    }
-
-    // Verify that the decidedMaxInterval respects MAX(GetPublisherSelectedIntervalLimit(), MaxIntervalCeiling)
-    uint16_t maximumMaxInterval = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
-    if (decidedMaxInterval > maximumMaxInterval)
-    {
-        decidedMaxInterval = maximumMaxInterval;
-    }
-
-    // Set max interval of the subscription
-    mMaxInterval = static_cast<uint16_t>(decidedMaxInterval);
-
+    mMaxInterval = static_cast<uint16_t>(preferredMaxInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     //

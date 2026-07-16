@@ -142,7 +142,7 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
     OTA_CancelImage();
     OTA_ServiceDeInit();
 
-    Clear();
+    TEMPORARY_RETURN_IGNORED Clear();
 
     return CHIP_NO_ERROR;
 }

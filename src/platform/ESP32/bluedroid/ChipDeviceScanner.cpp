@@ -33,7 +33,7 @@ bool BluedroidGetChipDeviceInfo(esp_ble_gap_cb_param_t & scan_result, chip::Ble:
     // Check for CHIP Service UUID
     if (scan_result.scan_rst.ble_adv != NULL)
     {
-        if (scan_result.scan_rst.adv_data_len > 13 && scan_result.scan_rst.ble_adv[5] == 0xf6 &&
+        if (scan_result.scan_rst.adv_data_len > 14 && scan_result.scan_rst.ble_adv[5] == 0xf6 &&
             scan_result.scan_rst.ble_adv[6] == 0xff)
         {
             deviceInfo.OpCode                              = scan_result.scan_rst.ble_adv[7];

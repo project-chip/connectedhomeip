@@ -44,27 +44,25 @@
 #   good way to disambiguate
 #
 
+import contextlib
 import fnmatch
 import logging
 import re
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from typing import Callable, Optional, Tuple
 
 import click
 import coloredlogs
 import cxxfilt
 import plotly.express as px
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARNING,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 __CHART_STYLES__ = {
@@ -139,11 +137,9 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    try:
+    # Allow to display the name as-is in case of failure.
+    with contextlib.suppress(cxxfilt.InvalidName):
         name = cxxfilt.demangle(name)
-    except cxxfilt.InvalidName:
-        # Allow display of the name as-is
-        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]
@@ -179,11 +175,10 @@ def tree_display_name(name: str) -> list[str]:
         if not m:
             continue
         d = m.groupdict()
-        logging.debug("Ember callback found: %s -> %r", name, d)
+        log.debug("Ember callback found: '%s' -> %r", name, d)
         if 'command' in d:
             return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
-        else:
-            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+        return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
@@ -410,10 +405,10 @@ def build_treemap(
     symbols: list[Symbol],
     separator: str,
     figure_generator: Callable,
-    color: Optional[list[str]],
+    color: list[str] | None,
     max_depth: int,
-    zoom: Optional[str],
-    strip: Optional[str],
+    zoom: str | None,
+    strip: str | None,
 ):
     # A treemap is based on parents (with title)
 
@@ -663,7 +658,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
         if symbol_file_name not in sources:
             if symbol_file_name not in unknown_file_names:
-                logging.warning('Source %r is not known', symbol_file_name)
+                log.warning('Source %r is not known', symbol_file_name)
                 unknown_file_names.add(symbol_file_name)
             path = [captures['section'], 'UNKNOWN', symbol_file_name, captures['name']]
         else:
@@ -720,7 +715,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
             "v",
             "V",
         }:
-            logging.debug("Found %s of size %d", name, size)
+            log.debug("Found '%s' of size %d", name, size)
             symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path=tree_display_name(name)))
         elif t in {
             # BSS - 0-initialized, not code
@@ -729,12 +724,12 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
         }:
             pass
         else:
-            logging.error("SKIPPING SECTION %s", t)
+            log.error("SKIPPING SECTION '%s'", t)
 
     return symbols
 
 
-def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: Optional[str]) -> Tuple[list[Symbol], str]:
+def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: str | None) -> tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
     match fetch:
@@ -770,8 +765,8 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     result = []
 
     for path in unique_paths:
-        orig_symbol = orig_items.get(path, None)
-        base_symbol = base_items.get(path, None)
+        orig_symbol = orig_items.get(path)
+        base_symbol = base_items.get(path)
 
         if not orig_symbol:
             if not base_symbol:
@@ -877,10 +872,10 @@ def main(
     color: str,
     fetch_via: str,
     max_depth: int,
-    zoom: Optional[str],
-    strip: Optional[str],
-    diff: Optional[str],
-    glob_filter: Optional[str],
+    zoom: str | None,
+    strip: str | None,
+    diff: str | None,
+    glob_filter: str | None,
 ):
     log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)

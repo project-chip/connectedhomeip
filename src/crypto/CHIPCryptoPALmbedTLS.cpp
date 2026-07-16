@@ -44,7 +44,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -653,7 +652,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
          * This avoids IAR compiler warning:
          * 'the order of volatile accesses is undefined ..' */
         unsigned char x = A[i], y = B[i];
-        diff |= x ^ y;
+        diff = static_cast<unsigned char>(diff | (x ^ y));
     }
 
     return ((int) diff);
@@ -722,7 +721,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
+    SuccessOrExit(error = output.SetLength(bbuf.Needed()));
 
 exit:
     ClearSecretData(privkey, sizeof(privkey));
@@ -929,6 +928,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

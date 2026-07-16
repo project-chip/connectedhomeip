@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+from collections.abc import Generator
 from dataclasses import dataclass
-from typing import Generator, List, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -25,7 +25,7 @@ from matter.idl.matter_idl_types import Cluster, Field, Idl, StructTag
 class TableEntry:
     code: str                   # Encoding like ContextTag() or AnonymousTag() or similar
     name: str                   # human friendly name
-    reference: Optional[str]    # reference to full name
+    reference: str | None    # reference to full name
     real_type: str              # real type
     item_type: str = 'kDefault'  # type flag for decoding
 
@@ -34,7 +34,7 @@ class TableEntry:
 class Table:
     # Usable variable fully qualified name (like <Cluster>_<name>)
     full_name: str
-    entries: List[TableEntry]
+    entries: list[TableEntry]
 
 
 class ClusterTablesGenerator:
@@ -63,7 +63,7 @@ class ClusterTablesGenerator:
         for b in self.cluster.bitmaps:
             self.item_type_map[b.name] = "kBitmap"
 
-    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override: Optional[str] = None) -> TableEntry:
+    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override: str | None = None) -> TableEntry:
         data_type_name = type_override or field.data_type.name
         type_reference = "%s_%s" % (self.cluster.name, data_type_name)
 
@@ -171,7 +171,7 @@ class ClusterTablesGenerator:
             )
             for e in self.cluster.events if e.fields
         ])
-        cluster_entries.extend(list(self.CommandEntries()))
+        cluster_entries.extend(self.CommandEntries())
 
         yield Table(
             full_name=self.cluster.name,
@@ -236,14 +236,14 @@ class ClusterTablesGenerator:
             )
 
 
-def CreateTables(idl: Idl) -> List[Table]:
+def CreateTables(idl: Idl) -> list[Table]:
     result = []
     for cluster in idl.clusters:
-        result.extend(list(ClusterTablesGenerator(cluster).GenerateTables()))
+        result.extend(ClusterTablesGenerator(cluster).GenerateTables())
     return result
 
 
-def IndexInTable(name: Optional[str], table: List[Table]) -> str:
+def IndexInTable(name: str | None, table: list[Table]) -> str:
     """Find the index of the given name in the table.
 
     The index is 1-based (to allow for a first entry containing a
@@ -293,7 +293,7 @@ class TLVMetaDataGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="TLVMetaData_cpp.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.cpp",
-            vars={
+            template_vars={
                 'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,
@@ -303,7 +303,7 @@ class TLVMetaDataGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="TLVMetaData_h.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.h",
-            vars={
+            template_vars={
                 'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,

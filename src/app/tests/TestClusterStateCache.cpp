@@ -32,7 +32,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -113,7 +113,7 @@ uint8_t AttributeInstruction::sInstructionId = 0;
 
 using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
-using TestClusterStateCache = chip::Test::AppContext;
+using TestClusterStateCache = chip::Testing::AppContext;
 
 class ForwardedDataCallbackValidator final
 {

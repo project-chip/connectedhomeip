@@ -16,7 +16,6 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Dict, List, Optional
 
 import click
 from lark import Lark
@@ -50,7 +49,7 @@ class PrefixCppDocComment:
             return
 
         actual_pos = self.start_pos + self.value_len
-        while content[actual_pos] in ' \t\n\r':
+        while actual_pos < len(content) and content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
@@ -65,9 +64,25 @@ class PrefixCppDocComment:
         """List all types supported by doc comments."""
         for cluster in idl.clusters:
             yield cluster
-
-            for command in cluster.commands:
-                yield command
+            for attribute in cluster.attributes:
+                yield attribute.definition
+            yield from cluster.commands
+            for struct in cluster.structs:
+                yield struct
+                for field in struct.fields:
+                    yield field
+            for event in cluster.events:
+                yield event
+                for field in event.fields:
+                    yield field
+            for enum in cluster.enums:
+                yield enum
+                for entry in enum.entries:
+                    yield entry
+            for bitmap in cluster.bitmaps:
+                yield bitmap
+                for entry in bitmap.entries:
+                    yield entry
 
     def __repr__(self):
         return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
@@ -147,8 +162,7 @@ class MatterIdlTransformer(Transformer):
         n = tokens[0].value
         if n.startswith('0x'):
             return int(n[2:], 16)
-        else:
-            return int(n)
+        return int(n)
 
     @v_args(inline=True)
     def negative_integer(self, value):
@@ -197,35 +211,38 @@ class MatterIdlTransformer(Transformer):
         if len(tokens) == 1:
             return DataType(name=tokens[0])
             # Just a string for data type
-        elif len(tokens) == 2:
+        if len(tokens) == 2:
             return DataType(name=tokens[0], max_length=tokens[1])
-        else:
-            raise Exception("Unexpected size for data type")
+        raise Exception("Unexpected size for data type")
 
-    @v_args(inline=True)
-    def constant_entry(self, api_maturity, id, number, spec_name):
+    @v_args(meta=True, inline=True)
+    def constant_entry(self, meta, api_maturity, constant_id, number, spec_name):
         if api_maturity is None:
             api_maturity = ApiMaturity.STABLE
-        return ConstantEntry(name=id, code=number, api_maturity=api_maturity, specification_name=spec_name)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return ConstantEntry(name=constant_id, code=number, api_maturity=api_maturity, specification_name=spec_name, parse_meta=meta)
 
-    @v_args(inline=True)
-    def enum(self, shared, id, type, *entries):
+    @v_args(meta=True, inline=True)
+    def enum(self, meta, shared, enum_id, enum_type, *entries):
         if shared is None:
             shared = False
-        return Enum(name=id, base_type=type, entries=list(entries), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Enum(name=enum_id, base_type=enum_type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
-    @v_args(inline=True)
-    def bitmap(self, shared, id, type, *entries):
+    @v_args(meta=True, inline=True)
+    def bitmap(self, meta, shared, bitmap_id, bitmap_type, *entries):
         if shared is None:
             shared = False
-        return Bitmap(name=id, base_type=type, entries=list(entries), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Bitmap(name=bitmap_id, base_type=bitmap_type, entries=list(entries), is_shared=shared, parse_meta=meta)
 
-    def field(self, args):
+    @v_args(meta=True)
+    def field(self, meta, args):
         data_type, name = args[0], args[1]
         is_list = (len(args) == 4)
         code = args[-1]
-
-        return Field(data_type=data_type, name=name, code=code, is_list=is_list)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Field(data_type=data_type, name=name, code=code, is_list=is_list, parse_meta=meta)
 
     def optional(self, _):
         return FieldQuality.OPTIONAL
@@ -266,42 +283,52 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
+    def command_fabric_scoped(self, _):
+        return CommandQuality.FABRIC_SCOPED
+
+    def command_timed(self, _):
+        return CommandQuality.TIMED_INVOKE
+
+    def command_qualities(self, qualities):
+        return UnionOfAllFlags(qualities) or CommandQuality.NONE
+
     def event_fabric_sensitive(self, _):
         return EventQuality.FABRIC_SENSITIVE
 
-    def event_qualities(selt, qualities):
+    def event_qualities(self, qualities):
         return UnionOfAllFlags(qualities) or EventQuality.NONE
 
-    def timed_command(self, _):
-        return CommandQuality.TIMED_INVOKE
+    def command_optional(self, _):
+        return CommandQuality.OPTIONAL
 
-    def fabric_scoped_command(self, _):
-        return CommandQuality.FABRIC_SCOPED
+    def event_optional(self, _):
+        return EventQuality.OPTIONAL
 
-    def command_qualities(self, attrs):
-        return UnionOfAllFlags(attrs) or CommandQuality.NONE
-
-    def struct_field(self, args):
+    @v_args(meta=True)
+    def struct_field(self, meta, args):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
         field.qualities = UnionOfAllFlags(args[1:-1]) or FieldQuality.NONE
         if args[0] is not None:
             field.api_maturity = args[0]
+
+        field.parse_meta = None if self.skip_meta else ParseMetaData(meta)
         return field
 
     def command_access(self, privilege):
         return privilege[0]
 
     def command_with_access(self, args):
-        # Arguments
-        #   - optional access for invoke
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": CommandQuality.NONE
         }
-        if len(args) > 1:
-            init_args["invokeacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, CommandQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["invokeacl"] = arg
 
         return init_args
 
@@ -309,35 +336,46 @@ class MatterIdlTransformer(Transformer):
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
     def command(self, meta, *tuple_args):
-        # The command takes 4 arguments if no input argument, 5 if input
-        # argument is provided
-        args = list(tuple_args)  # convert from tuple
-        if len(args) != 5:
-            args.insert(2, None)
+        # tuple_args contains:
+        # 0: command_qualities
+        # 1: [command_optional] (CommandQuality.OPTIONAL or None)
+        # 2: command_with_access
+        # Rest: input_param (optional), output_param, code
+        qualities, optional_quality, with_access, *rest = tuple_args
+        qualities = qualities or CommandQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
+
+        with_access.pop("qualities", None)
+
+        if len(rest) == 2:
+            input_param = None
+            output_param, code = rest
+        else:
+            input_param, output_param, code = rest
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
-        cmd = Command(
+        return Command(
             parse_meta=meta,
-            qualities=args[0],
-            input_param=args[2], output_param=args[3], code=args[4],
-            **args[1],
+            qualities=qualities,
+            input_param=input_param, output_param=output_param, code=code,
+            **with_access,
         )
-
-        return cmd
 
     def event_access(self, privilege):
         return privilege[0]
 
     def event_with_access(self, args):
-        # Arguments
-        #   - optional access for read
-        #   - event identifier (name)
         init_args = {
-            "name": args[-1]
+            "name": args[-1],
+            "qualities": EventQuality.NONE
         }
-        if len(args) > 1:
-            init_args["readacl"] = args[0]
+        for arg in args[:-1]:
+            if isinstance(arg, EventQuality):
+                init_args["qualities"] = arg
+            elif isinstance(arg, AccessPrivilege):
+                init_args["readacl"] = arg
 
         return init_args
 
@@ -345,8 +383,19 @@ class MatterIdlTransformer(Transformer):
     def cluster_revision(self, revision):
         return revision
 
-    def event(self, args):
-        return Event(qualities=args[0], priority=args[1], code=args[3], fields=args[4:], **args[2])
+    @v_args(meta=True)
+    def event(self, meta, args):
+        qualities, priority, optional_quality, with_access, code = args[:5]
+        fields = args[5:]
+
+        qualities = qualities or EventQuality.NONE
+        if optional_quality:
+            qualities |= optional_quality
+
+        with_access.pop("qualities", None)
+
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Event(qualities=qualities, priority=priority, code=code, fields=fields, parse_meta=meta, **with_access)
 
     def view_privilege(self, args):
         return AccessPrivilege.VIEW
@@ -401,26 +450,26 @@ class MatterIdlTransformer(Transformer):
         return AttributeStorage.CALLBACK
 
     @v_args(meta=True, inline=True)
-    def endpoint_attribute_instantiation(self, meta, storage, id, default=None):
+    def endpoint_attribute_instantiation(self, meta, storage, attribute_id, default=None):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
+        return AttributeInstantiation(parse_meta=meta, name=attribute_id, storage=storage, default=default)
 
     @v_args(meta=True, inline=True)
-    def endpoint_command_instantiation(self, meta, id):
+    def endpoint_command_instantiation(self, meta, command_id):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return CommandInstantiation(parse_meta=meta, name=id)
+        return CommandInstantiation(parse_meta=meta, name=command_id)
 
     @v_args(meta=True, inline=True)
-    def endpoint_emitted_event(self, meta, id):
+    def endpoint_emitted_event(self, meta, event_id):
         meta = None if self.skip_meta else ParseMetaData(meta)
-        return id
+        return event_id
 
     def ESCAPED_STRING(self, s):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
-    @v_args(inline=True)
-    def attribute(self, qualities, definition_tuple):
+    @v_args(meta=True, inline=True)
+    def attribute(self, meta, qualities, definition_tuple):
         (definition, acl) = definition_tuple
 
         # If the attribute is neither "readonly" nor "writeonly", then it must be Read/Write
@@ -428,22 +477,26 @@ class MatterIdlTransformer(Transformer):
             qualities |= AttributeQuality.READABLE
             qualities |= AttributeQuality.WRITABLE
 
+        definition.parse_meta = None if self.skip_meta else ParseMetaData(meta)
+
         return Attribute(definition=definition, qualities=qualities, **acl)
 
-    @v_args(inline=True)
-    def struct(self, shared, qualities, id, *fields):
+    @v_args(meta=True, inline=True)
+    def struct(self, meta, shared, qualities, struct_id, *fields):
         if shared is None:
             shared = False
-        return Struct(name=id, qualities=qualities, fields=list(fields), is_shared=shared)
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Struct(name=struct_id, qualities=qualities, fields=list(fields), is_shared=shared, parse_meta=meta)
 
     @v_args(inline=True)
     def request_struct(self, value):
         value.tag = StructTag.REQUEST
         return value
 
-    @v_args(inline=True)
-    def response_struct(self, id, code, *fields):
-        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
+    @v_args(meta=True, inline=True)
+    def response_struct(self, meta, struct_id, code, *fields):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return Struct(name=struct_id, tag=StructTag.RESPONSE, code=code, fields=list(fields), parse_meta=meta)
 
     @v_args(inline=True)
     def endpoint(self, number, *transforms):
@@ -459,11 +512,11 @@ class MatterIdlTransformer(Transformer):
         return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code, version=version))
 
     @v_args(inline=True)
-    def endpoint_cluster_binding(self, id):
-        return AddBindingToEndpointTransform(id)
+    def endpoint_cluster_binding(self, cluster_id):
+        return AddBindingToEndpointTransform(cluster_id)
 
     @v_args(meta=True, inline=True)
-    def endpoint_server_cluster(self, meta, id, *content):
+    def endpoint_server_cluster(self, meta, cluster_id, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         attributes = []
@@ -478,12 +531,18 @@ class MatterIdlTransformer(Transformer):
             else:
                 events.add(item)
         return AddServerClusterToEndpointTransform(
-            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events, commands=commands))
+            ServerClusterInstantiation(parse_meta=meta, name=cluster_id, attributes=attributes, events_emitted=events, commands=commands))
 
-    @v_args(inline=True)
-    def cluster_content(self, api_maturity, element):
+    @v_args(meta=True)
+    def cluster_content(self, meta, args):
+        api_maturity, element = args[0], args[1]
         if api_maturity is not None:
             element.api_maturity = api_maturity
+        if not self.skip_meta:
+            if isinstance(element, Attribute):
+                element.definition.parse_meta = ParseMetaData(meta)
+            elif hasattr(element, 'parse_meta'):
+                element.parse_meta = ParseMetaData(meta)
         return element
 
     @v_args(inline=True, meta=True)
@@ -553,7 +612,7 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> List[str]:
+def _referenced_type_names(cluster: Cluster) -> list[str]:
     """
     Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
@@ -624,15 +683,15 @@ class GlobalMapping:
                 if type_name in self.bitmap_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.bitmaps.append(self.bitmap_map[type_name])
+                    cluster.bitmaps.insert(0, self.bitmap_map[type_name])
                 elif type_name in self.enum_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.enums.append(self.enum_map[type_name])
+                    cluster.enums.insert(0, self.enum_map[type_name])
                 elif type_name in self.struct_map:
                     global_types_added.add(type_name)
                     changed = True
-                    cluster.structs.append(self.struct_map[type_name])
+                    cluster.structs.insert(0, self.struct_map[type_name])
 
         return cluster
 
@@ -667,7 +726,7 @@ class ParserWithLines:
             }
         )
 
-    def parse(self, file: str, file_name: Optional[str] = None):
+    def parse(self, file: str, file_name: str | None = None):
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
 
@@ -683,7 +742,7 @@ class ParserWithLines:
         #
         # A zap PR to allow us to not need this is:
         #    https://github.com/project-chip/zap/pull/1216
-        clusters: Dict[int, Cluster] = {}
+        clusters: dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:
@@ -737,7 +796,7 @@ __LOG_LEVELS__ = {
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.argument('filename')
-def main(log_level, filename=None):
+def main(log_level, filename):
     # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
 
@@ -747,7 +806,8 @@ def main(log_level, filename=None):
     )
 
     LOGGER.info("Starting to parse ...")
-    data = CreateParser().parse(open(filename).read(), file_name=filename)
+    with open(filename) as f:
+        data = CreateParser().parse(f.read(), file_name=filename)
     LOGGER.info("Parse completed")
 
     LOGGER.info("Data:")

@@ -21,7 +21,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
@@ -36,6 +38,8 @@ kConfigureTrustedTimeSource = 19
 
 
 class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
+    requires_dut = False
+
     # This test needs to be run against an app that has previously been commissioned, has been reset
     # but not factory reset, and which has been started with the --simulate-no-internal-time flag.
     # This test should be run using the provided "TestTimeSyncTrustedTimeSourceRunner.py" script

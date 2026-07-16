@@ -18,10 +18,11 @@
 import functools
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, TypeAlias
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
+from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
 
 
 @dataclass
@@ -29,11 +30,11 @@ class TagProblem:
     root: int
     missing_attribute: bool
     missing_feature: bool
-    duplicates: Set[int]
-    same_tag: Set[int] = field(default_factory=set)
+    duplicates: set[int]
+    same_tag: set[int] = field(default_factory=set)
 
 
-def separate_endpoint_types(endpoint_dict: Dict[int, Any]) -> Tuple[List[int], List[int]]:
+def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], list[int]]:
     """Returns a tuple containing the list of flat endpoints and a list of tree endpoints"""
     flat = []
     tree = []
@@ -52,13 +53,13 @@ def separate_endpoint_types(endpoint_dict: Dict[int, Any]) -> Tuple[List[int], L
     return (flat, tree)
 
 
-def get_all_children(endpoint_id: int, endpoint_dict: Dict[int, Any]) -> Set[int]:
+def get_all_children(endpoint_id: int, endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns all the children (include subchildren) of the given endpoint
        This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
     """
-    children: Set[int] = set()
+    children: set[int] = set()
 
-    def add_children(endpoint_id: int, children: Set[int]) -> None:
+    def add_children(endpoint_id: int, children: set[int]) -> None:
         immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
         if not immediate_children:
             return
@@ -70,7 +71,7 @@ def get_all_children(endpoint_id: int, endpoint_dict: Dict[int, Any]) -> Set[int
     return children
 
 
-def find_tree_roots(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) -> Set[int]:
+def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns a set of all the endpoints in tree_endpoints that are roots for a tree (not include singletons)"""
     tree_roots = set()
 
@@ -91,7 +92,7 @@ def find_tree_roots(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) ->
     return tree_roots
 
 
-def parts_list_problems(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]) -> List[int]:
+def parts_list_problems(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
     """Returns a list of all the endpoints in the tree_endpoints list that contain cycles or nodes with multiple paths to the root or non-existent endpoints"""
     def parts_list_problem_detect(visited: set, current_id: int) -> bool:
         if current_id in visited:
@@ -108,17 +109,17 @@ def parts_list_problems(tree_endpoints: List[int], endpoint_dict: Dict[int, Any]
     problems = []
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
-        visited: Set[int] = set()
+        visited: set[int] = set()
         if parts_list_problem_detect(visited, endpoint_id):
             problems.append(endpoint_id)
     return problems
 
 
-def create_device_type_lists(roots: List[int], endpoint_dict: Dict[int, Any]) -> Dict[int, Dict[int, Set[int]]]:
+def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) -> dict[int, dict[int, set[int]]]:
     """Returns a list of endpoints per device type for each root in the list"""
-    device_types: Dict[int, Dict[int, Set[int]]] = {}
+    device_types: dict[int, dict[int, set[int]]] = {}
     for root in roots:
-        tree_device_types: Dict[int, Set[int]] = defaultdict(set)
+        tree_device_types: dict[int, set[int]] = defaultdict(set)
         eps = get_all_children(root, endpoint_dict)
         eps.add(root)
         for ep in eps:
@@ -129,7 +130,7 @@ def create_device_type_lists(roots: List[int], endpoint_dict: Dict[int, Any]) ->
     return device_types
 
 
-def get_direct_children_of_root(endpoint_dict: Dict[int, Any]) -> Set[int]:
+def get_direct_children_of_root(endpoint_dict: dict[int, Any]) -> set[int]:
     root_children = set(endpoint_dict[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
     direct_children = root_children
     for ep in root_children:
@@ -138,7 +139,7 @@ def get_direct_children_of_root(endpoint_dict: Dict[int, Any]) -> Set[int]:
     return direct_children
 
 
-def create_device_type_list_for_root(direct_children: Set[int], endpoint_dict: Dict[int, Any]) -> Dict[int, Set[int]]:
+def create_device_type_list_for_root(direct_children: set[int], endpoint_dict: dict[int, Any]) -> dict[int, set[int]]:
     device_types = defaultdict(set)
     for ep in direct_children:
         for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
@@ -151,8 +152,7 @@ def cmp_tag_list(a: Clusters.Globals.Structs.SemanticTagStruct, b: Clusters.Glob
         return -1 if type(a.mfgCode) is Nullable else 1
     if a.mfgCode != b.mfgCode:
         # Adding type ignore for the comparison between potentially incompatible types
-        result = -1 if a.mfgCode < b.mfgCode else 1  # type: ignore
-        return result
+        return -1 if a.mfgCode < b.mfgCode else 1  # type: ignore
     if a.namespaceID != b.namespaceID:
         return -1 if a.namespaceID < b.namespaceID else 1
     if a.tag != b.tag:
@@ -161,12 +161,11 @@ def cmp_tag_list(a: Clusters.Globals.Structs.SemanticTagStruct, b: Clusters.Glob
         return -1 if type(a.label) is Nullable or a.label is None else 1
     if a.label != b.label:
         # Adding type ignore for the comparison between potentially incompatible types
-        result = -1 if a.label < b.label else 1  # type: ignore
-        return result
+        return -1 if a.label < b.label else 1  # type: ignore
     return 0
 
 
-def find_tag_list_problems(roots: List[int], device_types: Dict[int, Dict[int, Set[int]]], endpoint_dict: Dict[int, Any]) -> Dict[int, TagProblem]:
+def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, set[int]]], endpoint_dict: dict[int, Any]) -> dict[int, TagProblem]:
     """Checks for non-spec compliant tag lists"""
     tag_problems = {}
     for root in roots:
@@ -203,9 +202,72 @@ def find_tag_list_problems(roots: List[int], device_types: Dict[int, Dict[int, S
     return tag_problems
 
 
-def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: Dict[int, Any]) -> bool:
+def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: dict[int, Any]) -> bool:
     '''Checks if the (flat) PartsList on the supplied endpoint contains all the sub-children of its parts.'''
     sub_children = set()
     for child in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
         sub_children.update(get_all_children(child, endpoints_dict))
     return all(item in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList] for item in sub_children)
+
+
+@dataclass
+class EndpointTree:
+    endpoint: int
+    children: list[int]
+    is_aggregator_or_root: bool = False
+    is_tree_root: bool = False
+
+
+TreeDict: TypeAlias = dict[int, EndpointTree]
+
+
+def build_tree_for_graph(endpoints: dict[int, Any]) -> tuple[TreeDict, list[ProblemNotice]]:
+    problems: list[ProblemNotice] = []
+    aggregator_endpoints, tree_endpoints = separate_endpoint_types(endpoints)
+    problem_endpoints = parts_list_problems(tree_endpoints, endpoints)
+    for p in problem_endpoints:
+        location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
+        problems.append(ProblemNotice(test_name="Tree graph", location=location,
+                        severity=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {p}"))
+
+    roots = find_tree_roots(tree_endpoints, endpoints)
+    all_endpoints: TreeDict = {}
+
+    def create_tree(endpoint: int):
+        children = endpoints[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        all_endpoints[endpoint] = EndpointTree(endpoint=endpoint, children=children)
+        for e in all_endpoints[endpoint].children:
+            create_tree(e)
+
+    # Endpoints in trees
+    for r in roots:
+        create_tree(r)
+        all_endpoints[r].is_tree_root = True
+
+    singletons = set(endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]) - \
+        set(all_endpoints.keys()) - set(aggregator_endpoints)
+    # Aggregators
+    all_aggregator_children = set()
+    for a in aggregator_endpoints:
+        all_children = endpoints[a][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        children_roots = [c for c in all_children if c in roots or c in singletons]
+        all_aggregator_children.update(set(all_children))
+        all_endpoints[a] = EndpointTree(endpoint=a, children=children_roots, is_aggregator_or_root=True)
+    # Singletons are roots of a 1-element tree
+
+    for s in singletons:
+        if endpoints[s][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+            location = ClusterPathLocation(endpoint_id=p, cluster_id=Clusters.Descriptor.id)
+            problems.append(ProblemNotice(test_name="Tree graph", location=location,
+                            severity=ProblemSeverity.ERROR, problem=f"Bad topology on endpoint {s}"))
+        all_endpoints[s] = EndpointTree(endpoint=s, children=[], is_tree_root=True)
+
+    if problems:
+        return {}, problems
+    # NOTE: Does not handle aggregator of aggregators
+    root_node_trees = [r for r in roots if r not in all_aggregator_children]
+    singletons_in_root = [s for s in singletons if s not in all_aggregator_children]
+    root_node_children = root_node_trees + singletons_in_root + aggregator_endpoints
+    all_endpoints[0] = EndpointTree(endpoint=0, children=root_node_children, is_aggregator_or_root=True)
+
+    return all_endpoints, []

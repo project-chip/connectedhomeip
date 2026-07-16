@@ -32,7 +32,7 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-                                           
+
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
@@ -257,6 +257,14 @@ menu "CHIP Core"
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
+        config USE_LWIP_PBUF_RAM_PACKETBUFFER
+            bool "Use lwIP PBUF_RAM type for CHIP packet buffer"
+            default n
+            help
+                Enable this option to use lwIP PBUF_RAM type for CHIP packet buffer. Configure via
+                MAX_LARGE_BUFFER_SIZE_BYTES to support larger packets exceeding IPv6 MTU.
+                If not enabled, CHIP will use lwIP PBUF_POOL type for packet buffer.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -285,8 +293,8 @@ menu "CHIP Core"
             depends on ENABLE_OTA_REQUESTOR
             default n
             help
-                Enable this option for delta OTA image updates. 
-                Delta OTA updates allow for smaller, more efficient updates by only 
+                Enable this option for delta OTA image updates.
+                Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
         config OTA_AUTO_REBOOT_ON_APPLY
@@ -387,6 +395,13 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables the support for Commissionable Device Type.
 
+        config ENABLE_CONCURRENT_CONNECTION
+            bool "Enable Concurrent Connection"
+            default y
+            help
+                Enables or Disables the support for Concurrent Connection, it will affect the logic of ConnectNetwork
+                Command in Network Commissioning cluster.
+
         menuconfig ENABLE_ICD_SERVER
             bool "Enable ICD server"
             depends on OPENTHREAD_MTD
@@ -447,15 +462,40 @@ menu "CHIP Device Layer"
             bool "Enable Long Idle Time ICD"
             depends on ENABLE_ICD_SERVER
             default n
+            select ENABLE_ICD_CIP
+            select ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             help
                 Enables or Disables LIT ICD
 
-        config ENABLE_ICD_CIP
-            bool "Enable Check-in protocol"
+        config ENABLE_ICD_DSLS
+            bool "Enable Dynamic SIT LIT Support"
             depends on ENABLE_ICD_LIT
             default y
             help
+                Enables or Disables dynamic switching from SIT to LIT operating modes.
+
+        config ICD_SHORT_IDLE_MODE_DURATION_SEC
+            int "ICD Short Idle Mode Duration(s)"
+            depends on ENABLE_ICD_LIT
+            default 60
+            help
+                Shorter idle mode interval for LIT capable devices operating in SIT mode. This allows devices
+                to report more frequently and maintain a more reliable availability status with their
+                subscribers.
+
+        config ENABLE_ICD_CIP
+            bool "Enable Check-in protocol"
+            depends on ENABLE_ICD_SERVER
+            default y
+            help
                 Enables or Disables ICD Check-in protocol
+
+        config ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+            bool "Enable Check-in on report timeout"
+            depends on ENABLE_ICD_CIP
+            default y
+            help
+                Enables or disables sending Check-in message on report timeout
 
         config ICD_CLIENTS_SUPPORTED_PER_FABRIC
             int "ICD Clients Number Supported Per Fabric"
@@ -480,12 +520,12 @@ menu "CHIP Device Layer"
 
         config ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             bool "Enable User Active Mode Trigger feature"
-            depends on ENABLE_ICD_LIT
+            depends on ENABLE_ICD_SERVER
             default y
             help
                 Enables or Disables ICD User Active Mode Trigger feature
 
-        config ENABLE_BG_EVENT_PROCESSING
+        menuconfig ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
             default n
             help
@@ -609,6 +649,14 @@ menu "CHIP Device Layer"
             depends on ENABLE_WIFI_STATION
             help
                 The maximum number of networks to return as a result of a CHIP NetworkProvisioning:ScanNetworks request.
+
+        config WIFI_SCAN_ALL_CHANNEL_MODE
+            bool "Enable All-channel Scan Mode"
+            default n
+            depends on ENABLE_WIFI_STATION
+            help
+                Select to enable all-channel scan mode for Wi-Fi station. Note that this option might increase the time of
+                the station connecting to the AP by about 1-2 seconds.
 
         config WIFI_SCAN_COMPLETION_TIMEOUT
             int "WiFi Scan Completion Timeout (ms)"
@@ -735,6 +783,27 @@ menu "CHIP Device Layer"
             help
                 Stack size of Thread task.
 
+        config CHIP_USE_OT_ENDPOINT
+            bool "Use native OpenThread UDP endpoint"
+            default n
+            depends on ENABLE_MATTER_OVER_THREAD
+            depends on !OPENTHREAD_PLATFORM_NETIF
+            depends on !ENABLE_TCP_TRANSPORT
+            depends on !WIFI_NETWORK_COMMISSIONING_DRIVER
+            depends on !ETHERNET_NETWORK_COMMISSIONING_DRIVER
+            help
+                Build CHIP to use Matter's native OpenThread UDP endpoint instead of the
+                ESP-IDF OpenThread esp_netif/lwIP glue. This is intended for Thread-only
+                images and requires CONFIG_OPENTHREAD_PLATFORM_NETIF to be disabled when
+                that ESP-IDF option is available.
+
+        config CHIP_DEVICE_ENABLE_THREAD_MESHCOP
+            bool "Enable Thread MeshCoP"
+            default n
+            depends on ENABLE_MATTER_OVER_THREAD && !ENABLE_CONCURRENT_CONNECTION
+            help
+                Enable Matter commissioning over Thread MeshCoP
+
     endmenu
 
     menu "Ethernet Options"
@@ -753,6 +822,7 @@ menu "CHIP Device Layer"
             default 19 if IDF_TARGET_ESP32C3
             default 48 if IDF_TARGET_ESP32S3
             default 26 if IDF_TARGET_ESP32H2
+            default 54 if IDF_TARGET_ESP32P4
 
         config ETH_MDC_GPIO
             int "SMI MDC GPIO number"
@@ -855,54 +925,38 @@ menu "CHIP Device Layer"
                 By default, the implementation reads the Certification Declaration (CD) from the 'chip-factory'
                 NVS namespace. If this option is enabled, the application can use an API to set a CD,
                 the configured CD will be used for subsequent CD reads.
-
-       config ENABLE_ESP_INSIGHTS_TRACE
-           bool "Enable Matter ESP Insights"
-           depends on ESP_INSIGHTS_ENABLED
-           default y
-           help
-               ESP Insights is a remote diagnostics solution to monitor the health of ESP devices in the field.
-               Enabling the above option will enable the esp32 specific tracing functionality and report the
-               diagnostic information to the insights cloud.
-
-      config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-           bool "Enable System Stats for insights"
-           depends on ESP_INSIGHTS_ENABLED
-           default n
-           help
-               This option enables the system statistics to be sent to the insights cloud.
-
-        config MAX_PERMIT_LIST_SIZE
-            int "Set permit list size for Insights traces"
-            range 5 30
-            depends on ESP_INSIGHTS_ENABLED
-            default 20
-            help
-                Set the maximum number of group entries that can be included in the permit list for reporting
-                traces to Insights. This ensures proper management of trace reporting capacity.
     endmenu
 
     menu "Diagnostics Options"
-        config ENABLE_ESP_DIAGNOSTICS
+        config CHIP_ENABLE_ESP_DIAGNOSTICS
             bool "Enable ESP Platform Diagnostics for Matter"
             default n
             help
                 Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
                 This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
-        config ENABLE_ESP_DIAGNOSTIC_TRACES
+        config CHIP_ENABLE_ESP_DIAGNOSTIC_TRACES
             bool "Enable Traces"
             default y
-            depends on ENABLE_ESP_DIAGNOSTICS
+            depends on CHIP_ENABLE_ESP_DIAGNOSTICS
             help
                 Enable Traces for the ESP Platform Diagnostics for Matter.
 
-        config ENABLE_ESP_DIAGNOSTIC_METRICS
+        config CHIP_ENABLE_ESP_DIAGNOSTIC_METRICS
             bool "Enable Metrics"
             default y
-            depends on ENABLE_ESP_DIAGNOSTICS
+            depends on CHIP_ENABLE_ESP_DIAGNOSTICS
             help
                 Enable Metrics for the ESP Platform Diagnostics for Matter.
+
+        config MAX_PERMIT_LIST_SIZE
+            int "Set permit list size for Insights traces"
+            range 5 30
+            depends on CHIP_ENABLE_ESP_DIAGNOSTICS
+            default 20
+            help
+                Set the maximum number of group entries that can be included in the permit list for reporting
+                traces to Insights. This ensures proper management of trace reporting capacity.
     endmenu
 
     menu "Testing Options"
@@ -1211,6 +1265,23 @@ menu "CHIP Device Layer"
             default 4
             help
                 The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Matter TCP transport options"
+        config ENABLE_TCP_TRANSPORT
+            bool "Enable TCP transport"
+            select USE_LWIP_PBUF_RAM_PACKETBUFFER
+            default n
+            help
+                Enable TCP transport. If enabled, USE_LWIP_PBUF_RAM_PACKETBUFFER must be configured.
+
+        config MAX_LARGE_BUFFER_SIZE_BYTES
+            int "Max buffer size for TCP payloads"
+            depends on ENABLE_TCP_TRANSPORT
+            default 1530
+            help
+                Max TCP payload buffer size.
 
     endmenu
 

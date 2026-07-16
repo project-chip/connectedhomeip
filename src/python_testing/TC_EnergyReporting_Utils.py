@@ -22,7 +22,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class EnergyReportingBaseTestHelper:
@@ -47,7 +47,7 @@ class EnergyReportingBaseTestHelper:
         value = await self.read_epm_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         if allow_null and value is NullValue:
             # skip the range check
-            logger.info("value is NULL - OK")
+            log.info("value is NULL - OK")
             return value
 
         self.check_value_in_range(attribute, value, lower_value, upper_value)
@@ -57,7 +57,7 @@ class EnergyReportingBaseTestHelper:
         value = await self.read_eem_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         if allow_null and value is NullValue:
             # skip the range check
-            logger.info("value is NULL - OK")
+            log.info("value is NULL - OK")
             return value
 
         self.check_value_in_range(attribute, value, lower_value, upper_value)

@@ -16,13 +16,14 @@
  */
 #pragma once
 
+#include <app/data-model-provider/Provider.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <variant>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// specify what the next `emAfReadOrWriteAttribute` will contain
 ///
@@ -32,5 +33,27 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::Interactio
 /// Grab the data currently in the buffer
 chip::ByteSpan GetEmberBuffer();
 
-} // namespace Test
+/// Defines the provider used to notify of attribute writes.
+///
+/// Ember has NotifyAttributeChange logic in emberAfWriteAttribute. Since
+/// these classes override the write logic, we make change notifications be
+/// reported to this given provider.
+class TestNotifiedProvider
+{
+public:
+    TestNotifiedProvider(app::DataModel::Provider * provider)
+    {
+        mOldProvider = gProvider;
+        gProvider    = provider;
+    }
+    ~TestNotifiedProvider() { gProvider = mOldProvider; }
+
+    static app::DataModel::Provider * Provider() { return gProvider; }
+
+private:
+    app::DataModel::Provider * mOldProvider; // RAII override
+    static app::DataModel::Provider * gProvider;
+};
+
+} // namespace Testing
 } // namespace chip

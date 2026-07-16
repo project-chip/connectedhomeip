@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding=utf-8
 
 #
 #   Copyright (c) 2020 Project CHIP Authors
@@ -24,8 +23,6 @@
 #         This file contains definitions for working with data encoded in Chip TLV format
 #
 
-
-from __future__ import absolute_import, print_function
 
 import struct
 from collections import OrderedDict
@@ -137,7 +134,7 @@ class float32(float):
     pass
 
 
-class TLVWriter(object):
+class TLVWriter:
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
         self._implicitProfile = implicitProfile
@@ -214,7 +211,7 @@ class TLVWriter(object):
             self.putDouble(tag, val)
         elif isinstance(val, str):
             self.putString(tag, val)
-        elif isinstance(val, bytes) or isinstance(val, bytearray):
+        elif isinstance(val, (bytes, bytearray)):
             self.putBytes(tag, val)
         elif isinstance(val, Mapping):
             self.startStructure(tag)
@@ -242,16 +239,16 @@ class TLVWriter(object):
     def putSignedInt(self, tag, val):
         """Write a value as a TLV signed integer with the specified TLV tag."""
         if val >= INT8_MIN and val <= INT8_MAX:
-            format = "<b"
+            fmt = "<b"
         elif val >= INT16_MIN and val <= INT16_MAX:
-            format = "<h"
+            fmt = "<h"
         elif val >= INT32_MIN and val <= INT32_MAX:
-            format = "<l"
+            fmt = "<l"
         elif val >= INT64_MIN and val <= INT64_MAX:
-            format = "<q"
+            fmt = "<q"
         else:
             raise ValueError("Integer value out of range")
-        val = struct.pack(format, val)
+        val = struct.pack(fmt, val)
         controlAndTag = self._encodeControlAndTag(
             TLV_TYPE_SIGNED_INTEGER, tag, lenOfLenOrVal=len(val)
         )
@@ -309,10 +306,10 @@ class TLVWriter(object):
     def putBool(self, tag, val):
         """Write a value as a TLV boolean with the specified TLV tag."""
         if val:
-            type = TLVBoolean_True
+            tlv_type = TLVBoolean_True
         else:
-            type = TLVBoolean_False
-        controlAndTag = self._encodeControlAndTag(type, tag)
+            tlv_type = TLVBoolean_False
+        controlAndTag = self._encodeControlAndTag(tlv_type, tag)
         self._encoding.extend(controlAndTag)
 
     def putNull(self, tag):
@@ -349,8 +346,8 @@ class TLVWriter(object):
         controlAndTag = self._encodeControlAndTag(TLVEndOfContainer, None)
         self._encoding.extend(controlAndTag)
 
-    def _encodeControlAndTag(self, type, tag, lenOfLenOrVal=0):
-        controlByte = type
+    def _encodeControlAndTag(self, ctl, tag, lenOfLenOrVal=0):
+        controlByte = ctl
         if lenOfLenOrVal == 2:
             controlByte |= 1
         elif lenOfLenOrVal == 4:
@@ -359,7 +356,7 @@ class TLVWriter(object):
             controlByte |= 3
         if tag is None:
             if (
-                type != TLVEndOfContainer
+                ctl != TLVEndOfContainer
                 and len(self._containerStack) != 0
                 and self._containerStack[0] == TLV_TYPE_STRUCTURE
             ):
@@ -403,25 +400,21 @@ class TLVWriter(object):
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            elif profile == 0:
+                controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            if profile == 0:
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            else:
-                vendorId = (profile >> 16) & 0xFFFF
-                profileNum = (profile >> 0) & 0xFFFF
-                if tagNum <= UINT16_MAX:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
-                    return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
-                    return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
+                controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            vendorId = (profile >> 16) & 0xFFFF
+            profileNum = (profile >> 0) & 0xFFFF
+            if tagNum <= UINT16_MAX:
+                controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
+                return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
+            controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
+            return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
         raise ValueError("Invalid object given for TLV tag")
 
     @staticmethod
@@ -429,16 +422,16 @@ class TLVWriter(object):
         if val < 0:
             raise ValueError("Integer value out of range")
         if val <= UINT8_MAX:
-            format = "<B"
+            fmt = "<B"
         elif val <= UINT16_MAX:
-            format = "<H"
+            fmt = "<H"
         elif val <= UINT32_MAX:
-            format = "<L"
+            fmt = "<L"
         elif val <= UINT64_MAX:
-            format = "<Q"
+            fmt = "<Q"
         else:
             raise ValueError("Integer value out of range")
-        return struct.pack(format, val)
+        return struct.pack(fmt, val)
 
     @staticmethod
     def _verifyValidContainerType(containerType):
@@ -450,7 +443,7 @@ class TLVWriter(object):
             raise ValueError("Invalid TLV container type")
 
 
-class TLVReader(object):
+class TLVReader:
     def __init__(self, tlv):
         self._tlv = tlv
         self._bytesRead = 0

@@ -25,7 +25,6 @@ class FactoryDataWriter:
     # CONSTANTS
     TEMP_FILE = script_dir + "/tmp_nvm3.s37"
     OUT_FILE = script_dir + "/matter_factorydata.s37"  # Final output file containing the nvm3 data to flash to the device
-    BASE_MG12_FILE = script_dir + "/base_matter_mg12_nvm3.s37"
     BASE_MG24_FILE = script_dir + "/base_matter_mg24_nvm3.s37"
     # nvm3 keys to set
     SERIAL_NUMBER_NVM3_KEY = "0x87200:"
@@ -72,19 +71,19 @@ class FactoryDataWriter:
         return generation_results["Verifier"]
 
     # Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
-    def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
+    def WriteBits(self, bits, offset, input_data, numberOfBits, totalPayloadSizeInBits):
         if ((offset + numberOfBits) > totalPayloadSizeInBits):
             print("THIS IS NOT VALID")
-            return
+            return None
         # input < 1u << numberOfBits);
 
         index = offset
         offset += numberOfBits
-        while (input != 0):
-            if (input & 1):
+        while (input_data != 0):
+            if (input_data & 1):
                 bits[int(index / 8)] |= (1 << (index % 8))
             index += 1
-            input >>= 1
+            input_data >>= 1
 
         return offset
 
@@ -202,10 +201,8 @@ class FactoryDataWriter:
                 output = subprocess.check_output(cmd)
                 output = output.decode('utf-8').splitlines()
                 deviceInfo = dict(map(str.strip, lines.split(':')) for lines in output[0:len(output)-1])
-                # Only MG12 and MG24 are supported in matter currently
-                if "EFR32MG12" in deviceInfo["Part Number"]:
-                    inputImage = self.BASE_MG12_FILE
-                elif "EFR32MG24" in deviceInfo["Part Number"]:
+                # Only MG24 is supported in Matter currently
+                if "EFR32MG24" in deviceInfo["Part Number"]:
                     inputImage = self.BASE_MG24_FILE
                 else:
                     raise Exception('Invalid MCU')
@@ -214,13 +211,12 @@ class FactoryDataWriter:
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created
                 if self._args.mcu_family:
-                    if "EFR32MG12" == self._args.mcu_family:
-                        inputImage = self.BASE_MG12_FILE
-                    elif "EFR32MG24" == self._args.mcu_family:
+                    if self._args.mcu_family == "EFR32MG24":
                         inputImage = self.BASE_MG24_FILE
+                    else:
+                        raise ValueError(f"Unsupported MCU family: {self._args.mcu_family}. Only EFR32MG24 is currently supported.")
                 else:
-                    print("Connect debug port or provide the mcu_family")
-                    return
+                    raise RuntimeError("Device not connected. Please connect a debug port or provide '--mcu_family EFR32MG24'.")
 
         # Convert interger to little endian hex format and strings to hex byte array format for nvm3 storage
         spake2pIterationCount = self._args.spake2_iteration.to_bytes(4, 'little').hex()

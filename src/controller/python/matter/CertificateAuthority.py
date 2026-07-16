@@ -22,7 +22,6 @@ import ctypes
 import logging
 from ctypes import c_void_p
 from datetime import timedelta
-from typing import List, Optional
 
 from . import ChipStack, FabricAdmin
 from .native import GetLibraryHandle, PyChipError
@@ -58,7 +57,7 @@ class CertificateAuthority:
     def logger(cls):
         return logging.getLogger('CertificateAuthority')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: Optional[PersistentStorage] = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, caIndex: int, persistentStorage: PersistentStorage | None = None):
         '''  Initializes the CertificateAuthority. This will set-up the associated C++ OperationalCredentialsAdapter
              as well.
 
@@ -69,7 +68,7 @@ class CertificateAuthority:
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
                                     the default PersistentStorage object retrieved from the chipStack.
         '''
-        LOGGER.info(f"New CertificateAuthority at index {caIndex}")
+        LOGGER.info("New CertificateAuthority at index %s", caIndex)
 
         self._chipStack = chipStack
         self._caIndex = caIndex
@@ -103,7 +102,7 @@ class CertificateAuthority:
             raise ValueError("Encountered error initializing OpCreds adapter")
 
         self._isActive = True
-        self._activeAdmins: List[FabricAdmin.FabricAdmin] = []
+        self._activeAdmins: list[FabricAdmin.FabricAdmin] = []
 
     def LoadFabricAdminsFromStorage(self):
         ''' If FabricAdmins had been setup previously, this re-creates them using information from persistent storage.
@@ -250,7 +249,7 @@ class CertificateAuthorityManager:
     def logger(cls):
         return logging.getLogger('CertificateAuthorityManager')
 
-    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: Optional[PersistentStorage] = None):
+    def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage | None = None):
         ''' Initializes the manager.
 
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
@@ -266,7 +265,7 @@ class CertificateAuthorityManager:
             persistentStorage = self._chipStack.GetStorageManager()
 
         self._persistentStorage = persistentStorage
-        self._activeCaList: List[CertificateAuthority] = []
+        self._activeCaList: list[CertificateAuthority] = []
         self._isActive = True
 
     def _AllocateNextCaIndex(self):
@@ -294,7 +293,7 @@ class CertificateAuthorityManager:
             ca = self.NewCertificateAuthority(int(caIndex))
             ca.LoadFabricAdminsFromStorage()
 
-    def NewCertificateAuthority(self, caIndex: Optional[int] = None, maximizeCertChains: bool = False, certificateValidityPeriodSec: Optional[int] = None):
+    def NewCertificateAuthority(self, caIndex: int | None = None, maximizeCertChains: bool = False, certificateValidityPeriodSec: int | None = None):
         ''' Creates a new CertificateAuthority instance with the provided CA Index and the PersistentStorage
             instance previously setup in the constructor.
 
@@ -328,6 +327,23 @@ class CertificateAuthorityManager:
 
         return ca
 
+    def new_fabric_admin(self, vendorId: int, fabricId: int):
+        """
+        Create a new certificate authority with a new fabric admin.
+
+        This is a convenience method that creates a new CertificateAuthority
+        and initializes it with a FabricAdmin with the specified vendorId and fabricId.
+
+        Arguments:
+            vendorId: The vendor ID for the fabric admin
+            fabricId: The fabric ID for the fabric admin
+
+        Returns:
+            FabricAdmin: The newly created fabric admin instance
+        """
+        new_cert_auth = self.NewCertificateAuthority()
+        return new_cert_auth.NewFabricAdmin(vendorId=vendorId, fabricId=fabricId)
+
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
 
@@ -340,7 +356,7 @@ class CertificateAuthorityManager:
         self._isActive = False
 
     @property
-    def activeCaList(self) -> List[CertificateAuthority]:
+    def activeCaList(self) -> list[CertificateAuthority]:
         return self._activeCaList
 
     def __del__(self):

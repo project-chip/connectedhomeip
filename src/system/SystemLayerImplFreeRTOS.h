@@ -36,15 +36,15 @@ public:
     ~LayerImplFreeRTOS() { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
-    CHIP_ERROR Init() override;
+    CriticalFailure Init() override;
     void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
     Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
-    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
 public:
     // Platform implementation.
@@ -53,7 +53,7 @@ public:
 private:
     friend class PlatformEventing;
 
-    CHIP_ERROR StartPlatformTimer(System::Clock::Timeout aDelay);
+    CriticalFailure StartPlatformTimer(System::Clock::Timeout aDelay);
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;

@@ -256,6 +256,16 @@ public:
                                                         NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
+    /**
+     * Check whether the InvokeRequest we are handling is targeted to a group.
+     */
+    bool IsGroupRequest() const { return mGroupRequest; }
+
+    /**
+     * Check whether the SuppressResponse flag is set.
+     */
+    bool IsResponseSuppressed() const { return mSuppressResponse; }
+
 protected:
     // Lifetime management for CommandHandler::Handle
 
@@ -431,12 +441,7 @@ private:
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
-    /**
-     * Check whether the InvokeRequest we are handling is targeted to a group.
-     */
-    bool IsGroupRequest() { return mGroupRequest; }
-
-    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest && !mSuppressResponse; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.
@@ -454,6 +459,16 @@ private:
     void InvalidateHandles();
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
+
+    /**
+     * Returns the ExchangeContext, if one is still available, for use during asynchronous
+     * command processing. This is a best-effort accessor with no guarantees that
+     * an ExchangeContext is present once a command has gone async.
+     *
+     * This method exists to prevent use of GetExchangeContext() in async code paths and
+     * must NOT be used by cluster implementations.
+     */
+    Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const override;
 
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;

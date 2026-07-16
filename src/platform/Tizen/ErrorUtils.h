@@ -17,13 +17,11 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR TizenToChipError(int tizenError);
+void RegisterTizenPlatformErrorFormatter();
 
 } // namespace Internal
 } // namespace DeviceLayer

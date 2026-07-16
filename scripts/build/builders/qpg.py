@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -30,50 +32,47 @@ class QpgApp(Enum):
     def ExampleName(self):
         if self == QpgApp.LIGHT:
             return 'lighting-app'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return 'lock-app'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return 'shell'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent-storage'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return 'thermostat'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, board_name):
         if self == QpgApp.LIGHT:
             return f'chip-{board_name}-lighting-example'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return f'chip-{board_name}-lock-example'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return f'chip-{board_name}-shell-example'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return f'chip-{board_name}-persistent_storage-example'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return f'chip-{board_name}-light-switch-example'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return f'chip-{board_name}-thermostat-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == QpgApp.LIGHT:
             return 'lighting_app.out.flashbundle.txt'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return 'lock_app.out.flashbundle.txt'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return 'shell_app.out.flashbundle.txt'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent_storage_app.out.flashbundle.txt'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return 'light_switch_app.out.flashbundle.txt'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return 'thermostat.out.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'qpg')
@@ -90,29 +89,29 @@ class QpgBoard(Enum):
 class QpgBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: QpgApp = QpgApp.LIGHT,
                  board: QpgBoard = QpgBoard.QPG6200,
                  enable_rpcs: bool = False,
-                 update_image: bool = False,
-                 ):
-        super(QpgBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+                 update_image: bool = False):
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
         self.update_image = update_image
 
     def GnBuildArgs(self):
-        args = ['qpg_target_ic=\"%s\"' % (self.board.QpgBoardName)]
+        args = super().GnBuildArgs()
+        args.append('qpg_target_ic=\"%s\"' % (self.board.QpgBoardName))
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
             args.append('matter_ota_test_image=true')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out", "out.hex"]
         if self.options.enable_link_map_file:

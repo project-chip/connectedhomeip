@@ -21,6 +21,8 @@ import subprocess
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
@@ -38,10 +40,9 @@ __LOG_LEVELS__ = {
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--image',
     default=[],
@@ -63,21 +64,19 @@ __LOG_LEVELS__ = {
     default=False,
     is_flag=True,
     help='More verbose output')
-def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
+def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     image = list(image)
 
     if file_image_list:
-        logging.info("Reading image list from %s", file_image_list)
+        log.info("Reading image list from %s", file_image_list)
 
         basedir = os.path.dirname(file_image_list)
 
-        with open(file_image_list, 'rt') as f:
+        with open(file_image_list) as f:
             for name in f.readlines():
                 name = name.strip()
 
@@ -85,12 +84,12 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 if not os.path.isabs(name):
                     image_path = os.path.join(basedir, name)
 
-                logging.info("    Found %s => %s", name, image_path)
+                log.info("    Found %s => %s", name, image_path)
                 image.append(image_path)
 
     # the list "image" contains all the images that need to run
     for path in image:
-        logging.info("Executing image %s", path)
+        log.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
                                  "-drive", "file=%s,if=mtd,format=raw" % path], capture_output=True)
@@ -146,7 +145,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 print(output)
                 print("========== TEST OUTPUT END   ============")
 
-            logging.info("Image %s PASSED", path)
+            log.info("Image %s PASSED", path)
         except Exception:
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")

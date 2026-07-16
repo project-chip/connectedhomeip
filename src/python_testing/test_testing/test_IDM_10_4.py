@@ -59,7 +59,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
     if include_vendor_id:
         attrs_bi[bi.VendorID] = 0xFFF1
 
-    attrs_bi[bi.AttributeList] = [a.attribute_id for a in attrs_bi.keys()]
+    attrs_bi[bi.AttributeList] = [a.attribute_id for a in attrs_bi]
     attrs_bi[bi.AcceptedCommandList] = []
     attrs_bi[bi.GeneratedCommandList] = []
     attrs_bi[bi.FeatureMap] = 0
@@ -72,7 +72,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
 
     attrs_desc = {}
     attrs_desc[desc.DeviceTypeList] = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type, revision=1)]
-    attrs_desc[desc.AttributeList] = [a.attribute_id for a in attrs_desc.keys()]
+    attrs_desc[desc.AttributeList] = [a.attribute_id for a in attrs_desc]
     attrs_desc[desc.AcceptedCommandList] = []
     attrs_desc[desc.GeneratedCommandList] = []
     attrs_desc[desc.FeatureMap] = 0

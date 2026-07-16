@@ -45,7 +45,6 @@ import os
 import shutil
 import sys
 import time
-import typing
 import uuid
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -57,21 +56,28 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 
+log = logging.getLogger(__name__)
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+PAA_CACHE_DIR = os.getenv('PATH_TO_PAA_ROOTS', '/tmp/paa_roots')
+CD_CACHE_DIR = os.getenv('PATH_TO_CD_STORE', '/tmp/cd_store')
 
 try:
     from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
+    from matter.testing.matter_testing import MatterBaseTest
+    from matter.testing.runner import TestStep, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
+    from matter.testing.runner import TestStep, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl
@@ -86,10 +92,10 @@ sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_t
 @dataclass
 class Failure:
     step: str
-    exception: typing.Optional[Exception]
+    exception: Exception | None
 
 
-class Hooks():
+class Hooks:
     def __init__(self):
         self.failures = {}
         self.current_step = 'unknown'
@@ -129,7 +135,7 @@ class Hooks():
         return self.failures
 
 
-class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
+class TestEventTriggersCheck(BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
@@ -139,21 +145,22 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
 
 
-class DclCheck(MatterBaseTest, BasicCompositionTests):
+class DclCheck(BasicCompositionTests):
     def get_versions_and_assert_all_keys_exist(self):
         entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
         key_model_versions = 'modelVersions'
-        asserts.assert_true(key_model_versions in entry.keys(),
+        asserts.assert_true(key_model_versions in entry,
                             f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
-        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
-        logging.info(f'{entry[key_model_versions]}')
+        log.info('Found version info for %s in the DCL:', self.vid_pid_str)
+        log.info('%s', entry[key_model_versions])
         key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in entry[key_model_versions].keys(
-        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        asserts.assert_true(key_software_versions in entry[key_model_versions],
+                            f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
         return entry[key_model_versions][key_software_versions]
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         bi = Clusters.BasicInformation
@@ -173,9 +180,9 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         entry = requests.get(f"{self.url}/dcl/vendorinfo/vendors/{self.vid}").json()
         key = 'vendorInfo'
-        asserts.assert_true(key in entry.keys(), f"Unable to find vendor entry for {self.vid_str}")
-        logging.info(f'Found vendor key for {self.vid_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        asserts.assert_true(key in entry, f"Unable to find vendor entry for {self.vid_str}")
+        log.info('Found vendor key for %s in the DCL:', self.vid_str)
+        log.info('%s', entry[key])
 
     def steps_Model(self):
         return [TestStep(1, "Check if device VID/PID are listed in the DCL model schema", "Listing found")]
@@ -184,9 +191,9 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         key = 'model'
         entry = requests.get(f"{self.url}/dcl/model/models/{self.vid}/{self.pid}").json()
-        asserts.assert_true(key in entry.keys(), f"Unable to find model entry for {self.vid_pid_str}")
-        logging.info(f'Found model entry for {self.vid_pid_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        asserts.assert_true(key in entry, f"Unable to find model entry for {self.vid_pid_str}")
+        log.info('Found model entry for %s in the DCL:', self.vid_pid_str)
+        log.info('%s', entry[key])
 
     def steps_Compliance(self):
         return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
@@ -207,14 +214,14 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             cert_model_key = 'certifiedModel'
             entry = requests.get(
                 f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{software_version}/matter").json()
-            if key in entry.keys() and entry[key][sub_key] == software_version:
+            if key in entry and entry[key][sub_key] == software_version:
                 found_versions.append(software_version)
-                logging.info(
-                    f'Found compliance info for {vid_pid_sv_str} in the DCL:')
-                logging.info(f'{entry[key]}')
+                log.info(
+                    'Found compliance info for %s in the DCL:', vid_pid_sv_str)
+                log.info('%s', entry[key])
                 certified_model_entry = requests.get(
                     f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
-                asserts.assert_true(cert_model_key in certified_model_entry.keys(),
+                asserts.assert_true(cert_model_key in certified_model_entry,
                                     f"Unable to find certified model entry for {vid_pid_sv_str}")
         asserts.assert_true(found_versions,
                             f"Unable to find at least one compliance entry for the versions {software_versions}")
@@ -236,11 +243,11 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             sub_key = 'softwareVersion'
             entry = requests.get(
                 f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
-            if key in entry.keys() and entry[key][sub_key] == software_version:
+            if key in entry and entry[key][sub_key] == software_version:
                 is_found = True
-                logging.info(
-                    f'Found certified model for {vid_pid_sv_str} in the DCL:')
-                logging.info(f'{entry[key]}')
+                log.info(
+                    'Found certified model for %s in the DCL:', vid_pid_sv_str)
+                log.info('%s', entry[key])
                 break
         asserts.assert_true(is_found,
                             f"Unable to find at least one certified model entry for the versions {software_versions}")
@@ -262,8 +269,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
                 problems.append(
                     f'Missing key {key_model_version} in entry for {self.vid_pid_str} software version={software_version}')
                 continue
-            logging.info(f'Found entry version entry for {self.vid_pid_str} software version={software_version}')
-            logging.info(entry_wrapper)
+            log.info('Found entry version entry for %s software version=%s', self.vid_pid_str, software_version)
+            log.info(entry_wrapper)
             entry = entry_wrapper[key_model_version]
             key_ota_url = 'otaUrl'
             key_software_version_valid = 'softwareVersionValid'
@@ -272,7 +279,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             key_ota_file_size = 'otaFileSize'
 
             def check_key(key):
-                if key not in entry.keys():
+                if key not in entry:
                     problems.append(
                         f'Missing key {key} in DCL versions entry for {self.vid_pid_str} software version={software_version}')
             check_key(key_ota_url)
@@ -282,7 +289,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
                 check_key(key_ota_checksum_type)
                 checksum_types = {1: hashlib.sha256, 7: hashlib.sha384, 8: hashlib.sha256,
                                   10: hashlib.sha3_256, 11: hashlib.sha3_384, 12: hashlib.sha3_512}
-                if entry[key_ota_checksum_type] not in checksum_types.keys():
+                if entry[key_ota_checksum_type] not in checksum_types:
                     problems.append(
                         f'OtaChecksumType for entry {self.vid_pid_str} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {checksum_types.keys()}')
                     continue
@@ -366,44 +373,78 @@ def get_setup_code() -> (str, bool):
         pref = input()
         if pref in ['q', 'Q']:
             return (get_qr(), SetupCodeType.QR)
-        elif pref in ['m', 'M']:
+        if pref in ['m', 'M']:
             print('please enter manual code')
             m = input()
             m = ''.join([i for i in m if m.isnumeric()])
             if len(m) == 11 or len(m) == 21:
                 return (m, SetupCodeType.MANUAL)
-            else:
-                print("Invalid manual code - please try again")
+            print("Invalid manual code - please try again")
 
 
-class TestConfig(object):
-    def __init__(self, code: str, code_type: SetupCodeType):
+class TestConfig:
+    def __init__(self, code: str, code_type: SetupCodeType, use_cert_cache: bool = False, force_fetch: bool = False):
         tmp_uuid = str(uuid.uuid4())
-        tmpdir_paa = f'paas_{tmp_uuid}'
-        tmpdir_cd = f'cd_{tmp_uuid}'
-        self.paa_path = os.path.join('.', tmpdir_paa)
-        self.cd_path = os.path.join('.', tmpdir_cd)
-        os.mkdir(self.paa_path)
-        os.mkdir(self.cd_path)
-        fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
-                                                 use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=tmpdir_paa)
-        fetch_paa_certs_from_dcl.fetch_cd_signing_certs(tmpdir_cd)
+
+        # Determine PAA certs and CD paths based on use_cert_cache flag
+        if use_cert_cache:
+            self.paa_path = PAA_CACHE_DIR
+            self.cd_path = CD_CACHE_DIR
+            os.makedirs(self.paa_path, exist_ok=True)
+            os.makedirs(self.cd_path, exist_ok=True)
+            self.use_cert_cache = True
+        else:
+            tmpdir_paa = f'paas_{tmp_uuid}'
+            tmpdir_cd = f'cd_{tmp_uuid}'
+            self.paa_path = os.path.join('.', tmpdir_paa)
+            self.cd_path = os.path.join('.', tmpdir_cd)
+            os.mkdir(self.paa_path)
+            os.mkdir(self.cd_path)
+            self.use_cert_cache = False
+
+        # Fetch certificates only if:
+        # 1. Not using cache (always fetch for temp directories), OR
+        # 2. Using cache and (cache is empty OR force_fetch is True)
+        should_fetch = not use_cert_cache or force_fetch or self._is_cache_empty()
+
+        if should_fetch:
+            fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
+                                                     use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=self.paa_path)
+            fetch_paa_certs_from_dcl.fetch_cd_signing_certs(self.cd_path)
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
             1], global_test_params=global_test_params, storage_path=self.admin_storage)
+        # These tests run over PASE against an uncommissioned device: the background
+        # wildcard subscription cannot be established (it requires CASE), and its
+        # setup/teardown delays let a BLE PASE transport idle out between tests.
+        self.config.no_wildcard_subscription = True
         if code_type == SetupCodeType.QR:
             self.config.qr_code_content = [code]
         else:
             self.config.manual_code = [code]
         self.config.paa_trust_store_path = Path(self.paa_path)
         # Set for DA-1.2, which uses the CD signing certs for verification. This test is now set to use the production CD signing certs from the DCL.
-        self.config.global_test_params['cd_cert_dir'] = tmpdir_cd
+        self.config.global_test_params['cd_cert_dir'] = self.cd_path
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=112233,
             paaTrustStorePath=str(self.config.paa_trust_store_path)
         )
+
+    def _is_cache_empty(self):
+        """Check if the cache directories are empty (no certificate files)."""
+        # Check for common certificate file extensions
+        cert_extensions = ('.pem', '.crt', '.der', '.cer', '.p7b', '.p7c')
+
+        # Check PAA directory
+        paa_files = [f for f in os.listdir(self.paa_path) if f.endswith(cert_extensions)]
+        if not paa_files:
+            return True
+
+        # Check CD directory
+        cd_files = [f for f in os.listdir(self.cd_path) if f.endswith(cert_extensions)]
+        return not cd_files
 
     def get_stack(self):
         return self.stack
@@ -422,11 +463,13 @@ class TestConfig(object):
         self.default_controller.Shutdown()
         self.stack.Shutdown()
         os.remove(self.admin_storage)
-        shutil.rmtree(self.paa_path)
-        shutil.rmtree(self.cd_path)
+        # Only clean up directories if not using cache
+        if not self.use_cert_cache:
+            shutil.rmtree(self.paa_path)
+            shutil.rmtree(self.cd_path)
 
 
-def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: TestConfig) -> list[str]:
+def run_test(test_class: MatterBaseTest, tests: list[str], test_config: TestConfig) -> list[str]:
     hooks = Hooks()
     stack = test_config.get_stack()
     controller = test_config.get_controller()
@@ -509,9 +552,8 @@ def main():
         for s in report:
             print(f'\t{s}')
         return 1
-    else:
-        print('TEST PASSED!')
-        return 0
+    print('TEST PASSED!')
+    return 0
 
 
 if __name__ == "__main__":

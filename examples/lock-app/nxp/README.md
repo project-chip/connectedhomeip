@@ -43,7 +43,6 @@ The Door Lock example is supported on the following platforms :
 
 | NXP platform | Dedicated readme                                                    |
 | ------------ | ------------------------------------------------------------------- |
-| MCXW71       | [NXP MCXW71 Guide](../../../docs/platforms/nxp/nxp_mcxw71_guide.md) |
 | MCXW72       | [NXP MCXW72 Guide](../../../docs/platforms/nxp/nxp_mcxw72_guide.md) |
 
 For details on platform-specific requirements and configurations, please refer
@@ -52,11 +51,11 @@ to the respective platform's readme.
 A list of popular standard door lock app targets is presented below. These
 targets can be used with the `build_example.py` tool.
 
-| Target name                                                              | Description                                   |
-| ------------------------------------------------------------------------ | --------------------------------------------- |
-| `nxp-<device>-freertos-lock-app-thread-mtd-cmake-frdm`                   | Default door lock                             |
-| `nxp-<device>-freertos-lock-app-thread-mtd-low-power-cmake-frdm`         | Default low-power door lock                   |
-| `nxp-<device>-freertos-lock-app-thread-mtd-low-power-factory-cmake-frdm` | Default low-power door lock with factory data |
+| Target name                                                        | Description                                   |
+| ------------------------------------------------------------------ | --------------------------------------------- |
+| `nxp-<device>-freertos-lock-app-thread-mtd-frdm`                   | Default door lock                             |
+| `nxp-<device>-freertos-lock-app-thread-mtd-low-power-frdm`         | Default low-power door lock                   |
+| `nxp-<device>-freertos-lock-app-thread-mtd-low-power-factory-frdm` | Default low-power door lock with factory data |
 
 where `device` is one of the [supported platforms](#supported-platforms).
 

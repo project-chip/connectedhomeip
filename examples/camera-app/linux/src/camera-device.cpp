@@ -90,40 +90,38 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Check if SFrame encryption is enabled for this stream
-        auto & mediaController = self->GetMediaController();
-        Transport * transport  = mediaController.GetTransportForVideoStream(videoStreamID);
-
-        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
         {
-            auto & sframeConfig = transport->sFrameConfig.Value();
-            ChipLogProgress(Camera, "SFrame encryption enabled for video stream %u: cipherSuite=0x%04X, keyLen=%u", videoStreamID,
-                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
-
-            // TODO: Implement SFrame encryption (occurs AFTER H.264 encoding, BEFORE RTP packetization)
-            // Current state: map.data contains H.264 encoded frames from GStreamer
-            //
-            // SFrame encryption steps:
-            // 1. Take the H.264 compressed payload (map.data, map.size)
-            // 2. Select encryption algorithm based on cipherSuite:
-            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
-            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
-            // 3. Encrypt the H.264 payload using sframeConfig.baseKey
-            // 4. Build SFrame header containing:
-            //    - Key ID (kid) from sframeConfig.kid
-            //    - Frame counter (incremented per frame)
-            // 5. Prepend SFrame header to encrypted payload:
-            //    Result: [SFrame Header | Encrypted(H.264 Payload)]
-            // 6. This will later be packed into RTP as:
-            //    [RTP Header | SFrame Header | Encrypted(H.264 Payload)]
-            //    SFUs can inspect RTP headers but payload remains encrypted
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
         }
+        auto firstPtsIt = self->mVideoStreamPtsOffsetMs.find(videoStreamID);
+        if (firstPtsIt == self->mVideoStreamPtsOffsetMs.end())
+        {
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mVideoStreamPtsOffsetMs[videoStreamID] = nowMs - rawMs;
+        }
+        int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
+        if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
+        {
 
-        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(H.264)]
-        // If SFrame is disabled, this is raw H.264 encoded frames
-
-        // Forward H.264 RTP data to media controller with the correct videoStreamID
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
+            // Forward raw H.264 encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mVideoStreamPtsOffsetMs[videoStreamID], videoStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -164,40 +162,37 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Check if SFrame encryption is enabled for this stream
-        auto & mediaController = self->GetMediaController();
-        Transport * transport  = mediaController.GetTransportForAudioStream(audioStreamID);
-
-        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
         {
-            auto & sframeConfig = transport->sFrameConfig.Value();
-            ChipLogProgress(Camera, "SFrame encryption enabled for audio stream %u: cipherSuite=0x%04X, keyLen=%u", audioStreamID,
-                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
-
-            // TODO: Implement SFrame encryption (occurs AFTER Opus encoding, BEFORE RTP packetization)
-            // Current state: map.data contains Opus encoded frames from GStreamer
-            //
-            // SFrame encryption steps:
-            // 1. Take the Opus compressed payload (map.data, map.size)
-            // 2. Select encryption algorithm based on cipherSuite:
-            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
-            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
-            // 3. Encrypt the Opus payload using sframeConfig.baseKey
-            // 4. Build SFrame header containing:
-            //    - Key ID (kid) from sframeConfig.kid
-            //    - Frame counter (incremented per frame)
-            // 5. Prepend SFrame header to encrypted payload:
-            //    Result: [SFrame Header | Encrypted(Opus Payload)]
-            // 6. This will later be packed into RTP as:
-            //    [RTP Header | SFrame Header | Encrypted(Opus Payload)]
-            //    SFUs can inspect RTP headers but payload remains encrypted
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
         }
-
-        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(Opus)]
-        // If SFrame is disabled, this is raw Opus encoded frames
-
-        // Send raw Opus frames to the media controller
-        self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
+        auto firstPtsIt = self->mAudioStreamPtsOffsetMs.find(audioStreamID);
+        if (firstPtsIt == self->mAudioStreamPtsOffsetMs.end())
+        {
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mAudioStreamPtsOffsetMs[audioStreamID] = nowMs - rawMs;
+        }
+        int64_t ts = self->mAudioStreamPtsOffsetMs[audioStreamID] + (rawPts / 1000000);
+        if (ts >= self->mAudioStreamPtsOffsetMs[audioStreamID])
+        {
+            // Forward raw Opus encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mAudioStreamPtsOffsetMs[audioStreamID], audioStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -463,6 +458,23 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -556,6 +568,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         source = gst_element_factory_make("v4l2src", "source");
         g_object_set(source, "device", device.c_str(), nullptr);
+        ChipLogProgress(Camera, "Video pipeline: using V4L2 source");
     }
 
     // Check for any nullptr among the created elements
@@ -884,10 +897,15 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                          allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+
+    mCurrentVideoFrameRate = framerate;
+
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
     GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
+                                                     allocatedStream.minResolution.height, framerate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -906,7 +924,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
-                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
+                    allocatedStream.minResolution.height, framerate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");
@@ -1000,6 +1018,7 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
             return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
         }
     }
+    mVideoStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1117,6 +1136,8 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
         }
     }
 
+    mAudioStreamPtsOffsetMs.erase(streamID);
+
     return CameraError::SUCCESS;
 }
 
@@ -1174,7 +1195,7 @@ CameraError CameraDevice::StopAudioPlaybackStream()
 }
 
 // Allocate snapshot stream
-CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
                                                  uint16_t & outStreamID)
 {
 
@@ -1631,20 +1652,29 @@ CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zon
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 {
 
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    // Zone events are per-zone - each zone needs its own event notification
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 
-void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
 {
-    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+    mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
+    // Note: PushAVTransportManager doesn't need zone stopped event currently
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -1748,8 +1778,8 @@ void CameraDevice::InitializeSnapshotStreams()
                       streamId);
 }
 
-bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs,
-                                     uint16_t & outStreamID)
+bool CameraDevice::AddSnapshotStream(
+    const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs, uint16_t & outStreamID)
 {
     constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
 
@@ -1834,9 +1864,9 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
+void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderCluster * provider)
 {
-    return mWebRTCProviderManager;
+    mWebRTCProviderManager.SetWebRTCTransportProvider(provider);
 }
 
 PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
@@ -1844,7 +1874,7 @@ PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
     return mPushAVTransportManager;
 }
 
-CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamManagementDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
@@ -1854,7 +1884,7 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
     return mCameraAVStreamManager;
 }
 
-CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }
@@ -1867,11 +1897,6 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
-}
-
-void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
-{
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
 size_t CameraDevice::GetPreRollBufferSize()

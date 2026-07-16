@@ -20,6 +20,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 #include <cstdio>
 #include <inttypes.h>
@@ -35,9 +36,14 @@ CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peer
     NodeId nodeId               = peerId.GetNodeId();
     CompressedFabricId fabricId = peerId.GetCompressedFabricId();
 
-    snprintf(buffer, bufferLen, "%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(fabricId >> 32),
-             static_cast<uint32_t>(fabricId), static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
+    uint32_t fabricIdHi = static_cast<uint32_t>(fabricId >> 32);
+    uint32_t fabricIdLo = static_cast<uint32_t>(fabricId);
+    uint32_t nodeIdHi   = static_cast<uint32_t>(nodeId >> 32);
+    uint32_t nodeIdLo   = static_cast<uint32_t>(nodeId);
+    StringBuilderBase builder(buffer, bufferLen);
+    builder.AddFormat("%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, fabricIdHi, fabricIdLo, nodeIdHi, nodeIdLo);
 
+    VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
     return CHIP_NO_ERROR;
 }
 
@@ -134,10 +140,11 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         requiredSize = snprintf(buffer, bufferLen, "_D%u", static_cast<uint16_t>(subtype.code));
         break;
     case DiscoveryFilterType::kCompressedFabricId:
-        requiredSize = snprintf(buffer, bufferLen, "_I");
-        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - static_cast<size_t>(requiredSize),
-                                     Encoding::HexFlags::kUppercaseAndNullTerminate);
-        break;
+        // Make sure the "_I" prefix (2 chars + null) fits before writing it and offsetting past it;
+        // Uint64ToHex validates that the remaining space holds the hex-encoded fabric id.
+        VerifyOrReturnError(bufferLen >= 3, CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buffer, "_I");
+        return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2, Encoding::HexFlags::kUppercaseAndNullTerminate);
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
         break;

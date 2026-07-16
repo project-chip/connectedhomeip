@@ -161,6 +161,12 @@ struct FactoryInitParams
     //
     bool enableServerInteractions = false;
 
+    // Controls whether the controller factory initialization is prevented from
+    // overwriting the global DnssdServer's secured port. When running in a
+    // combined server/controller app where the server's port is primary, this
+    // must be set to true to keep DNS-SD advertising the server's port.
+    bool preventDnssdPortOverwrite = false;
+
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;
@@ -313,7 +319,9 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
+    bool mPreventDnssdPortOverwrite                                     = false;
 };
 
 } // namespace Controller

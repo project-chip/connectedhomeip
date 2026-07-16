@@ -74,11 +74,6 @@ PICS:
       id: MCORE.DD.DEV_BARRIER
 
     - label:
-          "Does the commissionee device have a vendor specific information
-          element (IE)?"
-      id: MCORE.DD.IE
-
-    - label:
           "Does the commissionee device or device packaging have a QR code based
           onboarding payload?"
       id: MCORE.DD.QR
@@ -127,13 +122,6 @@ PICS:
 
     - label: "Does the commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
-
-    - label:
-          "Does the commissioner support Discovery Capability over IP Network?"
-      id: MCORE.DD.DISCOVERY_IP
-
-    - label: "Does the commissioner support Discovery Capability over SoftAP?"
-      id: MCORE.DD.DISCOVERY_SOFTAP
 
     - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
       id: MCORE.DD.DISCOVERY_PAF
@@ -310,6 +298,9 @@ PICS:
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
 
+    - label: "Does Device support TCP transport?"
+      id: MCORE.SC.TCP
+
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
           trusted device on device attestation failure?"
@@ -342,10 +333,30 @@ PICS:
       id: MCORE.FS
 
     #
+    # Joint Fabric Administrator
+    #
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          server?"
+      id: JFADMIN.S
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          client?"
+      id: JFADMIN.C
+
+    - label: "Does the device implement AdministratorFabricIndex attribute?"
+      id: JFADMIN.S.A0000
+
+    #
     #IDM
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -590,11 +601,6 @@ PICS:
           "Is the device a Client and supports subscribing to an attribute of
           DataType List"
       id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
-
-    - label:
-          "Is the device a Server and capable of generating large data which is
-          greater than 1 MTU(1280 bytes)"
-      id: MCORE.IDM.S.LargeData
 
     - label:
           "Is the device a Client and supports subscribing to an individual
@@ -3706,6 +3712,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.A0008
 
+    - label: "Indicates the device load status."
+      id: DGGEN.S.A000a
+
     #
     # server / commandsReceived
     #
@@ -3816,6 +3825,9 @@ PICS:
           feature?"
       id: GRPKEY.S.F00
 
+    - label: "Does the device support groups using the Groupcast cluster?"
+      id: GRPKEY.S.F01
+
     #
     #server attributes
     #
@@ -3830,6 +3842,9 @@ PICS:
 
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
+
+    - label: "Does the device implement the GroupcastAdoption attribute?"
+      id: GRPKEY.S.A0004
 
     #
     # server commandsGenerated
@@ -5258,6 +5273,12 @@ PICS:
       id: OCC.S.A0032
 
     #
+    # server / Events
+    #
+    - label: "Does the device implement the OccupancyChanged event?"
+      id: OCC.S.E00
+
+    #
     # server / manually
     #
     - label:
@@ -6077,6 +6098,9 @@ PICS:
     - label: "Does the device implement the ExpiryDate attribute?"
       id: SMOKECO.S.A000c
 
+    - label: "Does the device implement the Unmounted attribute?"
+      id: SMOKECO.S.A000d
+
     #
     # server / Events
     #
@@ -6125,6 +6149,9 @@ PICS:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
       id: SMOKECO.M.ManuallyControlledMute
+
+    - label: "Is the device inoperative when it is unmounted?"
+      id: SMOKECO.M.InoperativeWhenUnmounted
 
     #
     # server / commandsReceived
@@ -6540,6 +6567,21 @@ PICS:
     - label:
           "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
       id: TSTAT.S.A0052
+
+    - label: "Does the device implement the MaxThermostatSuggestions attribute?"
+      id: TSTAT.S.A0053
+
+    - label: "Does the device implement the ThermostatSuggestions attribute?"
+      id: TSTAT.S.A0054
+
+    - label:
+          "Does the device implement the CurrentThermostatSuggestion attribute?"
+      id: TSTAT.S.A0055
+
+    - label:
+          "Does the device implement the ThermostatSuggestionNotFollowingReason
+          attribute?"
+      id: TSTAT.S.A0056
 
     #
     # server / commandsReceived
@@ -8909,6 +8951,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:

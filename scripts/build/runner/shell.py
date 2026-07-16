@@ -17,17 +17,27 @@ import os
 import subprocess
 import threading
 
+from .runner import Runner
 from .command_dedup import CommandDedup
+
+log = logging.getLogger(__name__)
+
+
+class SubcommandException(Exception):
+    def __init__(self, command, returncode) -> None:
+        self.command = command
+        self.returncode = returncode
+        super().__init__('Command %r failed: %d' % (command, returncode))
 
 
 class LogPipe(threading.Thread):
 
-    def __init__(self, level):
+    def __init__(self, level: int, title: str | None = None):
         """Setup the object with a logger and a loglevel
 
             and start the thread
             """
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name=title or self.__class__.__name__)
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = os.pipe()
@@ -41,7 +51,7 @@ class LogPipe(threading.Thread):
     def run(self):
         """Run the thread, logging everything."""
         for line in iter(self.pipeReader.readline, ''):
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip('\n'))
 
         self.pipeReader.close()
 
@@ -50,7 +60,7 @@ class LogPipe(threading.Thread):
         os.close(self.fd_write)
 
 
-class ShellRunner:
+class ShellRunner(Runner):
 
     def __init__(self, root: str):
         self.dry_run = False
@@ -60,17 +70,18 @@ class ShellRunner:
     def StartCommandExecution(self):
         pass
 
-    def Run(self, cmd, title=None, dedup=False):
+    def Run(self, cmd: list[str], title: str | None = None, dedup: bool = False, quiet: bool = False):
 
-        if title:
-            logging.info(title)
+        if title and not quiet:
+            log.info(title)
 
-        if dedup & self.deduplicator.is_duplicate(cmd):
-            logging.info("Skipping duplicate command...")
+        if dedup and self.deduplicator.is_duplicate(cmd):
+            if not quiet:
+                log.info("Skipping duplicate command...")
             return
 
-        outpipe = LogPipe(logging.INFO)
-        errpipe = LogPipe(logging.WARN)
+        outpipe = LogPipe(logging.INFO, title=title)
+        errpipe = LogPipe(logging.WARNING, title=title)
 
         with subprocess.Popen(cmd, cwd=self.root_dir,
                               stdout=outpipe, stderr=errpipe) as s:
@@ -78,6 +89,6 @@ class ShellRunner:
             errpipe.close()
             code = s.wait()
             if code != 0:
-                raise Exception('Command %r failed: %d' % (cmd, code))
-            else:
-                logging.info('Command %r completed', cmd)
+                raise SubcommandException(cmd, code)
+            if not quiet:
+                log.info('Command %r completed', cmd)

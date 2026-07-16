@@ -19,20 +19,22 @@ import logging
 import os
 import subprocess
 import sys
-from typing import List
+from collections.abc import Iterator
 
 import coloredlogs
+
+log = logging.getLogger(__name__)
 
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt'), 'rt') as file:
-        for line in file.readlines():
+def build_expected_output(root: str, out: str) -> Iterator[str]:
+    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
+        for line in file:
             yield line.replace("{root}", root).replace("{out}", out)
 
 
-def build_actual_output(root: str, out: str) -> List[str]:
+def build_actual_output(root: str, out: str) -> Iterator[str]:
     # Fake out that we have a project root
     binary = os.path.join(SCRIPT_ROOT, '../gn_to_cmakelists.py')
     project = os.path.join(SCRIPT_ROOT, "test_project.json")
@@ -42,9 +44,8 @@ def build_actual_output(root: str, out: str) -> List[str]:
         project,
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
-    with open(cmake, 'rt') as f:
-        for line in f.readlines():
-            yield line
+    with open(cmake) as f:
+        yield from f
 
 
 def main():
@@ -60,9 +61,9 @@ def main():
     diffs = list(difflib.unified_diff(expected, actual))
 
     if diffs:
-        logging.error("DIFFERENCE between expected and generated output")
+        log.error("DIFFERENCE between expected and generated output")
         for line in diffs:
-            logging.warning("  " + line.strip())
+            log.warning("  %s", line.strip())
         sys.exit(1)
 
 

@@ -19,16 +19,19 @@ import logging
 
 from mobly import asserts
 
+import matter.testing.nfc
+from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
-from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_DD_3_23(MatterBaseTest):
     def desc_TC_DD_3_23(self) -> str:
-        return "[TC-DD-3.23] NFC-based commissioning [DUT as Commissionee]"
+        return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
 
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [
@@ -36,22 +39,76 @@ class TC_DD_3_23(MatterBaseTest):
             TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
         ]
 
+    def setup_test(self):
+        super().setup_test()
+
+        # Booleans to detect some commissioner stages
+        self.unpowered_phase_complete_seen: bool = False
+        self.send_complete_seen: bool = False
+
+        # Filled at runtime
+        self.commissionee_node_id = 0
+
+        def _stage_start_listener(node_id: int, stage):
+            # Normalize stage to string
+            if isinstance(stage, bytes):
+                stage = stage.decode("utf-8", errors="replace")
+
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
+
+            self.commissionee_node_id = node_id
+
+            if stage == "UnpoweredPhaseComplete":
+                log.info("Detected 'UnpoweredPhaseComplete' commissioning stage")
+                self.unpowered_phase_complete_seen = True
+
+            if stage == "SendComplete":
+                log.info("Detected 'SendComplete' commissioning stage")
+                self.send_complete_seen = True
+
+        self._commissioning_stage_start_callback = _DevicePairingDelegate_OnCommissioningStageStartFunct(
+            _stage_start_listener
+        )
+        self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
+
     @async_test_body
     async def test_TC_DD_3_23(self):
 
+        self.wait_for_user_input(prompt_msg="Put the DUT in commissionable mode, bring its NFC interface close to the NFC reader"
+                                 " and keep the DUT powered")
+
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
-        nfc_tag_data = connect_read_nfc_tag_data(self.user_params.get("NFC_Reader_index", 0))
-        logger.info(f"NFC Tag data : '{nfc_tag_data}'")
+
+        nfc_reader_index = self.user_params.get("NFC_Reader_index", 0)
+        reader = matter.testing.nfc.NFCReader(nfc_reader_index)
+
+        nfc_tag_data = reader.read_nfc_tag_data()
+        log.info("NFC Tag data : '%s'", nfc_tag_data)
+        asserts.assert_true(
+            reader.is_onboarding_data(nfc_tag_data),
+            f"'{nfc_tag_data}' is not a valid Matter URI"
+        )
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
-        self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+
+        commissioning_method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_true(
+            str(commissioning_method).startswith("nfc-"),
+            f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
+        )
+
+        self.matter_test_config.commissioning_method = commissioning_method
         commissioning_success = await self.commission_devices()
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
+
+        asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
+        asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
 
 
 if __name__ == "__main__":

@@ -16,9 +16,10 @@
 
 
 import logging
+import subprocess
 import tempfile
 from os import path
-from typing import Optional
+from time import sleep
 
 from mobly import asserts
 
@@ -29,14 +30,20 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
-logger = logging.getLogger(__name__)
+# Type aliases for AccessControl cluster types
+AccessControlCluster = Clusters.AccessControl
+AccessControlEntryStruct = AccessControlCluster.Structs.AccessControlEntryStruct
+AccessControlTargetStruct = AccessControlCluster.Structs.AccessControlTargetStruct
+AccessControlEntryPrivilegeEnum = AccessControlCluster.Enums.AccessControlEntryPrivilegeEnum
+AccessControlEntryAuthModeEnum = AccessControlCluster.Enums.AccessControlEntryAuthModeEnum
+
+log = logging.getLogger(__name__)
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
-
-    current_provider_app_proc: Optional[OTAProviderSubprocess] = None
-    provider_app_path: Optional[str] = None
+    current_provider_app_proc: OTAProviderSubprocess | None = None
+    provider_app_path: str | None = None
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -46,9 +53,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        port: int = 5541,
                        storage_dir='/tmp',
                        extra_args: list = [],
-                       kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
-                       timeout: int = 10):
+                       kvs_path: str | None = None,
+                       log_file: str | None = None, expected_output: str = "Server initialization complete",
+                       timeout: int = 30):
         """Start the provider process using the provided configuration.
 
         Args:
@@ -57,14 +64,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
             discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
             port (int, optional): Port for the provider process. Defaults to 5541.
-            storage_dir (str, optional): Storage dir for the provider proccess. Defaults to '/tmp'.
+            storage_dir (str, optional): Storage dir for the provider process. Defaults to '/tmp'.
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
-            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f"Launching provider app with with ota image {ota_image_path}")
+        log.info("Launching provider app with with ota image %s", ota_image_path)
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -79,11 +86,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         if log_file is None:
             # Assign the file descriptor to log_file
-            log_file = tempfile.NamedTemporaryFile(
+            log_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
                 dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
-            logger.info(f"Writing Provider logs at :{log_file.name}")
+            log.info("Writing Provider logs at :%s", log_file.name)
         else:
-            logger.info(f"Writing Provider logs at : {log_file}")
+            log.info("Writing Provider logs at : %s", log_file)
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
             provider_app_path,
@@ -101,7 +108,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             timeout=timeout)
 
         self.current_provider_app_proc = proc
-        logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
+        log.info("Provider started with PID:  %s", self.current_provider_app_proc.get_pid())
+
+    def terminate_provider(self):
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            log.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
+        else:
+            log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -130,14 +145,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             metadataForNode=None,
             endpoint=endpoint
         )
-        logger.info("Sending AnnounceOTA Provider Command")
+        log.info("Sending AnnounceOTA Provider Command")
         cmd_resp = await self.send_single_cmd(
             cmd=cmd_announce_ota_provider,
             dev_ctrl=controller,
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        logger.info(f"Announce command sent {cmd_resp}")
+        log.info("Announce command sent %s", cmd_resp)
         return cmd_resp
 
     async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
@@ -145,9 +160,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Args:
             controller (ChipDeviceCtrl): Controller to write the providers.
-            provider_node_id (int): Node where the provider is localted.
+            provider_node_id (int): Node where the provider is located.
             requestor_node_id (int): Node of the requestor to write the providers.
-            endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
+            endpoint (int, optional): Endpoint to write the providers. Defaults to 0.
         """
 
         current_otap_info = await self.read_single_attribute_check_success(
@@ -155,7 +170,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers: {current_otap_info}")
+        log.info("OTA Providers: %s", current_otap_info)
 
         # Create Provider Location into Requestor
         provider_location_struct = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
@@ -180,7 +195,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
         )
-        logger.info(f"OTA Providers List: {after_otap_info}")
+        log.info("OTA Providers List: %s", after_otap_info)
 
     async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
@@ -217,7 +232,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ota_image_info['size'] = path.getsize(ota_path)
             ota_image_info['exists'] = True
         except OSError:
-            logger.info(f"OTA IMAGE at {ota_path} does not exists")
+            log.info("OTA IMAGE at %s does not exists", ota_path)
             return ota_image_info
 
         return ota_image_info
@@ -226,8 +241,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
                                       expected_previous_state,
                                       expected_new_state,
-                                      expected_target_version: Optional[int] = None,
-                                      expected_reason: Optional[int] = None):
+                                      expected_target_version: int | None = None,
+                                      expected_reason: int | None = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -237,7 +252,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             target_version (Optional[int], optional): Software version to verify if not provided ignore this check.. Defaults to None.
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
-        logger.info(f"Verifying the event {event_report}")
+        log.info("Verifying the event %s", event_report)
         asserts.assert_equal(event_report.previousState, expected_previous_state,
                              f"Previous state was not {expected_previous_state}")
         asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
@@ -250,8 +265,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                          provider_node_id: int,
-                         requestor_node_id: Optional[int] = None,
-                         acl_entries: Optional[list[Clusters.AccessControl.Structs.AccessControlEntryStruct]] = None,
+                         requestor_node_id: int | None = None,
+                         acl_entries: list[AccessControlEntryStruct] | None = None,
                          ):
         """Create ACL entries to allow OTA requestors to access the provider.
 
@@ -259,7 +274,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             dev_ctrl: Device controller for sending commands
             provider_node_id: Node ID of the OTA provider
             requestor_node_id: Optional specific requestor node ID for targeted access
-            acl_entries: Optional[list[Clusters.AccessControl.Structs.AccessControlEntryStruct]]. ACL list to write ino the requestor.
+            acl_entries: Optional[list[AccessControlEntryStruct]]. ACL list to write into the requestor.
 
         Returns:
             Result of the ACL write operation
@@ -272,20 +287,20 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # If there are not ACL entries using proper struct constructors create the default.
             acl_entries = [
                 # Admin entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=[admin_node_id],  # type: ignore
+                AccessControlEntryStruct(
+                    privilege=AccessControlEntryPrivilegeEnum.kAdminister,
+                    authMode=AccessControlEntryAuthModeEnum.kCase,
+                    subjects=[admin_node_id],
                     targets=NullValue
                 ),
                 # Operate entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=requestor_subjects,  # type: ignore
+                AccessControlEntryStruct(
+                    privilege=AccessControlEntryPrivilegeEnum.kOperate,
+                    authMode=AccessControlEntryAuthModeEnum.kCase,
+                    subjects=requestor_subjects,
                     targets=[
-                        Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                            cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        AccessControlTargetStruct(
+                            cluster=Clusters.OtaSoftwareUpdateProvider.id,
                             endpoint=NullValue,
                             deviceType=NullValue
                         )
@@ -294,9 +309,83 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ]
 
         # Create the attribute descriptor for the ACL attribute
-        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
+        acl_attribute = AccessControlCluster.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    def restart_requestor(self, restore: bool = False):
+        """This method Reboots or Restore the DUT."""
+        restart_flag_file = self.get_restart_flag_file()
+        log.info("RESTART FILE at %s", restart_flag_file)
+        if not restart_flag_file:
+            action_str = "Reboot"
+            prompt_message = "Reboot the DUT. Press Enter when ready.\n"
+            if restore:
+                action_str = "Restore"
+                prompt_message = "Manually restore the DUT to it's original version. Please type Enter when its ready.\n"
+            log.info("Restart file not found. Entering Manual %s.", action_str)
+            # No restart flag file: ask user to manually reboot. For this test will be needed to wipe or
+            # restore to the previous software version.
+            self.controller.ExpireSessions(self.requestor_node_id)
+            self.wait_for_user_input(prompt_msg=prompt_message)
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            # In manual reboot or device no sleep is added as the user notify until the Device is ready.
+            log.info("Manual device %s completed", action_str)
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                log.info("Created restart flag file to signal app restart")
+                # This sleep allows the app start while waiting for app ready pattern. If not in some cases connections will Drop.
+                sleep(1)
+                # Expire sessions and re-establish connections
+                log.info("Expiring sessions after manual device reboot")
+                self.controller.ExpireSessions(self.requestor_node_id)
+                log.info("App restart completed successfully")
+
+            except Exception as e:
+                asserts.fail(f"Requestor restart failed: {e}")
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        log.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+
+    def clear_kvs(self, kvs_path_prefix: str = "/tmp/chip_kvs"):
+        """
+        Remove all temporary KVS files created.
+
+        OTA Provider/Requestor use "/tmp/chip_kvs" as the default KVS location when no --KVS is provided.
+        Tests may also specify custom prefixes such as "/tmp/chip_kvs_provider".
+
+        Args:
+            kvs_path_prefix (str, optional): Prefix of KVS files/folders to remove.
+            Defaults to "/tmp/chip_kvs", which removes all temporary chip KVS files.
+        """
+        # Do not allow relative paths or paths outside of /tmp/
+        real_kvs_path_prefix = path.realpath(kvs_path_prefix)
+        # on some darwin devices /tmp/ folder is an alias of /private/tmp/
+        if not (real_kvs_path_prefix.startswith('/tmp/') or real_kvs_path_prefix.startswith('/private/tmp/')):
+            raise ValueError(
+                f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
+        subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
+        log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)

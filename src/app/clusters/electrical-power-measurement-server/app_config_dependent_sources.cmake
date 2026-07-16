@@ -16,8 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.cpp"
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.h"
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementDelegate.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/electrical-power-measurement-server.h"
 )

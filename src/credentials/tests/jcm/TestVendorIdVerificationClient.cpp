@@ -17,10 +17,11 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
-#include <controller/tests/data_model/DataModelFixtures.h>
+#include <app/util/mock/Functions.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <credentials/jcm/VendorIdVerificationClient.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -33,17 +34,17 @@ using namespace chip::Credentials;
 using namespace chip::Credentials::JCM;
 using namespace chip::Messaging;
 using namespace chip::Platform;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::TestCerts;
 using namespace chip::Transport;
 
 // Mock function for linking
-void InitDataModelHandler() {}
+__attribute__((weak)) void InitDataModelHandler() {}
 
 namespace chip {
 namespace app {
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+__attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
+                                                        chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {}
 } // namespace app
 namespace Credentials {
@@ -52,17 +53,22 @@ namespace JCM {
 class TestVendorIDVerificationDataModel : public CodegenDataModelProvider
 {
 public:
-    TestVendorIDVerificationDataModel(MessagingContext * messagingContext) : mMessagingContext(messagingContext) {}
+    TestVendorIDVerificationDataModel() : mMessagingContext(nullptr) {}
 
     static TestVendorIDVerificationDataModel & Instance(MessagingContext * messagingContext)
     {
-        static TestVendorIDVerificationDataModel instance(messagingContext);
+        static TestVendorIDVerificationDataModel instance;
+        instance.SetMessagingContext(messagingContext);
         return instance;
     }
+
+    void SetMessagingContext(MessagingContext * messagingContext) { mMessagingContext = messagingContext; }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & aRequest,
                                                                chip::TLV::TLVReader & aReader, CommandHandler * aHandler) override
     {
+        VerifyOrDie(mMessagingContext != nullptr);
+
         if (aRequest.path.mClusterId != Clusters::OperationalCredentials::Id ||
             aRequest.path.mCommandId !=
                 Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type::GetCommandId())
@@ -114,10 +120,9 @@ private:
     MessagingContext * mMessagingContext;
 };
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
@@ -138,7 +143,7 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class VendorIdVerificationClientTest : public chip::Test::AppContext, public Credentials::JCM::VendorIdVerificationClient
+class VendorIdVerificationClientTest : public AppContext, public Credentials::JCM::VendorIdVerificationClient
 {
 public:
     // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
@@ -146,7 +151,7 @@ public:
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
-        chip::Test::AppContext::SetUpTestSuite();
+        AppContext::SetUpTestSuite();
     }
 
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
@@ -158,7 +163,7 @@ public:
     }
 
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
-                                              ByteSpan & globallyTrustedRootSpan)
+                                              ByteSpan & globallyTrustedRootSpan) override
     {
         if (mInvalidOperationTrustAnchor)
         {
@@ -176,7 +181,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnVendorIdVerificationComplete(const CHIP_ERROR & err)
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
     {
         mVerificationCompleteCalled = true;
         mVerificationResult         = err;
@@ -217,7 +222,7 @@ protected:
 
         ExpireJFSessionAToB();
 
-        chip::Test::ResetMockNodeConfig();
+        ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }
@@ -379,6 +384,80 @@ TEST_F_FROM_FIXTURE(VendorIdVerificationClientTest, TestVerificationFailsDueToIn
 
     EXPECT_TRUE(mVerificationCompleteCalled);
     EXPECT_EQ(mVerificationResult, CHIP_ERROR_TLV_UNDERRUN);
+}
+
+// Minimal concrete subclass used to exercise the protected GuardWithLiveness() primitive
+// directly. These tests pin the property that a wrapped callback becomes a safe no-op once the
+// object is destroyed, while still forwarding through to the wrapped callable while alive.
+class GuardTestClient : public VendorIdVerificationClient
+{
+public:
+    using VendorIdVerificationClient::GuardWithLiveness;
+
+protected:
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId, Credentials::CertificateKeyId &, ByteSpan &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnVendorIdVerificationComplete(const CHIP_ERROR &) override {}
+};
+
+TEST(VendorIdVerificationClientLiveness, CallbackRunsWhileObjectAlive)
+{
+    GuardTestClient client;
+    int calls    = 0;
+    auto guarded = client.GuardWithLiveness([&calls]() { ++calls; });
+
+    guarded();
+
+    EXPECT_EQ(calls, 1);
+}
+
+TEST(VendorIdVerificationClientLiveness, CallbackIsNoOpAfterObjectDestroyed)
+{
+    int calls = 0;
+    std::function<void()> guarded;
+    {
+        GuardTestClient client;
+        guarded = client.GuardWithLiveness([&calls]() { ++calls; });
+    }
+
+    // The object backing the liveness token is gone; an in-flight callback delivered after
+    // teardown must self-reap into a no-op rather than run through freed state.
+    guarded();
+
+    EXPECT_EQ(calls, 0);
+}
+
+TEST(VendorIdVerificationClientLiveness, ForwardsArgumentsWhileAlive)
+{
+    GuardTestClient client;
+    int captured = 0;
+    auto guarded = client.GuardWithLiveness([&captured](int value) { captured = value; });
+
+    guarded(42);
+
+    EXPECT_EQ(captured, 42);
+}
+
+TEST(VendorIdVerificationClientLiveness, AllGuardsFromOneObjectDieTogether)
+{
+    int success = 0;
+    int failure = 0;
+    std::function<void()> onSuccess;
+    std::function<void()> onFailure;
+    {
+        // Mirrors the two GuardWithLiveness() wraps issued together in VerifyVendorId().
+        GuardTestClient client;
+        onSuccess = client.GuardWithLiveness([&success]() { ++success; });
+        onFailure = client.GuardWithLiveness([&failure]() { ++failure; });
+    }
+
+    onSuccess();
+    onFailure();
+
+    EXPECT_EQ(success, 0);
+    EXPECT_EQ(failure, 0);
 }
 
 } // namespace JCM

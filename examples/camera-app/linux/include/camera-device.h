@@ -54,7 +54,8 @@ static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
 static constexpr uint16_t k60fpsVideoFrameRate       = 60;
-static constexpr uint16_t kMinVideoFrameRate         = 30;
+static constexpr uint16_t k30fpsVideoFrameRate       = 30;
+static constexpr uint16_t kMinVideoFrameRate         = 15;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
 static constexpr uint32_t kKeyFrameIntervalMsec      = 4000;    // 4 sec; recommendation from Spec
@@ -87,16 +88,15 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
-    chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderController & GetWebRTCProviderController() override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
-
-    void HandlePushAvZoneTrigger(uint16_t zoneId) override;
 
     CameraDevice();
     ~CameraDevice();
@@ -104,6 +104,7 @@ public:
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
     void Init();
+    void Shutdown();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -126,7 +127,7 @@ public:
 
     // Allocate snapshot stream
     CameraError AllocateSnapshotStream(
-        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
         uint16_t & outStreamID) override;
 
     // Start snapshot stream
@@ -298,7 +299,7 @@ public:
 
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
-    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+    CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
@@ -313,13 +314,17 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+    void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
-    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();
     CameraError StopAudioPlaybackStream();
+
+    // Timestamp handling for video and audio streams
+    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
+    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
 private:
     int videoDeviceFd            = -1;
@@ -362,7 +367,7 @@ private:
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 1920, 1080 };
-    uint16_t mCurrentVideoFrameRate                                       = kMinVideoFrameRate;
+    uint16_t mCurrentVideoFrameRate                                       = k30fpsVideoFrameRate;
     bool mHDREnabled                                                      = false;
     bool mSpeakerMuted                                                    = false;
     bool mMicrophoneMuted                                                 = false;

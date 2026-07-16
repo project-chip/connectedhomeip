@@ -18,8 +18,8 @@ import enum
 import logging
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, List, Optional, Set
 
 from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle
@@ -66,7 +66,7 @@ class NodeAddress:
 class AggregatedDiscoveryResults:
     """Discovery results for a node."""
     peerId: PeerId
-    addresses: Set[NodeAddress]
+    addresses: set[NodeAddress]
 
 
 @dataclass
@@ -79,26 +79,26 @@ class PendingDiscovery:
 
 
 @dataclass
-class CommissionableNode():
-    instanceName: Optional[str] = None
-    hostName: Optional[str] = None
-    port: Optional[int] = None
-    longDiscriminator: Optional[int] = None
-    vendorId: Optional[int] = None
-    productId: Optional[int] = None
-    commissioningMode: Optional[int] = None
-    deviceType: Optional[int] = None
-    deviceName: Optional[str] = None
-    pairingInstruction: Optional[str] = None
-    pairingHint: Optional[int] = None
-    mrpRetryIntervalIdle: Optional[int] = None
-    mrpRetryIntervalActive: Optional[int] = None
-    mrpRetryActiveThreshold: Optional[int] = None
-    supportsTcpClient: Optional[bool] = None
-    supportsTcpServer: Optional[bool] = None
-    isICDOperatingAsLIT: Optional[bool] = None
-    addresses: Optional[List[str]] = None
-    rotatingId: Optional[str] = None
+class CommissionableNode:
+    instanceName: str | None = None
+    hostName: str | None = None
+    port: int | None = None
+    longDiscriminator: int | None = None
+    vendorId: int | None = None
+    productId: int | None = None
+    commissioningMode: int | None = None
+    deviceType: int | None = None
+    deviceName: str | None = None
+    pairingInstruction: str | None = None
+    pairingHint: int | None = None
+    mrpRetryIntervalIdle: int | None = None
+    mrpRetryIntervalActive: int | None = None
+    mrpRetryActiveThreshold: int | None = None
+    supportsTcpClient: bool | None = None
+    supportsTcpServer: bool | None = None
+    isICDOperatingAsLIT: bool | None = None
+    addresses: list[str] | None = None
+    rotatingId: str | None = None
 
 
 # Milliseconds to wait for additional results onece a single result has
@@ -109,7 +109,7 @@ _RESULT_WAIT_TIME_SEC = 0.05
 class _PendingDiscoveries:
     """Manages a list of pending discoveries and associated callbacks."""
 
-    activeDiscoveries: List[PendingDiscovery] = []
+    activeDiscoveries: list[PendingDiscovery] = []
 
     def __init__(self):
         self.operationCondition = threading.Condition()
@@ -166,10 +166,7 @@ class _PendingDiscoveries:
         if item.expireTime <= now:
             return True
 
-        if (item.firstResultTime > 0) and (item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now):
-            return True
-
-        return False
+        return bool(item.firstResultTime > 0 and item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now)
 
     def ComputeNextEventTimeoutSeconds(self):
         """Compute how much a thread needs to sleep based on the active discoveries list."""
@@ -214,7 +211,9 @@ def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str, port: int)
 def _DiscoverFailure(fabric: int, node: int, errorCode: PyChipError):
     # Many discovery errors currently do not include a useful node/fabric id
     # hence we just log and rely on discovery timeouts to return 'no data'
-    LOGGER.error("Discovery failure, error %d", errorCode.code)
+
+    # We need to eagerly convert to int as specified in PyChipError docstring.
+    LOGGER.error("Discovery failure, error %d", int(errorCode.code))
 
 
 def FindAddressAsync(fabricId: int, nodeId: int, callback, timeoutMs=1000):

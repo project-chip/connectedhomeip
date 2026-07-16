@@ -27,7 +27,6 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/Ble.h>
@@ -117,6 +116,13 @@ public:
      * @brief Remove the app Led linkage form the baseApplication context
      */
     void UnlinkAppLed() { sAppActionLed = nullptr; }
+
+    /**
+     * @brief Check if the application is initialized
+     *
+     * @return Set to true when Init() was called successfully
+     */
+    bool IsApplicationInitialized() const { return mIsApplicationInitialized; }
 
     /**
      * @brief PostEvent function that add event to AppTask queue for processing
@@ -292,5 +298,6 @@ protected:
     bool mSyncClusterToButtonAction;
 
 private:
+    bool mIsApplicationInitialized = false;
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };

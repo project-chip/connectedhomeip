@@ -84,15 +84,15 @@ class ClusterObjectTests:
     @base.test_case
     def TestAPI(cls):
         if Clusters.OnOff.id != 6:
-            raise ValueError()
+            raise ValueError
         if Clusters.OnOff.Commands.Off.command_id != 0:
-            raise ValueError()
+            raise ValueError
         if Clusters.OnOff.Commands.Off.cluster_id != 6:
-            raise ValueError()
+            raise ValueError
         if Clusters.OnOff.Commands.On.command_id != 1:
-            raise ValueError()
+            raise ValueError
         if Clusters.OnOff.Commands.On.cluster_id != 6:
-            raise ValueError()
+            raise ValueError
 
     @classmethod
     @base.test_case
@@ -101,8 +101,8 @@ class ClusterObjectTests:
         res = await devCtrl.SendCommand(nodeId=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if res is not None:
             logger.error(
-                f"Got {res} Response from server, but None is expected.")
-            raise ValueError()
+                "Got %s Response from server, but None is expected.", res)
+            raise ValueError
 
     @classmethod
     @base.test_case
@@ -112,7 +112,7 @@ class ClusterObjectTests:
             await devCtrl.SendCommand(nodeId=NODE_ID, endpoint=233, payload=req)
             raise ValueError("Failure expected")
         except matter.interaction_model.InteractionModelError as ex:
-            logger.info(f"Recevied {ex} from server.")
+            logger.info("Recevied %s from server.", ex)
             return
 
     @classmethod
@@ -121,11 +121,11 @@ class ClusterObjectTests:
         req = Clusters.UnitTesting.Commands.TestAddArguments(arg1=2, arg2=3)
         res = await devCtrl.SendCommand(nodeId=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
         if not isinstance(res, Clusters.UnitTesting.Commands.TestAddArgumentsResponse):
-            logger.error(f"Unexpected response of type {type(res)} received.")
-            raise ValueError()
-        logger.info(f"Received response: {res}")
+            logger.error("Unexpected response of type %s received.", type(res))
+            raise ValueError
+        logger.info("Received response: %s", res)
         if res.returnValue != 5:
-            raise ValueError()
+            raise ValueError
 
     @classmethod
     @base.test_case
@@ -157,12 +157,11 @@ class ClusterObjectTests:
                                                AttributeId=6), Status=matter.interaction_model.Status.ConstraintError)
         ]
 
-        logger.info(f"Received WriteResponse: {res}")
+        logger.info("Received WriteResponse: %s", res)
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         logger.info("2: Write chunked list")
@@ -178,9 +177,9 @@ class ClusterObjectTests:
                 Attribute=Clusters.UnitTesting.Attributes.ListLongOctetString), Status=matter.interaction_model.Status.Success),
         ]
 
-        logger.info(f"Received WriteResponse: {res}")
+        logger.info("Received WriteResponse: %s", res)
         if res != expectedRes:
-            logger.error(f"Expect {expectedRes} got {res}")
+            logger.error("Expect %s got %s", expectedRes, res)
             raise AssertionError("Write returned unexpected result.")
 
     @classmethod
@@ -194,7 +193,7 @@ class ClusterObjectTests:
             nonlocal updated
             value = transaction.GetAttribute(path)
             logger.info(
-                f"Received attribute update path {path}, New value {value}")
+                "Received attribute update path %s, New value %s", path, value)
             updated = True
         sub.SetAttributeUpdateCallback(subUpdate)
         req = Clusters.OnOff.Commands.On()
@@ -383,13 +382,12 @@ class ClusterObjectTests:
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=req))
 
         res = await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=req, returnClusterObject=True)
-        logger.info(
-            f"Basic Cluster - Label: {res[0][Clusters.BasicInformation].productLabel}")
+        logger.info("Basic Cluster - Label: %s", res[0][Clusters.BasicInformation].productLabel)
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
         #    f"Test Cluster - Struct: {res[1][Clusters.UnitTesting].structAttr}")
-        logger.info(f"Test Cluster: {res[1][Clusters.UnitTesting]}")
+        logger.info("Test Cluster: %s", res[1][Clusters.UnitTesting])
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeId=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListLongOctetString)])
@@ -430,7 +428,7 @@ class ClusterObjectTests:
     @classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
         for i in range(retryCount):
-            logger.info(f"Attempt {i + 1}/{retryCount}")
+            logger.info("Attempt %s/%s", i + 1, retryCount)
             res = await request()
             if until(res):
                 return res
@@ -451,11 +449,8 @@ class ClusterObjectTests:
             number_of_events = len(events)
             if number_of_events != 1:
                 return False
-
             parsed_event_number = events[0].Header.EventNumber
-            if parsed_event_number != current_event_filter:
-                return False
-            return True
+            return parsed_event_number == current_event_filter
 
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(
             nodeId=NODE_ID,
@@ -482,15 +477,14 @@ class ClusterObjectTests:
                                             payload=Clusters.UnitTesting.Commands.TestEmitTestFabricScopedEventRequest(arg1=0))
             raise ValueError("Unexpected Failure")
         except matter.interaction_model.InteractionModelError as ex:
-            logger.info(f"Recevied {ex} from server.")
+            logger.info("Recevied %s from server.", ex)
         res = await devCtrl.ReadEvent(nodeId=NODE_ID, events=[
             (1, Clusters.UnitTesting.Events.TestFabricScopedEvent, 0),
         ])
-        logger.info(f"return result is {res}")
+        logger.info("return result is %s", res)
         if len(res) != 0:
             raise AssertionError("failure: not expect to receive fabric-scoped event when fabric is undefined")
-        else:
-            logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
+        logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
 
     @classmethod
     @base.test_case
@@ -627,8 +621,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         req = [
@@ -659,8 +652,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
         res = await devCtrl.WriteAttribute(nodeId=NODE_ID,
@@ -677,8 +669,7 @@ class ClusterObjectTests:
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+                    logger.error("Item %s is not expected, expect %s got %s", i, expectedRes[i], res[i])
             raise AssertionError("Write returned unexpected result.")
 
     @classmethod
@@ -705,8 +696,7 @@ class ClusterObjectTests:
 
         for attributes in attributePathPossibilities():
             for events in eventPathPossibilities():
-                logger.info(
-                    f"{testCount}: Reading mixed Attributes({attributes[0]}) Events({events[0]})")
+                logger.info("%s: Reading mixed Attributes(%s) Events(%s)", testCount, attributes[0], events[0])
                 await cls._TriggerEvent(devCtrl)
                 res = await cls._RetryForContent(request=lambda: devCtrl.Read(
                     nodeId=NODE_ID,
@@ -737,7 +727,7 @@ class ClusterObjectTests:
             await cls.TestGenerateUndefinedFabricScopedEventRequests(devCtrl)
         except Exception as ex:
             logger.error(
-                f"Unexpected error occurred when running tests: {ex}")
+                "Unexpected error occurred when running tests: %s", ex)
             logger.exception(ex)
             return False
         return True

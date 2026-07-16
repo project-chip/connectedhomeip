@@ -49,12 +49,6 @@ if (CHIP_CFLAGS)
     matter_add_flags("${CHIP_CFLAGS}")
 endif()
 
-matter_add_cxxflags(-D_POSIX_C_SOURCE=200809)
-
-if (CONFIG_ARM)
-    matter_add_cflags(--specs=nosys.specs)
-endif()
-
 if(CONFIG_MBEDTLS)
     zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
     zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
@@ -116,6 +110,7 @@ endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
+    matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
 elseif(CONFIG_CHIP_WIFI OR CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 else()
@@ -136,8 +131,7 @@ matter_build(chip
 )
 
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
-# Enable visibility of POSIX.1-2008 functions, such as strnlen
-target_compile_definitions(chip INTERFACE _POSIX_C_SOURCE=200809)
+
 # Make sure that kernel symbols that are only referenced by the Matter libraries are resolved.
 target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 

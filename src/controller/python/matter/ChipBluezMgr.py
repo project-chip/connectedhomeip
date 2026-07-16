@@ -22,7 +22,6 @@
 #      BLE Central support for Chip Device Manager via BlueZ APIs.
 #
 
-from __future__ import absolute_import, print_function
 
 import logging
 import queue
@@ -81,11 +80,11 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
         delegates = item[1].get(interface)
         if not delegates:
             continue
-        slice = {}
         if item[0].startswith(prefix_path):
-            slice["object"] = bus.get_object(BLUEZ_NAME, item[0])
-            slice["path"] = item[0]
-            results.append(slice)
+            results.append({
+                "object": bus.get_object(BLUEZ_NAME, item[0]),
+                "path": item[0]
+            })
     return results
 
 
@@ -143,10 +142,7 @@ class BluezDbusAdapter:
             return
 
         if len(invalidated_properties) > 0:
-            LOGGER.debug(
-                "invalidated_properties is not empty %s" % str(
-                    invalidated_properties)
-            )
+            LOGGER.debug("invalidated_properties is not empty %s", str(invalidated_properties))
             return
 
         if interface == ADAPTER_INTERFACE:
@@ -187,8 +183,7 @@ class BluezDbusAdapter:
     @property
     def Address(self):
         try:
-            result = self.adapter_properties.Get(ADAPTER_INTERFACE, "Address")
-            return result
+            return self.adapter_properties.Get(ADAPTER_INTERFACE, "Address")
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -207,9 +202,9 @@ class BluezDbusAdapter:
             LOGGER.debug(traceback.format_exc())
             return None
 
-    def SetDiscoveryFilter(self, dict):
+    def SetDiscoveryFilter(self, f: dict):
         try:
-            self.adapter.SetDiscoveryFilter(dict)
+            self.adapter.SetDiscoveryFilter(f)
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
         except Exception:
@@ -354,10 +349,7 @@ class BluezDbusDevice:
             return
 
         if len(invalidated_properties) > 0:
-            LOGGER.debug(
-                "invalidated_properties is not empty %s" % str(
-                    invalidated_properties)
-            )
+            LOGGER.debug("invalidated_properties is not empty %s", str(invalidated_properties))
             return
 
         if interface == DEVICE_INTERFACE:
@@ -455,8 +447,7 @@ class BluezDbusDevice:
     @property
     def Name(self):
         try:
-            name = self.device_properties.Get(DEVICE_INTERFACE, "Name")
-            return name
+            return self.device_properties.Get(DEVICE_INTERFACE, "Name")
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -490,8 +481,7 @@ class BluezDbusDevice:
     @property
     def RSSI(self):
         try:
-            result = self.device_properties.Get(DEVICE_INTERFACE, "RSSI")
-            return result
+            return self.device_properties.Get(DEVICE_INTERFACE, "RSSI")
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -559,10 +549,9 @@ class BluezDbusGattService:
     @property
     def uuid(self):
         try:
-            result = uuid.UUID(
+            return uuid.UUID(
                 str(self.service_properties.Get(SERVICE_INTERFACE, "UUID"))
             )
-            return result
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -573,9 +562,8 @@ class BluezDbusGattService:
     @property
     def Primary(self):
         try:
-            result = bool(self.service_properties.Get(
+            return bool(self.service_properties.Get(
                 SERVICE_INTERFACE, "Primary"))
-            return result
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return False
@@ -586,8 +574,7 @@ class BluezDbusGattService:
     @property
     def Device(self):
         try:
-            result = self.service_properties.Get(SERVICE_INTERFACE, "Device")
-            return result
+            return self.service_properties.Get(SERVICE_INTERFACE, "Device")
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -674,10 +661,7 @@ class BluezDbusGattCharacteristic:
     def gatt_on_characteristic_changed_cb(
         self, interface, changed_properties, invalidated_properties
     ):
-        LOGGER.debug(
-            "property change in" +
-            str(self.characteristic) + str(changed_properties)
-        )
+        LOGGER.debug("property change in %s %s", self.characteristic, changed_properties)
 
         if len(changed_properties) == 0:
             return
@@ -707,13 +691,12 @@ class BluezDbusGattCharacteristic:
     @property
     def uuid(self):
         try:
-            result = uuid.UUID(
+            return uuid.UUID(
                 str(
                     self.characteristic_properties.Get(
                         CHARACTERISTIC_INTERFACE, "UUID")
                 )
             )
-            return result
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
             return None
@@ -824,8 +807,7 @@ class BluezManager(ChipBleBase):
                 )
             ]
             for adapter in adapters:
-                LOGGER.info("AdapterName: %s   AdapterAddress: %s" % (
-                    adapter.path.replace("/org/bluez/", ""), adapter.Address))
+                LOGGER.info("AdapterName: %s   AdapterAddress: %s", adapter.path.replace("/org/bluez/", ""), adapter.Address)
         except dbus.exceptions.DBusException as ex:
             LOGGER.debug(str(ex))
 
@@ -844,10 +826,7 @@ class BluezManager(ChipBleBase):
                     if (str(adapter.Address).upper() == str(identifier).upper() or
                             "/org/bluez/{}".format(identifier) == str(adapter.path)):
                         return adapter
-            LOGGER.info(
-                "adapter %s cannot be found, expect the ble mac address" % (
-                    identifier)
-            )
+            LOGGER.info("adapter %s cannot be found, expect the ble mac address", identifier)
             return None
 
         except dbus.exceptions.DBusException as ex:
@@ -902,28 +881,22 @@ class BluezManager(ChipBleBase):
             self.orig_input_hook()
 
     def dump_scan_result(self, device):
-        LOGGER.info("{0:<16}= {1}".format("Name", device.Name))
-        LOGGER.info("{0:<16}= {1}".format("ID", device.device_id))
-        LOGGER.info("{0:<16}= {1}".format("RSSI", device.RSSI))
-        LOGGER.info("{0:<16}= {1}".format("Address", device.Address))
+        LOGGER.info("%-16s= %s", "Name", device.Name)
+        LOGGER.info("%-16s= %s", "ID", device.device_id)
+        LOGGER.info("%-16s= %s", "RSSI", device.RSSI)
+        LOGGER.info("%-16s= %s", "Address", device.Address)
 
         devIdInfo = self.get_peripheral_devIdInfo(device)
         if devIdInfo is not None:
-            LOGGER.info("{0:<16}= {1}".format(
-                "Pairing State", devIdInfo.pairingState))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Discriminator", devIdInfo.discriminator))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Vendor Id", devIdInfo.vendorId))
-            LOGGER.info("{0:<16}= {1}".format(
-                "Product Id", devIdInfo.productId))
+            LOGGER.info("%-16s= %s", "Pairing State", devIdInfo.pairingState)
+            LOGGER.info("%-16s= %s", "Discriminator", devIdInfo.discriminator)
+            LOGGER.info("%-16s= %s", "Vendor Id", devIdInfo.vendorId)
+            LOGGER.info("%-16s= %s", "Product Id", devIdInfo.productId)
 
         if device.ServiceData:
             for advuuid in device.ServiceData:
-                LOGGER.info("{0:<16}= {1}".format(
-                    "Adv UUID", str(advuuid)))
-                LOGGER.info("{0:<16}= {1}".format(
-                    "Adv Data", bytes(device.ServiceData[advuuid]).hex()))
+                LOGGER.info("%-16s= %s", "Adv UUID", advuuid)
+                LOGGER.info("%-16s= %s", "Adv Data", bytes(device.ServiceData[advuuid]).hex())
         else:
             LOGGER.info("")
         LOGGER.info("")

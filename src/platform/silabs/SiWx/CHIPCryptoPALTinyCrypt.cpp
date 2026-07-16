@@ -53,7 +53,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -654,7 +653,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    output.SetLength(bbuf.Needed());
+    TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
 
 exit:
     memset(privkey, 0, sizeof(privkey));
@@ -757,7 +756,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
-    signature.SetLength(out_raw_sig_span.size());
+    TEMPORARY_RETURN_IGNORED signature.SetLength(out_raw_sig_span.size());
 
     // Verify the signature using the public key
     error = pubkey.ECDSA_validate_msg_signature(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(p),
@@ -880,7 +879,12 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     uECC_word_t tmp[2 * NUM_ECC_WORDS] = { 0 };
-    uECC_vli_bytesToNative(tmp, in, NUM_ECC_BYTES);
+
+    VerifyOrReturnError(in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(in_len <= sizeof(tmp), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((in_len % sizeof(uECC_word_t)) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    uECC_vli_bytesToNative(tmp, in, static_cast<int>(in_len));
 
     uECC_vli_mmod((uECC_word_t *) fe, tmp, curve_n);
 
@@ -1004,14 +1008,17 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1sin, size_t w1sin_len)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    int result       = UECC_SUCCESS;
 
-    result = UECC_SUCCESS;
-    uECC_word_t tmp[2 * NUM_ECC_WORDS];
-    uECC_word_t w1_bn[NUM_ECC_WORDS];
-    uECC_word_t L_tmp[2 * NUM_ECC_WORDS];
+    uECC_word_t tmp[2 * NUM_ECC_WORDS]   = { 0 };
+    uECC_word_t w1_bn[NUM_ECC_WORDS]     = { 0 };
+    uECC_word_t L_tmp[2 * NUM_ECC_WORDS] = { 0 };
 
-    uECC_vli_bytesToNative(tmp, w1sin, NUM_ECC_BYTES);
+    VerifyOrExit(w1sin != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(w1sin_len <= sizeof(tmp), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((w1sin_len % sizeof(uECC_word_t)) == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    uECC_vli_bytesToNative(tmp, w1sin, static_cast<int>(w1sin_len));
 
     uECC_vli_mmod(w1_bn, tmp, curve_n);
 

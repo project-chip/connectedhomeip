@@ -17,7 +17,6 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Optional, Set
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
@@ -27,7 +26,7 @@ from matter.idl.generators.type_definitions import (BasicInteger, BasicString, F
 from matter.idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -61,7 +60,7 @@ _GLOBAL_TYPES = [
 ]
 
 
-def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
+def _UnderlyingType(field: Field, context: TypeLookupContext) -> str | None:
     actual = ParseDataType(field.data_type, context)
     if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
@@ -69,27 +68,24 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
     if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'OctetString'
-        else:
-            return 'CharString'
-    elif isinstance(actual, BasicInteger):
+        return 'CharString'
+    if isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
-        else:
-            return "Int{}u".format(actual.power_of_two_bits)
-    elif isinstance(actual, FundamentalType):
+        return "Int{}u".format(actual.power_of_two_bits)
+    if isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'Boolean'
-        elif actual == FundamentalType.FLOAT:
+        if actual == FundamentalType.FLOAT:
             return 'Float'
-        elif actual == FundamentalType.DOUBLE:
+        if actual == FundamentalType.DOUBLE:
             return 'Double'
-        else:
-            LOGGER.warning('Unknown fundamental type: %r' % actual)
+        log.warning("Unknown fundamental type: %r", actual)
 
     return None
 
 
-def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Optional[str]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> str | None:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -139,22 +135,19 @@ def _CppType(field: Field, context: TypeLookupContext) -> str:
     if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'chip::ByteSpan'
-        else:
-            return 'chip::CharSpan'
-    elif isinstance(actual, BasicInteger):
+        return 'chip::CharSpan'
+    if isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "int{}_t".format(actual.power_of_two_bits)
-        else:
-            return "uint{}_t".format(actual.power_of_two_bits)
-    elif isinstance(actual, FundamentalType):
+        return "uint{}_t".format(actual.power_of_two_bits)
+    if isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'bool'
-        elif actual == FundamentalType.FLOAT:
+        if actual == FundamentalType.FLOAT:
             return 'float'
-        elif actual == FundamentalType.DOUBLE:
+        if actual == FundamentalType.DOUBLE:
             return 'double'
-        else:
-            LOGGER.warning('Unknown fundamental type: %r' % actual)
+        log.warning("Unknown fundamental type: %r", actual)
     elif isinstance(actual, IdlType):
         return f"chip::app::Clusters::{context.cluster.name}::Structs::{field.data_type.name}::DecodableType"
     elif isinstance(actual, IdlBitmapType):
@@ -270,10 +263,7 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
     global_name = FieldToGlobalName(field, context)
-    if global_name:
-        return True
-
-    return False
+    return bool(global_name)
 
 
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
@@ -331,7 +321,7 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
     }
 
 
-def NamedFilter(choices: List, name: str):
+def NamedFilter(choices: list, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
@@ -341,12 +331,11 @@ def NamedFilter(choices: List, name: str):
 def ToBoxedJavaType(field: Field):
     if field.is_optional:
         return 'jobject'
-    elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
+    if field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
         return 'jbyteArray'
-    elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
+    if field.data_type.name.lower() in ['char_string', 'long_char_string']:
         return 'jstring'
-    else:
-        return 'jobject'
+    return 'jobject'
 
 
 def LowercaseFirst(name: str) -> str:
@@ -382,7 +371,7 @@ class EncodableValue:
         for the underlying types.
     """
 
-    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: set[EncodableValueAttr]):
         self.context = context
         self.data_type = data_type
         self.attrs = attrs
@@ -459,13 +448,13 @@ class EncodableValue:
 
         if java_type == 'Boolean':
             return 'jboolean'
-        elif java_type == 'Float':
+        if java_type == 'Float':
             return 'jfloat'
-        elif java_type == 'Double':
+        if java_type == 'Double':
             return 'jdouble'
-        elif java_type == 'Long':
+        if java_type == 'Long':
             return 'jlong'
-        elif java_type == 'Integer':
+        if java_type == 'Integer':
             return 'jint'
 
         raise Exception("Unknown jni fundamental type.")
@@ -477,35 +466,29 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Float"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.byte_count >= 3:
                 return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, BasicString):
+            return "Integer"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "byte[]"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
+            return "String"
+        if isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, IdlBitmapType):
+            return "Integer"
+        if isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Long"
-            else:
-                return "Integer"
-        else:
-            return "Object"
+            return "Integer"
+        return "Object"
 
     @property
     def java_tlv_type(self):
@@ -514,29 +497,25 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Float"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.is_signed:
                 return "Int"
-            else:
-                return "UInt"
-        elif isinstance(t, BasicString):
+            return "UInt"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
+            return "String"
+        if isinstance(t, IdlEnumType):
             return "UInt"
-        elif isinstance(t, IdlBitmapType):
+        if isinstance(t, IdlBitmapType):
             return "UInt"
-        else:
-            return "Any"
+        return "Any"
 
     @property
     def kotlin_type(self):
@@ -545,41 +524,33 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Float"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.is_signed:
                 if t.byte_count >= 3:
                     return "Long"
-                else:
-                    return "Int"
-            else:
-                if t.byte_count >= 3:
-                    return "ULong"
-                else:
-                    return "UInt"
-        elif isinstance(t, BasicString):
+                return "Int"
+            if t.byte_count >= 3:
+                return "ULong"
+            return "UInt"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
+            return "String"
+        if isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "ULong"
-            else:
-                return "UInt"
-        elif isinstance(t, IdlBitmapType):
+            return "UInt"
+        if isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "ULong"
-            else:
-                return "UInt"
-        else:
-            return "Any"
+            return "UInt"
+        return "Any"
 
     @property
     def unboxed_java_signature(self):
@@ -591,19 +562,16 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Z"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "F"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "D"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "J"
-            else:
-                return "I"
-        else:
-            raise Exception("Not a basic type: %r" % self)
+            return "I"
+        raise Exception("Not a basic type: %r" % self)
 
     @property
     def boxed_java_signature(self):
@@ -619,34 +587,28 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Ljava/lang/Boolean;"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Ljava/lang/Float;"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Ljava/lang/Double;"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        elif isinstance(t, BasicString):
+            return "Ljava/lang/Integer;"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "[B"
-            else:
-                return "Ljava/lang/String;"
-        elif isinstance(t, IdlEnumType):
+            return "Ljava/lang/String;"
+        if isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        elif isinstance(t, IdlBitmapType):
+            return "Ljava/lang/Integer;"
+        if isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        else:
-            return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+            return "Ljava/lang/Integer;"
+        return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:
@@ -678,7 +640,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     return EncodableValue(context, field.data_type, attrs)
 
 
-def CreateLookupContext(idl: Idl, cluster: Optional[Cluster]) -> TypeLookupContext:
+def CreateLookupContext(idl: Idl, cluster: Cluster | None) -> TypeLookupContext:
     """
     A filter to mark a lookup context to be within a specific cluster.
 
@@ -781,7 +743,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterReadMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -790,7 +752,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -799,7 +761,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterIDMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -808,7 +770,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipClusters_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipClusters.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -817,7 +779,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipStructs_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipStructs.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -826,7 +788,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipEventStructs_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipEventStructs.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -835,7 +797,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterInfoMapping_java.jinja",
             output_file_name="java/chip/devicecontroller/ClusterInfoMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -844,7 +806,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipStructFiles_gni.jinja",
             output_file_name="java/chip/devicecontroller/cluster/files.gni",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -863,7 +825,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         struct_name=struct.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'struct': struct,
                         'typeLookup': TypeLookupContext(self.idl, cluster),
@@ -880,7 +842,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         event_name=event.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'event': event,
                         'typeLookup': TypeLookupContext(self.idl, cluster),

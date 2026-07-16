@@ -45,7 +45,7 @@ public:
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    void SetNativeParams(void * params);
+    void SetNativeParams(void * params) override;
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 

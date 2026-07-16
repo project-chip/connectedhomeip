@@ -27,12 +27,16 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
   val connectionID: UShort,
   val triggerType: UByte,
   val activationReason: Optional<UByte>,
+  val containerType: Optional<UByte>,
+  val CMAFSessionNumber: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttriggerType : $triggerType\n")
     append("\tactivationReason : $activationReason\n")
+    append("\tcontainerType : $containerType\n")
+    append("\tCMAFSessionNumber : $CMAFSessionNumber\n")
     append("}\n")
   }
 
@@ -45,6 +49,14 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         val optactivationReason = activationReason.get()
         put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
       }
+      if (containerType.isPresent) {
+        val optcontainerType = containerType.get()
+        put(ContextSpecificTag(TAG_CONTAINER_TYPE), optcontainerType)
+      }
+      if (CMAFSessionNumber.isPresent) {
+        val optCMAFSessionNumber = CMAFSessionNumber.get()
+        put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
+      }
       endStructure()
     }
   }
@@ -53,6 +65,8 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
     private const val TAG_CONNECTION_ID = 0
     private const val TAG_TRIGGER_TYPE = 1
     private const val TAG_ACTIVATION_REASON = 2
+    private const val TAG_CONTAINER_TYPE = 3
+    private const val TAG_CMAF_SESSION_NUMBER = 4
 
     fun fromTlv(
       tlvTag: Tag,
@@ -67,6 +81,18 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         } else {
           Optional.empty()
         }
+      val containerType =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CONTAINER_TYPE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_TYPE)))
+        } else {
+          Optional.empty()
+        }
+      val CMAFSessionNumber =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -74,6 +100,8 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         connectionID,
         triggerType,
         activationReason,
+        containerType,
+        CMAFSessionNumber,
       )
     }
   }

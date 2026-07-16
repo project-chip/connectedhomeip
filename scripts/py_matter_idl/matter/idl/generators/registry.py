@@ -43,21 +43,21 @@ class CodeGenerator(enum.Enum):
     def Create(self, *args, **kargs):
         if self == CodeGenerator.JAVA_JNI:
             return JavaJNIGenerator(*args, **kargs)
-        elif self == CodeGenerator.JAVA_CLASS:
+        if self == CodeGenerator.JAVA_CLASS:
             return JavaClassGenerator(*args, **kargs)
-        elif self == CodeGenerator.KOTLIN_CLASS:
+        if self == CodeGenerator.KOTLIN_CLASS:
             return KotlinClassGenerator(*args, **kargs)
-        elif self == CodeGenerator.CPP_APPLICATION:
+        if self == CodeGenerator.CPP_APPLICATION:
             return CppApplicationGenerator(*args, **kargs)
-        elif self == CodeGenerator.CPP_TLVMETA:
+        if self == CodeGenerator.CPP_TLVMETA:
             return TLVMetaDataGenerator(*args, **kargs)
-        elif self == CodeGenerator.CPP_SDK:
+        if self == CodeGenerator.CPP_SDK:
             return SdkGenerator(*args, **kargs)
-        elif self == CodeGenerator.IDL:
+        if self == CodeGenerator.IDL:
             return IdlGenerator(*args, **kargs)
-        elif self == CodeGenerator.SUMMARY_MARKDOWN:
+        if self == CodeGenerator.SUMMARY_MARKDOWN:
             return SummaryMarkdownGenerator(*args, **kargs)
-        elif self == CodeGenerator.CUSTOM:
+        if self == CodeGenerator.CUSTOM:
             # Use a package naming convention to find the custom generator:
             # ./matter_idl_plugin/__init__.py defines a subclass of CodeGenerator named CustomGenerator.
             # The plugin is expected to be in the path provided via the `--plugin <path>` cli argument.
@@ -65,8 +65,7 @@ class CodeGenerator(enum.Enum):
             plugin_module = importlib.import_module(kargs['plugin_module'])
             CustomGenerator = plugin_module.CustomGenerator
             return CustomGenerator(*args, **kargs)
-        else:
-            raise NameError("Unknown code generator type")
+        raise NameError("Unknown code generator type")
 
     @staticmethod
     def FromString(name):
@@ -74,8 +73,7 @@ class CodeGenerator(enum.Enum):
 
         if name.lower() in GENERATORS:
             return GENERATORS[name.lower()]
-        else:
-            raise NameError("Unknown code generator type '%s'" % name)
+        raise NameError("Unknown code generator type '%s'" % name)
 
 
 # Contains all known code generators along with a string

@@ -202,6 +202,10 @@ public:
      */
     void CloseActiveConnections();
 
+#if INET_CONFIG_TEST
+    static bool sForceFailureInDoHandleIncomingConnection;
+#endif
+
 private:
     // Allow tests to access private members.
     template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
@@ -338,7 +342,13 @@ public:
         }
     }
 
-    ~TCP() override { mPendingPackets.ReleaseAll(); }
+    ~TCP() override
+    {
+        mPendingPackets.ReleaseAll();
+
+        // Call Close to free the listening socket and close all active connections.
+        Close();
+    }
 
 private:
     ActiveTCPConnectionState mConnectionsBuffer[kActiveConnectionsSize];

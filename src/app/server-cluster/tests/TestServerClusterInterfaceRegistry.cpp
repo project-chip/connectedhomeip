@@ -32,7 +32,7 @@
 #include <cstdlib>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
@@ -100,11 +100,16 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
-        DefaultServerCluster::Startup(context);
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
         mStartupCalls++;
         return CHIP_ERROR_CANCELLED;
     }
-    void Shutdown() override { mShutdownCalls++; }
+
+    void Shutdown(ClusterShutdownType shutdownType) override
+    {
+        mShutdownCalls++;
+        DefaultServerCluster::Shutdown(shutdownType);
+    }
 
     uint32_t GetStartupCallCount() const { return mStartupCalls; }
     uint32_t GetShutdownCallCount() const { return mShutdownCalls; }

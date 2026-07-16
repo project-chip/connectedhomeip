@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
+#include <app/clusters/time-format-localization-server/TimeFormatLocalizationCluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
@@ -41,7 +42,7 @@ void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFor
                    TimeFormatLocalization::CalendarTypeEnum & defaultCalendarType)
 {
     // hour format always supported
-    if (TimeFormatLocalization::Attributes::HourFormat::Get(kRootEndpointId, &defaultHourFormat) != Status::Success)
+    if (TimeFormatLocalization::Attributes::HourFormat::GetDefault(kRootEndpointId, &defaultHourFormat) != Status::Success)
     {
         CodegenInitError("Failed to get HourFormat for endpoint %u", kRootEndpointId);
         defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
@@ -51,7 +52,8 @@ void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFor
     defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
     if (featureMap.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if (TimeFormatLocalization::Attributes::ActiveCalendarType::Get(kRootEndpointId, &defaultCalendarType) != Status::Success)
+        if (TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefault(kRootEndpointId, &defaultCalendarType) !=
+            Status::Success)
         {
             CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", kRootEndpointId);
             defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
@@ -72,7 +74,14 @@ public:
         const BitFlags<TimeFormatLocalization::Feature> featureMap(rawFeatureMap);
         FetchDefaults(featureMap, defaultHourFormat, defaultCalendarType);
 
-        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType);
+        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType,
+                       TimeFormatLocalizationCluster::Context{
+                           .deviceInfoProvider = []() -> DeviceLayer::DeviceInfoProvider & {
+                               auto provider = DeviceLayer::GetDeviceInfoProvider();
+                               VerifyOrDie(provider != nullptr);
+                               return *provider;
+                           }(),
+                       });
 
         return gServer.Registration();
     }
@@ -107,7 +116,7 @@ void MatterTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
         integrationDelegate);
 }
 
-void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
+void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType shutdownType)
 {
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
@@ -120,7 +129,7 @@ void MatterTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint)
             .fixedClusterInstanceCount = TimeFormatLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterTimeFormatLocalizationPluginServerInitCallback() {}

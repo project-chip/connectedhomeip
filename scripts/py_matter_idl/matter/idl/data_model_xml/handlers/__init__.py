@@ -47,5 +47,4 @@ class DataModelXmlHandler(BaseHandler):
                 "Found an abstract base cluster (no id): '%s'", attrs['name'])
 
             return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddAbstractBaseCluster(NormalizeName(attrs['name']), self.context.GetCurrentLocationMeta()))
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)

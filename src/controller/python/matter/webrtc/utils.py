@@ -16,13 +16,13 @@
 #
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Any
 
 LOGGER = logging.getLogger(__name__)
 
 
 class AsyncEventQueue(asyncio.Queue):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None, maxSize: int = 0):
+    def __init__(self, loop: asyncio.AbstractEventLoop | None = None, maxSize: int = 0):
         super().__init__(maxsize=maxSize)
         self._loop = loop or asyncio.get_running_loop()
 
@@ -40,9 +40,9 @@ class AsyncEventQueue(asyncio.Queue):
         if not self._loop.is_closed():
             self._loop.call_soon_threadsafe(self.put_nowait, value)
         else:
-            LOGGER.error(f"Ignoring value {value} because event loop is not running")
+            LOGGER.error("Ignoring value %s because event loop is not running", value)
 
-    async def get(self, timeout: Optional[int] = None):
+    async def get(self, timeout: int | None = None):
         """
         Override of Queue.get
         Async get with optional timeout seconds.

@@ -182,6 +182,9 @@ template("chip_data_model") {
     if (!defined(sources)) {
       sources = []
     }
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
 
     if (!defined(is_server)) {
       is_server = false
@@ -190,19 +193,18 @@ template("chip_data_model") {
     sources += [
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
-      "${_app_root}/clusters/groups-server/groups-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
-      "${_app_root}/clusters/scenes-server/SceneTable.h",
-      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
-      "${_app_root}/clusters/scenes-server/scenes-server.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
-      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
+    if (chip_data_model_overrides_dir != "") {
+      sources += [ "${chip_data_model_overrides_dir}/Accessors-override.cpp" ]
+    } else {
+      sources += [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp" ]
+    }
+
     sources += codegen_data_model_SOURCES
 
     if (!chip_build_controller_dynamic_server) {
@@ -216,7 +218,14 @@ template("chip_data_model") {
       ]
     }
 
-    if (defined(invoker.zap_file)) {
+    if (chip_data_model_overrides_dir != "") {
+      # Use the override .gni file to get the cluster server list instead
+      # of auto-discovering from the .zap file via zap_cluster_list.py.
+      # This allows applications to compile only the cluster server
+      # implementations they actually need.
+      import("${chip_data_model_overrides_dir}/cluster-servers-override.gni")
+      _cluster_sources = cluster_server_override_dirs
+    } else if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)
       _script_args = [
         "--zap_file",
@@ -257,7 +266,9 @@ template("chip_data_model") {
 
     _app_config_dependent_sources = []
     foreach(cluster, _cluster_sources) {
-      deps += [ "${_app_root}/clusters/${cluster}" ]
+      # Clusters are public deps to allow applications to depend on cluster APIs, (e.g. delegates / providers)
+      # without having to manually re-state the dependencies computed here from the zap file.
+      public_deps += [ "${_app_root}/clusters/${cluster}" ]
 
       # app_config_dependent_sources paths are relative to the target
       # accumulate them here so that we can "rebase_path" later on

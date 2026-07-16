@@ -20,13 +20,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -41,16 +40,15 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import logging
 
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
@@ -65,7 +63,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -117,8 +115,6 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TESTEVENT_TRIGGERKEY and EventTrigger field set to PIXIT.EEVSE.TESTEVENTTRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEVSE_2_4(self):

@@ -18,11 +18,13 @@
 import argparse
 import codecs
 import json
-import logging as log
+import logging
 import sys
 
 import cbor2 as cbor
 from intelhex import IntelHex
+
+log = logging.getLogger(__name__)
 
 HEX_PREFIX = "hex:"
 
@@ -38,16 +40,16 @@ class PartitionCreator:
 
     """
 
-    def __init__(self, offset: int, length: int, input: str, output: str) -> None:
+    def __init__(self, offset: int, length: int, input_file: str, output: str) -> None:
         self._ih = IntelHex()
         self._length = length
         self._offset = offset
         self._data_ready = False
         self._output = output
-        self._input = input
+        self._input_file = input_file
         try:
             self.__data_to_save = self._convert_to_dict(self._load_json())
-        except IOError:
+        except OSError:
             sys.exit(-1)
 
     def generate_cbor(self):
@@ -58,8 +60,8 @@ class PartitionCreator:
         """
         if self.__data_to_save:
             # prepare raw data from Json
-            cbor_data = cbor.dumps(self.__data_to_save)
-            return cbor_data
+            return cbor.dumps(self.__data_to_save)
+        return None
 
     def create_hex(self, data: bytes):
         """
@@ -98,7 +100,7 @@ class PartitionCreator:
         output_dict = {}
         for entry in data:
             if not isinstance(entry, dict):
-                log.debug("Processing entry {}".format(entry))
+                log.debug("Processing entry '%s'", entry)
                 if isinstance(data[entry], str) and data[entry].startswith(HEX_PREFIX):
                     output_dict[entry] = codecs.decode(data[entry][len(HEX_PREFIX):], "hex")
                 elif isinstance(data[entry], str):
@@ -116,10 +118,10 @@ class PartitionCreator:
         :raises IOError: if provided JSON file can not be read out.
         """
         try:
-            with open(self._input, "rb") as json_file:
+            with open(self._input_file, "rb") as json_file:
                 return json.loads(json_file.read())
-        except IOError as e:
-            log.error("Can not read Json file {}".format(self._input))
+        except OSError as e:
+            log.error("Can not read Json file '%s'", self._input_file)
             raise e
 
 
@@ -157,11 +159,11 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)
+        logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG)
     elif args.raw:
-        log.basicConfig(format='%(message)s', level=log.ERROR)
+        logging.basicConfig(format='%(message)s', level=logging.ERROR)
     else:
-        log.basicConfig(format='[%(asctime)s] %(message)s', level=log.INFO)
+        logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
     partition_creator = PartitionCreator(args.offset, args.size, args.input, args.output)
     cbor_data = partition_creator.generate_cbor()
@@ -172,7 +174,7 @@ def main():
             if not args.raw:
                 print_flashing_help()
     except ValueError as e:
-        log.error(e)
+        log.exception(e)
         sys.exit(-1)
 
 

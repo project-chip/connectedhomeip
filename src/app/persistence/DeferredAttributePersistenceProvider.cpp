@@ -39,7 +39,7 @@ CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, c
 void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
 {
     VerifyOrReturn(IsArmed());
-    persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
+    TEMPORARY_RETURN_IGNORED persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
     mValue.Free();
 }
 
@@ -87,7 +87,7 @@ void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
 
     if (nextFlushTime != System::Clock::Timestamp::max())
     {
-        DeviceLayer::SystemLayer().StartTimer(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
             nextFlushTime - now,
             [](System::Layer *, void * me) { static_cast<DeferredAttributePersistenceProvider *>(me)->FlushAndScheduleNext(); },
             this);

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "WebRTCTransportRequestorManager.h"
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 

@@ -23,7 +23,7 @@
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 class UDPTransportManager
 {
@@ -54,9 +54,9 @@ public:
     IOContext & GetIOContext() { return mIOContext; }
 
 private:
-    Test::IOContext mIOContext;
+    IOContext mIOContext;
     TransportMgr<chip::Transport::UDP> mTransportManager;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

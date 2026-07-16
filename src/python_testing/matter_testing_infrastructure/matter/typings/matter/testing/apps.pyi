@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from sys import stderr, stdout
-from typing import Any, BinaryIO, List, Optional, Union
+from typing import Any, BinaryIO
 
 from matter.testing.tasks import Subprocess
 
@@ -10,14 +10,14 @@ from matter.testing.tasks import Subprocess
 class OtaImagePath:
     path: str
     @property
-    def ota_args(self) -> List[str]: ...
+    def ota_args(self) -> list[str]: ...
 
 
 @dataclass
 class ImageListPath:
     path: str
     @property
-    def ota_args(self) -> List[str]: ...
+    def ota_args(self) -> list[str]: ...
 
 
 class AppServerSubprocess(Subprocess):
@@ -25,7 +25,7 @@ class AppServerSubprocess(Subprocess):
     log_file = ""
     err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
+                 passcode: int, port: int = 5540, extra_args: list[str] = ...) -> None: ...
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -35,23 +35,15 @@ class IcdAppServerSubprocess(AppServerSubprocess):
     def terminate(self) -> None: ...
 
 
-class JFControllerSubprocess(Subprocess):
-    PREFIX: bytes
-    def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: List[str] = ...) -> None: ...
-
-
 class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer): ...
+                 passcode: int, ota_source: OtaImagePath | ImageListPath,
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: str | None = None,
+                 log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer): ...
 
     def kill(self) -> None: ...
 
     def get_pid(self) -> int: ...
-
-    def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]: ...

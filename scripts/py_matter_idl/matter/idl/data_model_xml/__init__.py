@@ -16,12 +16,11 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import List, Optional, Union
 
 from matter.idl.data_model_xml.handlers import Context, DataModelXmlHandler
 from matter.idl.matter_idl_types import Idl
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
@@ -69,13 +68,13 @@ class ParseHandler(xml.sax.handler.ContentHandler):
             raise Exception("Unexpected nesting!")
 
     def startElement(self, name: str, attrs):
-        LOGGER.debug("ELEMENT START: %r / %r" % (name, attrs))
+        log.debug("ELEMENT START: %r / %r", name, attrs)
         self._context.path.push(name)
         self._processing_stack.append(
             self._processing_stack[-1].GetNextProcessor(name, attrs))
 
     def endElement(self, name: str):
-        LOGGER.debug("ELEMENT END: %r" % name)
+        log.debug("ELEMENT END: %r", name)
 
         last = self._processing_stack.pop()
         last.EndProcessing()
@@ -94,9 +93,9 @@ class ParseSource:
 
     Allows for named data sources to be parsed.
     """
-    source: Union[str, typing.IO]  # filename or stream
+    source: str | typing.IO  # filename or stream
     # actual filename to use, None if the source is a filename already
-    name: Optional[str] = None
+    name: str | None = None
 
     @property
     def source_file_name(self):
@@ -105,7 +104,7 @@ class ParseSource:
         return self.source  # assume string
 
 
-def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
+def ParseXmls(sources: list[ParseSource], include_meta_data=True) -> Idl:
     """Parse one or more XML inputs and return the resulting Idl data.
 
     Params:
@@ -115,7 +114,7 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
     handler = ParseHandler(include_meta_data=include_meta_data)
 
     for source in sources:
-        LOGGER.info('Parsing %s...' % source.source_file_name)
+        log.info("Parsing '%s'...", source.source_file_name)
         handler.PrepareParsing(source.source_file_name)
 
         parser = xml.sax.make_parser()
@@ -123,8 +122,8 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
         try:
             parser.parse(source.source)
         except AssertionError as e:
-            LOGGER.error("AssertionError %s at %r", e,
-                         handler._context.GetCurrentLocationMeta())
+            log.error("%r at %r", e,
+                      handler._context.GetCurrentLocationMeta())
             raise
 
     return handler.Finish()

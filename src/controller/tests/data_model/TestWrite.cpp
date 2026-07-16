@@ -40,7 +40,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::DataModelTests;
 using namespace chip::Protocols;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -146,22 +146,22 @@ private:
     StatusIB mPathStatus;
 };
 
-class TestWrite : public chip::Test::AppContext
+class TestWrite : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        chip::Testing::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
-        chip::Test::AppContext::TearDown();
+        chip::Testing::AppContext::TearDown();
     }
 
     void ResetCallback() { mSingleWriteCallback.reset(); }
@@ -244,7 +244,7 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
     EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion));
 
@@ -284,7 +284,7 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
     static_assert(kAcceptedDataVersion != kRejectedDataVersion);
 
     EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
@@ -456,8 +456,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
-        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
+        EXPECT_EQ(pathStatus.mClusterStatus, ClusterStatus(kExampleClusterSpecificSuccess));
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -489,8 +488,7 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
-        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
-        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificFailure); // NOLINT(bugprone-unchecked-optional-access)
+        EXPECT_EQ(pathStatus.mClusterStatus, ClusterStatus(kExampleClusterSpecificFailure));
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

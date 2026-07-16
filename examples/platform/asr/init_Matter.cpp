@@ -104,11 +104,11 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
     TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 
     ASR_LOG("Starting Platform Manager Event Loop");
     // // Start a task to run the CHIP Device event loop.

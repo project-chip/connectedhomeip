@@ -21,7 +21,6 @@ import logging
 import re
 import sys
 import traceback
-from typing import Dict
 
 import fastcore  # type: ignore
 import memdf.report
@@ -32,6 +31,8 @@ import memdf.util.sqlite
 import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
 from memdf.util.github import Gh
+
+log = logging.getLogger(__name__)
 
 DB_CONFIG: ConfigDescription = {
     Config.group_def('database'): {
@@ -131,22 +132,22 @@ class SizeContext:
 
         # Record size artifacts keyed by group and commit_hash to match them up
         # after we have the entire list.
-        size_artifacts: Dict[str, Dict[str, fastcore.basics.AttrDict]] = {}
+        size_artifacts: dict[str, dict[str, fastcore.basics.AttrDict]] = {}
         for a in self.gh.get_size_artifacts():
             if a.group not in size_artifacts:
                 size_artifacts[a.group] = {}
             size_artifacts[a.group][a.commit] = a
-            logging.debug('ASG: artifact %d %s', a.id, a.name)
+            log.debug("ASG: artifact %d '%s'", a.id, a.name)
 
         # Determine required size artifacts.
         artifact_limit = self.config['github.limit-artifacts']
         required_artifact_ids: set[int] = set()
         for group, group_reports in size_artifacts.items():
-            logging.debug('ASG: group %s', group)
+            log.debug("ASG: group '%s'", group)
             for report in group_reports.values():
                 if self.should_report(report.event):
                     if report.parent not in group_reports:
-                        logging.debug('ASN:  No match for %s', report.name)
+                        log.debug("ASN:  No match for '%s'", report.name)
                         continue
                     if (artifact_limit
                             and len(required_artifact_ids) >= artifact_limit):
@@ -156,9 +157,9 @@ class SizeContext:
                     parent = group_reports[report.parent]
                     required_artifact_ids.add(report.id)
                     required_artifact_ids.add(parent.id)
-                    logging.debug('ASM:  Match %s', report.parent)
-                    logging.debug('ASR:    %s %s', report.id, report.name)
-                    logging.debug('ASP:    %s %s', parent.id, parent.name)
+                    log.debug("ASM:  Match '%s'", report.parent)
+                    log.debug("ASR:    '%s' '%s'", report.id, report.name)
+                    log.debug("ASP:    '%s' '%s'", parent.id, parent.name)
 
         # Download and add required artifacts.
         for i in required_artifact_ids:
@@ -227,9 +228,8 @@ class SizeContext:
             commit = df.attrs['commit']
             latest = self.get_newest_commit(pr)
             if commit != latest:
-                logging.info(
-                    'SCS: PR #%s: not commenting for stale %s; newest is %s',
-                    pr, commit, latest)
+                log.info("SCS: PR #%s: not commenting for stale '%s'; newest is '%s'",
+                         pr, commit, latest)
                 # Return True so that the obsolete artifacts get removed.
                 return True
 
@@ -243,7 +243,7 @@ class SizeContext:
             return self.gh.update_comment(existing_comment.id, text)
         return self.gh.create_comment(pr, text)
 
-    def report_matching_commits(self) -> Dict[str, pd.DataFrame]:
+    def report_matching_commits(self) -> dict[str, pd.DataFrame]:
         """Report on all new comparable commits."""
         if not self.should_report():
             return {}
@@ -365,7 +365,7 @@ class V1Comment:
                     body.readline()  # Blank line before table.
                     cols, rows = memdf.util.markdown.read_hierified(body)
                     break
-        logging.debug('REC: read %d rows', len(rows))
+        log.debug("REC: read %d rows", len(rows))
         attrs = df.attrs
         df = pd.concat([df, pd.DataFrame(data=rows, columns=cols).astype(df.dtypes)],
                        ignore_index=True)

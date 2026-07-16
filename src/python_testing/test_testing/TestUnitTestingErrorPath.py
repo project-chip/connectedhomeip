@@ -40,13 +40,18 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 """ Integration test for error path returns via the UnitTesting cluster.
 """
 
 
 class TestUnitTestingErrorPath(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_unit_test_error_read(self):
@@ -103,7 +108,7 @@ class TestUnitTestingErrorPath(MatterBaseTest):
             attributes=[(1, attributes.ReadFailureCode(int(Status.Failure)))],
         )
 
-        logging.info("Test completed")
+        log.info("Test completed")
 
 
 if __name__ == "__main__":

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from typing import Union
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -22,7 +21,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          StructTag)
 
 
-def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
+def human_text_string(value: StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity | AttributeStorage) -> str:
     if type(value) is StructTag:
         if value == StructTag.REQUEST:
             return "request"
@@ -119,6 +118,18 @@ def event_access_string(e: Event) -> str:
     return f"access({result}) "
 
 
+def event_optional_string(e: Event) -> str:
+    if EventQuality.OPTIONAL in e.qualities:
+        return "optional "
+    return ""
+
+
+def command_optional_string(c: Command) -> str:
+    if CommandQuality.OPTIONAL in c.qualities:
+        return "optional "
+    return ""
+
+
 def command_access_string(c: Command) -> str:
     """Generates the access string required for a command. If string is non-empty it will
        include a trailing space
@@ -150,7 +161,7 @@ def attribute_access_string(a: Attribute) -> str:
     return f"access({', '.join(result)}) "
 
 
-def render_default(value: Union[str, int, bool]) -> str:
+def render_default(value: str | int | bool) -> str:
     """
     Renders a idl-style default.
 
@@ -161,11 +172,10 @@ def render_default(value: Union[str, int, bool]) -> str:
         #       however currently we never needed this. Escaping can be
         #       added once we use this info
         return f'"{value}"'
-    elif type(value) is bool:
+    if type(value) is bool:
         if value:
             return "true"
-        else:
-            return "false"
+        return "false"
     return str(value)
 
 
@@ -182,6 +192,8 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['command_access'] = command_access_string
         self.jinja_env.filters['attribute_access'] = attribute_access_string
         self.jinja_env.filters['render_default'] = render_default
+        self.jinja_env.filters['event_optional'] = event_optional_string
+        self.jinja_env.filters['command_optional'] = command_optional_string
 
         # Easier whitespace management
         self.jinja_env.trim_blocks = True
@@ -196,7 +208,7 @@ class IdlGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="MatterIdl.jinja",
             output_file_name="idl.matter",
-            vars={
+            template_vars={
                 'idl': self.idl
             }
         )

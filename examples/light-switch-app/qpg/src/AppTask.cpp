@@ -70,12 +70,12 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Init ZCL Data Model and start server
-    PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
 
     // Setup button handler
     ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, AppTask::ButtonEventHandlerWrapper);
 
-    PlatformMgr().ScheduleWork(InitBindingManager);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(InitBindingManager);
 
     SwitchMgr().Init();
 
@@ -91,7 +91,7 @@ void AppTask::InitServer(intptr_t arg)
     // Open commissioning after boot if no fabric was available
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
     {
-        PlatformMgr().ScheduleWork(OpenCommissioning, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(OpenCommissioning, 0);
     }
 }
 

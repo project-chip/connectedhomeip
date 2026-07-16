@@ -14,23 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections.abc import Iterator
 import difflib
 import os
 import subprocess
 import sys
 import unittest
-from typing import List
 
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(source: str, root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
+def build_expected_output(source: str, root: str, out: str) -> Iterator[str]:
+    with open(os.path.join(SCRIPT_ROOT, source)) as f:
         for line in f.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
 
-def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
+def build_actual_output(root: str, out: str, args: list[str]) -> list[str]:
     # Fake out that we have a project root
     binary = os.path.join(SCRIPT_ROOT, 'build_examples.py')
 
@@ -72,18 +72,18 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
 
 class TestBuilder(unittest.TestCase):
 
-    def assertCommandOutput(self, expected_file: str, args: List[str]):
+    def assertCommandOutput(self, expected_file: str, args: list[str]):
         ROOT = '/TEST/BUILD/ROOT'
         OUT = '/OUTPUT/DIR'
 
-        expected = [line for line in build_expected_output(expected_file, ROOT, OUT)]
-        actual = [line for line in build_actual_output(ROOT, OUT, args)]
+        expected = list(build_expected_output(expected_file, ROOT, OUT))
+        actual = list(build_actual_output(ROOT, OUT, args))
 
-        diffs = [line for line in difflib.unified_diff(expected, actual)]
+        diffs = list(difflib.unified_diff(expected, actual))
 
         if diffs:
             reference = os.path.basename(expected_file) + '.actual'
-            with open(reference, 'wt') as fo:
+            with open(reference, "w") as fo:
                 for line in build_actual_output(ROOT, OUT, args):
                     fo.write(line.replace(ROOT, '{root}').replace(OUT, '{out}'))
 
@@ -109,7 +109,7 @@ class TestBuilder(unittest.TestCase):
             'esp32-devkitc-light-rpc',
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
-            'efr32-brd4187c-light-rpc-no-version',
+            'efr32-brd4187c-light-rpc',
         ]
 
         for target in TARGETS:

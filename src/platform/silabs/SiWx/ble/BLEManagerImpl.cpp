@@ -32,6 +32,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/PlatformError.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -83,6 +84,8 @@ namespace {
 const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
+
+static uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
 
 // Used to send the Indication Confirmation
 uint8_t dev_address[RSI_DEV_ADDR_LEN];
@@ -243,6 +246,16 @@ void BLEManagerImpl::BlePostEvent(SilabsBleWrapper::BleEvent_t * event)
     }
 }
 
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
+{
+    ChipLogProgress(DeviceLayer, "BLE Info:");
+    ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
+    ChipLogProgress(DeviceLayer, "  Device Name: %s", mDeviceName);
+    ChipLogProgress(DeviceLayer, "  Random Static Address: %02X:%02X:%02X:%02X:%02X:%02X", randomAddrBLE[5], randomAddrBLE[4],
+                    randomAddrBLE[3], randomAddrBLE[2], randomAddrBLE[1], randomAddrBLE[0]);
+    return CHIP_NO_ERROR;
+}
+
 void BLEManagerImpl::sl_ble_event_handling_task(void * args)
 {
     sl_status_t status;
@@ -268,8 +281,7 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
 
 void BLEManagerImpl::sl_ble_init()
 {
-    uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
-    uint64_t randomAddr                        = chip::Crypto::GetRandU64();
+    uint64_t randomAddr = chip::Crypto::GetRandU64();
     memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
     // Set the two least significant bits as the first 2 bits of the address has to be '11' to ensure the address is a random
     // non-resolvable private address
@@ -316,7 +328,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     return err;
@@ -357,7 +369,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -378,7 +390,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -416,7 +428,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         mDeviceName[0] = 0;
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     ChipLogProgress(DeviceLayer, "_SetDeviceName Ended");
     return CHIP_NO_ERROR;
 }
@@ -512,8 +524,8 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
     }
 
     // start timer for the indication Confirmation Event
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS),
-                                          OnSendIndicationTimeout, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS), OnSendIndicationTimeout, this);
     return CHIP_NO_ERROR;
 }
 
@@ -545,7 +557,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case SL_STATUS_NOT_SUPPORTED:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     default:
-        return CHIP_ERROR(ChipError::Range::kPlatform, bleErr + CHIP_DEVICE_CONFIG_SILABS_BLE_ERROR_MIN);
+        return MATTER_PLATFORM_ERROR(bleErr + CHIP_DEVICE_CONFIG_SILABS_BLE_ERROR_MIN);
     }
 }
 
@@ -821,13 +833,13 @@ void BLEManagerImpl::UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 void BLEManagerImpl::HandleBootEvent(void)
 {
     mFlags.Set(Flags::kSiLabsBLEStackInitialize);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
     AddConnection(evt.connectionHandle, evt.bondingHandle);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt)
@@ -860,14 +872,12 @@ void BLEManagerImpl::HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_m
         // maximum connection limit being reached.
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
 void BLEManagerImpl::HandleWriteEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
-    ChipLogProgress(DeviceLayer, "Char Write Req, packet type %d", evt.rsi_ble_write.pkt_type);
-
     if (evt.rsi_ble_write.handle[0] == (uint8_t) rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
         HandleTXCharCCCDWrite(evt);
@@ -1114,7 +1124,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }
 

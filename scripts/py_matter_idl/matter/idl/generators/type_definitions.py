@@ -15,12 +15,11 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def ToPowerOfTwo(bits: int) -> int:
@@ -63,7 +62,7 @@ class BasicString:
     """
     idl_name: str
     is_binary: bool
-    max_length: Union[int, None] = None
+    max_length: int | None = None
 
 
 class FundamentalType(enum.Enum):
@@ -78,23 +77,21 @@ class FundamentalType(enum.Enum):
     def idl_name(self):
         if self == FundamentalType.BOOL:
             return "bool"
-        elif self == FundamentalType.FLOAT:
+        if self == FundamentalType.FLOAT:
             return "single"
-        elif self == FundamentalType.DOUBLE:
+        if self == FundamentalType.DOUBLE:
             return "double"
-        else:
-            raise Exception("Type not handled: %r" % self)
+        raise Exception("Type not handled: %r" % self)
 
     @property
     def byte_count(self):
         if self == FundamentalType.BOOL:
             return 1
-        elif self == FundamentalType.FLOAT:
+        if self == FundamentalType.FLOAT:
             return 4
-        elif self == FundamentalType.DOUBLE:
+        if self == FundamentalType.DOUBLE:
             return 8
-        else:
-            raise Exception("Type not handled: %r" % self)
+        raise Exception("Type not handled: %r" % self)
 
     @property
     def bits(self):
@@ -273,11 +270,11 @@ class TypeLookupContext:
 
     """
 
-    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+    def __init__(self, idl: matter_idl_types.Idl, cluster: matter_idl_types.Cluster | None):
         self.idl = idl
         self.cluster = cluster
 
-    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+    def find_enum(self, name) -> matter_idl_types.Enum | None:
         """
         Find the first enumeration matching the given name for the given
         lookup rules (searches cluster first, then global).
@@ -288,14 +285,14 @@ class TypeLookupContext:
 
         return None
 
-    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+    def find_struct(self, name) -> matter_idl_types.Struct | None:
         for s in self.all_structs:
             if s.name == name:
                 return s
 
         return None
 
-    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+    def find_bitmap(self, name) -> matter_idl_types.Bitmap | None:
         for s in self.all_bitmaps:
             if s.name == name:
                 return s
@@ -311,8 +308,7 @@ class TypeLookupContext:
         include a cluster, the enum list will be empty.
         """
         if self.cluster:
-            for e in self.cluster.enums:
-                yield e
+            yield from self.cluster.enums
 
     @property
     def all_bitmaps(self):
@@ -323,8 +319,7 @@ class TypeLookupContext:
         include a cluster, the bitmap list will be empty.
         """
         if self.cluster:
-            for b in self.cluster.bitmaps:
-                yield b
+            yield from self.cluster.bitmaps
 
     @property
     def all_structs(self):
@@ -334,8 +329,7 @@ class TypeLookupContext:
         include a cluster, the struct list will be empty.
         """
         if self.cluster:
-            for e in self.cluster.structs:
-                yield e
+            yield from self.cluster.structs
 
     def is_enum_type(self, name: str):
         """
@@ -346,13 +340,13 @@ class TypeLookupContext:
         """
         if name.lower() in ["enum8", "enum16"]:
             return True
-        return any((e.name == name for e in self.all_enums))
+        return any(e.name == name for e in self.all_enums)
 
     def is_struct_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a struct
         """
-        return any((s.name == name for s in self.all_structs))
+        return any(s.name == name for s in self.all_structs)
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
@@ -368,10 +362,10 @@ class TypeLookupContext:
         if self.is_untyped_bitmap_type(name):
             return True
 
-        return any((s.name == name for s in self.all_bitmaps))
+        return any(s.name == name for s in self.all_bitmaps)
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> BasicInteger | BasicString | FundamentalType | IdlType | IdlEnumType | IdlBitmapType:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.
@@ -388,18 +382,18 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return FundamentalType.BOOL
     if lowercase_name == 'single':
         return FundamentalType.FLOAT
-    elif lowercase_name == 'double':
+    if lowercase_name == 'double':
         return FundamentalType.DOUBLE
-    elif lowercase_name in ['char_string', 'long_char_string']:
+    if lowercase_name in ['char_string', 'long_char_string']:
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
-    elif lowercase_name in ['octet_string', 'long_octet_string']:
+    if lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
-    elif lowercase_name in ['enum8', 'enum16']:
+    if lowercase_name in ['enum8', 'enum16']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
-    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
+    if lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
-    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if int_type is not None:
         return int_type
 
@@ -418,8 +412,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        LOGGER.warning(
-            "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
+        log.warning("Data type '%s' is NOT known, but treating it as a generic IDL type.", data_type)
 
     return result
 
@@ -430,20 +423,20 @@ def IsSignedDataType(data_type: DataType) -> bool:
     Returns if the data type is a signed data type of False if the data type can not be found.
     """
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return False
 
     return sized_type.is_signed
 
 
-def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
+def GetDataTypeSizeInBits(data_type: DataType) -> int | None:
     """
     Returns the size in bits for a given data type or None if the data type can not be found.
     """
 
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return None
 

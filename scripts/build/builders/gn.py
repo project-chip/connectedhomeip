@@ -14,35 +14,50 @@
 
 import shlex
 
-from .builder import Builder
+from runner.runner import Runner
+
+from .builder import Builder, BuildProfile, OutDirLock, lock_output_dir
 
 
 class GnBuilder(Builder):
 
-    def __init__(self, root, runner):
+    def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock):
         """Creates  a generic ninja builder.
 
         Args:
            root: the root where to run GN into
            runner: what to use to execute shell commands
+           output_dir_lock: lock for the output directory
         """
-        super(GnBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
 
         self.build_command = None
 
-    def GnBuildArgs(self):
-        """Extra gn build `--args`
+    def GnBuildArgs(self) -> list[str]:
+        """Argument list passed to GN `--args` option."""
+        args = []
+        match self.options.build_profile:
+            case BuildProfile.DEFAULT:
+                pass  # Profile defined by the build system, no overrides.
+            case BuildProfile.DEBUG:
+                args.extend(["is_debug=true", "optimize_debug=false"])
+            case BuildProfile.DEBUG_OPTIMIZED:
+                args.extend(["is_debug=true", "optimize_debug=true"])
+            case BuildProfile.RELEASE:
+                args.extend(["is_debug=false", "optimize_for_size=false"])
+            case BuildProfile.RELEASE_SIZE:
+                args.extend(["is_debug=false", "optimize_for_size=true"])
+        if self.options.pw_command_launcher:
+            args.append(f'pw_command_launcher="{self.options.pw_command_launcher}"')
+        if self.options.enable_link_map_file:
+            args.append('chip_generate_link_map_file=true')
+        if self.options.pregen_dir:
+            args.append(f'chip_code_pre_generated_directory="{self.options.pregen_dir}"')
+        return args
 
-        If used, returns a list of arguments.
-        """
-        return None
-
-    def GnBuildEnv(self):
-        """Extra environment variables needed for the GN build to run.
-
-        If used, returns a dictionary of environment variables.
-        """
-        return None
+    def GnBuildEnv(self) -> dict[str, str]:
+        """Extra environment variables needed for the GN build to run."""
+        return {}
 
     def PreBuildCommand(self):
         """Extra steps to run before 'build'"""
@@ -52,67 +67,58 @@ class GnBuilder(Builder):
         """Extra steps to run after 'build'"""
         pass
 
+    @lock_output_dir
     def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
-            '--root=%s' % self.root
+            '--root=%s' % self.root,
         ]
 
-        extra_args = []
+        if self.quiet:
+            cmd.append("--ninja-extra-args=--quiet")
 
-        if self.options.pw_command_launcher:
-            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-        if self.options.enable_link_map_file:
-            extra_args.append('chip_generate_link_map_file=true')
-
-        if self.options.pregen_dir:
-            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-        extra_args.extend(self.GnBuildArgs() or [])
-        if extra_args:
-            cmd += ['--args=%s' % ' '.join(extra_args)]
+        if args := self.GnBuildArgs():
+            cmd += ['--args=%s' % ' '.join(args)]
 
         cmd += [self.output_dir]
 
-        title = 'Generating ' + self.identifier
-        extra_env = self.GnBuildEnv()
-
-        if extra_env:
+        if env := self.GnBuildEnv():
             # convert the command into a bash command that includes
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
 
-        self._Execute(cmd, title=title, dedup=dedup)
+        self._Execute(cmd, title=f"Generating {self.identifier}", dedup=dedup)
 
+    @lock_output_dir
     def _build(self):
         self.PreBuildCommand()
 
         cmd = ['ninja', '-C', self.output_dir]
         if self.verbose:
             cmd.append('-v')
+        if self.quiet:
+            cmd.append('--quiet')
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
         if self.build_command:
             cmd.append(self.build_command)
 
-        extra_env = self.GnBuildEnv()
-        if extra_env:
+        if env := self.GnBuildEnv():
             # convert the command into a bash command that includes
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
 
-        self._Execute(cmd, title='Building ' + self.identifier)
+        self._Execute(cmd, title=f"Building {self.identifier}")
 
         self.PostBuildCommand()

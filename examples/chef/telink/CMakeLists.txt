@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
@@ -46,6 +46,8 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/zephyr_ext
 )
 
+target_compile_definitions(app PRIVATE CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
+
 if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
     ${CHEF}/shell_common/globals.cpp
@@ -71,6 +73,7 @@ target_sources(app PRIVATE
     ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+    ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c
     ${CHEF}/common/stubs.cpp
 )
 

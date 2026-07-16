@@ -69,7 +69,7 @@ constexpr AttributeId kTestListLargeAttribute = 8; // This attribute will be lar
 // The size of the attribute which is a bit larger than the size of event used in the test.
 constexpr size_t kSizeOfLargeAttribute = 60;
 
-class TestEventChunking : public chip::Test::AppContext
+class TestEventChunking : public chip::Testing::AppContext
 {
 protected:
     // Performs setup for each test in the suite
