@@ -38,8 +38,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
 
     auto cachedMessage = CachedMessage(
         messageId, priority, messageControl, startTime, duration, std::string(messageText.data(), messageText.size()),
-        languageCode.HasValue() ? std::string(languageCode.Value().data(), languageCode.Value().size()) : std::string(),
-        messageUri.HasValue() ? std::string(messageUri.Value().data(), messageUri.Value().size()) : std::string());
+        (languageCode.HasValue() && !languageCode.Value().empty())
+            ? std::string(languageCode.Value().data(), languageCode.Value().size())
+            : std::string(),
+        (messageUri.HasValue() && !messageUri.Value().empty()) ? std::string(messageUri.Value().data(), messageUri.Value().size())
+                                                                : std::string());
     if (responses.HasValue())
     {
         auto iter = responses.Value().begin();

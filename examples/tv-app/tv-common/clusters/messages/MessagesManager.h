@@ -99,11 +99,11 @@ struct CachedMessage
         }
         if (!mLanguageCode.empty())
         {
-            message.languageCode = chip::MakeOptional(chip::CharSpan::fromCharString(mLanguageCode.c_str()));
+            message.languageCode = chip::MakeOptional(chip::CharSpan(mLanguageCode.data(), mLanguageCode.size()));
         }
         if (!mMessageUri.empty())
         {
-            message.messageURI = chip::MakeOptional(chip::CharSpan::fromCharString(mMessageUri.c_str()));
+            message.messageURI = chip::MakeOptional(chip::CharSpan(mMessageUri.data(), mMessageUri.size()));
         }
         return message;
     }

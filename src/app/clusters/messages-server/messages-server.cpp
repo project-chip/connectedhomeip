@@ -256,6 +256,16 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                         "bits both set but MultiModalMessages feature not supported");
         status = Status::InvalidCommand);
 
+    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kSpokenMessage) || languageCode.HasValue(),
+                 ChipLogProgress(
+                     Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but LanguageCode missing");
+                 status = Status::ConstraintError);
+
+    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kAudioMessage) || messageUri.HasValue(),
+                 ChipLogProgress(
+                     Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but MessageURI missing");
+                 status = Status::ConstraintError);
+
     if (languageCode.HasValue())
     {
         VerifyOrExit(delegate->HasFeature(endpoint, Feature::kSpokenMessages),
@@ -264,7 +274,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                                      "SpokenMessages feature not supported");
                      status = Status::InvalidCommand);
 
-        VerifyOrExit(languageCode.Value().size() <= kLanguageCodeLengthMax,
+        VerifyOrExit(languageCode.Value().size() > 0 && languageCode.Value().size() <= kLanguageCodeLengthMax,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid LanguageCode length");
                      status = Status::ConstraintError);
     }
@@ -277,7 +287,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                                      "AudioMessages feature not supported");
                      status = Status::InvalidCommand);
 
-        VerifyOrExit(messageUri.Value().size() <= kMessageUriLengthMax,
+        VerifyOrExit(messageUri.Value().size() > 0 && messageUri.Value().size() <= kMessageUriLengthMax,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid MessageURI length");
                      status = Status::ConstraintError);
     }
