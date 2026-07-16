@@ -30,6 +30,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_3_23(MatterBaseTest):
+    runner_prepopulates_global_wildcard = False
+
     def desc_TC_DD_3_23(self) -> str:
         return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
 

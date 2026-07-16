@@ -542,12 +542,10 @@ def run_tests_no_exit(
             # directly. Opening a PASE session from the runner would suppress
             # commissionable advertisement and cause those tests to fail, so
             # skip the pre-PASE wildcard read for them entirely.
-            is_discovery_test = test_class.__name__.startswith("TC_DD_")
-
-            if is_discovery_test:
+            if not getattr(test_class, "runner_prepopulates_global_wildcard", True):
                 LOGGER.info(
-                    "Discovery test detected (%s) — skipping pre-PASE wildcard read "
-                    "so the device remains free to advertise",
+                    "%s opted out of the pre-PASE wildcard read; skipping so the "
+                    "device remains free to advertise",
                     test_class.__name__
                 )
             else:
