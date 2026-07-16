@@ -38,20 +38,18 @@ inline constexpr uint64_t kInvalidBleDeviceId = 0;
  *
  * Populates @p outPayload with the OpCode, message counter, Tx power, and
  * obfuscated BLEDeviceID fields per the Matter Proximity Ranging spec's
- * advertisement format.
- *
- * @note The current implementation encodes the BLEDeviceID in plain
- *       big-endian form in the first 8 bytes of the obfuscated field. The
- *       HMAC-based obfuscation step keyed on @p sessionKey is a TODO; until
- *       it lands, @p sessionKey is unused and may be empty.
+ * advertisement format. The BLEDeviceID is obfuscated with HMAC-SHA256 keyed
+ * on @p sessionKey unless the test-only
+ * CHIP_CLUSTER_PROXIMITY_RANGING_DISABLE_SECURE_BLE_BEACONING flag is set, in which
+ * case it is carried in plaintext and @p sessionKey is ignored.
  *
  * @param bleDeviceId    The local device's 64-bit BLEDeviceID.
  * @param messageCounter Monotonic counter for replay protection.
  * @param txPower        Transmit power in dBm reported in the advertisement.
- * @param sessionKey     Per-session HMAC key (unused until obfuscation is wired up).
+ * @param sessionKey     Per-session HMAC key.
  * @param outPayload     Output. Initialised in-place; caller need not pre-init.
  *
- * @return CHIP_NO_ERROR on success.
+ * @return CHIP_NO_ERROR on success; a crypto error if HMAC computation fails.
  */
 CHIP_ERROR EncodeBeaconPayload(uint64_t bleDeviceId, uint16_t messageCounter, int8_t txPower, ByteSpan sessionKey,
                                Ble::ChipBLEProximityRangingIdentificationInfo & outPayload);
@@ -61,16 +59,18 @@ CHIP_ERROR EncodeBeaconPayload(uint64_t bleDeviceId, uint16_t messageCounter, in
  * candidate BLEDeviceID.
  *
  * Used by adapters in BLE-Scanning role to test whether an observed beacon
- * was emitted by a peer whose BLEDeviceID is @p candidateBleDeviceId.
- *
- * @note Mirrors EncodeBeaconPayload - when HMAC obfuscation lands, this will
- *       compute the expected HMAC tag rather than comparing plain bytes.
+ * was emitted by a peer whose BLEDeviceID is @p candidateBleDeviceId. Mirrors
+ * EncodeBeaconPayload: it recomputes the expected obfuscated field the same way
+ * (HMAC by default, plaintext under
+ * CHIP_CLUSTER_PROXIMITY_RANGING_DISABLE_SECURE_BLE_BEACONING) and constant-time
+ * compares it against the payload.
  *
  * @param payload              The decoded advertisement payload.
  * @param candidateBleDeviceId The BLEDeviceID to verify against.
- * @param sessionKey           Per-session HMAC key (unused until obfuscation is wired up).
+ * @param sessionKey           Per-session HMAC key.
  *
- * @return CHIP_NO_ERROR on match, CHIP_ERROR_NOT_FOUND on mismatch.
+ * @return CHIP_NO_ERROR on match, CHIP_ERROR_NOT_FOUND on mismatch; a crypto
+ *         error if HMAC computation fails.
  */
 CHIP_ERROR DecodeBeaconPayload(const Ble::ChipBLEProximityRangingIdentificationInfo & payload, uint64_t candidateBleDeviceId,
                                ByteSpan sessionKey);
