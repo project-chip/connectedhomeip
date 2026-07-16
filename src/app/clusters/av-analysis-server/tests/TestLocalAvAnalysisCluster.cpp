@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #include <pw_unit_test/framework.h>
+#include <ranges>
 
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
