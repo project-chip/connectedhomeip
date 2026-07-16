@@ -125,6 +125,16 @@ public:
     chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> ConvertSecuritytype(wifi_auth_mode_t auth_mode);
 
     void OnConnectWiFiNetwork();
+
+    // Called from a delayed timer scheduled in Init().  Avoids a race
+    // with filogic wpa_supplicant STA init that otherwise triggers a
+    // hard fault on plain reboots.
+    void TriggerBootAutoConnect();
+
+    // Re-push the staged STA credentials into wpa_supplicant right before a
+    // connect attempt.  
+    void ApplyStaProvToSupplicant();
+
     static GenioWiFiDriver & GetInstance()
     {
         static GenioWiFiDriver instance;

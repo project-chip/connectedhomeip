@@ -561,6 +561,11 @@ void ConnectivityManagerImpl::DriveStationState()
                 {
                     ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
 
+                    // opmode is now STA and the STA supplicant port is active.
+                    // Re-push the staged credentials so the supplicant profile
+                    // holds the SSID/PSK at the moment of connect.
+                    NetworkCommissioning::GenioWiFiDriver::GetInstance().ApplyStaProvToSupplicant();
+
                     status = wifi_config_reload_setting();
 
                     if (status < 0)
