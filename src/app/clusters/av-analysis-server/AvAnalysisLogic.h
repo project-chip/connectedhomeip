@@ -22,6 +22,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+#include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -47,14 +48,16 @@ public:
     /**
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
-
+     * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
+     * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
+     * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is not set.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     AvAnalysisServerLogic(EndpointId aEndpointId,
                           BitFlags<AvAnalysis::Feature> aFeatures,
-                          const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts);
+                          const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
+                          DataModel::Nullable<uint8_t> aMaxZones);
     ~AvAnalysisServerLogic();
 
     void SetDelegate(AvAnalysisDelegate * delegate)
@@ -74,15 +77,16 @@ public:
     
     // Definitions of class variables that represent the Cluster attributes
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> mSupportedAmbientContexts;
-    std::vector<AvAnalysis::Structs::ContextTriggerStruct::Type> mActiveAmbientContextTriggers;
+    std::vector<AvAnalysis::AmbientContextStorage> mActiveAmbientContextTriggers;
     uint8_t mMaxAnalysisStreamCount = 0;
     uint8_t mCurrentAnalysisStreamCount = 0; 
     std::vector<AvAnalysis::Structs::AnalysisStreamStruct::Type> mAnalysisStreams;
     bool mTrackingEnabled = false;
+    DataModel::Nullable<uint8_t> mMaxZones;
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR Startup();
+    CHIP_ERROR Startup(AttributePersistenceProvider & aAttributePersistenceProvider);
 
     // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
     // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
@@ -126,7 +130,9 @@ public:
                           const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
 private:
-    AvAnalysisDelegate * mDelegate      = nullptr;
+    AvAnalysisDelegate * mDelegate = nullptr;
+    AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+
     MarkDirtyCallback mMarkDirtyCallback;
 
     /**
@@ -143,13 +149,18 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                           const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleLocalDisableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleRemoteDisableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                          const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
                           
+    /*
+     * Command handler helper methods
+     */
+    bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
+    
+    /**
+     * Helper functions to handle persistent data and the KVS.
+     */
+    CHIP_ERROR StoreActiveAmbientContextTriggers();
+    CHIP_ERROR LoadActiveAmbientContextTriggers();
+    void LoadPersistentAttributes();
 };
 
 } // namespace Clusters

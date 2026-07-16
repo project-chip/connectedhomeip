@@ -51,7 +51,7 @@ CHIP_ERROR AvAnalysisCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     mLogic.SetMarkDirtyCallback([this](AttributeId attributeId) { MarkAttributeDirty(attributeId); });
-    return mLogic.Startup();
+    return mLogic.Startup(context.attributeStorage);
 }
 
 DataModel::ActionReturnStatus

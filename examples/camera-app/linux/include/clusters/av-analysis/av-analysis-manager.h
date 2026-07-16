@@ -44,16 +44,6 @@ public:
     /**
      */
     virtual Protocols::InteractionModel::Status
-    EnableContextTriggers() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status
-    DisableContextTriggers() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status
     EstablishAnalysisStream() override;
 
     /**
@@ -72,11 +62,14 @@ public:
      * Delegate command assists
      */
     
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t>) override;
+    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override;
     
     virtual bool CanAddContextTriggers() override;
     
     void ActiveAmbientContextTriggersUpdated() override;
+    
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
         
 private:
 

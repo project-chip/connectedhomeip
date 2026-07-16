@@ -107,7 +107,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         mCameraDevice->GetCameraHALInterface().GetSupportedAmbientContexts();
     
     // Instantiate the AV Analysis Server
-    mAVAnalysisServer.Create(mEndpoint, avAnalysisFeatures, appSupportedAmbientContexts);
+    mAVAnalysisServer.Create(mEndpoint, avAnalysisFeatures, appSupportedAmbientContexts, DataModel::MakeNullable(appMaxZones));
     mAVAnalysisServer.Cluster().SetDelegate(&mCameraDevice->GetAVAnalysisDelegate());
     err = CodegenDataModelProvider::Instance().Registry().Register(mAVAnalysisServer.Registration());
     if (err != CHIP_NO_ERROR)

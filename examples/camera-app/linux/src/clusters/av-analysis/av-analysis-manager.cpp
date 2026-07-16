@@ -40,22 +40,6 @@ using namespace chip::app::Clusters::AvAnalysis::Structs;
     /**
      */
     Protocols::InteractionModel::Status
-    AvAnalysisManager::EnableContextTriggers() 
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    /**
-     */
-    Protocols::InteractionModel::Status
-    AvAnalysisManager::DisableContextTriggers() 
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    /**
-     */
-    Protocols::InteractionModel::Status
     AvAnalysisManager::EstablishAnalysisStream() 
     {
         return Protocols::InteractionModel::Status::Success;
@@ -85,7 +69,7 @@ using namespace chip::app::Clusters::AvAnalysis::Structs;
     /**
      * Delegate command assists
      */
-    CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t>)
+    CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
     {
         return CHIP_NO_ERROR;
     }
@@ -93,3 +77,5 @@ using namespace chip::app::Clusters::AvAnalysis::Structs;
     bool AvAnalysisManager::CanAddContextTriggers() {return true; }
     
     void AvAnalysisManager::ActiveAmbientContextTriggersUpdated() {}
+    
+    CHIP_ERROR AvAnalysisManager::PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }

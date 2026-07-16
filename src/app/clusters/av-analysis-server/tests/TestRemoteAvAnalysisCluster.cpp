@@ -46,7 +46,8 @@ using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 static constexpr chip::EndpointId kTestEndpointId = 1;
-static constexpr uint8_t testMaxAnalysisStreams   = 8;
+static constexpr uint8_t kTestMaxZones            = 5;
+static constexpr uint8_t kTestMaxAnalysisStreams  = 8;
 
 // Test ambient contexts
 // Define the list of semantic tags for the endpoint
@@ -64,16 +65,6 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 {
 public:
     void ShutdownApp() {}
-
-    Protocols::InteractionModel::Status EnableContextTriggers() 
-    {
-        return Status::Success;
-    }
-
-    Protocols::InteractionModel::Status DisableContextTriggers()
-    {
-        return Status::Success;
-    }
 
     Protocols::InteractionModel::Status EstablishAnalysisStream() 
     {
@@ -95,7 +86,7 @@ public:
         return Status::Success;
     }
     
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t>)
+    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
     {
         return CHIP_NO_ERROR;
     }
@@ -103,7 +94,8 @@ public:
     bool CanAddContextTriggers() {return true; }
     
     void ActiveAmbientContextTriggersUpdated() {}
-
+    
+    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
 };
 
 struct TestRemoteAvAnalysisCluster : public ::testing::Test
@@ -115,7 +107,9 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         mServer(kTestEndpointId,
                 chip::BitFlags<Feature>(Feature::kRemoteContextDetection, 
                                         Feature::kPerZoneContextDetection),
-                testAmbientContexts),
+                testAmbientContexts,
+                DataModel::MakeNullable(kTestMaxZones)
+            ),
         mClusterTester(mServer)
     {}
 
@@ -124,7 +118,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         mServer.SetDelegate(&mMockDelegate);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.SetMaxAnalysisStreamCount(testMaxAnalysisStreams), CHIP_NO_ERROR);
+        EXPECT_EQ(mServer.SetMaxAnalysisStreamCount(kTestMaxAnalysisStreams), CHIP_NO_ERROR);
     }
 
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
@@ -189,7 +183,7 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 
     uint8_t aMaxAnalysisStreamCount = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MaxAnalysisStreamCount::Id, aMaxAnalysisStreamCount), CHIP_NO_ERROR);
-    ASSERT_EQ(testMaxAnalysisStreams, aMaxAnalysisStreamCount);
+    ASSERT_EQ(kTestMaxAnalysisStreams, aMaxAnalysisStreamCount);
 
     uint8_t aCurrentAnalysisStreamCount = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, aCurrentAnalysisStreamCount), CHIP_NO_ERROR);
