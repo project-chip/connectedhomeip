@@ -65,7 +65,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log response structure
-        log.info(f"ArmFailSafe response: {send_arm}")
+        log.info("ArmFailSafe response: %s", send_arm)
         # Verify that DUT sends ArmFailSafeResponse command with success status
         asserts.assert_equal(
             send_arm.errorCode,
@@ -79,14 +79,14 @@ class TC_CNET_4_15(MatterBaseTest):
         # Use a random SSID that is unlikely to exist, to avoid requiring testers to set a PIXIT flag
         network_id = b"NON_EXISTENT_SSID_12345"
 
-        log.info(f"Attempting to remove network with ID: {network_id}")
+        log.info("Attempting to remove network with ID: %s", network_id)
 
         read_networks = await self.read_single_attribute_check_success(
             cluster=cnet,
             attribute=cnet.Attributes.Networks,
             endpoint=0
         )
-        log.info(f"Current networks on device: {read_networks}")
+        log.info("Current networks on device: %s", read_networks)
 
         send_remove = await self.send_single_cmd(
             cmd=cnet.Commands.RemoveNetwork(
@@ -95,7 +95,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        log.info(f"RemoveNetwork complete response object: {vars(send_remove)}")
+        log.info("RemoveNetwork complete response object: %s", vars(send_remove))
 
         # Verify NetworkConfigResponse has NetworkIDNotFound status
         asserts.assert_equal(
@@ -114,7 +114,7 @@ class TC_CNET_4_15(MatterBaseTest):
             )
         )
         # Log complete response object structure for debugging
-        log.info(f"ConnectNetwork complete response object: {vars(send_connect)}")
+        log.info("ConnectNetwork complete response object: %s", vars(send_connect))
 
         # Verify ConnectNetworkResponse has NetworkIDNotFound status
         asserts.assert_equal(

@@ -586,10 +586,7 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1290,7 +1287,7 @@ cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1489,7 +1486,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -1528,7 +1525,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2159,7 +2155,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -2319,7 +2315,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_room_airconditioner = 114, version 3;
+  device type ma_room_airconditioner = 114, version 4;
 
 
   server cluster Identify {
@@ -2401,21 +2397,21 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    persist  attribute fanMode default = 0;
+    callback attribute fanMode;
     ram      attribute fanModeSequence default = 2;
-    ram      attribute percentSetting default = 0;
-    ram      attribute percentCurrent default = 0;
+    callback attribute percentSetting;
+    callback attribute percentCurrent;
     ram      attribute speedMax default = 100;
-    ram      attribute speedSetting default = 0;
-    ram      attribute speedCurrent;
+    callback attribute speedSetting;
+    callback attribute speedCurrent;
     ram      attribute rockSupport default = 0x00;
-    ram      attribute rockSetting default = 0x00;
-    ram      attribute airflowDirection default = 0;
+    callback attribute rockSetting;
+    callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 53;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
 
     handle command Step;
   }

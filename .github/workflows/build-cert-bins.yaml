@@ -1,24 +1,37 @@
 name: Build Certification Image
 on:
     workflow_call:
+        inputs:
+            commit_hash:
+                description: 'Upstream project-chip/connectedhomeip commit to build (defaults to the workflow trigger SHA)'
+                required: false
+                type: string
+                default: ''
     workflow_dispatch:
+        inputs:
+            commit_hash:
+                description: 'Upstream project-chip/connectedhomeip commit to build (defaults to the workflow trigger SHA)'
+                required: false
+                type: string
+                default: ''
 jobs:
     build-cert-bin:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04-arm
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+              uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
             - name: Publish to Registry
               uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
               with:
-                  name: ghcr.io/project-chip/chip-cert-bins
-                  tags: latest
+                  name: connectedhomeip/chip-cert-bins
+                  tags: ${{ inputs.commit_hash || github.sha }}
                   dockerfile: ./integrations/docker/images/chip-cert-bins/Dockerfile
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-                  registry: ghcr.io
-                  platforms: linux/amd64,linux/arm64,linux/arm
+                  username: ${{ secrets.CHIP_CERT_BINS_REGISTRY_USER }}
+                  password: ${{ secrets.CHIP_CERT_BINS_REGISTRY_TOKEN }}
+                  registry: docker.io
+                  platforms: linux/arm64
+                  buildargs: COMMITHASH=${{ inputs.commit_hash || github.sha }}
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

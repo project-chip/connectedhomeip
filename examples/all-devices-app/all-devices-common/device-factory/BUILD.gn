@@ -1,0 +1,78 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
+
+# Generate app_config/enabled_devices.h.
+# Will define a set of ALL_DEVICES_ENABLE_* constants
+enabled_devices_buildconfig_header("enabled_devices_buildconfig") {
+  header = "enabled_devices.h"
+  header_dir = "app_config"
+}
+
+source_set("device-factory") {
+  sources = [ "DeviceFactory.h" ]
+
+  public_deps = [
+    ":enabled_devices_buildconfig",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-dryer",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/boolean-state-sensor:boolean-state-sensor-accessor",
+    "${chip_root}/src/lib/support",
+  ]
+}

@@ -18,8 +18,9 @@
 import ipaddress
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -29,6 +30,55 @@ from matter.testing.matter_testing import AttributeMatcher
 from matter.testing.spec_parsing import build_xml_clusters, dm_from_spec_version
 
 logger = logging.getLogger(__name__)
+
+GROUP_EPOCH_KEY_LENGTH_BYTES = 16
+_GROUP_KEY_V1_INFO = b"GroupKey v1.0"
+_GROUP_KEY_HASH_INFO = b"GroupKeyHash"
+
+
+def derive_group_operational_key(epoch_key: bytes, compressed_fabric_id: bytes) -> bytes:
+    """Derive the operational group encryption key from an epoch key and compressed fabric ID."""
+    asserts.assert_equal(len(epoch_key), GROUP_EPOCH_KEY_LENGTH_BYTES,
+                         "Epoch key must be 16 bytes")
+    asserts.assert_equal(len(compressed_fabric_id), 8,
+                         "Compressed fabric ID must be 8 bytes")
+    return HKDF(
+        algorithm=hashes.SHA256(),
+        length=GROUP_EPOCH_KEY_LENGTH_BYTES,
+        salt=compressed_fabric_id,
+        info=_GROUP_KEY_V1_INFO,
+    ).derive(epoch_key)
+
+
+def derive_group_session_id(epoch_key: bytes, compressed_fabric_id: bytes) -> int:
+    """Derive the 16-bit Group Session ID for an epoch key on a fabric."""
+    operational_key = derive_group_operational_key(epoch_key, compressed_fabric_id)
+    session_id_bytes = HKDF(
+        algorithm=hashes.SHA256(),
+        length=2,
+        salt=b"",
+        info=_GROUP_KEY_HASH_INFO,
+    ).derive(operational_key)
+    return int.from_bytes(session_id_bytes, byteorder="big")
+
+
+def find_colliding_epoch_key(reference_epoch_key: bytes, compressed_fabric_id: bytes,
+                             max_attempts: int = 65536 * 10) -> bytes:
+    """Find an epoch key which lead to a Group Session ID collision with reference_epoch_key on the same fabric.
+    Group Session IDs are 16 bits wide, so a collision is expected after around 2^16 (65536) attempts.
+    Limit the number of attempts to avoid infinite loop or long execution time.
+    10 times the expected convergence attempts should provide less than 0.005% chance of not finding a collision.
+    """
+    target_session_id = derive_group_session_id(reference_epoch_key, compressed_fabric_id)
+    for attempt in range(1, max_attempts + 1):
+        candidate = attempt.to_bytes(GROUP_EPOCH_KEY_LENGTH_BYTES, byteorder="big")
+        if candidate == reference_epoch_key:
+            continue
+        if derive_group_session_id(candidate, compressed_fabric_id) == target_session_id:
+            # found an epoch key whose Group Session ID collides with the one of reference_epoch_key
+            return candidate
+
+    raise ValueError("Could not find a colliding key")
 
 
 def group_id_from_node_id(node_id: int) -> int:
@@ -86,20 +136,6 @@ def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int
     return equivalence_set
 
 
-def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
-    """
-    Utility method to check if a cluster supports groupcast commands.
-    """
-    # TODO(#42221): Use groupcast conformance when available
-    GROUPCAST_SUPPORTING_CLUSTERS = {
-        Clusters.OnOff.id,
-        Clusters.LevelControl.id,
-        Clusters.ColorControl.id,
-        Clusters.ScenesManagement.id
-    }
-    return cluster_id in GROUPCAST_SUPPORTING_CLUSTERS
-
-
 async def get_feature_map(test) -> tuple:
     """Get supported features."""
     feature_map = await test.read_single_attribute_check_success(
@@ -113,32 +149,24 @@ async def get_feature_map(test) -> tuple:
     asserts.assert_true(sd_enabled or ln_enabled,
                         "At least one of the following features must be enabled: Listener or Sender.")
     logger.info(
-        f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled} | PGA supported: {pga_enabled}")
+        "FeatureMap: %s : LN supported: %s | SD supported: %s | PGA supported: %s", feature_map, ln_enabled, sd_enabled, pga_enabled)
     return ln_enabled, sd_enabled, pga_enabled
 
 
 async def valid_endpoints_list(test, ln_enabled: bool) -> list:
-    """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender."""
-    endpoints_list = []
+    """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
+
+    For Senders: return empty list.
+    For Listeners: return the list of non-root endpoints that have at least one cluster exposing
+    one command requiring Operate privilege.
+    """
+    endpoints_list: list = []
     if ln_enabled:
-        device_type_list = await test.read_single_attribute_all_endpoints(
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
-        logger.info(f"Device Type List: {device_type_list}")
-        for endpoint, device_types in device_type_list.items():
-            if endpoint == 0:
-                continue
-            for device_type in device_types:
-                if device_type.deviceType == 14:  # Aggregator
-                    continue
-                server_list = await test.read_single_attribute_check_success(
-                    cluster=Clusters.Descriptor,
-                    attribute=Clusters.Descriptor.Attributes.ServerList,
-                    endpoint=endpoint)
-                logger.info(f"Server List: {server_list}")
-                for cluster in server_list:
-                    if is_groupcast_supporting_cluster(cluster) and endpoint not in endpoints_list:
-                        endpoints_list.append(endpoint)
+        operate_only_commands_dict = await get_operate_only_commands(
+            test.default_controller, test.dut_node_id, exclude_ep0=True)
+        endpoints_list = sorted(operate_only_commands_dict.keys())
+        logger.info(
+            "Endpoints with at least one Operate-privilege command: %s", endpoints_list)
         asserts.assert_greater(len(endpoints_list), 0,
                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
     return endpoints_list
@@ -155,10 +183,10 @@ async def is_groupcast_on_root_node(test) -> bool:
 
 def generate_membership_entry_matcher(
     group_id: int,
-    key_set_id: Optional[int] = None,
-    has_auxiliary_acl: Optional[bool] = None,
-    endpoints: Optional[list] = None,
-    mcastAddrPolicy: Optional[Clusters.Groupcast.Enums.MulticastAddrPolicyEnum] = None,
+    key_set_id: int | None = None,
+    has_auxiliary_acl: bool | None = None,
+    endpoints: list | None = None,
+    mcastAddrPolicy: Clusters.Groupcast.Enums.MulticastAddrPolicyEnum | None = None,
     test_for_exists: bool = True,
 ) -> AttributeMatcher:
     """Create a matcher that checks if Membership attribute contains (or does not contain) an entry matching the specified criteria.
@@ -277,7 +305,7 @@ class OperateOnlyCommand:
     command_object: Clusters.ClusterObjects.ClusterCommand
 
 
-async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> dict[int, list[OperateOnlyCommand]]:
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: int | None = None) -> dict[int, list[OperateOnlyCommand]]:
     """
     Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
     commands that only require Operate privilege.
@@ -329,7 +357,8 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
 
                     except KeyError:
                         logger.warning(
-                            f"Command ID {cmd_id} on cluster {cluster.id} not found in spec XMLs. This may be a manufacturer-specific command.")
+                            "Command ID %s on cluster %s not found in spec XMLs. This may be a manufacturer-specific command.",
+                            cmd_id, cluster.id)
 
     # Main logic
     attributes, spec_version = await get_device_composition_and_spec(dev_ctrl, node_id)

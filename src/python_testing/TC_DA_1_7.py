@@ -38,7 +38,6 @@
 import logging
 from glob import glob
 from pathlib import Path
-from typing import Optional
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
@@ -61,21 +60,21 @@ FORBIDDEN_AKID = [
     bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
 ]
 
-# List of certificate names that are known to have some issues, but not yet
+# List of certificate filename prefixes that are known to have some issues, but not yet
 # updated in DCL. They will fail the test at runtime if seen, but not in CI.
-ALLOWED_SKIPPED_FILENAMES = [
-    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
-    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
+ALLOWED_SKIPPED_FILENAME_PREFIXES = [
+    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL",
+    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL"
 ]
 
 
 def load_all_paa(paa_path: Path) -> dict:
-    log.info("Loading all PAAs in %s" % paa_path)
+    log.info("Loading all PAAs in %s", paa_path)
 
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
         with open(filename, "rb") as derfile:
-            log.info(f"Loading PAA: {filename}")
+            log.info("Loading PAA: %s", filename)
             try:
                 # Load cert
                 paa_der = derfile.read()
@@ -87,15 +86,17 @@ def load_all_paa(paa_path: Path) -> dict:
                         skid = extension.value.key_identifier
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (OSError, ValueError) as e:
-                log.error(f"Failed to load {filename}: {str(e)}")
-                if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
-                    log.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
+                log.error("Failed to load %s: %s", filename, e)
+                # Check if filename starts with any allowed prefix
+                filename_base = Path(filename).name
+                if not any(filename_base.startswith(prefix) for prefix in ALLOWED_SKIPPED_FILENAME_PREFIXES):
+                    log.error("Re-raising error and failing: found new invalid PAA: %s", filename)
                     raise
 
     return paa_by_skid
 
 
-def extract_akid(cert: Certificate) -> Optional[bytes]:
+def extract_akid(cert: Certificate) -> bytes | None:
     # Find the authority key identifier (if present)
     for extension in cert.extensions:
         if extension.oid == AuthorityKeyIdentifier.oid:
@@ -135,6 +136,7 @@ class TC_DA_1_7(MatterBaseTest):
     '''
 
     def setup_class(self):
+        super().setup_class()
         self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
         self.post_cert_test = self.user_params.get("post_cert_test", False)
 
@@ -202,7 +204,7 @@ class TC_DA_1_7(MatterBaseTest):
         log.info("Pre-condition: load all PAAs SKIDs")
         conf = self.matter_test_config
         paa_by_skid = load_all_paa(conf.paa_trust_store_path)
-        log.info("Found %d PAAs" % len(paa_by_skid))
+        log.info("Found %d PAAs", len(paa_by_skid))
 
         # Test plan step introducing test for each DUT
         self.step(f'{dut_index}')
@@ -225,14 +227,14 @@ class TC_DA_1_7(MatterBaseTest):
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
-        log.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
+        log.info("DUT %s Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid", dut_index)
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
             asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
 
         filename, paa_cert = paa_by_skid[pai_akid]
-        log.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
+        log.info("Matched PAA file %s, subject: %s", filename, paa_cert.subject)
         public_key = paa_cert.public_key()
 
         try:
@@ -242,7 +244,7 @@ class TC_DA_1_7(MatterBaseTest):
             asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
         log.info("Validated PAI signature against PAA")
 
-        log.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
+        log.info("DUT %s Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs", dut_index)
         if self.allow_sdk_dac:
             log.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:
@@ -260,7 +262,7 @@ class TC_DA_1_7(MatterBaseTest):
 
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        log.info("Subject public key pk: %s" % hex_from_bytes(pk))
+        log.info("Subject public key pk: %s", hex_from_bytes(pk))
         key = 'pk_{}'.format(dut_index)
         self.record_data({key: hex_from_bytes(pk)})
         return pk

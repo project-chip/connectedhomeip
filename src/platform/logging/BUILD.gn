@@ -21,7 +21,7 @@ group("default") {
     } else if (chip_device_platform == "esp32") {
       deps += [ "${chip_root}/src/platform/ESP32:logging" ]
     } else if (chip_device_platform == "bl602" ||
-               chip_device_platform == "bl616" ||
+               chip_device_platform == "bflb" ||
                chip_device_platform == "bl702" ||
                chip_device_platform == "bl702l") {
       deps += [ "${chip_root}/src/platform/bouffalolab/common:logging" ]

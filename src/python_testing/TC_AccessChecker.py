@@ -65,7 +65,6 @@
 import logging
 from copy import deepcopy
 from enum import Enum, auto
-from typing import Optional
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
@@ -95,7 +94,7 @@ def step_number_with_privilege(step: int, substep: str, privilege: Clusters.Acce
 
 
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                      acl_set_to: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]) -> bool:
+                      acl_set_to: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum | None) -> bool:
     ''' Determines if the action is allowed on the device based on the spec_requirements and the current ACL privilege granted.
 
         The spec parsing uses kUnknownEnumValue to indicate that NO access is allowed for this attribute
@@ -163,7 +162,7 @@ class AccessChecker(BasicCompositionTests):
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
             (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
 
-    async def _setup_acl(self, privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
+    async def _setup_acl(self, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum | None):
         if privilege is None:
             return
         new_acl = deepcopy(self.default_acl)
@@ -255,7 +254,7 @@ class AccessChecker(BasicCompositionTests):
             log.warning('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
-        log.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
+        log.info('Testing commands on %s at privilege %s', xml_cluster.name, privilege)
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}).get(command_id)
@@ -269,8 +268,8 @@ class AccessChecker(BasicCompositionTests):
                 # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
                 # may be let through here is if the spec requires operate and the implementation requires admin.
                 continue
-            log.info(
-                f'  Testing command {xml_cluster.accepted_commands[command_id].name} from cluster {xml_cluster.name} - at privilege {privilege}, requires {spec_requires}')
+            log.info('  Testing command %s from cluster %s - at privilege %s, requires %s',
+                     xml_cluster.accepted_commands[command_id].name, xml_cluster.name, privilege, spec_requires)
             try:
                 timed = None
                 if command.must_use_timed_invoke:
@@ -288,7 +287,7 @@ class AccessChecker(BasicCompositionTests):
                     self.record_error(test_name=name, location=location,
                                       problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
                     self.success = False
-                    log.info(f'      Received unexpected error {e}')
+                    log.info('      Received unexpected error %s', e)
                 else:
                     log.info('      Received expected error')
 
@@ -329,13 +328,13 @@ class AccessChecker(BasicCompositionTests):
                 self.success = False
                 return False
 
-            log.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
+            log.info("Successfully established subscription (ID: %s) with privilege %s", subscription.subscriptionId, privilege)
             subscription.Shutdown()
             return True
 
         except ChipStackError as e:  # chipstack-ok
             # Unexpected ChipStackError
-            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error("Unexpected ChipStackError subscribing to attribute %s: %s", attribute, e)
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -372,11 +371,11 @@ class AccessChecker(BasicCompositionTests):
                 # - NetworkCommissioning
                 # - CameraAvStreamManagement
                 # - OperationalCredentials
-                log.warning(
-                    f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
+                log.warning("INVALID_ACTION: %s.%s (Cluster=0x%04X, Attribute=0x%04X, Endpoint=%s, Privilege=%s)",
+                            cluster_class.__name__, attribute.__name__, cluster_id, attribute_id, endpoint_id, privilege.name)
                 return None  # Indicates skip
             # Unexpected ChipStackError
-            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            log.error("Unexpected ChipStackError subscribing to attribute %s: %s", attribute, e)
             self.record_error(test_name=test_name,
                               location=AttributePathLocation(endpoint_id=endpoint_id,
                                                              cluster_id=cluster_id, attribute_id=attribute_id),
@@ -399,7 +398,7 @@ class AccessChecker(BasicCompositionTests):
 
             test_name = f'Subscribe access checker - {privilege}'
 
-            log.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
+            log.info("Subscribing to attribute %s cluster %s privilege %s", attribute, xml_cluster.name, privilege)
 
             if operation_allowed(spec_requires, privilege):
                 result = await self._subscribe_single_attribute_check_success(
@@ -422,7 +421,7 @@ class AccessChecker(BasicCompositionTests):
 
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
-            log.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            log.info("Testing attribute %s on endpoint %s", attribute, endpoint_id)
             if attribute == Clusters.AccessControl.Attributes.Acl and privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister:
                 log.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
                 continue
@@ -488,7 +487,7 @@ class AccessChecker(BasicCompositionTests):
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
-            log.info(f"Testing for {privilege}")
+            log.info("Testing for %s", privilege)
             self.step(step_number_with_privilege(check_step, 'a', privilege))
             await self._setup_acl(privilege=privilege)
             self.step(step_number_with_privilege(check_step, 'b', privilege))

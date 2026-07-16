@@ -23,7 +23,7 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
 
 assert(current_os == "freertos")
 
@@ -112,16 +112,30 @@ silabs_executable("all_devices_app") {
     "${chip_root}/src/data-model-providers/codedriven",
 
     # All devices common targets
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
@@ -132,9 +146,9 @@ silabs_executable("all_devices_app") {
   ]
 
   if (chip_enable_wifi) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi" ]
   } else {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread" ]
   }
 
   deps += [ "${examples_plat_dir}:efr32-common" ]

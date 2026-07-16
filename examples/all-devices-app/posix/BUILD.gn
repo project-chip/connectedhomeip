@@ -13,35 +13,77 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
 
 executable("all-devices-app") {
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+
   sources = [
-    "PosixBleRssiRangingAdapter.cpp",
-    "PosixChimeDevice.cpp",
+    "AppCommandDelegate.cpp",
+    "ClusterTypeMappings.cpp",
+    "PosixAudioManager.cpp",
+    "PosixChime.cpp",
+    "PosixSpeaker.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-dryer",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
+    "${chip_root}/examples/platform/linux:commissionable-init",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
+    "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
@@ -49,6 +91,14 @@ executable("all-devices-app") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+  defines = []
+
+  if (chip_enable_transport_trace) {
+    deps += [
+      "${chip_root}/examples/common/tracing:trace_handlers",
+      "${chip_root}/examples/common/tracing:trace_handlers_decoder",
+    ]
+  }
 
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
@@ -60,6 +110,31 @@ executable("all-devices-app") {
     "include",
     "${chip_root}/examples/common",
   ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED=1",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+    ]
+
+    sources += [ "${chip_root}/examples/platform/linux/Rpc.cpp" ]
+
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/pigweed:pigweed-accessor",
+
+      # We reuse the common attributes service because it already provides a fully functional
+      # RPC read/write interface and TLV serialization out-of-the-box.
+      # Note: The ZCL types are used as a hint from the client so the RPC server
+      # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into,
+      # and is not coupled with ember.
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/platform/linux:pw_rpc",
+    ]
+
+    deps += pw_build_LINK_DEPS
+  } else {
+    defines += [ "PW_RPC_ENABLED=0" ]
+  }
 
   output_dir = root_out_dir
 }

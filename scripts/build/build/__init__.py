@@ -6,7 +6,7 @@ import shutil
 import time
 from enum import Enum, auto
 from concurrent.futures import ThreadPoolExecutor
-from typing import Sequence
+from collections.abc import Sequence
 
 from builders.builder import BuilderOptions, Builder, OutDirLock
 from runner.runner import Runner
@@ -43,8 +43,8 @@ class BuildTimer:
         total_time = self._total_end_time - self._total_start_time
         log.info("Build Time Summary:")
         for target, duration in self._build_times.items():
-            log.info(f"  - {target}: {self._format_duration(duration)}")
-        log.info(f"Total build time: {self._format_duration(total_time)}")
+            log.info("  - %s: %s", target, self._format_duration(duration))
+        log.info("Total build time: %s", self._format_duration(total_time))
 
     def _format_duration(self, seconds):
         minutes = int(seconds // 60)
@@ -97,7 +97,7 @@ class Context:
                     break
 
             if found_choice is None:
-                log.error(f"Target '{target}' could not be found. Nothing executed for it")
+                log.error("Target '%s' could not be found. Nothing executed for it", target)
                 continue
 
             parts = found_choice.StringIntoTargetParts(target)

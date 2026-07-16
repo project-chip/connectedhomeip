@@ -16,7 +16,7 @@
 #
 
 import xml.etree.ElementTree as ElementTree
-from typing import Callable
+from collections.abc import Callable
 
 from mobly import asserts
 
@@ -36,6 +36,8 @@ def basic_test(xml: str, cls: Callable) -> None:
 
 
 class TestConformanceSupport(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
         # a small feature map

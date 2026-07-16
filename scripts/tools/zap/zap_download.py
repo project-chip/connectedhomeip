@@ -25,7 +25,6 @@ import subprocess
 import sys
 import tempfile
 import zipfile
-from typing import Optional
 
 import click
 import requests
@@ -221,7 +220,7 @@ def _GetZapVersionToUse(project_root) -> str:
     help='What type of zap download to perform')
 @click.option('--platform', default=_GetDefaultPlatform(), show_default=True, help='ZAP Platform to download')
 @click.option('--arch', default=_GetDefaultArch(), show_default=True, help='ZAP Architecture to download')
-def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType, platform: str, arch: str):
+def main(log_level: str, sdk_root: str, extract_root: str, zap_version: str | None, zap: DownloadType, platform: str, arch: str):
     if _has_coloredlogs:
         coloredlogs.install(level=log_level, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
     else:

@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 from enum import Enum, auto
 from platform import uname
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -79,6 +78,7 @@ class HostCryptoLibrary(Enum):
     OPENSSL = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
+    PSA = auto()
 
     @property
     def gn_argument(self):
@@ -88,6 +88,10 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
+        if self == HostCryptoLibrary.PSA:
+            # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
+            # one-shot implementation (as ESP32 does).
+            return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
         raise ValueError("Unknown host crypto library: %r" % self)
 
 
@@ -95,7 +99,6 @@ class HostFuzzingType(Enum):
     """Defines fuzz target options available for host targets."""
     NONE = auto()
     LIB_FUZZER = auto()
-    OSS_FUZZ = auto()
     PW_FUZZTEST = auto()
 
 
@@ -458,20 +461,21 @@ class HostBuilder(GnBuilder):
     def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
-                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE,
+                 pw_fuzz_libfuzzer_compat=False, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None,
-                 chip_casting_simplified: Optional[bool] = None,
+                 enable_dnssd_tests: bool | None = None,
+                 chip_casting_simplified: bool | None = None,
                  disable_shell=False,
                  use_googletest=False,
                  enable_webrtc=False,
-                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
                  unified=False,
-                 chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
                  ):
         """
@@ -545,7 +549,13 @@ class HostBuilder(GnBuilder):
         if use_msan:
             if not runner.dry_run:
                 _msan_validate_sysroot(chip_root)
-            self.extra_gn_options.append('is_msan=true')
+            if fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+                # pw_fuzzer FuzzTest targets build in the chip_pw_fuzztest secondary toolchain,
+                # which does not consume chip's global is_msan/sanitize_default. Drive MSAN via
+                # the toolchain arg instead (it swaps pigweed's ASan for chip's sanitize_memory).
+                self.extra_gn_options.append('chip_pw_fuzz_msan=true')
+            else:
+                self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
             self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
@@ -567,10 +577,12 @@ class HostBuilder(GnBuilder):
 
         if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
-        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
-            self.extra_gn_options.append('oss_fuzz=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
+            if pw_fuzz_libfuzzer_compat:
+                self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
+            if use_ubsan:
+                self.extra_gn_options.append('chip_pw_fuzz_ubsan=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')

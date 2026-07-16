@@ -111,8 +111,7 @@ class TestSubscriptionResumption(CHIPVirtualHome):
                          "Test failed: non-zero return code")
 
         # Check the device can resume subscriptions
-        self.logger.info("checking device log for {}".format(
-            self.get_device_pretty_id(server_device_id)))
+        self.logger.info("checking device log for %s", self.get_device_pretty_id(server_device_id))
         self.assertTrue(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Resuming 1 subscriptions in 1 seconds",
             "Registered a ReadHandler that will schedule a report"]),

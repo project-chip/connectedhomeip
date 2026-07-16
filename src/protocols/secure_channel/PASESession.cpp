@@ -269,7 +269,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
+    SuccessOrExit(err = mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
 
     mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
@@ -547,6 +547,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     // Initiator's random value
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
     VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 

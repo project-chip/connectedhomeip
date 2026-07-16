@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import contextlib
 import importlib
 import importlib.resources as pkg_resources
 import logging
@@ -28,13 +29,13 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
-from typing import Optional, Union
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
 from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
+from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
@@ -46,7 +47,7 @@ LOGGER = logging.getLogger(__name__)
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
-_PRIVILEGE_STR = {
+_PRIVILEGE_STR: dict[int | None, str] = {
     None: "N/A",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
@@ -59,13 +60,28 @@ def to_access_code(privilege: int) -> str:
     return _PRIVILEGE_STR.get(privilege, "")
 
 
-def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
+def get_access_privilege_or_unknown(access_value: int | None) -> int:
     """
     Returns the given access_value if not None, otherwise returns the default unknown privilege.
     """
     if access_value is not None:
         return access_value
     return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
+
+
+def _parse_numeric_constraint_value(value_str: str) -> int | float | None:
+    """Parse a numeric constraint value, handling integers, floats, and hex strings.
+
+    Returns None if the value is not purely numeric (e.g., 'MaxMeasuredValue - 1'),
+    so callers can fall back to treating it as an attribute reference.
+    """
+    try:
+        if value_str.startswith(('0x', '0X')):
+            return int(value_str, 16)
+        value = float(value_str)
+        return int(value) if value.is_integer() else value
+    except ValueError:
+        return None
 
 
 class SpecParsingException(Exception):
@@ -85,16 +101,87 @@ class DataTypeEnum(StrEnum):
 
 
 @dataclass
+class ConstraintReference:
+    """Reference to another attribute for dynamic constraint values."""
+    attribute: str
+    field: str | None = None
+
+    def __str__(self):
+        if self.field:
+            return f"ref:{self.attribute}.{self.field}"
+        return f"ref:{self.attribute}"
+
+
+@dataclass
+class Constraints:
+    """Constraint information for attributes, commands, and device types."""
+    min_value: int | float | None = None
+    max_value: int | float | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    min_count: int | None = None
+    max_count: int | None = None
+    # Dynamic constraint references
+    min_value_ref: ConstraintReference | None = None
+    max_value_ref: ConstraintReference | None = None
+    min_count_ref: ConstraintReference | None = None
+    max_count_ref: ConstraintReference | None = None
+    allowed: list[str] | None = None
+
+    def has_constraints(self) -> bool:
+        """Check if any constraints are defined."""
+        return any([
+            self.min_value is not None,
+            self.max_value is not None,
+            self.min_length is not None,
+            self.max_length is not None,
+            self.min_count is not None,
+            self.max_count is not None,
+            self.min_value_ref is not None,
+            self.max_value_ref is not None,
+            self.min_count_ref is not None,
+            self.max_count_ref is not None,
+            self.allowed is not None,
+        ])
+
+    def __str__(self):
+        parts = []
+        if self.min_value is not None:
+            parts.append(f"min_value={self.min_value}")
+        if self.max_value is not None:
+            parts.append(f"max_value={self.max_value}")
+        if self.min_length is not None:
+            parts.append(f"min_length={self.min_length}")
+        if self.max_length is not None:
+            parts.append(f"max_length={self.max_length}")
+        if self.min_count is not None:
+            parts.append(f"min_count={self.min_count}")
+        if self.max_count is not None:
+            parts.append(f"max_count={self.max_count}")
+        if self.min_value_ref is not None:
+            parts.append(f"min_value_ref={self.min_value_ref}")
+        if self.max_value_ref is not None:
+            parts.append(f"max_value_ref={self.max_value_ref}")
+        if self.min_count_ref is not None:
+            parts.append(f"min_count_ref={self.min_count_ref}")
+        if self.max_count_ref is not None:
+            parts.append(f"max_count_ref={self.max_count_ref}")
+        if self.allowed is not None:
+            parts.append(f"allowed={self.allowed}")
+        return "Constraints(" + ", ".join(parts) + ")"
+
+
+@dataclass
 class XmlDataTypeComponent:
     value: uint
     name: str
     conformance: ConformanceCallable
     # Additional datatype component fields from cluster XML's
-    summary: Optional[str] = None  # For descriptions/documentation
-    type_info: Optional[str] = None  # Data type for struct fields
+    summary: str | None = None  # For descriptions/documentation
+    type_info: str | None = None  # Data type for struct fields
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
-    constraints: Optional[dict] = None  # For min/max values, lists, etc.
+    constraints: Constraints | None = None  # For min/max values, lists, etc.
 
 
 @dataclass
@@ -107,7 +194,7 @@ class XmlDataType:
     name: str
     components: dict[uint, XmlDataTypeComponent]
     # if this is None, this is a global struct
-    cluster_ids: Optional[list[uint]]
+    cluster_ids: list[uint] | None
 
 
 @dataclass
@@ -128,6 +215,12 @@ class XmlAttribute:
     read_access: int
     write_access: int
     write_optional: bool
+    # Quality flags from the spec XML <quality> element
+    changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
+    quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
+    scene: bool = False   # S quality: attribute value is stored/restored by the Scenes cluster
+    atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
+    constraints: Constraints | None = None
 
     def access_string(self):
         read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
@@ -137,7 +230,8 @@ class XmlAttribute:
         return f'{read_marker}{write_marker} {read_access_marker}{write_access_marker}'
 
     def __str__(self):
-        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}'
+        constraint_str = f', constraints: {self.constraints}' if self.constraints and self.constraints.has_constraints() else ""
+        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}{constraint_str}'
 
 
 @dataclass
@@ -161,7 +255,7 @@ class XmlEvent:
 class XmlCluster:
     name: str
     revision: int
-    derived: Optional[str]
+    derived: str | None
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
@@ -239,7 +333,7 @@ class XmlTag:
     """Represents a tag within a namespace"""
     id: int = 0
     name: str = ""
-    description: Optional[str] = None
+    description: str | None = None
 
     def __str__(self) -> str:
         desc = f" - {self.description}" if self.description else ""
@@ -256,7 +350,7 @@ class XmlDeviceType:
     classification_class: str
     classification_scope: str
     revision_desc: dict[int, str]
-    superset_of_device_type_name: Optional[str] = None
+    superset_of_device_type_name: str | None = None
     superset_of_device_type_id: int = 0
 
     def __str__(self):
@@ -305,7 +399,7 @@ def _fuzzy_name(to_fuzz: str):
     return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
 
 
-def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]):
+def get_location_from_element(element: ElementTree.Element, cluster_id: int | None):
     if cluster_id is None:
         cluster_id = 0
     cluster_location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
@@ -328,7 +422,7 @@ def get_location_from_element(element: ElementTree.Element, cluster_id: Optional
         return cluster_location
 
 
-def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) -> tuple[ElementTree.Element, typing.Optional[ProblemNotice]]:
+def get_conformance(element: ElementTree.Element, cluster_id: uint | None) -> tuple[ElementTree.Element, ProblemNotice | None]:
     for sub in element:
         if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
             return sub, None
@@ -339,7 +433,7 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 
 
 # Tuple of the root element, the conformance xml element within the root and the optional access element within the root
-XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
+XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, ElementTree.Element | None]
 
 
 def parse_revision_history(top_level: ElementTree.Element) -> tuple[dict[int, str], list[ProblemNotice]]:
@@ -360,7 +454,7 @@ def parse_revision_history(top_level: ElementTree.Element) -> tuple[dict[int, st
 
 class ClusterParser:
     # Cluster ID is optional to support base clusters that have no ID of their own.
-    def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
+    def __init__(self, cluster: ElementTree.Element, cluster_id: uint | None, name: str):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
         self._cluster_id = cluster_id
@@ -381,7 +475,7 @@ class ClusterParser:
                 if cid.attrib['name'] == name and list(cid.iter('provisionalConform')):
                     self._is_provisional = True
 
-        self._pics: Optional[str] = None
+        self._pics: str | None = None
         try:
             classification = next(cluster.iter('classification'))
             self._pics = classification.attrib['picsCode']
@@ -407,7 +501,7 @@ class ClusterParser:
             self._problems.append(problem)
         return element
 
-    def get_access(self, element: ElementTree.Element) -> Optional[ElementTree.Element]:
+    def get_access(self, element: ElementTree.Element) -> ElementTree.Element | None:
         for sub in element:
             if sub.tag == 'access':
                 return sub
@@ -463,7 +557,7 @@ class ClusterParser:
             commands[element.attrib['name']] = uint(int(element.attrib['id'], 0))
         return commands
 
-    def parse_conformance(self, conformance_xml: ElementTree.Element) -> Optional[ConformanceCallable]:
+    def parse_conformance(self, conformance_xml: ElementTree.Element) -> ConformanceCallable | None:
         try:
             return parse_callable_from_xml(conformance_xml, self.params)
         except ConformanceException as ex:
@@ -473,12 +567,12 @@ class ClusterParser:
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
-    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element]) -> bool:
+    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element | None) -> bool:
         if access_xml is None:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[int], Optional[int], Optional[int]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element | None, conformance: ConformanceCallable) -> tuple[int | None, int | None, int | None]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> int:
             if privilege_str == 'view':
@@ -593,7 +687,53 @@ class ClusterParser:
         quality = xml_field.find('./quality')
         return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
-    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> dict | None:
+    @staticmethod
+    def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """
+        Returns True if the attribute carries the Changes Omitted (C) quality.
+
+        Attributes with this quality do not report value changes in subscription reports.
+        They correspond to <quality changeOmitted="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('changeOmitted', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """
+        Returns True if the attribute carries the Quieter Reporting (Q) quality.
+
+        Attributes with this quality may be reported less frequently than the normal
+        minimum interval allows.  They correspond to <quality quieterReporting="true"/>
+        in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_scene_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Scene (S) quality.
+
+        Attributes with this quality have their value stored and restored by the
+        Scenes cluster.  They correspond to <quality scene="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('scene', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_atomic_write_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """
+        Returns True if the attribute carries the Atomic Write quality.
+
+        Attributes with this quality are modified only within an atomic write
+        transaction (AtomicRequest Begin/Commit); intermediate values are staged
+        and not reported until the transaction commits.
+        They correspond to <quality atomicWrite="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('atomicWrite', 'false').lower() == 'true'
+
+    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Constraints | None:
         """
         Parse constraint information from XML field element.
 
@@ -604,31 +744,51 @@ class ClusterParser:
             xml_field: XML element representing the field
 
         Returns:
-            Dictionary of constraints if any found, None otherwise
+            Constraints object if any found, None otherwise
         """
         constraint_elements = xml_field.findall('./constraint')
         if not constraint_elements:
             return None
 
-        constraints = {}
+        # Helper to parse integer values (for counts)
+        def parse_int_value(value_str: str) -> int | None:
+            """Parse integer constraint value (for counts)."""
+            try:
+                return int(value_str, 0)
+            except ValueError:
+                return None
+
+        min_value = None
+        max_value = None
+        max_count = None
+        max_count_ref = None
+
         for constraint in constraint_elements:
             # Handle direct attributes like min/max
-            for attr_name in ['min', 'max']:
-                if attr_name in constraint.attrib:
-                    constraints[attr_name] = constraint.attrib[attr_name]
+            if 'min' in constraint.attrib:
+                min_value = _parse_numeric_constraint_value(constraint.attrib['min'])
+            if 'max' in constraint.attrib:
+                max_value = _parse_numeric_constraint_value(constraint.attrib['max'])
 
             # Handle maxCount child element
-            max_count = constraint.find('./maxCount')
-            if max_count is not None and max_count.text is not None:
-                constraints['maxCount'] = max_count.text
+            max_count_elem = constraint.find('./maxCount')
+            if max_count_elem is not None and max_count_elem.text is not None:
+                max_count = parse_int_value(max_count_elem.text)
                 # If maxCount references an attribute, store that reference
-                attr_element = max_count.find('./attribute')
+                attr_element = max_count_elem.find('./attribute')
                 if attr_element is not None and 'name' in attr_element.attrib:
-                    constraints['maxCountAttribute'] = attr_element.attrib['name']
+                    max_count_ref = ConstraintReference(attribute=attr_element.attrib['name'], field=None)
 
-        # Return None instead of {} to clearly distinguish "no constraints found" from "empty constraints"
-        # This matches the Optional[dict] type in XmlDataTypeComponent.constraints
-        return constraints if constraints else None
+        # Only return Constraints object if we found any constraints
+        if min_value is not None or max_value is not None or max_count is not None or max_count_ref is not None:
+            return Constraints(
+                min_value=min_value,
+                max_value=max_value,
+                max_count=max_count,
+                max_count_ref=max_count_ref
+            )
+
+        return None
 
     def _parse_field_conformance(self, xml_field: ElementTree.Element) -> ConformanceCallable:
         """
@@ -774,6 +934,168 @@ class ClusterParser:
                                         conformance=conformance)
         return features
 
+    def parse_attribute_constraints(self, element: ElementTree.Element) -> Constraints | None:
+        """Parse constraint information from an attribute element.
+
+        Args:
+            element: The attribute XML element
+
+        Returns:
+            Constraints object, or None if no constraints are defined
+        """
+        # Find the constraint element
+        constraint_elem = element.find('./constraint')
+        if constraint_elem is None:
+            return None
+
+        # Helper to parse constraint reference from attribute value or element
+        def parse_reference(elem: ElementTree.Element, value_str: str | None = None) -> ConstraintReference | None:
+            """Parse dynamic constraint reference to another attribute."""
+            # First try to find a child attribute element
+            attr_ref = elem.find('./attribute')
+            if attr_ref is not None and 'name' in attr_ref.attrib:
+                attr_name = attr_ref.attrib['name']
+                field_ref = attr_ref.find('./field')
+                field_name = field_ref.attrib['name'] if field_ref is not None and 'name' in field_ref.attrib else None
+                return ConstraintReference(attribute=attr_name, field=field_name)
+
+            # If no child element but we have a value string, try to extract attribute name
+            # Handle cases like 'MaxMeasuredValue - 1' or 'SomeAttribute'
+            if value_str and not value_str.replace('.', '').replace('-', '').replace('+', '').replace(' ', '').isdigit():
+                # Extract the first identifier (attribute name) from the expression
+                # Match word characters before any operators or whitespace
+                import re
+                match = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)', value_str.strip())
+                if match:
+                    return ConstraintReference(attribute=match.group(1), field=None)
+
+            return None
+
+        # Initialize constraint values
+        min_value = None
+        max_value = None
+        min_length = None
+        max_length = None
+        min_count = None
+        max_count = None
+        min_value_ref = None
+        max_value_ref = None
+        min_count_ref = None
+        max_count_ref = None
+        allowed = None
+
+        # Parse min/max/between constraints
+        min_elem = constraint_elem.find('./min')
+        if min_elem is not None:
+            if 'value' in min_elem.attrib:
+                value_str = min_elem.attrib['value']
+                min_value = _parse_numeric_constraint_value(value_str)
+                # If numeric parsing failed, try to parse as reference
+                if min_value is None:
+                    min_value_ref = parse_reference(min_elem, value_str)
+            else:
+                min_value_ref = parse_reference(min_elem)
+
+        max_elem = constraint_elem.find('./max')
+        if max_elem is not None:
+            if 'value' in max_elem.attrib:
+                value_str = max_elem.attrib['value']
+                max_value = _parse_numeric_constraint_value(value_str)
+                # If numeric parsing failed, try to parse as reference
+                if max_value is None:
+                    max_value_ref = parse_reference(max_elem, value_str)
+            else:
+                max_value_ref = parse_reference(max_elem)
+
+        between_elem = constraint_elem.find('./between')
+        if between_elem is not None:
+            from_elem = between_elem.find('./from')
+            to_elem = between_elem.find('./to')
+
+            if from_elem is not None:
+                if 'value' in from_elem.attrib:
+                    value_str = from_elem.attrib['value']
+                    min_value = _parse_numeric_constraint_value(value_str)
+                    # If numeric parsing failed, try to parse as reference
+                    if min_value is None:
+                        min_value_ref = parse_reference(from_elem, value_str)
+                else:
+                    min_value_ref = parse_reference(from_elem)
+
+            if to_elem is not None:
+                if 'value' in to_elem.attrib:
+                    value_str = to_elem.attrib['value']
+                    max_value = _parse_numeric_constraint_value(value_str)
+                    # If numeric parsing failed, try to parse as reference
+                    if max_value is None:
+                        max_value_ref = parse_reference(to_elem, value_str)
+                else:
+                    max_value_ref = parse_reference(to_elem)
+
+        # Parse string length constraints
+        min_length_elem = constraint_elem.find('./minLength')
+        if min_length_elem is not None and 'value' in min_length_elem.attrib:
+            with contextlib.suppress(ValueError):
+                # Value is not a simple integer, ignore for now
+                min_length = int(min_length_elem.attrib['value'], 0)
+
+        max_length_elem = constraint_elem.find('./maxLength')
+        if max_length_elem is not None and 'value' in max_length_elem.attrib:
+            with contextlib.suppress(ValueError):
+                # Value is not a simple integer, ignore for now
+                max_length = int(max_length_elem.attrib['value'], 0)
+
+        # Parse list count constraints
+        min_count_elem = constraint_elem.find('./minCount')
+        if min_count_elem is not None:
+            if 'value' in min_count_elem.attrib:
+                value_str = min_count_elem.attrib['value']
+                try:
+                    min_count = int(value_str, 0)
+                except ValueError:
+                    # Value is not a simple integer, try parsing as reference
+                    min_count_ref = parse_reference(min_count_elem, value_str)
+            else:
+                min_count_ref = parse_reference(min_count_elem)
+
+        max_count_elem = constraint_elem.find('./maxCount')
+        if max_count_elem is not None:
+            if 'value' in max_count_elem.attrib:
+                value_str = max_count_elem.attrib['value']
+                try:
+                    max_count = int(value_str, 0)
+                except ValueError:
+                    # Value is not a simple integer, try parsing as reference
+                    max_count_ref = parse_reference(max_count_elem, value_str)
+            else:
+                max_count_ref = parse_reference(max_count_elem)
+
+        allowed_elems = constraint_elem.findall('./allowed')
+        if allowed_elems:
+            allowed = []
+            for a in allowed_elems:
+                if 'value' in a.attrib:
+                    allowed.append(a.attrib['value'])
+                else:
+                    for child in a:
+                        if 'value' in child.attrib:
+                            allowed.append(child.attrib['value'])
+
+        # Create and return the Constraints object
+        return Constraints(
+            min_value=min_value,
+            max_value=max_value,
+            min_length=min_length,
+            max_length=max_length,
+            min_count=min_count,
+            max_count=max_count,
+            min_value_ref=min_value_ref,
+            max_value_ref=max_value_ref,
+            min_count_ref=min_count_ref,
+            max_count_ref=max_count_ref,
+            allowed=allowed
+        )
+
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
         attributes: dict[uint, XmlAttribute] = {}
         for element, conformance_xml, access_xml in self.attribute_elements:
@@ -794,11 +1116,18 @@ class ClusterParser:
             write_optional = False
             if write_access not in [None, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue]:
                 write_optional = self.parse_write_optional(element, access_xml)
+            # Parse constraints for this attribute
+            constraints = self.parse_attribute_constraints(element)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance,
                                             read_access=get_access_privilege_or_unknown(read_access),
                                             write_access=get_access_privilege_or_unknown(write_access),
-                                            write_optional=write_optional)
+                                            write_optional=write_optional,
+                                            changes_omitted=self._is_change_omitted_attribute(element),
+                                            quieter_reporting=self._is_quieter_reporting_attribute(element),
+                                            scene=self._is_scene_attribute(element),
+                                            atomic_write=self._is_atomic_write_attribute(element),
+                                            constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
@@ -903,7 +1232,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
         for cid in ids:
             name = cid.get('name')
             cluster_id_str = cid.get('id')
-            cluster_id: Optional[uint] = None
+            cluster_id: uint | None = None
             if cluster_id_str:
                 cluster_id = uint(int(cluster_id_str, 0))
 
@@ -944,6 +1273,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_5 = auto()
     k1_5_1 = auto()
     k1_6 = auto()
+    k1_6_1 = auto()
 
     @property
     def dirname(self):
@@ -963,6 +1293,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.5.1"
         if self == PrebuiltDataModelDirectory.k1_6:
             return "1.6"
+        if self == PrebuiltDataModelDirectory.k1_6_1:
+            return "1.6.1"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -985,7 +1317,8 @@ class DataModelLevel(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
+def get_data_model_directory(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                             data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
@@ -1011,7 +1344,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                       errata_path: str | Traversable | None = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1054,7 +1388,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
-    def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
+    def remove_problem(location: CommandPathLocation | FeaturePathLocation):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
@@ -1137,6 +1471,21 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
+
+    if errata_path is not None:
+        errata_data = load_authoritative_errata(errata_path)
+        if errata_data:
+            active_rev = None
+            if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+                active_rev = data_model_directory.dirname
+            elif hasattr(data_model_directory, 'parent'):
+                active_rev = data_model_directory.parent.name
+
+            errata_problems = apply_errata(clusters, errata_data, active_spec_revision=active_rev)
+            problems.extend(errata_problems)
+        else:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
+                                          severity=ProblemSeverity.ERROR, problem=f"Failed to load required errata overlay: '{errata_path}'"))
 
     check_clusters_for_unknown_commands(clusters, problems)
 
@@ -1288,7 +1637,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
     return namespace, problems
 
 
-def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+def build_xml_namespaces(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
     """Build a dictionary of namespaces from XML files in the given directory"""
     namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
     namespaces: dict[int, XmlNamespace] = {}
@@ -1421,7 +1770,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
                 if cid not in cluster_definition_xml:
-                    LOGGER.info(f"Skipping unknown cluster {cid:04X}")
+                    LOGGER.info("Skipping unknown cluster %04X", cid)
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -1490,7 +1839,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
                                     LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
+                                        "Ignoring unknown %s %s in cluster %s because the conformance is disallowed", override_element_type, element_name, cid)
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))
@@ -1519,7 +1868,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable], cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Traversable, cluster_definition_xml: dict[uint, XmlCluster] | None = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
@@ -1570,7 +1919,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     return device_types, problems
 
 
-def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
+def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
     """
     Build XML global data types from the globals data model directory.
 
@@ -1642,7 +1991,8 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
                 filtered_problems = []
                 for problem in temp_problems:
                     if "ConformanceException" in problem.problem and any(field_name in problem.problem for field_name in ['PercentMax', 'PercentMin', 'FixedMax', 'FixedMin', 'MfgCode']):
-                        LOGGER.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
+                        LOGGER.info("Ignoring complex conformance in global data type %s from %s: %s",
+                                    name, f.name, problem.problem)
                         continue
                     filtered_problems.append(problem)
 
@@ -1685,6 +2035,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01050000: PrebuiltDataModelDirectory.k1_5,
         0x01050100: PrebuiltDataModelDirectory.k1_5_1,
         0x01060000: PrebuiltDataModelDirectory.k1_6,
+        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
     }
 
     if specification_version not in version_to_dm:

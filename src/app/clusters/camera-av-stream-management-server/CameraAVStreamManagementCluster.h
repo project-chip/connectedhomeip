@@ -23,7 +23,6 @@
 #include <clusters/CameraAvStreamManagement/Attributes.h>
 #include <clusters/CameraAvStreamManagement/Commands.h>
 
-#include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
 #include <optional>
@@ -387,19 +386,8 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
-    struct Context
-    {
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
-    };
-
     struct InitArguments
     {
-        /**
-         * Context providing injected dependencies.
-         * Note: the caller must ensure that the SafeAttributePersistenceProvider referenced by the context outlives this instance.
-         */
-        Context context;
-
         /**
          * A reference to the delegate to be used by this server.
          * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
@@ -467,8 +455,8 @@ public:
      * to be registered and called by the interaction model at the appropriate times.
      *
      * @param aArgs                             Initialization arguments.
-     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate
-     *                                          and the SafeAttributePersistenceProvider in context) outlive this cluster instance.
+     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate)
+     *                                          outlive this cluster instance.
      *
      */
     CameraAVStreamManagementCluster(InitArguments && aArgs);
@@ -731,7 +719,6 @@ private:
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
-    Context mContext;
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
@@ -794,7 +781,8 @@ private:
             auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
-                ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, currentValue));
+                ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&currentValue), sizeof(currentValue))));
             }
             mDelegate.OnAttributeChanged(attributeId);
             NotifyAttributeChanged(attributeId);

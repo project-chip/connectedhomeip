@@ -4292,6 +4292,82 @@ public static class MessagesClusterMessageCompleteEvent {
     return output.toString();
   }
 }
+public static class MessagesClusterMessageNotPresentedEvent {
+  public byte[] messageID;
+  public Boolean removedFromQueue;
+  public Integer fabricIndex;
+  private static final long MESSAGE_ID_ID = 0L;
+  private static final long REMOVED_FROM_QUEUE_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public MessagesClusterMessageNotPresentedEvent(
+    byte[] messageID,
+    Boolean removedFromQueue,
+    Integer fabricIndex
+  ) {
+    this.messageID = messageID;
+    this.removedFromQueue = removedFromQueue;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_ID_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(REMOVED_FROM_QUEUE_ID, new BooleanType(removedFromQueue)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageNotPresentedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Boolean removedFromQueue = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == REMOVED_FROM_QUEUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          removedFromQueue = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageNotPresentedEvent(
+      messageID,
+      removedFromQueue,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageNotPresentedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tremovedFromQueue: ");
+    output.append(removedFromQueue);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterPowerAdjustStartEvent {
 
   public DeviceEnergyManagementClusterPowerAdjustStartEvent(
@@ -4465,6 +4541,143 @@ public static class DeviceEnergyManagementClusterResumedEvent {
     output.append("DeviceEnergyManagementClusterResumedEvent {\n");
     output.append("\tcause: ");
     output.append(cause);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPowerRangeAdjustStartEvent {
+  public ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct adjustment;
+  public Long duration;
+  private static final long ADJUSTMENT_ID = 0L;
+  private static final long DURATION_ID = 1L;
+
+  public DeviceEnergyManagementClusterPowerRangeAdjustStartEvent(
+    ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct adjustment,
+    Long duration
+  ) {
+    this.adjustment = adjustment;
+    this.duration = duration;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ADJUSTMENT_ID, adjustment.encodeTlv()));
+    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerRangeAdjustStartEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct adjustment = null;
+    Long duration = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ADJUSTMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          adjustment = ChipStructs.DeviceEnergyManagementClusterPowerRangeAdjustStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerRangeAdjustStartEvent(
+      adjustment,
+      duration
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerRangeAdjustStartEvent {\n");
+    output.append("\tadjustment: ");
+    output.append(adjustment);
+    output.append("\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPowerRangeAdjustEndEvent {
+  public Integer cause;
+  public Long duration;
+  public Long energyUse;
+  private static final long CAUSE_ID = 0L;
+  private static final long DURATION_ID = 1L;
+  private static final long ENERGY_USE_ID = 2L;
+
+  public DeviceEnergyManagementClusterPowerRangeAdjustEndEvent(
+    Integer cause,
+    Long duration,
+    Long energyUse
+  ) {
+    this.cause = cause;
+    this.duration = duration;
+    this.energyUse = energyUse;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
+    values.add(new StructElement(ENERGY_USE_ID, new IntType(energyUse)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerRangeAdjustEndEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer cause = null;
+    Long duration = null;
+    Long energyUse = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ENERGY_USE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          energyUse = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerRangeAdjustEndEvent(
+      cause,
+      duration,
+      energyUse
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerRangeAdjustEndEvent {\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\tenergyUse: ");
+    output.append(energyUse);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -6862,26 +7075,26 @@ public static class OccupancySensingClusterOccupancyChangedEvent {
 }
 public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent {
   public Optional<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextDetected;
-  public Optional<Boolean> objectCountReached;
+  public Optional<Boolean> objectCountThresholdReached;
   public Optional<Integer> objectCount;
   private static final long AMBIENT_CONTEXT_DETECTED_ID = 0L;
-  private static final long OBJECT_COUNT_REACHED_ID = 1L;
+  private static final long OBJECT_COUNT_THRESHOLD_REACHED_ID = 1L;
   private static final long OBJECT_COUNT_ID = 2L;
 
   public AmbientContextSensingClusterAmbientContextDetectStartedEvent(
     Optional<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextDetected,
-    Optional<Boolean> objectCountReached,
+    Optional<Boolean> objectCountThresholdReached,
     Optional<Integer> objectCount
   ) {
     this.ambientContextDetected = ambientContextDetected;
-    this.objectCountReached = objectCountReached;
+    this.objectCountThresholdReached = objectCountThresholdReached;
     this.objectCount = objectCount;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AMBIENT_CONTEXT_DETECTED_ID, ambientContextDetected.<BaseTLVType>map((nonOptionalambientContextDetected) -> nonOptionalambientContextDetected.encodeTlv()).orElse(new EmptyType())));
-    values.add(new StructElement(OBJECT_COUNT_REACHED_ID, objectCountReached.<BaseTLVType>map((nonOptionalobjectCountReached) -> new BooleanType(nonOptionalobjectCountReached)).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_THRESHOLD_REACHED_ID, objectCountThresholdReached.<BaseTLVType>map((nonOptionalobjectCountThresholdReached) -> new BooleanType(nonOptionalobjectCountThresholdReached)).orElse(new EmptyType())));
     values.add(new StructElement(OBJECT_COUNT_ID, objectCount.<BaseTLVType>map((nonOptionalobjectCount) -> new UIntType(nonOptionalobjectCount)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -6892,7 +7105,7 @@ public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent
       return null;
     }
     Optional<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextDetected = Optional.empty();
-    Optional<Boolean> objectCountReached = Optional.empty();
+    Optional<Boolean> objectCountThresholdReached = Optional.empty();
     Optional<Integer> objectCount = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AMBIENT_CONTEXT_DETECTED_ID) {
@@ -6900,10 +7113,10 @@ public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent
           StructType castingValue = element.value(StructType.class);
           ambientContextDetected = Optional.of(ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct.decodeTlv(castingValue));
         }
-      } else if (element.contextTagNum() == OBJECT_COUNT_REACHED_ID) {
+      } else if (element.contextTagNum() == OBJECT_COUNT_THRESHOLD_REACHED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          objectCountReached = Optional.of(castingValue.value(Boolean.class));
+          objectCountThresholdReached = Optional.of(castingValue.value(Boolean.class));
         }
       } else if (element.contextTagNum() == OBJECT_COUNT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -6914,7 +7127,7 @@ public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent
     }
     return new AmbientContextSensingClusterAmbientContextDetectStartedEvent(
       ambientContextDetected,
-      objectCountReached,
+      objectCountThresholdReached,
       objectCount
     );
   }
@@ -6926,8 +7139,8 @@ public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent
     output.append("\tambientContextDetected: ");
     output.append(ambientContextDetected);
     output.append("\n");
-    output.append("\tobjectCountReached: ");
-    output.append(objectCountReached);
+    output.append("\tobjectCountThresholdReached: ");
+    output.append(objectCountThresholdReached);
     output.append("\n");
     output.append("\tobjectCount: ");
     output.append(objectCount);
@@ -6937,18 +7150,23 @@ public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent
   }
 }
 public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
-  public Long eventStartTime;
-  private static final long EVENT_START_TIME_ID = 0L;
+  public Optional<Long> eventStartTimePos;
+  public Optional<Long> eventStartTimeSys;
+  private static final long EVENT_START_TIME_POS_ID = 0L;
+  private static final long EVENT_START_TIME_SYS_ID = 1L;
 
   public AmbientContextSensingClusterAmbientContextDetectEndedEvent(
-    Long eventStartTime
+    Optional<Long> eventStartTimePos,
+    Optional<Long> eventStartTimeSys
   ) {
-    this.eventStartTime = eventStartTime;
+    this.eventStartTimePos = eventStartTimePos;
+    this.eventStartTimeSys = eventStartTimeSys;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(EVENT_START_TIME_ID, new UIntType(eventStartTime)));
+    values.add(new StructElement(EVENT_START_TIME_POS_ID, eventStartTimePos.<BaseTLVType>map((nonOptionaleventStartTimePos) -> new UIntType(nonOptionaleventStartTimePos)).orElse(new EmptyType())));
+    values.add(new StructElement(EVENT_START_TIME_SYS_ID, eventStartTimeSys.<BaseTLVType>map((nonOptionaleventStartTimeSys) -> new UIntType(nonOptionaleventStartTimeSys)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6957,17 +7175,24 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long eventStartTime = null;
+    Optional<Long> eventStartTimePos = Optional.empty();
+    Optional<Long> eventStartTimeSys = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == EVENT_START_TIME_ID) {
+      if (element.contextTagNum() == EVENT_START_TIME_POS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          eventStartTime = castingValue.value(Long.class);
+          eventStartTimePos = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == EVENT_START_TIME_SYS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          eventStartTimeSys = Optional.of(castingValue.value(Long.class));
         }
       }
     }
     return new AmbientContextSensingClusterAmbientContextDetectEndedEvent(
-      eventStartTime
+      eventStartTimePos,
+      eventStartTimeSys
     );
   }
 
@@ -6975,8 +7200,149 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("AmbientContextSensingClusterAmbientContextDetectEndedEvent {\n");
-    output.append("\teventStartTime: ");
-    output.append(eventStartTime);
+    output.append("\teventStartTimePos: ");
+    output.append(eventStartTimePos);
+    output.append("\n");
+    output.append("\teventStartTimeSys: ");
+    output.append(eventStartTimeSys);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientSensingUnionClusterUnionContributorAddedEvent {
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor;
+  private static final long ADDED_CONTRIBUTOR_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorAddedEvent(
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor
+  ) {
+    this.addedContributor = addedContributor;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ADDED_CONTRIBUTOR_ID, ArrayType.generateArrayType(addedContributor, (elementaddedContributor) -> elementaddedContributor.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorAddedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> addedContributor = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ADDED_CONTRIBUTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          addedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorAddedEvent(
+      addedContributor
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorAddedEvent {\n");
+    output.append("\taddedContributor: ");
+    output.append(addedContributor);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor;
+  private static final long REMOVED_CONTRIBUTOR_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorRemovedEvent(
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor
+  ) {
+    this.removedContributor = removedContributor;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(REMOVED_CONTRIBUTOR_ID, ArrayType.generateArrayType(removedContributor, (elementremovedContributor) -> elementremovedContributor.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorRemovedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> removedContributor = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == REMOVED_CONTRIBUTOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          removedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorRemovedEvent(
+      removedContributor
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorRemovedEvent {\n");
+    output.append("\tremovedContributor: ");
+    output.append(removedContributor);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange;
+  private static final long CONTRIBUTOR_STATUS_CHANGE_ID = 0L;
+
+  public AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange
+  ) {
+    this.contributorStatusChange = contributorStatusChange;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_STATUS_CHANGE_ID, ArrayType.generateArrayType(contributorStatusChange, (elementcontributorStatusChange) -> elementcontributorStatusChange.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterUnionContributorStatusChangedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_STATUS_CHANGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          contributorStatusChange = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
+      contributorStatusChange
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n");
+    output.append("\tcontributorStatusChange: ");
+    output.append(contributorStatusChange);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -7346,6 +7712,52 @@ public static class MediaPlaybackClusterStateChangedEvent {
     return output.toString();
   }
 }
+public static class ContentLauncherClusterContentReplicationEvent {
+  public Integer status;
+  private static final long STATUS_ID = 0L;
+
+  public ContentLauncherClusterContentReplicationEvent(
+    Integer status
+  ) {
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentReplicationEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentReplicationEvent(
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentReplicationEvent {\n");
+    output.append("\tstatus: ");
+    output.append(status);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
   public Integer fabricIndex;
@@ -7459,6 +7871,67 @@ public static class ContentControlClusterEnteringBlockContentTimeWindowEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ContentControlClusterEnteringBlockContentTimeWindowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaFileManagementClusterSharedFilesAddedEvent {
+  public Integer requestID;
+  public Integer responseID;
+  private static final long REQUEST_ID_ID = 0L;
+  private static final long RESPONSE_ID_ID = 1L;
+
+  public MediaFileManagementClusterSharedFilesAddedEvent(
+    Integer requestID,
+    Integer responseID
+  ) {
+    this.requestID = requestID;
+    this.responseID = responseID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestID)));
+    values.add(new StructElement(RESPONSE_ID_ID, new UIntType(responseID)));
+
+    return new StructType(values);
+  }
+
+  public static MediaFileManagementClusterSharedFilesAddedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer requestID = null;
+    Integer responseID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == REQUEST_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          requestID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RESPONSE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MediaFileManagementClusterSharedFilesAddedEvent(
+      requestID,
+      responseID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaFileManagementClusterSharedFilesAddedEvent {\n");
+    output.append("\trequestID: ");
+    output.append(requestID);
+    output.append("\n");
+    output.append("\tresponseID: ");
+    output.append(responseID);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }

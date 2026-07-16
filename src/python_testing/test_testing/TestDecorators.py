@@ -27,7 +27,6 @@
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 from mobly import asserts
 
@@ -94,12 +93,14 @@ class DecoratorTestRunnerHooks:
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         pass
 
 
 class TestDecorators(MatterBaseTest):
+    requires_dut = False
+
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)

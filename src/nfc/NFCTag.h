@@ -70,12 +70,6 @@ public:
     {
         uint16_t discriminator = 0;
 
-        constexpr Identifier()                     = default;
-        constexpr Identifier(const Identifier &)   = default;
-        constexpr Identifier(Identifier &&)        = default;
-        Identifier & operator=(const Identifier &) = default;
-        Identifier & operator=(Identifier &&)      = default;
-
         bool IsValid() const
         {
             static constexpr Identifier _invalidID;

@@ -165,6 +165,9 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
     static otSeekerVerdict _HandleSeekerScanEvaluator(void * aContext, const otSeekerScanResult * aResult);
     static void _HandleRendezvousRetransmissionTimer(System::Layer * aLayer, void * aAppState);
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+    static void _HandleSeekerRestartTimer(System::Layer * aLayer, void * aAppState);
+#endif
     void SendRendezvousAnnouncement();
 #endif
 
