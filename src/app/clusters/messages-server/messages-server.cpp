@@ -236,28 +236,32 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
 
     VerifyOrExit(!messageControl.Has(MessageControlBitmap::kSpokenMessage) ||
                      delegate->HasFeature(endpoint, Feature::kSpokenMessages),
-                 ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but "
-                                      "SpokenMessages feature not supported");
+                 ChipLogProgress(Zcl,
+                                 "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but "
+                                 "SpokenMessages feature not supported");
                  status = Status::InvalidCommand);
 
     VerifyOrExit(!messageControl.Has(MessageControlBitmap::kAudioMessage) ||
                      delegate->HasFeature(endpoint, Feature::kAudioMessages),
-                 ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but "
-                                      "AudioMessages feature not supported");
+                 ChipLogProgress(Zcl,
+                                 "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but "
+                                 "AudioMessages feature not supported");
                  status = Status::InvalidCommand);
 
-    VerifyOrExit(!(messageControl.Has(MessageControlBitmap::kSpokenMessage) &&
-                    messageControl.Has(MessageControlBitmap::kAudioMessage)) ||
-                     delegate->HasFeature(endpoint, Feature::kMultiModalMessages),
-                 ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage and AudioMessage "
-                                      "bits both set but MultiModalMessages feature not supported");
-                 status = Status::InvalidCommand);
+    VerifyOrExit(
+        !(messageControl.Has(MessageControlBitmap::kSpokenMessage) && messageControl.Has(MessageControlBitmap::kAudioMessage)) ||
+            delegate->HasFeature(endpoint, Feature::kMultiModalMessages),
+        ChipLogProgress(Zcl,
+                        "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage and AudioMessage "
+                        "bits both set but MultiModalMessages feature not supported");
+        status = Status::InvalidCommand);
 
     if (languageCode.HasValue())
     {
         VerifyOrExit(delegate->HasFeature(endpoint, Feature::kSpokenMessages),
-                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback LanguageCode sent but "
-                                          "SpokenMessages feature not supported");
+                     ChipLogProgress(Zcl,
+                                     "emberAfMessagesClusterPresentMessagesRequestCallback LanguageCode sent but "
+                                     "SpokenMessages feature not supported");
                      status = Status::InvalidCommand);
 
         VerifyOrExit(languageCode.Value().size() <= kLanguageCodeLengthMax,
@@ -268,8 +272,9 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     if (messageUri.HasValue())
     {
         VerifyOrExit(delegate->HasFeature(endpoint, Feature::kAudioMessages),
-                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback MessageURI sent but "
-                                          "AudioMessages feature not supported");
+                     ChipLogProgress(Zcl,
+                                     "emberAfMessagesClusterPresentMessagesRequestCallback MessageURI sent but "
+                                     "AudioMessages feature not supported");
                      status = Status::InvalidCommand);
 
         VerifyOrExit(messageUri.Value().size() <= kMessageUriLengthMax,
@@ -319,7 +324,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     }
 
     err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses,
-                                                  languageCode, messageUri);
+                                                 languageCode, messageUri);
 
 exit:
     if (err != CHIP_NO_ERROR)
