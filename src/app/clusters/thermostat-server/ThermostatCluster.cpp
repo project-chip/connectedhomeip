@@ -696,8 +696,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status
-ThermostatCluster::HandleTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
+Protocols::InteractionModel::Status ThermostatCluster::HandleTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
 {
     if (!value.IsNull())
     {
