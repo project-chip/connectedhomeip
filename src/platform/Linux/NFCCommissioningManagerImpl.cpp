@@ -625,6 +625,8 @@ void NFCCommissioningManagerImpl::_Shutdown()
 {
     ChipLogProgressNfcDebug(DeviceLayer, "NFCCommissioningManagerImpl::_Shutdown()");
 
+    std::queue<NfcWorkItem> droppedWorkItems;
+
     // Stop the NFC worker thread
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
@@ -632,10 +634,28 @@ void NFCCommissioningManagerImpl::_Shutdown()
         mNfcWorkerThreadRunning = false;
 
         // Discard all pending work immediately.
-        std::queue<NfcWorkItem> emptyQueue;
-        mWorkQueue.swap(emptyQueue);
+        mWorkQueue.swap(droppedWorkItems);
     }
     mWorkQueueCondition.notify_one();
+
+    // Work items present in the queue are going to be dropped without being processed
+    // by the worker thread. Complete them with CHIP_ERROR_SHUT_DOWN so waiting
+    // callers are unblocked
+    while (!droppedWorkItems.empty())
+    {
+        NfcWorkItem & item = droppedWorkItems.front();
+        if (item.syncCtx != nullptr)
+        {
+            {
+                std::lock_guard<std::mutex> lock(item.syncCtx->mutex);
+                item.syncCtx->result = CHIP_ERROR_SHUT_DOWN;
+                item.syncCtx->done   = true;
+            }
+            item.syncCtx->cv.notify_one();
+        }
+
+        droppedWorkItems.pop();
+    }
 
     if (mNfcWorkerThread.joinable())
     {
