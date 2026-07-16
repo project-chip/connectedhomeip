@@ -695,7 +695,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
     }
 
     std::unique_lock<std::mutex> initLock(mWorkerInitMutex);
-    mWorkerInitCondition.wait(initLock, [this]() { return mWorkerInitCompleted; });
+    mWorkerInitCondition.wait(initLock, [this]() CHIP_REQUIRES(mWorkerInitMutex) { return mWorkerInitCompleted; });
 
     return mWorkerInitResult;
 }
@@ -889,7 +889,8 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         // Wait for a work item to process
         {
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
-            mWorkQueueCondition.wait(lock, [this]() { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
+            mWorkQueueCondition.wait(lock,
+                                     [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
 
             // Exit immediately once the worker is stopped.
             if (!mNfcWorkerThreadRunning)
