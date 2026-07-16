@@ -23,6 +23,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/support/Span.h>
 
 namespace chip::app::Clusters::EnergyPreference {
 
