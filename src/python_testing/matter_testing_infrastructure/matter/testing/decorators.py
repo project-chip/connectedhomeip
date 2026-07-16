@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Callable
 
 from mobly import asserts
 
@@ -41,10 +41,10 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 EndpointCheckFunction = Callable[[
-    Optional[Clusters.Attribute.AsyncReadTransaction.ReadResponse], int], bool]
+    Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, int], bool]
 
 
-def _has_cluster(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.ReadResponse], endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -57,6 +57,10 @@ def _has_cluster(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.Read
             Returns False if endpoint is not found in wildcard attributes, or wildcard is None
     """
     if wildcard is None:
+        LOGGER.warning(
+            "has_cluster check for %s on endpoint %d: wildcard read result is None. "
+            "Treating as not present, which may cause the test to be skipped silently.",
+            cluster, endpoint)
         return False
     return endpoint in wildcard.attributes and cluster in wildcard.attributes[endpoint]
 
@@ -84,7 +88,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
     return partial(_has_cluster, cluster=cluster)
 
 
-def _has_attribute(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.ReadResponse], endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
     """Check if an attribute exists in a cluster's AttributeList on a specific endpoint.
 
     Args:
@@ -101,6 +105,10 @@ def _has_attribute(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.Re
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
     if wildcard is None:
+        LOGGER.warning(
+            "has_attribute check for %s on endpoint %d: wildcard read result is None. "
+            "Treating as not present, which may cause the test to be skipped silently.",
+            attribute, endpoint)
         return False
     cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
@@ -148,7 +156,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
-def _has_command(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.ReadResponse], endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
+def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
     """Check if a command exists in a cluster's AcceptedCommandList on a specific endpoint.
 
     Args:
@@ -165,6 +173,10 @@ def _has_command(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.Read
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
     if wildcard is None:
+        LOGGER.warning(
+            "has_command check for %s on endpoint %d: wildcard read result is None. "
+            "Treating as not present, which may cause the test to be skipped silently.",
+            command, endpoint)
         return False
     cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
@@ -210,8 +222,12 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
     return partial(_has_command, command=command)
 
 
-def _has_feature(wildcard: Optional[Clusters.Attribute.AsyncReadTransaction.ReadResponse], endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
     if wildcard is None:
+        LOGGER.warning(
+            "has_feature check for %s / %s on endpoint %d: wildcard read result is None. "
+            "Treating as not present, which may cause the test to be skipped silently.",
+            cluster, feature, endpoint)
         return False
     if endpoint not in wildcard.attributes:
         return False
@@ -407,3 +423,4 @@ def pics(*pics_list):
         fn._pics = list(pics_list)
         return fn
     return decorator
+    
