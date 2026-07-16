@@ -16,7 +16,6 @@
 
 import ctypes
 from enum import Enum, auto
-from typing import Optional
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 
@@ -53,7 +52,7 @@ class TraceType(Enum):
     PERFETTO = auto()
 
 
-def StartTracingTo(trace_type: TraceType, file_name: Optional[str] = None):
+def StartTracingTo(trace_type: TraceType, file_name: str | None = None):
     """
     Initiate tracing to the specified destination.
 
@@ -94,7 +93,7 @@ class TracingContext:
 
     """
 
-    def Start(self, trace_type: TraceType, file_name: Optional[str] = None):
+    def Start(self, trace_type: TraceType, file_name: str | None = None):
         StartTracingTo(trace_type, file_name)
 
     def StartFromString(self, destination: str):

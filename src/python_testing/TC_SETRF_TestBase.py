@@ -17,7 +17,7 @@
 import datetime
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -487,7 +487,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeTime)
 
-    async def check_tariff_info_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.TariffInformationStruct] = None) -> None:
+    async def check_tariff_info_attribute(self, endpoint: int, attribute_value: cluster.Structs.TariffInformationStruct | None = None) -> None:
         """Validate TariffInfo attribute.
 
         Args:
@@ -508,7 +508,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.tariffInfoValue, cluster.Structs.TariffInformationStruct), "TariffInfo must be of type TariffInformationStruct")
             await self.checkTariffInformationStruct(endpoint=endpoint, cluster=cluster, struct=self.tariffInfoValue)
 
-    async def check_tariff_unit_attribute(self, endpoint: int, attribute_value: Optional[Globals.Enums.TariffUnitEnum] = None) -> None:
+    async def check_tariff_unit_attribute(self, endpoint: int, attribute_value: Globals.Enums.TariffUnitEnum | None = None) -> None:
         """Validate TariffUnit attribute.
 
         Args:
@@ -530,7 +530,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 attribute_value, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
             asserts.assert_true(attribute_value >= 0 and attribute_value <= 1, "TariffUnit must be in range 0 - 1")
 
-    async def check_start_date_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_start_date_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate StartDate attribute.
 
         Args:
@@ -551,7 +551,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if self.startDateAttributeValue is not NullValue:
             matter_asserts.assert_valid_uint32(self.startDateAttributeValue, 'StartDate attribute must has uint32 type.')
 
-    async def check_day_entries_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.DayEntryStruct]] = None) -> None:
+    async def check_day_entries_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.DayEntryStruct] | None = None) -> None:
         """Validate DayEntries attribute.
 
         Args:
@@ -586,7 +586,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             # check DayEntryID uniqueness
             await self.check_list_elements_uniqueness(dayEntryIDs_from_day_entries_attribute, "DayEntryIDs")
 
-    async def check_day_patterns_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.DayPatternStruct]] = None) -> None:
+    async def check_day_patterns_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.DayPatternStruct] | None = None) -> None:
         """Validate DayPatterns attribute.
 
         Args:
@@ -613,7 +613,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 for item in self.dayPatternsValue:  # check each DayPatternStruct
                     await self.checkDayPatternStruct(struct=item)
 
-    async def check_calendar_periods_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.CalendarPeriodStruct]] = None) -> None:
+    async def check_calendar_periods_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.CalendarPeriodStruct] | None = None) -> None:
         """Validate CalendarPeriods attribute.
 
         Args:
@@ -661,7 +661,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                         asserts.assert_true(self.calendarPeriodsValue[item].startDate is not NullValue,
                                             "If StartDate is Null only first CalendarPeriod item Start Date field must be Null, the other CalendarPeriod items Start Date field must not be Null")
 
-    async def check_individual_days_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.DayStruct]] = None) -> None:
+    async def check_individual_days_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.DayStruct] | None = None) -> None:
         """Validate IndividualDays attribute.
 
         Args:
@@ -694,7 +694,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 asserts.assert_less(self.individualDaysValue[item].date, self.individualDaysValue[item + 1].date,
                                     "IndividualDays must be sorted by Date in increasing order!")
 
-    async def check_current_day_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayStruct] = None) -> None:
+    async def check_current_day_attribute(self, endpoint: int, attribute_value: cluster.Structs.DayStruct | None = None) -> None:
         """Validate CurrentDay attribute.
 
         Args:
@@ -717,7 +717,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.currentDayValue, cluster.Structs.DayStruct), "CurrentDay must be of type DayStruct")
             await self.checkDayStruct(cluster=cluster, struct=self.currentDayValue)
 
-    async def check_next_day_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayStruct] = None) -> None:
+    async def check_next_day_attribute(self, endpoint: int, attribute_value: cluster.Structs.DayStruct | None = None) -> None:
         """Validate NextDay attribute.
 
         Args:
@@ -740,7 +740,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 self.nextDayValue, cluster.Structs.DayStruct), "NextDay must be of type DayStruct")
             await self.checkDayStruct(cluster=cluster, struct=self.nextDayValue)
 
-    async def check_current_day_entry_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayEntryStruct] = None) -> None:
+    async def check_current_day_entry_attribute(self, endpoint: int, attribute_value: cluster.Structs.DayEntryStruct | None = None) -> None:
         """Validate CurrentDayEntry attribute.
 
         Args:
@@ -762,7 +762,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 attribute_value, cluster.Structs.DayEntryStruct), "CurrentDayEntry must be of type DayEntryStruct")
             await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=attribute_value)
 
-    async def check_current_day_entry_date_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_current_day_entry_date_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate CurrentDayEntryDate attribute.
 
         Args:
@@ -783,7 +783,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         if self.currentDayEntryDateValue is not NullValue:
             matter_asserts.assert_valid_uint32(self.currentDayEntryDateValue, 'CurrentDayEntryDate must be of type uint32')
 
-    async def check_next_day_entry_attribute(self, endpoint: int, attribute_value: Optional[cluster.Structs.DayEntryStruct] = None) -> None:
+    async def check_next_day_entry_attribute(self, endpoint: int, attribute_value: cluster.Structs.DayEntryStruct | None = None) -> None:
         """Validate NextDayEntry attribute.
 
         Args:
@@ -805,7 +805,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                 attribute_value, cluster.Structs.DayEntryStruct), "NextDayEntry must be of type DayEntryStruct")
             await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=attribute_value)
 
-    async def check_next_day_entry_date_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_next_day_entry_date_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate NextDayEntryDate attribute.
 
         Args:
@@ -828,7 +828,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_greater(self.nextDayEntryDateValue, self.currentDayEntryDateValue,
                                    "NextDayEntryDate must be greater than CurrentDayEntryDate")
 
-    async def check_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.TariffComponentStruct]] = None) -> None:
+    async def check_tariff_components_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.TariffComponentStruct] | None = None) -> None:
         """Validate TariffComponents attribute.
 
         Args:
@@ -856,7 +856,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             for item in self.tariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-    async def check_tariff_periods_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.TariffPeriodStruct]] = None) -> None:
+    async def check_tariff_periods_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.TariffPeriodStruct] | None = None) -> None:
         """Validate TariffPeriods attribute.
 
         Args:
@@ -886,7 +886,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
                 await self.validate_tariff_component_ID_uniqueness_for_features(await self.get_tariff_components_by_its_IDs(tariff_period.tariffComponentIDs))
 
-    async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.TariffComponentStruct]] = None) -> None:
+    async def check_current_tariff_components_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.TariffComponentStruct] | None = None) -> None:
         """Validate CurrentTariffComponents attribute.
 
         Args:
@@ -915,7 +915,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             for item in self.currentTariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-    async def check_next_tariff_components_attribute(self, endpoint: int, attribute_value: Optional[list[cluster.Structs.TariffComponentStruct]] = None) -> None:
+    async def check_next_tariff_components_attribute(self, endpoint: int, attribute_value: list[cluster.Structs.TariffComponentStruct] | None = None) -> None:
         """Validate NextTariffComponents attribute.
 
         Args:
@@ -944,7 +944,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             for item in self.nextTariffComponentsValue:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-    async def check_default_randomization_offset_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_default_randomization_offset_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate DefaultRandomizationOffset attribute.
 
         Args:
@@ -982,7 +982,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(
                 self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must be None if RNDM feature is disabled.")
 
-    async def check_default_randomization_type_attribute(self, endpoint: int, attribute_value: Optional[cluster.Enums.DayEntryRandomizationTypeEnum] = None) -> None:
+    async def check_default_randomization_type_attribute(self, endpoint: int, attribute_value: cluster.Enums.DayEntryRandomizationTypeEnum | None = None) -> None:
 
         self.defaultRandomizationType = attribute_value
         if self.defaultRandomizationType is None:
