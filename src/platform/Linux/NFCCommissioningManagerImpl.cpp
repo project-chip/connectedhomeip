@@ -667,7 +667,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
                 mWorkerInitCompleted = false;
                 mWorkerInitResult    = CHIP_ERROR_INCORRECT_STATE;
             }
-            mShuttingDown = false;
+            mShuttingDown           = false;
             mNfcWorkerThreadRunning = true;
 
             mNfcWorkerThread = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
@@ -1059,8 +1059,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
     switch (result)
     {
     case static_cast<LONG>(SCARD_S_SUCCESS): {
-        ChipLogProgressNfcDebug(DeviceLayer, "SCardConnect succeeded for reader %s, cardHandle: 0x" ChipLogFormatX64,
-                                readerName, ChipLogValueX64(cardHandle));
+        ChipLogProgressNfcDebug(DeviceLayer, "SCardConnect succeeded for reader %s, cardHandle: 0x" ChipLogFormatX64, readerName,
+                                ChipLogValueX64(cardHandle));
         // Check if we already have this couple (readerName, cardHandle)
         {
             std::lock_guard<std::mutex> lock(mStateMutex);

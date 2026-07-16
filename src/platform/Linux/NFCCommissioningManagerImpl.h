@@ -34,9 +34,9 @@
 #include <lib/support/Span.h>
 #include <mutex>
 #include <queue>
+#include <system/SystemMutex.h>
 #include <thread>
 #include <vector>
-#include <system/SystemMutex.h>
 #ifdef __APPLE__
 #include <PCSC/winscard.h>
 #else
@@ -251,7 +251,7 @@ private:
     std::mutex mWorkQueueMutex;
     std::condition_variable mWorkQueueCondition;
     bool mNfcWorkerThreadRunning CHIP_GUARDED_BY(mWorkQueueMutex) = false;
-    bool mShuttingDown CHIP_GUARDED_BY(mWorkQueueMutex) = false;
+    bool mShuttingDown CHIP_GUARDED_BY(mWorkQueueMutex)           = false;
 
     // Synchronization primitives used to wait until the worker thread has finished
     // its initialization, including PC/SC context creation.
