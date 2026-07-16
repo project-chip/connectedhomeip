@@ -26,9 +26,8 @@ Alchemy: v1.6.18+dirty
   <cluster>
     <domain>Media</domain>
     <name>Account Login</name>
-    <code>0x050E</code>
+    <code>0x050e</code>
     <define>ACCOUNT_LOGIN_CLUSTER</define>
-    <description>This cluster provides commands that facilitate user account login on a Content App or a node.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
@@ -100,24 +99,10 @@ Alchemy: v1.6.18+dirty
       </otherwiseConform>
     </command>
 
-    <command code="0x02" source="client" name="Login" isFabricScoped="true" mustUseTimedInvoke="true">
-      <description>The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process.</description>
-      <access op="invoke" privilege="administer"/>
-      <arg fieldId="0" name="TempAccountIdentifier" type="char_string" length="100" minLength="16"/>
-      <arg fieldId="1" name="SetupPIN" type="char_string" minLength="8"/>
-      <arg fieldId="2" name="Node" type="node_id" optional="true"/>
-    </command>
-
-    <command code="0x03" source="client" name="Logout" isFabricScoped="true" mustUseTimedInvoke="true">
-      <description>The purpose of this command is to instruct the Content App to clear the current user account.</description>
-      <arg fieldId="0" name="Node" type="node_id" optional="true"/>
-    </command>
-
-    <event code="0x0000" name="LoggedOut" priority="critical" side="server" isFabricSensitive="true" optional="true">
+    <event side="server" code="0x00" priority="critical" name="LoggedOut" optional="true" isFabricSensitive="true">
       <description>This event can be used by the Content App to indicate that the current user has logged out.</description>
       <field id="0" fieldId="0" name="Node" type="node_id" optional="true"/>
       <access op="read" privilege="administer"/>
-      <field id="0" name="Node" type="node_id" optional="true"/>
       <optionalConform/>
     </event>
 
