@@ -17,7 +17,7 @@
  */
 #include "AppConfig.h"
 #ifdef ENABLE_CHIP_SHELL
-#include "MatterShell.h" // nogncheck
+#include "shell/MatterShell.h" // nogncheck
 #endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
