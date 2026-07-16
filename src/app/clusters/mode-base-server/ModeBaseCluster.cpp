@@ -17,6 +17,8 @@
  */
 
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <app/data-model/Nullable.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/PlatformManager.h>
@@ -44,7 +46,6 @@ constexpr uint8_t kMaxNumOfModeTags = 8;
 ModeBaseCluster::ModeBaseCluster(EndpointId endpointId, ClusterId aClusterId, const Config & config) :
     DefaultServerCluster({ endpointId, aClusterId }), mFeature(config.feature), mOptionalAttributeSet(config.optionalAttributeSet),
     mAppDelegate(config.appDelegate), mOnOffValueForStartUp(config.onOffValueForStartUp),
-    mSafeAttributePersistenceProvider(config.safeAttributePersistenceProvider),
     mDiagnosticDataProvider(config.diagnosticDataProvider), mClusterRevision(config.clusterRevision)
 {}
 
@@ -123,9 +124,12 @@ Status ModeBaseCluster::UpdateCurrentMode(uint8_t aNewMode)
     VerifyOrReturnValue(IsSupportedMode(aNewMode), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mCurrentMode, aNewMode, CurrentMode::Id), Status::Success);
 
-    // Write new value to persistent storage.
-    LogErrorOnFailure(
-        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
+    if (mContext != nullptr)
+    {
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
+    }
     return Status::Success;
 }
 
@@ -134,9 +138,12 @@ Status ModeBaseCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStart
     VerifyOrReturnValue(aNewStartUpMode.IsNull() || IsSupportedMode(aNewStartUpMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mStartUpMode, aNewStartUpMode, StartUpMode::Id), Status::Success);
 
-    // Write new value to persistent storage.
-    LogErrorOnFailure(
-        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
+    if (mContext != nullptr)
+    {
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
+    }
     return Status::Success;
 }
 
@@ -145,9 +152,11 @@ Status ModeBaseCluster::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     VerifyOrReturnValue(aNewOnMode.IsNull() || IsSupportedMode(aNewOnMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mOnMode, aNewOnMode, OnMode::Id), Status::Success);
 
-    // Write new value to persistent storage.
-    LogErrorOnFailure(
-        mSafeAttributePersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
+    if (mContext != nullptr)
+    {
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
+    }
     return Status::Success;
 }
 
@@ -378,13 +387,12 @@ void ModeBaseCluster::LogStatus(Status status, const DataModel::Nullable<uint8_t
 
 void ModeBaseCluster::LoadPersistentAttributes()
 {
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
     uint8_t currentMode = 0;
     DataModel::Nullable<uint8_t> startUpMode;
     DataModel::Nullable<uint8_t> onMode;
 
-    CHIP_ERROR err =
-        mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, currentMode);
-    if (err == CHIP_NO_ERROR)
+    if (attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, currentMode, mCurrentMode))
     {
         LogStatus(UpdateCurrentMode(currentMode), currentMode, "CurrentMode");
     }
@@ -395,9 +403,8 @@ void ModeBaseCluster::LoadPersistentAttributes()
 
     if (mOptionalAttributeSet.IsSet(StartUpMode::Id))
     {
-        err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id },
-                                                                startUpMode);
-        if (err == CHIP_NO_ERROR)
+        if (attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, startUpMode,
+                                                  mStartUpMode))
         {
             LogStatus(UpdateStartUpMode(startUpMode), startUpMode, "StartUpMode");
         }
@@ -409,8 +416,7 @@ void ModeBaseCluster::LoadPersistentAttributes()
 
     if (mFeature.Has(Feature::kOnOff))
     {
-        err = mSafeAttributePersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, onMode);
-        if (err == CHIP_NO_ERROR)
+        if (attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, onMode, mOnMode))
         {
             LogStatus(UpdateOnMode(onMode), onMode, "OnMode");
         }

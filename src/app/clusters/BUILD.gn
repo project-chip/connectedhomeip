@@ -40,6 +40,7 @@ source_set("clusters") {
     "descriptor",
     "device-energy-management-server",
     "diagnostic-logs-server",
+    "dynamic-lighting-server",
     "electrical-energy-measurement-server",
     "electrical-power-measurement-server",
     "energy-evse-server",
