@@ -160,7 +160,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \                      
                       src/app/zap-templates/zcl/data-model/chip/ballast-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
