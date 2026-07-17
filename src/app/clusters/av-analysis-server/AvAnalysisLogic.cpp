@@ -359,10 +359,8 @@ AvAnalysisServerLogic::HandleEnableContextTriggers(CommandHandler & handler, con
     {
         return HandleLocalEnableContextTriggers(handler, commandPath, commandData);
     }
-    else
-    {
-        return HandleRemoteEnableContextTriggers(handler, commandPath, commandData);
-    }
+    
+    return HandleRemoteEnableContextTriggers(handler, commandPath, commandData);
 }
 
 /**
