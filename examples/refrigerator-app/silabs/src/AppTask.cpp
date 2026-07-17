@@ -29,9 +29,9 @@
 #ifdef DISPLAY_ENABLED
 #include "RefrigeratorUI.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)

@@ -100,7 +100,9 @@ config("efr32-common-config") {
   }
 
   if (show_qr_code) {
-    defines += [ "QR_CODE_ENABLED" ]
+    defines += [ "SL_MATTER_QR_CODE_ENABLED=1" ]
+  } else {
+    defines += [ "SL_MATTER_QR_CODE_ENABLED=0" ]
   }
 
   if (chip_enable_ota_requestor) {

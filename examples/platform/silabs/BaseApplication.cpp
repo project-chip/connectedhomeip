@@ -34,9 +34,9 @@
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
 #ifdef ENABLE_CHIP_SHELL
@@ -136,8 +136,8 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-bool sIsEnabled  = false;
-bool sIsAttached = false;
+[[maybe_unused]] bool sIsEnabled  = false;
+[[maybe_unused]] bool sIsAttached = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -215,12 +215,12 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         // resetting the isCommissioningStarted to false
         isComissioningStarted = false;
 #ifdef DISPLAY_ENABLED
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
         BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
     }
 }
@@ -1020,13 +1020,13 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
             slLCD.ShowQRCode(true);
         }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
         PrintQrCodeURL(setupPayload);
     }
