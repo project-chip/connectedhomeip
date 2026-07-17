@@ -51,7 +51,7 @@ namespace Internal {
 
 namespace {
 
-    inline void AssertMutexIsHeld(const std::mutex &m) CHIP_TSA_ATTRIBUTE__(assert_exclusive_lock(m)) {}
+inline void AssertMutexIsHeld(const std::mutex & m) CHIP_TSA_ATTRIBUTE__(assert_exclusive_lock(m)) {}
 
 } // namespace
 
