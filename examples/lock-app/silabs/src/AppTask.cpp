@@ -27,12 +27,17 @@
 
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+<<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+=======
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+>>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -214,7 +219,7 @@ CHIP_ERROR AppTask::AppInit()
     sUnlatchTimer = xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, UnlatchTimerCallback);
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(state.Value() != DlLockState::kUnlocked);
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
@@ -335,9 +340,9 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         SILABS_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
         sLockLED.Set(!locked);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
         sAppTask.GetLCD().WriteDemoUI(locked);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
     }
     else if (aAction == LockManager::UNLATCH_ACTION)
     {

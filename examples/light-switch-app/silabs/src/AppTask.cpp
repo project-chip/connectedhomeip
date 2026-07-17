@@ -31,12 +31,17 @@
 #include "ShellCommands.h"
 #endif // defined(ENABLE_CHIP_SHELL)
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+<<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+=======
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+>>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

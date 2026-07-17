@@ -23,12 +23,17 @@
 
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+<<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+=======
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+>>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>

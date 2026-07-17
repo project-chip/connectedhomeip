@@ -142,7 +142,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 
     sLightOn = false;
     sLightLED.Set(false);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(false);
 #endif
 }
@@ -188,7 +188,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     DisarmOffWithEffectTimer();
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
 
@@ -250,7 +250,7 @@ CHIP_ERROR AppTask::AppInit()
     sLightLED.Set(sLightOn);
 
 // Update the LCD with the stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(sLightOn);
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
@@ -459,7 +459,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 
             sLightOn = lightOn;
             sLightLED.Set(sLightOn);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
         }

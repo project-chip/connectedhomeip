@@ -169,8 +169,13 @@ CHIP_ERROR AppTask::AppInit()
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
+<<<<<<< HEAD
 #ifdef DISPLAY_ENABLED
 #ifdef QR_CODE_ENABLED
+=======
+#if SL_MATTER_DISPLAY_ENABLED
+#ifdef SL_MATTER_QR_CODE_ENABLED
+>>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 #ifdef SL_WIFI
     if (!chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
 #else
