@@ -238,10 +238,12 @@ def run_timeout(run: Metadata) -> float:
 @click.option("--ip-packet-capture-dir", type=click.Path(file_okay=False, writable=True, path_type=pathlib.Path),
               default=pathlib.Path.cwd() / "out/ip_packet_captures", help="Storage for capture files.")
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
+@click.option("--pre-existing-fabric", is_flag=True, default=False,
+              help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter):
+         app_filter, pre_existing_fabric: bool):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -256,6 +258,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                 app_stdin_pipe=app_stdin_pipe,
                 script_args=script_args,
                 script_gdb=script_gdb,
+                pre_existing_fabric=pre_existing_fabric,
             )
         ]
 
@@ -284,12 +287,14 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.script_gdb = script_gdb
         if quiet is not None:
             run.quiet = quiet
+        if pre_existing_fabric:
+            run.pre_existing_fabric = pre_existing_fabric
 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run)
+                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
 
 
 class AppRestartMonitor:
@@ -361,7 +366,7 @@ class AppRestartMonitor:
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -404,6 +409,59 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
         script_args += f" --restart-flag-file {restart_flag_file}"
+
+    if pre_existing_fabric:
+        # Some devices (custom commissioning) may show up at cert with a fabric already on the device
+        # to simulate this in the CI, this option allows the user to pre-commission the device onto
+        # an ephermeral fabric.
+        # This is done using the commission-only-re-open-window flag in the device testing framework.
+        # That flag commissions the device and then re-opens the commissioning window with the same
+        # discriminator and passcode.
+        p = matter_test_args_parser()
+        args, _ = p.parse_known_args(shlex.split(script_args))
+
+        if not args.commissioning_method or args.commissioning_method != "on-network":
+            raise click.ClickException(
+                "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
+            )
+
+        commission_tokens = shlex.split(script_args)
+        storage_path_found = False
+        for idx, token in enumerate(commission_tokens):
+            if token == '--storage-path':
+                if idx + 1 < len(commission_tokens):
+                    path_val = commission_tokens[idx + 1]
+                    name, ext = os.path.splitext(path_val)
+                    commission_tokens[idx + 1] = f"{name}_pre{ext}"
+                    storage_path_found = True
+            elif token.startswith('--storage-path='):
+                path_val = token.split('=', 1)[1]
+                name, ext = os.path.splitext(path_val)
+                commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
+                storage_path_found = True
+
+        if not storage_path_found:
+            commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
+
+        commission_args = shlex.join(commission_tokens)
+
+        commission_command = [
+            sys.executable, "-X", "faulthandler",
+            script,
+            "--fail-on-skipped",
+            "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            "--commission-only-re-open-window"
+        ] + shlex.split(commission_args)
+
+        log.info("Running python script to commission device on a pre-existing fabric and open commissioning window...")
+        log.info("Command: %s", ' '.join(commission_command))
+        commission_proc = Subprocess(commission_command[0], *commission_command[1:],
+                                     output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
+        commission_proc.start()
+        commission_exit = commission_proc.wait(120)
+        if commission_exit != 0:
+            log.error("Commissioning run failed with exit code %d", commission_exit)
+            sys.exit(commission_exit)
 
     script_command = [
         script,

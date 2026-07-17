@@ -20,10 +20,13 @@ This module contains CommissionDeviceTest class designed to handle the commissio
 """
 
 
+import logging
 from mobly import signals
 
 from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_devices
 from matter.testing.matter_testing import MatterBaseTest
+
+logger = logging.getLogger(__name__)
 
 
 class CommissionDeviceTest(MatterBaseTest):
@@ -63,3 +66,22 @@ class CommissionDeviceTest(MatterBaseTest):
             commissioning_info=self.commissioning_info
         )):
             raise signals.TestAbortAll("Failed to commission node(s)")
+
+        if self.matter_test_config.commission_only_re_open_window:
+            for node_id, setup_payload in zip(self.dut_node_ids, self.setup_payloads):
+                logger.info(f"Opening commissioning window on node {node_id} using ECM with passcode {setup_payload.passcode}...")
+                try:
+                    self.event_loop.run_until_complete(
+                        self.default_controller.OpenCommissioningWindow(
+                            nodeId=node_id,
+                            timeout=900,
+                            iteration=1000,
+                            discriminator=setup_payload.filter_value,
+                            option=self.default_controller.CommissioningWindowPasscode.kTokenWithProvidedPin,
+                            setupPinCode=setup_payload.passcode
+                        )
+                    )
+                    logger.info("Commissioning window opened successfully.")
+                except Exception as e:
+                    logger.exception(f"Failed to open commissioning window on node {node_id}")
+                    raise signals.TestAbortAll(f"Failed to open commissioning window on node {node_id}: {str(e)}")

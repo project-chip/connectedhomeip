@@ -1359,9 +1359,10 @@ class ChipDeviceControllerBase:
     class CommissioningWindowPasscode(enum.IntEnum):
         kOriginalSetupCode = 0
         kTokenWithRandomPin = 1
+        kTokenWithProvidedPin = 2
 
     async def OpenCommissioningWindow(self, nodeId: int, timeout: int, iteration: int,
-                                      discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
+                                      discriminator: int, option: CommissioningWindowPasscode, setupPinCode: int = 0) -> CommissioningParameters:
         '''
         Opens a commissioning window on the device with the given node ID.
 
@@ -1376,6 +1377,8 @@ class ChipDeviceControllerBase:
             option (int):
                 0 = kOriginalSetupCode
                 1 = kTokenWithRandomPIN
+                2 = kTokenWithProvidedPIN
+            setupPinCode (int): The setup PIN code to use. Ignored if option != 2
 
             Returns:
                 CommissioningParameters
@@ -1385,7 +1388,7 @@ class ChipDeviceControllerBase:
         async with self._open_window_context as ctx:
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
-                    self.devCtrl, self.pairingDelegate, nodeId, timeout, iteration, discriminator, option)
+                    self.devCtrl, self.pairingDelegate, nodeId, timeout, iteration, discriminator, option, setupPinCode)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
@@ -2935,7 +2938,7 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8, c_uint32]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
 
             try:

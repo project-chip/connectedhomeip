@@ -460,7 +460,7 @@ def run_tests_no_exit(
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
             # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
+            if not matter_test_config.commission_only and not matter_test_config.commission_only_re_open_window:
                 runner.add_test_class(test_config, test_class, tests)
 
             if hooks:
@@ -633,6 +633,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.commissioning_method = args.commissioning_method
     config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
+    config.commission_only_re_open_window = args.commission_only_re_open_window
 
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
@@ -1041,6 +1042,8 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
+    commission_group.add_argument('--commission-only-re-open-window', action="store_true", default=False,
+                                  help="If true, test commissions, opens a commissioning window using the original passcode/discriminator, and then exits without running subsequent tests")
 
     commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
 
