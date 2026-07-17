@@ -113,7 +113,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(1)
         if hasattr(cluster.Attributes, 'DataModelRevision') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
             ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
-            if hasattr(cluster.Attributes, 'SpecificationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
+            if hasattr(cluster.Attributes, 'SpecificationVersion') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
                 specification_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
                 try:
                     data_model = dm_from_spec_version(specification_version)
