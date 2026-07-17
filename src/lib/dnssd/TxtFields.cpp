@@ -84,9 +84,9 @@ uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val, uint32_t defaultValue = 0
     // value must be decimal digits only: strtoul() otherwise accepts a leading
     // sign or whitespace, so a nonconformant TXT value like "+5" or " 5" would
     // parse as 5 instead of being rejected.
-    for (size_t i = 0; i < val.size(); ++i)
+    for (uint8_t b : val)
     {
-        if (val.data()[i] < '0' || val.data()[i] > '9')
+        if (b < '0' || b > '9')
             return defaultValue;
     }
 
