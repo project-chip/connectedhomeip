@@ -21,6 +21,7 @@ config("lwip_config") {
     "${chip_root}/src/lwip/mt793x",
     "${chip_root}/src/lwip/freertos",
   ]
+  defines = [ "MTK_MATTER_LWIP=1" ]
 }
 
 lwip_target("lwip") {
