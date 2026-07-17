@@ -259,8 +259,9 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     }
 
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
-    bool are_equal = std::ranges::equal(testAmbientContexts, readContexts, [](const auto & p1, const auto & p2) {
-        return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
+    bool are_equal = std::equal(testAmbientContexts.begin(), testAmbientContexts.end(), readContexts.begin(), readContexts.end(), 
+        [](const auto & p1, const auto & p2) {
+            return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
 
@@ -437,8 +438,9 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
 
     // Are the supported and active contexts equal
     //
-    bool are_equal = std::ranges::equal(readSupportedContexts, readActiveContexts, [](const auto & p1, const auto & p2) {
-        return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
+    bool are_equal = std::equal(readSupportedContexts.begin(), readSupportedContexts.end(), readActiveContexts.begin(), 
+        readActiveContexts.end(), [](const auto & p1, const auto & p2) {
+            return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
     });
     ASSERT_TRUE(are_equal);
 }
@@ -777,8 +779,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestRemov
     // Are the active contexts our test contexts minus the first value
     //
     bool are_equal =
-        std::ranges::equal(std::ranges::subrange(testAmbientContexts.begin() + 1, testAmbientContexts.end()), readActiveContexts,
-                           [](const auto & p1, const auto & p2) { return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag; });
+        std::equal(testAmbientContexts.begin() + 1, testAmbientContexts.end(), readActiveContexts.begin(), readActiveContexts.end(),
+            [](const auto & p1, const auto & p2) { return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag; });
     ASSERT_TRUE(are_equal);
 }
 
