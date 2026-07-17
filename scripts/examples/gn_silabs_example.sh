@@ -63,11 +63,8 @@ if [ "$#" == "0" ]; then
     <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            BRD4186A
-            BRD4187A
             BRD4186C
             BRD4187C
-            BRD2601B
             BRD2703A
             BRD2704A
             BRD4316A
