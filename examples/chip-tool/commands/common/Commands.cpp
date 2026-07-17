@@ -31,10 +31,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 
-#if (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN) && !CHIP_DISABLE_PLATFORM_KVS
-#include <platform/Linux/CHIPLinuxStoragePaths.h>
-#endif
-
 #include "../clusters/JsonParser.h"
 
 namespace {
@@ -327,20 +323,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
 #if !CHIP_DISABLE_PLATFORM_KVS
-    // Set the platform KVS data file path before the CHIP stack is initialized
-    // (which happens inside command->Run() via PlatformMgr().InitChipStack() ->
-    // PosixConfig::Init()). This ensures PosixConfig::Init() uses the correct
-    // chip_tool_kvs path from the start, avoiding a re-initialization conflict
-    // when UseStorageDirectory would otherwise call Init() a second time with a
-    // different path.
-#if (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN)
-    {
-        std::string platformKVS = std::string(mStorage.GetDirectory()) + "/chip_tool_kvs";
-        chip::DeviceLayer::GetStoragePaths().SetKVSDataFile(platformKVS);
-    }
-#else
     UseStorageDirectory(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl(), mStorage.GetDirectory());
-#endif // (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN)
 #endif // !CHIP_DISABLE_PLATFORM_KVS
 
 #endif // CONFIG_USE_LOCAL_STORAGE

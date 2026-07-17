@@ -58,18 +58,38 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 
     if (mInitialized)
     {
-        if (mConfigPath != configFile)
+        if (mConfigPath == configFile)
         {
-            ChipLogError(DeviceLayer,
-                         "ChipLinuxStorage::Init: Attempt to re-initialize with a different KVS config file. "
-                         "Already initialized with: %s, requested: %s",
-                         StringOrNullMarker(mConfigPath.c_str()), StringOrNullMarker(configFile));
-            return CHIP_ERROR_INCORRECT_STATE;
+            ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Already initialized with KVS config file: %s",
+                          StringOrNullMarker(configFile));
+            return CHIP_NO_ERROR;
         }
 
-        ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Already initialized with KVS config file: %s",
-                      StringOrNullMarker(configFile));
-        return CHIP_NO_ERROR;
+        // Re-initialization with a different config file path. Flush any dirty
+        // data to the previous file, then clear the in-memory state so the new
+        // file can be loaded cleanly.
+        ChipLogDetail(DeviceLayer,
+                     "ChipLinuxStorage::Init: Re-initializing KVS from '%s' to '%s'",
+                     StringOrNullMarker(mConfigPath.c_str()), StringOrNullMarker(configFile));
+
+        if (mDirty)
+        {
+            retval = ChipLinuxStorageIni::CommitConfig(mConfigPath);
+            mDirty = false;
+            if (retval != CHIP_NO_ERROR)
+            {
+                return retval;
+            }
+        }
+
+        retval = ChipLinuxStorageIni::RemoveAll();
+        if (retval != CHIP_NO_ERROR)
+        {
+            return retval;
+        }
+
+        mConfigPath.clear();
+        mInitialized = false;
     }
 
     ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
