@@ -456,9 +456,9 @@ class PRContext:
 
     @cached_property
     def mergeable(self) -> bool | None:
-        val = self.pr.mergeable
-        if val is not None:
-            return val
+        is_mergeable = self.pr.mergeable
+        if is_mergeable is not None:
+            return is_mergeable
 
         # If the PR is not open, do not retry as mergeability won't be computed.
         if self.pr.state != "open":
@@ -470,19 +470,23 @@ class PRContext:
             return None
 
         # Retry logic if mergeability is still computing on GitHub
-        for i in range(1, 4):
-            sleep_time = 5 * i
+        for attempt in range(1, 4):
+            sleep_time = 5 * attempt
             log.info(
                 "PR #%d mergeability state is computing. Retrying in %d seconds... (Attempt %d/3)",
                 self.pr.number,
                 sleep_time,
-                i,
+                attempt,
             )
             time.sleep(sleep_time)  # Increasing backoff: 5s, 10s, 15s
-            self.pr.update()
-            val = self.pr.mergeable
-            if val is not None:
-                return val
+            try:
+                self.pr = self.repo.get_pull(self.pr.number)
+            except Exception as e:
+                log.warning("Failed to refresh PR #%d: %s", self.pr.number, e)
+                continue
+            is_mergeable = self.pr.mergeable
+            if is_mergeable is not None:
+                return is_mergeable
 
         return None
 
