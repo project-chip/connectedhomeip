@@ -424,6 +424,10 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
         if (src.Value().components.HasValue())
         {
             auto & components = src.Value().components.Value();
+            if (components.size() > kMaxComponentsPerPriceEntry)
+            {
+                return CHIP_ERROR_BAD_REQUEST;
+            }
             if (!mOwnedCurrentPriceComponentBuffer.Calloc(components.size()))
             {
                 return CHIP_ERROR_NO_MEMORY;
@@ -586,6 +590,10 @@ CHIP_ERROR Instance::CopyPriceForecast(const DataModel::List<const Structs::Comm
     // At this point our local storage should be unallocated
 
     size_t entries = src.size();
+    if (entries > kMaxForecastEntries)
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
     if (!mOwnedForecastPriceStructBuffer.Calloc(entries))
     {
         return CHIP_ERROR_NO_MEMORY;
