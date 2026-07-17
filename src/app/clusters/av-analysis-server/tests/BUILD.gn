@@ -20,9 +20,9 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestAvAnalysisCluster"
 
-  test_sources = [ 
+  test_sources = [
     "TestLocalAvAnalysisCluster.cpp",
-    "TestRemoteAvAnalysisCluster.cpp" 
+    "TestRemoteAvAnalysisCluster.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
