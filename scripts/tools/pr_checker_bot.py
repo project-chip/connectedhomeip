@@ -44,6 +44,20 @@ DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
 
 ELIGIBILITY_COMMENT_MARKER = "<!-- pr-checker-bot-eligibility-marker -->"
 
+# Timeout after which uncompleted check suites from known non-critical external apps
+# on Dependabot PRs are considered stale/indefinitely queued.
+DEPENDABOT_STALE_SUITE_TIMEOUT = timedelta(hours=6)
+
+# Third-party integrations / GitHub apps that register check suites on all PRs but
+# never complete or execute builds for Dependabot PRs
+IGNORED_STALE_SUITE_APPS = {
+    "GitHub Pages",
+    "Codecov",
+    "Testspace.com",
+    "SonarQubeCloud",
+    "BuildJet",
+}
+
 
 class ValidationCheck(Enum):
     CI = "ci"
@@ -385,14 +399,24 @@ class PRContext:
                     created_at = created_at.replace(tzinfo=UTC)
 
                 age = now - created_at
-                if self.is_dependabot and app_name != "GitHub Actions" and age > timedelta(hours=1):
+                # Some external integrations automatically create a CheckSuite on every commit but never trigger or complete
+                # builds for Dependabot PRs. To prevent Dependabot PRs from hanging, we ignore uncompleted check suites ONLY IF:
+                # 1. The PR is authored by Dependabot
+                # 2. The check suite belongs to a known external app in `IGNORED_STALE_SUITE_APPS`.
+                # 3. The check suite has been queued/pending for longer than `DEPENDABOT_STALE_SUITE_TIMEOUT`.
+                if (
+                    self.is_dependabot
+                    and app_name in IGNORED_STALE_SUITE_APPS
+                    and age > DEPENDABOT_STALE_SUITE_TIMEOUT
+                ):
                     log.info(
-                        "PR #%d HEAD commit %s check suite '%s' (%s) is pending but ignored (queued for %s)",
+                        "PR #%d HEAD commit %s check suite '%s' (%s) is pending but ignored (queued for %s > %s threshold)",
                         self.pr.number,
                         commit.sha[:8],
                         suite.id,
                         app_name,
                         age,
+                        DEPENDABOT_STALE_SUITE_TIMEOUT,
                     )
                     continue
 
@@ -693,7 +717,9 @@ def action_merge_platform(context: PRContext) -> None:
 
 def action_merge_dependabot(context: PRContext) -> None:
     merge_reason_comment = "### Dependabot Auto-Merge Executed\n"
-    merge_reason_comment += "This PR has been automatically merged because it passed all CI checks."
+    merge_reason_comment += (
+        "This PR has been automatically merged because it passed all CI checks."
+    )
 
     if context.dry_run:
         log.info(
