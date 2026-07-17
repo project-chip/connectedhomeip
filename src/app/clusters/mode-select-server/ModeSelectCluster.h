@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/scenes-server/SceneHandlerImpl.h>
+#include <app/data-model/Nullable.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ModeSelect/AttributeIds.h>
@@ -32,7 +34,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class ModeSelectCluster : public DefaultServerCluster
+class ModeSelectCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
     using OptionalAttributeSet = app::OptionalAttributeSet<ModeSelect::Attributes::StartUpMode::Id>;
@@ -40,8 +42,12 @@ public:
     class Delegate
     {
     public:
-        virtual ~Delegate() = default;
+        virtual ~Delegate()                                                                       = default;
         virtual Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const = 0;
+        // Returns the Description attribute value. Called at read time so the returned span
+        // does not need to outlive the function call. Default returns an empty span,
+        // falling back to Config::description.
+        virtual CharSpan GetDescription() const { return CharSpan(); }
     };
 
     struct Config
@@ -51,7 +57,8 @@ public:
         BitMask<ModeSelect::Feature> featureMap;
         OptionalAttributeSet optionalAttributeSet;
         bool onOffValueForStartUp = false;
-        SafeAttributePersistenceProvider & persistenceProvider;
+        DataModel::Nullable<uint8_t> initialStartUpMode; // ZAP default; fallback when no persisted value
+        DataModel::Nullable<uint8_t> initialOnMode;      // ZAP default; fallback when no persisted value
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -64,10 +71,8 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
@@ -83,8 +88,14 @@ public:
 
     bool IsSupportedMode(uint8_t mode) const;
 
+    // scenes::SceneHandler overrides
+    bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override;
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override;
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override;
+
 private:
-    void LoadPersistentAttributes();
+    void LoadPersistentAttributes(AttributePersistenceProvider & provider);
 
     Delegate & mDelegate;
     CharSpan mDescription;
@@ -92,13 +103,18 @@ private:
     BitMask<ModeSelect::Feature> mFeatureMap;
     OptionalAttributeSet mOptionalAttributeSet;
     bool mOnOffValueForStartUp;
-    SafeAttributePersistenceProvider & mPersistenceProvider;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 
     uint8_t mCurrentMode = 0;
     DataModel::Nullable<uint8_t> mStartUpMode{};
     DataModel::Nullable<uint8_t> mOnMode{};
 };
+
+namespace ModeSelect {
+/// Returns the cluster instance registered on the given endpoint, or nullptr if not found.
+/// Only valid when code-driven cluster integration is active (all-clusters apps).
+ModeSelectCluster * FindClusterOnEndpoint(EndpointId endpointId);
+} // namespace ModeSelect
 
 } // namespace Clusters
 } // namespace app

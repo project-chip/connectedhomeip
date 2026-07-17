@@ -50,6 +50,18 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     return ModeOptionsProvider(nullptr, nullptr);
 }
 
+chip::CharSpan StaticSupportedModesManager::getDescription(EndpointId endpointId) const
+{
+    for (auto & endpointSpanPair : supportedOptionsByEndpoints)
+    {
+        if (endpointSpanPair.mEndpointId == endpointId)
+        {
+            return "Coffee"_span;
+        }
+    }
+    return chip::CharSpan();
+}
+
 Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
                                                         const ModeOptionStructType ** dataPtr) const
 {
