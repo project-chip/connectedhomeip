@@ -494,7 +494,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     // Pigweed Logger is already thread safe.
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
     return BufLength;
-#endif
+#else
 
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, Buf, BufLength);
@@ -507,6 +507,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     }
 
     return UART_CONSOLE_ERR;
+#endif // PW_RPC_ENABLED
 }
 
 /**
