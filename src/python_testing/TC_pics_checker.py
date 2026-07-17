@@ -234,7 +234,7 @@ class TC_PICS_Checker(BasicCompositionTests):
 
         self.step(10)
         # Base/MCORE codes are device-wide but conventionally only declared
-        # in EP0's PICS slice (per Cecille's review). Skip on other endpoints
+        # in EP0's PICS slice. Skip on other endpoints
         # so we don't false-positive on PICS files that correctly omit MCORE
         # from non-EP0 endpoint slices.
         if self.endpoint_id == 0:

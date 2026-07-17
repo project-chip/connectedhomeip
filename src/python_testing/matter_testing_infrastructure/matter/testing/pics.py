@@ -169,10 +169,10 @@ class BasePicsFacts:
 
     The MCORE.COM.* transport-related PICS (WIFI / THR / ETH / WIRELESS and
     the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived
-    here: per Cecille (May 2026), the band PICS are about Public Action
-    Frame support on the corresponding band, which is not protocol-
-    observable from a wildcard read. PICSGenerator continues to derive
-    transport bits locally until the test-plans cleanup PRs land.
+    here: the band PICS indicate Public Action Frame support on the
+    corresponding band, which is not protocol-observable from a wildcard
+    read. PICSGenerator continues to derive transport bits locally until
+    the test-plans cleanup PRs land.
     """
     is_commissionee: bool = False
     is_server: bool = False

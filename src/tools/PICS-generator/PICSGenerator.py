@@ -68,9 +68,9 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 # the wildcard (commissionee, server, bridge, OTA, multi-endpoint groups,
 # Wi-Fi bands, mandatory events). Adds the MCORE.COM.WIFI/THR/ETH/WIRELESS
 # transport bits that the shared helper deliberately does not derive while
-# GRL stress-test feedback is outstanding (Cecille, May 2026). Once the
-# test-plans cleanup PRs land, this extension can be deleted and the
-# generator can use BasePicsFacts directly.
+# GRL stress-test feedback is outstanding. Once the test-plans cleanup PRs
+# land, this extension can be deleted and the generator can use
+# BasePicsFacts directly.
 @dataclass
 class _BasePicsFacts(BasePicsFacts):
     supports_wifi: bool = False
@@ -454,8 +454,8 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             # Transport bits the shared helper does not derive yet. Keep
             # MCORE.COM.WIFI / THR / ETH driven from the featuremap here
-            # until Cecille's test-plans cleanup PRs land and these PICS
-            # items are removed from Base.xml.
+            # until the test-plans cleanup PRs land and these PICS items
+            # are removed from Base.xml.
             if server == _NETWORK_COMMISSIONING_CLUSTER_ID:
                 if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_WIFI):
                     transport_supports_wifi = True
