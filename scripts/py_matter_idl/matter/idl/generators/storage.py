@@ -14,7 +14,6 @@
 
 import logging
 import os
-from typing import Optional
 
 log = logging.getLogger(__name__)
 
@@ -90,7 +89,7 @@ class InMemoryStorage(GeneratorStorage):
 
     def __init__(self):
         super().__init__()
-        self.content: Optional[str] = None
+        self.content: str | None = None
 
     def get_existing_data(self, relative_path: str):
         # Force re-generation each time

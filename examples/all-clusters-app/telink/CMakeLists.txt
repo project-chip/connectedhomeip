@@ -39,6 +39,7 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
