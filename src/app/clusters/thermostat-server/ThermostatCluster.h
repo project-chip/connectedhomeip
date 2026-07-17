@@ -475,8 +475,7 @@ private:
     Protocols::InteractionModel::Status HandleSystemMode(SystemModeEnum value);
 
     // Sets member to value via SetAttributeValue (which notifies subscribers on change) and, if it
-    // changed, persists the raw native-endian bytes to attribute storage. Returns true if changed.
-    // For plain scalar / enum attributes; nullable attributes need NullableToStorage handling instead.
+    // changed, persists the raw native-endian bytes to attribute storage.
     template <typename T>
     bool SetAndPersistScalar(T & member, T value, AttributeId attributeId)
     {
