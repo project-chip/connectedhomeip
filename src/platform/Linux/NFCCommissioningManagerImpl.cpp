@@ -958,9 +958,11 @@ CHIP_ERROR NFCCommissioningManagerImpl::ProcessScanWorkItem(const NfcWorkItem & 
     // If no specific target was requested, this is just a cache refresh scan.
     if (!item.targetIdentifier.IsValid())
     {
+        ChipLogProgressNfcDebug(DeviceLayer, "scanResult available. No specific discriminator requested. Returning scanResult");
         return scanResult;
     }
 
+    ChipLogProgressNfcDebug(DeviceLayer, "scanResult available. Now searching for a specific discriminator: %d", item.targetIdentifier.discriminator);
     std::shared_ptr<TagInstance> tagInstance;
     {
         std::lock_guard<std::mutex> lock(mStateMutex);
