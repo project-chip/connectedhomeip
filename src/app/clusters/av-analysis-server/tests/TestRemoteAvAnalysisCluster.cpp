@@ -151,10 +151,9 @@ TEST_F(TestRemoteAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
     }
 
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
-    bool are_equal = std::equal(testAmbientContexts.begin(), testAmbientContexts.end(), readContexts.begin(), readContexts.end(),
-        [](const auto & p1, const auto & p2) {
-            return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag;
-    });
+    bool are_equal =
+        std::equal(testAmbientContexts.begin(), testAmbientContexts.end(), readContexts.begin(), readContexts.end(),
+                   [](const auto & p1, const auto & p2) { return p1.namespaceID == p2.namespaceID && p1.tag == p2.tag; });
     ASSERT_TRUE(are_equal);
 
     // On startup there should be no active triggers
