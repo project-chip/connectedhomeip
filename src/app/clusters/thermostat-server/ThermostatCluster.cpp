@@ -580,17 +580,6 @@ void ThermostatCluster::GenerateScalarChangeEvent(AttributeId attributeId)
     }
 }
 
-bool ThermostatCluster::SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId)
-{
-    if (!SetAttributeValue(member, value, attributeId))
-    {
-        return false;
-    }
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, attributeId }, { reinterpret_cast<const uint8_t *>(&member), sizeof(member) }));
-    return true;
-}
-
 Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyHeatingSetpoint(int16_t value, AttributeId attributeId)
 {
     VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value >= mMinHeatSetpointLimit && value <= mAbsMaxHeatSetpointLimit &&
@@ -603,11 +592,11 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyHeatingSet
     }
     if (attributeId == OccupiedHeatingSetpoint::Id)
     {
-        SetAndPersistSetpoint(mOccupiedHeatingSetpoint, value, OccupiedHeatingSetpoint::Id);
+        SetAndPersistScalar(mOccupiedHeatingSetpoint, value, OccupiedHeatingSetpoint::Id);
     }
     else
     {
-        SetAndPersistSetpoint(mUnoccupiedHeatingSetpoint, value, UnoccupiedHeatingSetpoint::Id);
+        SetAndPersistScalar(mUnoccupiedHeatingSetpoint, value, UnoccupiedHeatingSetpoint::Id);
     }
     HandleSetpointPostWrite(attributeId);
 
@@ -626,11 +615,11 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyCoolingSet
     }
     if (attributeId == OccupiedCoolingSetpoint::Id)
     {
-        SetAndPersistSetpoint(mOccupiedCoolingSetpoint, value, OccupiedCoolingSetpoint::Id);
+        SetAndPersistScalar(mOccupiedCoolingSetpoint, value, OccupiedCoolingSetpoint::Id);
     }
     else
     {
-        SetAndPersistSetpoint(mUnoccupiedCoolingSetpoint, value, UnoccupiedCoolingSetpoint::Id);
+        SetAndPersistScalar(mUnoccupiedCoolingSetpoint, value, UnoccupiedCoolingSetpoint::Id);
     }
     HandleSetpointPostWrite(attributeId);
 
@@ -645,7 +634,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinHeatSetpointLimi
     {
         VerifyOrReturnError(value <= static_cast<int16_t>(mMinCoolSetpointLimit - DeadBandTemp()), Status::InvalidValue);
     }
-    SetAndPersistSetpoint(mMinHeatSetpointLimit, value, MinHeatSetpointLimit::Id);
+    SetAndPersistScalar(mMinHeatSetpointLimit, value, MinHeatSetpointLimit::Id);
     return Status::Success;
 }
 
@@ -657,7 +646,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMaxHeatSetpointLimi
     {
         VerifyOrReturnError(value <= static_cast<int16_t>(mMaxCoolSetpointLimit - DeadBandTemp()), Status::InvalidValue);
     }
-    SetAndPersistSetpoint(mMaxHeatSetpointLimit, value, MaxHeatSetpointLimit::Id);
+    SetAndPersistScalar(mMaxHeatSetpointLimit, value, MaxHeatSetpointLimit::Id);
     return Status::Success;
 }
 
@@ -669,7 +658,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinCoolSetpointLimi
     {
         VerifyOrReturnError(value >= static_cast<int16_t>(mMinHeatSetpointLimit + DeadBandTemp()), Status::InvalidValue);
     }
-    SetAndPersistSetpoint(mMinCoolSetpointLimit, value, MinCoolSetpointLimit::Id);
+    SetAndPersistScalar(mMinCoolSetpointLimit, value, MinCoolSetpointLimit::Id);
     return Status::Success;
 }
 
@@ -681,7 +670,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMaxCoolSetpointLimi
     {
         VerifyOrReturnError(value >= static_cast<int16_t>(mMaxHeatSetpointLimit + DeadBandTemp()), Status::InvalidValue);
     }
-    SetAndPersistSetpoint(mMaxCoolSetpointLimit, value, MaxCoolSetpointLimit::Id);
+    SetAndPersistScalar(mMaxCoolSetpointLimit, value, MaxCoolSetpointLimit::Id);
     return Status::Success;
 }
 
@@ -689,10 +678,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAutoMode), Status::UnsupportedAttribute);
     VerifyOrReturnError(value >= 0 && value <= 127, Status::ConstraintError);
-    SetAttributeValue(mMinSetpointDeadBand, static_cast<int8_t>(value), MinSetpointDeadBand::Id);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
-        { reinterpret_cast<const uint8_t *>(&mMinSetpointDeadBand), sizeof(mMinSetpointDeadBand) }));
+    SetAndPersistScalar(mMinSetpointDeadBand, static_cast<int8_t>(value), MinSetpointDeadBand::Id);
     return Status::Success;
 }
 
@@ -728,10 +714,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleRemoteSensing(BitMa
 Protocols::InteractionModel::Status ThermostatCluster::HandleControlSequenceOfOperation(ControlSequenceOfOperationEnum value)
 {
     VerifyOrReturnError(value <= ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat, Status::InvalidValue);
-    SetAttributeValue(mControlSequenceOfOperation, value, ControlSequenceOfOperation::Id);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
-        { reinterpret_cast<const uint8_t *>(&mControlSequenceOfOperation), sizeof(mControlSequenceOfOperation) }));
+    SetAndPersistScalar(mControlSequenceOfOperation, value, ControlSequenceOfOperation::Id);
     return Status::Success;
 }
 
@@ -753,10 +736,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleSystemMode(SystemMo
     default:
         break;
     }
-    SetAttributeValue(mSystemMode, value, SystemMode::Id);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, SystemMode::Id },
-        { reinterpret_cast<const uint8_t *>(&mSystemMode), sizeof(mSystemMode) }));
+    SetAndPersistScalar(mSystemMode, value, SystemMode::Id);
     GenerateScalarChangeEvent(SystemMode::Id);
     return Status::Success;
 }
@@ -890,7 +870,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
         case OccupiedHeatingSetpoint::Id: {
             int16_t minValidCooling = static_cast<int16_t>(mOccupiedHeatingSetpoint + deadband);
             if (mOccupiedCoolingSetpoint < minValidCooling &&
-                SetAndPersistSetpoint(mOccupiedCoolingSetpoint, minValidCooling, OccupiedCoolingSetpoint::Id))
+                SetAndPersistScalar(mOccupiedCoolingSetpoint, minValidCooling, OccupiedCoolingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
             }
@@ -899,7 +879,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
         case OccupiedCoolingSetpoint::Id: {
             int16_t maxValidHeating = static_cast<int16_t>(mOccupiedCoolingSetpoint - deadband);
             if (mOccupiedHeatingSetpoint > maxValidHeating &&
-                SetAndPersistSetpoint(mOccupiedHeatingSetpoint, maxValidHeating, OccupiedHeatingSetpoint::Id))
+                SetAndPersistScalar(mOccupiedHeatingSetpoint, maxValidHeating, OccupiedHeatingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
             }
@@ -908,7 +888,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
         case UnoccupiedHeatingSetpoint::Id: {
             int16_t minValidCooling = static_cast<int16_t>(mUnoccupiedHeatingSetpoint + deadband);
             if (mUnoccupiedCoolingSetpoint < minValidCooling &&
-                SetAndPersistSetpoint(mUnoccupiedCoolingSetpoint, minValidCooling, UnoccupiedCoolingSetpoint::Id))
+                SetAndPersistScalar(mUnoccupiedCoolingSetpoint, minValidCooling, UnoccupiedCoolingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(UnoccupiedCoolingSetpoint::Id);
             }
@@ -917,7 +897,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
         case UnoccupiedCoolingSetpoint::Id: {
             int16_t maxValidHeating = static_cast<int16_t>(mUnoccupiedCoolingSetpoint - deadband);
             if (mUnoccupiedHeatingSetpoint > maxValidHeating &&
-                SetAndPersistSetpoint(mUnoccupiedHeatingSetpoint, maxValidHeating, UnoccupiedHeatingSetpoint::Id))
+                SetAndPersistScalar(mUnoccupiedHeatingSetpoint, maxValidHeating, UnoccupiedHeatingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(UnoccupiedHeatingSetpoint::Id);
             }
@@ -1037,11 +1017,11 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
                 desiredHeating = static_cast<int16_t>(desiredHeating - adjust);
                 desiredCooling = static_cast<int16_t>(desiredCooling - adjust);
             }
-            if (SetAndPersistSetpoint(mOccupiedCoolingSetpoint, desiredCooling, OccupiedCoolingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedCoolingSetpoint, desiredCooling, OccupiedCoolingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
             }
-            if (SetAndPersistSetpoint(mOccupiedHeatingSetpoint, desiredHeating, OccupiedHeatingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedHeatingSetpoint, desiredHeating, OccupiedHeatingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
             }
@@ -1050,7 +1030,7 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
         else if (coolSupported)
         {
             int16_t coolingSetpoint = EnforceCoolingSetpointLimits(static_cast<int16_t>(mOccupiedCoolingSetpoint + amount * 10));
-            if (SetAndPersistSetpoint(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
             }
@@ -1059,7 +1039,7 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
         else if (heatSupported)
         {
             int16_t heatingSetpoint = EnforceHeatingSetpointLimits(static_cast<int16_t>(mOccupiedHeatingSetpoint + amount * 10));
-            if (SetAndPersistSetpoint(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
             }
@@ -1081,12 +1061,12 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
             {
                 return Status::InvalidCommand;
             }
-            if (SetAndPersistSetpoint(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
             }
         }
-        if (SetAndPersistSetpoint(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
+        if (SetAndPersistScalar(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
         {
             GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
         }
@@ -1106,12 +1086,12 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
             {
                 return Status::InvalidCommand;
             }
-            if (SetAndPersistSetpoint(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
+            if (SetAndPersistScalar(mOccupiedCoolingSetpoint, coolingSetpoint, OccupiedCoolingSetpoint::Id))
             {
                 GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
             }
         }
-        if (SetAndPersistSetpoint(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
+        if (SetAndPersistScalar(mOccupiedHeatingSetpoint, heatingSetpoint, OccupiedHeatingSetpoint::Id))
         {
             GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
         }
@@ -1343,12 +1323,7 @@ int16_t ThermostatCluster::GetAbsMaxCoolSetpointLimit()
 
 void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)
 {
-    VerifyOrReturn(value != mLocalTemperatureCalibration);
-    NotifyAttributeChangedIfSuccess(
-        LocalTemperatureCalibration::Id,
-        DefaultServerCluster::mContext->attributeStorage.WriteValue(
-            { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
-            { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
+    SetAndPersistScalar(mLocalTemperatureCalibration, value, LocalTemperatureCalibration::Id);
 }
 
 int8_t ThermostatCluster::GetLocalTemperatureCalibration()
@@ -1504,10 +1479,7 @@ ThermostatRunningModeEnum ThermostatCluster::GetThermostatRunningMode()
 
 void ThermostatCluster::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value)
 {
-    SetAttributeValue(mTemperatureSetpointHold, value, TemperatureSetpointHold::Id);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
-        { reinterpret_cast<const uint8_t *>(&mTemperatureSetpointHold), sizeof(mTemperatureSetpointHold) }));
+    SetAndPersistScalar(mTemperatureSetpointHold, value, TemperatureSetpointHold::Id);
 }
 
 TemperatureSetpointHoldEnum ThermostatCluster::GetTemperatureSetpointHold()
@@ -1563,10 +1535,7 @@ uint32_t ThermostatCluster::GetSetpointChangeSourceTimestamp()
 
 void ThermostatCluster::SetEmergencyHeatDelta(uint8_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mEmergencyHeatDelta, value, EmergencyHeatDelta::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
-        { reinterpret_cast<const uint8_t *>(&mEmergencyHeatDelta), sizeof(mEmergencyHeatDelta) }));
+    SetAndPersistScalar(mEmergencyHeatDelta, value, EmergencyHeatDelta::Id);
 }
 
 uint8_t ThermostatCluster::GetEmergencyHeatDelta()
@@ -1576,9 +1545,7 @@ uint8_t ThermostatCluster::GetEmergencyHeatDelta()
 
 void ThermostatCluster::SetACType(ACTypeEnum value)
 {
-    VerifyOrReturn(SetAttributeValue(mACType, value, ACType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACType::Id }, { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
+    SetAndPersistScalar(mACType, value, ACType::Id);
 }
 
 ACTypeEnum ThermostatCluster::GetACType()
@@ -1588,10 +1555,7 @@ ACTypeEnum ThermostatCluster::GetACType()
 
 void ThermostatCluster::SetACCapacity(uint16_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mACCapacity, value, ACCapacity::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCapacity::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCapacity), sizeof(mACCapacity) }));
+    SetAndPersistScalar(mACCapacity, value, ACCapacity::Id);
 }
 
 uint16_t ThermostatCluster::GetACCapacity()
@@ -1601,10 +1565,7 @@ uint16_t ThermostatCluster::GetACCapacity()
 
 void ThermostatCluster::SetACRefrigerantType(ACRefrigerantTypeEnum value)
 {
-    VerifyOrReturn(SetAttributeValue(mACRefrigerantType, value, ACRefrigerantType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACRefrigerantType), sizeof(mACRefrigerantType) }));
+    SetAndPersistScalar(mACRefrigerantType, value, ACRefrigerantType::Id);
 }
 
 ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
@@ -1614,10 +1575,7 @@ ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
 
 void ThermostatCluster::SetACCompressorType(ACCompressorTypeEnum value)
 {
-    VerifyOrReturn(SetAttributeValue(mACCompressorType, value, ACCompressorType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCompressorType), sizeof(mACCompressorType) }));
+    SetAndPersistScalar(mACCompressorType, value, ACCompressorType::Id);
 }
 
 ACCompressorTypeEnum ThermostatCluster::GetACCompressorType()
@@ -1637,10 +1595,7 @@ BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> ThermostatCluster::G
 
 void ThermostatCluster::SetACLouverPosition(ACLouverPositionEnum value)
 {
-    VerifyOrReturn(SetAttributeValue(mACLouverPosition, value, ACLouverPosition::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
-        { reinterpret_cast<const uint8_t *>(&mACLouverPosition), sizeof(mACLouverPosition) }));
+    SetAndPersistScalar(mACLouverPosition, value, ACLouverPosition::Id);
 }
 
 ACLouverPositionEnum ThermostatCluster::GetACLouverPosition()
@@ -1660,10 +1615,7 @@ DataModel::Nullable<int16_t> ThermostatCluster::GetACCoilTemperature()
 
 void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
 {
-    VerifyOrReturn(SetAttributeValue(mACCapacityFormat, value, ACCapacityformat::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCapacityFormat), sizeof(mACCapacityFormat) }));
+    SetAndPersistScalar(mACCapacityFormat, value, ACCapacityformat::Id);
 }
 
 ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()

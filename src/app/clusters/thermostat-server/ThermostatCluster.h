@@ -37,6 +37,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -472,8 +474,22 @@ private:
     Protocols::InteractionModel::Status HandleControlSequenceOfOperation(ControlSequenceOfOperationEnum value);
     Protocols::InteractionModel::Status HandleSystemMode(SystemModeEnum value);
 
-    // Sets member to value and, if it changed, persists it to attribute storage. Returns true if changed.
-    bool SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId);
+    // Sets member to value via SetAttributeValue (which notifies subscribers on change) and, if it
+    // changed, persists the raw native-endian bytes to attribute storage. Returns true if changed.
+    // For plain scalar / enum attributes; nullable attributes need NullableToStorage handling instead.
+    template <typename T>
+    bool SetAndPersistScalar(T & member, T value, AttributeId attributeId)
+    {
+        static_assert(std::is_trivially_copyable_v<T>, "SetAndPersistScalar requires a trivially copyable type");
+        if (!SetAttributeValue(member, value, attributeId))
+        {
+            return false;
+        }
+        LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+            { mPath.mEndpointId, Thermostat::Id, attributeId },
+            { reinterpret_cast<const uint8_t *>(&member), sizeof(member) }));
+        return true;
+    }
 
     // Emits the relevant change event for a just-written scalar attribute, if the Events feature is supported.
     void GenerateScalarChangeEvent(AttributeId attributeId);
