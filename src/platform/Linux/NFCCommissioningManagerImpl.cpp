@@ -896,8 +896,8 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         // Wait for a work item to process
         {
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
-            mWorkQueueCondition.wait(lock,
-                                     [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
+            mWorkQueueCondition.wait(
+                lock, [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
 
             // we do not manually unlock it
             AssertMutexIsHeld(mWorkQueueMutex);
