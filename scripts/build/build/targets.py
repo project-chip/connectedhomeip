@@ -46,6 +46,7 @@ _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
     'aggregator',
     'air-purifier',
+    'ambient-context-sensor',
     'bridged-node',
     'chime',
     'contact-sensor',
@@ -346,9 +347,6 @@ def BuildEfr32Target():
         TargetPart('brd4317a', board=Efr32Board.BRD4317A),
         TargetPart('brd4318a', board=Efr32Board.BRD4318A),
         TargetPart('brd4319a', board=Efr32Board.BRD4319A),
-        TargetPart('brd4186a', board=Efr32Board.BRD4186A),
-        TargetPart('brd4187a', board=Efr32Board.BRD4187A),
-        TargetPart('brd2601b', board=Efr32Board.BRD2601B),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
