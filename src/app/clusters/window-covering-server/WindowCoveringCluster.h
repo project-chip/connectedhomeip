@@ -135,12 +135,6 @@ public:
     void SetConfigStatus(chip::BitMask<ConfigStatus> status);
     chip::BitMask<ConfigStatus> GetConfigStatus() const { return mConfigStatus; }
 
-    void SetCurrentPositionLiftPercentage(NPercent curLiftPercentage);
-    NPercent GetCurrentPositionLiftPercentage() const { return mCurrentPositionLiftPercentage; };
-
-    void SetCurrentPositionTiltPercentage(NPercent curTiltPercentage);
-    NPercent GetCurrentPositionTiltPercentage() const { return mCurrentPositionTiltPercentage; };
-
     void SetOperationalStatus(chip::BitMask<OperationalStatus> newStatus);
     chip::BitMask<OperationalStatus> GetOperationalStatus() const { return mOperationalStatus; }
 
@@ -169,6 +163,9 @@ protected:
     void SetEndProductType(EndProductType type);
 
 private:
+    // Percentage attributes are derived from Percent100ths, not stored separately.
+    static NPercent PercentFromPercent100ths(NPercent100ths percent100ths);
+
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
 
     std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen();
@@ -188,8 +185,6 @@ private:
     uint16_t mNumberOfActuationsLift = 0;
     uint16_t mNumberOfActuationsTilt = 0;
     chip::BitMask<ConfigStatus> mConfigStatus;
-    NPercent mCurrentPositionLiftPercentage;
-    NPercent mCurrentPositionTiltPercentage;
     NPercent100ths mTargetPositionLiftPercent100ths;
     NPercent100ths mTargetPositionTiltPercent100ths;
     chip::BitMask<OperationalStatus> mOperationalStatus;

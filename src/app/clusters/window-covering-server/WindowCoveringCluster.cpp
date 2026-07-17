@@ -76,12 +76,6 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsTilt::Id),
         mNumberOfActuationsTilt, mNumberOfActuationsTilt);
     attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercentage::Id),
-        mCurrentPositionLiftPercentage, mCurrentPositionLiftPercentage);
-    attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercentage::Id),
-        mCurrentPositionTiltPercentage, mCurrentPositionTiltPercentage);
-    attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
         mCurrentPositionLiftPercent100ths, mCurrentPositionLiftPercent100ths);
     attributePersistence.LoadNativeEndianValue(
@@ -133,32 +127,13 @@ void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
         ByteSpan(reinterpret_cast<const uint8_t *>(&rawConfigStatus), sizeof(rawConfigStatus))));
 }
 
-void WindowCoveringCluster::SetCurrentPositionLiftPercentage(NPercent curLiftPercentage)
+NPercent WindowCoveringCluster::PercentFromPercent100ths(NPercent100ths percent100ths)
 {
-    VerifyOrReturn(
-        SetAttributeValue(mCurrentPositionLiftPercentage, curLiftPercentage, Attributes::CurrentPositionLiftPercentage::Id));
-    VerifyOrReturn(mContext != nullptr);
-
-    NumericAttributeTraits<Percent>::StorageType storageValue;
-    DataModel::NullableToStorage(curLiftPercentage, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercentage::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
-}
-
-void WindowCoveringCluster::SetCurrentPositionTiltPercentage(NPercent curTiltPercentage)
-{
-    VerifyOrReturn(
-        SetAttributeValue(mCurrentPositionTiltPercentage, curTiltPercentage, Attributes::CurrentPositionTiltPercentage::Id));
-    VerifyOrReturn(mContext != nullptr);
-
-    NumericAttributeTraits<Percent>::StorageType storageValue;
-    DataModel::NullableToStorage(curTiltPercentage, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercentage::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    if (percent100ths.IsNull())
+    {
+        return NPercent();
+    }
+    return NPercent(static_cast<Percent>(percent100ths.Value() / 100));
 }
 
 void WindowCoveringCluster::SetOperationalStatus(chip::BitMask<OperationalStatus> newStatus)
@@ -205,8 +180,17 @@ void WindowCoveringCluster::SetEndProductType(EndProductType type)
 
 void WindowCoveringCluster::SetCurrentPositionLiftPercent100ths(NPercent100ths curLiftPercent100ths)
 {
+    NPercent previousPercentage = PercentFromPercent100ths(mCurrentPositionLiftPercent100ths);
+
     VerifyOrReturn(SetAttributeValue(mCurrentPositionLiftPercent100ths, curLiftPercent100ths,
                                      Attributes::CurrentPositionLiftPercent100ths::Id));
+
+    if (mOptionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id) &&
+        (PercentFromPercent100ths(mCurrentPositionLiftPercent100ths) != previousPercentage))
+    {
+        NotifyAttributeChanged(Attributes::CurrentPositionLiftPercentage::Id);
+    }
+
     VerifyOrReturn(mContext != nullptr);
 
     NumericAttributeTraits<Percent100ths>::StorageType storageValue;
@@ -225,8 +209,17 @@ void WindowCoveringCluster::SetCurrentPositionLiftPercent100ths(NPercent100ths c
 
 void WindowCoveringCluster::SetCurrentPositionTiltPercent100ths(NPercent100ths curTiltPercent100ths)
 {
+    NPercent previousPercentage = PercentFromPercent100ths(mCurrentPositionTiltPercent100ths);
+
     VerifyOrReturn(SetAttributeValue(mCurrentPositionTiltPercent100ths, curTiltPercent100ths,
                                      Attributes::CurrentPositionTiltPercent100ths::Id));
+
+    if (mOptionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id) &&
+        (PercentFromPercent100ths(mCurrentPositionTiltPercent100ths) != previousPercentage))
+    {
+        NotifyAttributeChanged(Attributes::CurrentPositionTiltPercentage::Id);
+    }
+
     VerifyOrReturn(mContext != nullptr);
 
     NumericAttributeTraits<Percent100ths>::StorageType storageValue;
@@ -289,9 +282,9 @@ DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataMod
     case Attributes::ConfigStatus::Id:
         return encoder.Encode(GetConfigStatus().Raw());
     case Attributes::CurrentPositionLiftPercentage::Id:
-        return encoder.Encode(GetCurrentPositionLiftPercentage());
+        return encoder.Encode(PercentFromPercent100ths(mCurrentPositionLiftPercent100ths));
     case Attributes::CurrentPositionTiltPercentage::Id:
-        return encoder.Encode(GetCurrentPositionTiltPercentage());
+        return encoder.Encode(PercentFromPercent100ths(mCurrentPositionTiltPercent100ths));
     case Attributes::OperationalStatus::Id:
         return encoder.Encode(GetOperationalStatus().Raw());
     case Attributes::TargetPositionLiftPercent100ths::Id:

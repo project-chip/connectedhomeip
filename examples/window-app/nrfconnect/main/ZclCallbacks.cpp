@@ -91,10 +91,6 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
     // device reports a concrete starting position, but only for the lift/tilt features this endpoint actually supports.
     if (features.Has(Feature::kPositionAwareLift))
     {
-        if (wc->GetCurrentPositionLiftPercentage().IsNull())
-        {
-            wc->SetCurrentPositionLiftPercentage(0);
-        }
         if (wc->GetCurrentPositionLiftPercent100ths().IsNull())
         {
             wc->SetCurrentPositionLiftPercent100ths(0);
@@ -107,10 +103,6 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 
     if (features.Has(Feature::kPositionAwareTilt))
     {
-        if (wc->GetCurrentPositionTiltPercentage().IsNull())
-        {
-            wc->SetCurrentPositionTiltPercentage(0);
-        }
         if (wc->GetCurrentPositionTiltPercent100ths().IsNull())
         {
             wc->SetCurrentPositionTiltPercent100ths(0);

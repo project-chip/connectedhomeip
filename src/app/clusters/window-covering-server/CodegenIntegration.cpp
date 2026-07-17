@@ -176,15 +176,6 @@ public:
             {
                 cluster.SetTargetPositionLiftPercent100ths(percent100ths);
             }
-
-            if (optionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id))
-            {
-                DataModel::Nullable<Percent> percent;
-                if (Attributes::CurrentPositionLiftPercentage::GetDefault(endpointId, percent) == Status::Success)
-                {
-                    cluster.SetCurrentPositionLiftPercentage(percent);
-                }
-            }
         }
 
         if (features.HasAll(Feature::kTilt, Feature::kPositionAwareTilt))
@@ -197,15 +188,6 @@ public:
             if (Attributes::TargetPositionTiltPercent100ths::GetDefault(endpointId, percent100ths) == Status::Success)
             {
                 cluster.SetTargetPositionTiltPercent100ths(percent100ths);
-            }
-
-            if (optionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id))
-            {
-                DataModel::Nullable<Percent> percent;
-                if (Attributes::CurrentPositionTiltPercentage::GetDefault(endpointId, percent) == Status::Success)
-                {
-                    cluster.SetCurrentPositionTiltPercentage(percent);
-                }
             }
         }
 
@@ -472,19 +454,15 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrDie(cluster != nullptr);
-    NPercent percent;
 
     if (percent100ths.IsNull())
     {
-        percent.SetNull();
         ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
     }
     else
     {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
         ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
-    cluster->SetCurrentPositionLiftPercentage(percent);
     cluster->SetCurrentPositionLiftPercent100ths(percent100ths);
 }
 
@@ -492,19 +470,15 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrDie(cluster != nullptr);
-    NPercent percent;
 
     if (percent100ths.IsNull())
     {
-        percent.SetNull();
         ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
     }
     else
     {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
         ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
-    cluster->SetCurrentPositionTiltPercentage(percent);
     cluster->SetCurrentPositionTiltPercent100ths(percent100ths);
 }
 
