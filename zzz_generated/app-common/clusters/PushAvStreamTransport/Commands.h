@@ -87,6 +87,11 @@ struct Type;
 struct DecodableType;
 } // namespace FindTransportResponse
 
+namespace UpdateMotionZoneOptions {
+struct Type;
+struct DecodableType;
+} // namespace UpdateMotionZoneOptions
+
 } // namespace Commands
 
 namespace Commands {
@@ -375,6 +380,46 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindTransportResponse
+namespace UpdateMotionZoneOptions {
+enum class Fields : uint8_t
+{
+    kConnectionID      = 0,
+    kMotionZones       = 1,
+    kMotionSensitivity = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateMotionZoneOptions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
+
+    uint16_t connectionID = static_cast<uint16_t>(0);
+    DataModel::Nullable<DataModel::List<const Structs::TransportZoneOptionsStruct::Type>> motionZones;
+    Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateMotionZoneOptions::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    uint16_t connectionID = static_cast<uint16_t>(0);
+    DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>> motionZones;
+    Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace UpdateMotionZoneOptions
 } // namespace Commands
 } // namespace PushAvStreamTransport
 } // namespace Clusters

@@ -21407,6 +21407,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedPushAvStreamTransportClusterMaxZonesAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.MaxZonesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedPushAvStreamTransportClusterGeneratedCommandListAttributeCallback implements ChipClusters.PushAvStreamTransportCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -34513,6 +34534,31 @@ public class ClusterInfoMapping {
         pushAvStreamTransportfindTransportCommandParams
       );
     pushAvStreamTransportClusterInteractionInfoMap.put("findTransport", pushAvStreamTransportfindTransportInteractionInfo);
+
+    Map<String, CommandParameterInfo> pushAvStreamTransportupdateMotionZoneOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo pushAvStreamTransportupdateMotionZoneOptionsconnectionIDCommandParameterInfo = new CommandParameterInfo("connectionID", Integer.class, Integer.class);
+    pushAvStreamTransportupdateMotionZoneOptionsCommandParams.put("connectionID",pushAvStreamTransportupdateMotionZoneOptionsconnectionIDCommandParameterInfo);
+
+
+    CommandParameterInfo pushAvStreamTransportupdateMotionZoneOptionsmotionSensitivityCommandParameterInfo = new CommandParameterInfo("motionSensitivity", Optional.class, Integer.class);
+    pushAvStreamTransportupdateMotionZoneOptionsCommandParams.put("motionSensitivity",pushAvStreamTransportupdateMotionZoneOptionsmotionSensitivityCommandParameterInfo);
+    InteractionInfo pushAvStreamTransportupdateMotionZoneOptionsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.PushAvStreamTransportCluster) cluster)
+        .updateMotionZoneOptions((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("connectionID")
+        , (ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct>)
+        commandArguments.get("motionZones")
+        , (Optional<Integer>)
+        commandArguments.get("motionSensitivity")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        pushAvStreamTransportupdateMotionZoneOptionsCommandParams
+    );
+    pushAvStreamTransportClusterInteractionInfoMap.put("updateMotionZoneOptions", pushAvStreamTransportupdateMotionZoneOptionsInteractionInfo);
 
     commandMap.put("pushAvStreamTransport", pushAvStreamTransportClusterInteractionInfoMap);
 

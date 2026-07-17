@@ -55929,6 +55929,7 @@ class PushAvStreamTransport(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedFormats", Tag=0x00000000, Type=typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct]),
                 ClusterObjectFieldDescriptor(Label="currentConnections", Tag=0x00000001, Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct]),
+                ClusterObjectFieldDescriptor(Label="maxZones", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -55938,6 +55939,7 @@ class PushAvStreamTransport(Cluster):
 
     supportedFormats: typing.List[PushAvStreamTransport.Structs.SupportedFormatStruct] = field(default_factory=lambda: [])
     currentConnections: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+    maxZones: typing.Union[None, Nullable, uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -56103,6 +56105,25 @@ class PushAvStreamTransport(Cluster):
             maxPreRollLen: 'typing.Optional[uint]' = None
 
         @dataclass
+        class HLSEncryptionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="kid", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="baseKey", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="schemeURI", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="ratchetBits", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ratchetTime", Tag=4, Type=typing.Optional[uint]),
+                    ])
+
+            kid: 'bytes' = b""
+            baseKey: 'bytes' = b""
+            schemeURI: 'bytes' = b""
+            ratchetBits: 'uint' = 0
+            ratchetTime: 'typing.Optional[uint]' = None
+
+        @dataclass
         class CMAFContainerOptionsStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -56114,6 +56135,7 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="sessionGroup", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="trackName", Tag=4, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=7, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="HLSEncryption", Tag=8, Type=typing.Optional[PushAvStreamTransport.Structs.HLSEncryptionStruct]),
                     ])
 
             CMAFInterface: 'PushAvStreamTransport.Enums.CMAFInterfaceEnum' = 0
@@ -56122,6 +56144,7 @@ class PushAvStreamTransport(Cluster):
             sessionGroup: 'typing.Optional[uint]' = None
             trackName: 'typing.Optional[str]' = None
             metadataEnabled: 'typing.Optional[bool]' = None
+            HLSEncryption: 'typing.Optional[PushAvStreamTransport.Structs.HLSEncryptionStruct]' = None
 
         @dataclass
         class ContainerOptionsStruct(ClusterObject):
@@ -56336,6 +56359,26 @@ class PushAvStreamTransport(Cluster):
 
             transportConfigurations: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
 
+        @dataclass
+        class UpdateMotionZoneOptions(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000555
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="motionZones", Tag=1, Type=typing.Union[Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]]),
+                        ClusterObjectFieldDescriptor(Label="motionSensitivity", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            connectionID: uint = 0
+            motionZones: typing.Union[Nullable, typing.List[PushAvStreamTransport.Structs.TransportZoneOptionsStruct]] = NullValue
+            motionSensitivity: typing.Union[None, Nullable, uint] = None
+
     class Attributes:
         @dataclass
         class SupportedFormats(ClusterAttributeDescriptor):
@@ -56368,6 +56411,22 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct])
 
             value: typing.List[PushAvStreamTransport.Structs.TransportConfigurationStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class MaxZones(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000555
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

@@ -8461,6 +8461,56 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Kid", indent + 1, value.kid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Kid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BaseKey", indent + 1, value.baseKey);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BaseKey'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SchemeURI", indent + 1, value.schemeURI);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SchemeURI'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RatchetBits", indent + 1, value.ratchetBits);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RatchetBits'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RatchetTime", indent + 1, value.ratchetTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RatchetTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
     const chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::DecodableType & value)
@@ -8511,6 +8561,14 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HLSEncryption", indent + 1, value.HLSEncryption);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HLSEncryption'");
             return err;
         }
     }
@@ -25545,6 +25603,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentConnections", 1, value);
+        }
+        case PushAvStreamTransport::Attributes::MaxZones::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxZones", 1, value);
         }
         case PushAvStreamTransport::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

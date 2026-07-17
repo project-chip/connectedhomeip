@@ -22111,6 +22111,20 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                         }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = [MTRPushAVStreamTransportClusterHLSEncryptionStruct new];
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.kid = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().kid);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.baseKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().baseKey);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.schemeURI = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().schemeURI);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetBits = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetBits];
+                            if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.HasValue()) {
+                                newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.Value()];
+                            } else {
+                                newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = nil;
+                            }
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = nil;
+                        }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
                     }
@@ -22185,6 +22199,21 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
                 return nil;
             }
             value = array_0;
+        }
+        return value;
+    }
+    case Attributes::MaxZones::Id: {
+        using TypeInfo = Attributes::MaxZones::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
         }
         return value;
     }

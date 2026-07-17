@@ -68820,6 +68820,7 @@ public class ChipClusters {
 
     private static final long SUPPORTED_FORMATS_ATTRIBUTE_ID = 0L;
     private static final long CURRENT_CONNECTIONS_ATTRIBUTE_ID = 1L;
+    private static final long MAX_ZONES_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -68996,6 +68997,34 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct> motionZones, @Nullable Optional<Integer> motionSensitivity) {
+      updateMotionZoneOptions(callback, connectionID, motionZones, motionSensitivity, 0);
+    }
+
+    public void updateMotionZoneOptions(DefaultClusterCallback callback, Integer connectionID, @Nullable ArrayList<ChipStructs.PushAvStreamTransportClusterTransportZoneOptionsStruct> motionZones, @Nullable Optional<Integer> motionSensitivity, int timedInvokeTimeoutMs) {
+      final long commandId = 8L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long connectionIDFieldID = 0L;
+      BaseTLVType connectionIDtlvValue = new UIntType(connectionID);
+      elements.add(new StructElement(connectionIDFieldID, connectionIDtlvValue));
+
+      final long motionZonesFieldID = 1L;
+      BaseTLVType motionZonestlvValue = motionZones != null ? ArrayType.generateArrayType(motionZones, (elementmotionZones) -> elementmotionZones.encodeTlv()) : new NullType();
+      elements.add(new StructElement(motionZonesFieldID, motionZonestlvValue));
+
+      final long motionSensitivityFieldID = 2L;
+      BaseTLVType motionSensitivitytlvValue = motionSensitivity != null ? motionSensitivity.<BaseTLVType>map((nonOptionalmotionSensitivity) -> new UIntType(nonOptionalmotionSensitivity)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(motionSensitivityFieldID, motionSensitivitytlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface AllocatePushTransportResponseCallback extends BaseClusterCallback {
       void onSuccess(ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct transportConfiguration);
     }
@@ -69010,6 +69039,10 @@ public class ChipClusters {
 
     public interface CurrentConnectionsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.PushAvStreamTransportClusterTransportConfigurationStruct> value);
+    }
+
+    public interface MaxZonesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -69079,6 +69112,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_CONNECTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxZonesAttribute(
+        MaxZonesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxZonesAttribute(
+        MaxZonesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_ZONES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_ZONES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

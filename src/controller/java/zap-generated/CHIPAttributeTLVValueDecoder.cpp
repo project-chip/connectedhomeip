@@ -52742,6 +52742,180 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabledInsideOptional,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled);
                         }
+                        jobject
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryption;
+                        if (!entry_0.transportOptions.Value()
+                                 .containerOptions.CMAFContainerOptions.Value()
+                                 .HLSEncryption.HasValue())
+                        {
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                nullptr,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryption);
+                        }
+                        else
+                        {
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional;
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kid;
+                            jbyteArray
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kidByteArray =
+                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
+                                                                             .containerOptions.CMAFContainerOptions.Value()
+                                                                             .HLSEncryption.Value()
+                                                                             .kid.size()));
+                            env->SetByteArrayRegion(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kidByteArray,
+                                0,
+                                static_cast<jsize>(entry_0.transportOptions.Value()
+                                                       .containerOptions.CMAFContainerOptions.Value()
+                                                       .HLSEncryption.Value()
+                                                       .kid.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
+                                                                    .containerOptions.CMAFContainerOptions.Value()
+                                                                    .HLSEncryption.Value()
+                                                                    .kid.data()));
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kid =
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kidByteArray;
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKey;
+                            jbyteArray
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKeyByteArray =
+                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
+                                                                             .containerOptions.CMAFContainerOptions.Value()
+                                                                             .HLSEncryption.Value()
+                                                                             .baseKey.size()));
+                            env->SetByteArrayRegion(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKeyByteArray,
+                                0,
+                                static_cast<jsize>(entry_0.transportOptions.Value()
+                                                       .containerOptions.CMAFContainerOptions.Value()
+                                                       .HLSEncryption.Value()
+                                                       .baseKey.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
+                                                                    .containerOptions.CMAFContainerOptions.Value()
+                                                                    .HLSEncryption.Value()
+                                                                    .baseKey.data()));
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKey =
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKeyByteArray;
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURI;
+                            jbyteArray
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURIByteArray =
+                                    env->NewByteArray(static_cast<jsize>(entry_0.transportOptions.Value()
+                                                                             .containerOptions.CMAFContainerOptions.Value()
+                                                                             .HLSEncryption.Value()
+                                                                             .schemeURI.size()));
+                            env->SetByteArrayRegion(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURIByteArray,
+                                0,
+                                static_cast<jsize>(entry_0.transportOptions.Value()
+                                                       .containerOptions.CMAFContainerOptions.Value()
+                                                       .HLSEncryption.Value()
+                                                       .schemeURI.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.transportOptions.Value()
+                                                                    .containerOptions.CMAFContainerOptions.Value()
+                                                                    .HLSEncryption.Value()
+                                                                    .schemeURI.data()));
+                            newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURI =
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURIByteArray;
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBits;
+                            std::string
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBitsClassName =
+                                    "java/lang/Integer";
+                            std::string
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBitsCtorSignature =
+                                    "(I)V";
+                            jint
+                                jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBits =
+                                    static_cast<jint>(entry_0.transportOptions.Value()
+                                                          .containerOptions.CMAFContainerOptions.Value()
+                                                          .HLSEncryption.Value()
+                                                          .ratchetBits);
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBitsClassName
+                                    .c_str(),
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBitsCtorSignature
+                                    .c_str(),
+                                jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBits,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBits);
+                            jobject
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTime;
+                            if (!entry_0.transportOptions.Value()
+                                     .containerOptions.CMAFContainerOptions.Value()
+                                     .HLSEncryption.Value()
+                                     .ratchetTime.HasValue())
+                            {
+                                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                    nullptr,
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTime);
+                            }
+                            else
+                            {
+                                jobject
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptional;
+                                std::string
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptionalClassName =
+                                        "java/lang/Integer";
+                                std::string
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptionalCtorSignature =
+                                        "(I)V";
+                                jint
+                                    jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptional =
+                                        static_cast<jint>(entry_0.transportOptions.Value()
+                                                              .containerOptions.CMAFContainerOptions.Value()
+                                                              .HLSEncryption.Value()
+                                                              .ratchetTime.Value());
+                                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptionalClassName
+                                        .c_str(),
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptionalCtorSignature
+                                        .c_str(),
+                                    jninewElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptional,
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptional);
+                                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTimeInsideOptional,
+                                    newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTime);
+                            }
+
+                            {
+                                jclass HLSEncryptionStructStructClass_8;
+                                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                    env, "chip/devicecontroller/ChipStructs$PushAvStreamTransportClusterHLSEncryptionStruct",
+                                    HLSEncryptionStructStructClass_8);
+                                if (err != CHIP_NO_ERROR)
+                                {
+                                    ChipLogError(
+                                        Zcl, "Could not find class ChipStructs$PushAvStreamTransportClusterHLSEncryptionStruct");
+                                    return nullptr;
+                                }
+
+                                jmethodID HLSEncryptionStructStructCtor_8;
+                                err = chip::JniReferences::GetInstance().FindMethod(
+                                    env, HLSEncryptionStructStructClass_8, "<init>",
+                                    "([B[B[BLjava/lang/Integer;Ljava/util/Optional;)V", &HLSEncryptionStructStructCtor_8);
+                                if (err != CHIP_NO_ERROR || HLSEncryptionStructStructCtor_8 == nullptr)
+                                {
+                                    ChipLogError(
+                                        Zcl,
+                                        "Could not find ChipStructs$PushAvStreamTransportClusterHLSEncryptionStruct constructor");
+                                    return nullptr;
+                                }
+
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional =
+                                    env->NewObject(
+                                        HLSEncryptionStructStructClass_8, HLSEncryptionStructStructCtor_8,
+                                        newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_kid,
+                                        newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_baseKey,
+                                        newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_schemeURI,
+                                        newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetBits,
+                                        newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional_ratchetTime);
+                            }
+                            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryptionInsideOptional,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryption);
+                        }
 
                         {
                             jclass CMAFContainerOptionsStructStructClass_6;
@@ -52759,7 +52933,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             err = chip::JniReferences::GetInstance().FindMethod(
                                 env, CMAFContainerOptionsStructStructClass_6, "<init>",
                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
-                                "Optional;Ljava/util/Optional;)V",
+                                "Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
                                 &CMAFContainerOptionsStructStructCtor_6);
                             if (err != CHIP_NO_ERROR || CMAFContainerOptionsStructStructCtor_6 == nullptr)
                             {
@@ -52776,7 +52950,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_chunkDuration,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_sessionGroup,
                                 newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_trackName,
-                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled);
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_metadataEnabled,
+                                newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional_HLSEncryption);
                         }
                         TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                             newElement_0_transportOptionsInsideOptional_containerOptions_CMAFContainerOptionsInsideOptional,
@@ -53046,6 +53221,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                        newElement_0_fabricIndex);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::MaxZones::Id: {
+            using TypeInfo = Attributes::MaxZones::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                jint jnivalue                  = static_cast<jint>(cppValue.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             }
             return value;
         }
