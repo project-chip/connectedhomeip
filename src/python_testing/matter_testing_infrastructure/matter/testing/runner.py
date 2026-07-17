@@ -1043,7 +1043,8 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
     commission_group.add_argument('--commission-only-re-open-window', action="store_true", default=False,
-                                  help="If true, test commissions, opens a commissioning window using the original passcode/discriminator, and then exits without running subsequent tests")
+                                  help="If true, test commissions, opens a commissioning window using the original "
+                                       "passcode/discriminator, and then exits without running subsequent tests")
 
     commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
 

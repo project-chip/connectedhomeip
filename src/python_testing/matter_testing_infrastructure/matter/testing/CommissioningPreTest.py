@@ -70,15 +70,18 @@ class CommissionDeviceTest(MatterBaseTest):
 
         if self.matter_test_config.commission_only_re_open_window:
             for node_id, setup_payload in zip(self.dut_node_ids, self.setup_payloads):
-                logger.info(f"Opening commissioning window on node {node_id} using ECM with passcode {setup_payload.passcode}...")
+                logger.info(
+                    f"Opening commissioning window on node {node_id} using ECM with passcode "
+                    f"{setup_payload.passcode}...")
                 try:
+                    params = self.default_controller.CommissioningWindowPasscode
                     self.event_loop.run_until_complete(
                         self.default_controller.OpenCommissioningWindow(
                             nodeId=node_id,
                             timeout=900,
                             iteration=1000,
                             discriminator=setup_payload.filter_value,
-                            option=self.default_controller.CommissioningWindowPasscode.kTokenWithProvidedPin,
+                            option=params.kTokenWithProvidedPin,
                             setupPinCode=setup_payload.passcode
                         )
                     )

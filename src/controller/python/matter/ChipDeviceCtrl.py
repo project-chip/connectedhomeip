@@ -1361,8 +1361,10 @@ class ChipDeviceControllerBase:
         kTokenWithRandomPin = 1
         kTokenWithProvidedPin = 2
 
-    async def OpenCommissioningWindow(self, nodeId: int, timeout: int, iteration: int,
-                                      discriminator: int, option: CommissioningWindowPasscode, setupPinCode: int = 0) -> CommissioningParameters:
+    async def OpenCommissioningWindow(
+            self, nodeId: int, timeout: int, iteration: int,
+            discriminator: int, option: CommissioningWindowPasscode,
+            setupPinCode: int = 0) -> CommissioningParameters:
         '''
         Opens a commissioning window on the device with the given node ID.
 

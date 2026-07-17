@@ -413,7 +413,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         break
                 except (ValueError, IndexError, KeyError, TypeError):
                     continue
-            asserts.assert_is_not_none(th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
+            asserts.assert_is_not_none(
+                th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
 
             try:
                 th1_root_parser = MatterCertParser(th1_root_cert)

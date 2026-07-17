@@ -449,11 +449,14 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             sys.executable, "-X", "faulthandler",
             script,
             "--fail-on-skipped",
-            "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            "--paa-trust-store-path",
+            os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             "--commission-only-re-open-window"
         ] + shlex.split(commission_args)
 
-        log.info("Running python script to commission device on a pre-existing fabric and open commissioning window...")
+        log.info(
+            "Running python script to commission device on a pre-existing fabric and "
+            "open commissioning window...")
         log.info("Command: %s", ' '.join(commission_command))
         commission_proc = Subprocess(commission_command[0], *commission_command[1:],
                                      output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
