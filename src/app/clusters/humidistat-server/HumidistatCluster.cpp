@@ -147,6 +147,7 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
 
     if ((mMode == ModeEnum::kHumidifier) && (mMistType.IsNull() || !mMistType.Value().HasAny()))
     {
+        ChipLogDetail(Zcl, "Humidistat: Startup MistType null/empty in Humidifier mode, applying feature default");
         mMistType.SetNonNull();
         if (mFeatures.Has(Feature::kColdMist))
         {
