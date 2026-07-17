@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "pigweed_rpc/PigweedLogger.h"
 #include "pigweed/RpcService.h"
+#include "pigweed_rpc/PigweedLogger.h"
 #include <cmsis_os2.h>
 
 namespace chip {
