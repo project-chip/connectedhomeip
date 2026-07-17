@@ -18,11 +18,13 @@ source_set("mode-select-server") {
   sources = [
     "ModeSelectCluster.cpp",
     "ModeSelectCluster.h",
+    "SupportedModesManager.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:persistence",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/ModeSelect",

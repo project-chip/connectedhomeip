@@ -17,7 +17,6 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -76,7 +75,6 @@ struct TestModeSelectCluster : public ::testing::Test
         optionalAttributeSet               = {};
         diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         testContext.StorageDelegate().ClearStorage();
-        ASSERT_EQ(persistenceProvider.Init(&testContext.StorageDelegate()), CHIP_NO_ERROR);
     }
 
     ModeSelectCluster::Config MakeConfig(BitMask<Feature> featureMap = {}, bool onOffValueForStartUp = false)
@@ -87,13 +85,11 @@ struct TestModeSelectCluster : public ::testing::Test
             .featureMap             = featureMap,
             .optionalAttributeSet   = optionalAttributeSet,
             .onOffValueForStartUp   = onOffValueForStartUp,
-            .persistenceProvider    = persistenceProvider,
             .diagnosticDataProvider = diagnosticDataProvider,
         };
     }
 
     TestServerClusterContext testContext;
-    DefaultSafeAttributePersistenceProvider persistenceProvider;
     MockDelegate mockDelegate;
     TestDiagnosticDataProvider diagnosticDataProvider;
     ModeSelectCluster::OptionalAttributeSet optionalAttributeSet;
@@ -289,7 +285,7 @@ TEST_F(TestModeSelectCluster, WriteStartUpModeValidValue)
     EXPECT_TRUE(tester.IsAttributeDirty(StartUpMode::Id));
 }
 
-TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsConstraintError)
+TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsInvalidCommand)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
@@ -297,7 +293,7 @@ TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsConstraintError
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint8_t> invalidMode(99);
-    EXPECT_EQ(tester.WriteAttribute(StartUpMode::Id, invalidMode), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(StartUpMode::Id, invalidMode), Status::InvalidCommand);
 }
 
 TEST_F(TestModeSelectCluster, WriteOnModeValidValue)
@@ -361,14 +357,15 @@ TEST_F(TestModeSelectCluster, StartupAppliesStartUpMode)
     {
         ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
         ClusterTester tester(cluster);
-        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        // Use fixture's testContext so persistence survives across cluster instances.
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, DataModel::Nullable<uint8_t>(1)).IsSuccess());
     }
 
-    // Re-create cluster to simulate power cycle
+    // Re-create cluster to simulate power cycle — same testContext storage.
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
-    ASSERT_EQ(cluster2.Startup(tester2.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
@@ -381,7 +378,7 @@ TEST_F(TestModeSelectCluster, StartupSkipsStartUpModeOnOtaReboot)
     {
         ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
         ClusterTester tester(cluster);
-        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, DataModel::Nullable<uint8_t>(1)).IsSuccess());
     }
 
@@ -389,11 +386,11 @@ TEST_F(TestModeSelectCluster, StartupSkipsStartUpModeOnOtaReboot)
 
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig());
     ClusterTester tester2(cluster2);
-    ASSERT_EQ(cluster2.Startup(tester2.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
-    // CurrentMode was persisted as 0 (initial), so it should still be 0
+    // StartUpMode (1) is skipped on OTA reboot; CurrentMode stays at default (0).
     EXPECT_EQ(currentMode, 0u);
 }
 
@@ -401,22 +398,21 @@ TEST_F(TestModeSelectCluster, StartupAppliesOnModeOverStartUpMode)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     {
-        ModeSelectCluster cluster(kRootEndpointId, mockDelegate,
-                                  MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
+        ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
         ClusterTester tester(cluster);
-        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, DataModel::Nullable<uint8_t>(0)).IsSuccess());
         ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, DataModel::Nullable<uint8_t>(1)).IsSuccess());
     }
 
-    // Re-create cluster to simulate power cycle
+    // Re-create cluster to simulate power cycle — same testContext storage.
     ModeSelectCluster cluster2(kRootEndpointId, mockDelegate, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
     ClusterTester tester2(cluster2);
-    ASSERT_EQ(cluster2.Startup(tester2.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster2.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester2.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
-    // OnMode (1) wins over StartUpMode (0)
+    // OnMode (1) wins over StartUpMode (0).
     EXPECT_EQ(currentMode, 1u);
 }
 
