@@ -233,6 +233,12 @@
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
+        "Dynamic Lighting": [
+            "ClusterRevision",
+            "FeatureMap",
+            "CurrentEffectID",
+            "CurrentSpeed"
+        ],
         "Commissioner Control": [
             "SupportedDeviceCategories",
             "FeatureMap",
