@@ -18,13 +18,11 @@
 // encode/decode round-trip and the BLEDeviceID generation / persistence
 // helpers.
 //
-// These tests assume the helpers are compiled in their default, secure
-// configuration (CHIP_CLUSTER_PROXIMITY_RANGING_DISABLE_SECURE_BLE_BEACONING
-// undefined or 0), where the ObfuscatedBLEDeviceId field is an HMAC-SHA256 tag
-// over (BLEDeviceID || messageCounter). That is how the ble-rssi-helpers
-// source_set builds in CI; the plaintext flag is a test-only bring-up escape
-// hatch that is never set in normal builds, so obfuscation-specific assertions
-// (e.g. sensitivity to the session key) are valid here.
+// EncodeBeaconPayload / DecodeBeaconPayload default to the secure
+// HmacObfuscateBleDeviceId strategy, where the ObfuscatedBLEDeviceId field is an
+// HMAC-SHA256 tag over (BLEDeviceID || messageCounter). The obfuscation strategy
+// is injectable, so the obfuscation helpers and the insecure plaintext strategy
+// are exercised directly below rather than behind a build flag.
 
 #include <pw_unit_test/framework.h>
 
@@ -208,6 +206,65 @@ TEST_F(TestBleRssiRangingHelpers, GenerateProducesValidId)
         ASSERT_EQ(GenerateBleDeviceId(id), CHIP_NO_ERROR);
         EXPECT_NE(id, kInvalidBleDeviceId);
     }
+}
+
+// The HMAC obfuscator rejects an empty session key rather than producing a
+// keyless tag.
+TEST_F(TestBleRssiRangingHelpers, HmacObfuscateRejectsEmptySessionKey)
+{
+    uint8_t out[kObfuscatedLen] = {};
+    EXPECT_EQ(HmacObfuscateBleDeviceId(kDeviceId, kMsgCounter, ByteSpan(), MutableByteSpan(out)), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// The HMAC obfuscator rejects an output buffer smaller than the
+// ObfuscatedBLEDeviceId field rather than writing past its end. A valid key is
+// passed so the size guard (checked before the key guard) is what fires.
+TEST_F(TestBleRssiRangingHelpers, HmacObfuscateRejectsTooSmallBuffer)
+{
+    uint8_t out[kObfuscatedLen - 1] = {};
+    EXPECT_EQ(HmacObfuscateBleDeviceId(kDeviceId, kMsgCounter, ByteSpan(kSessionKey), MutableByteSpan(out)),
+              CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
+// EncodeBeaconPayload surfaces the empty-key failure from the default HMAC
+// strategy rather than emitting an unkeyed beacon.
+TEST_F(TestBleRssiRangingHelpers, EncodeRejectsEmptySessionKey)
+{
+    ChipBLEProximityRangingIdentificationInfo payload;
+    EXPECT_EQ(EncodeBeaconPayload(kDeviceId, kMsgCounter, kTxPower, ByteSpan(), payload), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+// The plaintext strategy writes the raw big-endian BLEDeviceID and ignores the
+// session key (it is the insecure bring-up path).
+TEST_F(TestBleRssiRangingHelpers, PlaintextObfuscateWritesRawBigEndianId)
+{
+    uint8_t out[kObfuscatedLen] = {};
+    ASSERT_EQ(PlaintextObfuscateBleDeviceId(kDeviceId, kMsgCounter, ByteSpan(), MutableByteSpan(out)), CHIP_NO_ERROR);
+
+    uint8_t expected[kObfuscatedLen] = {};
+    Encoding::BigEndian::Put64(expected, kDeviceId);
+    EXPECT_EQ(memcmp(out, expected, kObfuscatedLen), 0);
+}
+
+// The plaintext obfuscator also rejects an output buffer smaller than the
+// ObfuscatedBLEDeviceId field rather than writing past its end.
+TEST_F(TestBleRssiRangingHelpers, PlaintextObfuscateRejectsTooSmallBuffer)
+{
+    uint8_t out[kObfuscatedLen - 1] = {};
+    EXPECT_EQ(PlaintextObfuscateBleDeviceId(kDeviceId, kMsgCounter, ByteSpan(), MutableByteSpan(out)), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
+// A payload encoded with an injected strategy round-trips when decoded with the
+// same strategy: this is what lets two peers interoperate on the plaintext path
+// without a shared key.
+TEST_F(TestBleRssiRangingHelpers, EncodeDecodeRoundTripsWithInjectedPlaintextStrategy)
+{
+    ChipBLEProximityRangingIdentificationInfo payload;
+    ASSERT_EQ(EncodeBeaconPayload(kDeviceId, kMsgCounter, kTxPower, ByteSpan(), payload, PlaintextObfuscateBleDeviceId),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(DecodeBeaconPayload(payload, kDeviceId, ByteSpan(), PlaintextObfuscateBleDeviceId), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeBeaconPayload(payload, kOtherDeviceId, ByteSpan(), PlaintextObfuscateBleDeviceId), CHIP_ERROR_NOT_FOUND);
 }
 
 // First use on empty storage: generate a valid ID and persist it.
