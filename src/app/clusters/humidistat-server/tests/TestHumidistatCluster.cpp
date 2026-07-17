@@ -55,7 +55,6 @@ TEST_F(TestHumidistatCluster, AttributeList)
     {
         HumidistatCluster cluster(kTestEndpointId, BitFlags<Feature>{ Feature::kDehumidifier }, {});
 
-
         ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
                                                 SupportedModes::kMetadataEntry,
@@ -206,8 +205,8 @@ TEST_F(TestHumidistatCluster, AttributeList)
     // All features enabled, all optional attributes enabled - all attributes should be present.
 
     {
-        const BitFlags<Feature> features{ Feature::kSensor,       Feature::kHumidifier, Feature::kContinuous,
-                          Feature::kOptimal,      Feature::kColdMist };
+        const BitFlags<Feature> features{ Feature::kSensor, Feature::kHumidifier, Feature::kContinuous, Feature::kOptimal,
+                                          Feature::kColdMist };
 
         HumidistatCluster::OptionalAttributeSet optionalAttrs;
         optionalAttrs.Set<Sleep::Id>().Set<TargetSetpoint::Id>();
@@ -386,8 +385,8 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     config.step         = 10;
     config.userSetpoint = 50;
 
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kSensor, Feature::kContinuous,
-                                      Feature::kOptimal, Feature::kColdMist,   Feature::kCondPump };
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kSensor,  Feature::kContinuous,
+                                      Feature::kOptimal,    Feature::kColdMist,     Feature::kCondPump };
 
     HumidistatCluster::OptionalAttributeSet optionalAttrs;
     optionalAttrs.Set<Sleep::Id>();
@@ -398,8 +397,10 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
 
     EXPECT_EQ(tester.WriteAttribute(Mode::Id, ModeEnum::kHumidifier), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(60)), CHIP_NO_ERROR);
-    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(81)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range
-    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(19)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range    
+    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(81)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range
+    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(19)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range
     EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(Continuous::Id, true), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(Sleep::Id, true), CHIP_NO_ERROR);
@@ -689,7 +690,7 @@ TEST_F(TestHumidistatCluster, SetSettingsModeFailStopsProcessing)
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
     EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier); // unchanged
-    EXPECT_EQ(cluster.GetUserSetpoint(), 50);     // unchanged — not processed
+    EXPECT_EQ(cluster.GetUserSetpoint(), 50);            // unchanged — not processed
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -724,7 +725,7 @@ TEST_F(TestHumidistatCluster, SetSettingsCanDisallowSleepTrueIndependently)
     HumidistatCluster::OptionalAttributeSet optionalAttrs;
     optionalAttrs.Set<Sleep::Id>();
 
-    HumidistatCluster cluster(kTestEndpointId, {Feature::kHumidifier, Feature::kColdMist}, optionalAttrs);
+    HumidistatCluster cluster(kTestEndpointId, { Feature::kHumidifier, Feature::kColdMist }, optionalAttrs);
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -1018,14 +1019,14 @@ public:
         lastCondRunCount = newCondRunCount;
     }
 
-    int modeChangedCount           = 0;
-    int systemStateChangedCount    = 0;
-    int userSetpointChangedCount   = 0;
-    int targetSetpointChangedCount = 0;
-    int mistTypeChangedCount       = 0;
-    int continuousChangedCount     = 0;
-    int sleepChangedCount          = 0;
-    int optimalChangedCount        = 0;
+    int modeChangedCount            = 0;
+    int systemStateChangedCount     = 0;
+    int userSetpointChangedCount    = 0;
+    int targetSetpointChangedCount  = 0;
+    int mistTypeChangedCount        = 0;
+    int continuousChangedCount      = 0;
+    int sleepChangedCount           = 0;
+    int optimalChangedCount         = 0;
     int condPumpEnabledChangedCount = 0;
     int condRunCountChangedCount    = 0;
 
