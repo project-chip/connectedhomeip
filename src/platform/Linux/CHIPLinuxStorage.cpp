@@ -68,9 +68,8 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
         // Re-initialization with a different config file path. Flush any dirty
         // data to the previous file, then clear the in-memory state so the new
         // file can be loaded cleanly.
-        ChipLogDetail(DeviceLayer,
-                     "ChipLinuxStorage::Init: Re-initializing KVS from '%s' to '%s'",
-                     StringOrNullMarker(mConfigPath.c_str()), StringOrNullMarker(configFile));
+        ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Re-initializing KVS from '%s' to '%s'",
+                      StringOrNullMarker(mConfigPath.c_str()), StringOrNullMarker(configFile));
 
         if (mDirty)
         {
