@@ -247,7 +247,7 @@ namespace DeviceLayer {
                 [gContext setPersistentStoreCoordinator:coordinator];
 
                 mInitialized = true;
-                mFilePath   = fileName;
+                mFilePath = fileName;
                 return CHIP_NO_ERROR;
             } // @autoreleasepool
         }
