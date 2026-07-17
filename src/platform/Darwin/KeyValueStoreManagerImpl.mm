@@ -148,13 +148,34 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * fileName)
         {
             @autoreleasepool {
+                VerifyOrReturnError(fileName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(fileName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
+
                 if (mInitialized) {
-                    return CHIP_NO_ERROR;
+                    if (mFilePath == fileName) {
+                        return CHIP_NO_ERROR;
+                    }
+
+                    // Re-initialization with a different file path. Tear down the
+                    // existing CoreData stack so the new store can be loaded cleanly.
+                    ChipLogProgress(DeviceLayer, "Re-initializing KVS from '%s' to '%s'", mFilePath.c_str(), fileName);
+
+                    if (gContext != nullptr) {
+                        NSPersistentStoreCoordinator * coordinator = [gContext persistentStoreCoordinator];
+                        if (coordinator != nullptr) {
+                            NSError * error = nil;
+                            for (NSPersistentStore * store in [coordinator persistentStores]) {
+                                [coordinator removePersistentStore:store error:&error];
+                            }
+                        }
+                        gContext = nullptr;
+                    }
+
+                    mInitialized = false;
+                    mFilePath.clear();
                 }
 
                 VerifyOrReturnError(gContext == nullptr, CHIP_ERROR_INCORRECT_STATE);
-                VerifyOrReturnError(fileName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-                VerifyOrReturnError(fileName[0] != '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
                 NSURL * url = nullptr;
                 NSString * filepath = [NSString stringWithUTF8String:fileName];
@@ -226,6 +247,7 @@ namespace DeviceLayer {
                 [gContext setPersistentStoreCoordinator:coordinator];
 
                 mInitialized = true;
+                mFilePath   = fileName;
                 return CHIP_NO_ERROR;
             } // @autoreleasepool
         }
