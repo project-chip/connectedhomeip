@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <vector>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <vector>
 
 namespace chip {
 namespace app {
