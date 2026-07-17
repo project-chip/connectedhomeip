@@ -962,7 +962,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::ProcessScanWorkItem(const NfcWorkItem & 
         return scanResult;
     }
 
-    ChipLogProgressNfcDebug(DeviceLayer, "scanResult available. Now searching for a specific discriminator: %d", item.targetIdentifier.discriminator);
+    ChipLogProgressNfcDebug(DeviceLayer, "scanResult available. Now searching for a specific discriminator: %d",
+                            item.targetIdentifier.discriminator);
     std::shared_ptr<TagInstance> tagInstance;
     {
         std::lock_guard<std::mutex> lock(mStateMutex);
