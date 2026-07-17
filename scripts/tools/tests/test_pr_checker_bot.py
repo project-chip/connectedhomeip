@@ -30,7 +30,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, UnresolvedThread, ValidationCheck  # noqa: E402
+from pr_checker_bot import (  # noqa: E402
+    ELIGIBILITY_COMMENT_MARKER,
+    PrCheckerBot,
+    PRContext,
+    UnresolvedThread,
+    ValidationCheck,
+)
 
 
 class TestPrCheckerBot(unittest.TestCase):
@@ -1242,6 +1248,78 @@ esp32:
         ] + [mock_success_suite] * 9
         self.bot.check_and_process_pr(mock_pr)
         mock_pr.merge.assert_not_called()
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_retry_success(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property retries and succeeds if state becomes available."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "open"
+
+        def mock_update():
+            mock_pr.mergeable = True
+
+        mock_pr.update = mock_update
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        self.assertTrue(context.mergeable)
+        mock_sleep.assert_called_once_with(5)
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_retry_failure(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property retries and returns None if state stays computing."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "open"
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        from unittest.mock import call
+
+        self.assertIsNone(context.mergeable)
+        self.assertEqual(mock_sleep.call_count, 3)
+        mock_sleep.assert_has_calls([call(5), call(10), call(15)])
+
+    @patch("time.sleep", return_value=None)
+    def test_mergeable_no_retry_if_closed(self, mock_sleep: MagicMock) -> None:
+        """Tests that mergeable property does not retry if the PR is closed."""
+        mock_pr = MagicMock()
+        mock_pr.number = 1
+        mock_pr.mergeable = None
+        mock_pr.state = "closed"
+
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+
+        self.assertIsNone(context.mergeable)
+        mock_sleep.assert_not_called()
+        mock_pr.update.assert_not_called()
 
 
 if __name__ == "__main__":

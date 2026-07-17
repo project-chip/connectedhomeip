@@ -18,6 +18,7 @@
 import json
 import logging
 import os
+import time
 import urllib.request
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -453,9 +454,37 @@ class PRContext:
                 return status.state == "success"
         return False
 
-    @property
+    @cached_property
     def mergeable(self) -> bool | None:
-        return self.pr.mergeable
+        val = self.pr.mergeable
+        if val is not None:
+            return val
+
+        # If the PR is not open, do not retry as mergeability won't be computed.
+        if self.pr.state != "open":
+            log.info(
+                "PR #%d is not open (state: '%s'). Skipping mergeability retry.",
+                self.pr.number,
+                self.pr.state,
+            )
+            return None
+
+        # Retry logic if mergeability is still computing on GitHub
+        for i in range(1, 4):
+            sleep_time = 5 * i
+            log.info(
+                "PR #%d mergeability state is computing. Retrying in %d seconds... (Attempt %d/3)",
+                self.pr.number,
+                sleep_time,
+                i,
+            )
+            time.sleep(sleep_time)  # Increasing backoff: 5s, 10s, 15s
+            self.pr.update()
+            val = self.pr.mergeable
+            if val is not None:
+                return val
+
+        return None
 
     @cached_property
     def bot_comments(self) -> list:
