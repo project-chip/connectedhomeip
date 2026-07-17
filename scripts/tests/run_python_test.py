@@ -443,8 +443,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if not storage_path_found:
             commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
 
-        commission_args = shlex.join(commission_tokens)
-
         commission_command = [
             sys.executable, "-X", "faulthandler",
             script,
@@ -452,7 +450,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             "--paa-trust-store-path",
             os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             "--commission-only-re-open-window"
-        ] + shlex.split(commission_args)
+        ] + commission_tokens
 
         log.info(
             "Running python script to commission device on a pre-existing fabric and "
