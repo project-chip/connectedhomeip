@@ -17,6 +17,7 @@
 
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ModeSelect/Commands.h>
 #include <clusters/ModeSelect/Metadata.h>
@@ -31,16 +32,33 @@ using namespace chip::app::Clusters::ModeSelect::Attributes;
 using chip::Protocols::InteractionModel::Status;
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
+namespace {
+
+class ModeSelectSceneValidator : public scenes::AttributeValuePairValidator
+{
+public:
+    CHIP_ERROR Validate(const app::ConcreteClusterPath & clusterPath,
+                        AttributeValuePairValidator::AttributeValuePairType & value) override
+    {
+        VerifyOrReturnError(clusterPath.mClusterId == ModeSelect::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(value.attributeID == CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
+};
+
+ModeSelectSceneValidator & GlobalValidator()
+{
+    static ModeSelectSceneValidator sValidator;
+    return sValidator;
+}
+
+} // namespace
+
 ModeSelectCluster::ModeSelectCluster(EndpointId endpointId, Delegate & delegate, const Config & config) :
-    DefaultServerCluster({ endpointId, ModeSelect::Id }),
-    mDelegate(delegate),
-    mDescription(config.description),
-    mStandardNamespace(config.standardNamespace),
-    mFeatureMap(config.featureMap),
-    mOptionalAttributeSet(config.optionalAttributeSet),
-    mOnOffValueForStartUp(config.onOffValueForStartUp),
-    mPersistenceProvider(config.persistenceProvider),
-    mDiagnosticDataProvider(config.diagnosticDataProvider)
+    DefaultServerCluster({ endpointId, ModeSelect::Id }), DefaultSceneHandlerImpl(GlobalValidator()), mDelegate(delegate),
+    mDescription(config.description), mStandardNamespace(config.standardNamespace), mFeatureMap(config.featureMap),
+    mOptionalAttributeSet(config.optionalAttributeSet), mOnOffValueForStartUp(config.onOffValueForStartUp),
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mStartUpMode(config.initialStartUpMode), mOnMode(config.initialOnMode)
 {}
 
 CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
@@ -48,19 +66,23 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     auto modes = mDelegate.GetSupportedModes();
-    VerifyOrReturnError(modes.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    mCurrentMode = modes[0].mode;
+    if (modes.size() > 0)
+    {
+        mCurrentMode = modes[0].mode;
+    }
+    // If modes are empty (e.g. SupportedModesManager installed after Server::Init),
+    // mCurrentMode keeps its default (0); LoadPersistentAttributes may restore a persisted
+    // value. StartUpMode and OnMode application requires a valid mode list and is skipped.
 
-    LoadPersistentAttributes();
+    LoadPersistentAttributes(context.attributeStorage);
 
-    if (!mStartUpMode.IsNull())
+    if (modes.size() > 0 && !mStartUpMode.IsNull())
     {
         BootReasonType bootReason = BootReasonType::kUnspecified;
         CHIP_ERROR err            = mDiagnosticDataProvider.GetBootReason(bootReason);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                         "ModeSelect: Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT ". Assuming non-OTA reboot",
+            ChipLogError(Zcl, "ModeSelect: Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT ". Assuming non-OTA reboot",
                          err.Format());
             bootReason = BootReasonType::kUnspecified;
         }
@@ -75,52 +97,39 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
             Status status = UpdateCurrentMode(mStartUpMode.Value());
             if (status != Status::Success)
             {
-                ChipLogError(Zcl, "ModeSelect: Failed to apply StartUpMode: %u", to_underlying(status));
-                return StatusIB(status).ToChipError();
+                // Stale NVM value (e.g. mode removed by firmware update) — skip and keep current mode.
+                ChipLogError(Zcl, "ModeSelect: StartUpMode %u not supported, ignoring.", mStartUpMode.Value());
             }
         }
     }
 
-    if (mOnOffValueForStartUp && !mOnMode.IsNull() && mOnMode.Value() != mCurrentMode)
+    if (modes.size() > 0 && mOnOffValueForStartUp && !mOnMode.IsNull() && mOnMode.Value() != mCurrentMode)
     {
         ChipLogProgress(Zcl, "ModeSelect: Applying OnMode %u to CurrentMode.", mOnMode.Value());
         Status status = UpdateCurrentMode(mOnMode.Value());
         if (status != Status::Success)
         {
-            ChipLogError(Zcl, "ModeSelect: Failed to apply OnMode: %u", to_underlying(status));
-            return StatusIB(status).ToChipError();
+            // Stale NVM value (e.g. mode removed by firmware update) — skip and keep current mode.
+            ChipLogError(Zcl, "ModeSelect: OnMode %u not supported, ignoring.", mOnMode.Value());
         }
     }
 
     return CHIP_NO_ERROR;
 }
 
-void ModeSelectCluster::LoadPersistentAttributes()
+void ModeSelectCluster::LoadPersistentAttributes(AttributePersistenceProvider & provider)
 {
-    CHIP_ERROR err;
-
-    err = mPersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "ModeSelect: Failed to restore CurrentMode: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    AttributePersistence persistence{ provider };
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode, mCurrentMode);
 
     if (mOptionalAttributeSet.IsSet(StartUpMode::Id))
     {
-        err = mPersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(Zcl, "ModeSelect: Failed to restore StartUpMode: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        persistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode, mStartUpMode);
     }
 
     if (mFeatureMap.Has(Feature::kOnOff))
     {
-        err = mPersistenceProvider.ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(Zcl, "ModeSelect: Failed to restore OnMode: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        persistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode, mOnMode);
     }
 }
 
@@ -142,27 +151,32 @@ Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
     VerifyOrReturnValue(SetAttributeValue(mCurrentMode, newMode, CurrentMode::Id), Status::Success);
 
     LogErrorOnFailure(
-        mPersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mCurrentMode), sizeof(mCurrentMode))));
     return Status::Success;
 }
 
 Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStartUpMode)
 {
-    VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::ConstraintError);
+    VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::InvalidCommand);
     VerifyOrReturnValue(SetAttributeValue(mStartUpMode, newStartUpMode, StartUpMode::Id), Status::Success);
 
-    LogErrorOnFailure(
-        mPersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
+    // Null sentinel for nullable uint8 is 0xFF per Matter spec.
+    uint8_t storageVal = mStartUpMode.IsNull() ? static_cast<uint8_t>(0xFF) : mStartUpMode.Value();
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id), ByteSpan(&storageVal, sizeof(storageVal))));
     return Status::Success;
 }
 
 Status ModeSelectCluster::UpdateOnMode(DataModel::Nullable<uint8_t> newOnMode)
 {
-    VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::ConstraintError);
+    VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::InvalidCommand);
     VerifyOrReturnValue(SetAttributeValue(mOnMode, newOnMode, OnMode::Id), Status::Success);
 
-    LogErrorOnFailure(
-        mPersistenceProvider.WriteScalarValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
+    // Null sentinel for nullable uint8 is 0xFF per Matter spec.
+    uint8_t storageVal = mOnMode.IsNull() ? static_cast<uint8_t>(0xFF) : mOnMode.Value();
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id),
+                                                            ByteSpan(&storageVal, sizeof(storageVal))));
     return Status::Success;
 }
 
@@ -175,8 +189,10 @@ DataModel::ActionReturnStatus ModeSelectCluster::ReadAttribute(const DataModel::
         return encoder.Encode(kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
-    case Description::Id:
-        return encoder.Encode(mDescription);
+    case Description::Id: {
+        CharSpan delegateDesc = mDelegate.GetDescription();
+        return encoder.Encode(delegateDesc.empty() ? mDescription : delegateDesc);
+    }
     case StandardNamespace::Id:
         return encoder.Encode(mStandardNamespace);
     case SupportedModes::Id:
@@ -218,9 +234,9 @@ DataModel::ActionReturnStatus ModeSelectCluster::WriteAttribute(const DataModel:
     }
 }
 
-std::optional<DataModel::ActionReturnStatus>
-ModeSelectCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                 CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> ModeSelectCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -240,7 +256,7 @@ ModeSelectCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::
 }
 
 CHIP_ERROR ModeSelectCluster::Attributes(const ConcreteClusterPath & path,
-                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
@@ -256,4 +272,44 @@ CHIP_ERROR ModeSelectCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry });
+}
+
+bool ModeSelectCluster::SupportsCluster(EndpointId endpoint, ClusterId cluster)
+{
+    return (cluster == ModeSelect::Id) && (endpoint == mPath.mEndpointId);
+}
+
+CHIP_ERROR ModeSelectCluster::SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes)
+{
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = CurrentMode::Id;
+    pairs[0].valueUnsigned8.SetValue(mCurrentMode);
+
+    app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
+    return EncodeAttributeValueList(attributeValueList, serializedBytes);
+}
+
+CHIP_ERROR ModeSelectCluster::ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                                         scenes::TransitionTimeMs timeMs)
+{
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+
+    app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
+    ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
+
+    auto pair_iterator = attributeValueList.begin();
+    while (pair_iterator.Next())
+    {
+        auto & decodePair = pair_iterator.GetValue();
+        VerifyOrReturnError(decodePair.attributeID == CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        Status status = UpdateCurrentMode(decodePair.valueUnsigned8.Value());
+        VerifyOrReturnError(status == Status::Success, StatusIB(status).ToChipError());
+    }
+    return pair_iterator.GetStatus();
 }

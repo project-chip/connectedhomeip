@@ -17,26 +17,20 @@
 
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
-#include <clusters/ModeSelect/Ids.h>
-
-using chip::Protocols::InteractionModel::Status;
+#include <app/clusters/mode-select-server/ModeSelectCluster.h> // nogncheck
 
 namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
 void UpdateCurrentModeToOnMode(EndpointId endpoint)
 {
-    VerifyOrReturn(emberAfContainsAttribute(endpoint, Clusters::ModeSelect::Id, Clusters::ModeSelect::Attributes::OnMode::Id));
+    Clusters::ModeSelectCluster * cluster = Clusters::ModeSelect::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(cluster != nullptr);
 
-    Clusters::ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-
-    VerifyOrReturn(Clusters::ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == Status::Success);
+    auto onMode = cluster->GetOnMode();
     VerifyOrReturn(!onMode.IsNull());
 
     ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-    (void) Clusters::ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+    (void) cluster->UpdateCurrentMode(onMode.Value());
 }
 
 } // namespace chip::app::Clusters::OnOff::Internal::ModeSelect
