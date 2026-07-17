@@ -93,7 +93,7 @@ public:
     static constexpr uint16_t kAbsMaxCoolSetpointLimitDefault  = 3200; // 32C (90 F) is the default
     static constexpr uint16_t kOccupancyCoolingSetpointDefault = 2600; // 26C (78.8 F) is the default
     static constexpr uint16_t kOccupancyHeatingSetpointDefault = 2000; // 20C (68 F) is the default
-    static constexpr uint8_t kMinSetpointDeadbancDefault       = 20;   // 2C is the default
+    static constexpr uint8_t kMinSetpointDeadbandDefault       = 20;   // 2C is the default
     static constexpr uint8_t kEmergencyHeatDeltaDefault        = 255;  // 25.5C is the default
 
     /// Aggregates every construction-time parameter for the cluster.
@@ -212,7 +212,7 @@ public:
     Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(int16_t value);
     int16_t GetMaxCoolSetpointLimit();
 
-    // MinSetpointDeadbanc
+    // MinSetpointDeadband
     Protocols::InteractionModel::Status SetMinSetpointDeadband(int16_t value);
     int8_t GetMinSetpointDeadband();
 
@@ -384,7 +384,7 @@ protected:
     int16_t mMaxHeatSetpointLimit;
     int16_t mMinCoolSetpointLimit;
     int16_t mMaxCoolSetpointLimit;
-    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbancDefault };
+    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbandDefault };
     BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
     SystemModeEnum mSystemMode;
@@ -427,8 +427,9 @@ private:
     // @brief Validates and appends a preset to the delegate's pending-preset list during an atomic write.
     CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
 
-    // @brief Returns true if attributeId is a valid attribute on this cluster
-    bool IsKnownAttribute(AttributeId attributeId);
+    // @brief Returns true if attributeId is a valid attribute on this cluster, given the cluster's
+    // current attribute listing (see Attributes()).
+    bool IsKnownAttribute(AttributeId attributeId, const ReadOnlyBuffer<DataModel::AttributeEntry> & knownAttributes);
 
     // @brief Builds the AtomicAttributeStatusStruct list for an AtomicRequest
     Protocols::InteractionModel::Status BuildAttributeStatuses(

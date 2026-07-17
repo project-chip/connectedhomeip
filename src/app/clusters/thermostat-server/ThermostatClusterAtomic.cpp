@@ -136,7 +136,7 @@ void SendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath &
 
 } // anonymous namespace
 
-bool ThermostatCluster::IsKnownAttribute(AttributeId attributeId)
+bool ThermostatCluster::IsKnownAttribute(AttributeId attributeId, const ReadOnlyBuffer<DataModel::AttributeEntry> & knownAttributes)
 {
     // Global attributes are always present on every cluster (FeatureMap, ClusterRevision,
     // GeneratedCommandList, AcceptedCommandList, AttributeList).
@@ -150,12 +150,7 @@ bool ThermostatCluster::IsKnownAttribute(AttributeId attributeId)
 
     // Cluster-specific attributes, gated by the active feature map and optional-attribute set. The
     // cluster's own Attributes() listing is the code-driven source of truth (replaces ember metadata).
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
-    if (Attributes(ConcreteClusterPath(GetEndpointId(), Thermostat::Id), builder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    for (const auto & entry : builder.TakeBuffer())
+    for (const auto & entry : knownAttributes)
     {
         if (entry.attributeId == attributeId)
         {
@@ -214,10 +209,17 @@ Status ThermostatCluster::BuildAttributeStatuses(
     {
         return Status::InvalidCommand;
     }
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    if (Attributes(ConcreteClusterPath(GetEndpointId(), Thermostat::Id), builder) != CHIP_NO_ERROR)
+    {
+        return Status::Failure;
+    }
+    auto knownAttributes = builder.TakeBuffer();
     for (size_t i = 0; i < index; ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
-        if (!IsKnownAttribute(attributeStatus.attributeID))
+        if (!IsKnownAttribute(attributeStatus.attributeID, knownAttributes))
         {
             // This is not a valid attribute on the Thermostat cluster on this endpoint
             return Status::InvalidCommand;
