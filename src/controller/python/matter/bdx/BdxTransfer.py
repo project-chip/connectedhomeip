@@ -18,7 +18,6 @@
 import asyncio
 from ctypes import c_void_p
 from dataclasses import dataclass
-from typing import Optional
 
 from . import Bdx
 
@@ -44,7 +43,7 @@ class BdxTransfer:
     The transfer can be rejected by calling reject.
     '''
 
-    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: Optional[bytes] = None):
+    def __init__(self, bdx_transfer: c_void_p, init_message: InitMessage, data: bytes | None = None):
         self.init_message = init_message
         self._bdx_transfer = bdx_transfer
         # _data is a bytearray when receiving data, so the data to send is converted to one as well for consistency.

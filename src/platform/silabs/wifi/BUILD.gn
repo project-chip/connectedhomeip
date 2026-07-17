@@ -77,7 +77,9 @@ config("wifi-platform-config") {
   # TODO: This defines needs to be here for the spi_multiplex.h configuration header.
   # We need to find a better way to handle this.
   if (!disable_lcd) {
-    defines += [ "DISPLAY_ENABLED" ]
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=1" ]
+  } else {
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=0" ]
   }
   if (use_SiWx917 || wifi_soc) {
     include_dirs += [

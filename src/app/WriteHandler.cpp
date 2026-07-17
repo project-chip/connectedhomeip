@@ -670,10 +670,14 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     mStateFlags.Set(StateBits::kHasMoreChunks, boolValue);
 
     if (mStateFlags.Has(StateBits::kHasMoreChunks) &&
-        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest)))
+        (mExchangeCtx->IsGroupExchangeContext() || mStateFlags.Has(StateBits::kIsTimedRequest) ||
+         mStateFlags.Has(StateBits::kSuppressResponse)))
     {
         // Sanity check: group exchange context should only have one chunk.
         // Also, timed requests should not have more than one chunk.
+        // A chunked write needs intermediate WriteResponses (sent with kExpectResponse) to keep the exchange
+        // alive and pace the sender, so SuppressResponse is incompatible with more chunks; rejecting the
+        // combination avoids leaving a handler allocated on an exchange that the messaging layer closes.
         ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     }
 
