@@ -38,6 +38,13 @@ bool IsCurrentInterfaceUsable(T & iterator)
         return false;
     }
 
+    // Check if interface is allowed by the configured filter (set by applications)
+    if (!GetInterfaceFilter().IsInterfaceAllowed(name))
+    {
+        ChipLogProgress(Discovery, "InterfaceFilter: ignoring interface '%s'", name);
+        return false;
+    }
+
     // TODO: need a better way to ignore local loopback interfaces/addresses
     // We do not want to listen on local loopback even though they are up and
     // support multicast
