@@ -52,7 +52,8 @@
 
 - (instancetype)initWithContext:(nonnull NSManagedObjectContext *)context key:(nonnull NSString *)key value:(nonnull NSData *)value
 {
-    if (self = [super initWithContext:context]) {
+    self = [super initWithContext:context];
+    if (self != nil) {
         self.key = key;
         self.value = value;
     }
