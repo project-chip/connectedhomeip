@@ -390,7 +390,8 @@ jobs:
                       ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
                       ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
-                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'            \
+                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'           \
+                      ':(exclude)src/app/clusters/thermostat-server/CodegenIntegration.cpp'                  \
                       ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.h'            \

@@ -95,8 +95,8 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
 
 } // anonymous namespace
 
-bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
+bool ThermostatCluster::HandleAddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                      const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
     // Check constraints for PresetHandle and ExpirationInMinutes field.
     if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
@@ -112,7 +112,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     }
 
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate       = GetDelegate(endpoint);
+    auto delegate       = mDelegate;
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null for endpoint %u", endpoint);
@@ -201,11 +201,11 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     return true;
 }
 
-bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+bool ThermostatCluster::HandleRemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                         const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate       = GetDelegate(endpoint);
+    auto delegate       = mDelegate;
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null for endpoint %u", endpoint);
@@ -238,16 +238,3 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
-{
-    return Thermostat::AddThermostatSuggestion(commandObj, commandPath, commandData);
-}
-
-bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData)
-{
-    return Thermostat::RemoveThermostatSuggestion(commandObj, commandPath, commandData);
-}

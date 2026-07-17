@@ -57,10 +57,6 @@ public:
 
     int16_t GetLocalTemperature(void);
     void UpdateLocalTemperature(int16_t aLocalTemperature);
-    uint8_t GetPICoolingDemand(void);
-    void SetPICoolingDemand(uint8_t aPI);
-    uint8_t GetPIHeatingDemand(void);
-    void SetPIHeatingDemand(uint8_t aPI);
 
     int16_t GetOccupiedCoolingSetpoint(void);
     void SetOccupiedCoolingSetpoint(int16_t aSetpoint);

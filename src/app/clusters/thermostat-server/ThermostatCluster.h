@@ -26,9 +26,16 @@
 
 #include "ThermostatDelegate.h"
 
-#include <app-common/zap-generated/callback.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Commands.h>
+#include <clusters/Thermostat/Ids.h>
+#include <clusters/Thermostat/Metadata.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -41,191 +48,440 @@ enum class AtomicWriteState
     Open,
 };
 
-static constexpr size_t kThermostatEndpointCount =
-    MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+enum class OptionalAttributesBits : uint32_t
+{
+    kOutdoorTemperature              = 0x1,
+    kAbsMinHeatSetpointLimit         = 0x2,
+    kAbsMaxHeatSetpointLimit         = 0x4,
+    kAbsMinCoolSetpointLimit         = 0x8,
+    kAbsMaxCoolSetpointLimit         = 0x10,
+    kLocalTemperatureCalibration     = 0x20,
+    kMinHeatSetpointLimit            = 0x40,
+    kMaxHeatSetpointLimit            = 0x80,
+    kMinCoolSetpointLimit            = 0x100,
+    kMaxCoolSetpointLimit            = 0x200,
+    kRemoteSensing                   = 0x400,
+    kThermostatRunningMode           = 0x800,
+    kTemperatureSetpointHold         = 0x1000,
+    kTemperatureSetpointHoldDuration = 0x2000,
+    kThermostatRunningState          = 0x4000,
+    kSetpointChangeSource            = 0x8000,
+    kSetpointChangeAmount            = 0x10000,
+    kSetpointChangeSourceTimestamp   = 0x20000,
+    kEmergencyHeatDelta              = 0x40000,
+    kACType                          = 0x80000,
+    kACCapacity                      = 0x100000,
+    kACRefrigerantType               = 0x200000,
+    kACCompressorType                = 0x400000,
+    kACErrorCode                     = 0x800000,
+    kACLouverPosition                = 0x1000000,
+    kACCoilTemperature               = 0x2000000,
+    kACCapacityFormat                = 0x4000000,
+    kSetpointHoldExpiryTimestamp     = 0x8000000,
+};
 
 /**
- * @brief  Thermostat Attribute Access Interface.
+ * @brief Code-driven Thermostat cluster server.
+ *
  */
-class ThermostatAttrAccess : public chip::app::AttributeAccessInterface, public chip::FabricTable::Delegate
+class ThermostatCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
-
 public:
-    ThermostatAttrAccess() : AttributeAccessInterface(Optional<chip::EndpointId>::Missing(), Thermostat::Id) {}
+    static constexpr uint16_t kAbsMinHeatSetpointLimitDefault  = 700;  // 7C (44.5 F) is the default
+    static constexpr uint16_t kAbsMaxHeatSetpointLimitDefault  = 3000; // 30C (86 F) is the default
+    static constexpr uint16_t kAbsMinCoolSetpointLimitDefault  = 1600; // 16C (61 F) is the default
+    static constexpr uint16_t kAbsMaxCoolSetpointLimitDefault  = 3200; // 32C (90 F) is the default
+    static constexpr uint16_t kOccupancyCoolingSetpointDefault = 2600; // 26C (78.8 F) is the default
+    static constexpr uint16_t kOccupancyHeatingSetpointDefault = 2000; // 20C (68 F) is the default
+    static constexpr uint8_t kMinSetpointDeadbancDefault       = 20;   // 2C is the default
+    static constexpr uint8_t kEmergencyHeatDeltaDefault        = 255;  // 25.5C is the default
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
+    /// Aggregates every construction-time parameter for the cluster.
+    struct Config
+    {
+        Config(EndpointId endpointId, chip::FabricTable & fabricTable) : mEndpointId(endpointId), mFabricTable(fabricTable) {}
 
-private:
-    /**
-     * @brief Set the Active Preset to a given preset handle, or null
-     *
-     * @param endpoint The endpoint
-     * @param presetHandle The handle of the preset to set active, or null to clear the active preset
-     * @return Success if the active preset was updated, an error code if not
-     */
-    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle);
+        Config & WithFeatures(BitFlags<Thermostat::Feature> features)
+        {
+            mFeatureMap = features;
+            return *this;
+        }
+        Config & WithOptionalAttributes(BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes)
+        {
+            mOptionalAttributes = optionalAttributes;
+            return *this;
+        }
+        Config & WithSetpointLimits(int16_t absMinHeat, int16_t absMaxHeat, int16_t absMinCool, int16_t absMaxCool)
+        {
+            mAbsMinHeatSetpointLimit = absMinHeat;
+            mAbsMaxHeatSetpointLimit = absMaxHeat;
+            mAbsMinCoolSetpointLimit = absMinCool;
+            mAbsMaxCoolSetpointLimit = absMaxCool;
+            return *this;
+        }
+        Config & WithSchedules(uint8_t numberOfSchedules, uint8_t numberOfScheduleTransitions,
+                               DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay)
+        {
+            mNumberOfSchedules                = numberOfSchedules;
+            mNumberOfScheduleTransitions      = numberOfScheduleTransitions;
+            mNumberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
+            return *this;
+        }
 
-    /**
-     * @brief Apply a preset to the pending lists of presets during an atomic write
-     *
-     * @param delegate The current ThermostatDelegate
-     * @param preset The preset to append
-     * @return CHIP_NO_ERROR if successful, an error code if not
-     */
-    CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
+        EndpointId mEndpointId;
+        chip::FabricTable & mFabricTable;
+        BitFlags<Thermostat::Feature> mFeatureMap;
+        BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
+        int16_t mAbsMinHeatSetpointLimit     = kAbsMinHeatSetpointLimitDefault;
+        int16_t mAbsMaxHeatSetpointLimit     = kAbsMaxHeatSetpointLimitDefault;
+        int16_t mAbsMinCoolSetpointLimit     = kAbsMinCoolSetpointLimitDefault;
+        int16_t mAbsMaxCoolSetpointLimit     = kAbsMaxCoolSetpointLimitDefault;
+        uint8_t mNumberOfSchedules           = 0;
+        uint8_t mNumberOfScheduleTransitions = 0;
+        DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay;
+    };
 
-    /**
-     * @brief Verifies if the pending presets for a given endpoint are valid
-     *
-     * @param endpoint The endpoint
-     * @return Success if the list of pending presets is valid, an error code if not
-     */
-    Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
+    explicit ThermostatCluster(const Config & config);
 
-    void GenerateEvents(const ConcreteAttributePath & attributePath);
+    void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
+    Thermostat::Delegate * GetDelegate() const { return mDelegate; }
 
-    /**
-     * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
-     *
-     * @param fabricTable The fabric table
-     * @param fabricIndex The fabric index
-     */
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
-    /**
-     * @brief Gets the scoped node id of the originator that sent the last successful
-     *        AtomicRequest of type BeginWrite for the given endpoint.
-     *
-     * @param[in] endpoint The endpoint.
-     *
-     * @return the scoped node id for the given endpoint if set. Otherwise returns ScopedNodeId().
-     */
+    // Setters and Getters
+    // FeatureMap
+    uint32_t GetFeatureMap();
+
+    // LocalTemperature
+    void SetLocalTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetLocalTemperature();
+
+    // OutdoorTemperature
+    void SetOutdoorTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetOutdoorTemperature();
+
+    // Occupancy
+    void SetOccupancy(BitMask<OccupancyBitmap> value);
+    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> GetOccupancy();
+
+    // AbsMinHeatSetpointLimit
+    int16_t GetAbsMinHeatSetpointLimit();
+
+    // AbsMaxHeatSetpointLimit
+    int16_t GetAbsMaxHeatSetpointLimit();
+
+    // AbsMinCoolSetpointLimit
+    int16_t GetAbsMinCoolSetpointLimit();
+
+    // AbsMaxCoolSetpointLimit
+    int16_t GetAbsMaxCoolSetpointLimit();
+
+    // LocalTemperatureCalibration
+    void SetLocalTemperatureCalibration(int8_t value);
+    int8_t GetLocalTemperatureCalibration();
+
+    // OccupiedCoolingSetpoint
+    Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(int16_t value);
+    int16_t GetOccupiedCoolingSetpoint();
+
+    // OccupiedHeatingSetpoint
+    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(int16_t value);
+    int16_t GetOccupiedHeatingSetpoint();
+
+    // UnoccupiedCoolingSetpoint
+    Protocols::InteractionModel::Status SetUnoccupiedCoolingSetpoint(int16_t value);
+    int16_t GetUnoccupiedCoolingSetpoint();
+
+    // UnoccupiedHeatingSetpoint
+    Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(int16_t value);
+    int16_t GetUnoccupiedHeatingSetpoint();
+
+    // MinHeatSetpointLimit
+    Protocols::InteractionModel::Status SetMinHeatSetpointLimit(int16_t value);
+    int16_t GetMinHeatSetpointLimit();
+
+    // MaxHeatSetpointLimit
+    Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(int16_t value);
+    int16_t GetMaxHeatSetpointLimit();
+
+    // MinCoolSetpointLimit
+    Protocols::InteractionModel::Status SetMinCoolSetpointLimit(int16_t value);
+    int16_t GetMinCoolSetpointLimit();
+
+    // MaxCoolSetpointLimit
+    Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(int16_t value);
+    int16_t GetMaxCoolSetpointLimit();
+
+    // MinSetpointDeadbanc
+    Protocols::InteractionModel::Status SetMinSetpointDeadband(int16_t value);
+    int8_t GetMinSetpointDeadband();
+
+    // RemoteSensing
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> value);
+    BitMask<RemoteSensingBitmap> GetRemoteSensing();
+
+    // ControlSequenceOfOperation
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum value);
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation();
+
+    // SystemMode
+    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum value);
+    SystemModeEnum GetSystemMode();
+
+    // ThermostatRunningMode
+    void SetThermostatRunningMode(ThermostatRunningModeEnum value);
+    ThermostatRunningModeEnum GetThermostatRunningMode();
+
+    // TemperatureSetpointHold
+    void SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value);
+    TemperatureSetpointHoldEnum GetTemperatureSetpointHold();
+
+    // TemperatureSetpointHoldDuration
+    void SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value);
+    DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration();
+
+    // ThermostatRunningState
+    void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
+    BitMask<RelayStateBitmap> GetThermostatRunningState();
+
+    // SetpointChangeSource
+    void SetSetpointChangeSource(SetpointChangeSourceEnum value);
+    SetpointChangeSourceEnum GetSetpointChangeSource();
+
+    // SetpointChangeAmount
+    void SetSetpointChangeAmount(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetSetpointChangeAmount();
+
+    // SetpointChangeSourceTimestamp
+    void SetSetpointChangeSourceTimestamp(uint32_t value);
+    uint32_t GetSetpointChangeSourceTimestamp();
+
+    // EmergencyHeatDelta
+    void SetEmergencyHeatDelta(uint8_t value);
+    uint8_t GetEmergencyHeatDelta();
+
+    // ACType
+    void SetACType(ACTypeEnum value);
+    ACTypeEnum GetACType();
+
+    // ACCapacity
+    void SetACCapacity(uint16_t value);
+    uint16_t GetACCapacity();
+
+    // ACCapacity
+    void SetACRefrigerantType(ACRefrigerantTypeEnum value);
+    ACRefrigerantTypeEnum GetACRefrigerantType();
+
+    // ACCompressorType
+    void SetACCompressorType(ACCompressorTypeEnum value);
+    ACCompressorTypeEnum GetACCompressorType();
+
+    // ACErrorCode
+    void SetACErrorCode(BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value);
+    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> GetACErrorCode();
+
+    // ACLouverPosition
+    void SetACLouverPosition(ACLouverPositionEnum value);
+    ACLouverPositionEnum GetACLouverPosition();
+
+    // ACCoilTemperature
+    void SetACCoilTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetACCoilTemperature();
+
+    // ACCapacityFormat
+    void SetACCapacityFormat(ACCapacityFormatEnum value);
+    ACCapacityFormatEnum GetACCapacityFormat();
+
+    // NumberOfSchedules
+    void SetNumberOfSchedules(uint8_t value);
+    uint8_t GetNumberOfSchedules();
+
+    // NumberOfScheduleTransitions
+    void SetNumberOfScheduleTransitions(uint8_t value);
+    uint8_t GetNumberOfScheduleTransitions();
+
+    // NumberOfScheduleTransitionPerDay
+    void SetNumberOfScheduleTransitionPerDay(DataModel::Nullable<uint8_t> value);
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionPerDay();
+
+    // SetpointHoldExpiryTimestamp
+    void SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value);
+    DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp();
+
+    // Handle setters also persist their values across reboots.
+    void SetActivePresetHandle(DataModel::Nullable<ByteSpan> value);
+    void SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value);
+
+    // ServerClusterInterface
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType type) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
+    uint32_t GetFeatureMap() const { return mFeatures.Raw(); }
+
+    //
+    // Atomic-write state machine (moved from ThermostatAttrAccess in PR 3b-1). The session is per-instance;
+    // every method operates on this cluster's endpoint (the `endpoint` parameters must equal GetEndpointId()).
+    //
+    /// @brief Gets the scoped node id of the originator of the open atomic write, or ScopedNodeId() if none.
     ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
 
-    /**
-     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
-     *
-     * @param[in] endpoint The endpoint.
-     * @param[in] originatorNodeId The originator scoped node id.
-     * @param[in] state Whether or not an atomic write is open or closed.
-     * @param attributeStatuses The set of attribute status structs the atomic write should be associated with
-     * @return true if it was able to update the atomic write state
-     * @return false if it was unable to update the atomic write state
-     */
+    /// @brief Sets the atomic write state for the given originatorNodeId.
     bool
     SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
                    Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
-    /**
-     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
-     *
-     */
-    /**
-     * @brief Resets the atomic write for a given endpoint
-     *
-     * @param endpoint The endpoint
-     */
+    /// @brief Resets (closes) the atomic write, clears the pending preset list and cancels the timeout timer.
     void ResetAtomicWrite(EndpointId endpoint);
 
-    /**
-     * @brief Checks if a given endpoint has an atomic write open, optionally filtered by an attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
+    /// @brief Checks if an atomic write is open, optionally filtered by an attribute ID.
     bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
 
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given subject descriptor, optionally filtered by an
-     * attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param subjectDescriptor The subject descriptor for the client making a read or write request
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
+    /// @brief Checks if an atomic write is open for the given subject descriptor, optionally filtered by an attribute ID.
     bool InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
                        Optional<AttributeId> attributeId = NullOptional);
 
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given command invocation, optionally filtered by an
-     * attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param commandObj The CommandHandler for the invoked command
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
+    /// @brief Checks if an atomic write is open for the given command invocation, optionally filtered by an attribute ID.
     bool InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
 
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given command invocation and a list of attributes
-     *
-     * @param endpoint The endpoint
-     * @param commandObj The CommandHandler for the invoked command
-     * @param attributeStatuses The list of attribute statuses whose attributeIds must match the open atomic write
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
+    /// @brief Checks if an atomic write is open for the given command invocation and a list of attributes.
     bool
     InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 
-    /**
-     * @brief Handles an AtomicRequest of type BeginWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
     void BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                           const Commands::AtomicRequest::DecodableType & commandData);
-
-    /**
-     * @brief Handles an AtomicRequest of type CommitWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
     void CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                            const Commands::AtomicRequest::DecodableType & commandData);
-
-    /**
-     * @brief Handles an AtomicRequest of type RollbackWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
     void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AtomicRequest::DecodableType & commandData);
 
-    friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
+protected:
+    // Attributes
+    DataModel::Nullable<int16_t> mLocalTemperature{};
+    DataModel::Nullable<int16_t> mOutdoorTemperature{};
+    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> mOccupancy{};
+    int16_t mAbsMinHeatSetpointLimit;
+    int16_t mAbsMaxHeatSetpointLimit;
+    int16_t mAbsMinCoolSetpointLimit;
+    int16_t mAbsMaxCoolSetpointLimit;
+    int8_t mLocalTemperatureCalibration{};
+    int16_t mOccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mOccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
+    int16_t mUnoccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mUnoccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
+    int16_t mMinHeatSetpointLimit;
+    int16_t mMaxHeatSetpointLimit;
+    int16_t mMinCoolSetpointLimit;
+    int16_t mMaxCoolSetpointLimit;
+    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbancDefault };
+    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    SystemModeEnum mSystemMode;
+    ThermostatRunningModeEnum mThermostatRunningMode{};
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold{};
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration{};
+    BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> mThermostatRunningState{};
+    SetpointChangeSourceEnum mSetpointChangeSource{};
+    DataModel::Nullable<int16_t> mSetpointChangeAmount{};
+    uint32_t mSetpointChangeSourceTimestamp{};
+    uint8_t mEmergencyHeatDelta{ kEmergencyHeatDeltaDefault };
+    ACTypeEnum mACType{};
+    uint16_t mACCapacity{};
+    ACRefrigerantTypeEnum mACRefrigerantType{};
+    ACCompressorTypeEnum mACCompressorType{};
+    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> mACErrorCode{};
+    ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
+    DataModel::Nullable<int16_t> mACCoilTemperature{};
+    ACCapacityFormatEnum mACCapacityFormat{};
+    uint8_t mNumberOfSchedules{};
+    uint8_t mNumberOfScheduleTransitions{};
+    DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay{};
+    // mActivePresetHandle and mActiveScheduleHandle hold non-owning ByteSpans; the backing
+    // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
+    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
+    uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
+    DataModel::Nullable<chip::ByteSpan> mActivePresetHandle{};
+    DataModel::Nullable<chip::ByteSpan> mActiveScheduleHandle{};
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
 
-    friend void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint);
-    friend void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+private:
+    // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    // @brief Sets the ActivePresetHandle to the given handle (or null), validating it against the Presets list.
+    Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
 
-    friend bool emberAfThermostatClusterSetActivePresetRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
+    // @brief Validates that the delegate's pending-preset list satisfies the spec constraints before commit.
+    Protocols::InteractionModel::Status PrecommitPresets();
 
-    friend bool
-    emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                  const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
+    // @brief Validates and appends a preset to the delegate's pending-preset list during an atomic write.
+    CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
 
-    friend bool emberAfThermostatClusterAddThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
+    // @brief Returns true if attributeId is a valid attribute on this cluster
+    bool IsKnownAttribute(AttributeId attributeId);
 
-    friend bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+    // @brief Builds the AtomicAttributeStatusStruct list for an AtomicRequest
+    Protocols::InteractionModel::Status BuildAttributeStatuses(
+        const DataModel::DecodableList<AttributeId> & attributeRequests,
+        Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+
+    // Delegate-backed attribute encode/decode (presets / schedules / suggestions). Scalar attributes are
+    // handled directly by ReadAttribute / WriteAttribute.
+    CHIP_ERROR ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteDelegateAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+
+    // Suggestion command handlers (each writes its response/status onto commandObj directly).
+    bool HandleAddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                       const Commands::AddThermostatSuggestion::DecodableType & commandData);
+    bool HandleRemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                          const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+
+    // SetpointRaiseLower handling
+    Protocols::InteractionModel::Status HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
+
+    // Setpoint limit enforcement
+    int16_t EnforceHeatingSetpointLimits(int16_t heatingSetpoint) const;
+    int16_t EnforceCoolingSetpointLimits(int16_t coolingSetpoint) const;
+
+    // Deadband, in 0.01C units, or 0 when AutoMode is not supported.
+    int16_t DeadBandTemp() const { return mFeatures.Has(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0; }
+
+    // Post-write side effects for a setpoint attribute
+    void HandleSetpointPostWrite(AttributeId attributeId);
+
+    Protocols::InteractionModel::Status HandleOccupancyHeatingSetpoint(int16_t value, AttributeId attributeId);
+    Protocols::InteractionModel::Status HandleOccupancyCoolingSetpoint(int16_t value, AttributeId attributeId);
+    Protocols::InteractionModel::Status HandleMinHeatSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMaxHeatSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMinCoolSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMaxCoolSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMinSetpointDeadband(int16_t value);
+    Protocols::InteractionModel::Status HandleTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value);
+    Protocols::InteractionModel::Status HandleRemoteSensing(BitMask<RemoteSensingBitmap> value);
+    Protocols::InteractionModel::Status HandleControlSequenceOfOperation(ControlSequenceOfOperationEnum value);
+    Protocols::InteractionModel::Status HandleSystemMode(SystemModeEnum value);
+
+    // Sets member to value and, if it changed, persists it to attribute storage. Returns true if changed.
+    bool SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId);
+
+    // Emits the relevant change event for a just-written scalar attribute, if the Events feature is supported.
+    void GenerateScalarChangeEvent(AttributeId attributeId);
+    void LoadPersistentAttributes();
+
+    chip::FabricTable & mFabricTable;
+    Thermostat::Delegate * mDelegate = nullptr;
+    const BitFlags<Thermostat::Feature> mFeatures;
+    const BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
 
     struct AtomicWriteSession
     {
@@ -234,8 +490,7 @@ private:
         ScopedNodeId nodeId;
         EndpointId endpointId = kInvalidEndpointId;
     };
-
-    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
+    AtomicWriteSession mAtomicWriteSession;
 };
 
 /**

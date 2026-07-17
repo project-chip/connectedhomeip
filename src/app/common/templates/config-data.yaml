@@ -56,7 +56,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
@@ -64,7 +63,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Pump Configuration and Control
-    - Thermostat
     - Window Covering
     # keep-sorted end
 
@@ -76,7 +74,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
@@ -86,7 +83,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Dryer Controls
     - Mode Select
     - Pump Configuration and Control
-    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
     # Code Driven clusters are clusters that implement the ServerClusterInterface.
@@ -166,6 +162,7 @@ CodeDrivenClusters:
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

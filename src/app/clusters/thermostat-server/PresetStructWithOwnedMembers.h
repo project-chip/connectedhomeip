@@ -26,7 +26,9 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <app/data-model/Nullable.h>
+#include <clusters/Thermostat/Structs.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {

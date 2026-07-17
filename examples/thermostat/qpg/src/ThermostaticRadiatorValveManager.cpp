@@ -27,6 +27,7 @@
 #include "qPinCfg.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "gpSched.h"
@@ -267,12 +268,6 @@ void ThermostaticRadiatorValveManager::UpdateThermostaticRadiatorValveStatus(voi
     {
         if ((systemMode == SystemMode_t::kAuto) || (systemMode == SystemMode_t::kHeat))
         {
-            // Example only - simply set the PI value to the different between local temperature and setpoint
-            float delta = (float) (heatingSetpoint - localTemperature);
-            float pi;
-
-            pi = delta / heatingSetpoint * 100;
-            SetPIHeatingDemand((uint8_t) pi);
             // configure LED
             StatusLed_SetLed(SYSTEM_OPERATING_LED, true);
             // update the state
@@ -283,13 +278,6 @@ void ThermostaticRadiatorValveManager::UpdateThermostaticRadiatorValveStatus(voi
     {
         if ((systemMode == SystemMode_t::kAuto) || (systemMode == SystemMode_t::kCool))
         {
-            // Example only - simply set the PI value to the different between local temperature and setpoint
-            float delta = (float) (localTemperature - coolingSetpoint);
-            float pi;
-
-            pi = delta / coolingSetpoint * 100;
-            SetPICoolingDemand((uint8_t) pi);
-
             // configure LED
             StatusLed_SetLed(SYSTEM_OPERATING_LED, true);
             // update the state
@@ -299,10 +287,6 @@ void ThermostaticRadiatorValveManager::UpdateThermostaticRadiatorValveStatus(voi
 
     if (mThermostaticRadiatorValve_action == TRV_IDLE_ACTION)
     {
-        // no heating/cooling
-        SetPICoolingDemand((uint8_t) 0);
-        SetPIHeatingDemand((uint8_t) 0);
-
         StatusLed_SetLed(SYSTEM_OPERATING_LED, false);
     }
 
@@ -347,42 +331,6 @@ void ThermostaticRadiatorValveManager::UpdateLocalTemperature(int16_t aLocalTemp
         {
             ChipLogError(NotSpecified, "UpdateLocalTemperature failure");
         }
-    });
-}
-
-uint8_t ThermostaticRadiatorValveManager::GetPICoolingDemand(void)
-{
-    uint8_t value;
-
-    Thermostat::Attributes::PICoolingDemand::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
-
-    ChipLogDetail(NotSpecified, "GetPICoolingDemand - %d", value);
-    return value;
-}
-
-void ThermostaticRadiatorValveManager::SetPICoolingDemand(uint8_t aPI)
-{
-    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
-        Thermostat::Attributes::PICoolingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
-        ChipLogDetail(NotSpecified, "SetPICoolingDemand - %d", aPI);
-    });
-}
-
-uint8_t ThermostaticRadiatorValveManager::GetPIHeatingDemand(void)
-{
-    uint8_t value;
-
-    Thermostat::Attributes::PIHeatingDemand::Get(QPG_THERMOSTATIC_ENDPOINT_ID, &value);
-
-    ChipLogDetail(NotSpecified, "GetPIHeatingDemand - %d", value);
-    return value;
-}
-
-void ThermostaticRadiatorValveManager::SetPIHeatingDemand(uint8_t aPI)
-{
-    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
-        Thermostat::Attributes::PIHeatingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
-        ChipLogDetail(NotSpecified, "SetPIHeatingDemand - %d", aPI);
     });
 }
 

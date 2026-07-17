@@ -16,17 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/PresetStructWithOwnedMembers.cpp"
-    "${CLUSTER_DIR}/PresetStructWithOwnedMembers.h"
-    "${CLUSTER_DIR}/ThermostatClusterAtomic.cpp"
-    "${CLUSTER_DIR}/ThermostatClusterEvents.cpp"
-    "${CLUSTER_DIR}/ThermostatClusterEvents.h"
-    "${CLUSTER_DIR}/ThermostatClusterPresets.cpp"
-    "${CLUSTER_DIR}/ThermostatClusterPresets.h"
-    "${CLUSTER_DIR}/ThermostatClusterSuggestions.cpp"
-    "${CLUSTER_DIR}/ThermostatCluster.cpp"
-    "${CLUSTER_DIR}/ThermostatCluster.h"
-    "${CLUSTER_DIR}/ThermostatDelegate.h"
-    "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.cpp"
-    "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )
