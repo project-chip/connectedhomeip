@@ -21,6 +21,7 @@ This module contains CommissionDeviceTest class designed to handle the commissio
 
 
 import logging
+
 from mobly import signals
 
 from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_devices
