@@ -30,12 +30,12 @@ declare_args() {
   cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS/Device/ST/STM32WBAxx"
   stm32_wpan_sdk =
       "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
-  stm32_wpan_sdk_patch = "${chip_root}/third_party/st/STM32CubeWBAPatch"
   stm32_config_files =
       "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
-  stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Modules"
-  stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Interfaces"
+  stm32_system = "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Modules"
+  stm32_system_interfaces = "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Interfaces"
   stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Config"
+  stm32_system_App = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/"
   stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
 
   ## PATHS FOR FREERTOS ##
@@ -135,7 +135,8 @@ SOURCES = [
   "${stm32_system}/BasicAES/baes_ccm.c",
   "${stm32_system}/BasicAES/baes_cmac.c",
   "${stm32_system}/BasicAES/baes_ecb.c",
-  "${stm32_system}/ble_timer/ble_timer.c",
+  "${stm32_system_App}/ble_timer/ble_timer.c",
+  "${stm32_system_App}/stm32_lpm_if.c",
   "${stm32_system}/Flash/flash_driver.c",
   "${stm32_system}/Flash/flash_manager.c",
   "${stm32_system}/Flash/rf_timing_synchro.c",
@@ -155,7 +156,6 @@ SOURCES = [
   "${stm32_system_interfaces}/timer_if.c",
   "${stm32_system_interfaces}/adv_trace_usart_if.c",
   "${stm32_system_interfaces}/app_bsp.c",
-  "${stm32_system_interfaces}/stm32_lpm_if.c",
   "${stm32_system_Config}/ADC_Ctrl/adc_ctrl_conf.c",
   "${stm32_system_Config}/CRC_Ctrl/crc_ctrl_conf.c",
   "${stm32_system_Config}/Debug_GPIO/app_debug.c",
@@ -289,9 +289,10 @@ INCLUDE_DIRS = [
   "${stm32_mbedtls_alt}/",
 
   #SYSTEM
+  "${stm32_system_App}/",
+  "${stm32_system_App}/ble_timer",
   "${stm32_system}/",
   "${stm32_system}/BasicAES",
-  "${stm32_system}/ble_timer",
   "${stm32_system}/Flash",
   "${stm32_system}/MemoryManager",
   "${stm32_system}/RFControl",

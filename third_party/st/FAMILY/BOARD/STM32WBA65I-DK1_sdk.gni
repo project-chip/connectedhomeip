@@ -35,7 +35,6 @@ SOURCES = [
   "${stm32_board_src}/Src/sysmem.c",
   "${stm32_board_src}/Src/system_stm32wbaxx.c",
   "${stm32_board_src}/Src/stm32_factorydata.c",
-  "${stm32_board_src}/Src/entropy_hardware_poll.c",
 
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/FreeRTOSConfig.h",
