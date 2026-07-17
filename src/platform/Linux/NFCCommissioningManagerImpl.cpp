@@ -951,15 +951,15 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
 // Scan all the readers and tags, and search one with 'item.targetIdentifier.discriminator'
 CHIP_ERROR NFCCommissioningManagerImpl::ProcessScanWorkItem(const NfcWorkItem & item)
 {
-    if (!item.targetIdentifier.IsValid())
-    {
-        ChipLogError(DeviceLayer, "Invalid target identifier for scan work item");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     ChipLogProgressNfcDebug(DeviceLayer, "Scan all the readers and tags");
 
     CHIP_ERROR scanResult = ScanAllReaders();
+
+    // If no specific target was requested, this is just a cache refresh scan.
+    if (!item.targetIdentifier.IsValid())
+    {
+        return scanResult;
+    }
 
     std::shared_ptr<TagInstance> tagInstance;
     {
