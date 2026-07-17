@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import enum
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -44,11 +44,11 @@ class PaseParams:
         discriminator: The device's long or short discriminator.
         passcode: The setup PIN code (passcode).
     """
-    setup_code: Optional[str] = None
-    discriminator: Optional[int] = None
-    passcode: Optional[int] = None
+    setup_code: str | None = None
+    discriminator: int | None = None
+    passcode: int | None = None
 
-    def resolve_setup_code(self, dev_ctrl: Any) -> Optional[str]:
+    def resolve_setup_code(self, dev_ctrl: Any) -> str | None:
         """Resolve manual pairing code via the controller when needed."""
         if self.setup_code:
             return self.setup_code

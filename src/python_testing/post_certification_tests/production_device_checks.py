@@ -45,7 +45,6 @@ import os
 import shutil
 import sys
 import time
-import typing
 import uuid
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -93,7 +92,7 @@ sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_t
 @dataclass
 class Failure:
     step: str
-    exception: typing.Optional[Exception]
+    exception: Exception | None
 
 
 class Hooks:

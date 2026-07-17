@@ -15,7 +15,6 @@
 import logging
 from dataclasses import dataclass
 from io import StringIO
-from typing import Optional
 
 import yaml
 
@@ -27,13 +26,14 @@ class Metadata:
     py_script_path: str
     run: str
     app: str = ""
-    app_args: Optional[str] = None
-    app_ready_pattern: Optional[str] = None
-    app_stdin_pipe: Optional[str] = None
-    script_args: Optional[str] = None
+    app_args: str | None = None
+    app_ready_pattern: str | None = None
+    app_stdin_pipe: str | None = None
+    script_args: str | None = None
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
+    timeout: float | None = None
     quiet: bool = False
 
 
@@ -154,6 +154,7 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
+                timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 
