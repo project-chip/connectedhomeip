@@ -132,7 +132,7 @@ public:
     void TriggerBootAutoConnect();
 
     // Re-push the staged STA credentials into wpa_supplicant right before a
-    // connect attempt.  
+    // connect attempt.
     void ApplyStaProvToSupplicant();
 
     static GenioWiFiDriver & GetInstance()

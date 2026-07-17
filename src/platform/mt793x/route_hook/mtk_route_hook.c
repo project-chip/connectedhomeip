@@ -173,7 +173,7 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 int8_t mtk_route_hook_init()
 {
     ip_addr_t router_group    = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
-    mtk_route_hook_t * hook = NULL;
+    mtk_route_hook_t * hook   = NULL;
     uint8_t ret               = 0;
     struct netif * lwip_netif = netif_default;
 
@@ -210,7 +210,6 @@ int8_t mtk_route_hook_init()
         ret = -1;
         goto exit;
     }
-
 
     hook->netif = lwip_netif;
     hook->pcb   = raw_new_ip_type(IPADDR_TYPE_V6, IP6_NEXTH_ICMP6);

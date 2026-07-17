@@ -80,13 +80,12 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     // Calling ConnectWiFiNetwork() synchronously from Init() races with
     // filogic's wpa_supplicant STA config initialization and crashes on
     // an internal assert.
-    CHIP_ERROR startErr = DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(kBootAutoConnectDelayMs), BootAutoConnectHandler, this);
+    CHIP_ERROR startErr =
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kBootAutoConnectDelayMs), BootAutoConnectHandler, this);
     if (startErr != CHIP_NO_ERROR)
     {
         ChipLogError(NetworkProvisioning,
-                     "GenioWiFiDriver::Init: StartTimer failed (%" CHIP_ERROR_FORMAT
-                     "); falling back to immediate connect",
+                     "GenioWiFiDriver::Init: StartTimer failed (%" CHIP_ERROR_FORMAT "); falling back to immediate connect",
                      startErr.Format());
         TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     }
@@ -104,8 +103,8 @@ void GenioWiFiDriver::TriggerBootAutoConnect()
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen,
-                                                 mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials,
+                                                mSavedNetwork.credentialsLen);
 }
 
 CHIP_ERROR GenioWiFiDriver::CommitConfiguration()
@@ -354,10 +353,10 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
             security = GetInstance().ConvertSecuritytype(aScanResult->auth_mode);
 
             scanResponse.security.Set(security);
-            scanResponse.channel = aScanResult->channel;
+            scanResponse.channel         = aScanResult->channel;
             scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
             scanResponse.signal.strength = aScanResult->rssi;
-            scanResponse.ssidLen = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            scanResponse.ssidLen         = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
             memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
             memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 

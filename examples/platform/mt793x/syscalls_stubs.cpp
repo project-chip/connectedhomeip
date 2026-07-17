@@ -47,7 +47,6 @@ int _lseek(int file, int ptr, int dir);
 int _read(int file, char * ptr, int len);
 int _write(int file, const char * ptr, int len);
 
-
 int __attribute__((weak)) _open(char * path, int flags, ...)
 {
     (void) path;
@@ -128,9 +127,9 @@ int __attribute__((weak)) _write(int file, const char * ptr, int len)
  * rebuild against nano libc) it will override these.
  */
 __attribute__((weak)) struct _reent * _global_impure_ptr = 0;
-__attribute__((weak)) FILE __sf_fake_stdin  = { 0 };
-__attribute__((weak)) FILE __sf_fake_stdout = { 0 };
-__attribute__((weak)) FILE __sf_fake_stderr = { 0 };
+__attribute__((weak)) FILE __sf_fake_stdin               = { 0 };
+__attribute__((weak)) FILE __sf_fake_stdout              = { 0 };
+__attribute__((weak)) FILE __sf_fake_stderr              = { 0 };
 
 void __attribute__((weak)) exit(int status)
 {
