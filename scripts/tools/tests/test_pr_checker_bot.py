@@ -20,6 +20,7 @@ import os
 import sys
 import tempfile
 import unittest
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 # Ensure the parent directory is in the path so we can import pr_checker_bot
@@ -28,7 +29,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot  # noqa: E402
+from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, UnresolvedThread, ValidationCheck  # noqa: E402
 
 
 class TestPrCheckerBot(unittest.TestCase):
@@ -65,7 +66,9 @@ esp32:
         self.mock_github_instance = MagicMock()
         self.mock_github_class.return_value = self.mock_github_instance
         self.mock_repo = MagicMock()
+        self.mock_repo.full_name = "dummy/repo"
         self.mock_github_instance.get_repo.return_value = self.mock_repo
+        self.mock_github_instance.get_user.return_value.login = "pr-checker-bot"
 
         # Default mock commit with passing CI
         self.mock_commit = MagicMock()
@@ -79,6 +82,19 @@ esp32:
         self.mock_commit.get_check_suites.return_value = [mock_suite] * 10
         self.mock_repo.get_commit.return_value = self.mock_commit
 
+        # Patch PRContext methods to avoid network/GraphQL calls by default
+        self.unresolved_threads_patcher = patch(
+            "pr_checker_bot.PRContext._load_unresolved_threads", return_value=[]
+        )
+        self.mock_load_unresolved_threads = self.unresolved_threads_patcher.start()
+        self.addCleanup(self.unresolved_threads_patcher.stop)
+
+        self.pullapprove_patcher = patch(
+            "pr_checker_bot.PRContext._check_pullapprove_green", return_value=False
+        )
+        self.mock_check_pullapprove_green = self.pullapprove_patcher.start()
+        self.addCleanup(self.pullapprove_patcher.stop)
+
         # Initialize bot under test
         self.bot = PrCheckerBot(
             token="dummy_token",
@@ -86,9 +102,6 @@ esp32:
             config_path=self.temp_config_name,
             dry_run=False,
         )
-        self.bot._bot_username = "pr-checker-bot"
-        self.bot._get_unresolved_threads = MagicMock(return_value=[])
-        self.bot._is_pullapprove_green = MagicMock(return_value=False)
 
     def create_mock_file(self, filename: str) -> MagicMock:
         """Creates a mock file object with the given filename."""
@@ -169,7 +182,16 @@ esp32:
             ),  # requested changes later
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
-        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        approvers, change_requesters = context.approvers, context.change_requesters
 
         # doru91 should be in approvers (latest was approved)
         # nxpdev should NOT be in approvers (latest was changes requested)
@@ -183,7 +205,16 @@ esp32:
             self.create_mock_review("doru91", "DISMISSED"),
         ]
         mock_pr2 = self.create_mock_pr(2, "Test PR 2", "author", [], reviews2)
-        approvers2, change_requesters2 = self.bot.get_pr_review_states(mock_pr2)
+        context2 = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr2,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        approvers2 = context2.approvers
         self.assertNotIn("doru91", approvers2)
 
     def test_analyze_pr_files_fully_covered(self) -> None:
@@ -193,7 +224,18 @@ esp32:
             self.create_mock_file("examples/all-clusters-app/nxp/main.cpp"),
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        analysis = context.file_analysis
+        matched_files = analysis.matched_files_per_group
+        uncovered = analysis.uncovered_files
 
         self.assertEqual(uncovered, set())
         self.assertEqual(
@@ -203,7 +245,7 @@ esp32:
                 "examples/all-clusters-app/nxp/main.cpp",
             },
         )
-        self.assertEqual(matched_files["esp32"], set())
+        self.assertNotIn("esp32", matched_files)
 
     def test_analyze_pr_files_not_fully_covered(self) -> None:
         """Tests that uncovered files are correctly identified."""
@@ -212,7 +254,18 @@ esp32:
             self.create_mock_file("src/app/Command.cpp"),  # Uncovered
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        analysis = context.file_analysis
+        matched_files = analysis.matched_files_per_group
+        uncovered = analysis.uncovered_files
 
         self.assertEqual(uncovered, {"src/app/Command.cpp"})
         self.assertEqual(
@@ -225,7 +278,16 @@ esp32:
         mock_file.previous_filename = "src/app/Command.cpp"
         files = [mock_file]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        _, uncovered = self.bot.analyze_pr_files(mock_pr)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        uncovered = context.file_analysis.uncovered_files
 
         self.assertIn("src/app/Command.cpp", uncovered)
 
@@ -275,7 +337,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[Any] = []
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
         mock_comment.user.login = "pr-checker-bot"
@@ -296,7 +358,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[Any] = []
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # First run: posts the eligibility comment
@@ -422,8 +484,16 @@ esp32:
             self.create_mock_review("doru91", "COMMENTED"),
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
-        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
-        self.assertIn("doru91", approvers)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        self.assertIn("doru91", context.approvers)
 
     def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(
         self,
@@ -434,8 +504,16 @@ esp32:
             self.create_mock_review("doru91", "COMMENTED"),
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
-        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
-        self.assertIn("doru91", change_requesters)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        self.assertIn("doru91", context.change_requesters)
 
     def test_check_and_process_pr_removes_comment_when_ineligible(self) -> None:
         """Tests that a stale eligibility comment is deleted if the PR is no longer eligible."""
@@ -458,7 +536,7 @@ esp32:
 
     def test_check_and_process_pr_removes_comment_when_no_changed_files(self) -> None:
         """Tests that a stale eligibility comment is deleted if the PR has no changed files."""
-        files = []  # No changed files
+        files: list[Any] = []  # No changed files
         mock_comment = MagicMock()
         mock_comment.user.login = "pr-checker-bot"
         mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
@@ -476,7 +554,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[Any] = []
 
         # We have two eligibility comments
         mock_comment1 = MagicMock()
@@ -604,14 +682,18 @@ esp32:
         mock_success_suite = MagicMock()
         mock_success_suite.status = "completed"
         mock_success_suite.conclusion = "success"
-        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [
+            mock_success_suite
+        ] * 9
 
         self.bot.check_and_process_pr(mock_pr)
 
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_called_once()
 
-    def test_check_and_process_pr_ci_incomplete_check_suite_does_not_merge(self) -> None:
+    def test_check_and_process_pr_ci_incomplete_check_suite_does_not_merge(
+        self,
+    ) -> None:
         """Tests that a PR is not merged when check suite is still running."""
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
         reviews = [self.create_mock_review("doru91", "APPROVED")]
@@ -624,14 +706,18 @@ esp32:
         mock_success_suite = MagicMock()
         mock_success_suite.status = "completed"
         mock_success_suite.conclusion = "success"
-        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [
+            mock_success_suite
+        ] * 9
 
         self.bot.check_and_process_pr(mock_pr)
 
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_called_once()
 
-    def test_check_and_process_pr_ci_passing_non_blocking_check_suite_merges(self) -> None:
+    def test_check_and_process_pr_ci_passing_non_blocking_check_suite_merges(
+        self,
+    ) -> None:
         """Tests that neutral/skipped/success check suites allow merge."""
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
         reviews = [self.create_mock_review("doru91", "APPROVED")]
@@ -672,7 +758,7 @@ esp32:
         )
 
         # Mock pullapprove green
-        self.bot._is_pullapprove_green.return_value = True
+        self.mock_check_pullapprove_green.return_value = True
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -688,12 +774,12 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # Mock an unresolved thread
-        self.bot._get_unresolved_threads.return_value = [
-            {
-                "author": "jmartinez-silabs",
-                "body_preview": "Maybe we could check...",
-                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
-            }
+        self.mock_load_unresolved_threads.return_value = [
+            UnresolvedThread(
+                author="jmartinez-silabs",
+                body_preview="Maybe we could check...",
+                url="https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            )
         ]
 
         self.bot.check_and_process_pr(mock_pr)
@@ -742,17 +828,15 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # Configure skip check
-        from pr_checker_bot import ValidationCheck
-
         self.bot.skip_checks = {ValidationCheck.COMMENTS}
 
         # Mock unresolved threads (should be ignored)
-        self.bot._get_unresolved_threads.return_value = [
-            {
-                "author": "jmartinez-silabs",
-                "body_preview": "unresolved",
-                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
-            }
+        self.mock_load_unresolved_threads.return_value = [
+            UnresolvedThread(
+                author="jmartinez-silabs",
+                body_preview="unresolved",
+                url="https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            )
         ]
 
         self.bot.check_and_process_pr(mock_pr)
@@ -775,9 +859,7 @@ esp32:
         mock_status = MagicMock()
         mock_status.context = "license/cla"
         mock_status.state = "pending"
-        self.mock_commit.get_combined_status.return_value.statuses = [
-            mock_status
-        ]
+        self.mock_commit.get_combined_status.return_value.statuses = [mock_status]
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -791,9 +873,16 @@ esp32:
         ]
         # PR is authored by "doru91"
         mock_pr = self.create_mock_pr(1, "Test PR", "doru91", [], reviews)
-        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
-
-        self.assertNotIn("doru91", approvers)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        self.assertNotIn("doru91", context.approvers)
 
     def test_check_and_process_pr_deleted_author_skips(self) -> None:
         """Tests that a PR from a deleted/ghost author is skipped."""
@@ -809,46 +898,74 @@ esp32:
         mock_pr.create_issue_comment.assert_not_called()
 
     @patch("urllib.request.urlopen")
-    def test_get_unresolved_threads_pagination_gating(self, mock_urlopen: MagicMock) -> None:
+    def test_get_unresolved_threads_pagination_gating(
+        self, mock_urlopen: MagicMock
+    ) -> None:
         """Tests that _get_unresolved_threads appends a system blocker when hasNextPage is True."""
+        # Stop the global patch to test the real method
+        self.unresolved_threads_patcher.stop()
+        self.addCleanup(self.unresolved_threads_patcher.start)
+
         mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps({
-            "data": {
-                "repository": {
-                    "pullRequest": {
-                        "reviewThreads": {
-                            "pageInfo": {
-                                "hasNextPage": True
-                            },
-                            "nodes": []
+        mock_response.read.return_value = json.dumps(
+            {
+                "data": {
+                    "repository": {
+                        "pullRequest": {
+                            "reviewThreads": {
+                                "pageInfo": {"hasNextPage": True},
+                                "nodes": [],
+                            }
                         }
                     }
                 }
             }
-        }).encode("utf-8")
+        ).encode("utf-8")
         mock_urlopen.return_value.__enter__.return_value = mock_response
 
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [])
-        unresolved = PrCheckerBot._get_unresolved_threads(self.bot, mock_pr)
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
+        unresolved = context.unresolved_threads
 
         self.assertEqual(len(unresolved), 1)
-        self.assertEqual(unresolved[0]["author"], "system")
-        self.assertIn("Too many review threads", unresolved[0]["body_preview"])
+        self.assertEqual(unresolved[0].author, "system")
+        self.assertIn("Too many review threads", unresolved[0].body_preview)
 
     @patch("urllib.request.urlopen")
-    def test_get_unresolved_threads_malformed_graphql_response(self, mock_urlopen: MagicMock) -> None:
+    def test_get_unresolved_threads_malformed_graphql_response(
+        self, mock_urlopen: MagicMock
+    ) -> None:
         """Tests that _get_unresolved_threads raises RuntimeError if the JSON payload is missing key data structures."""
+        # Stop the global patch to test the real method
+        self.unresolved_threads_patcher.stop()
+        self.addCleanup(self.unresolved_threads_patcher.start)
+
         mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps({
-            "data": {
-                "repository": {}
-            }
-        }).encode("utf-8")
+        mock_response.read.return_value = json.dumps(
+            {"data": {"repository": {}}}
+        ).encode("utf-8")
         mock_urlopen.return_value.__enter__.return_value = mock_response
 
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [])
+        context = PRContext(
+            self.mock_github_instance,
+            "dummy_token",
+            self.mock_repo,
+            mock_pr,
+            self.bot.groups,
+            False,
+            set(),
+        )
         with self.assertRaises(RuntimeError) as ctx:
-            PrCheckerBot._get_unresolved_threads(self.bot, mock_pr)
+            _ = context.unresolved_threads
 
         self.assertIn("missing PR repository/pullRequest data", str(ctx.exception))
 
