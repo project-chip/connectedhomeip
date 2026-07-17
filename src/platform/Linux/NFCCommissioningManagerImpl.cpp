@@ -49,7 +49,11 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {} // namespace
+namespace {
+
+    inline void AssertMutexIsHeld(const std::mutex &m) CHIP_TSA_ATTRIBUTE__(assert_exclusive_lock(m)) {}
+
+} // namespace
 
 #define MAX_APDU_SIZE 256
 #define MAX_MESSAGE_SIZE 1280
@@ -697,6 +701,9 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
     std::unique_lock<std::mutex> initLock(mWorkerInitMutex);
     mWorkerInitCondition.wait(initLock, [this]() CHIP_REQUIRES(mWorkerInitMutex) { return mWorkerInitCompleted; });
 
+    // we know this is locked by the above, we did not unlock the initLock
+    AssertMutexIsHeld(mWorkerInitMutex);
+
     return mWorkerInitResult;
 }
 
@@ -891,6 +898,9 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
             mWorkQueueCondition.wait(lock,
                                      [this]() CHIP_REQUIRES(mWorkQueueMutex) { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
+
+            // we do not manually unlock it
+            AssertMutexIsHeld(mWorkQueueMutex);
 
             // Exit immediately once the worker is stopped.
             if (!mNfcWorkerThreadRunning)
