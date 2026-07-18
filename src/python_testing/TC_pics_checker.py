@@ -102,7 +102,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                          "Manual pairing code PICS is set if QR or NFC is set on EP0; skipped elsewhere."),
                 TestStep(10, "When endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
                          "Base/MCORE PICS exactly match the device on EP0; skipped elsewhere."),
-                TestStep(11, "If --bool-arg assert_mandatory_events is set: for every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
+                TestStep(11, "For every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file.",
                          "Event PICS match spec conformance for clusters on this endpoint."),
                 TestStep(12, "If any of the checks failed, fail the test")]
 
@@ -246,21 +246,15 @@ class TC_PICS_Checker(BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(11)
-        # Default off: enabling this turns the spec-conformance event rules
-        # into an assertion. Bounded to --endpoint to match Steps 2-6's
-        # per-endpoint semantics, and OTA clusters are skipped here for the
-        # same reason they're skipped from checkable_clusters above (no
-        # published PICS codes today).
-        if self.user_params.get("assert_mandatory_events", False):
-            endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
-            for cluster_id, event_ids in endpoint_events.items():
-                if cluster_id in ota_ids:
-                    continue
-                pics_base = self.xml_clusters[cluster_id].pics
-                for event_id in event_ids:
-                    location = EventPathLocation(
-                        endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
-                    self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
+        endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
+        for cluster_id, event_ids in endpoint_events.items():
+            if cluster_id in ota_ids:
+                continue
+            pics_base = self.xml_clusters[cluster_id].pics
+            for event_id in event_ids:
+                location = EventPathLocation(
+                    endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
+                self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
 
         self.step(12)
         if not self.success:
