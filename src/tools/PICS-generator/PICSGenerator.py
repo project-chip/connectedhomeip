@@ -39,7 +39,7 @@ sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceException  # noqa: E402
 from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
 from matter.testing.pics import BasePicsFacts, derive_base_pics_facts_from_device_wildcard  # noqa: E402
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, XmlEvent, build_xml_clusters  # noqa: E402
+from matter.testing.spec_parsing import XmlEvent, build_xml_clusters, dm_from_spec_version  # noqa: E402
 
 console = None
 xml_clusters = None
@@ -662,22 +662,10 @@ class DeviceMappingTest(MatterBaseTest):
             specVersion = specVersionResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
             console.print(f"Specification version received from device: {specVersion:x}")
 
-            if specVersion == 0x1030000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-            elif specVersion == 0x1040000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-            elif specVersion == 0x1040100:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
-            elif specVersion == 0x1040200:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
-            elif specVersion == 0x1050000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-            elif specVersion == 0x1050100:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
-            elif specVersion == 0x1060000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
-            else:
-                console.print("FAILURE: Specification version reported by device not supported")
+            try:
+                xml_clusters, problems = build_xml_clusters(dm_from_spec_version(specVersion))
+            except ConformanceException as e:
+                console.print(f"FAILURE: Specification version reported by device not supported: {e}")
                 return
 
         # Run device mapping function
