@@ -437,7 +437,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
     if (deviceName != NULL && deviceName[0] != 0)
     {
-        VerifyOrExit(strlen(deviceName) >= kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         // Configure the BLE device name.
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
