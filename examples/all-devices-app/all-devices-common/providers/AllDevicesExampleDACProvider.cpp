@@ -30,7 +30,7 @@ struct AllDevicesExampleDACProvider::FileProviderContext
     Credentials::Examples::TestHarnessDACProvider provider;
 };
 
-AllDevicesExampleDACProvider::AllDevicesExampleDACProvider() = default;
+AllDevicesExampleDACProvider::AllDevicesExampleDACProvider()  = default;
 AllDevicesExampleDACProvider::~AllDevicesExampleDACProvider() = default;
 
 CHIP_ERROR AllDevicesExampleDACProvider::Init(const std::optional<std::string> & filePath)
@@ -74,7 +74,7 @@ CHIP_ERROR AllDevicesExampleDACProvider::GetProductAttestationIntermediateCert(M
 }
 
 CHIP_ERROR AllDevicesExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
-                                                                     MutableByteSpan & out_signature_buffer)
+                                                                      MutableByteSpan & out_signature_buffer)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mDelegate->SignWithDeviceAttestationKey(message_to_sign, out_signature_buffer);
