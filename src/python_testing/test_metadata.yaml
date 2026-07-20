@@ -2,11 +2,17 @@
 # why they are not.
 not_automated:
     - name: TC_DD_3_23.py
-      reason: NFC Reader needed for running this test-case and CI does not support it
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_DD_3_24.py
-      reason: NFC Reader needed for running this test-case and CI does not support it
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_IDM_10_7.py
-      reason: NFC Reader needed for running this test-case and CI does not support it
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_SC_TC_2_1.py
       reason: Test requires Thread MeshCoP hardware or simulation.
     - name: TC_SC_TC_2_2.py
