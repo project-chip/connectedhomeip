@@ -458,6 +458,5 @@ TEST(TestAppOptions, Parse_DacProvider)
     ArgParser::OptionSet * options[] = { AppOptions::GetOptions(), nullptr };
     EXPECT_TRUE(ArgParser::ParseArgs("all-devices-app", 3, const_cast<char * const *>(argv), options));
     EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
-    EXPECT_TRUE(AppOptions::GetConfig().dacProvider.has_value());
-    EXPECT_EQ(AppOptions::GetConfig().dacProvider.value(), "path/to/dac.json");
+    EXPECT_EQ(AppOptions::GetConfig().dacProvider.value_or(""), "path/to/dac.json");
 }
