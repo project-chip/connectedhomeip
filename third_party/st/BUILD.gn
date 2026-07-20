@@ -31,13 +31,11 @@ group("stm32_sdk") {
 
 config("stm32_mbedtls_config") {
   if (stm32_family == "stm32wb5") {
-
     include_dirs = [
       chip_root,
       "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
     ]
   } else {
-
     include_dirs = [
       chip_root,
       "${chip_root}/examples/platform/stm32/config_files/STM32WB6/",
