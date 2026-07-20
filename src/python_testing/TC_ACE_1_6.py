@@ -519,6 +519,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20a: Verify GroupcastTesting event (AccessAllowed: true)
             self.step("20a")
+            # This is the first groupcast testing event generated from a step in this test. This means it will be the first
+            # groupcast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
             event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
@@ -549,7 +551,15 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20d: Check for event (kNoAvailableKey)
             self.step("20d")
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
+            # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
+            # the DUT and controller.
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect destination IP address in event")
@@ -570,12 +580,6 @@ class TC_ACE_1_6(MatterBaseTest):
             # Step 20g: Verify GroupcastTesting event is emitted (AccessAllowed: true)
             self.step("20g")
 
-            def previous_event_filter(data) -> bool:
-                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey
-
-            def current_event_filter(data) -> bool:
-                return data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess
-
             # Duplicate events could occur from step 20d, as this is an event emitted from a point where the message cannot
             # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
             # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
@@ -583,8 +587,8 @@ class TC_ACE_1_6(MatterBaseTest):
             # previous steps.
             event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=current_event_filter,
-                previous_event_filter_func=previous_event_filter,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
                 timeout_sec=30
             )
 
@@ -601,7 +605,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 22: Verify event (AccessAllowed: false)
             self.step(22)
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -620,7 +629,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 25: Verify event (AccessAllowed: true)
             self.step(25)
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -644,7 +658,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 28: Verify event (AccessAllowed: false)
             self.step(28)
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -662,7 +681,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31a: Verify event (AccessAllowed: true)
             self.step("31a")
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
