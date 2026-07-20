@@ -414,8 +414,8 @@ TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
 struct TestResourceStruct
 {
     uint32_t id;
-    CharSpan label;                             // Requires manual memory management
-    DataModel::List<const uint32_t> nestedList; // Requires cleanup
+    CharSpan label;                             // Managed by labelBuffer RAII
+    DataModel::List<const uint32_t> nestedList; // Managed by listBuffer RAII
 
     Platform::ScopedMemoryBufferWithSize<char> labelBuffer;
     Platform::ScopedMemoryBufferWithSize<uint32_t> listBuffer;
