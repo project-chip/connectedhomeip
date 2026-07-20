@@ -22,8 +22,8 @@
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
-#include <platform/PlatformManager.h>
 #include <binding-handler/binding-handler.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -282,12 +282,12 @@ public:
         uint8_t transitionTime = json.isMember("TransitionTime") && json["TransitionTime"].isUInt()
             ? static_cast<uint8_t>(json["TransitionTime"].asUInt())
             : 0;
-        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
-            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
-            : 0;
+        uint8_t optionsMask =
+            json.isMember("OptionsMask") && json["OptionsMask"].isUInt() ? static_cast<uint8_t>(json["OptionsMask"].asUInt()) : 0;
 
         SimulateBindingMoveToLevel(endpointId, level, transitionTime, optionsMask);
-        ChipLogProgress(AppServer, "SimulateBindingMoveToLevel level=%u transitionTime=%u on endpoint %d", level, transitionTime, endpointId);
+        ChipLogProgress(AppServer, "SimulateBindingMoveToLevel level=%u transitionTime=%u on endpoint %d", level, transitionTime,
+                        endpointId);
     }
 };
 
@@ -302,11 +302,10 @@ public:
             ChipLogError(AppServer, "Invalid SimulateBindingMove command: missing 'MoveMode' or 'Rate' field");
             return;
         }
-        uint8_t moveMode    = static_cast<uint8_t>(json["MoveMode"].asUInt());
-        uint8_t rate        = static_cast<uint8_t>(json["Rate"].asUInt());
-        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
-            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
-            : 0;
+        uint8_t moveMode = static_cast<uint8_t>(json["MoveMode"].asUInt());
+        uint8_t rate     = static_cast<uint8_t>(json["Rate"].asUInt());
+        uint8_t optionsMask =
+            json.isMember("OptionsMask") && json["OptionsMask"].isUInt() ? static_cast<uint8_t>(json["OptionsMask"].asUInt()) : 0;
 
         SimulateBindingMove(endpointId, moveMode, rate, optionsMask);
         ChipLogProgress(AppServer, "SimulateBindingMove moveMode=%u rate=%u on endpoint %d", moveMode, rate, endpointId);
@@ -329,9 +328,8 @@ public:
         uint8_t transitionTime = json.isMember("TransitionTime") && json["TransitionTime"].isUInt()
             ? static_cast<uint8_t>(json["TransitionTime"].asUInt())
             : 0;
-        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
-            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
-            : 0;
+        uint8_t optionsMask =
+            json.isMember("OptionsMask") && json["OptionsMask"].isUInt() ? static_cast<uint8_t>(json["OptionsMask"].asUInt()) : 0;
 
         SimulateBindingStep(endpointId, stepMode, stepSize, transitionTime, optionsMask);
         ChipLogProgress(AppServer, "SimulateBindingStep stepMode=%u stepSize=%u on endpoint %d", stepMode, stepSize, endpointId);

@@ -24,12 +24,12 @@
 namespace chip::app {
 
 // Bit-packing Constants for uintptr_t context
-constexpr uintptr_t kBindingCommandMask                 = 0xFF;
-constexpr uintptr_t kBindingOnOffOnCommandId           = 0x01;
-constexpr uintptr_t kBindingOnOffOffCommandId          = 0x02;
-constexpr uintptr_t kBindingOnOffToggleCommandId       = 0x03;
-constexpr uintptr_t kBindingLevelMoveToLevelCommandId  = 0x04;
-constexpr uintptr_t kBindingLevelMoveCommandId         = 0x05;
+constexpr uintptr_t kBindingCommandMask               = 0xFF;
+constexpr uintptr_t kBindingOnOffOnCommandId          = 0x01;
+constexpr uintptr_t kBindingOnOffOffCommandId         = 0x02;
+constexpr uintptr_t kBindingOnOffToggleCommandId      = 0x03;
+constexpr uintptr_t kBindingLevelMoveToLevelCommandId = 0x04;
+constexpr uintptr_t kBindingLevelMoveCommandId        = 0x05;
 constexpr uintptr_t kBindingLevelStepCommandId        = 0x06;
 constexpr uintptr_t kBindingLevelStopCommandId        = 0x07;
 

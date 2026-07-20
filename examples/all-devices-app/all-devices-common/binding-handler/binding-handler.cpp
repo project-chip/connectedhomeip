@@ -36,9 +36,7 @@ namespace chip::app {
 
 namespace {
 
-void BoundDeviceChangedHandler(const Binding::TableEntry & binding,
-                               OperationalDeviceProxy * peer_device,
-                               void * context)
+void BoundDeviceChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     uintptr_t args    = reinterpret_cast<uintptr_t>(context);
     uint8_t commandId = static_cast<uint8_t>(args & kBindingCommandMask);
@@ -58,19 +56,13 @@ void BoundDeviceChangedHandler(const Binding::TableEntry & binding,
         {
             VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
             TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
-                                                                      peer_device->GetSecureSession().Value(),
-                                                                      binding.remote,
-                                                                      commandObj,
-                                                                      onSuccess,
-                                                                      onFailure);
+                                                                      peer_device->GetSecureSession().Value(), binding.remote,
+                                                                      commandObj, onSuccess, onFailure);
         }
         else if (binding.type == Binding::MATTER_MULTICAST_BINDING)
         {
-            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(
-                &Server::GetInstance().GetExchangeManager(),
-                binding.fabricIndex,
-                binding.groupId,
-                commandObj);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&Server::GetInstance().GetExchangeManager(),
+                                                                           binding.fabricIndex, binding.groupId, commandObj);
         }
     };
 
@@ -149,7 +141,7 @@ void InitBindingHandlerInternal(intptr_t arg)
 CHIP_ERROR InitBindingHandler()
 {
     // The server instance needs to be initialized before the binding handler. This is why
-    // we schedule the init of the binding handler to be run later, once the neccessary values 
+    // we schedule the init of the binding handler to be run later, once the neccessary values
     // can be fetched from the server.
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
     return CHIP_NO_ERROR;
@@ -158,55 +150,49 @@ CHIP_ERROR InitBindingHandler()
 void SimulateBindingOnOff(EndpointId endpointId, bool on)
 {
     uintptr_t cmdId = on ? kBindingOnOffOnCommandId : kBindingOnOffOffCommandId;
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::OnOff::Id, reinterpret_cast<void *>(cmdId));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::OnOff::Id,
+                                                                                       reinterpret_cast<void *>(cmdId));
 }
 
 void SimulateBindingToggle(EndpointId endpointId)
 {
     uintptr_t cmdId = kBindingOnOffToggleCommandId;
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::OnOff::Id, reinterpret_cast<void *>(cmdId));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::OnOff::Id,
+                                                                                       reinterpret_cast<void *>(cmdId));
 }
 
 void SimulateBindingMoveToLevel(EndpointId endpointId, uint8_t newLevel, uint8_t transitionTimeSec, uint8_t optionsMask)
 {
-    uintptr_t packedArgs = kBindingLevelMoveToLevelCommandId |
-                           (static_cast<uintptr_t>(newLevel) << 8) |
-                           (static_cast<uintptr_t>(transitionTimeSec) << 16) |
-                           (static_cast<uintptr_t>(optionsMask) << 24);
+    uintptr_t packedArgs = kBindingLevelMoveToLevelCommandId | (static_cast<uintptr_t>(newLevel) << 8) |
+        (static_cast<uintptr_t>(transitionTimeSec) << 16) | (static_cast<uintptr_t>(optionsMask) << 24);
 
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::LevelControl::Id, reinterpret_cast<void *>(packedArgs));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::LevelControl::Id,
+                                                                                       reinterpret_cast<void *>(packedArgs));
 }
 
 void SimulateBindingMove(EndpointId endpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask)
 {
-    uintptr_t packedArgs = kBindingLevelMoveCommandId |
-                           (static_cast<uintptr_t>(moveMode) << 8) |
-                           (static_cast<uintptr_t>(rate) << 16) |
-                           (static_cast<uintptr_t>(optionsMask) << 24);
+    uintptr_t packedArgs = kBindingLevelMoveCommandId | (static_cast<uintptr_t>(moveMode) << 8) |
+        (static_cast<uintptr_t>(rate) << 16) | (static_cast<uintptr_t>(optionsMask) << 24);
 
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::LevelControl::Id, reinterpret_cast<void *>(packedArgs));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::LevelControl::Id,
+                                                                                       reinterpret_cast<void *>(packedArgs));
 }
 
 void SimulateBindingStep(EndpointId endpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTimeSec, uint8_t optionsMask)
 {
-    uintptr_t packedArgs = kBindingLevelStepCommandId |
-                           (static_cast<uintptr_t>(stepMode) << 8) |
-                           (static_cast<uintptr_t>(stepSize) << 16) |
-                           (static_cast<uintptr_t>(optionsMask) << 24);
+    uintptr_t packedArgs = kBindingLevelStepCommandId | (static_cast<uintptr_t>(stepMode) << 8) |
+        (static_cast<uintptr_t>(stepSize) << 16) | (static_cast<uintptr_t>(optionsMask) << 24);
 
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::LevelControl::Id, reinterpret_cast<void *>(packedArgs));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::LevelControl::Id,
+                                                                                       reinterpret_cast<void *>(packedArgs));
 }
 
 void SimulateBindingStop(EndpointId endpointId)
 {
     uintptr_t cmdId = kBindingLevelStopCommandId;
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(
-        endpointId, Clusters::LevelControl::Id, reinterpret_cast<void *>(cmdId));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(endpointId, Clusters::LevelControl::Id,
+                                                                                       reinterpret_cast<void *>(cmdId));
 }
 
 } // namespace chip::app

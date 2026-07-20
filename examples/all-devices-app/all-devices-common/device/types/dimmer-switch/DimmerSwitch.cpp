@@ -17,9 +17,9 @@
 
 #include "DimmerSwitch.h"
 
-#include <binding-handler/binding-handler.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <binding-handler/binding-handler.h>
 #include <clusters/Groups/Ids.h>
 #include <clusters/Identify/Ids.h>
 #include <clusters/LevelControl/Ids.h>
