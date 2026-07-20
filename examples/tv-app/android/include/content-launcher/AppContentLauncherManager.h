@@ -68,13 +68,15 @@ private:
 
     // All Content Launcher features enabled
     static constexpr uint32_t kEndpointFeatureMap =
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentSearch) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kURLPlayback) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kTextTracks) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAudioTracks) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentReplication) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentQueueing) |
-        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kPresets);
+        chip::BitFlags<chip::app::Clusters::ContentLauncher::Feature>(
+            chip::app::Clusters::ContentLauncher::Feature::kContentSearch,
+            chip::app::Clusters::ContentLauncher::Feature::kURLPlayback,
+            chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek,
+            chip::app::Clusters::ContentLauncher::Feature::kTextTracks,
+            chip::app::Clusters::ContentLauncher::Feature::kAudioTracks,
+            chip::app::Clusters::ContentLauncher::Feature::kContentReplication,
+            chip::app::Clusters::ContentLauncher::Feature::kContentQueueing,
+            chip::app::Clusters::ContentLauncher::Feature::kPresets)
+            .Raw();
     ContentAppAttributeDelegate * mAttributeDelegate;
 };
