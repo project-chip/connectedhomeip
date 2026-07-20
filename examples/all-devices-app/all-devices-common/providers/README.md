@@ -36,8 +36,8 @@ JSON files or memory accessible to user space.
     and register it at boot.
 -   **Commercial Linux Gateways**: Real products replace
     `AllDevicesExampleDACProvider` with a provider that delegates signing
-    directly to a Hardware Secure Element (e.g., `ATECC608`, NXP `SE050`), TPM, or
-    platform Secure Enclave / TrustZone
+    directly to a Hardware Secure Element (e.g., `ATECC608`, NXP `SE050`), TPM,
+    or platform Secure Enclave / TrustZone
     ([`TrustyDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/Linux/DeviceAttestationCredsTrusty.h#L26-L45)).
 
 ### 2. Device Instance Info
