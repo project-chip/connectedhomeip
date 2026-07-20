@@ -82,6 +82,7 @@ public:
      * change), so this method is optional as it might be redundant.
      */
     void OnEnterActiveMode() override;
+    void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {}) override;
     void RescheduleAllReports() override;
 
     /**

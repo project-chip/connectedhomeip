@@ -176,31 +176,11 @@ public:
 
     virtual void ReportTimerCallback() = 0;
 
-    virtual void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {})
-    {
-        Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-        mNodesPool.ForEachActiveObject([this, now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
-            if (node->IsInterestedInEndpoints(targetedEndpoints))
-            {
-                System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
-                System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
-                node->SetDeferralEndTimestamp(now + effectiveDelay);
-            }
-            return Loop::Continue;
-        });
-        RescheduleAllReports();
-    }
+    virtual void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {}) = 0;
 
     virtual void RescheduleAllReports() = 0;
 
-    System::Clock::Timeout GetRemainingTimeout(const Timestamp & targetTimestamp, const Timestamp & now)
-    {
-        if (targetTimestamp > now)
-        {
-            return std::chrono::duration_cast<System::Clock::Timeout>(targetTimestamp - now);
-        }
-        return System::Clock::Milliseconds32(0);
-    }
+
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
