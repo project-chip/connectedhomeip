@@ -206,7 +206,7 @@ disk**. In real products:
    into system RAM.
 2. **Platform Hardware Binding**:
     - **Linux / Android Gateways**: Delegate signing to a Hardware Secure
-      Element (e.g. ATECC608, NXP SE050 via I2C/PKCS#11), TPM, or platform
+      Element (e.g. `ATECC608`, NXP `SE050` via I2C/PKCS#11), TPM, or platform
       Secure Enclave / TrustZone (see
       [`TrustyDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/Linux/DeviceAttestationCredsTrusty.h#L26-L45)).
     - **Embedded MCUs (ESP32, Nordic, Silicon Labs)**: Use the platform's
