@@ -17,9 +17,9 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/EventLogging.h>
 #include "ThermostatCluster.h"
 #include "ThermostatClusterEvents.h"
+#include <app/EventLogging.h>
 
 #include <limits>
 
@@ -36,23 +36,26 @@ namespace Thermostat {
 
 void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp)
 {
-    switch (attributeId) {
-        case OccupiedHeatingSetpoint::Id: {
-            GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap::kOccupied, MakeOptional(oldTemp), newTemp);
-           break;
-        }
-        case UnoccupiedHeatingSetpoint::Id: {
-            GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
-            break;
-        }
-        case OccupiedCoolingSetpoint::Id: {
-            GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap::kOccupied, MakeOptional(oldTemp), newTemp);
-            break;
-        }
-        case UnoccupiedCoolingSetpoint::Id: {
-            GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
-            break;
-        }
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id: {
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap::kOccupied, MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    }
+    case UnoccupiedHeatingSetpoint::Id: {
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
+        break;
+    }
+    case OccupiedCoolingSetpoint::Id: {
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap::kOccupied, MakeOptional(oldTemp),
+                                    newTemp);
+        break;
+    }
+    case UnoccupiedCoolingSetpoint::Id: {
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
+        break;
+    }
     }
 }
 

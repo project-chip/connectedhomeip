@@ -28,8 +28,8 @@
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
-#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>

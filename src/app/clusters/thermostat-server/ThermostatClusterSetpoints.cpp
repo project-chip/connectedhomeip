@@ -45,8 +45,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
-                                               temperature value,
-                                               SetpointAttributes & changedAttributes)
+                                                                      temperature value, SetpointAttributes & changedAttributes)
 {
     switch (attributeId)
     {
@@ -153,7 +152,8 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
         return status;
     }
     status = SaveSetpoints(setpoints, changedAttributes);
-    if (status == Protocols::InteractionModel::Status::Success) {
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
         mSetpoints = setpoints;
     }
 
@@ -162,7 +162,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
 
 Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence)
 {
-    auto endpoint = mPath.mEndpointId;
+    auto endpoint                = mPath.mEndpointId;
     setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
     setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
     setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
@@ -240,26 +240,29 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
     if (setpoints.occupancySupported)
     {
         int16_t unoccupiedCooling;
-        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id },
-                                          unoccupiedCooling, static_cast<int16_t>(kDefaultCoolingSetpoint));
+        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, unoccupiedCooling,
+                                          static_cast<int16_t>(kDefaultCoolingSetpoint));
         setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
 
         int16_t unoccupiedHeating;
-        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id },
-                                          unoccupiedHeating, static_cast<int16_t>(kDefaultHeatingSetpoint));
+        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, unoccupiedHeating,
+                                          static_cast<int16_t>(kDefaultHeatingSetpoint));
         setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
     }
 
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint) {
+Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint)
+{
     VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
     VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
     temperature newTemp = newSetpoint.Temperature();
-    auto status = mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId()), ByteSpan(reinterpret_cast<const uint8_t *>(&newTemp), sizeof(newTemp)));
-    if (status != CHIP_NO_ERROR) {
+    auto status =
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId()),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&newTemp), sizeof(newTemp)));
+    if (status != CHIP_NO_ERROR)
+    {
         return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
     }
     GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
@@ -268,10 +271,10 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpoints,
-                                                                     SetpointAttributes changedAttributes)
+DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes)
 {
-    if (!setpoints.Valid()) {
+    if (!setpoints.Valid())
+    {
         return Status::ConstraintError;
     }
 
@@ -300,7 +303,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
                 status = SaveSetpoint(mSetpoints.unoccupiedRange.heating, setpoints.unoccupiedRange.heating);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
-        }   
+        }
     }
     if (setpoints.coolSupported)
     {
@@ -326,7 +329,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
                 status = SaveSetpoint(mSetpoints.unoccupiedRange.cooling, setpoints.unoccupiedRange.cooling);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
-        } 
+        }
     }
     return Status::Success;
 }

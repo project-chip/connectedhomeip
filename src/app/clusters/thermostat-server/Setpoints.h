@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"
@@ -144,7 +144,7 @@ public:
      * @return The status of the operation.
      */
     DataModel::ActionReturnStatus ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
-                                                           SetpointAttributes & changedAttributes);
+                                                     SetpointAttributes & changedAttributes);
 
     /**
      * Change the cooling value of a given setpoint range.
@@ -156,7 +156,7 @@ public:
      * @return The status of the operation.
      */
     DataModel::ActionReturnStatus ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
-                                                           SetpointAttributes & changedAttributes);
+                                                     SetpointAttributes & changedAttributes);
 
     /**
      * Change either or both of the values of a given setpoint range.
@@ -169,7 +169,7 @@ public:
      * @return The status of the operation.
      */
     DataModel::ActionReturnStatus ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
-                                                    ClampMode clamp, SetpointAttributes & changedAttributes);
+                                              ClampMode clamp, SetpointAttributes & changedAttributes);
 
     /**
      * Change the minimum value of a given setpoint limit
@@ -179,8 +179,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    DataModel::ActionReturnStatus ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, temperature min,
-                                                           SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimitMinimum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature min, SetpointAttributes & changedAttributes);
 
     /**
      * Change the maximum value of a given setpoint limit
@@ -190,8 +190,8 @@ public:
      * @param changedAttributes The set of attributes changed by this operation.
      * @return The status of the operation.
      */
-    DataModel::ActionReturnStatus ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, temperature max,
-                                                           SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimitMaximum(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                                     temperature max, SetpointAttributes & changedAttributes);
 
     /**
      * Attempt to fix any violations of the setpoint rules
@@ -210,8 +210,9 @@ private:
     @param changedAttributes The set of attributes changed by this operation.
     @return The status of the operation; Success if the setpoints are now valid, ConstraintError if it was not possible to fix them
     */
-    DataModel::ActionReturnStatus ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min,
-                                                     Optional<temperature> max, SetpointAttributes & changedAttributes);
+    DataModel::ActionReturnStatus ChangeLimits(UserSetpointLimits & limits, AbsoluteSetpointLimits & absoluteLimits,
+                                               Optional<temperature> min, Optional<temperature> max,
+                                               SetpointAttributes & changedAttributes);
 
     /*
     Attempt to fix the user setpoint limits to comply with the deadband
@@ -249,8 +250,6 @@ private:
         return (max.Temperature() - min.Temperature()) < static_cast<int32_t>(deadBand);
     }
 };
-
-
 
 } // namespace Thermostat
 } // namespace Clusters

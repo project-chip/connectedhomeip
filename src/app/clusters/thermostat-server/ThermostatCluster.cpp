@@ -44,7 +44,6 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace Protocols::InteractionModel;
 
-
 namespace chip {
 namespace app {
 namespace Clusters {

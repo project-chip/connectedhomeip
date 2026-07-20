@@ -26,9 +26,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Thermostat {
-
-} // namespace Thermostat
+namespace Thermostat {} // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
