@@ -646,8 +646,8 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
     if (mContext != nullptr)
     {
         AttributePersistence attrPersistence{ mContext->attributeStorage };
-        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id), mSleep));
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id), mSleep));
     }
 
     if (mDelegate != nullptr)
