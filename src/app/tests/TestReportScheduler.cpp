@@ -904,8 +904,8 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralOnce)
     sScheduler.OnSubscriptionReportSent(readHandler1);
 
     // After transmission, the next report minInterval is 1s from now (i.e. at 4s).
-    // The previous deferral (which was at absolute time 3s) is now in the past (since current mock time is 3s and minInterval is 4s).
-    // Therefore, the schedule should reset back to minInterval (1s from now), and NOT be deferred any more!
+    // The previous deferral (which was at absolute time 3s) is now in the past (since current mock time is 3s and minInterval is
+    // 4s). Therefore, the schedule should reset back to minInterval (1s from now), and NOT be deferred any more!
     EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
 
     // Clean up
