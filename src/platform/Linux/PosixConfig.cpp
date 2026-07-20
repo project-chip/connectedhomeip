@@ -113,10 +113,10 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
     return nullptr;
 }
 
-ChipLinuxStorage * PosixConfig::GetChipLinuxDataStorage() {
+ChipLinuxStorage * PosixConfig::GetChipLinuxDataStorage()
+{
     return &gChipLinuxDataStorage;
 }
-
 
 CHIP_ERROR PosixConfig::Init()
 {
