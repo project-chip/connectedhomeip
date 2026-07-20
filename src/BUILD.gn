@@ -72,6 +72,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/chime-server/tests",
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
+      "${chip_root}/src/app/clusters/color-control-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",

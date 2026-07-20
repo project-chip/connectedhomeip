@@ -2487,22 +2487,22 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    ram      attribute remainingTime default = 0x0000;
-    persist  attribute colorTemperatureMireds default = 0x00FA;
-    persist  attribute colorMode default = 0x02;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
-    persist  attribute enhancedColorMode default = 0x02;
-    ram      attribute colorCapabilities default = 0x0010;
+    callback attribute remainingTime;
+    callback attribute colorTemperatureMireds;
+    callback attribute colorMode;
+    callback attribute options;
+    callback attribute numberOfPrimaries;
+    callback attribute enhancedColorMode;
+    callback attribute colorCapabilities;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
+    callback attribute startUpColorTemperatureMireds;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0010;
-    ram      attribute clusterRevision default = 0x0009;
+    callback attribute clusterRevision;
 
     handle command MoveToColorTemperature;
     handle command StopMoveStep;

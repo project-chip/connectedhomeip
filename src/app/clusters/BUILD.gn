@@ -35,6 +35,7 @@ source_set("clusters") {
     "chime-server",
     "closure-control-server",
     "closure-dimension-server",
+    "color-control-server",
     "commissioner-control-server",
     "concentration-measurement-server",
     "descriptor",
