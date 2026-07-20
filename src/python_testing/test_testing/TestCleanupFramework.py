@@ -127,7 +127,7 @@ class TestCleanupFramework(MatterBaseTest):
 
     def _find_endpoint_with_cluster(self, cluster) -> int | None:
         """Returns the first endpoint that has the given cluster, or None."""
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             return None
         for ep in wildcard.attributes:
@@ -258,7 +258,7 @@ class TestCleanupFramework(MatterBaseTest):
         if ep is None:
             logger.info("ScenesManagement cluster not present on DUT — skipping")
             return
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None or not _has_cluster(wildcard, ep, Clusters.Groups):
             logger.info("Groups cluster not present on endpoint %d — skipping scenes scenario", ep)
             return
@@ -311,7 +311,7 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_icd_client_cleanup(self):
         logger.info("--- Scenario: ICD client registration ---")
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if not _has_attribute(wildcard=wildcard, endpoint=0,
                               attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
             logger.info("ICD Management cluster not present on DUT — skipping")
@@ -338,7 +338,7 @@ class TestCleanupFramework(MatterBaseTest):
         if ep is None:
             logger.info("TlsClientManagement cluster not present on DUT — skipping")
             return
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None or not _has_cluster(wildcard, ep, Clusters.TlsCertificateManagement):
             logger.info("TlsCertificateManagement cluster not present on endpoint %d — skipping", ep)
             return

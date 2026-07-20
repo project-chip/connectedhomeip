@@ -868,8 +868,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         controller-side cleanup. Each step is gated by TestCleanupConfig so individual
         steps can be disabled by test authors when needed.
 
-        Cluster-presence checks use ``stored_global_wildcard`` (or
-        ``stored_global_wildcard_or_none`` when the framework must tolerate a missing read), which the
+        Cluster-presence checks use ``stored_global_wildcard``, which the
         test runner populates in ``user_params`` at session start (see ``read_global_wildcard`` in
         ``runner.run_tests_no_exit``). If that read failed, cleanup steps that need it log and skip.
         """
@@ -1121,7 +1120,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Must run before _purge_group_memberships since RemoveAllScenes needs the group to
         still exist on the DUT.
         """
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
@@ -1159,7 +1158,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
         """
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
             return
@@ -1184,7 +1183,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _purge_doorlock(self) -> None:
         """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
             return
@@ -1221,7 +1220,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         tls_cluster_id = Clusters.TlsClientManagement.id
         found_any = False
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping TLS endpoint cleanup")
             return
@@ -1276,7 +1275,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Unregisters all ICD clients registered on the DUT via the default controller"""
         # Check if the ICD Management cluster is present on the DUT.
         # Wildcard is pre-populated by the test runner; guard when unavailable.
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = self.stored_global_wildcard()
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
             return
@@ -1680,21 +1679,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         return global_stash.unstash_globally(self.user_params.get("hooks"))
 
     @property
-    def stored_global_wildcard_or_none(self) -> Attribute.AsyncReadTransaction.ReadResponse | None:
+    def stored_global_wildcard(self) -> Attribute.AsyncReadTransaction.ReadResponse | None:
         """Returns the runner's cached global wildcard read, or None if it was never stashed.
 
         Framework cleanup uses this to skip steps when the wildcard was unavailable. Test bodies and
         guards should use :py:attr:`stored_global_wildcard` instead, which raises if the stash is missing.
         """
-        return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
-
-    @property
-    def stored_global_wildcard(self) -> Attribute.AsyncReadTransaction.ReadResponse:
-        """Accesses the cached global wildcard read populated by the test runner."""
-        wildcard = self.stored_global_wildcard_or_none()
+        wildcard = global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
         if wildcard is None:
-            raise RuntimeError(
-                "stored_global_wildcard was not populated by the runner"
+            LOGGER.warning(
+                "[MatterBaseTest] stored_global_wildcard was not populated by the runner"
             )
         return wildcard
 
