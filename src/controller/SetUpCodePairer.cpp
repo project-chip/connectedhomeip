@@ -568,11 +568,16 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
     mWaitingForDiscovery[kBLETransport] = false;
 
     // In order to not wait for all the possible addresses discovered over mdns to
-    // be tried before trying to connect over BLE, the discovered connection object is
-    // inserted at the beginning of the list.
+    // be tried before trying to connect over BLE, the discovered BLE option is
+    // inserted at the beginning of the list. It makes it the 'next' thing to try
+    // to connect to if there are already some discovered parameters in the list.
     //
-    // It makes it the 'next' thing to try to connect to if there are already some
-    // discovered parameters in the list.
+    // If a PASE attempt is already in progress, do not queue connObj for later.
+    // No BLEEndPoint has been created for it yet, and the BLE platform still owns
+    // the connection object. If the DUT disconnects before this queued entry is
+    // retried, that object may be invalidated by the platform. Queue
+    // reconnectable BLE parameters instead so the later retry starts a fresh BLE
+    // connection.
     //
     // TODO: Consider implementing the SHOULD the spec has about commissioning things
     // in QR code order by waiting for a second or something before actually starting
