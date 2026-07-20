@@ -37,7 +37,7 @@ using namespace chip::app::Clusters::AlarmBase::Attributes;
 using namespace chip::Testing;
 using Status = Protocols::InteractionModel::Status;
 
-constexpr ClusterId kDishwasherClusterId = DishwasherAlarm::Id;
+constexpr ClusterId kDishwasherClusterId   = DishwasherAlarm::Id;
 constexpr ClusterId kRefrigeratorClusterId = RefrigeratorAlarm::Id;
 
 class TestAlarmDelegate : public AlarmBase::Delegate
@@ -76,12 +76,12 @@ struct TestAlarmBaseCluster : public ::testing::Test
         }
 
         return AlarmBaseCluster::Config{
-            .feature                      = feature,
-            .clusterRevision              = DishwasherAlarm::kRevision,
-            .supported                    = AlarmMap(0x3F),
-            .latch                        = AlarmMap(0),
-            .supportsModifyEnabledAlarms  = withModifyCommand,
-            .delegate                     = &delegate,
+            .feature                     = feature,
+            .clusterRevision             = DishwasherAlarm::kRevision,
+            .supported                   = AlarmMap(0x3F),
+            .latch                       = AlarmMap(0),
+            .supportsModifyEnabledAlarms = withModifyCommand,
+            .delegate                    = &delegate,
         };
     }
 

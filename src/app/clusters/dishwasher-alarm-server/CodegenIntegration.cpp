@@ -36,8 +36,7 @@ using namespace chip::app::Clusters::AlarmBase;
 namespace {
 
 constexpr size_t kDishwasherAlarmFixedClusterCount = DishwasherAlarm::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kDishwasherAlarmMaxClusterCount =
-    kDishwasherAlarmFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kDishwasherAlarmMaxClusterCount   = kDishwasherAlarmFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kDishwasherAlarmFixedClusterCount == MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT,
               "DishwasherAlarm static cluster config must match ZAP server endpoint count");
@@ -93,13 +92,13 @@ public:
         BitMask<DishwasherAlarm::AlarmBitmap> latch{};
 
         AlarmBaseCluster::Config config{
-            .feature                     = features,
-            .clusterRevision             = GetClusterRevision(DishwasherAlarm::Id),
-            .supported                   = AlarmMap(supported.Raw()),
-            .latch                       = AlarmMap(latch.Raw()),
-            .supportsModifyEnabledAlarms = EndpointHasCommand(endpointId, DishwasherAlarm::Id,
-                                                              DishwasherAlarm::Commands::ModifyEnabledAlarms::Id),
-            .delegate                    = &gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
+            .feature         = features,
+            .clusterRevision = GetClusterRevision(DishwasherAlarm::Id),
+            .supported       = AlarmMap(supported.Raw()),
+            .latch           = AlarmMap(latch.Raw()),
+            .supportsModifyEnabledAlarms =
+                EndpointHasCommand(endpointId, DishwasherAlarm::Id, DishwasherAlarm::Commands::ModifyEnabledAlarms::Id),
+            .delegate = &gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
         };
 
         gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(

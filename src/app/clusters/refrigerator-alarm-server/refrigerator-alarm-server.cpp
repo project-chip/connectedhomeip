@@ -18,8 +18,8 @@
 #include "refrigerator-alarm-server.h"
 
 #include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
-#include <app/clusters/refrigerator-alarm-server/CodegenIntegration.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
+#include <app/clusters/refrigerator-alarm-server/CodegenIntegration.h>
 #include <lib/support/BitFlags.h>
 
 using namespace chip;

@@ -71,7 +71,7 @@ Status AlarmBaseCluster::SetSupportedValue(const AlarmMap supported)
     AlarmMap latch;
     if (GetLatchValue(&latch) == Status::Success && !supported.HasAll(latch))
     {
-        latch = latch & supported;
+        latch         = latch & supported;
         Status status = SetLatchValue(latch);
         if (status != Status::Success)
         {
@@ -86,7 +86,7 @@ Status AlarmBaseCluster::SetSupportedValue(const AlarmMap supported)
     }
     if (!supported.HasAll(mask))
     {
-        mask   = supported & mask;
+        mask          = supported & mask;
         Status status = SetMaskValue(mask);
         if (status != Status::Success)
         {
@@ -108,7 +108,7 @@ Status AlarmBaseCluster::SetMaskValue(const AlarmMap mask)
     }
     if (!mask.HasAll(state))
     {
-        state  = mask & state;
+        state         = mask & state;
         Status status = SetStateValue(state, true);
         if (status != Status::Success)
         {
@@ -231,7 +231,8 @@ DataModel::ActionReturnStatus AlarmBaseCluster::WriteAttribute(const DataModel::
     return Status::UnsupportedAttribute;
 }
 
-CHIP_ERROR AlarmBaseCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR AlarmBaseCluster::Attributes(const ConcreteClusterPath & path,
+                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
@@ -278,7 +279,7 @@ std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::InvokeCommand(con
 }
 
 std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::HandleReset(CommandHandler & commandObj,
-                                                                          const ConcreteCommandPath & commandPath, AlarmMap alarms)
+                                                                           const ConcreteCommandPath & commandPath, AlarmMap alarms)
 {
     if (!HasResetFeature())
     {
@@ -308,9 +309,8 @@ std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::HandleReset(Comma
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::HandleModifyEnabledAlarms(CommandHandler & commandObj,
-                                                                                          const ConcreteCommandPath & commandPath,
-                                                                                          AlarmMap mask)
+std::optional<DataModel::ActionReturnStatus>
+AlarmBaseCluster::HandleModifyEnabledAlarms(CommandHandler & commandObj, const ConcreteCommandPath & commandPath, AlarmMap mask)
 {
     if (!mSupportsModifyEnabledAlarms)
     {

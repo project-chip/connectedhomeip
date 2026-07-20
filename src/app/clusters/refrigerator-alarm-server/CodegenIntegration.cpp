@@ -74,10 +74,7 @@ public:
         return &gRefrigeratorAlarmClusters[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override
-    {
-        gRefrigeratorAlarmClusters[clusterInstanceIndex].Destroy();
-    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gRefrigeratorAlarmClusters[clusterInstanceIndex].Destroy(); }
 };
 
 } // namespace

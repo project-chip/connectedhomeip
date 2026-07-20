@@ -91,9 +91,8 @@ private:
     std::optional<DataModel::ActionReturnStatus> HandleReset(CommandHandler & commandObj, const ConcreteCommandPath & commandPath,
                                                              AlarmBase::AlarmMap alarms);
 
-    std::optional<DataModel::ActionReturnStatus> HandleModifyEnabledAlarms(CommandHandler & commandObj,
-                                                                           const ConcreteCommandPath & commandPath,
-                                                                           AlarmBase::AlarmMap mask);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleModifyEnabledAlarms(CommandHandler & commandObj, const ConcreteCommandPath & commandPath, AlarmBase::AlarmMap mask);
 };
 
 } // namespace chip::app::Clusters
