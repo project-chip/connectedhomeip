@@ -187,6 +187,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ColorControl::Id:
+        MatterColorControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterInitCallback(endpoint);
         break;
@@ -379,6 +382,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ColorControl::Id:
+        MatterColorControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterShutdownCallback(endpoint, shutdownType);

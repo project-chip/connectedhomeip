@@ -35,16 +35,16 @@ ColorControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 /**
  * Registers the application `ColorControlDelegate` for `endpoint`, used by the codegen integration layer.
  *
- * The integration keeps one delegate pointer per Color Control server endpoint. The code-driven cluster is
- * always wired to an internal wrapper (see CodegenIntegration.cpp) that holds this pointer and forwards the
- * color-science `Convert*` conversions and the hardware `On*Changed` callbacks; when no application delegate
- * is registered the `Convert*` calls fall back to the base no-ops (correct for single-feature devices, which
- * never switch into a mode they do not advertise) and the `On*Changed` notifications are dropped.
+ * The integration keeps one delegate pointer per Color Control server endpoint. When the cluster is
+ * constructed it is bound to this delegate, or to a shared no-op default when none is registered (the
+ * base `Convert*` no-ops are correct for single-feature devices, which never switch into a mode they do
+ * not advertise, and `On*Changed` notifications are simply dropped).
  *
- * Call this from application init before or after the cluster is constructed.
+ * Call this from application init BEFORE the cluster is constructed: the delegate is bound once at
+ * construction and is not repointable afterwards.
  *
  * @param endpoint  Color Control server endpoint.
- * @param delegate  Application delegate, or `nullptr` to unbind.
+ * @param delegate  Application delegate, or `nullptr` to use the shared no-op default.
  */
 void SetDefaultDelegate(EndpointId endpoint, ColorControlDelegate * delegate);
 

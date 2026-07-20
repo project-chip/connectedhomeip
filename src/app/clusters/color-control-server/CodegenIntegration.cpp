@@ -42,90 +42,19 @@ constexpr size_t kColorControlMaxClusterCount   = kColorControlFixedClusterCount
 
 static_assert(kColorControlMaxClusterCount <= kEmberInvalidEndpointIndex, "ColorControl cluster table size error");
 
-// Integration-owned delegate used only by the codegen integration layer.
+// A single shared no-op delegate for endpoints that have no application delegate registered.
 //
-// ColorControlCluster is constructed with a mandatory ColorControlDelegate& (no nullptr). Ember/ZAP apps
-// register a real application delegate later (or never) via SetDefaultDelegate, so the cluster cannot assume
-// an application delegate exists at construction time.
-//
-// This wrapper is the single object passed into ColorControlCluster::Config for the endpoint slot: it always
-// lives for the slot and holds an optional pointer to the application delegate. Color-science Convert* calls
-// forward when that pointer is non-null; otherwise they fall through to the base no-ops. A single-feature
-// device never switches into a mode it does not advertise, so those no-ops are never reached there; a
-// multi-feature device MUST register a delegate that implements the relevant conversions. Hardware On*Changed
-// notifications forward when a delegate is present and are dropped otherwise.
-class ColorControlIntegrationDelegateWrapper final : public ColorControlDelegate
-{
-public:
-    void Init(EndpointId ep, ColorControlDelegate * wrapped)
-    {
-        mEndpoint = ep;
-        mWrapped  = wrapped;
-    }
-
-    // ---- Color-science conversion (§3.2.8.2) ----
-    void ConvertXYToHueSat(EndpointId ep, uint16_t x, uint16_t y, uint8_t & outHue, uint8_t & outSat) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertXYToHueSat(ep, x, y, outHue, outSat);
-    }
-    void ConvertHueSatToXY(EndpointId ep, uint8_t hue, uint8_t sat, uint16_t & outX, uint16_t & outY) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertHueSatToXY(ep, hue, sat, outX, outY);
-    }
-    void ConvertXYToMireds(EndpointId ep, uint16_t x, uint16_t y, uint16_t & outMireds) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertXYToMireds(ep, x, y, outMireds);
-    }
-    void ConvertMiredsToXY(EndpointId ep, uint16_t mireds, uint16_t & outX, uint16_t & outY) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertMiredsToXY(ep, mireds, outX, outY);
-    }
-    void ConvertHueSatToMireds(EndpointId ep, uint8_t hue, uint8_t sat, uint16_t & outMireds) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertHueSatToMireds(ep, hue, sat, outMireds);
-    }
-    void ConvertMiredsToHueSat(EndpointId ep, uint16_t mireds, uint8_t & outHue, uint8_t & outSat) override
-    {
-        if (mWrapped)
-            mWrapped->ConvertMiredsToHueSat(ep, mireds, outHue, outSat);
-    }
-
-    // ---- Hardware output ----
-    void OnColorXYChanged(EndpointId ep, uint16_t x, uint16_t y) override
-    {
-        if (mWrapped)
-            mWrapped->OnColorXYChanged(ep, x, y);
-    }
-    void OnColorHSChanged(EndpointId ep, uint8_t hue, uint8_t sat) override
-    {
-        if (mWrapped)
-            mWrapped->OnColorHSChanged(ep, hue, sat);
-    }
-    void OnColorCTChanged(EndpointId ep, uint16_t mireds) override
-    {
-        if (mWrapped)
-            mWrapped->OnColorCTChanged(ep, mireds);
-    }
-    void OnEnhancedHueChanged(EndpointId ep, uint16_t enhancedHue) override
-    {
-        if (mWrapped)
-            mWrapped->OnEnhancedHueChanged(ep, enhancedHue);
-    }
-
-private:
-    EndpointId mEndpoint            = kInvalidEndpointId;
-    ColorControlDelegate * mWrapped = nullptr;
-};
+// ColorControlCluster requires a non-null ColorControlDelegate&, and every base-class method is a no-op: the
+// color-science Convert* are never reached on a single-feature device (it cannot switch into a mode it does
+// not advertise), and hardware On*Changed are simply not delivered. So one stateless instance safely backs
+// every delegate-less endpoint. Applications that need conversions or hardware output register their own
+// delegate via SetDefaultDelegate BEFORE the cluster is constructed; the binding is fixed at construction and
+// is not repointable afterwards (no consumer needs that).
+ColorControlDelegate gDefaultColorControlDelegate;
 
 struct ClusterWithDelegate
 {
     ColorControlDelegate * userDelegate = nullptr;
-    ColorControlIntegrationDelegateWrapper integrationDelegateWrapper;
     LazyRegisteredServerCluster<ColorControlCluster> server;
 };
 
@@ -137,9 +66,12 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId, gClusters[clusterInstanceIndex].userDelegate);
+        // Bind the application delegate registered for this endpoint, or the shared no-op default if none.
+        ColorControlDelegate & delegate = (gClusters[clusterInstanceIndex].userDelegate != nullptr)
+            ? *gClusters[clusterInstanceIndex].userDelegate
+            : gDefaultColorControlDelegate;
 
-        ColorControlCluster::Config config(gClusters[clusterInstanceIndex].integrationDelegateWrapper);
+        ColorControlCluster::Config config(delegate);
         config.mFeatures.SetRaw(featureMap);
 
         // Color-temperature physical limits + couple-to-level minimum are Fixed (F) attributes whose ZAP
@@ -249,7 +181,6 @@ void SetDefaultDelegate(EndpointId endpoint, ColorControlDelegate * delegate)
     if (ep < kColorControlMaxClusterCount)
     {
         gClusters[ep].userDelegate = delegate;
-        gClusters[ep].integrationDelegateWrapper.Init(endpoint, delegate);
     }
 }
 
