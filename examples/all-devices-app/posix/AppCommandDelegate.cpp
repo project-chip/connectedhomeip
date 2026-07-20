@@ -325,13 +325,10 @@ public:
         }
         uint8_t stepMode       = static_cast<uint8_t>(json["StepMode"].asUInt());
         uint8_t stepSize       = static_cast<uint8_t>(json["StepSize"].asUInt());
-        uint8_t transitionTime = json.isMember("TransitionTime") && json["TransitionTime"].isUInt()
-            ? static_cast<uint8_t>(json["TransitionTime"].asUInt())
-            : 0;
         uint8_t optionsMask =
             json.isMember("OptionsMask") && json["OptionsMask"].isUInt() ? static_cast<uint8_t>(json["OptionsMask"].asUInt()) : 0;
 
-        SimulateBindingStep(endpointId, stepMode, stepSize, transitionTime, optionsMask);
+        SimulateBindingStep(endpointId, stepMode, stepSize, optionsMask);
         ChipLogProgress(AppServer, "SimulateBindingStep stepMode=%u stepSize=%u on endpoint %d", stepMode, stepSize, endpointId);
     }
 };

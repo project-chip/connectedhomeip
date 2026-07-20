@@ -190,7 +190,7 @@ void SimulateBindingMove(EndpointId endpointId, uint8_t moveMode, uint8_t rate, 
                                                                                        reinterpret_cast<void *>(packedArgs));
 }
 
-void SimulateBindingStep(EndpointId endpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTimeSec, uint8_t optionsMask)
+void SimulateBindingStep(EndpointId endpointId, uint8_t stepMode, uint8_t stepSize, uint8_t optionsMask)
 {
     uintptr_t packedArgs = kBindingLevelStepCommandId | (static_cast<uintptr_t>(stepMode) << 8) |
         (static_cast<uintptr_t>(stepSize) << 16) | (static_cast<uintptr_t>(optionsMask) << 24);

@@ -44,7 +44,7 @@ void SimulateBindingOnOff(EndpointId endpointId, bool on);
 void SimulateBindingToggle(EndpointId endpointId);
 void SimulateBindingMoveToLevel(EndpointId endpointId, uint8_t newLevel, uint8_t transitionTimeSec, uint8_t optionsMask);
 void SimulateBindingMove(EndpointId endpointId, uint8_t moveMode, uint8_t rate, uint8_t optionsMask);
-void SimulateBindingStep(EndpointId endpointId, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTimeSec, uint8_t optionsMask);
+void SimulateBindingStep(EndpointId endpointId, uint8_t stepMode, uint8_t stepSize, uint8_t optionsMask);
 void SimulateBindingStop(EndpointId endpointId);
 
 } // namespace chip::app
