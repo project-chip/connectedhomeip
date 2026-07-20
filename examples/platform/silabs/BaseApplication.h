@@ -42,13 +42,13 @@
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "demo-ui.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 /**********************************************************
  * Defines
@@ -132,7 +132,7 @@ public:
      */
     static void PostEvent(const AppEvent * event);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     /**
      * @brief Return LCD object
      */
@@ -159,7 +159,7 @@ public:
      * @param screen The screen to be displayed
      */
     static void PostUpdateDisplayEvent(SilabsLCD::Screen_e screen);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     /**
      * @brief Function called to start the LED light timer

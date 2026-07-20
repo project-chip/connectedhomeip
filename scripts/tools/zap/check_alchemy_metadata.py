@@ -62,7 +62,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -131,7 +130,7 @@ if _OVERLAP:
     )
 
 
-def _find_alchemy_comment(content: str) -> Optional[str]:
+def _find_alchemy_comment(content: str) -> str | None:
     """Return the Alchemy metadata comment block, or None if absent."""
     for m in _COMMENT_RE.finditer(content):
         if _MARKER_RE.search(m.group(1)):
@@ -139,7 +138,7 @@ def _find_alchemy_comment(content: str) -> Optional[str]:
     return None
 
 
-def _get_base_content(git_ref: str, repo_path: str, root: Path) -> Optional[str]:
+def _get_base_content(git_ref: str, repo_path: str, root: Path) -> str | None:
     """Retrieve file content at *git_ref* via ``git show``, or None."""
     try:
         result = subprocess.run(

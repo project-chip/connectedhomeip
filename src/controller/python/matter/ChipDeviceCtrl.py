@@ -73,10 +73,10 @@ AttributeReadRequest: typing.TypeAlias = (
     | ClusterAttribute.TypedAttributePath  # Directly specified attribute path
 )
 
-AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
+AttributeReadRequestList: typing.TypeAlias = list[AttributeReadRequest] | None
 
 # Type alias for subscription target specifications
-SubscriptionTargetList = list[tuple[int, ClusterObjects.Cluster | ClusterObjects.ClusterAttributeDescriptor]]
+SubscriptionTargetList: typing.TypeAlias = list[tuple[int, ClusterObjects.Cluster | ClusterObjects.ClusterAttributeDescriptor]]
 
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
@@ -159,20 +159,20 @@ class CommissioningParameters:
 
 @dataclass
 class NOCChain:
-    nocBytes: typing.Optional[bytes]
-    icacBytes: typing.Optional[bytes]
-    rcacBytes: typing.Optional[bytes]
-    ipkBytes: typing.Optional[bytes]
+    nocBytes: bytes | None
+    icacBytes: bytes | None
+    rcacBytes: bytes | None
+    ipkBytes: bytes | None
     adminSubject: int
 
 
 @dataclass
 class ICDRegistrationParameters:
-    symmetricKey: typing.Optional[bytes]
-    checkInNodeId: typing.Optional[int]
-    monitoredSubject: typing.Optional[int]
-    stayActiveMs: typing.Optional[int]
-    clientType: typing.Optional[Clusters.IcdManagement.Enums.ClientTypeEnum]
+    symmetricKey: bytes | None
+    checkInNodeId: int | None
+    monitoredSubject: int | None
+    stayActiveMs: int | None
+    clientType: Clusters.IcdManagement.Enums.ClientTypeEnum | None
 
     class CStruct(Structure):
         _fields_ = [('symmetricKey', c_char_p), ('symmetricKeyLength', c_size_t), ('checkInNodeId',
@@ -316,7 +316,7 @@ class CallbackContext:
         return self
 
     @property
-    def future(self) -> typing.Optional[concurrent.futures.Future]:
+    def future(self) -> concurrent.futures.Future | None:
         return self._future
 
     async def __aexit__(self, exc_type, exc_value, traceback):
@@ -1531,7 +1531,7 @@ class ChipDeviceControllerBase:
 
         return self._Cluster
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: typing.Optional[int] = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> typing.Optional[DeviceProxyWrapper]:
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: int | None = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> DeviceProxyWrapper | None:
         '''
         Find or establish a PASE session.
 
@@ -1564,7 +1564,7 @@ class ChipDeviceControllerBase:
 
         return None
 
-    def GetConnectedDeviceSync(self, nodeId: int, allowPASE=True, timeoutMs: typing.Optional[int] = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+    def GetConnectedDeviceSync(self, nodeId: int, allowPASE=True, timeoutMs: int | None = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
@@ -1637,7 +1637,7 @@ class ChipDeviceControllerBase:
         await WaitForCheckIn(ScopedNodeId(nodeId, self._fabricIndex), timeoutSeconds=timeoutSeconds)
         return await self.SendCommand(nodeId, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
-    async def GetConnectedDevice(self, nodeId: int, allowPASE: bool = True, timeoutMs: typing.Optional[int] = None,
+    async def GetConnectedDevice(self, nodeId: int, allowPASE: bool = True, timeoutMs: int | None = None,
                                  payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
@@ -1722,7 +1722,7 @@ class ChipDeviceControllerBase:
         return self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
 
-    def GetRemoteSessionParameters(self, nodeId: int) -> typing.Optional[SessionParameters]:
+    def GetRemoteSessionParameters(self, nodeId: int) -> SessionParameters | None:
         '''
         Returns the SessionParameters of reported by the remote node associated with `nodeId`.
         If there is some error in getting SessionParameters None is returned.
@@ -1751,10 +1751,10 @@ class ChipDeviceControllerBase:
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
 
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
-                                        timedRequestTimeoutMs: typing.Optional[int] = None,
-                                        interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                        suppressResponse: typing.Optional[bool] = None, remoteMaxPathsPerInvoke: typing.Optional[int] = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[list[int]] = None):
+                                        timedRequestTimeoutMs: int | None = None,
+                                        interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
+                                        suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
         '''
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
@@ -1840,7 +1840,7 @@ class ChipDeviceControllerBase:
                                                                     ],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
-                                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                                    interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                                                     payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         ONLY TO BE USED FOR TEST: Write attributes with decoupled Timed Request action and TimedRequest field.
@@ -1877,9 +1877,9 @@ class ChipDeviceControllerBase:
         return await future
 
     async def SendCommand(self, nodeId: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
-                          timedRequestTimeoutMs: typing.Optional[int] = None,
-                          interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                          suppressResponse: typing.Optional[bool] = None,
+                          timedRequestTimeoutMs: int | None = None,
+                          interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
+                          suppressResponse: bool | None = None,
                           payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
@@ -1922,9 +1922,9 @@ class ChipDeviceControllerBase:
         return await self._run_with_session_retry(nodeId, _send_impl)
 
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
-                                timedRequestTimeoutMs: typing.Optional[int] = None,
-                                interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                suppressResponse: typing.Optional[bool] = None,
+                                timedRequestTimeoutMs: int | None = None,
+                                interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
+                                suppressResponse: bool | None = None,
                                 payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
@@ -1964,7 +1964,7 @@ class ChipDeviceControllerBase:
 
         return await self._run_with_session_retry(nodeId, _batch_send_impl)
 
-    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Optional[int] = None):
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: int | None = None):
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future
         that can be awaited upon to get confirmation command was sent.
@@ -1989,8 +1989,8 @@ class ChipDeviceControllerBase:
                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor]
                                  | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                              ],
-                             timedRequestTimeoutMs: typing.Optional[int] = None,
-                             interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                             timedRequestTimeoutMs: int | None = None,
+                             interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Write a list of attributes on a target node.
@@ -2024,8 +2024,8 @@ class ChipDeviceControllerBase:
                                   tuple[int, ClusterObjects.ClusterAttributeDescriptor]
                                   | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                               ],
-                              timedRequestTimeoutMs: typing.Optional[int] = None,
-                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                              timedRequestTimeoutMs: int | None = None,
+                              interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
 
         self.CheckIsActive()
@@ -2048,8 +2048,8 @@ class ChipDeviceControllerBase:
                                                        tuple[int, ClusterObjects.ClusterAttributeDescriptor]
                                                        | tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                                                    ],
-                                                   timedRequestTimeoutMs: typing.Optional[int] = None,
-                                                   interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                   timedRequestTimeoutMs: int | None = None,
+                                                   interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Please see WriteAttribute for description.
@@ -2074,7 +2074,7 @@ class ChipDeviceControllerBase:
                                           forceLegacyListEncoding=True)
 
     def WriteGroupAttribute(
-            self, groupid: int, attributes: list[tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Optional[int] = None):
+            self, groupid: int, attributes: list[tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: int | None = None):
         '''
         Write a list of attributes on a target group.
 
@@ -2273,7 +2273,7 @@ class ChipDeviceControllerBase:
     async def Read(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[
+        attributes: list[
             None  # Empty tuple, all wildcard
             | tuple[int]  # Endpoint
             | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
@@ -2281,8 +2281,8 @@ class ChipDeviceControllerBase:
             | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
             | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
             | ClusterAttribute.AttributePath  # Directly specified attribute path
-        ]] = None,
-        dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[list[
+        ] | None = None,
+        dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None, events: list[
             None  # Empty tuple, all wildcard
             | tuple[str, int]  # all wildcard with urgency set
             | tuple[int, int]  # Endpoint
@@ -2290,9 +2290,9 @@ class ChipDeviceControllerBase:
             | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
             | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
             | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
-        ]] = None,
-        eventNumberFilter: typing.Optional[int] = None,
-        returnClusterObject: bool = False, reportInterval: typing.Optional[tuple[int, int]] = None,
+        ] | None = None,
+        eventNumberFilter: int | None = None,
+        returnClusterObject: bool = False, reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
     ):
@@ -2406,7 +2406,7 @@ class ChipDeviceControllerBase:
     async def ReadAttribute(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[
+        attributes: list[
             None  # Empty tuple, all wildcard
             | tuple[int]  # Endpoint
             | tuple[type[ClusterObjects.Cluster]]  # Wildcard endpoint, Cluster id present
@@ -2414,9 +2414,10 @@ class ChipDeviceControllerBase:
             | tuple[int, type[ClusterObjects.Cluster]]  # Wildcard attribute id
             | tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]]  # Concrete path
             | ClusterAttribute.AttributePath  # Directly specified attribute path
-        ]], dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None,
+        ] | None,
+        dataVersionFilters: list[tuple[int, type[ClusterObjects.Cluster], int]] | None = None,
         returnClusterObject: bool = False,
-        reportInterval: typing.Optional[tuple[int, int]] = None,
+        reportInterval: tuple[int, int] | None = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
     ):
@@ -2498,9 +2499,9 @@ class ChipDeviceControllerBase:
             | tuple[type[ClusterObjects.ClusterEvent], int]  # Wildcard endpoint, Cluster + Event present
             | tuple[int, type[ClusterObjects.Cluster], int]  # Wildcard event id
             | tuple[int, type[ClusterObjects.ClusterEvent], int]  # Concrete path
-        ], eventNumberFilter: typing.Optional[int] = None,
+        ], eventNumberFilter: int | None = None,
         fabricFiltered: bool = True,
-        reportInterval: typing.Optional[tuple[int, int]] = None,
+        reportInterval: tuple[int, int] | None = None,
         keepSubscriptions: bool = False,
         autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
@@ -2583,8 +2584,8 @@ class ChipDeviceControllerBase:
 
     def SetGroupKeySet(self, keyset_id: int, policy: int, num_keys: int,
                        epoch_key0: bytes, epoch_start_time0: int,
-                       epoch_key1: typing.Optional[bytes] = None, epoch_start_time1: int = 0,
-                       epoch_key2: typing.Optional[bytes] = None, epoch_start_time2: int = 0):
+                       epoch_key1: bytes | None = None, epoch_start_time1: int = 0,
+                       epoch_key2: bytes | None = None, epoch_start_time2: int = 0):
         '''
         Writes a GroupKeySet into the controller's GroupDataProvider for this fabric.
 
@@ -3078,7 +3079,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
                  paaTrustStorePath: str = "",
                  useTestCommissioner: bool = False,
                  name: str = '',
-                 keypair: typing.Optional[p256keypair.P256Keypair] = None):
+                 keypair: p256keypair.P256Keypair | None = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -3119,7 +3120,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> typing.Optional[FabricAdmin.FabricAdmin]:
+    def fabricAdmin(self) -> FabricAdmin.FabricAdmin | None:
         return self._fabricAdmin
 
     async def Commission(self, nodeId: int) -> int:
@@ -3612,7 +3613,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
-    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: str | None):
         '''
         Set the path to the device attestation revocation set JSON file.
 
@@ -3635,7 +3636,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
-                 icac: bytes | None, rcac: bytes, ipk: bytes | None, adminVendorId: int, name: typing.Optional[str] = None):
+                 icac: bytes | None, rcac: bytes, ipk: bytes | None, adminVendorId: int, name: str | None = None):
         '''
         Creates a controller without AutoCommissioner.
 
