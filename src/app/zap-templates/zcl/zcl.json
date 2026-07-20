@@ -292,6 +292,16 @@
             "StartUpColorTemperatureMireds",
             "ClusterRevision"
         ],
+        "Commissioning Proxy": [
+            "Transport",
+            "ScanMaxTime",
+            "MaxSessions",
+            "MaxCachedResults",
+            "NumCachedResults",
+            "CacheTimeout",
+            "CachedResults",
+            "WiFiBand"
+        ],
         "Commodity Price": [
             "TariffUnit",
             "Currency",
