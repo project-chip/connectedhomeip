@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -60,7 +60,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -72,7 +72,7 @@ jobs:
                 platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
+              uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
@@ -131,11 +131,41 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
+            # CodeQL analyze/filter/upload are inlined here (rather than in a composite
+            # action) so every github/codeql-action pin lives in one Dependabot directory
+            # scope, letting the pins bump together and stay consistent (see lint.yml check).
             - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
+              if: ${{ inputs.run-codeql }}
+              uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
               with:
-                language: cpp
+                  category: "/language:cpp"
+                  upload: False
+                  output: sarif-results
+            - name: Filter SARIF
+              if: ${{ inputs.run-codeql }}
+              uses: advanced-security/filter-sarif@2da736ff05ef065cb2894ac6892e47b5eac2c3c0 # v1.1
+              with:
+                  # Drop generated/third-party code and a couple of noisy checks.
+                  patterns: |
+                      -**/third_party/**
+                      -**/scripts/**
+                      -**/tests/**
+                      -**/*.cpp:cpp/trivial-switch
+                      -**/*.cpp:cpp/empty-block
+                  input: "sarif-results/cpp.sarif"
+                  output: "sarif-results/cpp.sarif"
+            - name: Upload SARIF
+              if: ${{ inputs.run-codeql }}
+              uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+              with:
+                  sarif_file: "sarif-results/cpp.sarif"
+            - name: Upload loc as a Build Artifact
+              if: ${{ inputs.run-codeql }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: sarif-results
+                  path: sarif-results
+                  retention-days: 1
             # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
             # having the job timeout.
             #
@@ -150,6 +180,11 @@ jobs:
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
@@ -157,7 +192,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -174,7 +209,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -191,7 +226,7 @@ jobs:
             # deactivate until a better workaround is found
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
+            #   uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
             #   with:
             #       languages: "cpp"
             - name: Setup and Build Simulated Device
@@ -303,13 +338,16 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
+            # Ensuring fuzztests build in compat mode
+            - name: Build pw_fuzzer FuzzTests in compat mode
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-ossfuzz build"
             # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
             # deactivate until a better solution is found
             # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
+            #   (if re-enabling, inline the analyze/Filter SARIF/upload-sarif steps used by the
+            #   linux build job above; the perform-codeql-analysis composite action was removed)
 
             - name: Uploading core files
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -333,6 +371,11 @@ jobs:
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_linux_python_lib:
         name: Build on Linux (python_lib)
 
@@ -340,7 +383,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -357,7 +400,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -374,7 +417,7 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install out/controller/python/matter*.whl
+                  python -m pip install out/obj/src/controller/python/matter-controller-wheels/*.whl
 
             - name: Run Python tests
               shell: bash
@@ -396,6 +439,11 @@ jobs:
             - name: Run revocation set generation tests
               run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
 
@@ -403,7 +451,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -420,7 +468,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -430,6 +478,11 @@ jobs:
               run: |
                   scripts/build_python_device.sh --chip_detail_logging true
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_darwin:
         name: Build on Darwin (clang, simulated)
         runs-on: namespace-profile-macos-26
@@ -437,7 +490,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -451,7 +504,7 @@ jobs:
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
+            #   uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
             #   with:
             #       languages: "cpp"
 
@@ -509,14 +562,17 @@ jobs:
 
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
+            #   (if re-enabling, inline the analyze/Filter SARIF/upload-sarif steps used by the
+            #   linux build job above; the perform-codeql-analysis composite action was removed)
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
 
@@ -532,13 +588,13 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -554,8 +610,13 @@ jobs:
                 apt-get update
                 apt-get install -y --no-install-recommends gnupg
             - name: Upload coverage reports to Codecov with GitHub Action
-              uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
               with:
                 fail_ci_if_error: true
               env:
                 CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

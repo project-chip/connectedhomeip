@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-from typing import Optional
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest
@@ -58,7 +57,7 @@ def warning_wrapper(override_flag: str):
     return warning_wrapper_internal
 
 
-class DefaultChecker():
+class DefaultChecker:
     @warning_wrapper(FLAG_PRODUCT_NAME)
     def check_default_product_name(self):
         cluster = Clusters.BasicInformation
@@ -98,7 +97,7 @@ class DefaultChecker():
             self.mark_current_step_skipped()
         return None
 
-    def _check_testing_cluster_presence(self, cluster: Clusters.ClusterObjects.Cluster) -> Optional[ProblemNotice]:
+    def _check_testing_cluster_presence(self, cluster: Clusters.ClusterObjects.Cluster) -> ProblemNotice | None:
         for endpoint_num, endpoint in self.endpoints.items():
             if cluster.id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]:
                 return _problem(ClusterPathLocation(endpoint_num, cluster.id), f"{cluster.__name__} cluster found on device.")

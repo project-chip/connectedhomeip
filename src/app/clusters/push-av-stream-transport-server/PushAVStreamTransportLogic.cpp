@@ -392,9 +392,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    // Check for video stream name length constraints
+    // Check for video stream list count constraint (spec: max 16)
     if (transportOptions.videoStreams.HasValue())
     {
+        size_t vsCount   = 0;
+        CHIP_ERROR vsErr = transportOptions.videoStreams.Value().ComputeSize(&vsCount);
+        VerifyOrReturnValue(vsErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, vsErr.Format()));
+        VerifyOrReturnValue(vsCount <= kMaxVideoStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(vsCount), static_cast<unsigned>(kMaxVideoStreams)));
+
         for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().videoStreamName;
@@ -407,9 +420,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         }
     }
 
-    // Check for audio stream name length constraints
+    // Check for audio stream list count constraint (spec: max 16)
     if (transportOptions.audioStreams.HasValue())
     {
+        size_t asCount   = 0;
+        CHIP_ERROR asErr = transportOptions.audioStreams.Value().ComputeSize(&asCount);
+        VerifyOrReturnValue(asErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, asErr.Format()));
+        VerifyOrReturnValue(asCount <= kMaxAudioStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(asCount), static_cast<unsigned>(kMaxAudioStreams)));
+
         for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().audioStreamName;
@@ -607,51 +633,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Duration field not within allowed range",
                                          mEndpointId));
 
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key constraint "
-                             "Error, actual length: %" PRIu32 " not "
-                             "equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
-        }
-
         if (!mFeatures.Has(Feature::kMetadata))
         {
             VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue(), Status::InvalidCommand,
                                 ChipLogError(Zcl,
                                              "Transport Options verification from command data[ep=%d]: Found CMAF Container "
                                              "Options MetadataEnabled which is not expected.",
-                                             mEndpointId));
-        }
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: Missing CMAF Container Options CENC Key ID ",
-                             mEndpointId));
-
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength,
-                Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key ID "
-                             "constraint Error, actual "
-                             "length: %" PRIu32 " not equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
-        }
-        else
-        {
-            VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                                ChipLogError(Zcl,
-                                             "Transport Options verification from command data[ep=%d]: Found CMAF Container "
-                                             "Options CENC Key ID which is not expected",
                                              mEndpointId));
         }
     }
@@ -830,7 +817,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddVideoStream(newVideoStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddVideoStream(newVideoStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add video stream", mEndpointId));
         }
 
         if (transportOptions.audioStreamID.HasValue())
@@ -872,7 +860,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddAudioStream(newAudioStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddAudioStream(newAudioStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add audio stream", mEndpointId));
         }
     }
 
@@ -1530,33 +1519,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Call the delegate
     status = mDelegate->ManuallyTriggerTransport(connectionID, activationReason, timeControl);
 
-    if (status == Status::Success)
-    {
-        // Get container type from transport configuration
-        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
-
-        // For CMAF container type, we need to provide CMAF session number
-        Optional<uint64_t> cmafSessionNumber;
-        if (containerType == ContainerFormatEnum::kCmaf)
-        {
-            uint64_t sessionNumber = 0;
-            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-            {
-                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-            }
-            else
-            {
-                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
-                             connectionID);
-                // Don't include the session number if we can't get it
-                cmafSessionNumber = Optional<uint64_t>();
-            }
-        }
-
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
-                                        containerType, cmafSessionNumber);
-    }
-
     handler.AddStatus(commandPath, status);
 
     return std::nullopt;
@@ -1688,10 +1650,10 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID      = connectionID;
-    event.triggerType       = triggerType;
-    event.activationReason  = activationReason;
-    event.containerType     = containerType;
+    event.connectionID     = connectionID;
+    event.triggerType      = triggerType;
+    event.activationReason = activationReason;
+    event.containerType.SetValue(containerType);
     event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1715,7 +1677,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
     if (transportConfig != nullptr)
     {
-        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+        event.containerType.SetValue(transportConfig->transportOptions.Value().containerOptions.containerType);
 
         // For CMAF container type, we need to provide CMAF session number
         if (event.containerType == ContainerFormatEnum::kCmaf)
@@ -1741,7 +1703,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     else
     {
         // Fallback values if transport config not found
-        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.containerType.SetValue(ContainerFormatEnum::kCmaf); // Default fallback
         event.CMAFSessionNumber = Optional<uint64_t>();
     }
 

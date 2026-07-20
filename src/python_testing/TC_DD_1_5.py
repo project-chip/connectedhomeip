@@ -32,6 +32,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_1_5(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_1_5(self) -> str:
         return "[TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT - Commissionee]"
 
@@ -99,7 +101,7 @@ class TC_DD_1_5(MatterBaseTest):
 
         reader.deactivate_tag_monitoring()
         nfc_tag_content = await monitoring_task
-        log.info(f"nfc_tag_content: {nfc_tag_content}")
+        log.info("nfc_tag_content: %s", nfc_tag_content)
         asserts.assert_true(reader.is_onboarding_data(nfc_tag_content), "No NFC tag with onboarding data found")
 
         ###########
@@ -126,7 +128,7 @@ class TC_DD_1_5(MatterBaseTest):
             asserts.assert_true(self.matter_test_config.qr_code_content,
                                 "This test needs to be run with qr_code param")
             qr_code_content = self.matter_test_config.qr_code_content[0]
-            log.info(f"qr_code_content: {qr_code_content}")
+            log.info("qr_code_content: %s", qr_code_content)
 
             asserts.assert_equal(
                 qr_code_content,

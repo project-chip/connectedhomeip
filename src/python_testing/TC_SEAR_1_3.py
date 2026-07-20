@@ -65,7 +65,7 @@ class TC_SEAR_1_3(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        log.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s", supported_areas)
 
         self.supported_areas = supported_areas
 
@@ -75,7 +75,7 @@ class TC_SEAR_1_3(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        log.info(f"SelectedAreas {selected_areas}")
+        log.info("SelectedAreas %s", selected_areas)
 
         return selected_areas
 

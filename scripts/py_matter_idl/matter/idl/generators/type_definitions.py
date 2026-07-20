@@ -15,7 +15,6 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
@@ -63,7 +62,7 @@ class BasicString:
     """
     idl_name: str
     is_binary: bool
-    max_length: Union[int, None] = None
+    max_length: int | None = None
 
 
 class FundamentalType(enum.Enum):
@@ -271,11 +270,11 @@ class TypeLookupContext:
 
     """
 
-    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+    def __init__(self, idl: matter_idl_types.Idl, cluster: matter_idl_types.Cluster | None):
         self.idl = idl
         self.cluster = cluster
 
-    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+    def find_enum(self, name) -> matter_idl_types.Enum | None:
         """
         Find the first enumeration matching the given name for the given
         lookup rules (searches cluster first, then global).
@@ -286,14 +285,14 @@ class TypeLookupContext:
 
         return None
 
-    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+    def find_struct(self, name) -> matter_idl_types.Struct | None:
         for s in self.all_structs:
             if s.name == name:
                 return s
 
         return None
 
-    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+    def find_bitmap(self, name) -> matter_idl_types.Bitmap | None:
         for s in self.all_bitmaps:
             if s.name == name:
                 return s
@@ -309,8 +308,7 @@ class TypeLookupContext:
         include a cluster, the enum list will be empty.
         """
         if self.cluster:
-            for e in self.cluster.enums:
-                yield e
+            yield from self.cluster.enums
 
     @property
     def all_bitmaps(self):
@@ -321,8 +319,7 @@ class TypeLookupContext:
         include a cluster, the bitmap list will be empty.
         """
         if self.cluster:
-            for b in self.cluster.bitmaps:
-                yield b
+            yield from self.cluster.bitmaps
 
     @property
     def all_structs(self):
@@ -332,8 +329,7 @@ class TypeLookupContext:
         include a cluster, the struct list will be empty.
         """
         if self.cluster:
-            for e in self.cluster.structs:
-                yield e
+            yield from self.cluster.structs
 
     def is_enum_type(self, name: str):
         """
@@ -369,7 +365,7 @@ class TypeLookupContext:
         return any(s.name == name for s in self.all_bitmaps)
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> BasicInteger | BasicString | FundamentalType | IdlType | IdlEnumType | IdlBitmapType:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.
@@ -434,7 +430,7 @@ def IsSignedDataType(data_type: DataType) -> bool:
     return sized_type.is_signed
 
 
-def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
+def GetDataTypeSizeInBits(data_type: DataType) -> int | None:
     """
     Returns the size in bits for a given data type or None if the data type can not be found.
     """

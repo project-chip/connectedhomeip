@@ -18,8 +18,6 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/CommandHandler.h>
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
@@ -36,6 +34,9 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 namespace {
 
 using namespace chip;
@@ -84,6 +85,43 @@ static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
 {
     static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
     return supportedStreamUsage;
+}
+
+static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate)
+{
+    CameraAVStreamManagementCluster::InitArguments args{
+        .delegate   = delegate,
+        .endpointId = kTestEndpointId,
+        .features   = chip::BitFlags<CameraAvStreamManagement::Feature>(
+            CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
+            CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
+            CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
+            CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
+            CameraAvStreamManagement::Feature::kNightVision),
+        .optionalAttrs = chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
+            CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
+            CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
+            CameraAvStreamManagement::OptionalAttribute::kImageRotation,
+            CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
+            CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
+            CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
+            CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
+        .maxConcurrentEncoders        = 1,
+        .maxEncodedPixelRate          = 248832000 /*1920*1080*120 */,
+        .videoSensorParams            = GetVideoSensorParams(),
+        .nightVisionUsesInfrared      = false,
+        .minViewPort                  = { 640, 480 },
+        .rateDistortionTradeOffPoints = GetRateDistortionTradeOffPoints(),
+        .maxContentBufferSize         = 4096,
+        .microphoneCapabilities       = GetAudioCapabilities(),
+        .spkrCapabilities             = GetAudioCapabilities(),
+        .twoWayTalkSupport            = TwoWayTalkSupportTypeEnum::kFullDuplex,
+        .snapshotCapabilities         = GetSnapshotCapabilities(),
+        .maxNetworkBandwidth          = 128000000,
+        .supportedStreamUsages        = GetSupportedStreamUsages(),
+        .streamUsagePriorities        = GetSupportedStreamUsages()
+    };
+    return args;
 }
 
 // Mock delegate for testing CameraAVStreamManagement
@@ -280,32 +318,12 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     }
 
     TestCameraAVStreamManagementCluster() :
-        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(CameraAvStreamManagement::CameraAVStreamManagementCluster::Context{ mPersistenceProvider }, mMockDelegate,
-                kTestEndpointId,
-                chip::BitFlags<CameraAvStreamManagement::Feature>(
-                    CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
-                    CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
-                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
-                    CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
-                    CameraAvStreamManagement::Feature::kNightVision),
-                chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-                    CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-                    CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-                1, 248832000 /*1920*1080*120 */, GetVideoSensorParams(), false, { 640, 480 }, GetRateDistortionTradeOffPoints(),
-                4096, GetAudioCapabilities(), GetAudioCapabilities(), TwoWayTalkSupportTypeEnum::kFullDuplex,
-                GetSnapshotCapabilities(), 128000000, GetSupportedStreamUsages(), GetSupportedStreamUsages()),
+        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams), mServer(MakeInitArguments(mMockDelegate)),
         mClusterTester(mServer)
     {}
 
     void SetUp() override
     {
-        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
@@ -315,7 +333,6 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
     MockCameraAVStreamManagementDelegate mMockDelegate;
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
 };
@@ -1726,6 +1743,187 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
 
     // Non-existent ID
     EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
+{
+    // 1. Prepare data with non-zero referenceCount
+    VideoStreamStruct stream{};
+    stream.videoStreamID  = 1;
+    stream.referenceCount = 5; // Non-zero
+
+    uint8_t buffer[kMaxAllocatedVideoStreamsSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    size_t len = writer.GetLengthWritten();
+
+    // 2. Write to persistence
+    ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(path, ByteSpan(buffer, len)),
+              CHIP_NO_ERROR);
+
+    // 3. Simulate a reboot: Startup() re-establishes the cluster context, Init() reloads
+    //    persistent attributes (resetting refCounts) and validates feature configuration.
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    // 4. Verify in-memory state has reset refCount
+    Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+
+    auto it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, 0);
+}
+
+// ---------------------------------------------------------------------------
+// Migration tests for MigrationCameraAVStreamManagementCluster
+// ---------------------------------------------------------------------------
+
+struct TestCodegenCameraAVStreamManagementMigration : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    TestCodegenCameraAVStreamManagementMigration() :
+        mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams), mServer(MakeInitArguments(mMockDelegate)),
+        mClusterTester(mServer)
+    {}
+
+    void SetUp() override
+    {
+        mOldSafePersistence = app::GetSafeAttributePersistenceProvider();
+        ASSERT_EQ(mSafePersistence.Init(&mClusterTester.GetTestContext().StorageDelegate()), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mSafePersistence);
+    }
+
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(mOldSafePersistence);
+        if (mServerStarted)
+        {
+            mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+        }
+    }
+
+    void StartServer()
+    {
+        ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        mServerStarted = true;
+        ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    }
+
+    template <typename T>
+    void WriteSafeScalar(AttributeId attrId, T value)
+    {
+        ASSERT_EQ(
+            mSafePersistence.WriteScalarValue(ConcreteAttributePath(kTestEndpointId, CameraAvStreamManagement::Id, attrId), value),
+            CHIP_NO_ERROR);
+    }
+
+    std::vector<VideoStreamStruct> mVideoStreams;
+    std::vector<AudioStreamStruct> mAudioStreams;
+    std::vector<SnapshotStreamStruct> mSnapshotStreams;
+    MockCameraAVStreamManagementDelegate mMockDelegate;
+    MigrationCameraAVStreamManagementCluster mServer;
+    ClusterTester mClusterTester;
+    app::DefaultSafeAttributePersistenceProvider mSafePersistence;
+    app::SafeAttributePersistenceProvider * mOldSafePersistence = nullptr;
+    bool mServerStarted                                         = false;
+};
+
+// Verify that a bool attribute written to the safe provider is migrated correctly.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, MigratesBoolScalar)
+{
+    WriteSafeScalar(Attributes::HDRModeEnabled::Id, true);
+    StartServer();
+
+    bool hdrModeEnabled = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_TRUE(hdrModeEnabled);
+}
+
+// Verify that a uint8 attribute written to the safe provider is migrated correctly.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, MigratesUint8Scalar)
+{
+    WriteSafeScalar(Attributes::SpeakerVolumeLevel::Id, static_cast<uint8_t>(5));
+    StartServer();
+
+    uint8_t speakerVolumeLevel = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SpeakerVolumeLevel::Id, speakerVolumeLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(speakerVolumeLevel, static_cast<uint8_t>(5));
+}
+
+// Verify that a uint16 attribute written to the safe provider is migrated correctly.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, MigratesUint16Scalar)
+{
+    WriteSafeScalar(Attributes::ImageRotation::Id, static_cast<uint16_t>(90));
+    StartServer();
+
+    uint16_t imageRotation = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ImageRotation::Id, imageRotation), CHIP_NO_ERROR);
+    EXPECT_EQ(imageRotation, static_cast<uint16_t>(90));
+}
+
+// Verify that an enum8 attribute stored as uint8 is migrated correctly.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, MigratesEnumAsUint8)
+{
+    WriteSafeScalar(Attributes::NightVision::Id, static_cast<uint8_t>(to_underlying(TriStateAutoEnum::kOn)));
+    StartServer();
+
+    TriStateAutoEnum nightVision = TriStateAutoEnum::kOff;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::NightVision::Id, nightVision), CHIP_NO_ERROR);
+    EXPECT_EQ(nightVision, TriStateAutoEnum::kOn);
+}
+
+// Verify that when no data is in the safe provider the cluster starts up with default values.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, NoDataStartsWithDefaults)
+{
+    StartServer();
+
+    bool hdrModeEnabled = true;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_FALSE(hdrModeEnabled); // Default is false
+}
+
+// Verify that after a successful migration the key is removed from the safe provider.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, OldDataDeletedAfterMigration)
+{
+    WriteSafeScalar(Attributes::HDRModeEnabled::Id, true);
+    StartServer();
+
+    uint8_t dummy = 0;
+    MutableByteSpan span(&dummy, sizeof(dummy));
+    EXPECT_EQ(mSafePersistence.SafeReadValue(
+                  ConcreteAttributePath(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::HDRModeEnabled::Id), span),
+              CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+
+// Verify that a value already present in the new provider is not overwritten during migration.
+TEST_F(TestCodegenCameraAVStreamManagementMigration, ExistingNewValueNotOverwritten)
+{
+    // Pre-populate the attribute persistence provider with the value we want preserved.
+    constexpr bool kExistingValue = false;
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().WriteValue(
+                  ConcreteAttributePath(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::HDRModeEnabled::Id),
+                  ByteSpan(reinterpret_cast<const uint8_t *>(&kExistingValue), sizeof(kExistingValue))),
+              CHIP_NO_ERROR);
+
+    // Write a different value to the safe provider.
+    WriteSafeScalar(Attributes::HDRModeEnabled::Id, true);
+    StartServer();
+
+    // Migration must not overwrite the already-present new-provider value.
+    bool hdrModeEnabled = true;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::HDRModeEnabled::Id, hdrModeEnabled), CHIP_NO_ERROR);
+    EXPECT_FALSE(hdrModeEnabled);
 }
 
 } // namespace

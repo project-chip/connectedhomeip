@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -67,14 +69,14 @@ class Cyw30739Board(Enum):
 class Cyw30739Builder(GnBuilder):
     def __init__(
         self,
-        root,
-        runner,
+        root: str,
+        runner: Runner,
+        output_dir_lock: OutDirLock,
         app: Cyw30739App = Cyw30739App.LIGHT,
         board: Cyw30739Board = Cyw30739Board.CYW30739B2_P5_EVK_01,
         release: bool = False,
     ):
-        super(Cyw30739Builder, self).__init__(
-            root=app.BuildRoot(root), runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.release = release
@@ -98,6 +100,7 @@ class Cyw30739Builder(GnBuilder):
             args.append('is_debug=false')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["elf"]
         if self.options.enable_link_map_file:

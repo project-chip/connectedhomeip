@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_LVL_9_1(MatterBaseTest):
@@ -219,3 +219,7 @@ class TC_LVL_9_1(MatterBaseTest):
 
         self.step("6b")
         await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentLevel, min_level, min_level)])
+
+
+if __name__ == "__main__":
+    default_matter_test_main()

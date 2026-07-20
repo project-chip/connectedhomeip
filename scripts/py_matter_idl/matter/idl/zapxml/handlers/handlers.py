@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
                                          EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
@@ -87,6 +87,9 @@ class EventHandler(BaseHandler):
 
         if attrs.get('isFabricSensitive', "false").lower() == 'true':
             self._event.qualities |= EventQuality.FABRIC_SENSITIVE
+
+        if attrs.get('optional', "false").lower() == 'true':
+            self._event.qualities |= EventQuality.OPTIONAL
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
@@ -428,6 +431,9 @@ class CommandHandler(BaseHandler):
             if attrs.get('mustUseTimedInvoke', 'false') == 'true':
                 self._command.qualities |= CommandQuality.TIMED_INVOKE
 
+            if attrs.get('optional', 'false').lower() == 'true':
+                self._command.qualities |= CommandQuality.OPTIONAL
+
         else:
             self._struct.tag = StructTag.RESPONSE
             self._struct.code = ParseInt(attrs['code'])
@@ -522,7 +528,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
 class ClusterHandler(BaseHandler):
     """Handles /configurator/cluster elements."""
 
-    def __init__(self, context: Context, idl: Optional[Idl]):
+    def __init__(self, context: Context, idl: Idl | None):
         super().__init__(context)
         self._cluster = Cluster(
             name="NAME-MISSING",

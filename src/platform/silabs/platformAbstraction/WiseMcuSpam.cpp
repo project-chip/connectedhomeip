@@ -141,12 +141,9 @@ int soc_pll_config(void)
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
-SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    mButtonCallback = nullptr;
-
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
     soc_pll_config();
@@ -232,6 +229,7 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
 #if SL_ICD_ENABLED
@@ -243,7 +241,7 @@ extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         // if the btn was not pressed and only a release event came, ignore it
         // if the btn was already pressed and another press event came, ignore it
         // essentially, if both of them are in the same state then ignore it.
-        VerifyOrReturn(btnAction != GetPlatform().GetButtonState(SL_BUTTON_BTN0_NUMBER));
+        VerifyOrReturn(btnAction != sButtonStates[SL_BUTTON_BTN0_NUMBER]);
     }
 #endif // SL_ICD_ENABLED
     VerifyOrReturn(GetPlatform().mButtonCallback != nullptr);
@@ -325,7 +323,7 @@ void SilabsPlatform::SleepButtonActionHandler()
 {
     const uint8_t btnAction = (sl_si91x_gpio_get_uulp_npss_pin(SL_BUTTON_BTN0_PIN) == LOW) ? BUTTON_PRESSED : BUTTON_RELEASED;
     // If the button state is the same as the last state, return
-    VerifyOrReturn(btnAction != GetButtonState(SL_BUTTON_BTN0_NUMBER));
+    VerifyOrReturn(btnAction != sButtonStates[SL_BUTTON_BTN0_NUMBER]);
     if (btnAction == BUTTON_PRESSED)
     {
 #if SL_MATTER_GN_BUILD == 0
@@ -335,11 +333,6 @@ void SilabsPlatform::SleepButtonActionHandler()
     sl_button_on_change(SL_BUTTON_BTN0_NUMBER, btnAction);
 }
 #endif // SL_ICD_ENABLED
-#else
-uint8_t SilabsPlatform::GetButtonState(uint8_t button)
-{
-    return 0;
-}
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 void SilabsPlatform::SoftwareReset()

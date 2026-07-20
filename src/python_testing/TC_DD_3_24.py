@@ -29,6 +29,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_3_24(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_3_24(self) -> str:
         return "[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"
 
@@ -55,9 +57,7 @@ class TC_DD_3_24(MatterBaseTest):
             if isinstance(stage, bytes):
                 stage = stage.decode("utf-8", errors="replace")
 
-            log.info(
-                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-            )
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
 
             self.commissionee_node_id = node_id
 
@@ -87,7 +87,6 @@ class TC_DD_3_24(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info(f"NFC Tag data : '{nfc_tag_data}'")
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"
@@ -112,7 +111,8 @@ class TC_DD_3_24(MatterBaseTest):
                  getattr(self, "default_controller", None),
                  hex(id(self.default_controller)) if hasattr(self, "default_controller") else "N/A")
 
-        commissioning_success = await self.commission_devices()
+        # Force a commissioning over NTL
+        commissioning_success = await self.commission_ntl_device(payload)
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
@@ -127,7 +127,7 @@ class TC_DD_3_24(MatterBaseTest):
             "commissionee_node_id was not set before calling ContinueCommissioningAfterConnectNetworkRequest"
         )
 
-        log.info(f"commissionee_node_id : 0x{self.commissionee_node_id:X}")
+        log.info("commissionee_node_id : 0x%X", self.commissionee_node_id)
 
         effective_node_id = await self.default_controller.ContinueCommissioningAfterConnectNetworkRequest(
             self.commissionee_node_id

@@ -19,6 +19,7 @@
 #include <WindowApp.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 
 #include <lib/support/CodeUtils.h>
@@ -309,27 +310,27 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
         cover->TiltGoToTarget();
         break;
     /* RO OperationalStatus */
-    case Attributes::OperationalStatus::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::OperationalStatus::Id: {
+        chip::DeviceLayer::StackLock lock;
         opStatus = OperationalStatusGet(endpoint);
         OperationalStatusPrint(opStatus);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
+    }
     /* RW Mode */
-    case Attributes::Mode::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::Mode::Id: {
+        chip::DeviceLayer::StackLock lock;
         mode = ModeGet(endpoint);
         ModePrint(mode);
-        ModeSet(endpoint, mode); // refilter mode if needed
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        ModeSet(endpoint, mode);
         break;
+    }
     /* RO ConfigStatus: set by WC server */
-    case Attributes::ConfigStatus::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::ConfigStatus::Id: {
+        chip::DeviceLayer::StackLock lock;
         configStatus = ConfigStatusGet(endpoint);
         ConfigStatusPrint(configStatus);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
+    }
     /* ### ATTRIBUTEs CHANGEs IGNORED ### */
     /* RO Type: not supposed to dynamically change */
     case Attributes::Type::Id:
@@ -454,21 +455,23 @@ void WindowApp::Cover::Finish()
 
 void WindowApp::Cover::LiftStepToward(OperationalState direction)
 {
-    Protocols::InteractionModel::Status status;
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
+        current = wc->GetCurrentPositionLiftPercent100ths();
+    }
 
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
     }
     else
     {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        percent100ths = kWcPercent100thsMiddle; // set at middle by default
     }
 
     LiftSchedulePositionSet(percent100ths);
@@ -477,15 +480,17 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
 void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
     NPercent100ths current, target;
+    OperationalState opState;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
 
-    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-
-    OperationalState opState = ComputeOperationalState(target, current);
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        target  = wc->GetTargetPositionLiftPercent100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
+        opState = ComputeOperationalState(target, current);
+    }
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -518,21 +523,23 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 
 void WindowApp::Cover::TiltStepToward(OperationalState direction)
 {
-    Protocols::InteractionModel::Status status;
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
+        current = wc->GetCurrentPositionTiltPercent100ths();
+    }
 
-    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
     }
     else
     {
-        percent100ths = WC_PERCENT100THS_MIDDLE; // set at middle by default
+        percent100ths = kWcPercent100thsMiddle; // set at middle by default
     }
 
     TiltSchedulePositionSet(percent100ths);
@@ -541,15 +548,17 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
 void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
     NPercent100ths current, target;
+    OperationalState opState;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
 
-    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-
-    OperationalState opState = ComputeOperationalState(target, current);
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        target  = wc->GetTargetPositionTiltPercent100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
+        opState = ComputeOperationalState(target, current);
+    }
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -594,40 +603,36 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
 
 void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
 {
-    Protocols::InteractionModel::Status status;
+    chip::DeviceLayer::StackLock lock;
+    auto wc = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current;
     chip::Percent100ths target;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
     if (isTilt)
     {
-        status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionTiltPercent100ths();
+        if (!current.IsNull())
         {
-
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
-            (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionTiltPercent100ths(DataModel::MakeNullable(target));
         }
     }
     else
     {
-        status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
+        current = wc->GetCurrentPositionLiftPercent100ths();
+        if (!current.IsNull())
         {
-
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
-            (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
+            wc->SetTargetPositionLiftPercent100ths(DataModel::MakeNullable(target));
         }
     }
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 Type WindowApp::Cover::CycleType()
 {
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::DeviceLayer::StackLock lock;
     Type type = TypeGet(mEndpoint);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     switch (type)
     {
@@ -646,9 +651,7 @@ Type WindowApp::Cover::CycleType()
         type = Type::kTiltBlindLiftAndTilt;
     }
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
     TypeSet(mEndpoint, type);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return type;
 }

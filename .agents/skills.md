@@ -12,6 +12,45 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Triggers**: Automatically activates when reviewing files ending in
     `_test.py` or located in `src/python_testing`.
 
+### ZAP XML Generation (Alchemy)
+
+-   **Location**: `.agents/skills/zap-xml-generation/`
+-   **Purpose**: Guidance and command patterns for generating and updating ZAP
+    template XMLs from Matter specification AsciiDoc files
+    (`connectedhomeip-spec`) to the Matter SDK (`connectedhomeip`) using the
+    Alchemy CLI (`alchemy zap`).
+-   **Triggers**: Automatically activates when modifying or generating ZAP XML
+    artifacts (`src/app/zap-templates/zcl/data-model/chip/*-cluster.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/device-types.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/namespaces.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/global-structs.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/global-enums.xml`), handling
+    `#ifdef` guarded spec attributes, or synchronizing spec-to-SDK data models.
+
+### GitHub PR Description Writer
+
+-   **Location**: `.agents/skills/github-pr-description-writer/`
+-   **Purpose**: Guidelines for generating clear, concise, and objective GitHub
+    Pull Request descriptions.
+-   **Triggers**: Use when preparing or writing descriptions for pull requests.
+
+### Podman VSCode Build
+
+-   **Location**: `.agents/skills/podman-vscode-build/`
+-   **Purpose**: Guidelines for building and testing Matter examples using
+    Podman with the official vscode build image in a non-interactive
+    environment.
+-   **Triggers**: Use when running builds or tests inside a Podman container,
+    especially when targeting embedded or cross-compiled platforms.
+
+### GitHub Action Failure Investigation
+
+-   **Location**: `.agents/skills/github-action-failure-investigation/`
+-   **Purpose**: Guidelines for fetching, downloading, and analyzing failed
+    GitHub Actions runs, including raw logs, packet captures, and detecting
+    runner freezes.
+-   **Triggers**: Use when investigating a failed GitHub Actions run or job.
+
 ## Using Skills
 
 AI agents will automatically discover and load these skills when they are
