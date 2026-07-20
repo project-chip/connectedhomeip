@@ -397,6 +397,7 @@ void CommandSender::Close()
 {
     mSuppressResponse = false;
     mTimedRequest     = false;
+    mDelayReportData  = std::nullopt;
     MoveToState(State::AwaitingDestruction);
     OnDoneCallback();
 }

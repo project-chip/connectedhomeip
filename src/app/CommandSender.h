@@ -681,7 +681,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
-    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
+    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData = std::nullopt;
 };
 
 } // namespace app
