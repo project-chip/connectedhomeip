@@ -613,7 +613,6 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
 
 } // namespace OnOff
 
-
 namespace UnitTesting {
 
 Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath,
@@ -871,7 +870,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::OnOff::Id:
         errorStatus = Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-
     case Clusters::UnitTesting::Id:
         errorStatus = Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
