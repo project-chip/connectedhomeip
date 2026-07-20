@@ -54,7 +54,11 @@ void BoundDeviceChangedHandler(const Binding::TableEntry & binding, OperationalD
     auto SendCommand = [&](auto & commandObj) {
         if (binding.type == Binding::MATTER_UNICAST_BINDING)
         {
-            VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+            if (peer_device == nullptr || !peer_device->ConnectionReady() || !peer_device->GetSecureSession().HasValue())
+            {
+                ChipLogError(AppServer, "Peer device connection or session is not ready");
+                return;
+            }
             TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
                                                                       peer_device->GetSecureSession().Value(), binding.remote,
                                                                       commandObj, onSuccess, onFailure);
@@ -140,6 +144,13 @@ void InitBindingHandlerInternal(intptr_t arg)
 
 CHIP_ERROR InitBindingHandler()
 {
+    static bool sBindingHandlerInitialized = false;
+    if (sBindingHandlerInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+    sBindingHandlerInitialized = true;
+
     // The server instance needs to be initialized before the binding handler. This is why
     // we schedule the init of the binding handler to be run later, once the neccessary values
     // can be fetched from the server.
