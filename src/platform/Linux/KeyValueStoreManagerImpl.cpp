@@ -29,12 +29,18 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/Linux/PosixConfig.h>
+
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
+
+DeviceLayer::Internal::ChipLinuxStorage * ChipLinuxStorageDelegate() {
+    return DeviceLayer::Internal::PosixConfig::GetStorageForNamespace(DeviceLayer::Internal::PosixConfig::kConfigKey_KVS);
+}
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
@@ -109,6 +115,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 exit:
     return err;
 }
+
+CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * file) { 
+    return ChipLinuxStorageDelegate()->Init(file); 
+}
+
+
+
+
+
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer
