@@ -323,8 +323,8 @@ public:
             ChipLogError(AppServer, "Invalid SimulateBindingStep command: missing 'StepMode' or 'StepSize' field");
             return;
         }
-        uint8_t stepMode       = static_cast<uint8_t>(json["StepMode"].asUInt());
-        uint8_t stepSize       = static_cast<uint8_t>(json["StepSize"].asUInt());
+        uint8_t stepMode = static_cast<uint8_t>(json["StepMode"].asUInt());
+        uint8_t stepSize = static_cast<uint8_t>(json["StepSize"].asUInt());
         uint8_t optionsMask =
             json.isMember("OptionsMask") && json["OptionsMask"].isUInt() ? static_cast<uint8_t>(json["OptionsMask"].asUInt()) : 0;
 
