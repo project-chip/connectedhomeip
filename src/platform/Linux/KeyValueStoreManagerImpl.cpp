@@ -31,14 +31,14 @@
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/Linux/PosixConfig.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-DeviceLayer::Internal::ChipLinuxStorage * ChipLinuxStorageDelegate() {
+DeviceLayer::Internal::ChipLinuxStorage * ChipLinuxStorageDelegate()
+{
     return DeviceLayer::Internal::PosixConfig::GetStorageForNamespace(DeviceLayer::Internal::PosixConfig::kConfigKey_KVS);
 }
 
@@ -116,14 +116,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * file) { 
-    return ChipLinuxStorageDelegate()->Init(file); 
+CHIP_ERROR KeyValueStoreManagerImpl::Init(const char * file)
+{
+    return ChipLinuxStorageDelegate()->Init(file);
 }
-
-
-
-
-
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer

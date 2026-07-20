@@ -43,7 +43,6 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
