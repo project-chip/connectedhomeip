@@ -228,7 +228,10 @@
         "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER": ["mode-base-server"],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
-        "DISHWASHER_ALARM_CLUSTER": ["alarm-base-server", "dishwasher-alarm-server"],
+        "DISHWASHER_ALARM_CLUSTER": [
+            "alarm-base-server",
+            "dishwasher-alarm-server"
+        ],
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "DYNAMIC_LIGHTING_CLUSTER": ["dynamic-lighting-server"],
         "ELECTRICAL_ALARM_CLUSTER": [],
@@ -338,7 +341,10 @@
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "REFRIGERATOR_ALARM_CLUSTER": ["alarm-base-server", "refrigerator-alarm-server"],
+        "REFRIGERATOR_ALARM_CLUSTER": [
+            "alarm-base-server",
+            "refrigerator-alarm-server"
+        ],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
             "mode-base-server"
         ],
