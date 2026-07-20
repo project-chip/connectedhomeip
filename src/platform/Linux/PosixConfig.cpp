@@ -56,10 +56,6 @@ static ChipLinuxStorage gChipLinuxCountersStorage;
 const char PosixConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
 const char PosixConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char PosixConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
-const char PosixConfig::kConfigNamespace_ChipKVS[]      = "chip-kvs";
-
-// Keys stored in the Chip-KVS namespace
-const PosixConfig::Key PosixConfig::kConfigKey_KVS = { kConfigNamespace_ChipKVS, "default" };
 
 // Keys stored in the Chip-factory namespace
 const PosixConfig::Key PosixConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
@@ -98,9 +94,6 @@ const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfi
 
 ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 {
-    if (strcmp(key.Namespace, kConfigNamespace_ChipKVS) == 0)
-        return &gChipLinuxDataStorage;
-
     if (strcmp(key.Namespace, kConfigNamespace_ChipFactory) == 0)
         return &gChipLinuxFactoryStorage;
 
