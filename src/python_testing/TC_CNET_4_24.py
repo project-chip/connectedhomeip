@@ -118,7 +118,7 @@ def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn) -> bytes:
                 )
 
             result[value_start:value_end] = modified_value
-            logger.info(f" --- Modified TLV type 0x{tlv_type:02x} ({current_length} bytes)")
+            logger.info(" --- Modified TLV type 0x%02x (%d bytes)", tlv_type, current_length)
             return bytes(result)
 
         i += 2 + current_length
@@ -200,7 +200,7 @@ class TC_CNET_4_24(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus)
-        logger.info(f" --- LastNetworkingStatus = {status}")
+        logger.info(" --- LastNetworkingStatus = %s", status)
         if expected_status is not None:
             asserts.assert_equal(status, expected_status,
                                  f"Expected {expected_status}, got {status}")
@@ -286,18 +286,18 @@ class TC_CNET_4_24(MatterBaseTest):
                     break
         if correct_thread_dataset is None:
             asserts.fail("Thread operational dataset must be provided via --thread-dataset-hex <dataset_hex>.")
-        logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
+        logger.info(" --- Correct Thread operational dataset: %s", correct_thread_dataset.hex())
 
         # Create incorrect datasets
         incorrect_thread_dataset_1 = modify_thread_tlv(
             correct_thread_dataset, EXTENDED_PAN_ID_TLV_TYPE,
             lambda v: bytes(b ^ 0xAA for b in v))
-        logger.info(f" --- Incorrect dataset 1 (modified Extended PAN ID): {incorrect_thread_dataset_1.hex()}")
+        logger.info(" --- Incorrect dataset 1 (modified Extended PAN ID): %s", incorrect_thread_dataset_1.hex())
 
         incorrect_thread_dataset_2 = modify_thread_tlv(
             correct_thread_dataset, NETWORK_KEY_TLV_TYPE,
             lambda v: bytes(b ^ 0xCC for b in v))
-        logger.info(f" --- Incorrect dataset 2 (modified Network Key): {incorrect_thread_dataset_2.hex()}")
+        logger.info(" --- Incorrect dataset 2 (modified Network Key): %s", incorrect_thread_dataset_2.hex())
 
         # Step 0: Establish PASE session over BLE
         self.step(0)
@@ -326,9 +326,9 @@ class TC_CNET_4_24(MatterBaseTest):
                 node_id=self.dut_node_id,
                 endpoint=endpoint,
                 attribute=cgen.Attributes.SupportsConcurrentConnection)
-            logger.info(f" --- SupportsConcurrentConnection = {supports_concurrent}")
+            logger.info(" --- SupportsConcurrentConnection = %s", supports_concurrent)
         except Exception as e:
-            logger.warning(f" --- Could not read SupportsConcurrentConnection: {e}")
+            logger.warning(" --- Could not read SupportsConcurrentConnection: %s", e)
 
         # Arm fail-safe for 300 seconds
         logger.info(" --- Arming fail-safe to 300 seconds")
@@ -343,22 +343,22 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(1)
 
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Found {len(networks)} network(s) configured")
+        logger.info(" --- Found %d network(s) configured", len(networks))
         for network in networks:
             network_id = network.networkID
-            logger.info(f" --- Removing network with Extended PAN ID: {network_id.hex()}")
+            logger.info(" --- Removing network with Extended PAN ID: %s", network_id.hex())
             remove_response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.RemoveNetwork(networkID=network_id, breadcrumb=1))
             await self._validate_network_config_response(remove_response)
-            logger.info(f" --- Network removed successfully (Extended PAN ID: {network_id.hex()})")
+            logger.info(" --- Network removed successfully (Extended PAN ID: %s)", network_id.hex())
 
         networks_after = await self._read_networks(endpoint)
         asserts.assert_equal(len(networks_after), 0,
                              f"Expected empty network list, but found {len(networks_after)} network(s)")
         logger.info(" --- All networks successfully removed.")
 
-        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY}s for device to update status...")
+        logger.info(" --- Waiting %ss for device to update status...", NETWORK_STATUS_UPDATE_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Verify LastNetworkingStatus and LastConnectErrorValue are Null
@@ -368,8 +368,8 @@ class TC_CNET_4_24(MatterBaseTest):
         last_connect_error = await self.read_single_attribute(
             dev_ctrl=self.default_controller, node_id=self.dut_node_id,
             endpoint=endpoint, attribute=cnet.Attributes.LastConnectErrorValue)
-        logger.info(f" --- LastNetworkingStatus: {last_networking_status}")
-        logger.info(f" --- LastConnectErrorValue: {last_connect_error}")
+        logger.info(" --- LastNetworkingStatus: %s", last_networking_status)
+        logger.info(" --- LastConnectErrorValue: %s", last_connect_error)
 
         asserts.assert_is(last_networking_status, NullValue,
                           f"Expected LastNetworkingStatus to be Null, got {last_networking_status}")
@@ -389,7 +389,7 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(3)
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1,
                                       tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(f" --- Sending ConnectNetwork with incorrect Extended PAN ID: {network_id_1.hex()}")
+        logger.info(" --- Sending ConnectNetwork with incorrect Extended PAN ID: %s", network_id_1.hex())
 
         try:
             response = await self.send_single_cmd(
@@ -399,7 +399,7 @@ class TC_CNET_4_24(MatterBaseTest):
             await self._validate_connect_network_response(response, expect_success=True)
             logger.info(" --- ConnectNetwork returned response")
         except Exception as e:
-            logger.info(f" --- ConnectNetwork raised exception: {type(e).__name__}")
+            logger.info(" --- ConnectNetwork raised exception: %s", type(e).__name__)
             logger.info(" --- Continuing to observe post-connect network state")
 
         # Wait for Thread to attempt connection and update status
@@ -413,7 +413,7 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 5: Read Networks — verify incorrect Extended PAN ID is stored
         self.step(5)
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Networks attribute has {len(networks)} network(s)")
+        logger.info(" --- Networks attribute has %d network(s)", len(networks))
         network_ids = [net.networkID for net in networks]
         asserts.assert_in(network_id_1, network_ids,
                           "Incorrect Extended PAN ID not found in Networks attribute")
@@ -429,7 +429,7 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 7: Read Networks — verify empty
         self.step(7)
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Networks attribute has {len(networks)} network(s) after removal")
+        logger.info(" --- Networks attribute has %d network(s) after removal", len(networks))
         asserts.assert_equal(len(networks), 0,
                              f"Expected empty Networks list, but has {len(networks)} network(s)")
 
@@ -446,7 +446,7 @@ class TC_CNET_4_24(MatterBaseTest):
         self.step(9)
         network_id_2 = get_thread_tlv(incorrect_thread_dataset_2,
                                       tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(f" --- Sending ConnectNetwork with incorrect Network Key: {network_id_2.hex()}")
+        logger.info(" --- Sending ConnectNetwork with incorrect Network Key: %s", network_id_2.hex())
 
         try:
             response = await self.send_single_cmd(
@@ -456,7 +456,7 @@ class TC_CNET_4_24(MatterBaseTest):
             await self._validate_connect_network_response(response, expect_success=True)
             logger.info(" --- ConnectNetwork completed")
         except Exception as e:
-            logger.info(f" --- ConnectNetwork raised exception: {type(e).__name__}")
+            logger.info(" --- ConnectNetwork raised exception: %s", type(e).__name__)
             logger.info(" --- Continuing to observe post-connect network state")
 
         # Wait for Thread to attempt connection and update status
@@ -475,14 +475,14 @@ class TC_CNET_4_24(MatterBaseTest):
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
         await self._validate_network_config_response(response)
 
-        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY}s for DUT to stabilize Thread configuration...")
+        logger.info(" --- Waiting %ss for DUT to stabilize Thread configuration...", NETWORK_STATUS_UPDATE_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Step 12: ConnectNetwork with correct credentials
         self.step(12)
         correct_network_id = get_thread_tlv(correct_thread_dataset,
                                             tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(f" --- Sending ConnectNetwork with correct dataset: {correct_network_id.hex()}")
+        logger.info(" --- Sending ConnectNetwork with correct dataset: %s", correct_network_id.hex())
 
         response = await self.send_single_cmd(
             endpoint=endpoint,
@@ -502,13 +502,13 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 14: Read Networks — verify connected to correct network
         self.step(14)
         response = await self._read_networks(endpoint)
-        logger.info(f" --- Networks attribute has {len(response)} network(s)")
+        logger.info(" --- Networks attribute has %d network(s)", len(response))
         asserts.assert_greater_equal(len(response), 1,
                                      "Expected at least one network after successful connection")
 
         connected_networks = [network.networkID for network in response if network.connected]
-        logger.info(f" --- Connected networks: {[net.hex() for net in connected_networks]}")
-        logger.info(f" --- Expected network ID: {correct_network_id.hex()}")
+        logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
+        logger.info(" --- Expected network ID: %s", correct_network_id.hex())
         asserts.assert_true(
             correct_network_id in connected_networks,
             f"Expected device to be connected to Thread network with Extended PAN ID '{correct_network_id.hex()}'")
