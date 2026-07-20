@@ -92,8 +92,8 @@ struct TestColorControlPersistence : public ::testing::Test
     // reboot a second cluster on the SAME storage, and hand it to `verify` to assert the restored state.
     // Both clusters share one config and one storage-backed context, exactly as a reboot re-opens the KVS.
     template <typename DriveFn, typename VerifyFn>
-    void ExpectStateSurvivesReboot(const ColorControlCluster::Config & config, DriveFn drive,
-                                   EnhancedColorModeEnum expectedMode, VerifyFn verify)
+    void ExpectStateSurvivesReboot(const ColorControlCluster::Config & config, DriveFn drive, EnhancedColorModeEnum expectedMode,
+                                   VerifyFn verify)
     {
         ColorControlCluster a(kEp, config);
         Testing::ClusterTester tester(a);
@@ -114,15 +114,15 @@ TEST_F(TestColorControlPersistence, ColorTemperatureSurvivesReboot)
     // Default config value is 250, but the persisted 350 must win after reboot.
     ExpectStateSurvivesReboot(
         CtConfig(), [](ColorControlCluster & c) { return c.moveToColorTemp(350, 10); },
-        EnhancedColorModeEnum::kColorTemperatureMireds,
-        [](ColorControlCluster & b) { EXPECT_EQ(b.ColorTempMireds(), 350u); });
+        EnhancedColorModeEnum::kColorTemperatureMireds, [](ColorControlCluster & b) { EXPECT_EQ(b.ColorTempMireds(), 350u); });
 }
 
 TEST_F(TestColorControlPersistence, XyColorSurvivesReboot)
 {
     ExpectStateSurvivesReboot(
         XyConfig(), [](ColorControlCluster & c) { return c.moveToColor(30000, 40000, 10); },
-        EnhancedColorModeEnum::kCurrentXAndCurrentY, [](ColorControlCluster & b) {
+        EnhancedColorModeEnum::kCurrentXAndCurrentY,
+        [](ColorControlCluster & b) {
             EXPECT_EQ(b.CurrentX(), 30000u);
             EXPECT_EQ(b.CurrentY(), 40000u);
         });
@@ -131,9 +131,9 @@ TEST_F(TestColorControlPersistence, XyColorSurvivesReboot)
 TEST_F(TestColorControlPersistence, HueSaturationSurvivesReboot)
 {
     ExpectStateSurvivesReboot(
-        HsConfig(),
-        [](ColorControlCluster & c) { return c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false); },
-        EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation, [](ColorControlCluster & b) {
+        HsConfig(), [](ColorControlCluster & c) { return c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false); },
+        EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation,
+        [](ColorControlCluster & b) {
             EXPECT_EQ(b.EnhancedHue(), static_cast<uint16_t>(100 << 8)); // CurrentHue == 100
             EXPECT_EQ(b.Saturation(), 200u);
         });
@@ -166,8 +166,8 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
     Testing::ClusterTester tester(a);
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ASSERT_TRUE(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(320))
-                    .IsSuccess());
+    ASSERT_TRUE(
+        tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(320)).IsSuccess());
 
     // Reboot: b's config leaves StartUpColorTemperatureMireds null, so the only way it lands on 320 is
     // by loading the persisted write and applying it (§3.2.11.10 forces CT mode to the startup value).
@@ -186,8 +186,8 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
 
     // Activate the loop from the current enhanced hue, incrementing, one revolution / 30 s.
     const BitMask<UpdateFlagsBitmap> flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
-                                                    .Set(UpdateFlagsBitmap::kUpdateDirection)
-                                                    .Set(UpdateFlagsBitmap::kUpdateAction);
+                                                 .Set(UpdateFlagsBitmap::kUpdateDirection)
+                                                 .Set(UpdateFlagsBitmap::kUpdateAction);
     EXPECT_EQ(a.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
                              /*time=*/30, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
@@ -230,7 +230,7 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     ColorControlCluster b(kEp, bcfg);
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(b.ColorLoopActive(), 1);                                              // still active...
+    EXPECT_EQ(b.ColorLoopActive(), 1);                                                   // still active...
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds); // ...but CT owns the output
     EXPECT_EQ(b.ColorTempMireds(), 300u);
 }

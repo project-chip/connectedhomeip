@@ -18,10 +18,10 @@
 #include <app/clusters/color-control-server/LevelControlCoupling.h>
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
-#include <app/clusters/level-control/LevelControlCluster.h>          // nogncheck
+#include <app/clusters/level-control/LevelControlCluster.h> // nogncheck
 #include <clusters/ColorControl/ClusterId.h>
 #include <clusters/LevelControl/ClusterId.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>    // nogncheck
+#include <data-model-providers/codegen/CodegenDataModelProvider.h> // nogncheck
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 

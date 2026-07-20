@@ -34,8 +34,7 @@ namespace chip::app::Clusters {
 // which doubles as the handler's presence check.
 ColorControlCluster * FindClusterOnEndpoint(EndpointId endpoint)
 {
-    return static_cast<ColorControlCluster *>(
-        CodegenDataModelProvider::Instance().Registry().Get({ endpoint, ColorControl::Id }));
+    return static_cast<ColorControlCluster *>(CodegenDataModelProvider::Instance().Registry().Get({ endpoint, ColorControl::Id }));
 }
 
 } // namespace chip::app::Clusters

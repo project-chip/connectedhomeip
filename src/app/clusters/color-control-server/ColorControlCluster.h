@@ -24,9 +24,9 @@
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
-#include <clusters/ColorControl/Enums.h>
 #include <clusters/ColorControl/Attributes.h>
 #include <clusters/ColorControl/Commands.h>
+#include <clusters/ColorControl/Enums.h>
 #include <lib/support/BitFlags.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -174,18 +174,16 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & decoder) override;
-    std::optional<DataModel::ActionReturnStatus>
-    InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+                                                 AttributeValueDecoder & decoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR HandleApplyScene(ColorControl::EnhancedColorModeEnum ColorMode, const ColorControl::ColorValue & target,
                                 const ColorControl::ColorLoopState & loop, uint16_t timeMs);
-    bool HasFeature(ColorControl::Feature feature) const
-    {
-        return mFeatures.Has(feature);
-    }
+    bool HasFeature(ColorControl::Feature feature) const { return mFeatures.Has(feature); }
 
     // §3.2.8.x Coupling color temperature to Level Control. Called (via the Level Control coupling glue)
     // whenever the Level Control cluster's CurrentLevel changes and its CoupleColorTempToLevel option is
@@ -212,7 +210,7 @@ public:
     uint16_t ColorLoopTime() const { return mColorLoop.time; }
     ColorControl::EnhancedColorModeEnum GetEnhancedColorMode() const;
     bool SupportsMode(ColorControl::EnhancedColorModeEnum mode) const;
-    
+
     // ---- Command handlers ----
     // Public (application-facing / unit-testable, like LevelControl's command API). The spec does not
     // require these to be private; exposing them lets callers and tests drive commands directly.
@@ -249,7 +247,7 @@ public:
     Status moveColorTemp(ColorControl::MoveModeEnum moveMode, uint16_t rate, uint16_t minFieldMireds, uint16_t maxFieldMireds,
                          OptMask optionsMask = {}, OptMask optionsOverride = {});
     Status stepColorTemp(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, uint16_t minFieldMireds,
-                        uint16_t maxFieldMireds, OptMask optionsMask = {}, OptMask optionsOverride = {});
+                         uint16_t maxFieldMireds, OptMask optionsMask = {}, OptMask optionsOverride = {});
     Status ColorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
                         ColorControl::ColorLoopDirectionEnum direction, uint16_t time, uint16_t startHue,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsMask,
@@ -267,10 +265,7 @@ public:
                             chip::BitMask<ColorControl::OptionsBitmap> optionOverride);
 
 private:
- static void TimerCallback(System::Layer *, void * ctx)
-    {
-        static_cast<ColorControlCluster *>(ctx)->OnTick();
-    }
+    static void TimerCallback(System::Layer *, void * ctx) { static_cast<ColorControlCluster *>(ctx)->OnTick(); }
 
     std::optional<DataModel::ActionReturnStatus> HandleStopMoveStep(const ColorControl::Commands::StopMoveStep::DecodableType & req,
                                                                     CommandHandler * handler);
@@ -285,13 +280,13 @@ private:
     uint64_t mColorLoopStartTimeMs = 0; // SystemClock() reading at the moment the loop started
 
     // ---- Cluster state (initialized from Config in the constructor) ----
-    ColorControlDelegate & mDelegate;           // reference → must be set in the ctor init list
-    BitMask<ColorControl::Feature> mFeatures{}; // advertised features
-    ColorControl::ColorValue mColorValue;       // active color; its alternative encodes the mode
-    Transition mTransition;                     // active driver (monostate == stable)
-    ColorControl::ColorLoopState mColorLoop;    // mode-independent autonomous hue driver
-    State mState;                               // options, capabilities, numberOfPrimaries, remainingTime
-    CTConfig mCT;                               // color-temperature limits + startup
+    ColorControlDelegate & mDelegate;             // reference → must be set in the ctor init list
+    BitMask<ColorControl::Feature> mFeatures{};   // advertised features
+    ColorControl::ColorValue mColorValue;         // active color; its alternative encodes the mode
+    Transition mTransition;                       // active driver (monostate == stable)
+    ColorControl::ColorLoopState mColorLoop;      // mode-independent autonomous hue driver
+    State mState;                                 // options, capabilities, numberOfPrimaries, remainingTime
+    CTConfig mCT;                                 // color-temperature limits + startup
     const StaticConfig * mStaticConfig = nullptr; // app-owned fixed descriptors; null == none supported
     OnOffCluster * mOnOff              = nullptr; // injected On/Off cluster for ShouldExecuteIfOff; null == no coupling
     ColorControlSceneInvalidator * mSceneInvalidator = nullptr; // injected scene-invalidation hook; null == no coupling
@@ -333,7 +328,6 @@ private:
 
     static constexpr uint16_t kMaxTransitionTime         = 65534; // Max value as defined by the spec.
     static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec (0xFEFF).
-
 };
 } // namespace Clusters
 } // namespace app

@@ -110,17 +110,15 @@ TEST_F(TestColorControlAttributes, StartUpColorTemperatureWriteRoundTripAndConst
     ASSERT_EQ(c.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Valid value round-trips.
-    ASSERT_TRUE(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id,
-                                      DataModel::MakeNullable<uint16_t>(300))
-                    .IsSuccess());
+    ASSERT_TRUE(
+        tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(300)).IsSuccess());
     DataModel::Nullable<uint16_t> readBack;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::StartUpColorTemperatureMireds::Id, readBack).IsSuccess());
     ASSERT_FALSE(readBack.IsNull());
     EXPECT_EQ(readBack.Value(), 300);
 
     // Above the spec max (0xFEFF) is rejected.
-    EXPECT_EQ(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id,
-                                    DataModel::MakeNullable<uint16_t>(0xFF00)),
+    EXPECT_EQ(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(0xFF00)),
               Status::ConstraintError);
 }
 

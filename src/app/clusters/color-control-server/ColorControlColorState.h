@@ -28,7 +28,6 @@
 
 namespace chip::app::Clusters::ColorControl {
 
-
 // CIE xy chromaticity coordinates.
 struct XYColor
 {
@@ -55,7 +54,7 @@ struct HueSatColor
 struct EnhancedHueSatColor
 {
     uint16_t enhancedHue = 0;
-    uint8_t  saturation  = 0;
+    uint8_t saturation   = 0;
 
     // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue.
     uint8_t hue() const { return static_cast<uint8_t>(enhancedHue >> 8); }
@@ -69,8 +68,8 @@ using ColorValue = std::variant<XYColor, HueSatColor, EnhancedHueSatColor, CTCol
 // loop can be active-but-dormant while XY/CT owns the output.
 struct ColorLoopState
 {
-    uint8_t  active            = 0;
-    uint8_t  direction         = 0;
+    uint8_t active             = 0;
+    uint8_t direction          = 0;
     uint16_t time              = 0x0019;
     uint16_t startEnhancedHue  = 0x2300;
     uint16_t storedEnhancedHue = 0;

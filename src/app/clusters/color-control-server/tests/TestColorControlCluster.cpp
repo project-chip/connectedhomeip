@@ -76,7 +76,6 @@ TEST_F(TestColorControlCluster, SupportsModeReflectsFeatures)
     EXPECT_FALSE(cluster.SupportsMode(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation));
 }
 
-
 TEST_F(TestColorControlCluster, ColorTemperatureCommandBoundaries)
 {
     ColorControlCluster cluster(kTestEndpointId, MakeConfig(delegate));

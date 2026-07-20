@@ -69,10 +69,10 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
 
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorTemperature);
-    config.mColorValue                    = CTColor{ .mireds = 250 };
+    config.mColorValue                         = CTColor{ .mireds = 250 };
     config.ctConfig.colorTempPhysicalMinMireds = 100;
     config.ctConfig.colorTempPhysicalMaxMireds = 400;
-    config.onOff                          = &onOff;
+    config.onOff                               = &onOff;
     ColorControlCluster cluster(kTestEndpointId, config);
 
     const BitMask<OptionsBitmap> none;

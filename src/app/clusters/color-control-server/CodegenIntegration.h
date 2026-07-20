@@ -67,12 +67,12 @@ ColorControlDelegate * GetDelegate(EndpointId endpoint);
 class ColorControlServer
 {
 public:
-    using StepModeEnum    = chip::app::Clusters::ColorControl::StepModeEnum;
-    using MoveModeEnum    = chip::app::Clusters::ColorControl::MoveModeEnum;
-    using DirectionEnum   = chip::app::Clusters::ColorControl::DirectionEnum;
-    using Feature         = chip::app::Clusters::ColorControl::Feature;
-    using OptionsBitmap   = chip::app::Clusters::ColorControl::OptionsBitmap;
-    using Status          = chip::Protocols::InteractionModel::Status;
+    using StepModeEnum  = chip::app::Clusters::ColorControl::StepModeEnum;
+    using MoveModeEnum  = chip::app::Clusters::ColorControl::MoveModeEnum;
+    using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
+    using Feature       = chip::app::Clusters::ColorControl::Feature;
+    using OptionsBitmap = chip::app::Clusters::ColorControl::OptionsBitmap;
+    using Status        = chip::Protocols::InteractionModel::Status;
 
     static ColorControlServer & Instance();
 
@@ -82,10 +82,11 @@ public:
     Status stopMoveStepCommand(chip::EndpointId endpoint,
                                const chip::app::Clusters::ColorControl::Commands::StopMoveStep::DecodableType & commandData);
 
-    Status moveHueCommand(chip::EndpointId endpoint, MoveModeEnum moveMode, uint16_t rate,
-                          chip::BitMask<OptionsBitmap> optionsMask, chip::BitMask<OptionsBitmap> optionsOverride, bool isEnhanced);
+    Status moveHueCommand(chip::EndpointId endpoint, MoveModeEnum moveMode, uint16_t rate, chip::BitMask<OptionsBitmap> optionsMask,
+                          chip::BitMask<OptionsBitmap> optionsOverride, bool isEnhanced);
     Status moveToHueCommand(chip::EndpointId endpoint, uint16_t hue, DirectionEnum moveDirection, uint16_t transitionTime,
-                            chip::BitMask<OptionsBitmap> optionsMask, chip::BitMask<OptionsBitmap> optionsOverride, bool isEnhanced);
+                            chip::BitMask<OptionsBitmap> optionsMask, chip::BitMask<OptionsBitmap> optionsOverride,
+                            bool isEnhanced);
     Status moveToHueAndSaturationCommand(chip::EndpointId endpoint, uint16_t hue, uint8_t saturation, uint16_t transitionTime,
                                          chip::BitMask<OptionsBitmap> optionsMask, chip::BitMask<OptionsBitmap> optionsOverride,
                                          bool isEnhanced);
@@ -94,8 +95,9 @@ public:
 
     Status moveSaturationCommand(chip::EndpointId endpoint,
                                  const chip::app::Clusters::ColorControl::Commands::MoveSaturation::DecodableType & commandData);
-    Status moveToSaturationCommand(chip::EndpointId endpoint,
-                                   const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
+    Status
+    moveToSaturationCommand(chip::EndpointId endpoint,
+                            const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::DecodableType & commandData);
     Status stepSaturationCommand(chip::EndpointId endpoint,
                                  const chip::app::Clusters::ColorControl::Commands::StepSaturation::DecodableType & commandData);
     Status colorLoopCommand(chip::EndpointId endpoint,
@@ -108,13 +110,15 @@ public:
     Status stepColorCommand(chip::EndpointId endpoint,
                             const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
 
-    Status moveColorTempCommand(chip::EndpointId endpoint,
-                                const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
+    Status
+    moveColorTempCommand(chip::EndpointId endpoint,
+                         const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
     Status
     moveToColorTempCommand(chip::EndpointId endpoint,
                            const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & commandData);
-    Status stepColorTempCommand(chip::EndpointId endpoint,
-                                const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+    Status
+    stepColorTempCommand(chip::EndpointId endpoint,
+                         const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 
 private:
     ColorControlServer() = default;

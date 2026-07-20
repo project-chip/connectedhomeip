@@ -51,7 +51,7 @@ constexpr EndpointId kEp = 1;
 
 // CT physical range / coupling minimum used across the tests.
 constexpr uint16_t kPhysMin   = 100;
-constexpr uint16_t kPhysMax    = 400;
+constexpr uint16_t kPhysMax   = 400;
 constexpr uint16_t kCoupleMin = 150;
 
 // Records InvalidateScenes() calls. SceneIntegration injects the real implementation (which forwards to
@@ -190,8 +190,7 @@ TEST_F(TestColorControlClusterBackwardsCompatibility, SceneCaptureAndApplyRestor
     // Apply the captured scene (what DefaultColorControlSceneHandler::ApplyScene does after decoding the EFS).
     ColorValue target = CTColor{ .mireds = captured };
     ColorLoopState loop{};
-    EXPECT_EQ(c.HandleApplyScene(EnhancedColorModeEnum::kColorTemperatureMireds, target, loop, /*transitionDs=*/0),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(c.HandleApplyScene(EnhancedColorModeEnum::kColorTemperatureMireds, target, loop, /*transitionDs=*/0), CHIP_NO_ERROR);
     Complete(c);
 
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);

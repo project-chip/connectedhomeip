@@ -15,21 +15,20 @@
  *    limitations under the License.
  */
 
-
 #include "ColorControlCluster.h"
 #include "ColorControlSceneInvalidator.h" // injected scene-invalidation hook
+#include <algorithm>
 #include <app/clusters/on-off-server/OnOffCluster.h> // injected On/Off cluster (GetOnOff) for ShouldExecuteIfOff
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ColorControl/Metadata.h>
+#include <cstdlib>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-#include <algorithm>
-#include <cstdlib>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;                          // bare ActionReturnStatus / AttributeChangeType
+using namespace chip::app::DataModel; // bare ActionReturnStatus / AttributeChangeType
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
 using namespace chip::app::Clusters::ColorControl::Attributes; // bare attribute names (CurrentHue::Id, …)
@@ -45,7 +44,6 @@ struct overloaded : Ts...
 };
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
-
 
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
@@ -351,8 +349,8 @@ void ColorControlCluster::OnTick()
 bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
 {
     const uint64_t elapsed = now - tx.startTimeMs;
-    uint16_t eh = 0;
-    bool done = false;
+    uint16_t eh            = 0;
+    bool done              = false;
 
     if (tx.durationMs == 0)
     {
@@ -604,15 +602,16 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         if (std::holds_alternative<XYColor>(mColorValue))
             return; // no-op
         XYColor next{};
-        std::visit(overloaded{ [&](const HueSatColor & hs) {
-                                  mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue, hs.saturation, next.x, next.y);
-                              },
-                               [&](const EnhancedHueSatColor & hs) {
-                                   mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue(), hs.saturation, next.x, next.y);
-                               },
-                               [&](const CTColor & ct) { mDelegate.ConvertMiredsToXY(mPath.mEndpointId, ct.mireds, next.x, next.y); },
-                               [](const XYColor &) {} },
-                   mColorValue);
+        std::visit(
+            overloaded{ [&](const HueSatColor & hs) {
+                           mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue, hs.saturation, next.x, next.y);
+                       },
+                        [&](const EnhancedHueSatColor & hs) {
+                            mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue(), hs.saturation, next.x, next.y);
+                        },
+                        [&](const CTColor & ct) { mDelegate.ConvertMiredsToXY(mPath.mEndpointId, ct.mireds, next.x, next.y); },
+                        [](const XYColor &) {} },
+            mColorValue);
         mColorValue = next; // the variant assignment IS the store
         NotifyAttributeChanged(CurrentX::Id, AttributeChangeType::kQuiet);
         NotifyAttributeChanged(CurrentY::Id, AttributeChangeType::kQuiet);
@@ -826,13 +825,13 @@ Status ColorControlCluster::moveToSaturation(uint8_t saturation, uint16_t transi
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
 
     ApplyModeSwitch(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
-    const uint32_t durationMs = transitionTimeDs * 100u; // deciseconds → ms
-    auto & hs = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
-    hs.sat    = SatTransition{
-        .startSat    = GetSaturation(), // read AFTER the mode switch
-        .targetSat   = std::clamp<uint8_t>(saturation, MIN_SATURATION_VALUE, MAX_SATURATION_VALUE),
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-        .durationMs  = durationMs,
+    const uint32_t durationMs = transitionTimeDs * 100u;  // deciseconds → ms
+    auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
+    hs.sat                    = SatTransition{
+                           .startSat    = GetSaturation(), // read AFTER the mode switch
+                           .targetSat   = std::clamp<uint8_t>(saturation, MIN_SATURATION_VALUE, MAX_SATURATION_VALUE),
+                           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+                           .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(static_cast<uint16_t>(durationMs / 100), /*isNewTransition=*/true); // finite
     ArmTick();
@@ -1035,7 +1034,7 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
  */
 Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, BitMask<OptionsBitmap> optionsMask,
-                                   BitMask<OptionsBitmap> optionsOverride)
+                                    BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     // §3.2.8.1: an active color loop owns the hue axis; hue commands must not disturb it.
@@ -1066,10 +1065,10 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     auto & hs = EnsureHueSatTransition(); // preserve a running sat axis (§3.2.5.2)
     hs.hue    = HueTransition{
-        .startHue    = GetEnhancedHue(),  // 16-bit canonical current
-        .signedDelta = signedRatePerSec,  // hue-units per second; sign = up/down
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-        .durationMs  = 0, // 0 == indefinite rate move (TickHue runs until StopHueAxis)
+           .startHue    = GetEnhancedHue(), // 16-bit canonical current
+           .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
+           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+           .durationMs  = 0, // 0 == indefinite rate move (TickHue runs until StopHueAxis)
     };
     SetQuietReportRemainingTime(MAX_INT16U_VALUE, /*isNewTransition=*/true); // indefinite
     ArmTick();
@@ -1094,7 +1093,7 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
  *         Status::ConstraintError when the other parameters are outside their defined value range.
  */
 Status ColorControlCluster::moveToHue(uint16_t hue, DirectionEnum dir, uint16_t transitionTimeDs, bool isEnhanced,
-                                     BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                      BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     // §3.2.8.1: an active color loop owns the hue axis; hue commands must not disturb it.
@@ -1156,7 +1155,7 @@ Status ColorControlCluster::moveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
  *         Status::ConstraintError when the other parameters are outside their defined value range.
  */
 Status ColorControlCluster::stepHue(StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, bool isEnhanced,
-                                   BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                    BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     // §3.2.8.1: an active color loop owns the hue axis; hue commands must not disturb it.
@@ -1174,7 +1173,8 @@ Status ColorControlCluster::stepHue(StepModeEnum stepMode, uint16_t stepSize, ui
     const int32_t signedDelta = (stepMode == StepModeEnum::kUp ? +1 : -1) * step16; // sign from stepMode
 
     auto & hs = EnsureHueSatTransition();
-    hs.hue    = HueTransition{ GetEnhancedHue(), signedDelta, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
+    hs.hue =
+        HueTransition{ GetEnhancedHue(), signedDelta, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     ArmTick();
     InvalidateScenes();
@@ -1190,7 +1190,7 @@ Status ColorControlCluster::stepHue(StepModeEnum stepMode, uint16_t stepSize, ui
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state.
  */
 Status ColorControlCluster::moveSaturation(MoveModeEnum moveMode, uint8_t rate, BitMask<OptionsBitmap> optionsMask,
-                                          BitMask<OptionsBitmap> optionsOverride)
+                                           BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
@@ -1239,7 +1239,7 @@ Status ColorControlCluster::moveSaturation(MoveModeEnum moveMode, uint8_t rate, 
  *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a saturation transition state,
  */
 Status ColorControlCluster::stepSaturation(StepModeEnum stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
-                                          BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
@@ -1342,17 +1342,17 @@ CHIP_ERROR ColorControlCluster::Attributes(const ConcreteClusterPath & path,
     // Fixed-descriptor presence: supplied table AND the specific optional engaged. Each primary gates its
     // X / Y / Intensity together (Intensity's value stays nullable via ChromaticityPoint::intensity).
     const StaticConfig * sc = mStaticConfig;
-    const bool p1 = sc && sc->primaries[0].has_value();
-    const bool p2 = sc && sc->primaries[1].has_value();
-    const bool p3 = sc && sc->primaries[2].has_value();
-    const bool p4 = sc && sc->primaries[3].has_value();
-    const bool p5 = sc && sc->primaries[4].has_value();
-    const bool p6 = sc && sc->primaries[5].has_value();
-    const bool wpx = sc && sc->whitePointX.has_value();
-    const bool wpy = sc && sc->whitePointY.has_value();
-    const bool cpr = sc && sc->colorPointR.has_value();
-    const bool cpg = sc && sc->colorPointG.has_value();
-    const bool cpb = sc && sc->colorPointB.has_value();
+    const bool p1           = sc && sc->primaries[0].has_value();
+    const bool p2           = sc && sc->primaries[1].has_value();
+    const bool p3           = sc && sc->primaries[2].has_value();
+    const bool p4           = sc && sc->primaries[3].has_value();
+    const bool p5           = sc && sc->primaries[4].has_value();
+    const bool p6           = sc && sc->primaries[5].has_value();
+    const bool wpx          = sc && sc->whitePointX.has_value();
+    const bool wpy          = sc && sc->whitePointY.has_value();
+    const bool cpr          = sc && sc->colorPointR.has_value();
+    const bool cpg          = sc && sc->colorPointG.has_value();
+    const bool cpb          = sc && sc->colorPointB.has_value();
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { true, ColorControl::Attributes::RemainingTime::kMetadataEntry }, // optional, but we run transitions
@@ -1632,8 +1632,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint> and `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field,
-                     auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
@@ -1927,10 +1926,8 @@ Status ColorControlCluster::moveColor(int16_t rateX, int16_t rateY, BitMask<Opti
 
     const uint16_t targetX = (rateX > 0) ? MAX_CIE_XY_VALUE : (rateX < 0 ? MIN_CIE_XY_VALUE : xy.x);
     const uint16_t targetY = (rateY > 0) ? MAX_CIE_XY_VALUE : (rateY < 0 ? MIN_CIE_XY_VALUE : xy.y);
-    const uint32_t durX =
-        rateX ? uint32_t(std::abs(int32_t(targetX) - xy.x)) * 1000u / static_cast<uint32_t>(std::abs(rateX)) : 0;
-    const uint32_t durY =
-        rateY ? uint32_t(std::abs(int32_t(targetY) - xy.y)) * 1000u / static_cast<uint32_t>(std::abs(rateY)) : 0;
+    const uint32_t durX = rateX ? uint32_t(std::abs(int32_t(targetX) - xy.x)) * 1000u / static_cast<uint32_t>(std::abs(rateX)) : 0;
+    const uint32_t durY = rateY ? uint32_t(std::abs(int32_t(targetY) - xy.y)) * 1000u / static_cast<uint32_t>(std::abs(rateY)) : 0;
 
     mTransition = XYTransition{
         .startX      = xy.x,
@@ -1958,7 +1955,7 @@ Status ColorControlCluster::moveColor(int16_t rateX, int16_t rateY, BitMask<Opti
  *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlCluster::stepColor(int16_t stepX, int16_t stepY, uint16_t transitionTimeDs, BitMask<OptionsBitmap> optionsMask,
-                                     BitMask<OptionsBitmap> optionsOverride)
+                                      BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(!(stepX == 0 && stepY == 0), Status::InvalidCommand); // §3.2.8.13.4
@@ -1995,7 +1992,7 @@ Status ColorControlCluster::stepColor(int16_t stepX, int16_t stepY, uint16_t tra
  * @return Status::Success if successful, Status::UnsupportedEndpoint if the endpoint doesn't support color temperature.
  */
 Status ColorControlCluster::moveToColorTemp(uint16_t colorTemperature, uint16_t transitionTimeDs,
-                                           BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                            BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(colorTemperature <= kMaxColorTemperatureMireds, Status::ConstraintError);
@@ -2025,7 +2022,7 @@ Status ColorControlCluster::moveToColorTemp(uint16_t colorTemperature, uint16_t 
  * @return Status::Success if successful, Status::ConstraintError if a parameter is out of range.
  */
 Status ColorControlCluster::moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTimeDs,
-                                       BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                        BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     // Command parameter constraint checks (targets already validated → no clamp needed below):
@@ -2091,7 +2088,7 @@ void ColorControlCluster::ApplyStartUpColorTemperature()
  *         Status::ConstraintError when a command parameter is outside its defined value range.
  */
 Status ColorControlCluster::moveColorTemp(MoveModeEnum moveMode, uint16_t rate, uint16_t minFieldMireds, uint16_t maxFieldMireds,
-                                         BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
+                                          BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(minFieldMireds <= kMaxColorTemperatureMireds, Status::ConstraintError); // fields: max 65279
@@ -2235,9 +2232,8 @@ void ColorControlCluster::CoupleColorTempToLevel(uint8_t currentLevel)
     else
     {
         const uint32_t u32TempPhysMax = static_cast<uint32_t>(tempPhysMax);
-        const uint32_t tempDelta =
-            ((u32TempPhysMax - tempCoupleMin) * currentLevel) / (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-        newColorTemp = static_cast<uint16_t>(tempPhysMax - tempDelta);
+        const uint32_t tempDelta = ((u32TempPhysMax - tempCoupleMin) * currentLevel) / (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+        newColorTemp             = static_cast<uint16_t>(tempPhysMax - tempDelta);
     }
 
     // Instantaneous coupling move (transitionTime 0) reusing the fully validated CT move path

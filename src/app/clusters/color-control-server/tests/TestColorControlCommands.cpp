@@ -42,7 +42,7 @@ using Status = Protocols::InteractionModel::Status;
 constexpr EndpointId kEp = 1;
 
 // Saturation/CIE limits mirrored from the cluster.
-constexpr uint8_t kMaxSat   = 254;
+constexpr uint8_t kMaxSat    = 254;
 constexpr uint16_t kMaxCieXy = 0xFEFF;
 
 struct TestColorControlCommands : public ::testing::Test
@@ -87,9 +87,9 @@ struct TestColorControlCommands : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorTemperature);
-        c.mColorValue                              = CTColor{ .mireds = 250 };
-        c.ctConfig.colorTempPhysicalMinMireds      = 100;
-        c.ctConfig.colorTempPhysicalMaxMireds      = 400;
+        c.mColorValue                         = CTColor{ .mireds = 250 };
+        c.ctConfig.colorTempPhysicalMinMireds = 100;
+        c.ctConfig.colorTempPhysicalMaxMireds = 400;
         return c;
     }
     ColorControlCluster::Config LoopConfig()
@@ -335,8 +335,7 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
     ColorControlCluster c(kEp, LoopConfig());
 
     // Update time and direction (no action): the color-loop attributes change, loop stays inactive.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
-                                 .Set(UpdateFlagsBitmap::kUpdateDirection),
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
                              ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, /*time=*/30,
                              /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
@@ -346,22 +345,20 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
 
     // Activate.
     EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
-                             ColorLoopActionEnum::kActivateFromColorLoopStartEnhancedHue, ColorLoopDirectionEnum::kIncrement, 0,
-                             0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+                             ColorLoopActionEnum::kActivateFromColorLoopStartEnhancedHue, ColorLoopDirectionEnum::kIncrement, 0, 0,
+                             BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 
     // Deactivate.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
-                             ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, 0, 0,
-                             BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kDeactivate,
+                             ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 0);
 
     // Unknown action is rejected.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
-                             ColorLoopActionEnum::kUnknownEnumValue, ColorLoopDirectionEnum::kIncrement, 0, 0,
-                             BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kUnknownEnumValue,
+                             ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::InvalidCommand);
 }
 
@@ -394,7 +391,7 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransition)
 TEST_F(TestColorControlCommands, MoveToHueAndSaturationRejectsOutOfRange)
 {
     ColorControlCluster c(kEp, HsConfig());
-    EXPECT_EQ(c.moveToHueAndSaturation(100, 255, 10, /*isEnhanced=*/false), Status::ConstraintError);   // sat > 254
+    EXPECT_EQ(c.moveToHueAndSaturation(100, 255, 10, /*isEnhanced=*/false), Status::ConstraintError);    // sat > 254
     EXPECT_EQ(c.moveToHueAndSaturation(100, 200, 65535, /*isEnhanced=*/false), Status::ConstraintError); // time > 65534
     EXPECT_EQ(c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);            // valid
 }

@@ -118,8 +118,8 @@ public:
     }
 
 private:
-    EndpointId mEndpoint             = kInvalidEndpointId;
-    ColorControlDelegate * mWrapped  = nullptr;
+    EndpointId mEndpoint            = kInvalidEndpointId;
+    ColorControlDelegate * mWrapped = nullptr;
 };
 
 struct ClusterWithDelegate
@@ -137,8 +137,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId,
-                                                                        gClusters[clusterInstanceIndex].userDelegate);
+        gClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(endpointId, gClusters[clusterInstanceIndex].userDelegate);
 
         ColorControlCluster::Config config(gClusters[clusterInstanceIndex].integrationDelegateWrapper);
         config.mFeatures.SetRaw(featureMap);
@@ -238,15 +237,15 @@ ColorControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
 
 ColorControlDelegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id,
-                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kColorControlMaxClusterCount ? nullptr : gClusters[ep].userDelegate);
 }
 
 void SetDefaultDelegate(EndpointId endpoint, ColorControlDelegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id,
-                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kColorControlMaxClusterCount)
     {
         gClusters[ep].userDelegate = delegate;
@@ -354,8 +353,8 @@ ColorControlServer::stepSaturationCommand(EndpointId endpoint,
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
-    return cluster->stepSaturation(commandData.stepMode, commandData.stepSize, commandData.transitionTime,
-                                   commandData.optionsMask, commandData.optionsOverride);
+    return cluster->stepSaturation(commandData.stepMode, commandData.stepSize, commandData.transitionTime, commandData.optionsMask,
+                                   commandData.optionsOverride);
 }
 
 ColorControlServer::Status
@@ -400,8 +399,7 @@ ColorControlServer::moveColorTempCommand(EndpointId endpoint,
     auto * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
     return cluster->moveColorTemp(commandData.moveMode, commandData.rate, commandData.colorTemperatureMinimumMireds,
-                                  commandData.colorTemperatureMaximumMireds, commandData.optionsMask,
-                                  commandData.optionsOverride);
+                                  commandData.colorTemperatureMaximumMireds, commandData.optionsMask, commandData.optionsOverride);
 }
 
 ColorControlServer::Status

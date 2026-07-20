@@ -122,9 +122,9 @@ public:
         // values for several modes in arbitrary order, and a std::variant holds only one alternative,
         // so assigning per-case would drop fields (X then Y) and could build the wrong alternative
         // before EnhancedColorMode is even seen. No clamping here — the cluster clamps in HandleApplyScene.
-        auto           targetColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
-        uint16_t       x = 0, y = 0, enhancedHue = 0, mireds = 0;
-        uint8_t        saturation = 0;
+        auto targetColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
+        uint16_t x = 0, y = 0, enhancedHue = 0, mireds = 0;
+        uint8_t saturation = 0;
         ColorLoopState loop;
 
         auto it = attributeValueList.begin();
