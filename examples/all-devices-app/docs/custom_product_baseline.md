@@ -164,7 +164,37 @@ void ApplicationShutdownHook()
 
 ---
 
-## 5. Commercial Firmware Guidelines
+## 5. Device Attestation Credentials (DAC) Implementation & Production
+
+In the Matter data model, Device Attestation Credentials (DAC) provide cryptographic proof of a device's identity, vendor ID, product ID, and Matter certification.
+
+### DAC Implementation in `all-devices-app`
+
+The `all-devices-app` implementation provides a decoupled provider architecture:
+
+- **Reference Provider**: [`AllDevicesExampleDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/all-devices-common/providers/AllDevicesExampleDACProvider.h) located in [`all-devices-common/providers/`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/all-devices-common/providers/).
+- **POSIX Simulator Boot**: In [`posix/main.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/posix/main.cpp#L347-L352), the application initializes `AllDevicesExampleDACProvider` with `AppOptions::GetConfig().dacProvider`. This allows passing `--dac_provider <path.json>` on the command line to dynamically load JSON test vectors during CI/WOCA certification testing, or falling back to the SDK's built-in example credentials (`chip::Credentials::Examples::GetExampleDACProvider()`).
+- **Embedded MCU Boot**: On hardware targets like ESP32 ([`esp32/main/main.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/esp32/main/main.cpp#L416-L424)) or Silicon Labs ([`silabs/src/AppTask.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/silabs/src/AppTask.cpp#L167)), the platform boots with a hardware `FactoryDataProvider` that reads credentials from encrypted flash partitions.
+
+### Transitioning to Production Hardware
+
+Commercial products **must never use JSON files or plaintext DAC private keys on disk**. In real products:
+
+1. **Implement `DeviceAttestationCredentialsProvider`**: Implement the pure abstract interface [`chip::Credentials::DeviceAttestationCredentialsProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/credentials/DeviceAttestationCredsProvider.h#L34-L70). Cryptographic signing operations (`SignWithDeviceAttestationKey`) must delegate directly to your secure hardware without exporting the private key into system RAM.
+2. **Platform Hardware Binding**:
+   - **Linux / Android Gateways**: Delegate signing to a Hardware Secure Element (e.g. ATECC608, NXP SE050 via I2C/PKCS#11), TPM, or platform Secure Enclave / TrustZone (see [`TrustyDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/Linux/DeviceAttestationCredsTrusty.h#L26-L45)).
+   - **Embedded MCUs (ESP32, Nordic, Silicon Labs)**: Use the platform's hardware factory data provider (e.g., [`ESP32FactoryDataProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/ESP32/ESP32FactoryDataProvider.h)) to read factory-flashed credentials and utilize on-chip crypto hardware.
+3. **Register at Boot**: Register your hardware provider before initializing the Matter server or starting the event loop:
+   ```cpp
+   #include <credentials/DeviceAttestationCredsProvider.h>
+
+   // Initialize your hardware/platform secure element DAC provider
+   SetDeviceAttestationCredentialsProvider(&gProductHardwareDACProvider);
+   ```
+
+---
+
+## 6. Commercial Firmware Guidelines
 
 1. **Link Specific Devices**: In `BUILD.gn` or `CMakeLists.txt`, link directly
    against required device modules (e.g.,
@@ -175,3 +205,6 @@ void ApplicationShutdownHook()
 3. **Persist Hardware State**: Replace simulated cluster implementations with
    hardware drivers (e.g., binding a PWM driver to WriteAttribute callbacks) and
    persist calibration data via storage delegates.
+4. **Hardware-Isolated Attestation**: Bind `DeviceAttestationCredentialsProvider`
+   directly to your secure element or factory partition driver rather than using
+   CLI/file-based credentials.

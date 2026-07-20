@@ -53,3 +53,25 @@ source_set("all-devices-example-device-instance-info-provider") {
     "${chip_root}/src:includes",
   ]
 }
+
+source_set("all-devices-example-dac-provider") {
+  sources = [
+    "AllDevicesExampleDACProvider.cpp",
+    "AllDevicesExampleDACProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/support",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+  ]
+
+  public_configs = [
+    ":includes",
+    "${chip_root}/src:includes",
+  ]
+}
+
