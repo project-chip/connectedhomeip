@@ -77,8 +77,7 @@ private:
             chip::app::Clusters::ContentLauncher::Feature::kContentSearch,
             chip::app::Clusters::ContentLauncher::Feature::kURLPlayback,
             chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek,
-            chip::app::Clusters::ContentLauncher::Feature::kTextTracks,
-            chip::app::Clusters::ContentLauncher::Feature::kAudioTracks,
+            chip::app::Clusters::ContentLauncher::Feature::kTextTracks, chip::app::Clusters::ContentLauncher::Feature::kAudioTracks,
             chip::app::Clusters::ContentLauncher::Feature::kContentReplication,
             chip::app::Clusters::ContentLauncher::Feature::kContentQueueing,
             chip::app::Clusters::ContentLauncher::Feature::kPresets)
