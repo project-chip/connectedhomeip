@@ -112,6 +112,9 @@ public:
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
+    static ChipLinuxStorage * GetChipLinuxDataStorage();
+
+private:
     static ChipLinuxStorage * GetStorageForNamespace(Key key);
 };
 

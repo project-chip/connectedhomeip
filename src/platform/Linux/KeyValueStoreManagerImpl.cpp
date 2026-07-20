@@ -39,7 +39,7 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
 DeviceLayer::Internal::ChipLinuxStorage * ChipLinuxStorageDelegate()
 {
-    return DeviceLayer::Internal::PosixConfig::GetStorageForNamespace(DeviceLayer::Internal::PosixConfig::kConfigKey_KVS);
+    return DeviceLayer::Internal::PosixConfig::GetChipLinuxDataStorage();
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
