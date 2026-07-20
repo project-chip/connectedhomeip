@@ -72,6 +72,51 @@ class TargetVideoPlayerInfo
 public:
     TargetVideoPlayerInfo() {}
 
+    // mMACAddress is a CharSpan that points into this object's own mMACAddressBuf, and mDeviceProxy is
+    // a raw pointer to a live connection. The compiler-generated copy would (a) duplicate mMACAddress's
+    // pointer verbatim, leaving the copy's span aliasing the SOURCE's buffer (a later read then
+    // serializes the wrong/destroyed MAC — see the cached-player shift in PersistenceManager), and
+    // (b) shallow-copy mDeviceProxy so two infos point at one proxy. Deep-copy the buffer and re-bind
+    // the span to this object, and do not adopt the source's proxy.
+    TargetVideoPlayerInfo(const TargetVideoPlayerInfo & other) { *this = other; }
+
+    TargetVideoPlayerInfo & operator=(const TargetVideoPlayerInfo & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        for (size_t i = 0; i < kMaxNumberOfEndpoints; i++)
+        {
+            mEndpoints[i] = other.mEndpoints[i];
+        }
+        mNodeId      = other.mNodeId;
+        mFabricIndex = other.mFabricIndex;
+        mDeviceProxy = nullptr; // a cached copy does not own or share the source's live device proxy
+        mVendorId    = other.mVendorId;
+        mProductId   = other.mProductId;
+        mDeviceType  = other.mDeviceType;
+        memcpy(mDeviceName, other.mDeviceName, sizeof(mDeviceName));
+        memcpy(mHostName, other.mHostName, sizeof(mHostName));
+        mNumIPs = other.mNumIPs;
+        for (size_t i = 0; i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+        {
+            mIpAddress[i] = other.mIpAddress[i];
+        }
+        memcpy(mInstanceName, other.mInstanceName, sizeof(mInstanceName));
+        mPort = other.mPort;
+
+        // Re-bind the self-referential MAC span into THIS object's buffer.
+        memcpy(mMACAddressBuf, other.mMACAddressBuf, sizeof(mMACAddressBuf));
+        mMACAddress = chip::CharSpan(mMACAddressBuf, other.mMACAddress.size());
+
+        mLastDiscovered = other.mLastDiscovered;
+        mIsAsleep       = other.mIsAsleep;
+        mInitialized    = other.mInitialized;
+        return *this;
+    }
+
     bool operator==(const TargetVideoPlayerInfo & other) const { return this->mNodeId == other.mNodeId; }
 
     bool IsInitialized() { return mInitialized; }

@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/color-control-server.cpp"
-    "${CLUSTER_DIR}/color-control-server.h"
+    "${CLUSTER_DIR}/codegen/color-control-server.cpp"
+    "${CLUSTER_DIR}/codegen/color-control-server.h"
 )

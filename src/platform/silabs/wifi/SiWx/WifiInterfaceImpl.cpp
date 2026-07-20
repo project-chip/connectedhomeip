@@ -19,6 +19,7 @@
 #include "sl_matter_wifi_config.h"
 #endif // SL_MATTER_GN_BUILD
 
+#include "SlNetConfig.h"
 #include "ble_config.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
@@ -80,14 +81,6 @@ using namespace chip::DeviceLayer::Internal;
 using namespace chip::DeviceLayer::Silabs;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
-// The REGION_CODE macro defines the regulatory region for the Wi-Fi device.
-// The default value is 'US'. Users can override this macro to specify a different region code.
-// The region code must match one of the values defined in the 'sl_wifi_region_code_t' enum,
-// which is located in 'wifi-sdk/inc/sl_wifi_constants.h'. Example values include US, EU, JP, etc.
-#ifndef REGION_CODE
-#define REGION_CODE US
-#endif // !REGION_CODE
-
 // TODO: This needs to be refactored so we don't need the global object
 WfxRsi_t wfx_rsi;
 
@@ -117,98 +110,6 @@ osMessageQueueId_t sWifiEventQueue = nullptr;
 
 sl_net_wifi_lwip_context_t wifi_client_context;
 sl_wifi_security_t security = SL_WIFI_SECURITY_UNKNOWN;
-
-const sl_wifi_device_configuration_t config = {
-    .boot_option = LOAD_NWP_FW,
-    .mac_address = NULL,
-    .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-    .region_code =
-#ifndef SL_SI91X_ACX_MODULE
-        REGION_CODE,
-#else
-        IGNORE_REGION,
-#endif
-    .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-                     .coex_mode = SL_SI91X_WLAN_BLE_MODE,
-#else
-                     .coex_mode = 0, // WLAN-only when BLE disabled (e.g. BLE on EFR32 host)
-#endif
-                     .feature_bit_map =
-#ifdef SLI_SI91X_MCU_INTERFACE
-                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_WPS_DISABLE),
-#else
-                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE |
-                          SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1),
-#endif
-                     .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT |
-                                                SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_BYPASS
-#ifdef ipv6_FEATURE_REQUIRED
-                                                | SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6
-#endif
-                                                | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-                     .custom_feature_bit_map     = (SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
-                     .ext_custom_feature_bit_map = (RSI_EXT_CUSTOM_FEATURE_BIT_MAP
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-                                                    | (SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE)
-#endif
-#if (defined A2DP_POWER_SAVE_ENABLE)
-                                                    | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
-#endif // A2DP_POWER_SAVE_ENABLE
-                                                        ),
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-                     .bt_feature_bit_map = (RSI_BT_FEATURE_BITMAP
-#if (RSI_BT_GATT_ON_CLASSIC)
-                                            | SL_SI91X_BT_ATT_OVER_CLASSIC_ACL /* to support att over classic acl link */
-#endif                                                                         // RSI_BT_GATT_ON_CLASSIC
-                                            ),
-#else
-                     .bt_feature_bit_map         = 0,
-#endif
-#ifdef RSI_PROCESS_MAX_RX_DATA
-                     .ext_tcp_ip_feature_bit_map =
-                         (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID | SL_SI91X_EXT_TCP_MAX_RECV_LENGTH),
-#else
-                     .ext_tcp_ip_feature_bit_map = (RSI_EXT_TCPIP_FEATURE_BITMAP | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
-#endif
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-                     //! ENABLE_BLE_PROTOCOL in bt_feature_bit_map
-                     .ble_feature_bit_map =
-                         ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) |
-                           SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) |
-                           SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) |
-                           SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC)) |
-                          SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX) |
-                          SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
-#if RSI_BLE_GATT_ASYNC_ENABLE
-                          | SL_SI91X_BLE_GATT_ASYNC_ENABLE
-#endif
-                          ),
-
-                     .ble_ext_feature_bit_map = ((SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) |
-                                                  SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES))
-#if RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
-                                                 | SL_SI91X_BLE_INDICATE_CONFIRMATION_FROM_HOST // indication response from app
-#endif
-#if RSI_BLE_MTU_EXCHANGE_FROM_HOST
-                                                 | SL_SI91X_BLE_MTU_EXCHANGE_FROM_HOST // MTU Exchange request initiation from app
-#endif
-#if RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-                                                 | (SL_SI91X_BLE_SET_SCAN_RESP_DATA_FROM_HOST) // Set SCAN Resp Data from app
-#endif
-#if RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
-                                                 | (SL_SI91X_BLE_DISABLE_CODED_PHY_FROM_HOST) // Disable Coded PHY from app
-#endif
-#if BLE_SIMPLE_GATT
-                                                 | SL_SI91X_BLE_GATT_INIT
-#endif
-                                                 ),
-#else
-                     .ble_feature_bit_map        = 0,
-                     .ble_ext_feature_bit_map    = 0,
-#endif
-                     .config_feature_bit_map = (SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP | RSI_CONFIG_FEATURE_BITMAP) }
-};
 
 constexpr int8_t kAdvScanThreshold           = -40;
 constexpr uint8_t kAdvRssiToleranceThreshold = 5;
@@ -386,11 +287,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
         }
         // SET FALLBACK VALUES FOR THE SCAN
         wfx_rsi.ap_chan = SL_WIFI_AUTO_CHANNEL;
-#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-        security = SL_WIFI_WPA3_TRANSITION;
-#else
-        security = SL_WIFI_WPA_WPA2_MIXED;
-#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+        security        = SL_WIFI_WPA3_TRANSITION;
     }
     else
     {
@@ -535,7 +432,7 @@ sl_status_t SetWifiConfigurations()
  *
  * @return sl_wifi_system_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
  *                                        kHighPerformance: HIGH_PERFORMANCE
- *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
+ *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE_LOW_LATENCY
  *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
  */
 sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
@@ -548,7 +445,7 @@ sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInte
         profile = HIGH_PERFORMANCE;
         break;
     case PowerSaveInterface::PowerSaveConfiguration::kConnectedSleep:
-        profile = ASSOCIATED_POWER_SAVE;
+        profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
         break;
     case PowerSaveInterface::PowerSaveConfiguration::kDeepSleep:
         profile = DEEP_SLEEP_WITH_RAM_RETENTION;
@@ -614,7 +511,10 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
+    // The device configuration must be fully built before sl_net_init, which consumes it.
+    sl_wifi_device_configuration_t deviceConfiguration = SLNetGetDeviceConfig();
+
+    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &deviceConfiguration, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion

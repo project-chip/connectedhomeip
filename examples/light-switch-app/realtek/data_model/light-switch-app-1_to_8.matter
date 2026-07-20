@@ -579,10 +579,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1957,7 +1954,7 @@ cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2685,7 +2682,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -3063,7 +3060,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3098,7 +3095,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3131,7 +3128,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3164,7 +3161,7 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3197,7 +3194,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3230,7 +3227,7 @@ endpoint 5 {
   }
 }
 endpoint 6 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3263,7 +3260,7 @@ endpoint 6 {
   }
 }
 endpoint 7 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3296,7 +3293,7 @@ endpoint 7 {
   }
 }
 endpoint 8 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3329,7 +3326,7 @@ endpoint 8 {
   }
 }
 endpoint 9 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;

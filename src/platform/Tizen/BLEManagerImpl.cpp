@@ -941,8 +941,16 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "BLEManager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogProgress(DeviceLayer, "BLE will be disabled - Bluetooth may be off");
+        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        return CHIP_NO_ERROR;
+    }
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
