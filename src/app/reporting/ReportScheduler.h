@@ -180,8 +180,6 @@ public:
 
     virtual void RescheduleAllReports() = 0;
 
-
-
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
     bool IsReportableNow(ReadHandler * aReadHandler)
