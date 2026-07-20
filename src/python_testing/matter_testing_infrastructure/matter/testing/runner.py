@@ -25,7 +25,6 @@ import os
 import pathlib
 import re
 import sys
-import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
@@ -72,7 +71,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
+def default_paa_rootstore_from_root(root_path: pathlib.Path) -> pathlib.Path | None:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
 
     This attempts to find {root_path}/credentials/development/paa-root-certs.
@@ -224,8 +223,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         """
         This method is called when the test runner needs to prompt the user for input.
 
@@ -249,7 +248,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
 @dataclass
 class TestStep:
-    test_plan_number: typing.Union[int, str]
+    test_plan_number: int | str
     description: str
     expectation: str = ""
     is_commissioning: bool = False
@@ -337,7 +336,8 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = parse_matter_test_args()
+    p = matter_test_args_parser()
+    matter_test_config = convert_args_to_matter_config(p.parse_args())
 
     # Find the test class in the test script.
     test_class = _find_test_class()
@@ -554,8 +554,8 @@ class MockTestRunner:
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
+                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -790,6 +790,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
     config.debug = args.debug
+    if getattr(args, 'enable_spec_errata_ci_only_disallowed_for_certification', False):
+        config.spec_errata_path = "data_model/errata_future.yaml"
+    else:
+        config.spec_errata_path = None
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
@@ -807,6 +811,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
+    config.no_wildcard_subscription = args.no_wildcard_subscription
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -938,7 +943,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[list[str]] = None):
+def matter_test_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -947,6 +952,8 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                              help='A list of tests in the test class to execute.')
     basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
                              help="Fail the test if any test cases are skipped")
+    basic_group.add_argument('--enable-spec-errata-ci-only-disallowed-for-certification', action='store_true', default=False,
+                             help="Enable declarative data model errata overlays to bridge Spec IDM testing with in-progress Matter SDK PRs")
     basic_group.add_argument('--trace-to', nargs="*", default=[],
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
@@ -981,6 +988,11 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")
+    basic_group.add_argument("--no-wildcard-subscription", action="store_true", default=False,
+                             dest="no_wildcard_subscription",
+                             help="Skip the background wildcard attribute subscription that is normally started "
+                                  "before each test.  Prefer setting disable_wildcard_subscription = True on the "
+                                  "test class (MatterBaseTest) for certification; this flag overrides for ad-hoc runs.")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
@@ -1070,7 +1082,4 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    if not argv:
-        argv = sys.argv[1:]
-
-    return convert_args_to_matter_config(parser.parse_args(argv))
+    return parser

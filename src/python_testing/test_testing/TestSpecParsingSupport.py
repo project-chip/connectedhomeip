@@ -264,6 +264,8 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 
 
 class TestSpecParsingSupport(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
         # Latest fully certified build
@@ -279,6 +281,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         one_five_xml_clusters, one_five_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         one_five_one_xml_clusters, one_five_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
         one_six_xml_clusters, one_six_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        one_six_one_xml_clusters, one_six_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
@@ -295,6 +298,9 @@ class TestSpecParsingSupport(MatterBaseTest):
         for p in one_six_problems:
             print(p)
         asserts.assert_equal(len(one_six_problems), 0, "Unexpected problems found on 1.6 cluster parsing")
+        for p in one_six_one_problems:
+            print(p)
+        asserts.assert_equal(len(one_six_one_problems), 0, "Unexpected problems found on 1.6.1 cluster parsing")
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -312,6 +318,8 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      0, "1.5.1 has fewer clusters than 1.5")
         asserts.assert_greater_equal(len(set(one_six_xml_clusters.keys()) - set(one_five_one_xml_clusters.keys())),
                                      0, "1.6 has fewer clusters than 1.5.1")
+        asserts.assert_greater_equal(len(set(one_six_one_xml_clusters.keys()) - set(one_six_xml_clusters.keys())),
+                                     0, "1.6.1 has fewer clusters than 1.6")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
         one_two_removed = {0x0005, 0x0407, 0x0408}
@@ -561,6 +569,33 @@ class TestSpecParsingSupport(MatterBaseTest):
             "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
         asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                               "Atomic request found in thermostat generated command list for 1.3")
+
+    def test_is_scene_attribute(self):
+        # Each case is (attribute XML, expected scene flag).
+        cases = [
+            ('<attribute><quality scene="true"/></attribute>', True),
+            # Case-insensitive parsing of the attribute value.
+            ('<attribute><quality scene="TRUE"/></attribute>', True),
+            ('<attribute><quality scene="false"/></attribute>', False),
+            # scene attribute absent from the quality element defaults to False.
+            ('<attribute><quality nullable="true"/></attribute>', False),
+            # No quality element at all defaults to False.
+            ('<attribute/>', False),
+        ]
+        for attribute_xml, expected in cases:
+            element = ElementTree.fromstring(attribute_xml)
+            asserts.assert_equal(ClusterParser._is_scene_attribute(element), expected,
+                                 f"Unexpected scene quality parsed from '{attribute_xml}'")
+
+    def test_scene_attribute_end_to_end(self):
+        # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
+        # other attributes carry scene="false".
+        xml_cluster = parse_cluster(BASE_CLUSTER_XML_STR)
+        asserts.assert_true(xml_cluster.attributes[0x0001].scene,
+                            "CurrentMode should carry the Scene (S) quality")
+        for attribute_id in (0x0000, 0x0002, 0x0003):
+            asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
+                                 f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
 
 
 if __name__ == "__main__":

@@ -48,6 +48,7 @@ class TestInvokeReturnCodes(MatterBaseTest):
     Validates that the invoke action correctly refuses commands
     on invalid endpoints.
     """
+    requires_dut = False
 
     @async_test_body
     async def test_invalid_endpoint_command(self):

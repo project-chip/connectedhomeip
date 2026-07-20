@@ -126,6 +126,12 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
               },
               contentUrl,
               Optional.of(contentDisplayString),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
+              Optional.empty(),
               Optional.empty());
         };
     return inflater.inflate(R.layout.fragment_matter_content_launcher_launch_url, container, false);

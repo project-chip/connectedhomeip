@@ -17,7 +17,6 @@
 
 import os
 import time
-import typing
 from datetime import UTC, datetime, timedelta
 
 from mobly import asserts, signals
@@ -28,7 +27,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.pics import parse_pics, parse_pics_xml
-from matter.testing.runner import default_matter_test_main, parse_matter_test_args
+from matter.testing.runner import convert_args_to_matter_config, default_matter_test_main, matter_test_args_parser
 from matter.testing.taglist_and_topology_test import (TagProblem, build_tree_for_graph, create_device_type_list_for_root,
                                                       create_device_type_lists, find_tag_list_problems, find_tree_roots,
                                                       flat_list_ok, get_all_children, get_direct_children_of_root,
@@ -67,11 +66,11 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
     vals = get_raw_type_list()
 
     if test_nullable and test_optional:
-        match_type = typing.Union[Nullable, None, test_type]
+        match_type = Nullable | None | test_type
     elif test_nullable:
-        match_type = typing.Union[Nullable, test_type]
+        match_type = Nullable | test_type
     elif test_optional:
-        match_type = typing.Optional[test_type]
+        match_type = test_type | None
     else:
         match_type = test_type
 
@@ -108,6 +107,8 @@ def run_all_match_tests_for_type(test_type):
 
 
 class TestMatterTestingSupport(MatterBaseTest):
+    requires_dut = False
+
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
@@ -729,7 +730,8 @@ class TestMatterTestingSupport(MatterBaseTest):
             "--json-arg", "PIXIT.TEST.JSON:{\"key\":\"value\"}",
         ]
 
-        parsed = parse_matter_test_args(args)
+        p = matter_test_args_parser()
+        parsed = convert_args_to_matter_config(p.parse_args(args))
         asserts.assert_equal(parsed.tests, ["TC_1", "TC_2"])
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.DEC"), 42)
         asserts.assert_equal(parsed.global_test_params.get("PIXIT.TEST.HEX"), 0x1234)

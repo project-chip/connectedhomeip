@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
+#include <clusters/AudioControl/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
 #include <clusters/AvAnalysis/CommandIds.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
@@ -48,6 +49,7 @@
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
+#include <clusters/CommissioningProxy/CommandIds.h>
 #include <clusters/CommodityMetering/CommandIds.h>
 #include <clusters/CommodityPrice/CommandIds.h>
 #include <clusters/CommodityTariff/CommandIds.h>
@@ -97,6 +99,7 @@
 #include <clusters/LevelControl/CommandIds.h>
 #include <clusters/LocalizationConfiguration/CommandIds.h>
 #include <clusters/LowPower/CommandIds.h>
+#include <clusters/MediaFileManagement/CommandIds.h>
 #include <clusters/MediaInput/CommandIds.h>
 #include <clusters/MediaPlayback/CommandIds.h>
 #include <clusters/Messages/CommandIds.h>
@@ -147,7 +150,9 @@
 #include <clusters/Switch/CommandIds.h>
 #include <clusters/TargetNavigator/CommandIds.h>
 #include <clusters/TemperatureControl/CommandIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/CommandIds.h>
 #include <clusters/TemperatureMeasurement/CommandIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/CommandIds.h>
 #include <clusters/Thermostat/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>

@@ -38,7 +38,6 @@ target_include_directories(app PRIVATE
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
@@ -52,7 +51,8 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-minimal-app.zap
