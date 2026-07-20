@@ -22,6 +22,8 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CodeUtils.h>
 
+#include <fstream>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -37,9 +39,13 @@ CHIP_ERROR AllDevicesExampleDACProvider::Init(const std::optional<std::string> &
 {
     if (filePath.has_value() && !filePath.value().empty())
     {
-        mFileContext = std::make_unique<FileProviderContext>();
-        mFileContext->provider.Init(filePath.value().c_str());
-        mDelegate = &mFileContext->provider;
+        std::ifstream jsonFile(filePath.value().c_str(), std::ifstream::binary);
+        VerifyOrReturnError(jsonFile.is_open(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        auto fileContext = std::make_unique<FileProviderContext>();
+        fileContext->provider.Init(filePath.value().c_str());
+        mFileContext = std::move(fileContext);
+        mDelegate    = &mFileContext->provider;
     }
     else
     {
