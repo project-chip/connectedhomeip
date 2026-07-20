@@ -2,13 +2,18 @@
 
 ## Cluster design
 
-The service area cluster is designed around three core classes: `Instance`,
-`StorageDelegate`, and a second `Delegate` class.
+The service area cluster is designed around four core classes:
+`ServiceAreaCluster`, `Instance`, `StorageDelegate`, and `Delegate`.
 
-The `Instance` class serves as the primary interface for safely accessing and
-modifying cluster attributes, adhering to the constraints outlined in the
-specification document. However, it does not handle the storage of list
-attributes.
+`ServiceAreaCluster` is the code-driven cluster implementation. It extends
+`DefaultServerCluster` and implements the Matter data model (`ReadAttribute`,
+`InvokeCommand`, and related methods). List attribute storage is delegated to
+`StorageDelegate`; device-specific business logic lives in `Delegate`.
+
+`Instance` is a backwards-compatible wrapper around `ServiceAreaCluster`.
+Existing applications (such as `rvc-app`) can continue to use
+`ServiceArea::Instance` and `Instance::Init()` without modification. New code
+should prefer `ServiceAreaCluster` directly.
 
 Storage management is delegated to the `StorageDelegate` class, which provides a
 list of virtual methods for the user to implement. These methods are

@@ -17,7 +17,6 @@
 
 import asyncio
 import logging
-from typing import Optional
 
 from .async_websocket_client import AsyncWebSocketClient
 from .browser_webrtc_client import BrowserWebRTCClient
@@ -51,7 +50,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         fabric_index: int,
         endpoint: int,
         ws_client: AsyncWebSocketClient,
-        event_loop: Optional[asyncio.AbstractEventLoop] = None,
+        event_loop: asyncio.AbstractEventLoop | None = None,
     ):
         super().__init__(ws_client=ws_client, id=node_id)
         self.event_loop = event_loop or asyncio.get_running_loop()
@@ -88,7 +87,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         self.on_state_change(self.on_state_change_cb)
 
     async def get_local_ice_candidates(
-        self, timeout_s: Optional[int] = None, wait_for_gathering_complete: bool = False
+        self, timeout_s: int | None = None, wait_for_gathering_complete: bool = False
     ) -> list[IceCandidate]:
         """Retrieves the local ICE candidates for the WebRTC peer connection.
         Ensure that the WebRTC peer connection is properly initialized before calling this function.
@@ -125,7 +124,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         # for candidate in remote_candidates:
         await self.set_remote_icecandidates(remote_candidates)
 
-    async def get_local_answer(self, timeout_sec: Optional[int] = None) -> str:
+    async def get_local_answer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP answer for the WebRTC peer connection.
 
         Args:
@@ -163,7 +162,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         """
         await self.set_remote_description(answer_sdp, "answer")
 
-    async def get_local_offer(self, timeout_sec: Optional[int] = None) -> str:
+    async def get_local_offer(self, timeout_sec: int | None = None) -> str:
         """Fetches the local SDP offer for the WebRTC peer connection.
 
         Args:
@@ -186,7 +185,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         """
         await self.set_remote_description(offer_sdp, "offer")
 
-    async def get_remote_offer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_offer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP offer to be received through a matter command.
 
         Args:
@@ -202,7 +201,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         LOGGER.debug("Waiting for remote offer")
         return await self._remote_events[Events.OFFER].get(timeout_s)
 
-    async def get_remote_answer(self, timeout_s: Optional[int] = None) -> tuple[int, str]:
+    async def get_remote_answer(self, timeout_s: int | None = None) -> tuple[int, str]:
         """Waits for a remote SDP answer to be received through a matter command.
 
         Args:
@@ -218,7 +217,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
+    async def get_remote_ice_candidates(self, timeout_s: int | None = None) -> tuple[int, list[IceCandidate]]:
         """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:

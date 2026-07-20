@@ -106,8 +106,6 @@ lark==1.1.5
     #   -r requirements.build.txt
     #   matter-idl
     #   matter-yamltests
-librt==0.9.0
-    # via mypy
 lxml==6.0.4
     # via -r requirements.build.txt
 markupsafe==2.1.2
@@ -116,10 +114,8 @@ matplotlib-inline==0.1.6
     # via ipython
 mobly==1.13
     # via -r requirements.all.txt
-mypy==1.19.1
+mypy==2.1.0
     # via -r requirements.all.txt
-mypy-extensions==1.0.0
-    # via mypy
 numpy==1.26.4
     # via pandas
 packaging==23.0
@@ -132,8 +128,6 @@ pandas==2.2.3 ; platform_machine != "aarch64" and platform_machine != "arm64"
     # via -r requirements.memory.txt
 parso==0.8.3
     # via jedi
-pathspec==0.12.1
-    # via mypy
 pep517==0.13.0
     # via build
 pexpect==4.8.0

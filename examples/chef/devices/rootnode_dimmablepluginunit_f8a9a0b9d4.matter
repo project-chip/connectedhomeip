@@ -729,10 +729,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1621,7 +1618,7 @@ cluster SoftwareDiagnostics = 52 {
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2135,7 +2132,7 @@ cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2320,7 +2317,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablepluginunit = 267, version 5;
+  device type ma_dimmablepluginunit = 267, version 6;
 
   binding cluster Binding;
   binding cluster OccupancySensing;
