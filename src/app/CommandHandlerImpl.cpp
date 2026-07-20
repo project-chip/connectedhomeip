@@ -274,17 +274,9 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
-    {
-        mNumTargetedEndpoints = 0;
-        mDelayReportData.ClearValue();
-        InvokeRequestMessage::DelayReportData delayReportData;
-        err = invokeRequestMessage.GetDelayReportData(&delayReportData);
-        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, Status::InvalidAction);
-        if (err == CHIP_NO_ERROR)
-        {
-            mDelayReportData.SetValue(delayReportData);
-        }
-    }
+    mNumTargetedEndpoints = 0;
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
@@ -332,15 +324,9 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
-    if (mDelayReportData.HasValue() && mpCallback != nullptr)
+    if (delayReportData.has_value())
     {
-        uint32_t delayMs = mDelayReportData.Value().delayMinMs;
-        if (mDelayReportData.Value().delayJitterWindowMs > 0)
-        {
-            delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
-        }
-        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
-                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
+        TriggerDelayReport(delayReportData.value());
     }
 
     return Status::Success;
@@ -1022,19 +1008,10 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
-    {
-        mNumTargetedEndpoints = 0;
-        CHIP_ERROR err        = CHIP_NO_ERROR;
-        mDelayReportData.ClearValue();
-        InvokeRequestMessage::DelayReportData delayReportData;
-        err = invokeRequestMessage.GetDelayReportData(&delayReportData);
-        VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, DataManagement,
-                           "DUT Failure: Failed to read DelayReportData");
-        if (err == CHIP_NO_ERROR)
-        {
-            mDelayReportData.SetValue(delayReportData);
-        }
-    }
+    mNumTargetedEndpoints = 0;
+    std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
+    VerifyOrDieWithMsg(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Failed to read DelayReportData");
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1095,15 +1072,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
 
-    if (mDelayReportData.HasValue() && mpCallback != nullptr)
+    if (delayReportData.has_value())
     {
-        uint32_t delayMs = mDelayReportData.Value().delayMinMs;
-        if (mDelayReportData.Value().delayJitterWindowMs > 0)
-        {
-            delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
-        }
-        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
-                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
+        TriggerDelayReport(delayReportData.value());
     }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
@@ -1125,6 +1096,20 @@ void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
     {
         ChipLogDetail(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
                       static_cast<unsigned int>(kMaxTargetedEndpoints));
+    }
+}
+
+void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData)
+{
+    if (mpCallback != nullptr)
+    {
+        uint32_t delayMs = aDelayReportData.delayMinMs;
+        if (aDelayReportData.delayJitterWindowMs > 0)
+        {
+            delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
+        }
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
+                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
     }
 }
 

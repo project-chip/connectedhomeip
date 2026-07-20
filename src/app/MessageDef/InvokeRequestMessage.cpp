@@ -113,16 +113,22 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
     return apInvokeRequests->Init(reader);
 }
 
-CHIP_ERROR InvokeRequestMessage::Parser::GetDelayReportData(DelayReportData * const apDelayReportData) const
+CHIP_ERROR InvokeRequestMessage::Parser::GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kDelayReportData), reader));
+    CHIP_ERROR err = mReader.FindElementWithTag(TLV::ContextTag(Tag::kDelayReportData), reader);
+    if (err == CHIP_ERROR_TLV_TAG_NOT_FOUND || err == CHIP_END_OF_TLV)
+    {
+        aDelayReportData = std::nullopt;
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
     VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
 
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    DelayReportData data;
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         if (!TLV::IsContextTag(reader.GetTag()))
@@ -132,24 +138,22 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetDelayReportData(DelayReportData * co
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
-        case 0:
-            ReturnErrorOnFailure(reader.Get(apDelayReportData->delayMinMs));
+        case to_underlying(DelayReportDataTag::kDelayMinMs):
+            ReturnErrorOnFailure(reader.Get(data.delayMinMs));
             break;
-        case 1:
-            ReturnErrorOnFailure(reader.Get(apDelayReportData->delayJitterWindowMs));
+        case to_underlying(DelayReportDataTag::kDelayJitterWindowMs):
+            ReturnErrorOnFailure(reader.Get(data.delayJitterWindowMs));
             break;
         default:
             break;
         }
     }
 
-    if (err == CHIP_END_OF_TLV)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(err.NoErrorIf(CHIP_END_OF_TLV));
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
-    return reader.ExitContainer(containerType);
+    aDelayReportData.emplace(data);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InvokeRequestMessage::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter)
@@ -186,11 +190,11 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::DelayReport(const
         mError = mpWriter->StartContainer(TLV::ContextTag(Tag::kDelayReportData), TLV::kTLVType_Structure, containerType);
         if (mError == CHIP_NO_ERROR)
         {
-            mError = mpWriter->Put(TLV::ContextTag(0), aDelayReportData.delayMinMs);
+            mError = mpWriter->Put(TLV::ContextTag(DelayReportDataTag::kDelayMinMs), aDelayReportData.delayMinMs);
         }
         if (mError == CHIP_NO_ERROR)
         {
-            mError = mpWriter->Put(TLV::ContextTag(1), aDelayReportData.delayJitterWindowMs);
+            mError = mpWriter->Put(TLV::ContextTag(DelayReportDataTag::kDelayJitterWindowMs), aDelayReportData.delayJitterWindowMs);
         }
         if (mError == CHIP_NO_ERROR)
         {

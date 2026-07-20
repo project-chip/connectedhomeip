@@ -672,9 +672,9 @@ CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-    if (mDelayReportData.HasValue())
+    if (mDelayReportData.has_value())
     {
-        mInvokeRequestBuilder.DelayReport(mDelayReportData.Value());
+        mInvokeRequestBuilder.DelayReport(mDelayReportData.value());
     }
     ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);

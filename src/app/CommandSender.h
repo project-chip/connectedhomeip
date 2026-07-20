@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
@@ -356,9 +357,9 @@ public:
      *                  configuration option.
      *               2. Ensure you provide ExtendableCallback.
      */
-    void SetDelayReportData(const InvokeRequestMessage::DelayReportData & aDelayReportData)
+    void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
     {
-        mDelayReportData.SetValue(aDelayReportData);
+        mDelayReportData = aDelayReportData;
     }
 
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
@@ -680,7 +681,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
-    Optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
+    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 
 } // namespace app

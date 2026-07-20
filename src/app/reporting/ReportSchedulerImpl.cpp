@@ -60,9 +60,11 @@ void ReportSchedulerImpl::RescheduleAllReports()
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
         Milliseconds32 newTimeout;
-        if (this->CalculateNextReportTimeout(newTimeout, node, now) == CHIP_NO_ERROR)
+        CHIP_ERROR err = this->CalculateNextReportTimeout(newTimeout, node, now);
+        LogErrorOnFailure(err);
+        if (err == CHIP_NO_ERROR)
         {
-            TEMPORARY_RETURN_IGNORED(this->ScheduleReport(newTimeout, node, now));
+            LogErrorOnFailure(this->ScheduleReport(newTimeout, node, now));
         }
         return Loop::Continue;
     });

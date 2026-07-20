@@ -88,9 +88,11 @@ void SynchronizedReportSchedulerImpl::RescheduleAllReports()
 {
     Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     Timeout timeout = Milliseconds32(0);
-    if (CalculateNextReportTimeout(timeout, nullptr, now) == CHIP_NO_ERROR)
+    CHIP_ERROR err  = CalculateNextReportTimeout(timeout, nullptr, now);
+    LogErrorOnFailure(err);
+    if (err == CHIP_NO_ERROR)
     {
-        TEMPORARY_RETURN_IGNORED(ScheduleReport(timeout, nullptr, now));
+        LogErrorOnFailure(ScheduleReport(timeout, nullptr, now));
     }
 }
 

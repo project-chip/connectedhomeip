@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include <app/CommandHandler.h>
 
 #include <app/CommandHandlerExchangeInterface.h>
@@ -460,6 +462,8 @@ private:
 
     void InvalidateHandles();
 
+    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData);
+
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
     /**
@@ -496,7 +500,7 @@ private:
     bool mSuppressResponse = false;
     bool mTimedRequest     = false;
     bool mGroupRequest     = false;
-    Optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
+
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
     // TODO(#32486): We should introduce breaking change where calls to add CommandData

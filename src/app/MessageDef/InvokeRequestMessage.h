@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -37,6 +39,12 @@ enum class Tag : uint8_t
     kTimedRequest     = 1,
     kInvokeRequests   = 2,
     kDelayReportData  = 3,
+};
+
+enum class DelayReportDataTag : uint8_t
+{
+    kDelayMinMs          = 0,
+    kDelayJitterWindowMs = 1,
 };
 
 struct DelayReportData
@@ -81,12 +89,11 @@ public:
     /**
      *  @brief Get DelayReportData parameters.
      *
-     *  @param [out] apDelayReportData    A pointer to the delay report data structure to write to.
+     *  @param [out] aDelayReportData    A reference to the std::optional of delay report data structure to write to.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetDelayReportData(DelayReportData * const apDelayReportData) const;
+    CHIP_ERROR GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const;
 };
 
 class Builder : public MessageBuilder
