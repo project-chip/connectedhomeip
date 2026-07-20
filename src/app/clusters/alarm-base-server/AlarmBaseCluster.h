@@ -47,9 +47,6 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
-
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -88,11 +85,9 @@ private:
     void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
                          AlarmBase::AlarmMap mask);
 
-    std::optional<DataModel::ActionReturnStatus> HandleReset(CommandHandler & commandObj, const ConcreteCommandPath & commandPath,
-                                                             AlarmBase::AlarmMap alarms);
+    DataModel::ActionReturnStatus HandleReset(AlarmBase::AlarmMap alarms);
 
-    std::optional<DataModel::ActionReturnStatus>
-    HandleModifyEnabledAlarms(CommandHandler & commandObj, const ConcreteCommandPath & commandPath, AlarmBase::AlarmMap mask);
+    DataModel::ActionReturnStatus HandleModifyEnabledAlarms(AlarmBase::AlarmMap mask);
 };
 
 } // namespace chip::app::Clusters

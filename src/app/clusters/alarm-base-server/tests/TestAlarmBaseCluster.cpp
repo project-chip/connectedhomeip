@@ -35,7 +35,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
 using namespace chip::app::Clusters::AlarmBase::Attributes;
 using namespace chip::Testing;
-using Status = Protocols::InteractionModel::Status;
+using Status            = Protocols::InteractionModel::Status;
+using ClusterStatusCode = Protocols::InteractionModel::ClusterStatusCode;
 
 constexpr ClusterId kDishwasherClusterId   = DishwasherAlarm::Id;
 constexpr ClusterId kRefrigeratorClusterId = RefrigeratorAlarm::Id;
@@ -276,7 +277,8 @@ TEST_F(TestAlarmBaseCluster, DelegateCanRejectModifyEnabledAlarms)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     Commands::ModifyEnabledAlarms::Type command{ .mask = BitMask<DishwasherAlarm::AlarmBitmap>(0x1) };
-    EXPECT_EQ(tester.Invoke(command).GetStatusCode()->GetStatus(), Status::Failure);
+    auto result = tester.Invoke(command);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
 }
 
 } // namespace

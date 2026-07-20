@@ -223,14 +223,6 @@ DataModel::ActionReturnStatus AlarmBaseCluster::ReadAttribute(const DataModel::R
     }
 }
 
-DataModel::ActionReturnStatus AlarmBaseCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                               AttributeValueDecoder & decoder)
-{
-    (void) decoder;
-    (void) request;
-    return Status::UnsupportedAttribute;
-}
-
 CHIP_ERROR AlarmBaseCluster::Attributes(const ConcreteClusterPath & path,
                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -266,76 +258,64 @@ std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::InvokeCommand(con
     case Commands::Reset::Id: {
         Commands::Reset::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleReset(*handler, request.path, AlarmMap(data.alarms.Raw()));
+        return HandleReset(AlarmMap(data.alarms.Raw()));
     }
     case Commands::ModifyEnabledAlarms::Id: {
         Commands::ModifyEnabledAlarms::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return HandleModifyEnabledAlarms(*handler, request.path, AlarmMap(data.mask.Raw()));
+        return HandleModifyEnabledAlarms(AlarmMap(data.mask.Raw()));
     }
     default:
         return Status::UnsupportedCommand;
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> AlarmBaseCluster::HandleReset(CommandHandler & commandObj,
-                                                                           const ConcreteCommandPath & commandPath, AlarmMap alarms)
+DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
 {
     if (!HasResetFeature())
     {
-        commandObj.AddStatus(commandPath, Status::UnsupportedCommand);
-        return std::nullopt;
+        return Status::UnsupportedCommand;
     }
 
     if (!mSupported.HasAll(alarms))
     {
-        commandObj.AddStatus(commandPath, Status::Failure);
-        return std::nullopt;
+        return Status::Failure;
     }
 
     if (mDelegate != nullptr && !mDelegate->ResetAlarms(alarms))
     {
-        commandObj.AddStatus(commandPath, Status::Failure);
-        return std::nullopt;
+        return Status::Failure;
     }
 
     if (ResetLatchedAlarms(alarms) != Status::Success)
     {
-        commandObj.AddStatus(commandPath, Status::Failure);
-        return std::nullopt;
+        return Status::Failure;
     }
 
-    commandObj.AddStatus(commandPath, Status::Success);
-    return std::nullopt;
+    return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-AlarmBaseCluster::HandleModifyEnabledAlarms(CommandHandler & commandObj, const ConcreteCommandPath & commandPath, AlarmMap mask)
+DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmMap mask)
 {
     if (!mSupportsModifyEnabledAlarms)
     {
-        commandObj.AddStatus(commandPath, Status::UnsupportedCommand);
-        return std::nullopt;
+        return Status::UnsupportedCommand;
     }
 
     if (!mSupported.HasAll(mask))
     {
-        commandObj.AddStatus(commandPath, Status::InvalidCommand);
-        return std::nullopt;
+        return Status::InvalidCommand;
     }
 
     if (mDelegate != nullptr && !mDelegate->ModifyEnabledAlarms(mask))
     {
-        commandObj.AddStatus(commandPath, Status::Failure);
-        return std::nullopt;
+        return Status::Failure;
     }
 
     if (SetMaskValue(mask) != Status::Success)
     {
-        commandObj.AddStatus(commandPath, Status::Failure);
-        return std::nullopt;
+        return Status::Failure;
     }
 
-    commandObj.AddStatus(commandPath, Status::Success);
-    return std::nullopt;
+    return Status::Success;
 }
