@@ -69,7 +69,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints)
 {
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    mNodesPool.ForEachActiveObject([this, now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
+    mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
         if (node->IsInterestedInEndpoints(targetedEndpoints))
         {
             System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
