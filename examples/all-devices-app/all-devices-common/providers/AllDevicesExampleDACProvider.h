@@ -60,6 +60,7 @@ public:
 private:
     Credentials::DeviceAttestationCredentialsProvider * mDelegate = nullptr;
 
+    // Use PIMPL idiom to avoid leaking TestHarnessDACProvider test headers into the public provider interface.
     struct FileProviderContext;
     std::unique_ptr<FileProviderContext> mFileContext;
 };
