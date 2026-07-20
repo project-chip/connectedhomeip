@@ -8447,19 +8447,22 @@ endpoint 1 {
   server cluster Humidistat {
     callback attribute supportedModes;
     ram      attribute mode default = 0;
-    ram      attribute systemState default = 40;
+    ram      attribute systemState default = 3;
     ram      attribute userSetpoint default = 40;
-    ram      attribute minSetpoint default = 60;
-    ram      attribute maxSetpoint default = 5;
-    ram      attribute step default = 0;
-    ram      attribute targetSetpoint default = 0;
-    ram      attribute mistType default = 0;
+    ram      attribute minSetpoint default = 30;
+    ram      attribute maxSetpoint default = 60;
+    ram      attribute step default = 5;
+    ram      attribute targetSetpoint default = 40;
+    ram      attribute mistType default = 1;
     ram      attribute continuous default = 0;
     ram      attribute sleep default = 0;
+    ram      attribute optimal default = 0;
+    ram      attribute condPumpEnabled default = 0;
+    ram      attribute condRunCount default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 511;
+    ram      attribute featureMap default = 1023;
     callback attribute clusterRevision default = 1;
 
     handle command SetSettings;
