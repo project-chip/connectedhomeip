@@ -27,7 +27,6 @@
 #include <clusters/RefrigeratorAlarm/Metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
-#include <lib/support/BitMask.h>
 
 #include <array>
 #include <cstdint>
