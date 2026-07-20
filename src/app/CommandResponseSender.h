@@ -20,15 +20,12 @@
 #include <app/CommandHandlerExchangeInterface.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/StatusResponse.h>
+#include <app/reporting/ReportScheduler.h>
 #include <messaging/ExchangeHolder.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace app {
-
-namespace reporting {
-class ReportScheduler;
-} // namespace reporting
 
 // TODO(#30453): Rename CommandResponseSender to CommandResponder in follow up PR
 /**
