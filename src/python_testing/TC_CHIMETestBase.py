@@ -93,4 +93,3 @@ class CHIMETestBase:
                 log.info("Level Control not supported on Speaker endpoint, skipping volume initialization step")
         else:
             log.info("No child Speaker endpoint found, skipping volume initialization step")
-
