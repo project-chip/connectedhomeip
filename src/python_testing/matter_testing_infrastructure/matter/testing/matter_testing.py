@@ -1120,7 +1120,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Must run before _purge_group_memberships since RemoveAllScenes needs the group to
         still exist on the DUT.
         """
-        wildcard = self.stored_global_wildcard()
+        wildcard = self.stored_global_wildcard
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
@@ -1158,7 +1158,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
         """
-        wildcard = self.stored_global_wildcard()
+        wildcard = self.stored_global_wildcard
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
             return
@@ -1183,7 +1183,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _purge_doorlock(self) -> None:
         """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
-        wildcard = self.stored_global_wildcard()
+        wildcard = self.stored_global_wildcard
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
             return
@@ -1220,7 +1220,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         tls_cluster_id = Clusters.TlsClientManagement.id
         found_any = False
-        wildcard = self.stored_global_wildcard()
+        wildcard = self.stored_global_wildcard
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping TLS endpoint cleanup")
             return
@@ -1275,7 +1275,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Unregisters all ICD clients registered on the DUT via the default controller"""
         # Check if the ICD Management cluster is present on the DUT.
         # Wildcard is pre-populated by the test runner; guard when unavailable.
-        wildcard = self.stored_global_wildcard()
+        wildcard = self.stored_global_wildcard
         if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
             return
