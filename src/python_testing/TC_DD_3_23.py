@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 
 class TC_DD_3_23(MatterBaseTest):
     runner_prepopulates_global_wildcard = False
+    disable_wildcard_subscription = True
 
     def desc_TC_DD_3_23(self) -> str:
         return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
@@ -86,7 +87,6 @@ class TC_DD_3_23(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info("NFC Tag data : '%s'", nfc_tag_data)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"
@@ -96,6 +96,7 @@ class TC_DD_3_23(MatterBaseTest):
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
+
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
 
         commissioning_method = self.matter_test_config.in_test_commissioning_method
@@ -104,9 +105,11 @@ class TC_DD_3_23(MatterBaseTest):
             str(commissioning_method).startswith("nfc-"),
             f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
         )
-
         self.matter_test_config.commissioning_method = commissioning_method
-        commissioning_success = await self.commission_devices()
+
+        # Force a commissioning over NTL
+        commissioning_success = await self.commission_ntl_device(payload)
+
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
 
         asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
