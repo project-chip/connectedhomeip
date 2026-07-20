@@ -38,8 +38,8 @@ namespace chip::app::Clusters {
 
 // The handler lives in chip::app::Clusters so that chip / chip::app / chip::app::Clusters names
 // (scenes::, EndpointId, ByteSpan, DataModel::, ScenesManagement::, ...) resolve through enclosing-namespace
-// lookup. ColorControl attribute/enum/color-state names are used unqualified, so pull that namespace in too.
-using namespace ColorControl;
+// lookup. ColorControl attribute/enum/color-state names are pulled in per-function via `using namespace
+// ColorControl;` (a namespace-scope using-directive in a header trips the lint check).
 
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -60,6 +60,7 @@ public:
     /// @brief Serialize the cluster's current color state into a scene EFS.
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId clusterId, MutableByteSpan & serializedBytes) override
     {
+        using namespace ColorControl; // Feature, Attributes, EnhancedColorModeEnum, ...
         using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         auto * cluster = FindClusterOnEndpoint(endpoint);
@@ -108,6 +109,8 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
+        using namespace ColorControl; // Attributes, EnhancedColorModeEnum, ColorValue, XYColor, ...
+
         auto * cluster = FindClusterOnEndpoint(endpoint);
         VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
