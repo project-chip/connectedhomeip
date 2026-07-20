@@ -930,7 +930,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralEndpointSpecific)
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
     // Add path targeting endpoint 1
     AttributePathParams pathParams1(1, 1, 1);
-    SingleLinkedListNode<AttributePathParams> pathNode1{pathParams1};
+    SingleLinkedListNode<AttributePathParams> pathNode1{ pathParams1 };
     readHandler1->mpAttributePathList = &pathNode1;
     readHandler1->ForceDirtyState();
 
@@ -940,7 +940,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralEndpointSpecific)
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 1, 5));
     // Add path targeting endpoint 2
     AttributePathParams pathParams2(2, 1, 1);
-    SingleLinkedListNode<AttributePathParams> pathNode2{pathParams2};
+    SingleLinkedListNode<AttributePathParams> pathNode2{ pathParams2 };
     readHandler2->mpAttributePathList = &pathNode2;
     readHandler2->ForceDirtyState();
 
