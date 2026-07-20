@@ -41,6 +41,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmer-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",

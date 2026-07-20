@@ -28,6 +28,7 @@
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/dimmer-switch/DimmerSwitch.h>
 #include <device/types/dishwasher/Dishwasher.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
@@ -299,6 +300,13 @@ private:
                         .timerDelegate     = mContext->timerDelegate,
                     },
                     DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_DIMMER_SWITCH)
+        {
+            RegisterCreator("dimmer-switch", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<DimmerSwitch>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)

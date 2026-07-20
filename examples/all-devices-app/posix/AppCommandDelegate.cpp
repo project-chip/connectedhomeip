@@ -23,6 +23,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <platform/PlatformManager.h>
+#include <binding-handler/binding-handler.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -238,6 +239,116 @@ void AllDevicesAppCommandDelegate::DispatchCommand(intptr_t context)
     Platform::Delete(cmdContext);
 }
 
+class SimulateBindingOnOffCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingOnOff"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        if (!json.isMember("On") || !json["On"].isBool())
+        {
+            ChipLogError(AppServer, "Invalid SimulateBindingOnOff command: missing 'On' field");
+            return;
+        }
+        bool on = json["On"].asBool();
+        SimulateBindingOnOff(endpointId, on);
+        ChipLogProgress(AppServer, "SimulateBindingOnOff %d on endpoint %d", on, endpointId);
+    }
+};
+
+class SimulateBindingToggleCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingToggle"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        SimulateBindingToggle(endpointId);
+        ChipLogProgress(AppServer, "SimulateBindingToggle on endpoint %d", endpointId);
+    }
+};
+
+class SimulateBindingMoveToLevelCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingMoveToLevel"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        if (!json.isMember("Level") || !json["Level"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SimulateBindingMoveToLevel command: missing 'Level' field");
+            return;
+        }
+        uint8_t level          = static_cast<uint8_t>(json["Level"].asUInt());
+        uint8_t transitionTime = json.isMember("TransitionTime") && json["TransitionTime"].isUInt()
+            ? static_cast<uint8_t>(json["TransitionTime"].asUInt())
+            : 0;
+        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
+            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
+            : 0;
+
+        SimulateBindingMoveToLevel(endpointId, level, transitionTime, optionsMask);
+        ChipLogProgress(AppServer, "SimulateBindingMoveToLevel level=%u transitionTime=%u on endpoint %d", level, transitionTime, endpointId);
+    }
+};
+
+class SimulateBindingMoveCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingMove"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        if (!json.isMember("MoveMode") || !json["MoveMode"].isUInt() || !json.isMember("Rate") || !json["Rate"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SimulateBindingMove command: missing 'MoveMode' or 'Rate' field");
+            return;
+        }
+        uint8_t moveMode    = static_cast<uint8_t>(json["MoveMode"].asUInt());
+        uint8_t rate        = static_cast<uint8_t>(json["Rate"].asUInt());
+        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
+            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
+            : 0;
+
+        SimulateBindingMove(endpointId, moveMode, rate, optionsMask);
+        ChipLogProgress(AppServer, "SimulateBindingMove moveMode=%u rate=%u on endpoint %d", moveMode, rate, endpointId);
+    }
+};
+
+class SimulateBindingStepCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingStep"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        if (!json.isMember("StepMode") || !json["StepMode"].isUInt() || !json.isMember("StepSize") || !json["StepSize"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SimulateBindingStep command: missing 'StepMode' or 'StepSize' field");
+            return;
+        }
+        uint8_t stepMode       = static_cast<uint8_t>(json["StepMode"].asUInt());
+        uint8_t stepSize       = static_cast<uint8_t>(json["StepSize"].asUInt());
+        uint8_t transitionTime = json.isMember("TransitionTime") && json["TransitionTime"].isUInt()
+            ? static_cast<uint8_t>(json["TransitionTime"].asUInt())
+            : 0;
+        uint8_t optionsMask = json.isMember("OptionsMask") && json["OptionsMask"].isUInt()
+            ? static_cast<uint8_t>(json["OptionsMask"].asUInt())
+            : 0;
+
+        SimulateBindingStep(endpointId, stepMode, stepSize, transitionTime, optionsMask);
+        ChipLogProgress(AppServer, "SimulateBindingStep stepMode=%u stepSize=%u on endpoint %d", stepMode, stepSize, endpointId);
+    }
+};
+
+class SimulateBindingStopCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SimulateBindingStop"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        SimulateBindingStop(endpointId);
+        ChipLogProgress(AppServer, "SimulateBindingStop on endpoint %d", endpointId);
+    }
+};
+
 void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler)
 {
     mCommandHandlers[handler->GetName()] = std::move(handler);
@@ -250,4 +361,11 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetHoldTimeCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+
+    RegisterCommandHandler(std::make_unique<SimulateBindingOnOffCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SimulateBindingToggleCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SimulateBindingMoveToLevelCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SimulateBindingMoveCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SimulateBindingStepCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SimulateBindingStopCommandHandler>());
 }
