@@ -114,6 +114,7 @@ CodeDrivenClusters:
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
+    - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting
     - Electrical Power Measurement
@@ -153,6 +154,7 @@ CodeDrivenClusters:
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
+    - Refrigerator Alarm
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management
