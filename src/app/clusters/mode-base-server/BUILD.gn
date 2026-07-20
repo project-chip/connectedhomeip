@@ -25,6 +25,7 @@ source_set("mode-base-server") {
   public_deps = [
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster",
   ]
 }

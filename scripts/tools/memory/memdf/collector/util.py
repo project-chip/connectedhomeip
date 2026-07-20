@@ -17,10 +17,9 @@
 
 import os
 import re
-from typing import Optional
 
 
-def simplify_source(source: str, prefixes: Optional[re.Pattern]) -> str:
+def simplify_source(source: str, prefixes: re.Pattern | None) -> str:
     """Simplify a source file path."""
     r = source
     if prefixes:

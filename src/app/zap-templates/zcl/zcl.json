@@ -232,6 +232,12 @@
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
+        "Dynamic Lighting": [
+            "ClusterRevision",
+            "FeatureMap",
+            "CurrentEffectID",
+            "CurrentSpeed"
+        ],
         "Commissioner Control": [
             "SupportedDeviceCategories",
             "FeatureMap",
@@ -997,7 +1003,11 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
-        "Window Covering": ["ClusterRevision"],
+        "Window Covering": [
+            "ClusterRevision",
+            "OperationalStatus",
+            "SafetyStatus"
+        ],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
