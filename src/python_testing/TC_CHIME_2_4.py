@@ -111,52 +111,12 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
 
         # Step 2: Unmute child Speaker if present
         self.step(2)
-        parts_list = await self.read_single_attribute_check_success(
-            endpoint=endpoint,
-            cluster=Clusters.Objects.Descriptor,
-            attribute=Clusters.Objects.Descriptor.Attributes.PartsList
-        )
-
-        speaker_endpoint = None
-        for child_endpoint in parts_list:
-            device_type_list = await self.read_single_attribute_check_success(
-                endpoint=child_endpoint,
-                cluster=Clusters.Objects.Descriptor,
-                attribute=Clusters.Objects.Descriptor.Attributes.DeviceTypeList
-            )
-            for dt in device_type_list:
-                if dt.deviceType == 0x0022:  # Speaker device type ID
-                    speaker_endpoint = child_endpoint
-                    break
-            if speaker_endpoint is not None:
-                break
-
-        if speaker_endpoint is not None:
-            await self.send_single_cmd(
-                cmd=Clusters.OnOff.Commands.On(),
-                endpoint=speaker_endpoint
-            )
-        else:
-            log.info("No child Speaker endpoint found, skipping unmute initialization step")
+        speaker_endpoint = await self.get_child_speaker_endpoint(endpoint)
+        await self.unmute_speaker_if_present(speaker_endpoint)
 
         # Step 3: Set Level Control to high if supported on child Speaker
         self.step(3)
-        if speaker_endpoint is not None:
-            server_list = await self.read_single_attribute_check_success(
-                endpoint=speaker_endpoint,
-                cluster=Clusters.Objects.Descriptor,
-                attribute=Clusters.Objects.Descriptor.Attributes.ServerList
-            )
-            has_level_control = 0x0008 in server_list
-            if has_level_control:
-                await self.send_single_cmd(
-                    cmd=Clusters.LevelControl.Commands.MoveToLevel(level=200, transitionTime=0, optionsMask=0, optionsOverride=0),
-                    endpoint=speaker_endpoint
-                )
-            else:
-                log.info("Level Control not supported on Speaker endpoint, skipping volume initialization step")
-        else:
-            log.info("No child Speaker endpoint found, skipping volume initialization step")
+        await self.set_speaker_volume_high_if_supported(speaker_endpoint)
 
         # Step 4: Write Enabled = False
         self.step(4)
