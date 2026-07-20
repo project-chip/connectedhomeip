@@ -24,7 +24,7 @@ assert(current_os == "freertos")
 
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WBA65I-DK1"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
-stm32_board_src = "${chip_root}/examples/platform/stm32/common"
+stm32_board_src = "${chip_root}/examples/platform/stm32"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
@@ -76,9 +76,9 @@ stm32_executable("lighting_app") {
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Inc",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/App",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Inc",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App",
     "include/",
     "${chip_root}/src/include/",
   ]

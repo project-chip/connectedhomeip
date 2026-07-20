@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 
 declare_args() {
   ## PATHS FOR STM32WB BOARD ##
-  stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
+  stm32_board_src = "${chip_root}/examples/platform/stm32/STM32WB5MM-DK"
   bsp_stm32wb5mm_dk =
       "${chip_root}/third_party/st/STM32CubeWB/Drivers/BSP/STM32WB5MM-DK"
   components_common =
@@ -35,7 +35,7 @@ declare_args() {
 }
 
 SOURCES = [
-  # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WB5MM-DK/)
+  # BOARD APPLICATION SRC(in examples/platform/stm32/STM32WB5MM-DK/)
   "${stm32_board_src}/Src/app_debug.c",
   "${stm32_board_src}/Src/entropy_hardware_poll.c",
   "${stm32_board_src}/Src/flash_wb.c",

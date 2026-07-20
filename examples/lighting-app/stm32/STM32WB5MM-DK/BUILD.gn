@@ -24,7 +24,7 @@ assert(current_os == "freertos")
 
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WB5MM-DK"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
-stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
+stm32_board_src = "${chip_root}/examples/platform/stm32/STM32WB5MM-DK"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
@@ -64,11 +64,11 @@ stm32_sdk("sdk") {
   sources = [
     "${examples_plat_dir}/config_files/STM32WB5/FreeRTOSConfig.h",
     "${examples_plat_dir}/config_files/STM32WB5/matter_config.h",
-    "${stm32_project_dir}/include/STM32WB5/CHIPProjectConfig.h",
+    "${stm32_project_dir}/include/CHIPProjectConfig.h",
   ]
 
   include_dirs += [
-    "${stm32_project_dir}/include/STM32WB5",
+    "${stm32_project_dir}/include",
     "${chip_root}/src/include",
   ]
 
@@ -87,9 +87,9 @@ stm32_executable("lighting_app") {
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
-    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
-    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/Target",
-    "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/STM32_WPAN/App",
+    "${chip_root}/examples/platform/stm32/STM32WB5MM-DK/Inc",
+    "${chip_root}/examples/platform/stm32/STM32WB5MM-DK/STM32_WPAN/Target",
+    "${chip_root}/examples/platform/stm32/STM32WB5MM-DK/STM32_WPAN/App",
     "${chip_root}/src/include/",
   ]
   defines = []
@@ -104,10 +104,10 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/Src/app_entry.cpp",
     "${stm32_board_src}/Src/main.cpp",
     "${stm32_board_src}/Src/ota.cpp",
-    "src/STM32WB5/AppTask.cpp",
-    "src/STM32WB5/IdentifierEffect.cpp",
-    "src/STM32WB5/LightingManager.cpp",
-    "src/STM32WB5/ZclCallbacks.cpp",
+    "src/AppTask.cpp",
+    "src/IdentifierEffect.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
   ]
 
   deps = [

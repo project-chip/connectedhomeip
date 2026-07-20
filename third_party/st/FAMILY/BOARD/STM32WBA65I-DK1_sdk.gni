@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 declare_args() {
   ## PATHS FOR STM32WB BOARD ##
   stm32_board_src =
-      "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1"
+      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1"
   stm32_wb_bsp = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/BSP"
 
   ## PATHS FOR ST UTILITIES ##
@@ -26,7 +26,7 @@ declare_args() {
 }
 
 SOURCES = [
-  # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WBA65I-DK1/)
+  # BOARD APPLICATION SRC(in examples/platform/stm32/STM32WBA65I-DK1/)
   "${stm32_board_src}/Src/app_nvm.c",
   "${stm32_board_src}/Src/app_freertos.c",
   "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",

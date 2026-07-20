@@ -34,8 +34,8 @@ declare_args() {
       "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
   stm32_system = "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Modules"
   stm32_system_interfaces = "${chip_root}/third_party/st/STM32CubeWBA/Projects/Common/WPAN/Interfaces"
-  stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Config"
-  stm32_system_App = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/"
+  stm32_system_Config = "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Common/WPAN/Config"
+  stm32_system_App = "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Common/WPAN/"
   stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
 
   ## PATHS FOR FREERTOS ##
@@ -307,7 +307,7 @@ INCLUDE_DIRS = [
   "${stm32_system_Config}/Flash",
   "${stm32_system_Config}/Log",
   "${stm32_system_Config}/LowPower",
-  "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
+  "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
 
   #FREERTOS INCLUDES
   "${freertos_st}/include",
