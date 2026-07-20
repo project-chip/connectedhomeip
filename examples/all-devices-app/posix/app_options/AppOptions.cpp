@@ -237,7 +237,11 @@ OptionSet * AppOptions::GetOptions()
 #endif
 
         result += "  --KVS <path>\n";
+#if defined(CHIP_CONFIG_KVS_PATH)
         result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+#else
+        result += "       Path to the Key Value Store file\n\n";
+#endif
 
         result += "  --discriminator <number>\n";
         result += "       Discriminator value for commissioning (default: 3840)\n\n";
