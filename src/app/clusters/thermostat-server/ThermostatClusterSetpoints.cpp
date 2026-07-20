@@ -230,24 +230,24 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
     int16_t occupiedCooling;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id }, occupiedCooling,
                                       static_cast<int16_t>(kDefaultCoolingSetpoint));
-    setpoints.occupied.cooling.SetTemperature(occupiedCooling);
+    setpoints.occupiedRange.cooling.SetTemperature(occupiedCooling);
 
     int16_t occupiedHeating;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id }, occupiedHeating,
                                       static_cast<int16_t>(kDefaultHeatingSetpoint));
-    setpoints.occupied.heating.SetTemperature(occupiedHeating);
+    setpoints.occupiedRange.heating.SetTemperature(occupiedHeating);
 
     if (setpoints.occupancySupported)
     {
         int16_t unoccupiedCooling;
         persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id },
                                           unoccupiedCooling, static_cast<int16_t>(kDefaultCoolingSetpoint));
-        setpoints.unoccupied.cooling.SetTemperature(unoccupiedCooling);
+        setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
 
         int16_t unoccupiedHeating;
         persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id },
                                           unoccupiedHeating, static_cast<int16_t>(kDefaultHeatingSetpoint));
-        setpoints.unoccupied.heating.SetTemperature(unoccupiedHeating);
+        setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
     }
 
     return Status::Success;
@@ -264,6 +264,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     }
     GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
     oldSetpoint.SetTemperature(newSetpoint.Temperature());
+    NotifyAttributeChanged(oldSetpoint.AttributeId());
     return Status::Success;
 }
 
@@ -289,14 +290,14 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
         }
         if (changedAttributes.Has(OccupiedHeatingSetpoint::Id))
         {
-            status = SaveSetpoint(mSetpoints.occupied.heating, setpoints.occupied.heating);
+            status = SaveSetpoint(mSetpoints.occupiedRange.heating, setpoints.occupiedRange.heating);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (setpoints.occupancySupported)
         {
             if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id))
             {
-                status = SaveSetpoint(mSetpoints.unoccupied.heating, setpoints.unoccupied.heating);
+                status = SaveSetpoint(mSetpoints.unoccupiedRange.heating, setpoints.unoccupiedRange.heating);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
         }   
@@ -315,20 +316,19 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
         }
         if (changedAttributes.Has(OccupiedCoolingSetpoint::Id))
         {
-            status = SaveSetpoint(mSetpoints.occupied.cooling, setpoints.occupied.cooling);
+            status = SaveSetpoint(mSetpoints.occupiedRange.cooling, setpoints.occupiedRange.cooling);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (setpoints.occupancySupported)
         {
             if (changedAttributes.Has(UnoccupiedCoolingSetpoint::Id))
             {
-                status = SaveSetpoint(mSetpoints.unoccupied.cooling, setpoints.unoccupied.cooling);
+                status = SaveSetpoint(mSetpoints.unoccupiedRange.cooling, setpoints.unoccupiedRange.cooling);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
         } 
     }
     return Status::Success;
->>>>>>> 5d457bc605 (Initial conversion of Thermostat cluster to code-driven)
 }
 
 DataModel::ActionReturnStatus ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, temperature temp)
