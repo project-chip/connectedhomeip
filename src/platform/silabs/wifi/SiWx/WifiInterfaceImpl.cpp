@@ -269,9 +269,8 @@ sl_status_t SiWxPlatformInit(void)
 
     // Initiate and program the key required for TRNG hardware engine
     status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
-    VerifyOrReturnError(
-        status == SL_STATUS_OK, status,
-        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationInit);
@@ -423,8 +422,7 @@ sl_status_t SetWifiConfigurations()
                         ChipLogError(DeviceLayer, "sl_wifi_set_join_configuration failed: 0x%" PRIx32, status));
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%" PRIx32, status));
+    VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%" PRIx32, status));
 
     return status;
 }
@@ -483,9 +481,8 @@ void WifiInterfaceImpl::MatterWifiTask(void * arg)
     sl_status_t status = SL_STATUS_OK;
 
     status = SiWxPlatformInit();
-    VerifyOrReturn(
-        status == SL_STATUS_OK,
-        ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+    VerifyOrReturn(status == SL_STATUS_OK,
+                   ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Remove High performance request after the device is initialized
@@ -828,9 +825,8 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
     uint8_t filterBcastInTim     = (enableBroadcastFilter) ? 1 : 0;
 
     status = sl_wifi_filter_broadcast(beaconDropThreshold, filterBcastInTim, 1 /* valid till next update*/);
-    VerifyOrReturnError(
-        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-        ChipLogError(DeviceLayer, "sl_wifi_filter_broadcast failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "sl_wifi_filter_broadcast failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
     return CHIP_NO_ERROR;
 }

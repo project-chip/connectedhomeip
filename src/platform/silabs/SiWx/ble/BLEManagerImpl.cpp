@@ -273,8 +273,7 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
         }
         else
         {
-            ChipLogError(DeviceLayer, "sl_ble_event_handling_task: get event failed: 0x%" PRIx32,
-                         static_cast<uint32_t>(status));
+            ChipLogError(DeviceLayer, "sl_ble_event_handling_task: get event failed: 0x%" PRIx32, static_cast<uint32_t>(status));
         }
     }
 }

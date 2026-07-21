@@ -312,8 +312,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                     }
                     else
                     {
-                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%" PRIx32,
-                                     status);
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error 0x%" PRIx32, status);
                         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                         return;
                     }
