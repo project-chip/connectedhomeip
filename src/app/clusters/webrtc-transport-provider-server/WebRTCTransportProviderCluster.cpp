@@ -1102,13 +1102,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         args.sessionId = sessionId;
     }
 
-    args.streamUsage           = req.streamUsage.Value();
+    args.streamUsage           = req.streamUsage.ValueOr(outSession.streamUsage);
     args.videoStreams          = videoStreams;
     args.audioStreams          = audioStreams;
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID.Value();
+    args.originatingEndpointId = req.originatingEndpointID.ValueOr(chip::kInvalidEndpointId);
 
     if (req.SFrameConfig.HasValue())
     {
