@@ -380,6 +380,12 @@ private:
 
     void CleanupCASEClient();
 
+    /**
+     * Helper to get the System::Layer from the session manager.
+     * Returns nullptr if not available.
+     */
+    System::Layer * GetSystemLayer();
+
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                  Callback::Callback<OnSetupFailure> * onSetupFailure,
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
@@ -494,12 +500,6 @@ private:
      * Start the fallback timeout timer.
      */
     CHIP_ERROR StartFallbackTimer();
-
-    /**
-     * Helper to get the System::Layer from the session manager.
-     * Returns nullptr if not available.
-     */
-    System::Layer * GetSystemLayer();
 
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 };

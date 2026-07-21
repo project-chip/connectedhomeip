@@ -168,7 +168,7 @@ protected:
     void DrainSystemLayer()
     {
         EXPECT_EQ(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                      [](intptr_t) -> void { RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, 0),
+                      [](intptr_t) -> void { EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask()); }, 0),
                   CHIP_NO_ERROR);
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
     }
@@ -222,6 +222,27 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseS
     DrainSystemLayer();
 
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+}
+
+TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupLeaksWhenSystemLayerUnavailable)
+{
+    ExchangeManager uninitializedExchangeManager;
+    CASEClientInitParams params = CreateCASEClientInitParams();
+    params.exchangeMgr           = &uninitializedExchangeManager;
+
+    OperationalSessionSetup sessionSetup(params, &mCASEClientPool, ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
+    chip::Testing::OperationalSessionSetupTestAccess access(&sessionSetup);
+    CASEClient * caseClient = mCASEClientPool.Allocate();
+    ASSERT_NE(caseClient, nullptr);
+
+    access.SetCASEClient(caseClient);
+    access.SetStateConnecting();
+    access.CleanupCASEClient();
+
+    EXPECT_EQ(access.GetCASEClient(), nullptr);
+    EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);
+
+    mCASEClientPool.Release(caseClient);
 }
 
 #if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK

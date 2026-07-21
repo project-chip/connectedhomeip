@@ -555,8 +555,6 @@ void OperationalSessionSetup::CleanupCASEClient()
     CASEClientPoolDelegate * clientPool = mClientPool;
     mCASEClient                         = nullptr;
 
-    VerifyOrReturn(clientPool != nullptr, ChipLogError(Discovery, "Cannot release CASEClient without a client pool"));
-
     auto releaseClient = [clientPool, caseClient]() { clientPool->Release(caseClient); };
 
     if (mState != State::Connecting)
@@ -565,9 +563,11 @@ void OperationalSessionSetup::CleanupCASEClient()
         return;
     }
 
-    auto * systemLayer = mInitParams.sessionManager == nullptr ? nullptr : mInitParams.sessionManager->SystemLayer();
+    auto * systemLayer = GetSystemLayer();
     VerifyOrReturn(systemLayer != nullptr,
-                   ChipLogError(Discovery, "Cannot schedule deferred CASEClient release without a SystemLayer"));
+                   ChipLogError(Discovery,
+                                "Cannot schedule deferred CASEClient release without a SystemLayer; leaking client to avoid "
+                                "re-entrant destruction"));
 
     CHIP_ERROR err = systemLayer->ScheduleLambda(releaseClient);
     if (err != CHIP_NO_ERROR)
@@ -796,7 +796,8 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     VerifyOrDie(mRemainingAttempts > 0);
     // Try again, but not if things are in shutdown such that we can't get
     // to a system layer, and not if we've run out of attempts.
-    if (!mInitParams.exchangeMgr->GetSessionManager() || !mInitParams.exchangeMgr->GetSessionManager()->SystemLayer())
+    auto * systemLayer = GetSystemLayer();
+    if (systemLayer == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -849,7 +850,7 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     }
     timerDelay = std::chrono::duration_cast<System::Clock::Seconds16>(actualTimerDelay);
 
-    CHIP_ERROR err = mInitParams.exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(actualTimerDelay, TrySetupAgain, this);
+    CHIP_ERROR err = systemLayer->StartTimer(actualTimerDelay, TrySetupAgain, this);
 
     // TODO: If responseWasBusy, should we increment, mRemainingAttempts and
     // mResolveAttemptsAllowed, since we were explicitly told to retry?  Hard to
@@ -868,10 +869,7 @@ void OperationalSessionSetup::CancelSessionSetupReattempt()
     // If we can't get a system layer, there is no way for us to cancel things
     // at this point, but hopefully that's because everything is torn down
     // anyway and hence the timer will not fire.
-    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
-    VerifyOrReturn(sessionManager != nullptr);
-
-    auto * systemLayer = sessionManager->SystemLayer();
+    auto * systemLayer = GetSystemLayer();
     VerifyOrReturn(systemLayer != nullptr);
 
     systemLayer->CancelTimer(TrySetupAgain, this);
@@ -953,14 +951,6 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
-void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
-{
-    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Setting fallback resolve result",
-                    ChipLogValueScopedNodeId(mPeerId));
-    mFallbackResolveResult.SetValue(result);
-}
-
 System::Layer * OperationalSessionSetup::GetSystemLayer()
 {
     auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
@@ -969,6 +959,14 @@ System::Layer * OperationalSessionSetup::GetSystemLayer()
         return nullptr;
     }
     return sessionManager->SystemLayer();
+}
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
+{
+    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Setting fallback resolve result",
+                    ChipLogValueScopedNodeId(mPeerId));
+    mFallbackResolveResult.SetValue(result);
 }
 
 CHIP_ERROR OperationalSessionSetup::StartFallbackTimer()
