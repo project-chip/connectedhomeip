@@ -58,7 +58,7 @@ class TC_CNET_4_22(MatterBaseTest):
             TestStep(6, 'TH reads Breadcrumb attribute from the General Commissioning Cluster')
         ]
 
-    def def_TC_CNET_4_22(self):
+    def desc_TC_CNET_4_22(self):
         return '[TC-CNET-4.22] [Thread] Verification for ScanNetworks command [DUT-Server]'
 
     def pics_TC_CNET_4_22(self):
