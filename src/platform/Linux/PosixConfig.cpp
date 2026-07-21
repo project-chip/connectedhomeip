@@ -120,7 +120,11 @@ ChipLinuxStorage * PosixConfig::GetChipLinuxDataStorage()
 
 CHIP_ERROR PosixConfig::Init()
 {
-    return CHIP_NO_ERROR;
+    auto & paths = chip::DeviceLayer::GetStoragePaths();
+
+    // Use KVS data file path (resolved from base directory + default filename if not explicitly set)
+    std::string kvsDataPath = paths.GetKVSDataFilePath();
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(kvsDataPath.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -513,11 +517,6 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     {
         storage = &gChipLinuxCountersStorage;
         err     = storage->Init(paths.GetCountersFilePath().c_str());
-    }
-    else if (strcmp(ns, kConfigNamespace_ChipKVS) == 0)
-    {
-        storage = &gChipLinuxDataStorage;
-        err     = storage->Init(paths.GetKVSDataFilePath().c_str());
     }
 
     SuccessOrExit(err);
