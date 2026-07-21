@@ -7975,8 +7975,8 @@ endpoint 1 {
   }
 
   server cluster ModeSelect {
-    callback attribute description;
-    callback attribute standardNamespace;
+    ram      attribute description default = "Coffee";
+    ram      attribute standardNamespace default = 0;
     callback attribute supportedModes;
     callback attribute currentMode;
     callback attribute startUpMode;
