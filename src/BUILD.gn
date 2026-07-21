@@ -156,6 +156,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+      "${chip_root}/src/lib/dnssd/srp/tests",
       "${chip_root}/src/lib/dnssd/tests",
       "${chip_root}/src/lib/format/tests",
       "${chip_root}/src/lib/support/verhoeff/tests",
