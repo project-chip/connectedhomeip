@@ -24,7 +24,7 @@
  *          key-value config calls to the correct partition.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/CHIPDeviceError.h>        
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
