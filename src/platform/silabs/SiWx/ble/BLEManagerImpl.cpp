@@ -661,12 +661,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     if (result != SL_STATUS_OK)
     {
         //    err = MapBLEError(result);
-        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: 0x%" PRIx32, static_cast<uint32_t>(result));
+        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %" PRIu32, static_cast<uint32_t>(result));
         ExitNow();
     }
     else
     {
-        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: 0x%" PRIx32, static_cast<uint32_t>(result));
+        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %" PRIu32, static_cast<uint32_t>(result));
     }
     index                 = 0;
     responseData[index++] = 0x02;                     // length
