@@ -58,7 +58,7 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Triggers**: Always consult when starting a new task, especially before
     altering code or executing test harnesses.
 
-### GitHub Action Failure Investigation
+### GitHub Actions Failure Investigation
 
 -   **Location**: `.agents/skills/github-action-failure-investigation/`
 -   **Purpose**: Guidelines for fetching, downloading, and analyzing failed
