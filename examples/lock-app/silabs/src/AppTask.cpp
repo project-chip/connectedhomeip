@@ -34,10 +34,10 @@
 <<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-=======
+    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
->>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
+    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -63,7 +63,7 @@
 #define APP_FUNCTION_BUTTON 0
 #define APP_LOCK_SWITCH 1
 
-using chip::app::Clusters::DoorLock::DlLockState;
+    using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 

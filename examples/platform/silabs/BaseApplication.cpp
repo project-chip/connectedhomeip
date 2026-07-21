@@ -39,10 +39,10 @@
 <<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-=======
+    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
->>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
+    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #ifdef ENABLE_CHIP_SHELL
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -121,7 +121,7 @@
 #endif // ENABLE_WSTK_LEDS
 #define APP_FUNCTION_BUTTON 0
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
@@ -222,21 +222,20 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
 <<<<<<< HEAD
 #ifdef DISPLAY_ENABLED
 #ifdef QR_CODE_ENABLED
-=======
+        =======
 #if SL_MATTER_DISPLAY_ENABLED
 #if SL_MATTER_QR_CODE_ENABLED
->>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
-        SilabsLCD::Screen_e screen;
+            >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069)) SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
         BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
 <<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-=======
+        =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
->>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
+            >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
     }
 }
 

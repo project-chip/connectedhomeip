@@ -50,10 +50,10 @@
 <<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-=======
+    =======
 #endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
->>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
+    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 /**********************************************************
  * Defines
@@ -67,7 +67,8 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
-class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
+    class BaseApplicationDelegate : public AppDelegate,
+                                    public chip::FabricTable::Delegate
 {
 public:
     bool isCommissioningInProgress() { return isComissioningStarted; }
