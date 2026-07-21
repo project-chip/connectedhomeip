@@ -110,13 +110,13 @@ public:
 
 private:
     chip::JniGlobalReference mMediaPlaybackManagerObject;
-    jmethodID mRequestMethod             = nullptr;
-    jmethodID mGetAttributeMethod        = nullptr;
-    jmethodID mGetPositionMethod         = nullptr;
-    jmethodID mGetAvailableTracksMethod  = nullptr;
-    jmethodID mActivateTrackMethod       = nullptr;
-    jmethodID mDeactivateTextTrackMethod = nullptr;
-    jmethodID mGetActiveTrackMethod      = nullptr;
+    jmethodID mRequestMethod              = nullptr;
+    jmethodID mGetAttributeMethod         = nullptr;
+    jmethodID mGetPositionMethod          = nullptr;
+    jmethodID mGetAvailableTracksMethod   = nullptr;
+    jmethodID mActivateTrackMethod        = nullptr;
+    jmethodID mDeactivateTextTrackMethod  = nullptr;
+    jmethodID mGetActiveTrackMethod       = nullptr;
     jmethodID mGetAvailableCommandsMethod = nullptr;
     jmethodID mGetContentInfoMethod       = nullptr;
 

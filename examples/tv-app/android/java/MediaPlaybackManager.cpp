@@ -282,8 +282,8 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncode
         }
 
         VerifyOrReturnError(commandsArray != nullptr, CHIP_NO_ERROR);
-        jint size     = env->GetArrayLength(commandsArray);
-        jint * values = env->GetIntArrayElements(commandsArray, nullptr);
+        jint size      = env->GetArrayLength(commandsArray);
+        jint * values  = env->GetIntArrayElements(commandsArray, nullptr);
         CHIP_ERROR err = CHIP_NO_ERROR;
         for (jint i = 0; i < size; i++)
         {
@@ -325,7 +325,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aE
         return aEncoder.EncodeNull();
     }
 
-    jclass infoClass         = env->GetObjectClass(infoObj);
+    jclass infoClass          = env->GetObjectClass(infoObj);
     jfieldID contentTypeField = env->GetFieldID(infoClass, "contentType", "I");
     jfieldID titleField       = env->GetFieldID(infoClass, "title", "Ljava/lang/String;");
 
@@ -538,8 +538,8 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mGetContentInfoMethod = env->GetMethodID(mMediaPlaybackManagerClass, "getContentInfo",
-                                             "()Lcom/matter/tv/server/tvapp/MediaPlaybackContentInfo;");
+    mGetContentInfoMethod =
+        env->GetMethodID(mMediaPlaybackManagerClass, "getContentInfo", "()Lcom/matter/tv/server/tvapp/MediaPlaybackContentInfo;");
     if (mGetContentInfoMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getContentInfo' method");
