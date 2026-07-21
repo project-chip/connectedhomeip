@@ -65,7 +65,12 @@ def main():
     df = pd.read_json("fail_run_list.json")
 
     log.info("Listing recent fails from '%s'", yesterday)
-    df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
+    # Defensive: gh returned an empty list -> DataFrame has 0 cols, cannot assign 4 column names.
+    if df.empty:
+        log.warning("No failed runs found for %s; producing empty reports.", yesterday)
+        df = pd.DataFrame(columns=["ID", "Pull Request", "Start Time", "Workflow"])
+    else:
+        df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
     print(f"Recent Fails From {yesterday}:")
     print(df.to_string(columns=["Pull Request", "Workflow"], index=False))
     print()
@@ -87,13 +92,21 @@ def main():
     all_df = pd.read_json("all_run_list.json")
 
     log.info("Gathering pass/fail rate info.")
-    all_df.columns = ["Workflow"]
-    all_df.apply(lambda row: pass_fail_rate(row["Workflow"]), axis=1)
+    # Same defensive treatment for all_df.
+    if all_df.empty:
+        log.warning("No runs at all found for %s; skipping per-workflow pass rate scan.", yesterday)
+        all_df = pd.DataFrame(columns=["Workflow"])
+    else:
+        all_df.columns = ["Workflow"]
+        all_df.apply(lambda row: pass_fail_rate(row["Workflow"]), axis=1)
 
     log.info("Conducting fail information parsing.")
-    root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"],
-                           row["Start Time"], row["Workflow"]), axis=1, result_type="expand")
-    root_causes.columns = ["Pull Request", "Workflow", "Cause of Failure"]
+    if df.empty:
+        root_causes = pd.DataFrame(columns=["Pull Request", "Workflow", "Cause of Failure"])
+    else:
+        root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"],
+                               row["Start Time"], row["Workflow"]), axis=1, result_type="expand")
+        root_causes.columns = ["Pull Request", "Workflow", "Cause of Failure"]
     print("Likely Root Cause of Recent Fails:")
     print(root_causes.to_string(index=False))
     print()
@@ -101,6 +114,9 @@ def main():
 
     log.info("Listing percent pass rate of recent fails by workflow.")
     pass_rate = {}
+    # Defensive: directory may not exist if no runs were collected.
+    if not os.path.isdir("workflow_pass_rate"):
+        os.makedirs("workflow_pass_rate", exist_ok=True)
     for workflow in next(os.walk("workflow_pass_rate"))[1]:
         try:
             info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
