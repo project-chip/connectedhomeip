@@ -30,9 +30,9 @@
 #ifdef DISPLAY_ENABLED
 #include "AirQualitySensorUI.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
 #include <AirQualityConfig.h>
@@ -289,12 +289,12 @@ void AppTask::UpdateAirQualitySensorUI()
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
     GetLCD().WriteDemoUI(false);
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     if (BaseApplication::GetProvisionStatus())
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif
 }
 
