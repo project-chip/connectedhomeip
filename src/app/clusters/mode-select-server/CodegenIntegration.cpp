@@ -78,17 +78,6 @@ public:
                                                                        static_cast<size_t>(provider.end() - provider.begin()));
     }
 
-    // Called at attribute read time; sSupportedModesManager is guaranteed set by then.
-    CharSpan GetDescription() const override
-    {
-        const SupportedModesManager * mgr = sSupportedModesManager;
-        if (mgr == nullptr)
-        {
-            return CharSpan();
-        }
-        return mgr->getDescription(mEndpointId);
-    }
-
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
 };
@@ -112,11 +101,7 @@ public:
     {
         VerifyOrDie(clusterInstanceIndex < kMaxClusterCount);
         ModeSelectEntry & entry = gEntries[clusterInstanceIndex];
-        entry.delegate          = SupportedModesManagerDelegate(endpointId);
-
-        // Read StandardNamespace from Ember attribute store.
-        DataModel::Nullable<uint16_t> standardNamespace =
-            CodegenClusterIntegration::ReadNullableUint16Attribute(endpointId, ModeSelect::Id, StandardNamespace::Id);
+        entry.delegate = SupportedModesManagerDelegate(endpointId);
 
         ModeSelectCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
@@ -145,7 +130,6 @@ public:
         DataModel::Nullable<uint8_t> initialOnMode      = DataModel::NullNullable;
 
         ModeSelectCluster::Config config{
-            .standardNamespace      = standardNamespace,
             .featureMap             = BitMask<Feature>(featureMap),
             .optionalAttributeSet   = optionalAttributeSet,
             .onOffValueForStartUp   = onOffValueForStartUp,
@@ -224,12 +208,6 @@ void MatterModeSelectPluginServerShutdownCallback() {}
 
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId) {}
 
-Status MatterModeSelectClusterServerPreAttributeChangedCallback(const ConcreteAttributePath &, EmberAfAttributeType, uint16_t,
-                                                                uint8_t *)
-{
-    return Status::Success;
-}
-
 // ---- Backward-compat global API for app code ----
 
 namespace chip::app::Clusters::ModeSelect {
@@ -242,6 +220,15 @@ const SupportedModesManager * getSupportedModesManager()
 void setSupportedModesManager(SupportedModesManager * mgr)
 {
     sSupportedModesManager = mgr;
+    // Apply startup mode logic to all clusters that started before the manager was set.
+    // (Example apps call this in ApplicationInit, after Server::Init.)
+    for (auto & entry : gEntries)
+    {
+        if (entry.server.IsConstructed())
+        {
+            entry.server.Cluster().ApplyStartupModeLogic();
+        }
+    }
 }
 
 ModeSelectCluster * FindClusterOnEndpoint(EndpointId endpointId)

@@ -42,18 +42,12 @@ public:
     class Delegate
     {
     public:
-        virtual ~Delegate()                                                                       = default;
+        virtual ~Delegate()                                                                        = default;
         virtual Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const = 0;
-        // Returns the Description attribute value. Called at read time so the returned span
-        // does not need to outlive the function call. Default returns an empty span,
-        // falling back to Config::description.
-        virtual CharSpan GetDescription() const { return CharSpan(); }
     };
 
     struct Config
     {
-        CharSpan description;
-        DataModel::Nullable<uint16_t> standardNamespace;
         BitMask<ModeSelect::Feature> featureMap;
         OptionalAttributeSet optionalAttributeSet;
         bool onOffValueForStartUp = false;
@@ -88,6 +82,9 @@ public:
 
     bool IsSupportedMode(uint8_t mode) const;
 
+    // Called by setSupportedModesManager() when modes become available after Startup().
+    void ApplyStartupModeLogic();
+
     // scenes::SceneHandler overrides
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override;
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override;
@@ -98,11 +95,9 @@ private:
     void LoadPersistentAttributes(AttributePersistenceProvider & provider);
 
     Delegate & mDelegate;
-    CharSpan mDescription;
-    DataModel::Nullable<uint16_t> mStandardNamespace;
-    BitMask<ModeSelect::Feature> mFeatureMap;
-    OptionalAttributeSet mOptionalAttributeSet;
-    bool mOnOffValueForStartUp;
+    const BitMask<ModeSelect::Feature> mFeatureMap;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    const bool mOnOffValueForStartUp;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 
     uint8_t mCurrentMode = 0;

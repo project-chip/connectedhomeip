@@ -1655,8 +1655,8 @@ endpoint 1 {
   }
 
   server cluster ModeSelect {
-    callback attribute description;
-    callback attribute standardNamespace;
+    ram      attribute description default = "Mode Select Sample";
+    ram      attribute standardNamespace;
     callback attribute supportedModes;
     callback attribute currentMode;
     callback attribute generatedCommandList;

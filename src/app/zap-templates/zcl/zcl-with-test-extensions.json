@@ -639,8 +639,6 @@
         "Mode Select": [
             "ClusterRevision",
             "FeatureMap",
-            "Description",
-            "StandardNamespace",
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
