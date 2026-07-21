@@ -166,10 +166,7 @@ protected:
         return params;
     }
 
-    static void StopEventLoop(intptr_t)
-    {
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
-    }
+    static void StopEventLoop(intptr_t) { EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }
 
     void DrainSystemLayer()
     {
