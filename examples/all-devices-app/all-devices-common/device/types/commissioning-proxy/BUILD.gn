@@ -40,7 +40,7 @@ source_set("commissioning-proxy") {
   }
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/commissioning-proxy-server",
     "${chip_root}/src/lib",
     "${chip_root}/zzz_generated/app-common/devices",

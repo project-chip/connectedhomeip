@@ -29,12 +29,15 @@ namespace chip {
 namespace app {
 
 CommissioningProxyDevice::CommissioningProxyDevice() :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1))
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCommissioningByProxy, 1))
 {}
 
 CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     BitMask<Feature> features(Feature::kBackgroundScan);
@@ -50,6 +53,7 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
     ReturnErrorOnFailure(provider.AddCluster(mCluster.Registration()));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

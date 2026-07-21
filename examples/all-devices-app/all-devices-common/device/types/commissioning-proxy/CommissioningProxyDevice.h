@@ -20,7 +20,7 @@
 
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <devices/interface/SingleEndpointDevice.h>
+#include <device/api/SingleEndpoint.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-class CommissioningProxyDevice : public SingleEndpointDevice
+class CommissioningProxyDevice : public SingleEndpoint
 {
 public:
     CommissioningProxyDevice();

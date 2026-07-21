@@ -20,7 +20,7 @@
 #include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/commissioning-proxy/CommissioningProxyDevice.h>
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
 
 namespace chip {
 namespace app {
