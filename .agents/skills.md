@@ -55,8 +55,8 @@ etc.) to assist with development and code review in the Matter repository.
     incrementally discover, read, and consult top-level monorepo documentation
     and example-specific reference guides before altering code or executing test
     harnesses.
--   **Triggers**: Use when starting a new task, especially before
-    altering code or executing test harnesses.
+-   **Triggers**: Use when starting a new task, especially before altering code
+    or executing test harnesses.
 
 ### GitHub Actions Failure Investigation
 
