@@ -9325,7 +9325,7 @@ endpoint 0 {
   }
 
   server cluster ModeSelect {
-    callback attribute description;
+    ram      attribute description;
     callback attribute standardNamespace;
     callback attribute supportedModes;
     callback attribute currentMode;
