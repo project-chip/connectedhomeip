@@ -185,6 +185,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/bootloader/platform/bootloader/core/flash",
       "${efr32_sdk_root}/bootloader/platform/bootloader/common/api",
       "${efr32_sdk_root}/bootloader/platform/bootloader/common",
+      "${efr32_sdk_root}/bootloader/platform/bootloader/api",
       "${efr32_sdk_root}/bootloader/platform/bootloader/core/flash",
       "${efr32_sdk_root}/bgapi_protocol/rtos_adaptation/inc",
       "${efr32_sdk_root}/bgapi_protocol/bgapi_trace/inc",
