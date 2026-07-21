@@ -29,10 +29,10 @@
 #include "CHIPDeviceManager.h"
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
 #include <assert.h>

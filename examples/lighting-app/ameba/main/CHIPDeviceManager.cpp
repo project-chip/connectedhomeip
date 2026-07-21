@@ -37,9 +37,9 @@
 #include "LEDWidget.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>

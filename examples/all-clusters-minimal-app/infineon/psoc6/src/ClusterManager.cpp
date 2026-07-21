@@ -25,9 +25,9 @@
 #include "AppConfig.h"
 #include "LEDWidget.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
