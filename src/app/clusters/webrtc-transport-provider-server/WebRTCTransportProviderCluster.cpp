@@ -951,7 +951,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             }
             audioStreams.SetValue(std::move(streams));
         }
-        
+
         // For re-offers, if we have stream lists, use these
         if (req.videoStreams.HasValue())
         {
@@ -964,7 +964,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             }
             videoStreams.SetValue(std::move(streams));
         }
-        
+
         if (req.audioStreams.HasValue())
         {
             // Our request is a DecodableList, convert to a vector
@@ -985,7 +985,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         if (!req.streamUsage.HasValue())
         {
             ChipLogError(Zcl, "HandleProvideOffer: Missing mandated streamUsage.");
-            return Status::InvalidCommand;            
+            return Status::InvalidCommand;
         }
 
         if (req.streamUsage.Value() == StreamUsageEnum::kUnknownEnumValue)
@@ -993,7 +993,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
             return Status::ConstraintError;
         }
-                
+
         // Check privacy modes (per spec: only for new sessions)
         Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage.Value());
         if (status != Status::Success)
@@ -1004,7 +1004,8 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         // Validate that the StreamUsage is in the StreamUsagePriorities list
         if (mDelegate.IsStreamUsageSupported(req.streamUsage.Value()) != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage.Value()));
+            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities",
+                         to_underlying(req.streamUsage.Value()));
             return Status::DynamicConstraintError;
         }
 

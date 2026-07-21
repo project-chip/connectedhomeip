@@ -205,7 +205,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     }
     else
     {
-        outSession.videoStreamID = MakeOptional(DataModel::NullNullable); 
+        outSession.videoStreamID = MakeOptional(DataModel::NullNullable);
     }
 
     if (!audioStreams.empty())
