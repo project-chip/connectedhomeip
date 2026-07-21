@@ -223,7 +223,7 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     mProvideOfferData.ICETransportPolicy = NullOptional;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
-    mCurrentStreamUsage = value.streamUsage;
+    mCurrentStreamUsage = value.streamUsage.Value();
 
     // Attempt to find or establish a CASE session to the target PeerId.
     InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
@@ -327,8 +327,8 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : DataModel::MakeNullable<uint16_t>();
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : DataModel::MakeNullable<uint16_t>();
+    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : MakeOptional(DataModel::MakeNullable<uint16_t>());
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
@@ -351,13 +351,13 @@ void WebRTCTransportProviderClient::HandleSolicitOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : chip::app::DataModel::NullNullable;
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : chip::app::DataModel::NullNullable;
+    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID.Value() : MakeOptional(DataModel::NullNullable);
+    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID.Value() : MakeOptional(DataModel::NullNullable);
 
     // If DeferredOffer == FALSE these fields MUST be valid
     if (!value.deferredOffer)
     {
-        if (session.videoStreamID.IsNull() && session.audioStreamID.IsNull())
+        if (session.videoStreamID.Value().IsNull() && session.audioStreamID.Value().IsNull())
         {
             ChipLogError(Camera, "Provider reported DeferredOffer=FALSE but did not supply valid Video and Audio stream IDs");
             return;
