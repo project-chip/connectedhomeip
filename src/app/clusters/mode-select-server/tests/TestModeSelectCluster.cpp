@@ -80,8 +80,6 @@ struct TestModeSelectCluster : public ::testing::Test
     ModeSelectCluster::Config MakeConfig(BitMask<Feature> featureMap = {}, bool onOffValueForStartUp = false)
     {
         return ModeSelectCluster::Config{
-            .description            = "Test Mode Select"_span,
-            .standardNamespace      = DataModel::Nullable<uint16_t>(),
             .featureMap             = featureMap,
             .optionalAttributeSet   = optionalAttributeSet,
             .onOffValueForStartUp   = onOffValueForStartUp,
@@ -123,10 +121,9 @@ TEST_F(TestModeSelectCluster, AttributeListMandatoryOnly)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
+    // Description and StandardNamespace are served by ember from ZAP defaults, not by cluster code.
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
-                                            Description::kMetadataEntry,
-                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                         }));
@@ -141,8 +138,6 @@ TEST_F(TestModeSelectCluster, AttributeListWithStartUpMode)
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
-                                            Description::kMetadataEntry,
-                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                             StartUpMode::kMetadataEntry,
@@ -157,8 +152,6 @@ TEST_F(TestModeSelectCluster, AttributeListWithOnOffFeature)
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
-                                            Description::kMetadataEntry,
-                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                             OnMode::kMetadataEntry,
@@ -199,28 +192,6 @@ TEST_F(TestModeSelectCluster, ReadFeatureMap)
     uint32_t readFeatureMap = 0;
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, readFeatureMap), CHIP_NO_ERROR);
     EXPECT_EQ(readFeatureMap, featureMap.Raw());
-}
-
-TEST_F(TestModeSelectCluster, ReadDescription)
-{
-    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    CharSpan description;
-    ASSERT_EQ(tester.ReadAttribute(Description::Id, description), CHIP_NO_ERROR);
-    EXPECT_TRUE(description.data_equal("Test Mode Select"_span));
-}
-
-TEST_F(TestModeSelectCluster, ReadStandardNamespaceNull)
-{
-    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint16_t> standardNamespace;
-    ASSERT_EQ(tester.ReadAttribute(StandardNamespace::Id, standardNamespace), CHIP_NO_ERROR);
-    EXPECT_TRUE(standardNamespace.IsNull());
 }
 
 TEST_F(TestModeSelectCluster, ReadCurrentMode)
@@ -285,7 +256,7 @@ TEST_F(TestModeSelectCluster, WriteStartUpModeValidValue)
     EXPECT_TRUE(tester.IsAttributeDirty(StartUpMode::Id));
 }
 
-TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsInvalidCommand)
+TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsConstraintError)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
@@ -293,7 +264,7 @@ TEST_F(TestModeSelectCluster, WriteStartUpModeInvalidValueReturnsInvalidCommand)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint8_t> invalidMode(99);
-    EXPECT_EQ(tester.WriteAttribute(StartUpMode::Id, invalidMode), Status::InvalidCommand);
+    EXPECT_EQ(tester.WriteAttribute(StartUpMode::Id, invalidMode), Status::ConstraintError);
 }
 
 TEST_F(TestModeSelectCluster, WriteOnModeValidValue)

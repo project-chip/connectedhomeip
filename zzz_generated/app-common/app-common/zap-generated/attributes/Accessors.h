@@ -1027,7 +1027,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace TemperatureControlledCabinetTopology
 
 namespace ModeSelect {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Description {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+} // namespace Description
+
+namespace StandardNamespace {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // enum16
+} // namespace StandardNamespace
+
+} // namespace Attributes
 } // namespace ModeSelect
 
 namespace LaundryWasherMode {

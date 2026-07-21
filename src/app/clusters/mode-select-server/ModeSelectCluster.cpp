@@ -56,27 +56,45 @@ ModeSelectSceneValidator & GlobalValidator()
 
 ModeSelectCluster::ModeSelectCluster(EndpointId endpointId, Delegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, ModeSelect::Id }), DefaultSceneHandlerImpl(GlobalValidator()), mDelegate(delegate),
-    mDescription(config.description), mStandardNamespace(config.standardNamespace), mFeatureMap(config.featureMap),
-    mOptionalAttributeSet(config.optionalAttributeSet), mOnOffValueForStartUp(config.onOffValueForStartUp),
-    mDiagnosticDataProvider(config.diagnosticDataProvider), mStartUpMode(config.initialStartUpMode), mOnMode(config.initialOnMode)
+    mFeatureMap(config.featureMap), mOptionalAttributeSet(config.optionalAttributeSet),
+    mOnOffValueForStartUp(config.onOffValueForStartUp), mDiagnosticDataProvider(config.diagnosticDataProvider),
+    mStartUpMode(config.initialStartUpMode), mOnMode(config.initialOnMode)
 {}
 
 CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    LoadPersistentAttributes(context.attributeStorage);
+    // Modes may not be available yet if setSupportedModesManager() hasn't been called
+    // (it's called in ApplicationInit, after Server::Init). ApplyStartupModeLogic()
+    // will be called again from setSupportedModesManager() in that case.
+    ApplyStartupModeLogic();
+    return CHIP_NO_ERROR;
+}
+
+void ModeSelectCluster::ApplyStartupModeLogic()
+{
+    if (mContext == nullptr)
+    {
+        return; // Startup() has not run yet
+    }
 
     auto modes = mDelegate.GetSupportedModes();
-    if (modes.size() > 0)
+    if (modes.empty())
     {
-        mCurrentMode = modes[0].mode;
+        return;
     }
-    // If modes are empty (e.g. SupportedModesManager installed after Server::Init),
-    // mCurrentMode keeps its default (0); LoadPersistentAttributes may restore a persisted
-    // value. StartUpMode and OnMode application requires a valid mode list and is skipped.
 
-    LoadPersistentAttributes(context.attributeStorage);
+    if (!IsSupportedMode(mCurrentMode))
+    {
+        // First boot or stale persisted value: initialize to first available mode.
+        SetAttributeValue(mCurrentMode, modes[0].mode, CurrentMode::Id);
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id),
+            ByteSpan(reinterpret_cast<const uint8_t *>(&mCurrentMode), sizeof(mCurrentMode))));
+    }
 
-    if (modes.size() > 0 && !mStartUpMode.IsNull())
+    if (!mStartUpMode.IsNull())
     {
         BootReasonType bootReason = BootReasonType::kUnspecified;
         CHIP_ERROR err            = mDiagnosticDataProvider.GetBootReason(bootReason);
@@ -97,24 +115,20 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
             Status status = UpdateCurrentMode(mStartUpMode.Value());
             if (status != Status::Success)
             {
-                // Stale NVM value (e.g. mode removed by firmware update) — skip and keep current mode.
                 ChipLogError(Zcl, "ModeSelect: StartUpMode %u not supported, ignoring.", mStartUpMode.Value());
             }
         }
     }
 
-    if (modes.size() > 0 && mOnOffValueForStartUp && !mOnMode.IsNull() && mOnMode.Value() != mCurrentMode)
+    if (mOnOffValueForStartUp && !mOnMode.IsNull() && mOnMode.Value() != mCurrentMode)
     {
         ChipLogProgress(Zcl, "ModeSelect: Applying OnMode %u to CurrentMode.", mOnMode.Value());
         Status status = UpdateCurrentMode(mOnMode.Value());
         if (status != Status::Success)
         {
-            // Stale NVM value (e.g. mode removed by firmware update) — skip and keep current mode.
             ChipLogError(Zcl, "ModeSelect: OnMode %u not supported, ignoring.", mOnMode.Value());
         }
     }
-
-    return CHIP_NO_ERROR;
 }
 
 void ModeSelectCluster::LoadPersistentAttributes(AttributePersistenceProvider & provider)
@@ -158,7 +172,7 @@ Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
 
 Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStartUpMode)
 {
-    VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::InvalidCommand);
+    VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mStartUpMode, newStartUpMode, StartUpMode::Id), Status::Success);
 
     // Null sentinel for nullable uint8 is 0xFF per Matter spec.
@@ -170,7 +184,7 @@ Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStar
 
 Status ModeSelectCluster::UpdateOnMode(DataModel::Nullable<uint8_t> newOnMode)
 {
-    VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::InvalidCommand);
+    VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mOnMode, newOnMode, OnMode::Id), Status::Success);
 
     // Null sentinel for nullable uint8 is 0xFF per Matter spec.
@@ -189,12 +203,6 @@ DataModel::ActionReturnStatus ModeSelectCluster::ReadAttribute(const DataModel::
         return encoder.Encode(kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
-    case Description::Id: {
-        CharSpan delegateDesc = mDelegate.GetDescription();
-        return encoder.Encode(delegateDesc.empty() ? mDescription : delegateDesc);
-    }
-    case StandardNamespace::Id:
-        return encoder.Encode(mStandardNamespace);
     case SupportedModes::Id:
         return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
             for (const auto & mode : mDelegate.GetSupportedModes())
@@ -260,12 +268,18 @@ CHIP_ERROR ModeSelectCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
+    // Description and StandardNamespace are fixed attributes served by ember from ZAP defaults.
+    static constexpr DataModel::AttributeEntry kMandatory[] = {
+        SupportedModes::kMetadataEntry,
+        CurrentMode::kMetadataEntry,
+    };
+
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mOptionalAttributeSet.IsSet(StartUpMode::Id), StartUpMode::kMetadataEntry },
         { mFeatureMap.Has(Feature::kOnOff), OnMode::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
+    return listBuilder.Append(Span(kMandatory), Span(optionalAttributes));
 }
 
 CHIP_ERROR ModeSelectCluster::AcceptedCommands(const ConcreteClusterPath & path,
