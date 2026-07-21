@@ -236,6 +236,26 @@ int __attribute__((weak)) _write(int file, const char * ptr, int len)
 }
 #endif // SILABS_LOG_OUT_UART
 
+<<<<<<< HEAD
+=======
+/**************************************************************************
+ * @brief
+ *  Override exit to prevent hard fault
+ *
+ * @param[in] status
+ *  Exit status (not used).
+ **************************************************************************/
+void __attribute__((weak)) exit(int status)
+{
+    (void) status;
+    static const char kExitMessage[] = "exit not supported, resetting system...\r\n";
+    _write(0, kExitMessage, sizeof(kExitMessage) - 1);
+    NVIC_SystemReset();
+    // Unreachable, satisfies noreturn attribute
+    __builtin_unreachable();
+}
+
+>>>>>>> b83c34c ([Silabs] Fixed Si917 compatibility with clang. (#73111))
 #ifdef __cplusplus
 }
 #endif

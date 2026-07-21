@@ -84,9 +84,57 @@ namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
+<<<<<<< HEAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 bool btn0_pressed = false;
 #endif /* SL_ICD_ENABLED */
+=======
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
+
+// Keep awake duration in milliseconds
+static constexpr uint32_t kSiWxKeepAwakeDurationMs = 10000;
+
+// CMSIS-RTOS2 one-shot timer: each BTN0 press (re)starts the full kSiWxKeepAwakeDurationMs window.
+static osTimerId_t sSiWxKeepAwakeOsTimer = nullptr;
+static bool sSiWxKeepAwakePs4Active      = false;
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
+int soc_pll_config(void)
+{
+    int32_t status = RSI_OK;
+
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_ULPREFCLK, 0);
+    // Configures the required registers for 180 Mhz clock in PS4
+    RSI_PS_PS4SetRegisters();
+    // Configure the PLL frequency
+    // Configure the SOC PLL to 180MHz
+    RSI_CLK_SetSocPllFreq(M4CLK, PS4_SOC_FREQ, SOC_PLL_REF_FREQUENCY);
+    // Switch M4 clock to PLL clock for speed operations
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
+
+    SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
+
+#ifdef SWITCH_QSPI_TO_SOC_PLL
+    /* program intf pll to 160Mhz */
+    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
+    status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
+    if (status != RSI_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: 0x%" PRIx32, status);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+    }
+
+    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
+#endif /* SWITCH_QSPI_TO_SOC_PLL */
+    return status;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+>>>>>>> b83c34c ([Silabs] Fixed Si917 compatibility with clang. (#73111))
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;

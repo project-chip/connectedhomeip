@@ -148,7 +148,14 @@ typedef struct
 #if SILABS_LOG_OUT_UART
 #define UART_MAX_QUEUE_SIZE 125
 #else
+<<<<<<< HEAD
 #if (_SILICON_LABS_32B_SERIES < 3)
+=======
+static constexpr uint32_t kUartTxCompleteFlag = 1;
+#if CHIP_DETAIL_LOGGING
+#define UART_MAX_QUEUE_SIZE 60
+#else
+>>>>>>> b83c34c ([Silabs] Fixed Si917 compatibility with clang. (#73111))
 #define UART_MAX_QUEUE_SIZE 25
 #else
 #define UART_MAX_QUEUE_SIZE 50
@@ -161,7 +168,6 @@ typedef struct
 #define UART_TX_MAX_BUF_LEN (258)
 #endif
 
-static constexpr uint32_t kUartTxCompleteFlag = 1;
 static osThreadId_t sUartTaskHandle;
 constexpr uint32_t kUartTaskSize = 1024;
 static uint8_t uartStack[kUartTaskSize];

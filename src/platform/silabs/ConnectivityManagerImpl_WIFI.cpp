@@ -39,6 +39,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+
 #include "CHIPDevicePlatformConfig.h"
 #include <platform/silabs/wifi/WifiInterface.h>
 

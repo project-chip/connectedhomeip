@@ -91,7 +91,33 @@ config("siwx917-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
+<<<<<<< HEAD
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+=======
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
+  }
+
+  ldflags = []
+  if (is_clang) {
+    ldflags += [
+      "-Wl,--allow-multiple-definition",  # allow overrides from memory manager
+
+      # Group so lld resolves libc<-->nosys (_sbrk) regardless of -l order.
+      "-Wl,--start-group",
+      "-lc_nano",  # stdlib functions (e.g. snprintf)
+      "-lstdc++_nano",  # C++ stdlib functions (e.g. sprintf)
+      "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
+      "-lnosys",  # newlib syscall stubs (e.g. _sbrk); GCC gets this via
+                  # nosys.specs
+      "-Wl,--end-group",
+    ]
+  } else {
+    ldflags += [ "-Wl,--no-warn-rwx-segment" ]
+  }
+>>>>>>> b83c34c ([Silabs] Fixed Si917 compatibility with clang. (#73111))
 }
 
 source_set("siwx917-common") {

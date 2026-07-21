@@ -28,6 +28,7 @@
 
 #include "wfx_sl_ble_init.h"
 #include <ble/Ble.h>
+#include <cinttypes>
 #include <crypto/RandUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -83,8 +84,6 @@ namespace {
 #define TIMER_MS_2_TIMERTICK(ms) ((TIMER_CLK_FREQ * ms) / 1000)
 #define TIMER_S_2_TIMERTICK(s) (TIMER_CLK_FREQ * s)
 
-const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                              0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 // Used to send the Indication Confirmation
@@ -115,9 +114,9 @@ void rsi_ble_add_matter_service(void)
     constexpr uuid_t custom_characteristic_RX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
                                                   .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },
                                                   .val      = { .val128 = {
-                                                                    .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 },
-                                                                    .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2 },
-                                                                    .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3 },
+                                                                    .data1 = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1,
+                                                                    .data2 = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2,
+                                                                    .data3 = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3,
                                                                     .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_4 } } } };
 
     rsi_ble_resp_add_serv_t new_serv_resp = { 0 };
@@ -139,9 +138,9 @@ void rsi_ble_add_matter_service(void)
     constexpr uuid_t custom_characteristic_TX = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE,
                                                   .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED },
                                                   .val      = { .val128 = {
-                                                                    .data1 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 },
-                                                                    .data2 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2 },
-                                                                    .data3 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3 },
+                                                                    .data1 = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1,
+                                                                    .data2 = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2,
+                                                                    .data3 = RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3,
                                                                     .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_4 } } } };
 
     // Adding custom characteristic declaration to the custom service
@@ -244,7 +243,7 @@ void BLEManagerImpl::BlePostEvent(SilabsBleWrapper::BleEvent_t * event)
     sl_status_t status = osMessageQueuePut(sInstance.sBleEventQueue, event, 0, 0);
     if (status != osOK)
     {
-        ChipLogError(DeviceLayer, "BlePostEvent: failed to post event: 0x%lx", status);
+        ChipLogError(DeviceLayer, "BlePostEvent: failed to post event: 0x%" PRIx32, static_cast<uint32_t>(status));
         // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
     }
 }
@@ -267,7 +266,7 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
         }
         else
         {
-            ChipLogError(DeviceLayer, "sl_ble_event_handling_task: get event failed: 0x%lx", static_cast<uint32_t>(status));
+            ChipLogError(DeviceLayer, "sl_ble_event_handling_task: get event failed: 0x%" PRIx32, static_cast<uint32_t>(status));
         }
     }
 }
@@ -513,7 +512,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
     status         = rsi_ble_indicate_value(dev_address, rsi_ble_measurement_hndl, data->DataLength(), data->Start());
     if (status != RSI_SUCCESS)
     {
-        ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
+        ChipLogProgress(DeviceLayer, "indication failed with error code 0x%" PRIx32, static_cast<uint32_t>(status));
         return BLE_ERROR_GATT_INDICATE_FAILED;
     }
 
@@ -655,12 +654,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     if (result != SL_STATUS_OK)
     {
         //    err = MapBLEError(result);
-        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %ld", result);
+        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() failed: %" PRIu32, static_cast<uint32_t>(result));
         ExitNow();
     }
     else
     {
-        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %ld", result);
+        ChipLogError(DeviceLayer, "rsi_ble_set_advertise_data() success: %" PRIu32, static_cast<uint32_t>(result));
     }
     index                 = 0;
     responseData[index++] = 0x02;                     // length
@@ -697,7 +696,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         status = rsi_ble_stop_advertising();
         if (status != RSI_SUCCESS)
         {
-            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx ", status);
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%" PRIx32, static_cast<uint32_t>(status));
         }
     }
     else
@@ -738,7 +737,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Failed with status: %lx", status);
+        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Failed with status: 0x%" PRIx32, static_cast<uint32_t>(status));
     }
 
 exit:
