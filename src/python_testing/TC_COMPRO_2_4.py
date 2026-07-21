@@ -234,6 +234,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             ssh_user=params.get('ed_ssh_user', 'ubuntu'),
             extra_args=extra_args,
             ed_transport=ed_transport,
+            serial_port=params.get('ed_serial_port'),
         )
 
     @async_test_body

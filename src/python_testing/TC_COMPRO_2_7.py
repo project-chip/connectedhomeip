@@ -141,6 +141,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
             ssh_user=params.get(f'{prefix}_ssh_user', 'ubuntu'),
             extra_args=params.get(f'{prefix}_extra_args', ''),
             ed_transport=params.get(f'{prefix}_transport', params.get('ed_transport', 'wifipaf')),
+            serial_port=params.get(f'{prefix}_serial_port'),
         )
 
     def _discriminator_for_index(self, n: int) -> int:

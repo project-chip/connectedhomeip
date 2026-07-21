@@ -146,19 +146,33 @@ def commission_if_needed() -> None:
     sys.argv[1:] = filtered
 
 
+# Path to the serial-console CLI used to drive the ED in standalone-serial mode
+# (eth0 physically disconnected, ED reachable only over its UART login console).
+# Defaults to the copy shipped alongside this module; override via the
+# ED_SERIAL_CLI env var for a differently-provisioned test harness.
+ED_SERIAL_CLI = os.environ.get(
+    "ED_SERIAL_CLI", os.path.join(os.path.dirname(__file__), "serial_console.py")
+)
+
+
 class EDFixture:
     """Controls a Matter end device for use as the commissionable ED.
 
-    Two modes are supported:
+    Three modes are supported:
 
-    **Local mode** (``ssh_host=None``): the ED binary runs as a subprocess on the
-    same machine as the test.  Suitable for simulated/CI environments.
+    **Local mode** (``ssh_host`` and ``serial_port`` both unset): the ED binary
+    runs as a subprocess on the same machine as the test.  Suitable for
+    simulated/CI environments.
 
-    **Remote mode** (``ssh_host`` set): the ED binary is started/stopped over SSH
-    on a remote host (e.g., a Raspberry Pi on the same LAN).  This is the typical
-    configuration for hardware-in-the-loop testing.
+    **Remote-SSH mode** (``ssh_host`` set): the ED binary is started/stopped over
+    SSH on a remote host (e.g., a Raspberry Pi on the same LAN).  The ED's eth0
+    is masked from the commissioner (iptables) so the WiFi path is exercised.
 
-    In both modes:
+    **Standalone-serial mode** (``serial_port`` set): the ED is driven entirely
+    over its UART login console (``serial_console.py``), with eth0 *physically*
+    disconnected.  No eth0 iptables block is needed or applied.
+
+    In all modes:
     - ``start()`` makes the device commissionable (starts advertising via NAN/WiFiPAF).
     - ``stop()`` makes it non-commissionable (kills the process).
     """
@@ -172,6 +186,8 @@ class EDFixture:
         ssh_user: str = "ubuntu",
         extra_args: str = "",
         ed_transport: str = "wifipaf",
+        serial_port: typing.Optional[str] = None,
+        serial_baud: int = 115200,
     ):
         self._app_path = app_path
         self._discriminator = discriminator
@@ -180,6 +196,11 @@ class EDFixture:
         self._ssh_user = ssh_user
         self._extra_args = extra_args
         self._ed_transport = ed_transport
+        self._serial_port = serial_port
+        self._serial_baud = serial_baud
+        # "remote" == not an in-process subprocess: driven over SSH or serial.
+        self._remote = bool(ssh_host or serial_port)
+        self._remote_desc = ssh_host or (f"serial:{serial_port}" if serial_port else "local")
         self._process: typing.Optional[asyncio.subprocess.Process] = None
         self._remote_pid: typing.Optional[int] = None
         self._validate_extra_args_for_transport()
@@ -210,32 +231,40 @@ class EDFixture:
 
     async def start(self):
         """Start the ED app so it is commissionable."""
-        if self._ssh_host:
-            # Block the commissioner's eth0 path *before* launching the ED so
-            # no mDNS leak window exists.  If the ED start then fails, undo
-            # the block so the rig is left clean.
-            await self._block_eth0_up()
-            try:
-                await self._start_remote()
-            except Exception:
-                await self._block_eth0_down()
-                raise
-        else:
+        if not self._remote:
             await self._start_local()
+            return
+        # The eth0 iptables block only applies in remote-SSH mode; standalone-
+        # serial has eth0 physically disconnected, so there is nothing to block.
+        if self._serial_port:
+            await self._start_remote()
+            return
+        # Block the commissioner's eth0 path *before* launching the ED so no
+        # mDNS leak window exists.  If the ED start then fails, undo the block
+        # so the rig is left clean.
+        await self._block_eth0_up()
+        try:
+            await self._start_remote()
+        except Exception:
+            await self._block_eth0_down()
+            raise
 
     async def stop(self):
         """Stop the ED app so it is no longer commissionable."""
-        if self._ssh_host:
-            try:
-                await self._stop_remote()
-            finally:
-                await self._block_eth0_down()
-        else:
+        if not self._remote:
             await self._stop_local()
+            return
+        if self._serial_port:
+            await self._stop_remote()
+            return
+        try:
+            await self._stop_remote()
+        finally:
+            await self._block_eth0_down()
 
     @property
     def is_running(self) -> bool:
-        if self._ssh_host:
+        if self._remote:
             return self._remote_pid is not None
         return self._process is not None
 
@@ -290,8 +319,8 @@ class EDFixture:
         if self._remote_pid is not None:
             logger.info("Remote ED fixture already running (PID=%d) – skipping", self._remote_pid)
             return
-        logger.info("Starting remote ED fixture on %s@%s: %s",
-                    self._ssh_user, self._ssh_host, self._app_path)
+        logger.info("Starting remote ED fixture (%s): %s",
+                    self._remote_desc, self._app_path)
         kvs = f"/tmp/ed_kvs_{self._discriminator}.json"
         # Anchor the pkill pattern to the start of the cmdline (^) so it only
         # matches the actual app process.  Without the anchor, pkill -f would
@@ -309,9 +338,10 @@ class EDFixture:
             f"{self._extra_args} "
             f"> /tmp/ed_app.log 2>&1 & echo $!"
         )
-        pid_str = await self._ssh(app_cmd)
-        # Take the last non-empty line to skip any SSH banner or warning lines.
-        lines = [line.strip() for line in pid_str.splitlines() if line.strip()]
+        pid_str = await self._exec(app_cmd)
+        # Take the last all-digits line to skip any SSH banner / serial console
+        # or kernel-log noise that may precede the echoed PID.
+        lines = [line.strip() for line in pid_str.splitlines() if line.strip().isdigit()]
         if not lines:
             raise RuntimeError(f"Remote ED start did not return a PID; output: {pid_str!r}")
         self._remote_pid = int(lines[-1])
@@ -321,16 +351,16 @@ class EDFixture:
         # data transfer, not just handshake-sized packets.
         await asyncio.sleep(5)
         logger.info("Remote ED fixture started (PID=%d, discriminator=%d, host=%s)",
-                    self._remote_pid, self._discriminator, self._ssh_host)
+                    self._remote_pid, self._discriminator, self._remote_desc)
 
     async def _stop_remote(self):
         if self._remote_pid is None:
             # No tracked PID — kill any stale instance from a previous run by app path.
-            await self._ssh(f"pkill -f '^{self._app_path}' 2>/dev/null || true")
+            await self._exec(f"pkill -f '^{self._app_path}' 2>/dev/null || true")
             await asyncio.sleep(1)
             return
-        logger.info("Stopping remote ED fixture (PID=%d) on %s", self._remote_pid, self._ssh_host)
-        await self._ssh(f"kill {self._remote_pid} 2>/dev/null || true; sleep 1")
+        logger.info("Stopping remote ED fixture (PID=%d) on %s", self._remote_pid, self._remote_desc)
+        await self._exec(f"kill {self._remote_pid} 2>/dev/null || true; sleep 1")
         self._remote_pid = None
         await asyncio.sleep(1)
         logger.info("Remote ED fixture stopped")
@@ -360,6 +390,31 @@ class EDFixture:
         except Exception as exc:
             logger.warning("Could not clear eth0 block on %s: %s",
                            self._ssh_host, exc)
+
+    async def _exec(self, remote_cmd: str) -> str:
+        """Run a command on the ED over whichever channel is configured."""
+        if self._serial_port:
+            return await self._serial(remote_cmd)
+        return await self._ssh(remote_cmd)
+
+    async def _serial(self, remote_cmd: str) -> str:
+        """Run a command on the ED over its serial console, return stdout."""
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, ED_SERIAL_CLI,
+            "--port", self._serial_port, "--baud", str(self._serial_baud),
+            "--timeout", "45", "run", remote_cmd,
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=130)
+        if proc.returncode != 0:
+            raise RuntimeError(
+                f"Serial command failed (exit={proc.returncode}): {remote_cmd!r}\n"
+                f"stderr: {stderr.decode(errors='replace')}\n"
+                f"stdout: {stdout.decode(errors='replace')}"
+            )
+        return stdout.decode(errors='replace')
 
     async def _ssh(self, remote_cmd: str) -> str:
         """Run a command on the remote host via SSH, return stdout."""
@@ -463,6 +518,9 @@ class COMPROBaseTest(MatterBaseTest):
           ed_passcode        — passcode (default 20202021)
           ed_ssh_host        — if set, start/stop the ED via SSH on this host
           ed_ssh_user        — SSH username (default: ubuntu)
+          ed_serial_port     — if set, drive the ED over this serial console
+                               (standalone-serial mode; eth0 physically out).
+                               Takes precedence over ed_ssh_host.
           ed_extra_args      — extra CLI args forwarded to the ED app
                                (e.g. "--wifi --wifipaf freq_list=2437")
           ed_transport       — 'wifipaf' (default) or 'ble'.  Selects which
@@ -481,6 +539,7 @@ class COMPROBaseTest(MatterBaseTest):
             ssh_user=params.get('ed_ssh_user', 'ubuntu'),
             extra_args=params.get('ed_extra_args', ''),
             ed_transport=params.get('ed_transport', 'wifipaf'),
+            serial_port=params.get('ed_serial_port'),
         )
 
     async def ensure_ed_commissionable(
