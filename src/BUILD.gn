@@ -19,6 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
@@ -49,12 +50,16 @@ if (chip_build_tests) {
 
   chip_test_group("tests") {
     deps = []
+
+    # Note: Tests for cluster with external dependencies must be included
+    # conditionally on a per-cluster chip_enable_* argument declared in lib.gni.
     tests = [
       # keep-sorted: start
       "${chip_root}/src/access/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/actions-server/tests",
@@ -68,37 +73,48 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
+      "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
+      "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
+      "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/energy-evse-server/tests",
+      "${chip_root}/src/app/clusters/fan-control-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/groupcast/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
       "${chip_root}/src/app/clusters/groups-server/tests",
+      "${chip_root}/src/app/clusters/humidistat-server/tests",
       "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
       "${chip_root}/src/app/clusters/illuminance-measurement-server/tests",
       "${chip_root}/src/app/clusters/relative-humidity-measurement-server/tests",
       "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      "${chip_root}/src/app/clusters/laundry-washer-controls-server/tests",
       "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
+      "${chip_root}/src/app/clusters/mode-base-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/network-identity-management-server/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
       "${chip_root}/src/app/clusters/on-off-server/tests",
       "${chip_root}/src/app/clusters/operational-credentials-server/tests",
+      "${chip_root}/src/app/clusters/operational-state-server/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/ota-requestor/tests",
       "${chip_root}/src/app/clusters/power-topology-server/tests",
-      "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      "${chip_root}/src/app/clusters/proximity-ranging-server/tests",
+      "${chip_root}/src/app/clusters/power-source-server/tests",
       "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/clusters/scenes-server/tests",
+      "${chip_root}/src/app/clusters/service-area-server/tests",
+      "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests",
       "${chip_root}/src/app/clusters/flow-measurement-server/tests",
       "${chip_root}/src/app/clusters/pressure-measurement-server/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
@@ -106,6 +122,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/switch-server/tests",
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
       "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/thread-network-directory-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
@@ -115,8 +132,10 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/unit-localization-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
       "${chip_root}/src/app/clusters/valve-configuration-and-control-server/tests",
+      "${chip_root}/src/app/clusters/water-heater-management-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/window-covering-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
@@ -158,6 +177,12 @@ if (chip_build_tests) {
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
 
+    if (chip_enable_push_av_stream_transport) {
+      tests += [
+        "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      ]
+    }
+
     # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
     # test build. Restrict them to specific platforms only
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
@@ -165,12 +190,14 @@ if (chip_build_tests) {
         # keep-sorted: start
         "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
 
         # keep-sorted: end
@@ -179,14 +206,6 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
-    }
-
-    if (chip_device_platform == "darwin") {
-      # Darwin does not include the uriparser submodule, which is required by
-      # push-av-stream-transport-server tests.
-      tests -= [
-        "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
-      ]
     }
 
     if (current_os != "zephyr") {

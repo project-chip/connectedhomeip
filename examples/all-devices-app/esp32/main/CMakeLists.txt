@@ -24,7 +24,7 @@ get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomei
 # always points to the actual source location of this file.
 get_filename_component(ALL_DEVICES_COMMON_DIR "${CMAKE_CURRENT_LIST_DIR}/../../all-devices-common" REALPATH)
 
-include("${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake")
+include("${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake")
 
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
@@ -54,7 +54,7 @@ set(SRC_DIRS_LIST
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})
 
-target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS})
+target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_CLUSTER_SOURCES})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC

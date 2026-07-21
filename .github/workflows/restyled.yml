@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: restyled-io/actions/setup@f31a2185676c560a98c4f9e0185e9bfe8ec3eaf9 # v4
+      - uses: restyled-io/actions/setup@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
 
       - id: restyler
-        uses: restyled-io/actions/run@f31a2185676c560a98c4f9e0185e9bfe8ec3eaf9 # v4
+        uses: restyled-io/actions/run@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
 
       - name: Save restyle patch
         if: ${{ steps.restyler.outputs.git-patch }}

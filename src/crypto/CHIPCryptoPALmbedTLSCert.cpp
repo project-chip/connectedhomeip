@@ -28,7 +28,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
-#include <mbedtls/ecp.h>
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
 #include <mbedtls/version.h>
@@ -36,6 +35,8 @@
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #include <psa/crypto.h>
+#else
+#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #include <mbedtls/x509_csr.h>
@@ -98,6 +99,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 #else
     {
         mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+        VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
         // Copy the public key from the CSR
         result =

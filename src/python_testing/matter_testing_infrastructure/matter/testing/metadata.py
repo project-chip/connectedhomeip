@@ -15,7 +15,6 @@
 import logging
 from dataclasses import dataclass
 from io import StringIO
-from typing import Dict, List, Optional
 
 import yaml
 
@@ -27,13 +26,14 @@ class Metadata:
     py_script_path: str
     run: str
     app: str = ""
-    app_args: Optional[str] = None
-    app_ready_pattern: Optional[str] = None
-    app_stdin_pipe: Optional[str] = None
-    script_args: Optional[str] = None
+    app_args: str | None = None
+    app_ready_pattern: str | None = None
+    app_stdin_pipe: str | None = None
+    script_args: str | None = None
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
+    timeout: float | None = None
     quiet: bool = False
 
 
@@ -43,14 +43,14 @@ class NamedStringIO(StringIO):
         self.name = name
 
 
-def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
+def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
     """Extract the run arguments from the CI test arguments blocks."""
 
     found_ci_args_section = False
-    runs_arg_lines: Dict[str, Dict[str, str]] = {}
+    runs_arg_lines: dict[str, dict[str, str]] = {}
 
     ci_args_section_lines = []
-    with open(py_script_path, 'r', encoding='utf8') as py_script:
+    with open(py_script_path, encoding='utf8') as py_script:
         for line_idx, line in enumerate(py_script.readlines()):
             line = line.strip()
 
@@ -77,7 +77,7 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
         except yaml.YAMLError as e:
-            LOGGER.error(f"Failed to parse CI arguments YAML: {e}")
+            LOGGER.error("Failed to parse CI arguments YAML: %s", e)
 
     return runs_arg_lines
 
@@ -98,9 +98,9 @@ class MetadataReader:
          Path to the environment file that contains the YAML configuration.
         """
         with open(env_yaml_file_path) as stream:
-            self.env: Dict[str, str] = yaml.safe_load(stream)
+            self.env: dict[str, str] = yaml.safe_load(stream)
 
-    def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
+    def __resolve_env_vals__(self, metadata_dict: dict[str, str]) -> None:
         """
         Resolves the argument defined in the test script to environment values.
         For example, if a test script defines "all_clusters" as the value for app
@@ -122,7 +122,7 @@ class MetadataReader:
                 arg_val = arg_val.replace(f'${{{name}}}', value)
             metadata_dict[arg] = arg_val.strip()
 
-    def parse_script(self, py_script_path: str) -> List[Metadata]:
+    def parse_script(self, py_script_path: str) -> list[Metadata]:
         """
         Parses a script and returns a list of metadata object where
         each element of that list representing run arguments associated
@@ -140,7 +140,7 @@ class MetadataReader:
          the run arguments associated with a particular run defined in
          the script file.
         """
-        runs_metadata: List[Metadata] = []
+        runs_metadata: list[Metadata] = []
         runs_args = extract_runs_args(py_script_path)
 
         for run, attr in runs_args.items():
@@ -154,6 +154,7 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
+                timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 

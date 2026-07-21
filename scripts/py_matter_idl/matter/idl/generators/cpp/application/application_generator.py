@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import List, Mapping, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters
@@ -38,7 +38,7 @@ class ServerClusterConfig:
 
     # Set if a `Feature` enumeration is available in the underlying
     # cluster type
-    feature_bitmap_type: Optional[Bitmap]
+    feature_bitmap_type: Bitmap | None
 
     @property
     def features(self) -> list[Feature]:
@@ -69,11 +69,11 @@ class ServerClusterConfig:
 
 @dataclass
 class ClusterConfiguration:
-    endpoint_configs: List[ServerClusterConfig]
-    feature_bitmap_type: Optional[Bitmap]
+    endpoint_configs: list[ServerClusterConfig]
+    feature_bitmap_type: Bitmap | None
 
 
-def find_feature_bitmap(idl: Idl, cluster_name: str) -> Optional[Bitmap]:
+def find_feature_bitmap(idl: Idl, cluster_name: str) -> Bitmap | None:
     """
     Searches for an enumeration named `Feature` within the given cluster
     and returns it.

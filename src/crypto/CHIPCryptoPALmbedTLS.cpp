@@ -652,7 +652,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
          * This avoids IAR compiler warning:
          * 'the order of volatile accesses is undefined ..' */
         unsigned char x = A[i], y = B[i];
-        diff |= x ^ y;
+        diff = static_cast<unsigned char>(diff | (x ^ y));
     }
 
     return ((int) diff);
@@ -928,6 +928,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

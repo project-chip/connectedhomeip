@@ -384,7 +384,7 @@ def gen_mfd_partition(args, mfd_output):
         "product_part_no": {'sec': False, "id": 17, "len": 32, "data": convert_to_bytes(args.product_part_no)},
         "product_url": {'sec': False, "id": 18, "len": 256, "data": convert_to_bytes(args.product_url)},
         "product_label": {'sec': False, "id": 19, "len": 64, "data": convert_to_bytes(args.product_label)},
-        "manufactoring_date": {'sec': False, "id": 20, "len": 16, "data": convert_to_bytes(args.manufactoring_date)},
+        "manufactoring_date": {'sec': False, "id": 20, "len": 16, "data": convert_to_bytes(args.manufacturing_date)},
         "hardware_ver": {'sec': False, "id": 21, "len": 4, "data": convert_to_bytes(args.hardware_version)},
         "hardware_ver_str": {'sec': False, "id": 22, "len": 64, "data": convert_to_bytes(args.hardware_version_string)},
     }
@@ -477,12 +477,13 @@ def main():
     parser.add_argument("--product_id", type=hex_to_int, default=0x1001, help="Product Identification, hex string, mandatory.")
     parser.add_argument("--product_name", type=str, default="Test Product", help="Product Name string, optional.")
 
-    parser.add_argument("--product_part_no", type=str, help="Product Part number, optional.")
-    parser.add_argument("--product_url", type=str, help="Product Web URL, optional.")
-    parser.add_argument("--product_label", type=str, help="Product Web URL, optional.")
-    parser.add_argument("--manufactoring_date", type=str, help="Product Web URL, optional.")
-    parser.add_argument("--hardware_version", type=int, help="Product Web URL, optional.")
-    parser.add_argument("--hardware_version_string", type=str, help="Product Web URL, optional.")
+    parser.add_argument("--product_part_no", type=str, default="", help="Product Part number, optional.")
+    parser.add_argument("--product_url", type=str, default="", help="Product Web URL, optional.")
+    parser.add_argument("--product_label", type=str, default="", help="Product Label, optional.")
+    parser.add_argument("--manufacturing_date", type=str, default=datetime.now().strftime("%Y-%m-%d"),
+                        help="Manufacturing Date in YYYY-MM-DD format, optional.")
+    parser.add_argument("--hardware_version", type=int, default=1, help="Hardware Version, optional.")
+    parser.add_argument("--hardware_version_string", type=str, default="prerelease", help="Hardware Version String, optional.")
     parser.add_argument("--rendezvous", type=int, default=6, help="Rendezvous Mode for QR code generation")
 
     parser.add_argument("--output", type=str, help="output path.")

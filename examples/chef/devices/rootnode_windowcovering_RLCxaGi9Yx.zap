@@ -2478,7 +2478,7 @@
         }
       ],
       "deviceVersions": [
-        3
+        7
       ],
       "deviceIdentifiers": [
         514

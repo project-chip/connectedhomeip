@@ -1,6 +1,6 @@
 # Matter EFR32 Water Heater Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
@@ -78,11 +78,8 @@ based on the Silicon Labs platform.
 
     MG24 boards :
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD2703A / MG24 Explorer Kit
     -   BRD2704A / SparkFun Thing Plus MGM240P board
@@ -197,13 +194,11 @@ combination with JLinkRTTClient as follows:
 
 -   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
 
-    For MG12 use:
+    For MG24 use:
 
-                      $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-
-    For MG21 use:
-
-                      $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+              ```
+              $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+              ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 

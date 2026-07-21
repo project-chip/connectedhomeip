@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,15 +44,45 @@ from .target import BuildTarget, TargetPart
 # in all-devices: examples/all-devices-app/all-devices-common/devices
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
+    'aggregator',
+    'air-purifier',
+    'ambient-context-sensor',
+    'bridged-node',
     'chime',
     'contact-sensor',
+    'cooktop',
+    'device-energy-management',
     'dimmable-light',
+    'dimmable-plug-in-unit',
+    'dishwasher',
+    'extractor-hood',
+    'fan',
+    'flow-sensor',
+    'generic-switch',
+    'humidity-sensor',
+    'laundry-dryer',
+    'laundry-washer',
+    'light-sensor',
+    'microwave-oven',
+    'mounted-dimmable-load-control',
+    'mounted-on-off-control',
     'occupancy-sensor',
     'on-off-light',
+    'on-off-light-switch',
+    'on-off-plug-in-unit',
+    'oven',
+    'power-source',
+    'pressure-sensor',
+    'proximity-ranger',
+    'rain-sensor',
+    'refrigerator',
+    'robotic-vacuum-cleaner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'water-freeze-detector',
     'water-leak-detector',
+    'water-valve',
     # keep-sorted: end
 ]
 
@@ -85,18 +115,19 @@ def BuildHostFakeTarget():
     ])
 
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
-    target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
-        "-clang").ExceptIfRe('-libfuzzer')
+    target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
-        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+        "-clang").ExceptIfRe('-(libfuzzer|asan)')
     target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
@@ -118,6 +149,8 @@ def BuildHostTarget():
     if cross_compile:
         board_parts.append(TargetPart(
             'arm64', board=HostBoard.ARM64).OnlyIfRe('-(clang|nodeps)'))
+        board_parts.append(TargetPart(
+            'arm', board=HostBoard.ARM).OnlyIfRe('-(clang|nodeps)'))
 
     target.AppendFixedTargets(board_parts)
 
@@ -209,18 +242,21 @@ def BuildHostTarget():
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier("msan", use_msan=True).OnlyIfRe("-clang").OnlyIfRe("-x64").ExceptIfRe(
+        "-(asan|tsan|ubsan|ossfuzz)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
-    target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
-        "-clang").ExceptIfRe('-libfuzzer')
+    target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
-        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+        "-clang").ExceptIfRe('-(libfuzzer|asan)')
     target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
@@ -311,9 +347,6 @@ def BuildEfr32Target():
         TargetPart('brd4317a', board=Efr32Board.BRD4317A),
         TargetPart('brd4318a', board=Efr32Board.BRD4318A),
         TargetPart('brd4319a', board=Efr32Board.BRD4319A),
-        TargetPart('brd4186a', board=Efr32Board.BRD4186A),
-        TargetPart('brd4187a', board=Efr32Board.BRD4187A),
-        TargetPart('brd2601b', board=Efr32Board.BRD2601B),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
@@ -326,8 +359,9 @@ def BuildEfr32Target():
     ])
 
     # apps
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -339,7 +373,14 @@ def BuildEfr32Target():
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
@@ -363,8 +404,8 @@ def BuildEfr32Target():
         '-(wifi|use-ot-coap-lib)')
     target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
         '-(wifi|use-ot-lib)')
-    target.AppendModifier('no-version', no_version=True)
     target.AppendModifier('skip-rps-generation', use_rps_extension=False)
+    target.AppendModifier('uart-log', uart_log=True)
 
     return target
 
@@ -498,7 +539,6 @@ def BuildAmebaTarget():
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
         TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
-        TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
     return target
@@ -574,7 +614,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
-    target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="ota", enable_ota=True)
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True)
@@ -732,26 +772,27 @@ def BuildBouffalolabTarget():
         TargetPart('BL602DK',
                    board=BouffalolabBoard.BL602DK, module_type="BL602"),
         TargetPart('BL616DK', board=BouffalolabBoard.BL616DK, module_type="BL616"),
+        TargetPart('BL616CLDK', board=BouffalolabBoard.BL616CLDK, module_type="BL616CL"),
         TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
         TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
         TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
     ])
 
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
-        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True).OnlyIfRe('-(bl704l)'),
+        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True),
     ])
 
     target.AppendFixedTargets([
-        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl706dk)'),
-        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk)'),
-        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
-        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
-        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl616cldk|bl706dk)'),
+        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk|bl616cldk)'),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
     ])
 
     target.AppendFixedTargets([
@@ -763,8 +804,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
     target.AppendModifier('rpc', enable_rpcs=True, baudrate=115200).OnlyIfRe('-(bl602dk|bl704ldk|bl706dk)')
-    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)')
-    target.AppendModifier('mot', use_matter_openthread=True).OnlyIfRe('-(thread)')
+    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)(?!.*-rpc)')
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
     target.AppendModifier('coredump', enable_debug_coredump=True)
 
@@ -814,10 +854,11 @@ def BuildTelinkTarget():
         TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor', app=TelinkApp.AIR_QUALITY_SENSOR),
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('all-devices', app=TelinkApp.ALL_DEVICES),
         TargetPart('bridge', app=TelinkApp.BRIDGE),
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
@@ -832,7 +873,17 @@ def BuildTelinkTarget():
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    # Each modifier selects exactly one device; the binary is named example-device-app.
+    # Multi-device subsets should be built by passing
+    # -DALL_DEVICES_ENABLED_DEVICES=<device1;device2;...> through the
+    # Zephyr/west+CMake build system (for example via build_examples).
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=TelinkApp.ALL_DEVICES, all_devices_enabled_devices=[_device]))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('ota', enable_ota=True)
     target.AppendModifier('dfu-smp', enable_dfu_smp=True)

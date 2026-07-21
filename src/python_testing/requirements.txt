@@ -7,3 +7,4 @@ langcodes
 requests
 pycountry
 validators
+nest-asyncio

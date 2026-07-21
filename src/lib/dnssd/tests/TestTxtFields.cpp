@@ -140,6 +140,10 @@ TEST(TestTxtFields, TestGetProduct)
     // overflow a uint16
     sprintf(vp, "123+%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     EXPECT_EQ(GetProduct(GetSpan(vp)), 0);
+
+    // Empty value (e.g. an on-wire "VP=" TXT entry, which ParseTxtRecord delivers as an
+    // empty ByteSpan). The length check must not underflow on a zero-length span.
+    EXPECT_EQ(GetProduct(ByteSpan()), 0);
 }
 TEST(TestTxtFields, TestGetVendor)
 {

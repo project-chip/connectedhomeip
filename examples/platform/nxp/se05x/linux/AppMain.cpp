@@ -59,6 +59,10 @@
 #include <ControllerShellCommands.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#ifndef CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
+#define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 1
+#endif
+
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h> // nogncheck
@@ -138,13 +142,6 @@
 #include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#include <platform/Darwin/NetworkCommissioningDriver.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
@@ -198,16 +195,6 @@ DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 #define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
 DeviceLayer::NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 1
-DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
-DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 #ifndef CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #define CHIP_APP_MAIN_HAS_THREAD_DRIVER 0
@@ -1006,6 +993,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static chip::PersistentStorageOpKeystorese05x se05xInstance;
     initParams.operationalKeystore = &se05xInstance;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+#endif
+
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.
 #if ENABLE_SE05X_DEVICE_ATTESTATION
@@ -1037,17 +1031,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         SuccessOrDie(exampleAccessRestrictionProvider->SetEntries(1, LinuxDeviceOptions::GetInstance().arlEntries.Value()));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
-    {
-        ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
-        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
-        // all? or Change the handling within WiFiPAFShutdown?
-        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
-        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
-                                                                                chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
-    }
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
@@ -1069,11 +1052,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
+#endif // CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
@@ -1083,35 +1068,11 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 
     ApplicationInit();
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
-    platformMgr.RegisterSignalHandler(SIGINT, ^{
-        platformMgr.UnregisterAllSignalHandlers();
-        StopSignalHandler(SIGINT);
-    });
-
-    platformMgr.RegisterSignalHandler(SIGTERM, ^{
-        platformMgr.UnregisterAllSignalHandlers();
-        StopSignalHandler(SIGTERM);
-    });
-#else
-    // NOTE: For some reason, on Darwin, the signal handler is not called if the signal is
-    //       registered with sigaction() call and TSAN is enabled. The problem seems to be
-    //       related with the dispatch_semaphore_wait() function in the RunEventLoop() method.
-    //       If this call is commented out, the signal handler is called as expected...
-    // NOLINTBEGIN(bugprone-signal-handler)
-    signal(SIGINT, StopSignalHandler);
-    signal(SIGTERM, StopSignalHandler);
-    // NOLINTEND(bugprone-signal-handler)
-#endif
-#else
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
     sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
-#endif
 
     // This message is used as a marker for when the application process has started.
     // See: scripts/tests/chiptest/test_definition.py
@@ -1147,11 +1108,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput, BuildProfile
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, BuildProfile, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -119,12 +121,11 @@ class AndroidApp(Enum):
 
 class AndroidBuilder(Builder):
     def __init__(self,
-                 root,
-                 runner,
-                 board: AndroidBoard,
-                 app: AndroidApp,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock, board: AndroidBoard, app: AndroidApp,
                  optimize_size: bool = False):
-        super(AndroidBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
         self.optimize_size = optimize_size
@@ -163,17 +164,17 @@ class AndroidBuilder(Builder):
                 # Test environment - assume the path is valid
                 sdk_manager = path
                 checked_details.append(f"{path} (test environment - assumed valid)")
-                log.info(f"Using SDK manager for {for_purpose} from test environment: {sdk_manager}")
+                log.info("Using SDK manager for %s from test environment: %s", for_purpose, sdk_manager)
                 break
             # Real environment - check actual file existence
             exists = os.path.isfile(path)
             executable = os.access(path, os.X_OK)
             checked_details.append(f"{path} (exists: {exists}, executable: {executable})")
-            log.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
+            log.debug("Checking SDK manager path for %s: %s - exists: %s, executable: %s", for_purpose, path, exists, executable)
 
             if exists and executable:
                 sdk_manager = path
-                log.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
+                log.info("Found SDK manager for %s at: %s", for_purpose, sdk_manager)
                 break
 
         return sdk_manager, checked_details
@@ -198,8 +199,8 @@ class AndroidBuilder(Builder):
         android_home = os.environ.get("ANDROID_HOME", "")
 
         log.info("Android environment paths:")
-        log.info(f"  ANDROID_NDK_HOME: {android_ndk_home}")
-        log.info(f"  ANDROID_HOME: {android_home}")
+        log.info("  ANDROID_NDK_HOME: %s", android_ndk_home)
+        log.info("  ANDROID_HOME: %s", android_home)
 
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
             if k not in os.environ:
@@ -214,7 +215,7 @@ class AndroidBuilder(Builder):
         if not sdk_manager:
             log.error("SDK manager not found in any expected location")
             for detail in checked_details:
-                log.error(f"  {detail}")
+                log.error("  %s", detail)
 
             android_home = os.environ["ANDROID_HOME"]
             possible_fixes = [
@@ -391,6 +392,7 @@ class AndroidBuilder(Builder):
                 title="Building Example " + self.identifier,
             )
 
+    @lock_output_dir
     def generate(self):
         self._Execute(
             ["python3", "third_party/android_deps/set_up_android_deps.py"],
@@ -441,33 +443,24 @@ class AndroidBuilder(Builder):
                 gn_args["matter_enable_tracing_support"] = False
                 gn_args["use_static_libcxx"] = True
 
-                # TV Casting App size optimizations: compile only the
-                # ~36 casting-relevant clusters instead of the full
-                # generated cluster-objects.cpp, and use slim TLV
-                # decoder source overrides covering only the 18
-                # casting clusters so that ChipClusters.java
-                # read/subscribe APIs remain functional at runtime.
-                # These must be passed as explicit GN build args
+                # TV Casting App size optimizations: point the build at
+                # the override directory containing slim source files
+                # (cluster-objects, TLV decoders, accessors, cluster
+                # servers) covering only the ~36 casting-relevant
+                # clusters.  The build system resolves well-known
+                # filenames inside this directory automatically.
+                # This must be passed as an explicit GN build arg
                 # because args.gni is evaluated inside default_args
                 # (before args.gn is applied), so the
                 # if (optimize_apk_size) conditional there cannot see
                 # the args.gn value.
                 if self.app == AndroidApp.TV_CASTING_APP:
-                    gn_args["chip_cluster_objects_source_override"] = (
+                    gn_args["chip_data_model_overrides_dir"] = (
                         "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-cluster-objects.cpp"
+                        "tv-casting-app/tv-casting-common"
                     )
-                    gn_args["chip_tlv_decoder_attribute_source_override"] = (
-                        "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-CHIPAttributeTLVValueDecoder.cpp"
-                    )
-                    gn_args["chip_tlv_decoder_event_source_override"] = (
-                        "//third_party/connectedhomeip/examples/"
-                        "tv-casting-app/tv-casting-common/"
-                        "casting-CHIPEventTLVValueDecoder.cpp"
-                    )
+                    gn_args["chip_data_model_extra_logging"] = False
+                    gn_args["enable_rtti"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -508,6 +501,7 @@ class AndroidBuilder(Builder):
             # Handle SDK manager license acceptance
             self._handle_sdk_license_acceptance()
 
+    @lock_output_dir
     def stripSymbols(self):
         output_libs_dir = os.path.join(
             self.output_dir,
@@ -524,6 +518,7 @@ class AndroidBuilder(Builder):
                     "Stripping symbols from " + lib
                 )
 
+    @lock_output_dir
     def _build(self):
         if self.board.IsIde():
             # App compilation IDE
@@ -656,6 +651,7 @@ class AndroidBuilder(Builder):
             if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
                 self.stripSymbols()
 
+    @lock_output_dir
     def build_outputs(self):
         if self.board.IsIde():
             yield BuilderOutput(

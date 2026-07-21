@@ -3752,7 +3752,7 @@
       ],
       "deviceVersions": [
         1,
-        1
+        2
       ],
       "deviceIdentifiers": [
         17,
