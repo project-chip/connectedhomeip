@@ -16,6 +16,8 @@
  */
 #include "MultiOTAImageHeader.h"
 
+#include <algorithm>
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>

@@ -40,7 +40,7 @@ void HandleRestart(chip::System::Layer * systemLayer, void * appState)
 
 } // namespace
 
-CHIP_ERROR AppImageProcessor::Init(const SubImageHeader & entry)
+CHIP_ERROR AppImageProcessor::Init(const SubImageHeader &)
 {
     mPartition   = nullptr;
     mOtaHandle   = 0;

@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <inttypes.h>
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
@@ -127,6 +128,7 @@ CHIP_ERROR MultiImageOTAProcessorImpl::RegisterProcessor(ImageProcessorEntry & e
     {
         VerifyOrReturnError(current->tag != entry.tag, CHIP_ERROR_DUPLICATE_KEY_ID);
     }
+    // Prepend so the app image, which is registered first, ends up last in the list and is applied last.
     entry.next    = mRegistryHead;
     mRegistryHead = &entry;
     return CHIP_NO_ERROR;
@@ -215,6 +217,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
     CHIP_ERROR error = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
+        imageProcessor->mLastErr = error;
         imageProcessor->mDownloader->EndDownload(error);
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
@@ -223,6 +226,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
     error = imageProcessor->ProcessMultiImageHeader(block);
     if (error != CHIP_NO_ERROR)
     {
+        imageProcessor->mLastErr = error;
         imageProcessor->mDownloader->EndDownload(error);
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
@@ -390,13 +394,22 @@ void MultiImageOTAProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
+
     for (ImageProcessorEntry * entry = imageProcessor->mRegistryHead; entry != nullptr; entry = entry->next)
     {
         if (!entry->processor->IsInitialized())
         {
             continue;
         }
-        LogErrorOnFailure(entry->processor->Apply());
+        CHIP_ERROR err = entry->processor->Apply();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " apply failed: %" CHIP_ERROR_FORMAT, entry->tag, err.Format());
+            imageProcessor->mLastErr = err;
+            PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
+            return;
+        }
     }
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
 }
@@ -469,25 +482,27 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
 
         // The app image must be the last entry, and there must be exactly one.
         VerifyOrReturnError(mMultiOTAImageHeader.subImages.back().imageId == kAppImageProcessorTag,
-                            CHIP_ERROR_INVALID_FILE_IDENTIFIER, "App image is not the last entry in the payload");
+                            CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "App image is not the last entry in the payload"));
 
         const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
-        VerifyOrReturnError(mParams.totalFileBytes <= UINT32_MAX, CHIP_ERROR_INVALID_FILE_IDENTIFIER, "Total file bytes is too large");
+        VerifyOrReturnError(mParams.totalFileBytes <= UINT32_MAX, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Total file bytes is too large"));
 
         uint64_t expectedOffset = headerSize;
         size_t appImageCount    = 0;
         for (const auto & subImage : mMultiOTAImageHeader.subImages)
         {
-            VerifyOrReturnError(subImage.length > 0, CHIP_ERROR_INVALID_FILE_IDENTIFIER, "Sub-image %d length is 0", subImage.imageId);
-            VerifyOrReturnError(subImage.offset == expectedOffset, CHIP_ERROR_INVALID_FILE_IDENTIFIER, "Sub-image %d offset is not correct", subImage.imageId);
+            VerifyOrReturnError(subImage.length > 0, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " length is 0",
+                                subImage.imageId));
+            VerifyOrReturnError(subImage.offset == expectedOffset, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                                ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " offset is not correct", subImage.imageId));
             expectedOffset += subImage.length;
             if (subImage.imageId == kAppImageProcessorTag)
             {
                 appImageCount++;
             }
         }
-        VerifyOrReturnError(expectedOffset == mParams.totalFileBytes, CHIP_ERROR_INVALID_FILE_IDENTIFIER, "Processed header size is not same as reported");
-        VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER, "App image count is not 1");
+        VerifyOrReturnError(expectedOffset == mParams.totalFileBytes, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Processed header size is not same as reported"));
+        VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "App image count is not 1"));
 
         VerifyOrReturnError(mSubImageResults.Alloc(mMultiOTAImageHeader.subImages.size()), CHIP_ERROR_NO_MEMORY);
         mSubImageResultCount = 0;
