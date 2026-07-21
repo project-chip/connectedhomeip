@@ -16,24 +16,48 @@ import contextlib
 import queue
 import threading
 import time
+from collections.abc import Callable
 from multiprocessing.managers import SyncManager
-from typing import Generic, Protocol, TypeVar
+from typing import Generic, ParamSpec, Protocol, TypeVar, runtime_checkable
+
+from chiptest.concurrency.context import TerminableResource
 
 
+@runtime_checkable
 class Waitable(Protocol):
     def wait(self, timeout: float | None = None) -> bool: ...
 
 
-def wait_for_mp_managed(waitable: Waitable, timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
+P = ParamSpec("P")
+
+
+@runtime_checkable
+class WaitableFor(Protocol, Generic[P]):
+    def wait_for(self, predicate: Callable[P, bool], timeout: float | None = None) -> bool: ...
+
+
+def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable[P, bool] | None = None,
+                        timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
     """
     Wait for a resource managed by multiprocessing.Manager.
 
     Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
     as the manager process explicitly ignores SIGINT.
     """
+    if predicate is not None:
+        if not isinstance(waitable, WaitableFor):
+            raise TypeError("Waitable must have wait_for() method if predicate is provided")
+
+        def wait_fn(timeout: float | None = None) -> bool:
+            return waitable.wait_for(predicate, timeout)
+    else:
+        if not isinstance(waitable, Waitable):
+            raise TypeError("Waitable must have wait() method")
+        wait_fn = waitable.wait
+
     # Blocking wait with no timeout. Cancellable only with a KeyboardInterrupt.
     if timeout_sec is None:
-        while not waitable.wait(polling_interval_sec):
+        while not wait_fn(polling_interval_sec):
             pass
         return True
 
@@ -42,12 +66,12 @@ def wait_for_mp_managed(waitable: Waitable, timeout_sec: float | None = None, po
     # returns immediately. The default Condition implementation checks if `timeout > 0`: if so, it acquires the underlying lock
     # with a timeout (blocking). Otherwise, it acquires the lock without blocking, without checking for negative timeout values.
     if timeout_sec <= 0:
-        return waitable.wait(timeout_sec)
+        return wait_fn(timeout_sec)
 
     # Countdown wait with polling, so that we can catch KeyboardInterrupt.
     end = time.monotonic() + timeout_sec
     while (time_left_sec := end - time.monotonic()) > 0:
-        if waitable.wait(min(polling_interval_sec, time_left_sec)):
+        if wait_fn(min(polling_interval_sec, time_left_sec)):
             return True
 
     return False
@@ -64,7 +88,7 @@ class EndOfQueue(Exception):
 QueueElementT = TypeVar("QueueElementT")
 
 
-class CancellableQueue(Generic[QueueElementT]):
+class CancellableQueue(TerminableResource, Generic[QueueElementT]):
     """
     Queue that supports synchronized cancellation and end-of-work signaling.
 
@@ -82,7 +106,21 @@ class CancellableQueue(Generic[QueueElementT]):
     _cancel_event: threading.Event
     _end_of_queue: threading.Event
 
-    def __init__(self, mp_manager: SyncManager | None = None) -> None:
+    def __init__(self, mp_manager: SyncManager | None = None, queue_element_cls: type[QueueElementT] | None = None,
+                 name: str | None = None) -> None:
+        """
+        Initialize the queue.
+
+        If `mp_manager` is provided, the queue will be managed by the multiprocessing manager and can be shared across processes.
+        Otherwise, it will be a regular in-memory queue for use within a single process.
+
+        `queue_element_cls` is an optional argument to specify the type of elements in the queue. Useful when the queue is used as
+        a context manager.
+        """
+        if queue_element_cls is not None and name is None:
+            name = f"CancellableQueue[{queue_element_cls.__name__}]"
+        super().__init__(name, terminate_debug_logging=name is not None)
+
         if mp_manager is None:
             self._cond = threading.Condition()
             self._queue = queue.Queue()
@@ -130,7 +168,7 @@ class CancellableQueue(Generic[QueueElementT]):
                     return self.get(timeout=0)
 
                 # We wait for the condition within the timeout (or infinitely when timeout=None).
-                if not self._cond.wait(timeout):
+                if not wait_for_mp_managed(self._cond, timeout_sec=timeout):
                     raise TimeoutError("Timeout when waiting for queue item")
 
             # Check for cancel event.
@@ -151,9 +189,6 @@ class CancellableQueue(Generic[QueueElementT]):
     def cancel(self) -> None:
         """Set cancel event and notify all consumers."""
         with self._cond:
-            if self._cancel_event.is_set():
-                return
-
             self._cancel_event.set()
             self._cond.notify_all()
 
@@ -164,12 +199,13 @@ class CancellableQueue(Generic[QueueElementT]):
     def close(self) -> None:
         """Set end-of-queue event and notify all consumers."""
         with self._cond:
-            if self._end_of_queue.is_set():
-                return
-
             self._end_of_queue.set()
             self._cond.notify_all()
 
     def wait_for_closed(self) -> bool:
         """Wait until the queue is closed."""
         return wait_for_mp_managed(self._end_of_queue)
+
+    def resource_terminate(self) -> None:
+        """On termination, we cancel the queue to unblock any waiting consumers."""
+        self.cancel()

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any
 
 from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
                      TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
@@ -137,7 +137,7 @@ _CONFIG_VARIABLE_SCHEMA = {
 @dataclass
 class SchemaTree:
     schema: dict[str, type]
-    children: Union[dict[str, SchemaTree], None] = None
+    children: dict[str, SchemaTree] | None = None
 
 
 _constraint_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA)
@@ -164,7 +164,7 @@ yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
 class YamlLoader:
     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
 
-    def load(self, yaml_file: str) -> tuple[str, Union[list, str], dict, list]:
+    def load(self, yaml_file: str) -> tuple[str, list | str, dict, list]:
         filename = ''
         name = ''
         pics = None

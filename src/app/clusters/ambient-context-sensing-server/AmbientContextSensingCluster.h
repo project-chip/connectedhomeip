@@ -33,13 +33,9 @@ class AmbientContextSensingCluster : public DefaultServerCluster, public TimerCo
 public:
     struct Config
     {
-        Config(EndpointId endpointId, AmbientContextSensing::AmbientContextSensingDelegate & acsDelegate,
-               TimerDelegate & timerDelegate) :
-            mEndpointId(endpointId),
-            mDelegate(acsDelegate), mHoldTimeDelegate(timerDelegate)
-        {}
+        Config(TimerDelegate & timerDelegate) : mHoldTimeDelegate(timerDelegate) {}
 
-        Config & WithFeatures(AmbientContextSensing::Feature featureMap)
+        Config & WithFeatures(BitMask<AmbientContextSensing::Feature> featureMap)
         {
             mFeatureMap = featureMap;
             return *this;
@@ -59,7 +55,6 @@ public:
             return *this;
         }
 
-        EndpointId mEndpointId;
         BitMask<AmbientContextSensing::Feature> mFeatureMap = 0;
         uint32_t mOptionalAttributeBits                     = 0;
         AmbientContextSensing::ObjectCountConfigType mObjectCountConfig            = {
@@ -75,17 +70,17 @@ public:
             .holdTimeMax     = AmbientContextSensing::kDefaultHoldTimeMax,
             .holdTimeDefault = AmbientContextSensing::kDefaultHoldTimeDefault
         };
-        AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
         TimerDelegate & mHoldTimeDelegate;
     };
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<AmbientContextSensing::Attributes::ObjectCount::Id>;
 
-    AmbientContextSensingCluster(const Config & config);
+    AmbientContextSensingCluster(EndpointId endpointId, const Config & config);
     ~AmbientContextSensingCluster() = default;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
+    void SetDelegate(AmbientContextSensing::AmbientContextSensingDelegate * pDelegate) { mACSDelegate = pDelegate; }
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -136,15 +131,17 @@ private:
 
     const BitMask<AmbientContextSensing::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
-    bool mHumanActivityDetected = false;
-    bool mObjectIdentified      = false;
-    bool mAudioContextDetected  = false;
-    AmbientContextSensing::AmbientContextSensingDelegate & mACSDelegate;
+    bool mHumanActivityDetected                                         = false;
+    bool mObjectIdentified                                              = false;
+    bool mAudioContextDetected                                          = false;
+    AmbientContextSensing::AmbientContextSensingDelegate * mACSDelegate = nullptr;
 
     Span<AmbientContextSensing::SemanticTagType> mAmbientContextTypeSupportedList;
 
     IntrusiveList<AmbientContextSensing::AmbientContextSensed> mAmbientContextTypeList;
     uint8_t mAmbientContextTypeListSize = 0;
+
+    Span<AmbientContextSensing::PredictActivity> mPredictedActivityList;
 
     uint8_t mSimultaneousDetectionLimit = AmbientContextSensing::kDefaultSimultaneousDetectionLimit;
     bool mObjectCountThresholdReached   = false;

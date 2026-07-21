@@ -21,12 +21,13 @@
 
 #include <string.h>
 
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
 #include "uart.h"
 #else
 #include "SEGGER_RTT.h"
 #endif
-
+#endif // SILABS_LOG_ENABLED
 // TODO: The FreeRTOS CMSIS OS2 wrapper does not implement osKernelSuspend().
 // Using vTaskSuspendAll() directly until the SDK provides the wrapper.
 #include "FreeRTOS.h"
@@ -68,6 +69,7 @@ extern char __ramfuncs_end__[];     // End of RAM functions (EFR32 Series 2/3 on
 template <size_t N>
 static void PrintAddr(const char (&prefix)[N], uintptr_t addr)
 {
+#if SILABS_LOG_ENABLED
     static_assert(N > 0, "Prefix must not be empty");
     constexpr size_t prefixLen = N - 1; // Exclude null terminator
     constexpr size_t bufSize   = prefixLen + kAddrHexDigits + kAddrSuffixLen + kAddrNullTerm;
@@ -90,6 +92,10 @@ static void PrintAddr(const char (&prefix)[N], uintptr_t addr)
 #else
     SEGGER_RTT_WriteNoLock(0, msg, totalLen);
 #endif
+#else
+    (void) addr;
+    (void) prefix;
+#endif // SILABS_LOG_ENABLED
 }
 
 extern "C" void chipDie(void)
