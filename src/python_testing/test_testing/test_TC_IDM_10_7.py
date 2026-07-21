@@ -21,11 +21,12 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from TC_IDM_10_7 import TC_IDM_10_7
 
 import matter.clusters as Clusters
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 logging.disable(logging.CRITICAL)
 
