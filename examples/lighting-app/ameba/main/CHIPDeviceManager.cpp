@@ -37,6 +37,7 @@
 #include "LEDWidget.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
@@ -151,12 +152,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if (attributeId == CurrentHue::Id)
         {
             hue = *value;
-            CurrentSaturation::Get(endpointId, &saturation);
+            ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
         }
         if (attributeId == CurrentSaturation::Id)
         {
             saturation = *value;
-            CurrentHue::Get(endpointId, &hue);
+            ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
         }
         ChipLogProgress(Zcl, "New hue: %d, New saturation: %d ", hue, saturation);
     }

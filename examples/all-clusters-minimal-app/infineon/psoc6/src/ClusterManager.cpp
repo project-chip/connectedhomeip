@@ -25,6 +25,7 @@
 #include "AppConfig.h"
 #include "LEDWidget.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
@@ -98,7 +99,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-            CurrentSaturation::Get(endpointId, &saturation);
+            ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
         }
         else
         {
@@ -107,7 +108,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
              */
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-            CurrentHue::Get(endpointId, &hue);
+            ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
         }
         /* Set RGB Color on Cluster Indication LED */
         sClusterLED.SetColor(hue, saturation);

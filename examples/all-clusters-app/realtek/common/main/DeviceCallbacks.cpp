@@ -29,6 +29,7 @@
 #include "CHIPDeviceManager.h"
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -280,12 +281,12 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        CurrentSaturation::Get(endpointId, &saturation);
+        ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
     }
     if (attributeId == CurrentSaturation::Id)
     {
         saturation = *value;
-        CurrentHue::Get(endpointId, &hue);
+        ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
     }
 
     ChipLogProgress(DeviceLayer, "New hue: %d, New saturation: %d", hue, saturation);
