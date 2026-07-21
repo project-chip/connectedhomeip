@@ -62,9 +62,9 @@ class TestBleLayer : public BleLayer,
 public:
     // Add mOnBleConnectionCompleteCalls and mOnBleConnectionErrorCalls
     // to check if the callbacks are invoked correctly.
-    int mOnBleConnectionCompleteCalls = 0;
-    int mOnBleConnectionErrorCalls    = 0;
-    int mCloseConnectionCalls         = 0;
+    int mOnBleConnectionCompleteCalls           = 0;
+    int mOnBleConnectionErrorCalls              = 0;
+    int mCloseConnectionCalls                   = 0;
     BLE_CONNECTION_OBJECT mLastClosedConnection = BLE_CONNECTION_UNINITIALIZED;
 
     static void SetUpTestSuite()
