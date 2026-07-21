@@ -32,6 +32,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Pool.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -165,11 +166,14 @@ protected:
         return params;
     }
 
+    static void StopEventLoop(intptr_t)
+    {
+        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
+    }
+
     void DrainSystemLayer()
     {
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                      [](intptr_t) -> void { EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, 0),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop, 0), CHIP_NO_ERROR);
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
     }
 
@@ -188,6 +192,7 @@ protected:
 
 TEST_F(TestOperationalSessionSetupFallback, ImmediateCASEClientCleanupReleasesInline)
 {
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: immediate release start");
     OperationalSessionSetup sessionSetup(CreateCASEClientInitParams(), &mCASEClientPool, ScopedNodeId(kTestNodeId, kFabricIndex),
                                          &mReleaseDelegate);
     chip::Testing::OperationalSessionSetupTestAccess access(&sessionSetup);
@@ -199,10 +204,12 @@ TEST_F(TestOperationalSessionSetupFallback, ImmediateCASEClientCleanupReleasesIn
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: immediate release complete");
 }
 
 TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseSessionSetupAfterReturn)
 {
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: deferred release start");
     CASEClient * caseClient = mCASEClientPool.Allocate();
     ASSERT_NE(caseClient, nullptr);
 
@@ -217,15 +224,20 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseS
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: deferred release scheduled");
 
     chip::Platform::Delete(sessionSetup);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: setup deleted");
     DrainSystemLayer();
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: system layer drained");
 
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: deferred release complete");
 }
 
 TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupLeaksWhenSystemLayerUnavailable)
 {
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: no SystemLayer start");
     ExchangeManager uninitializedExchangeManager;
     CASEClientInitParams params = CreateCASEClientInitParams();
     params.exchangeMgr          = &uninitializedExchangeManager;
@@ -241,8 +253,10 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupLeaksWhenSy
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: no SystemLayer retention confirmed");
 
     mCASEClientPool.Release(caseClient);
+    ChipLogProgress(AppServer, "OperationalSessionSetup cleanup test: no SystemLayer cleanup complete");
 }
 
 #if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
