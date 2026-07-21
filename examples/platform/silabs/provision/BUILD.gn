@@ -35,7 +35,13 @@ source_set("storage") {
 
   if (wifi_soc) {
     if (sl_si91x_crypto_flavor == "psa") {
-      libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917.a" ]
+      if (is_clang) {
+        libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917-clang.a" ]
+      } else {
+        libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917.a" ]
+      }
+    } else if (is_clang) {
+      libs = [ "${sl_provision_root}/libs/libProvision-si917-clang.a" ]
     } else {
       libs = [ "${sl_provision_root}/libs/libProvision-si917.a" ]
     }
