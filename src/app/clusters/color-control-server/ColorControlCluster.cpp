@@ -81,6 +81,14 @@ ColorControlCluster::ColorControlCluster(EndpointId endpoint, const Config & con
     }
 }
 
+ColorControlCluster::~ColorControlCluster()
+{
+    // Guaranteed cleanup: cancel the tick timer so a callback registered against DeviceLayer::SystemLayer()
+    // with `this` never fires after the object is gone. Shutdown() also cancels it, but is not always called
+    // (e.g. stack-allocated clusters in unit tests), and CancelTimer is a no-op when nothing is armed.
+    DeviceLayer::SystemLayer().CancelTimer(&TimerCallback, this);
+}
+
 CHIP_ERROR ColorControlCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));

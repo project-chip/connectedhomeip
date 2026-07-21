@@ -158,7 +158,11 @@ public:
     // Per MIGRATION.md: endpoint is explicit and forwarded to the base ConcreteClusterPath (which is where
     // mPath — and thus mPath.mEndpointId — lives). Members are copied out of config at construction.
     ColorControlCluster(chip::EndpointId endpoint, const Config & config);
-    ~ColorControlCluster() override = default;
+    // Cancels the 100ms tick timer. Shutdown() also cancels it, but the timer is registered against
+    // DeviceLayer::SystemLayer() with `this` as the callback context, so a cluster destroyed while a
+    // tick is armed (e.g. Shutdown() was never called) would leave a dangling callback pointing at freed
+    // memory — the timer must be canceled here too so teardown is guaranteed by RAII.
+    ~ColorControlCluster() override;
 
     // Arm the one-shot 100ms tick timer (no-op if already armed). OnTick re-arms itself while active.
     void ArmTick();
