@@ -131,7 +131,6 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
     // If the thermostat suggestions list is full, return RESOURCE_EXHAUSTED.
     if (mDelegate->GetNumberOfThermostatSuggestions() >= mDelegate->GetMaxThermostatSuggestions())
     {
-        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
         return Status::ResourceExhausted;
     }
 
