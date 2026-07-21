@@ -221,7 +221,8 @@ ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const
     return Status::Success;
 }
 
-void ThermostatCluster::ReEvaluateCurrentSuggestion() {
+void ThermostatCluster::ReEvaluateCurrentSuggestion()
+{
     if (mDelegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null for endpoint %u", mPath.mEndpointId);
@@ -236,16 +237,18 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion() {
     auto beforeReevaluationHandle = DataModel::MakeNullable(beforeReevaluationHandleSpan);
 
     CHIP_ERROR err = mDelegate->GetActivePresetHandle(beforeReevaluationHandle);
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT,
-                     mPath.mEndpointId, err.Format());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
+                     err.Format());
         return;
     }
 
     err = mDelegate->ReEvaluateCurrentSuggestion();
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion at endpoint %u with error: %" CHIP_ERROR_FORMAT,
-                     mPath.mEndpointId, err.Format());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
+                     err.Format());
         return;
     }
 
@@ -268,9 +271,10 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion() {
     auto afterReevaluationHandle = DataModel::MakeNullable(afterReevaluationHandleSpan);
 
     err = mDelegate->GetActivePresetHandle(afterReevaluationHandle);
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT,
-                     mPath.mEndpointId, err.Format());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
+                     err.Format());
         return;
     }
 
