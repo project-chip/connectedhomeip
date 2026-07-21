@@ -283,6 +283,9 @@ public:
 
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
+    /// Close a connection that is not associated with a BLE endpoint.
+    CHIP_ERROR CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj);
+
     void CloseAllBleConnections();
     void CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
 

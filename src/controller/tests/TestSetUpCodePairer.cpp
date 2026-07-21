@@ -37,15 +37,15 @@ using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 namespace {
 
 template <typename T>
-static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(unsigned int value)
+static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(uint8_t *)
 {
-    return static_cast<T>(value);
+    return static_cast<T>(1);
 }
 
 template <typename T>
-static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConnectionObject(unsigned int value)
+static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConnectionObject(uint8_t * storage)
 {
-    return reinterpret_cast<T>(static_cast<uintptr_t>(value));
+    return reinterpret_cast<T>(storage);
 }
 
 // DeviceCommissioner is too large to embed in a test fixture (it exceeds
@@ -182,7 +182,8 @@ TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
 {
     Access().SetWaitingForPASE(true);
 
-    BLE_CONNECTION_OBJECT connObj = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(0x1234);
+    uint8_t connectionObjectStorage;
+    BLE_CONNECTION_OBJECT connObj = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionObjectStorage);
     Access().CallOnDiscoveredDeviceOverBle(connObj, std::optional<uint16_t>{ 3840 });
 
     ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);

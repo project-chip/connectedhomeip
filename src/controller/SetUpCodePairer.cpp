@@ -578,7 +578,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
     // the connection object. If the DUT disconnects before this queued entry is
     // retried, that object may be invalidated by the platform. Queue
     // reconnectable BLE parameters instead so the later retry starts a fresh BLE
-    // connection.
+    // connection, then close the unused connection object.
     //
     // TODO: Consider implementing the SHOULD the spec has about commissioning things
     // in QR code order by waiting for a second or something before actually starting
@@ -592,6 +592,10 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
         params.SetPeerAddress(Transport::PeerAddress::BLE());
         params.mLongDiscriminator = matchedLongDiscriminator;
         mDiscoveredParameters.emplace_front(std::move(params));
+        if (mBleLayer != nullptr)
+        {
+            LogErrorOnFailure(mBleLayer->CloseUnclaimedConnection(connObj));
+        }
     }
     else
     {
