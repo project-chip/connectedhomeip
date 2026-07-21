@@ -228,7 +228,7 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupLeaksWhenSy
 {
     ExchangeManager uninitializedExchangeManager;
     CASEClientInitParams params = CreateCASEClientInitParams();
-    params.exchangeMgr           = &uninitializedExchangeManager;
+    params.exchangeMgr          = &uninitializedExchangeManager;
 
     OperationalSessionSetup sessionSetup(params, &mCASEClientPool, ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
     chip::Testing::OperationalSessionSetupTestAccess access(&sessionSetup);
