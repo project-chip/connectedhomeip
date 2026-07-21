@@ -190,7 +190,7 @@ TEST_F(TestColorControlClusterBackwardsCompatibility, SceneCaptureAndApplyRestor
     // Apply the captured scene (what DefaultColorControlSceneHandler::ApplyScene does after decoding the EFS).
     ColorValue target = CTColor{ .mireds = captured };
     ColorLoopState loop{};
-    EXPECT_EQ(c.HandleApplyScene(EnhancedColorModeEnum::kColorTemperatureMireds, target, loop, /*transitionDs=*/0), CHIP_NO_ERROR);
+    EXPECT_EQ(c.HandleApplyScene(EnhancedColorModeEnum::kColorTemperatureMireds, target, loop, /*timeMs=*/0), CHIP_NO_ERROR);
     Complete(c);
 
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);

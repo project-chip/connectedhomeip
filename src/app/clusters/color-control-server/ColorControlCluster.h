@@ -302,7 +302,7 @@ private:
     void ApplyModeSwitch(ColorControl::EnhancedColorModeEnum target);
 
     // ---- Color-loop lifecycle ----
-    void startColorLoop(bool fromStartHue);
+    void startColorLoop(bool startFromStartHue);
     void stopColorLoop();
 
     // ---- Per-tick / mode / reporting helpers ----
