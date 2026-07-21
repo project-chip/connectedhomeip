@@ -45,19 +45,19 @@ class MatterStackState:
     def __init__(self, config: 'MatterTestConfig'):
         self._config = config
 
+        persistent_storage = None
         if not hasattr(builtins, "chipStack"):
             matter.native.Init(bluetoothAdapter=config.ble_controller)
             if config.chip_tool_common_storage_path is not None and config.chip_tool_fabric_storage_path is not None:
-                self._init_stack(already_initialized=False, persistent_storage=PersistentStorageINI(
-                    config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path),
-                    enable_server_interactions=config.enable_server_interactions)
+                persistent_storage=PersistentStorageINI(config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path)
             else:
-                self._init_stack(already_initialized=False, persistent_storage=PersistentStorageJSON(config.storage_path),
-                                 enable_server_interactions=config.enable_server_interactions)
+                persistent_storage=PersistentStorageJSON(config.storage_path)
             self._we_initialized_the_stack = True
         else:
-            self._init_stack(already_initialized=True)
             self._we_initialized_the_stack = False
+
+        self._init_stack(already_initialized = not self._we_initialized_the_stack, persistent_storage=persistent_storage,
+                         enable_server_interactions=config.enable_server_interactions)
 
     def _init_stack(self, already_initialized: bool, persistent_storage: PersistentStorage | None = None,
                     enable_server_interactions: bool = True):
