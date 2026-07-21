@@ -802,7 +802,7 @@ them as an additional option for the west command. For example (replace
 `nrf52840dk_nrf52840` with own board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y -DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
 ```
 
 Alternatively, you can add the relevant Kconfig option lines to the example's
