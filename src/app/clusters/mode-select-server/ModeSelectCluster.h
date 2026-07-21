@@ -42,7 +42,7 @@ public:
     class Delegate
     {
     public:
-        virtual ~Delegate()                                                                        = default;
+        virtual ~Delegate()                                                                       = default;
         virtual Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const = 0;
     };
 

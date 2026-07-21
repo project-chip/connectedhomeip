@@ -101,7 +101,7 @@ public:
     {
         VerifyOrDie(clusterInstanceIndex < kMaxClusterCount);
         ModeSelectEntry & entry = gEntries[clusterInstanceIndex];
-        entry.delegate = SupportedModesManagerDelegate(endpointId);
+        entry.delegate          = SupportedModesManagerDelegate(endpointId);
 
         ModeSelectCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
