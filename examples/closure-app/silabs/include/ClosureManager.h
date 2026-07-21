@@ -58,18 +58,16 @@ public:
      * - Creates a CMSIS-OS software timer for closure operations.
      * - Initializes closure endpoints (ep1, ep2, ep3).
      * - Sets the semantic tag lists for each closure endpoint.
+     *
      */
-    void Init();
+    virtual void Init();
 
     /**
      * @brief Returns the singleton instance of the ClosureManager.
      *
-     * This static method provides access to the single, global instance of the ClosureManager,
-     * ensuring that only one instance exists throughout the application's lifetime.
-     *
      * @return Reference to the singleton ClosureManager instance.
      */
-    static ClosureManager & GetInstance() { return sClosureMgr; }
+    static ClosureManager & GetInstance();
 
     /**
      * @brief Handles the calibration command for the closure.
@@ -81,7 +79,7 @@ public:
      * @return chip::Protocols::InteractionModel::Status
      *         Returns Status::Success if all operations succeed, otherwise Status::Failure.
      */
-    chip::Protocols::InteractionModel::Status OnCalibrateCommand();
+    virtual chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
     /**
      * @brief Handles the MoveTo command for the Closure.
@@ -94,7 +92,7 @@ public:
      * @param speed Optional speed setting for the movement, represented as a ThreeLevelAutoEnum.
      * @return chip::Protocols::InteractionModel::Status Status of the command handling operation.
      */
-    chip::Protocols::InteractionModel::Status
+    virtual chip::Protocols::InteractionModel::Status
     OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
                     const chip::Optional<bool> latch, const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
 
@@ -107,7 +105,7 @@ public:
      *         Returns Status::Success if the Stop command is handled successfully,
      *         or an appropriate error status otherwise.
      */
-    chip::Protocols::InteractionModel::Status OnStopCommand();
+    virtual chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
      * @brief Handles the SetTarget command for a closure panel.
@@ -124,7 +122,7 @@ public:
      *         Returns Status::Success if the SetTarget command is handled successfully,
      *         or an appropriate error status otherwise.
      */
-    chip::Protocols::InteractionModel::Status
+    virtual chip::Protocols::InteractionModel::Status
     OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & position, const chip::Optional<bool> & latch,
                        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
                        const chip::EndpointId endpointId);
@@ -141,7 +139,7 @@ public:
      * @param endpointId The endpoint on which to perform the operation.
      * @return chip::Protocols::InteractionModel::Status Status of the command execution.
      */
-    chip::Protocols::InteractionModel::Status
+    virtual chip::Protocols::InteractionModel::Status
     OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                   const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
                   const chip::EndpointId & endpointId);
@@ -212,51 +210,9 @@ public:
      */
     CHIP_ERROR SetClosurePanelInitialState(chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint & closurePanelEndpoint);
 
-private:
-    static ClosureManager sClosureMgr;
-
-    osTimerId_t mClosureTimer;
-
-    // Below Progress variables and mCurrentAction, mCurrentActionEndpointId should be set only in
-    // chip task context. Incase if these variables are to be set in other task context, then we should
-    // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
-    // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
-    // to ensure that these variables are set in thread safe manner in chip task context.
-    bool mIsCalibrationInProgress = false;
-    bool mIsMoveToInProgress      = false;
-    bool mIsSetTargetInProgress   = false;
-    bool mIsStepActionInProgress  = false;
-
-    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
-    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
-
-    // Define the endpoint ID for the Closure
-    static constexpr chip::EndpointId kClosureEndpoint1      = 1;
-    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
-    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
-
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
-
-    /**
-     * @brief Starts or restarts the closure function timer with the specified timeout.
-     *
-     * This method initiates or resets the timer associated with closure operations.
-     * If the timer fails to start, an error is logged and the application error handler is invoked.
-     *
-     * @param aTimeoutMs Timeout duration in milliseconds for the timer.
-     */
-    void StartTimer(uint32_t aTimeoutMs);
-
-    /**
-     * @brief Cancels the closure timer if it is currently running.
-     *
-     * Attempts to stop the mClosureTimer using the osTimerStop function.
-     * If stopping the timer fails, logs an error message and triggers
-     * the application error handler with APP_ERROR_STOP_TIMER_FAILED.
-     */
-    void CancelTimer();
+protected:
+    ClosureManager()          = default;
+    virtual ~ClosureManager() = default;
 
     /**
      * @brief Handles the completion of a closure action.
@@ -267,38 +223,6 @@ private:
      * @param action The action that has completed, used to notify relevant endpoints.
      */
     void HandleClosureActionComplete(Action_t action);
-
-    /**
-     * @brief Initiates a closure action based on the provided application event.
-     *
-     * This method sets the current action according to the action specified in the given AppEvent.
-     * It logs the initiation of the corresponding action and, for certain actions, may start a timer.
-     *
-     * @param event Pointer to the AppEvent containing the action to initiate.
-     */
-    static void InitiateAction(AppEvent * event);
-
-    /**
-     * @brief Handles a closure action complete event.
-     *
-     * This method processes closure action complete event and schedules the completion of the closure action
-     * to be executed asynchronously on the platform manager's work queue.
-     *
-     * @param event Pointer to the AppEvent containing closure event details.
-     */
-
-    static void HandleClosureActionCompleteEvent(AppEvent * event);
-
-    /**
-     * @brief Timer event handler for the ClosureManager.
-     *
-     * This static function is called when the closure timer expires. The handler creates an AppEvent and
-     * posts the event to the application task queue. This ensures that the closure event is processed in the context of the
-     * application task rather than the timer task.
-     *
-     * @param timerCbArg Pointer to the callback argument (unused).
-     */
-    static void TimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Handles the motion action for closure endpoint.
@@ -364,6 +288,92 @@ private:
      * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
      */
     void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    // State, endpoints, and helpers available to CustomerAppManager *Impl() overrides.
+    static constexpr chip::EndpointId kClosureEndpoint1      = 1;
+    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
+    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
+
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
+
+    /**
+     * @brief Starts or restarts the closure function timer with the specified timeout.
+     *
+     * This method initiates or resets the timer associated with closure operations.
+     * If the timer fails to start, an error is logged and the application error handler is invoked.
+     *
+     * @param aTimeoutMs Timeout duration in milliseconds for the timer.
+     */
+    void StartTimer(uint32_t aTimeoutMs);
+
+    /**
+     * @brief Cancels the closure timer if it is currently running.
+     *
+     * Attempts to stop the mClosureTimer using the osTimerStop function.
+     * If stopping the timer fails, logs an error message and triggers
+     * the application error handler with APP_ERROR_STOP_TIMER_FAILED.
+     */
+    void CancelTimer();
+
+    osTimerId_t mClosureTimer;
+
+    // Below Progress variables and mCurrentAction, mCurrentActionEndpointId should be set only in
+    // chip task context. Incase if these variables are to be set in other task context, then we should
+    // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
+    // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
+    // to ensure that these variables are set in thread safe manner in chip task context.
+    bool mIsCalibrationInProgress = false;
+    bool mIsMoveToInProgress      = false;
+    bool mIsSetTargetInProgress   = false;
+    bool mIsStepActionInProgress  = false;
+
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
+    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
+
+    /**
+     * @brief Initiates a closure action based on the provided application event.
+     *
+     * This method sets the current action according to the action specified in the given AppEvent.
+     * It logs the initiation of the corresponding action and, for certain actions, may start a timer.
+     *
+     * @param event Pointer to the AppEvent containing the action to initiate.
+     */
+    static void InitiateAction(AppEvent * event);
+
+    /**
+     * @brief Handles a closure action complete event.
+     *
+     * This method processes closure action complete event and schedules the completion of the closure action
+     * to be executed asynchronously on the platform manager's work queue.
+     *
+     * @param event Pointer to the AppEvent containing closure event details.
+     */
+    static void HandleClosureActionCompleteEvent(AppEvent * event);
+
+    /**
+     * @brief ScheduleWork handlers. `arg` is the expected Action_t at schedule time; work is
+     * skipped if the current action no longer matches (e.g. after Stop). Panel handlers read
+     * `mCurrentActionEndpointId` when the work runs, not a snapshotted endpoint.
+     */
+    static void HandleScheduledCalibrateComplete(intptr_t expectedAction);
+    static void HandleScheduledClosureMotion(intptr_t expectedAction);
+    static void HandleScheduledClosureUnlatch(intptr_t expectedAction);
+    static void HandleScheduledPanelSetTarget(intptr_t expectedAction);
+    static void HandleScheduledPanelUnlatch(intptr_t expectedAction);
+    static void HandleScheduledPanelStep(intptr_t expectedAction);
+
+    /**
+     * @brief Timer event handler for the ClosureManager.
+     *
+     * This static function is called when the closure timer expires. The handler creates an AppEvent and
+     * posts the event to the application task queue. This ensures that the closure event is processed in the context of the
+     * application task rather than the timer task.
+     *
+     * @param timerCbArg Pointer to the callback argument (unused).
+     */
+    static void TimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Retrieves the panel endpoint associated with the specified endpoint ID.

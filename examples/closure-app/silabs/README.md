@@ -1,19 +1,36 @@
-# Matter SiWx917 Closure Example
+# Matter EFR32 Closure Example
 
-An example showing the use of CHIP on the Silicon Labs SiWx917
+An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter SiWx917 Closure Example](#matter-siwx917-closure-example)
+-   [Matter EFR32 Closure Example](#matter-efr32-closure-example)
     -   [Introduction](#introduction)
+    -   [Extending Base App Implementation](#extending-base-app-implementation)
+        -   [CustomerAppTask](#customerapptask)
+        -   [CustomerAppManager](#customerappmanager)
+        -   [How to Override APIs](#how-to-override-apis)
+        -   [DataModelCallbacks and CustomerAppTask](#datamodelcallbacks-and-customerapptask)
+        -   [Sample Implementation](#sample-implementation)
+        -   [Override API Reference](#override-api-reference)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SEGGER RTT (recommended)](#segger-rtt-recommended)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
     -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [Running RPC console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
     -   [Group Communication (Multicast)](#group-communication-multicast)
     -   [Building options](#building-options)
         -   [Disabling logging](#disabling-logging)
         -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling QR CODE](#disabling-qr-code)
+        -   [Disabling LCD](#disabling-lcd)
         -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
@@ -26,17 +43,245 @@ An example showing the use of CHIP on the Silicon Labs SiWx917
 
 ## Introduction
 
-The SiWx917 Closure example provides a baseline demonstration of a closure base
-device type, built using Matter and the Silicon Labs gecko SDK. It can be
-controlled by a Chip controller over Wifi network.
+The EFR32 closure example provides a baseline demonstration of a Closure control
+device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
+by a Chip controller over an Openthread or Wifi network..
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the
-device and the Chip controller will exchange security information with the
+The EFR32 device can be commissioned over Bluetooth Low Energy where the device
+and the Chip controller will exchange security information with the Rendez-vous
+procedure. If using Thread, Thread Network credentials are then provided to the
+EFR32 device which will then join the Thread network.
+
+If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
+needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The Closure examples are intended to serve both as a means to explore the
-workings of Matter Closure as well as a template for creating real products
-based on the Silicon Labs platform.
+The closure example is intended to serve both as a means to explore the
+workings of Matter as well as a template for creating real products based on the
+Silicon Labs platform.
+
+Unlike the lighting example (single CRTP chain on `AppTask`), this app keeps a
+separate `ClosureManager` for closure domain logic and a second CRTP chain for
+product customization. See
+[Extending Base App Implementation](#extending-base-app-implementation).
+
+## Extending Base App Implementation
+
+| Concern | Base | CRTP hook layer | Customer leaf |
+| ------- | ---- | --------------- | ------------- |
+| Lifecycle / UI / buttons / DM callbacks | `AppTask` | [`AppTaskImpl`](include/AppTaskImpl.h) | [`CustomerAppTask`](../../platform/silabs/customer/CustomerAppTask.h) |
+| Closure domain logic (motion, latch, panels) | `ClosureManager` | [`ClosureManagerImpl`](include/ClosureManagerImpl.h) | [`CustomerAppManager`](include/customer/CustomerAppManager.h) |
+
+### CustomerAppTask
+
+To implement custom app behavior you can override any Silicon Labs implemented
+API in the CustomerAppTask file. This example provides
+[`CustomerAppTask.h`](../../platform/silabs/customer/CustomerAppTask.h) and
+[`CustomerAppTask.cpp`](../../platform/silabs/customer/CustomerAppTask.cpp) for
+that purpose. The base implementation and the full set of overridable `*Impl()`
+APIs live in this example's source tree under
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h) and
+[`src/AppTask.cpp`](src/AppTask.cpp). Any `*Impl()` you do not override keeps
+the Silicon Labs default behavior. To customize behavior, copy
+[`CustomerAppTask.h`](../../platform/silabs/customer/CustomerAppTask.h) and
+[`CustomerAppTask.cpp`](../../platform/silabs/customer/CustomerAppTask.cpp) from
+`examples/platform/silabs/customer/` into this app's `include/` and `src/`
+folders, then update the corresponding paths in `BUILD.gn`.
+
+### CustomerAppManager
+
+Closure domain logic lives on `ClosureManager`. The customer leaf is already in
+this app under
+[`include/customer/CustomerAppManager.h`](include/customer/CustomerAppManager.h)
+and
+[`src/customer/CustomerAppManager.cpp`](src/customer/CustomerAppManager.cpp).
+Override `*Impl()` hooks there; do not edit `ClosureManager.cpp` for
+app-specific behavior. See
+[`ClosureManagerImpl.h`](include/ClosureManagerImpl.h) for the full hook list.
+
+### How to Override APIs
+
+Both leaves use the Curiously Recurring Template Pattern (CRTP). You override
+only the `*Impl()` methods you need; each base declares one `*Impl()` per
+overridable API. Steps:
+
+1. Find the method to override in the base API (see
+   [Override API reference](#override-api-reference) below).
+2. Declare the same method signature in `CustomerAppTask.h` or
+   `CustomerAppManager.h` under `private:`. Match the base `*Impl()` signature
+   exactly — note that `*Impl()` overrides are **non-static instance methods**
+   even when the public dispatcher (e.g. `ButtonEventHandler`) is `static`.
+3. Implement the method in the corresponding `.cpp`.
+4. Build. The CRTP layer automatically routes each call to your `*Impl()` if
+   present, otherwise to the Silicon Labs default.
+
+Some `ClosureManager` APIs (`Init`, cluster `On*Command` handlers) are virtual
+so shared `closure-common/` code can reach your leaf. Override the matching
+`*Impl()` on `CustomerAppManager` — do not override the virtuals directly.
+
+### DataModelCallbacks and CustomerAppTask
+
+What used to live in `DataModelCallbacks.cpp` now lives in `AppTask.cpp`. The
+Matter SDK's `MatterPostAttributeChangeCallback` is implemented in
+`examples/platform/silabs/BaseApplication.cpp` and forwards to
+`AppTask::DMPostAttributeChangeCallback` (defined in `AppTask.cpp`), which you
+can customize via `DMPostAttributeChangeCallbackImpl()` in `CustomerAppTask`.
+
+Closure-specific cluster attribute-changed callbacks
+(`MatterClosureControlClusterServerAttributeChangedCallback`,
+`MatterClosureDimensionClusterServerAttributeChangedCallback`) are forwarders
+in `AppTask.cpp` and dispatch to
+`DMClosureControlClusterAttributeChangedCallback` /
+`DMClosureDimensionClusterAttributeChangedCallback`, customized via the
+matching `*Impl()` hooks on `CustomerAppTask`.
+
+Forwarding into `AppTask` still goes through CRTP as in
+[How to Override APIs](#how-to-override-apis).
+
+-   **Methods that already exist in the AppTask** — Customize them by overriding
+    the matching `*Impl()` method in `CustomerAppTask`. Do not edit the
+    `AppTask.cpp` for app-specific behavior.
+
+-   **Methods that already exist in the ClosureManager** — Customize them by
+    overriding the matching `*Impl()` method in `CustomerAppManager`. Do not
+    edit `ClosureManager.cpp` for app-specific behavior.
+
+-   **New custom data model methods** — Add them in `CustomerAppTask` or
+    `CustomerAppManager` directly. Do not add new application logic in
+    autogenerated sources; those edits will not survive regeneration or project
+    upgrades.
+
+### Sample Implementation
+
+The following shows a minimal example that overrides `AppInitImpl()` and
+`ButtonEventHandlerImpl()` on `CustomerAppTask`, and adds
+`OnMoveToCommandImpl()` to the existing `CustomerAppManager` leaf. Declare the
+manager hook under `private:` without replacing `GetInstance` / `sInstance`.
+
+**CustomerAppTask.h**
+
+```cpp
+#pragma once
+#include "AppTaskImpl.h"
+
+/**
+ * Minimal AppTaskImpl-derived class. Override only the *Impl() methods you need;
+ * add AppInitImpl(), GetAppTask(), and sAppTask as required by the CRTP base.
+ */
+class CustomerAppTask : public AppTaskImpl<CustomerAppTask>
+{
+public:
+    static CustomerAppTask & GetAppTask() { return sAppTask; }
+
+private:
+    friend class AppTaskImpl<CustomerAppTask>;
+    CHIP_ERROR AppInitImpl();
+    void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction);
+    static CustomerAppTask sAppTask;
+};
+```
+
+**CustomerAppTask.cpp**
+
+```cpp
+#include "CustomerAppTask.h"
+#include "AppTask.h"
+#include "AppConfig.h"
+#include "AppEvent.h"
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+using namespace ::chip::DeviceLayer::Silabs;
+
+#define APP_FUNCTION_BUTTON 0
+#define APP_CLOSURE_BUTTON  1
+
+CustomerAppTask CustomerAppTask::sAppTask;
+
+AppTask & AppTask::GetAppTask()
+{
+    return CustomerAppTask::GetAppTask();
+}
+
+CHIP_ERROR CustomerAppTask::AppInitImpl()
+{
+    SILABS_LOG("CustomerAppTask: custom implementation (AppInitImpl)");
+    CHIP_ERROR err = this->AppTask::AppInit();
+    if (err == CHIP_NO_ERROR)
+    {
+        // Override the SDK default button handler registered in AppTask::AppInit().
+        chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(CustomerAppTask::ButtonEventHandler);
+    }
+    return err;
+}
+
+void CustomerAppTask::ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction)
+{
+    SILABS_LOG("CustomerAppTask: custom implementation (ButtonEventHandlerImpl)");
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
+    if (button == APP_CLOSURE_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    {
+        button_event.Handler = &CustomerAppTask::ClosureButtonActionEventHandler;
+        AppTask::GetAppTask().PostEvent(&button_event);
+    }
+    else if (button == APP_FUNCTION_BUTTON)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        AppTask::GetAppTask().PostEvent(&button_event);
+    }
+}
+```
+
+**CustomerAppManager.h**
+
+```cpp
+chip::Protocols::InteractionModel::Status OnMoveToCommandImpl(
+    const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
+    const chip::Optional<bool> latch,
+    const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
+```
+
+**CustomerAppManager.cpp**
+
+```cpp
+chip::Protocols::InteractionModel::Status CustomerAppManager::OnMoveToCommandImpl(
+    const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
+    const chip::Optional<bool> latch,
+    const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed)
+{
+    SILABS_LOG("CustomerAppManager: custom implementation (OnMoveToCommandImpl)");
+    // Call through for default motion behavior, or drive real hardware here.
+    return ClosureManager::OnMoveToCommand(position, latch, speed);
+}
+```
+
+### Override API Reference
+
+`CHIP_ERROR StartAppTask()` is declared on `AppTask` only. It is not an
+`*Impl()` hook: platform code (for example `MatterConfig`) calls
+`AppTask::GetAppTask().StartAppTask()` with static type `AppTask &`, which runs
+the implementation in `AppTask.cpp` (creating the FreeRTOS app task via
+`BaseApplication::StartAppTask(...)`). To change startup behavior, edit
+`AppTask::StartAppTask()` or `BaseApplication::StartAppTask` in your product
+sources.
+
+The base API and default AppTask behavior for this example are maintained under
+[`include/`](include/AppTaskImpl.h) and [`src/`](src/AppTask.cpp). Use them as
+the reference for overridable methods and app configuration.
+
+| File                                             | Purpose                                                                                                                                              |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`include/AppTaskImpl.h`](include/AppTaskImpl.h) | Declarations of every overridable `*Impl()` method. Copy the signatures you need from here into `CustomerAppTask.h`.                                 |
+| [`src/AppTask.cpp`](src/AppTask.cpp)             | Silicon Labs default implementation of AppTask. This is what runs for any `*Impl()` you do not override. Use as reference when customizing behavior. |
+
+This example also has a ClosureManager CRTP chain:
+
+| File                                                           | Purpose                                                                                                                                                     |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`include/ClosureManagerImpl.h`](include/ClosureManagerImpl.h) | Declarations of every overridable `*Impl()` method. Copy the signatures you need from here into `CustomerAppManager.h`.                                     |
+| [`src/ClosureManager.cpp`](src/ClosureManager.cpp)             | Silicon Labs default implementation of ClosureManager. This is what runs for any `*Impl()` you do not override. Use as reference when customizing behavior. |
 
 ## Building
 
@@ -46,8 +291,9 @@ based on the Silicon Labs platform.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 -   Install some additional tools (likely already present for CHIP developers):
 
@@ -61,14 +307,32 @@ based on the Silicon Labs platform.
         > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
         > in the Silicon Labs Matter Documentation
 
+    MG24 boards :
+
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD2703A / MG24 Explorer Kit
+    -   BRD2704A / SparkFun Thing Plus MGM240P board
+
     917SoC boards :
 
     -   BRD4338A
 
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
+
 *   Build the example application:
 
             cd ~/connectedhomeip
-            ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs/ ./out/closure-app BRD4338A
+            ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs/ ./out/closure-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -80,10 +344,7 @@ based on the Silicon Labs platform.
             $ cd ~/connectedhomeip/examples/closure-app/silabs
             $ git submodule update --init
             $ source third_party/connectedhomeip/scripts/activate.sh
-            $ export SILABS_BOARD=BRD4338A
-
-    To build the Closure example
-
+            $ export SILABS_BOARD=BRD4187C
             $ gn gen out/debug
             $ ninja -C out/debug
 
@@ -92,6 +353,29 @@ based on the Silicon Labs platform.
             $ cd ~/connectedhomeip/examples/closure-app/silabs
             $ rm -rf out/
 
+*   Build the example as Intermittently Connected Device (ICD)
+
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs/ ./out/closure-app_ICD BRD4187C --icd
+
+    or use gn as previously mentioned but adding the following arguments:
+
+            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+
+*   Build the example with pigweed RPC
+
+            $ ./scripts/examples/gn_silabs_example.sh examples/closure-app/silabs/ out/closure_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+
+    or use GN/Ninja Directly
+
+            $ cd ~/connectedhomeip/examples/closure-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
+
+    [Running Pigweed RPC console](#running-rpc-console)
+
 For more build options, help is provided when running the build script without
 arguments
 
@@ -99,40 +383,134 @@ arguments
 
 ## Flashing the Application
 
--   SiWx917 SoC device support is available in the latest Simplicity Commander.
-    The SiWx917 SOC board will support .rps as the only file to flash.
+-   On the command line (EFR32):
+
+            $ cd ~/connectedhomeip/examples/closure-app/silabs
+            $ python3 out/debug/matter-silabs-closure-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
+
+All EFR32 boards require a bootloader, see Silicon Labs documentation for more
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
+
+-   SiWx917 SoC device support is available in the latest Simplicity Commander.
+    The SiWx917 SOC board will support .rps as the only file to flash.
 
 All SiWx917 boards require a connectivity firmware, see Silicon Labs
 documentation for more info. Pre-built firmware binaries are available on the
 [Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#siwx917-firmware-for-siwn917-ncp-and-siwg917-soc).
 
+## Viewing Logging Output
+
+### SEGGER RTT (recommended)
+
+The example application is built to use the SEGGER Real Time Transfer (RTT)
+facility for log output. RTT is a feature built-in to the J-Link Interface MCU
+on the WSTK development board. It allows bi-directional communication with an
+embedded application without the need for a dedicated UART.
+
+Using the RTT facility requires downloading and installing the _SEGGER J-Link
+Software and Documentation Pack_
+([web site](https://www.segger.com/downloads/jlink#J-LinkSoftwareAndDocumentationPack)).
+
+Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too
+after flashing the .out file.
+
+-   Download the J-Link installer by navigating to the appropriate URL and
+    agreeing to the license agreement.
+
+-   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
+-   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
+
+*   Install the J-Link software
+
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+
+*   In Linux, grant the logged in user the ability to talk to the development
+    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
+    dialout group.
+
+            $ sudo usermod -a -G dialout ${USER}
+
+Once the above is complete, log output can be viewed using the JLinkExe tool in
+combination with JLinkRTTClient as follows:
+
+-   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
+
+    For MG24 use:
+
+            ```
+            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+            ```
+
+-   In a second terminal, run the JLinkRTTClient to view logs:
+
+            $ JLinkRTTClient
+
+### Console Log
+
+If the binary was built with this option or if you're using the Siwx917 WiFi
+SoC, the logs and the CLI (if enabled) will be available on the serial console.
+
+This console required a baudrate of **115200** with CTS/RTS. This is the default
+configuration of Silicon Labs dev kits.
+
+**HOWEVER** the console will required a baudrate of **921600** with CTS/RTS if
+the verbose mode is selected (--verbose)
+
+#### Configuring the VCOM
+
+-   Using (Simplicity
+    Studio)[https://community.silabs.com/s/article/wstk-virtual-com-port-baudrate-setting?language=en_US]
+-   Using commander-cli
+    ```
+    commander vcom config --baudrate 921600 --handshake rtscts
+    ```
+
+### Using the console
+
+With any serial terminal application such as screen, putty, minicom etc.
+
 ## Running the Complete Example
 
--   To run a Matter over Wi-Fi application, you must first create a Matter
-    network using the chip-tool, and then control the Matter device from the
-    chip-tool.
+-   It is assumed here that you already have an OpenThread border router
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
 
-**Creating the Matter Network**
+    Take note that the RCP code is available directly through
+    [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
+    under File->New->Project Wizard->Examples->Thread : ot-rcp
 
-     This procedure uses the chip-tool installed on the Matter Hub. The commissioning procedure does the following:
-     - Chip-tool scans BLE and locates the Silicon Labs device that uses the specified discriminator.
-     - Establishes operational certificates.
-     - Sends the Wi-Fi SSID and Passkey.
-     - The Silicon Labs device will join the Wi-Fi network and get an IP address. It then starts providing mDNS records on IPv4 and IPv6.
-     - Future communications (tests) will then happen over Wi-Fi.
+-   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
+    Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
+    BLE
 
--   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
-    Here is an example with the chip-tool:
+    **LED 0** shows the overall state of the device and its connectivity. The
+    following states are possible:
 
-            $ chip-tool pairing ble-wifi 1 <SSID> <Password> 20202021 3840
+          -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-*   User interface :
+          -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
+
+          -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
+
+          -   _Solid On_ ; The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **Push Button 0**
 
@@ -146,9 +524,91 @@ documentation for more info. Pre-built firmware binaries are available on the
               procedure. **LEDs** blink in unison when the factory reset procedure is
               initiated.
 
+    **Push Button 1** Toggles the closure between fully open and fully closed.
+    If a motion action is already in progress, pressing Button 1 stops it
+    instead.
+
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
+
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the chip-tool:
+
+            $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+            $ chip-tool closurecontrol move-to 1 1 --Position 1 --timedInteractionTimeoutMs 1000
+            $ chip-tool closurecontrol stop 1 1
+
+    For Wi-Fi commissioning instead of Thread:
+
+            $ chip-tool pairing ble-wifi 1 <SSID> <Password> 20202021 3840
+
+### Notes
+
+-   Depending on your network settings your router might not provide native ipv6
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC
+
+    -   On Border Router: `sudo ip addr add dev <Network interface> 2002::2/64`
+
+    -   On PC(Linux): `sudo ip addr add dev <Network interface> 2002::1/64`
+
+    -   Add Ipv6 route on PC(Linux)
+        `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
+
+## Running RPC console
+
+-   As part of building the example with RPCs enabled the chip_rpc python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
+    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
+
+-   To use the chip-rpc console after it has been installed run:
+    `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+
+-   Then you can simulate a button press or release using the following command
+    where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
+    RELEASE Test toggling the closure with
+    `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
+
+## Device Tracing
+
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See Build the example with pigweed RPC.
+
+Obtain tracing json file.
+
+    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
+    -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`configTOTAL_HEAP_SIZE` define inside
+`examples/platform/silabs/freertos_config/FreeRTOSConfig.h`. Please take note
+that a HEAP size smaller than 13k can and will cause a Mbedtls failure during
+the BLE rendez-vous or CASE session
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify `examples/platform/silabs/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function
+
+## OTA Software Update
+
+For the description of Software Update process with EFR32 example applications
+see
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
+
 ## Group Communication (Multicast)
 
-With this Closure example you can also use group communication to send Closure
+With this closure example you can also use group communication to send Closure
 commands to multiples devices at once. Please refer to the
 [chip-tool documentation](../../chip-tool/README.md) _Configuring the server
 side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
@@ -165,25 +625,25 @@ passed to the build scripts.
 
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4187C "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 `is_debug`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A "is_debug=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4187C "is_debug=false"
 
-### Disabling QR CODE
+### Disabling LCD
 
-show_qr_code
+`show_qr_code`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4187C "show_qr_code=false"
 
 ### KVS maximum entry count
 
 `kvs_max_entries`
 
-    Set the maximum Kvs entries that can be stored in NVM (Default 255)
+    Set the maximum Kvs entries that can be stored in NVM (Default 511)
     Thresholds: 30 <= kvs_max_entries <= 511
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4338A kvs_max_entries=355
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/closure-app/silabs ./out/closure-app BRD4187C kvs_max_entries=50

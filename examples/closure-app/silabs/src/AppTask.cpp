@@ -20,37 +20,24 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
+#include "CustomerAppManager.h"
+#include "CustomerAppTask.h"
 
 #if SL_MATTER_DISPLAY_ENABLED
 #include "ClosureUI.h"
 #include "ClosureUIStrings.h"
 #include "lcd.h"
-#if SL_MATTER_QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
 
-#include <ClosureManager.h>
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
-#include <assert.h>
-#include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <setup_payload/OnboardingCodesUtil.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
-#include <stdio.h>
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_CLOSURE_BUTTON 1
@@ -60,190 +47,32 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
-using namespace ::chip::DeviceLayer::Internal;
-using namespace chip::TLV;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ClosureControl {
-
-static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
-
-} // namespace ClosureControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-AppTask AppTask::sAppTask;
-
-CHIP_ERROR AppTask::AppInit()
+namespace {
+CustomerAppTask & AppInstance()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#if SL_MATTER_DISPLAY_ENABLED
-    LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
-    GetLCD().SetCustomUI(ClosureUI::DrawUI);
-#endif
-
-    // Initialization of Closure Manager and endpoints of closure and closurepanel.
-    ClosureManager::GetInstance().Init();
-
-// Update the LCD with the Stored value. Show QR Code if not provisioned
-#if SL_MATTER_DISPLAY_ENABLED
-    UpdateClosureUI();
-#if SL_MATTER_QR_CODE_ENABLED
-#ifdef SL_WIFI
-    if (!ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-    if (!ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
-    {
-        GetLCD().ShowQRCode(true);
-    }
-#endif // SL_MATTER_QR_CODE_ENABLED
-#endif // SL_MATTER_DISPLAY_ENABLED
-
-    return err;
+    return CustomerAppTask::GetAppTask();
 }
 
-CHIP_ERROR AppTask::StartAppTask()
+CustomerAppManager & AppManagerInstance()
 {
-    return BaseApplication::StartAppTask(AppTaskMain);
+    return CustomerAppManager::GetInstance();
 }
 
-void AppTask::AppTaskMain(void * pvParameter)
+#ifdef SL_MATTER_DISPLAY_ENABLED
+// AppEvent handler for kEventType_UpdateUI; pass nullptr to refresh from AppInit.
+void UpdateClosureUI(AppEvent * aEvent)
 {
-    AppEvent event;
-    osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
-
-    CHIP_ERROR err = sAppTask.Init();
-    if (err != CHIP_NO_ERROR)
+    if (aEvent != nullptr && aEvent->Type != AppEvent::kEventType_UpdateUI)
     {
-        ChipLogError(AppServer, "AppTask Init failed");
-        appError(err);
+        return;
     }
 
-    ChipLogProgress(AppServer, "App Task started");
+    CustomerAppManager & manager = AppManagerInstance();
 
-    while (true)
-    {
-        osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
-        while (eventReceived == osOK)
-        {
-            sAppTask.DispatchEvent(&event);
-            eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
-        }
-    }
-}
-
-void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
-{
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
-
-    if (button == APP_CLOSURE_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
-    {
-        button_event.Handler = ClosureButtonActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (button == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-}
-
-void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
-        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) {
-                // Check if an action is already in progress
-                if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
-                {
-                    // Stop the current action
-                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleStop();
-                    if (status != Protocols::InteractionModel::Status::Success)
-                    {
-                        ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
-                    }
-                }
-                else
-                {
-                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState =
-                        ClosureManager::GetInstance().GetClosureControlCluster().GetOverallCurrentState();
-
-                    if (currentState.IsNull())
-                    {
-                        ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
-                        return;
-                    }
-                    if (!currentState.Value().position.HasValue() || currentState.Value().position.Value().IsNull())
-                    {
-                        ChipLogError(AppServer, "Failed to get current closure state: position is null");
-                        return;
-                    }
-
-                    // Get current position and determine target position (toggle)
-                    auto currentPosition = currentState.Value().position.Value().Value();
-                    ChipLogProgress(AppServer, "Current state - Position: %d", to_underlying(currentPosition));
-
-                    ClosureControl::TargetPositionEnum targetPosition =
-                        (currentPosition == ClosureControl::CurrentPositionEnum::kFullyOpened)
-                        ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
-                        : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
-                    ChipLogProgress(AppServer, "Target position: %d", to_underlying(targetPosition));
-
-                    Optional<bool> latch = chip::NullOptional;
-                    if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
-                    {
-                        latch = MakeOptional(false);
-                    }
-
-                    Optional<Globals::ThreeLevelAutoEnum> speed = NullOptional;
-                    if (currentState.Value().speed.HasValue())
-                    {
-                        speed = chip::MakeOptional(currentState.Value().speed.Value());
-                    }
-
-                    // Move to the target position with latch set to false and preserved speed value
-                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleMoveTo(
-                        MakeOptional(targetPosition), latch, speed);
-                    if (status != Protocols::InteractionModel::Status::Success)
-                    {
-                        ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));
-                    }
-                }
-            },
-            0));
-    }
-    else
-    {
-        ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
-    }
-}
-
-#if SL_MATTER_DISPLAY_ENABLED
-void AppTask::UpdateClosureUIHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type == AppEvent::kEventType_UpdateUI)
-    {
-        UpdateClosureUI();
-    }
-}
-
-void AppTask::UpdateClosureUI()
-{
-    ClosureManager & closureManager = ClosureManager::GetInstance();
-
-    // Lock chip stack when accessing CHIP attributes from app task context
+    // Lock Matter stack when accessing attributes from app task context
     DeviceLayer::PlatformMgr().LockChipStack();
-    auto uiData = closureManager.GetClosureUIData();
+    auto uiData = manager.GetClosureUIData();
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ClosureUI::SetMainState(uiData.mainState);
@@ -323,7 +152,213 @@ void AppTask::UpdateClosureUI()
     if (ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
     {
-        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
+        AppInstance().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
     }
 }
 #endif // SL_MATTER_DISPLAY_ENABLED
+} // namespace
+
+void MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    VerifyOrReturn(AppInstance().IsApplicationInitialized());
+    AppInstance().DMClosureControlClusterAttributeChangedCallback(attributePath);
+}
+
+void MatterClosureDimensionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    VerifyOrReturn(AppInstance().IsApplicationInitialized());
+    AppInstance().DMClosureDimensionClusterAttributeChangedCallback(attributePath);
+}
+
+CHIP_ERROR AppTask::AppInit()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
+
+#ifdef DISPLAY_ENABLED
+    LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
+    GetLCD().SetCustomUI(ClosureUI::DrawUI);
+#endif
+
+    // Initialization of Closure Manager and endpoints of closure and closurepanel.
+    AppManagerInstance().Init();
+
+// Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    UpdateClosureUI(nullptr);
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true);
+    }
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
+
+    BaseApplication::InitCompleteCallback(err);
+    return err;
+}
+
+CHIP_ERROR AppTask::StartAppTask()
+{
+    return BaseApplication::StartAppTask(&AppTask::AppTaskMain);
+}
+
+void AppTask::AppTaskMain(void * pvParameter)
+{
+    AppEvent event;
+    osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
+
+    CHIP_ERROR err = AppInstance().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "AppTask Init failed");
+        appError(err);
+    }
+
+    ChipLogProgress(AppServer, "App Task started");
+
+    while (true)
+    {
+        osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
+        while (eventReceived == osOK)
+        {
+            AppInstance().DispatchEvent(&event);
+            eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
+        }
+    }
+}
+
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
+{
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
+
+    if (button == APP_CLOSURE_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    {
+        button_event.Handler = &CustomerAppTask::ClosureButtonActionEventHandler;
+        AppInstance().PostEvent(&button_event);
+    }
+    else if (button == APP_FUNCTION_BUTTON)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        AppInstance().PostEvent(&button_event);
+    }
+}
+
+void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                // Check if an action is already in progress
+                if (AppManagerInstance().IsClosureControlMotionInProgress())
+                {
+                    // Stop the current action
+                    auto status = AppManagerInstance().GetClosureControlCluster().HandleStop();
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
+                    }
+                }
+                else
+                {
+                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState =
+                        AppManagerInstance().GetClosureControlCluster().GetOverallCurrentState();
+
+                    if (currentState.IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
+                        return;
+                    }
+                    if (!currentState.Value().position.HasValue() || currentState.Value().position.Value().IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: position is null");
+                        return;
+                    }
+
+                    // Get current position and determine target position (toggle)
+                    auto currentPosition = currentState.Value().position.Value().Value();
+                    ChipLogProgress(AppServer, "Current state - Position: %d", to_underlying(currentPosition));
+
+                    ClosureControl::TargetPositionEnum targetPosition =
+                        (currentPosition == ClosureControl::CurrentPositionEnum::kFullyOpened)
+                        ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
+                        : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
+                    ChipLogProgress(AppServer, "Target position: %d", to_underlying(targetPosition));
+
+                    Optional<bool> latch = chip::NullOptional;
+                    if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
+                    {
+                        latch = MakeOptional(false);
+                    }
+
+                    Optional<Globals::ThreeLevelAutoEnum> speed = NullOptional;
+                    if (currentState.Value().speed.HasValue())
+                    {
+                        speed = chip::MakeOptional(currentState.Value().speed.Value());
+                    }
+
+                    // Move to the target position with latch set to false and preserved speed value
+                    auto status = AppManagerInstance().GetClosureControlCluster().HandleMoveTo(
+                        MakeOptional(targetPosition), latch, speed);
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));
+                    }
+                }
+            },
+            0));
+    }
+    else
+    {
+        ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
+    }
+}
+
+void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                            uint8_t * value)
+{
+    using namespace chip::app::Clusters;
+    switch (attributePath.mClusterId)
+    {
+    case Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+    default:
+        break;
+    }
+}
+
+void AppTask::DMClosureControlClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+#ifdef DISPLAY_ENABLED
+    using namespace chip::app::Clusters::ClosureControl::Attributes;
+    switch (attributePath.mAttributeId)
+    {
+    case MainState::Id:
+    case OverallCurrentState::Id: {
+        AppEvent event;
+        event.Type    = AppEvent::kEventType_UpdateUI;
+        event.Handler = UpdateClosureUI;
+        AppInstance().PostEvent(&event);
+        break;
+    }
+    default:
+        break;
+    }
+#endif // DISPLAY_ENABLED
+}
+
+void AppTask::DMClosureDimensionClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Closure Dimension cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+}
