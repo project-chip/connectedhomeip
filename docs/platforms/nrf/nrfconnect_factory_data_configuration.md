@@ -647,9 +647,7 @@ factory data set is stored. This area is configured using the
 within which all partitions are declared in the `pm_static.yml` file.
 
 To prepare an example that supports factory data, add a partition called
-`factory_data` to the `pm_static.yml` file. The partition size should be a
-multiple of one flash page (for nRF52 and nRF53 SoCs, a single page size equals
-4 kB).
+`factory_data` to the `pm_static.yml` file. The partition size should be a multiple of one flash page. For nRF52 and nRF53 SoCs, a single flash page equals 4 kB. The nRF54L Series uses RRAM instead of flash, which the nRF Connect SDK exposes with a 4 kB erase block size, so the same 4 kB alignment applies.
 
 See the following code snippet for an example of a factory data partition in the
 `pm_static.yml` file. The snippet is based on the `pm_static.yml` file from the
