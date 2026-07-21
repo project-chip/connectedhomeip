@@ -313,6 +313,21 @@ void ContentAppCommandDelegate::FormatResponseData(CommandHandlerInterface::Hand
         }
         break;
     }
+
+    case app::Clusters::KeypadInput::Id: {
+        Status status;
+        auto sendKeyResponse = FormatSendKeyResponse(value, status);
+        if (status != chip::Protocols::InteractionModel::Status::Success)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+        }
+        else
+        {
+            handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, sendKeyResponse);
+        }
+        break;
+    }
+
     default:
         handlerContext.SetCommandNotHandled();
     }
@@ -418,6 +433,25 @@ Status ContentAppCommandDelegate::FormatStatusResponse(Json::Value value)
     {
         return chip::Protocols::InteractionModel::Status::Failure;
     }
+}
+
+chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
+ContentAppCommandDelegate::FormatSendKeyResponse(Json::Value value, Status & status)
+{
+    status = chip::Protocols::InteractionModel::Status::Success;
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type sendKeyResponse;
+    std::string statusFieldId =
+        std::to_string(to_underlying(app::Clusters::KeypadInput::Commands::SendKeyResponse::Fields::kStatus));
+    if (value[statusFieldId].empty())
+    {
+        status = chip::Protocols::InteractionModel::Status::Failure;
+        return sendKeyResponse;
+    }
+    else
+    {
+        sendKeyResponse.status = static_cast<app::Clusters::KeypadInput::StatusEnum>(value[statusFieldId].asInt());
+    }
+    return sendKeyResponse;
 }
 
 } // namespace AppPlatform
