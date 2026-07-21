@@ -182,7 +182,7 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
     NotifyAttributeChanged(ThermostatSuggestions::Id);
 
     // Re-evaluate the current thermostat suggestion.
-    TEMPORARY_RETURN_IGNORED mDelegate->ReEvaluateCurrentSuggestion();
+    ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
@@ -216,9 +216,77 @@ ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
     TEMPORARY_RETURN_IGNORED RemoveExpiredSuggestions(mDelegate);
-    TEMPORARY_RETURN_IGNORED mDelegate->ReEvaluateCurrentSuggestion();
+    ReEvaluateCurrentSuggestion();
 
     return Status::Success;
+}
+
+void ThermostatCluster::ReEvaluateCurrentSuggestion() {
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null for endpoint %u", mPath.mEndpointId);
+        return;
+    }
+
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionBeforeReevaluation;
+    mDelegate->GetCurrentThermostatSuggestion(currentSuggestionBeforeReevaluation);
+
+    uint8_t buffer[kPresetHandleSize];
+    MutableByteSpan beforeReevaluationHandleSpan(buffer);
+    auto beforeReevaluationHandle = DataModel::MakeNullable(beforeReevaluationHandleSpan);
+
+    CHIP_ERROR err = mDelegate->GetActivePresetHandle(beforeReevaluationHandle);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT,
+                     mPath.mEndpointId, err.Format());
+        return;
+    }
+
+    err = mDelegate->ReEvaluateCurrentSuggestion();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion at endpoint %u with error: %" CHIP_ERROR_FORMAT,
+                     mPath.mEndpointId, err.Format());
+        return;
+    }
+
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionAfterReevaluation;
+    mDelegate->GetCurrentThermostatSuggestion(currentSuggestionAfterReevaluation);
+
+    if (!currentSuggestionBeforeReevaluation.IsNull() && !currentSuggestionAfterReevaluation.IsNull())
+    {
+        if (currentSuggestionBeforeReevaluation.Value().GetUniqueID() == currentSuggestionAfterReevaluation.Value().GetUniqueID())
+        {
+            return;
+        }
+    }
+
+    // If the current thermostat suggestion changed, notify the attribute changed.
+    NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
+
+    uint8_t afterReevaluationBuffer[kPresetHandleSize];
+    MutableByteSpan afterReevaluationHandleSpan(afterReevaluationBuffer);
+    auto afterReevaluationHandle = DataModel::MakeNullable(afterReevaluationHandleSpan);
+
+    err = mDelegate->GetActivePresetHandle(afterReevaluationHandle);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT,
+                     mPath.mEndpointId, err.Format());
+        return;
+    }
+
+    if (beforeReevaluationHandle.IsNull() && afterReevaluationHandle.IsNull())
+    {
+        return;
+    }
+
+    if (!beforeReevaluationHandle.IsNull() && !afterReevaluationHandle.IsNull() &&
+        beforeReevaluationHandle.Value().data_equal(afterReevaluationHandle.Value()))
+    {
+        return;
+    }
+
+    // If the active preset handle changed, notify the attribute changed.
+    NotifyAttributeChanged(ActivePresetHandle::Id);
 }
 
 } // namespace Thermostat

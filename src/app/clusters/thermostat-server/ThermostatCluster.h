@@ -162,6 +162,8 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+
+    void ReEvaluateCurrentSuggestion();
 };
 
 ThermostatCluster * ClusterForEndpoint(EndpointId endpointId);

@@ -275,6 +275,8 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return StatusIB(err).mStatus;
     }
 
+    NotifyAttributeChanged(ActivePresetHandle::Id);
+
     return Status::Success;
 }
 
