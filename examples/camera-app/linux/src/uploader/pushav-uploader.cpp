@@ -18,6 +18,9 @@
 
 #include "pushav-uploader.h"
 #include <algorithm>
+#include <cctype>
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -52,7 +55,7 @@ PushAVUploader::~PushAVUploader()
     {
         const std::filesystem::path filePath(lastUploadJob.first);
 
-        if (filePath.extension() == ".mpd")
+        if (filePath.extension() == ".mpd" || filePath.extension() == ".upload")
         {
             UploadData(lastUploadJob);
         }
@@ -318,33 +321,50 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
         }
     }
 
-    // Update segment number by adding 1000
-    const auto segmentPos = result.find("segment_");
-    if (segmentPos != std::string::npos)
+    // FFmpeg names segment files starting from 0001, but the spec requires segment
+    // numbering to start from 1001. Add offset of 1000 to convert file segment
+    // numbers to spec-compliant segment numbers in the upload path.
+    // e.g., segment_0001.m4s on disk -> segment_1001.m4s on server
+    const std::string segPrefix = "segment_";
+    const auto segPos           = result.find(segPrefix);
+    if (segPos != std::string::npos)
     {
-        const auto numberStart = segmentPos + 8;
-        const auto m4sPos      = result.find(".m4s", numberStart);
-
-        if (m4sPos != std::string::npos && (m4sPos - numberStart) >= 4 && (m4sPos - numberStart) <= 5)
+        const auto numStart = segPos + segPrefix.length();
+        const auto numEnd   = result.find(".m4s", numStart);
+        if (numEnd != std::string::npos)
         {
-            const auto numberStr = result.substr(numberStart, 4);
-            char * endPtr;
-            const long originalNumber = std::strtol(numberStr.c_str(), &endPtr, 10);
-
-            if (endPtr == numberStr.c_str() || *endPtr != '\0' || originalNumber > INT_MAX || originalNumber < INT_MIN)
+            std::string numStr = result.substr(numStart, numEnd - numStart);
+            bool valid         = !numStr.empty();
+            for (char c : numStr)
             {
-                ChipLogError(Camera, "Invalid segment number format: %s", numberStr.c_str());
+                if (!std::isdigit(static_cast<unsigned char>(c)))
+                {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid)
+            {
+                char * endPtr = nullptr;
+                long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
+                // Per spec, SegmentNumber is uint16 (range 1001-65535). In practice,
+                // SegmentNumber will never exceed 9999 due to session duration limits
+                // (5 min max / 500ms min segment duration = ~600 segments max per session).
+                // Verify the parsed value is non-negative and that adding the +1000 offset
+                // won't exceed the spec's uint16 type limit.
+                if (endPtr == numStr.c_str() || segNum < 0 || segNum > UINT16_MAX - 1000)
+                {
+                    ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
+                    return path;
+                }
+                segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
+                result.replace(numStart, numEnd - numStart, std::to_string(segNum));
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to parse segment number from path: %s", result.c_str());
                 return path;
             }
-
-            auto newNumber = static_cast<int>(originalNumber) + 1000;
-            if (newNumber > 9999)
-            {
-                ChipLogError(Camera, "Segment number overflow: %d", newNumber);
-                newNumber = 0;
-            }
-            const auto newNumberStr = std::string(4 - std::to_string(newNumber).length(), '0') + std::to_string(newNumber);
-            result.replace(numberStart, 4, newNumberStr);
         }
     }
 
@@ -397,7 +417,22 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     // Extract file extension from full path using std::filesystem
     std::filesystem::path filePath(data.first);
     std::filesystem::path extension = filePath.extension();
-    if (extension == ".mpd")
+    // .upload files are modified MPD snapshots - treat as MPD and strip .upload for remote URL
+    bool isUploadMpd    = (extension == ".upload");
+    bool isMpdExtension = (extension == ".mpd");
+    if (isUploadMpd)
+    {
+        // Check if the base filename (without .upload) is an MPD file
+        std::string baseName = filePath.stem().string();
+        if (baseName.size() >= 4 && baseName.substr(baseName.size() - 4) == ".mpd")
+        {
+            contentType = "application/dash+xml";
+            // Strip .upload suffix so remote URL uses .mpd extension
+            static constexpr size_t kUploadSuffixLen = 7; // strlen(".upload")
+            fullPath                                 = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
+        }
+    }
+    else if (isMpdExtension)
     {
         contentType = "application/dash+xml"; // Manifest file
     }
@@ -518,7 +553,9 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
         ChipLogDetail(Camera, "CURL uploaded file  %s size: %zu", data.first.c_str(), static_cast<size_t>(size));
     }
 
-    if (extension != ".mpd")
+    // Delete file after upload, except for .mpd files which are kept (FFmpeg may still be writing).
+    // .upload files (modified MPD snapshots) are always deleted after upload.
+    if (!isMpdExtension || isUploadMpd)
     {
         if (!std::filesystem::remove(data.first, ec))
         {

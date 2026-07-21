@@ -38,8 +38,8 @@ An example RPC command:
 """
 import argparse
 import sys
+from collections.abc import Collection
 from pathlib import Path
-from typing import Collection
 
 import pw_system.console
 from pw_hdlc import rpc

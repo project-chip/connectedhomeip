@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
+#include <clusters/AudioControl/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>
 #include <clusters/AvAnalysis/AttributeIds.h>
 #include <clusters/BallastConfiguration/AttributeIds.h>
@@ -98,6 +99,7 @@
 #include <clusters/LevelControl/AttributeIds.h>
 #include <clusters/LocalizationConfiguration/AttributeIds.h>
 #include <clusters/LowPower/AttributeIds.h>
+#include <clusters/MediaFileManagement/AttributeIds.h>
 #include <clusters/MediaInput/AttributeIds.h>
 #include <clusters/MediaPlayback/AttributeIds.h>
 #include <clusters/Messages/AttributeIds.h>
