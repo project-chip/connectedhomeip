@@ -9,8 +9,8 @@ etc.) to assist with development and code review in the Matter repository.
 
 -   **Location**: `.agents/skills/binary-size-comparison/`
 -   **Purpose**: Guidelines for comparing binary (ELF) sizes using Rust-based
-    tooling (`elf-bloat` and `asm-annotate`) across various platforms to analyze the
-    footprint impact of changes.
+    tooling (`elf-bloat` and `asm-annotate`) across various platforms to analyze
+    the footprint impact of changes.
 -   **Triggers**: Use when analyzing the impact of code changes on binary
     footprint (size) or comparing binary sizes across platforms.
 
@@ -53,8 +53,8 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Location**: `.agents/skills/documentation-discovery/`
 -   **Purpose**: Essential guidelines instructing AI agents on how to
     incrementally discover, read, and consult top-level monorepo documentation
-    and example-specific reference guides before altering code or executing
-    test harnesses.
+    and example-specific reference guides before altering code or executing test
+    harnesses.
 -   **Triggers**: Always consult when starting a new task, especially before
     altering code or executing test harnesses.
 
@@ -110,9 +110,9 @@ etc.) to assist with development and code review in the Matter repository.
 ### ZAP and Matter File Analysis
 
 -   **Location**: `.agents/skills/zap-matter-analysis/`
--   **Purpose**: Guidelines and common jq/grep/awk queries for investigating
-    ZAP (`.zap`) and Matter (`.matter`) files to understand endpoints,
-    clusters, attributes, and commands.
+-   **Purpose**: Guidelines and common jq/grep/awk queries for investigating ZAP
+    (`.zap`) and Matter (`.matter`) files to understand endpoints, clusters,
+    attributes, and commands.
 -   **Triggers**: Use when analyzing ZAP (`.zap`) and Matter (`.matter`) data
     model configuration files.
 
