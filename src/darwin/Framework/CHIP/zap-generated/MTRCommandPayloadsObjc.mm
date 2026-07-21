@@ -42049,9 +42049,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _sdp = @"";
 
-        _streamUsage = @(0);
+        _streamUsage = nil;
 
-        _originatingEndpointID = @(0);
+        _originatingEndpointID = nil;
 
         _videoStreamID = nil;
 
@@ -42122,10 +42122,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.sdp = AsCharSpan(self.sdp);
     }
     {
-        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+        if (self.streamUsage != nil) {
+            auto & definedValue_0 = encodableStruct.streamUsage.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.streamUsage.unsignedCharValue);
+        }
     }
     {
-        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
+        if (self.originatingEndpointID != nil) {
+            auto & definedValue_0 = encodableStruct.originatingEndpointID.Emplace();
+            definedValue_0 = self.originatingEndpointID.unsignedShortValue;
+        }
     }
     {
         if (self.videoStreamID != nil) {
@@ -53091,15 +53097,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & nonNullValue_3 = definedValue_1.myBitmap.SetNonNull();
                 nonNullValue_3 = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(self.arg1.d.myBitmap.unsignedIntValue);
             }
-            if (self.arg1.d.myEnum != nil) {
-                auto & definedValue_3 = definedValue_1.myEnum.Emplace();
-                if (self.arg1.d.myEnum == nil) {
-                    definedValue_3.SetNull();
-                } else {
-                    auto & nonNullValue_4 = definedValue_3.SetNonNull();
-                    nonNullValue_4 = static_cast<std::remove_reference_t<decltype(nonNullValue_4)>>(self.arg1.d.myEnum.unsignedCharValue);
-                }
-            }
         }
     }
 
@@ -54670,15 +54667,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.field1.myBitmap = [NSNumber numberWithUnsignedInt:decodableStruct.field1.myBitmap.Value().Raw()];
         }
-        if (decodableStruct.field1.myEnum.HasValue()) {
-            if (decodableStruct.field1.myEnum.Value().IsNull()) {
-                self.field1.myEnum = nil;
-            } else {
-                self.field1.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field1.myEnum.Value().Value())];
-            }
-        } else {
-            self.field1.myEnum = nil;
-        }
     }
     {
         self.field2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.field2)];
@@ -55860,15 +55848,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             auto & nonNullValue_1 = encodableStruct.field1.myBitmap.SetNonNull();
             nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.field1.myBitmap.unsignedIntValue);
-        }
-        if (self.field1.myEnum != nil) {
-            auto & definedValue_1 = encodableStruct.field1.myEnum.Emplace();
-            if (self.field1.myEnum == nil) {
-                definedValue_1.SetNull();
-            } else {
-                auto & nonNullValue_2 = definedValue_1.SetNonNull();
-                nonNullValue_2 = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(self.field1.myEnum.unsignedCharValue);
-            }
         }
     }
     {

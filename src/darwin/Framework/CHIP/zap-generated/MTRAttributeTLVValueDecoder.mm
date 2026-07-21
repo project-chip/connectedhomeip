@@ -21780,15 +21780,23 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.IsNull()) {
+                if (entry_0.videoStreamID.HasValue()) {
+                    if (entry_0.videoStreamID.Value().IsNull()) {
+                        newElement_0.videoStreamID = nil;
+                    } else {
+                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
+                    }
+                } else {
                     newElement_0.videoStreamID = nil;
-                } else {
-                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
                 }
-                if (entry_0.audioStreamID.IsNull()) {
-                    newElement_0.audioStreamID = nil;
+                if (entry_0.audioStreamID.HasValue()) {
+                    if (entry_0.audioStreamID.Value().IsNull()) {
+                        newElement_0.audioStreamID = nil;
+                    } else {
+                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
+                    }
                 } else {
-                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
+                    newElement_0.audioStreamID = nil;
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
@@ -21875,15 +21883,23 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.IsNull()) {
+                if (entry_0.videoStreamID.HasValue()) {
+                    if (entry_0.videoStreamID.Value().IsNull()) {
+                        newElement_0.videoStreamID = nil;
+                    } else {
+                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
+                    }
+                } else {
                     newElement_0.videoStreamID = nil;
-                } else {
-                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
                 }
-                if (entry_0.audioStreamID.IsNull()) {
-                    newElement_0.audioStreamID = nil;
+                if (entry_0.audioStreamID.HasValue()) {
+                    if (entry_0.audioStreamID.Value().IsNull()) {
+                        newElement_0.audioStreamID = nil;
+                    } else {
+                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
+                    }
                 } else {
-                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
+                    newElement_0.audioStreamID = nil;
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
@@ -25429,15 +25445,6 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         } else {
             value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.myBitmap.Value().Raw()];
         }
-        if (cppValue.myEnum.HasValue()) {
-            if (cppValue.myEnum.Value().IsNull()) {
-                value.myEnum = nil;
-            } else {
-                value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.myEnum.Value().Value())];
-            }
-        } else {
-            value.myEnum = nil;
-        }
         return value;
     }
     case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
@@ -26050,15 +26057,6 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
                 value.myBitmap = nil;
             } else {
                 value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.Value().myBitmap.Value().Raw()];
-            }
-            if (cppValue.Value().myEnum.HasValue()) {
-                if (cppValue.Value().myEnum.Value().IsNull()) {
-                    value.myEnum = nil;
-                } else {
-                    value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().myEnum.Value().Value())];
-                }
-            } else {
-                value.myEnum = nil;
             }
         }
         return value;

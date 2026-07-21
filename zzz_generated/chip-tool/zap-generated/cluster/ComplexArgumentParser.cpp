@@ -478,13 +478,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myBitmap, value["myBitmap"]));
     valueCopy.removeMember("myBitmap");
 
-    if (value.isMember("myEnum"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "myEnum");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.myEnum, value["myEnum"]));
-    }
-    valueCopy.removeMember("myEnum");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -492,7 +485,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Test
 {
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.myBitmap);
-    ComplexArgumentParser::Finalize(request.myEnum);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::ViewportStruct::Type & request,
@@ -552,10 +544,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("peerEndpointID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.streamUsage", "streamUsage", value.isMember("streamUsage")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.videoStreamID", "videoStreamID",
-                                                                  value.isMember("videoStreamID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.audioStreamID", "audioStreamID",
-                                                                  value.isMember("audioStreamID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WebRTCSessionStruct.metadataEnabled", "metadataEnabled",
                                                                   value.isMember("metadataEnabled")));
 
@@ -576,12 +564,18 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.streamUsage, value["streamUsage"]));
     valueCopy.removeMember("streamUsage");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
+    if (value.isMember("videoStreamID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
+    }
     valueCopy.removeMember("videoStreamID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
+    if (value.isMember("audioStreamID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
+    }
     valueCopy.removeMember("audioStreamID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
