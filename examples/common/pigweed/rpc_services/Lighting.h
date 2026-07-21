@@ -24,8 +24,19 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/color-control-server/CodegenIntegration.h>
 #include <platform/PlatformManager.h>
+
+// Color support here drives the code-driven Color Control cluster through its ColorControlServer facade.
+// That facade (CodegenIntegration.cpp) is compiled only when the app's data model includes Color Control,
+// so guard all color code on the generated per-endpoint presence macro (from endpoint_config.h, pulled in
+// via attribute-storage.h above). This keeps this shared header linkable in apps/device types that omit
+// Color Control but still build the Lighting RPC service (e.g. non-color chef devices).
+#if defined(MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT) && (MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+#define CHIP_RPC_LIGHTING_SUPPORTS_COLOR 1
+#include <app/clusters/color-control-server/color-control-server.h>
+#else
+#define CHIP_RPC_LIGHTING_SUPPORTS_COLOR 0
+#endif
 
 namespace chip {
 namespace rpc {
@@ -52,6 +63,7 @@ public:
 
         if (mSupportColor && request.has_color)
         {
+#if CHIP_RPC_LIGHTING_SUPPORTS_COLOR
             constexpr uint32_t kColorMax = 0xFE;
             // Clip color to max
             uint8_t hue        = std::min(request.color.hue, kColorMax);
@@ -63,6 +75,7 @@ public:
             RETURN_STATUS_IF_NOT_OK(ColorControlServer::Instance().moveToHueAndSaturationCommand(
                 kEndpoint, hue, saturation, /*transitionTime=*/0, /*optionsMask=*/{}, /*optionsOverride=*/{},
                 /*isEnhanced=*/false));
+#endif // CHIP_RPC_LIGHTING_SUPPORTS_COLOR
         }
         return pw::OkStatus();
     }
@@ -88,6 +101,7 @@ public:
 
         if (mSupportColor)
         {
+#if CHIP_RPC_LIGHTING_SUPPORTS_COLOR
             // ColorControl is code-driven and no longer exposes generated Ember Get() accessors; read the
             // live hue/saturation through the legacy ColorControlServer facade (out-param + Status shape) so
             // we do not depend on the internal cluster type.
@@ -98,6 +112,7 @@ public:
             response.color.hue        = hue;
             response.color.saturation = saturation;
             response.has_color        = true;
+#endif // CHIP_RPC_LIGHTING_SUPPORTS_COLOR
         }
 
         return pw::OkStatus();
