@@ -28,9 +28,6 @@ import matter.clusters as Clusters
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-logging.disable(logging.CRITICAL)
-
-
 def make_descriptor_cluster(parts_list=None):
     if parts_list is None:
         parts_list = []
