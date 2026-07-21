@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -26,15 +25,15 @@ import matter.tlv.TlvWriter
 class AmbientSensingUnionClusterUnionContributorStruct(
   val contributorNodeID: ULong?,
   val contributorEndpointID: UShort?,
-  val contributorName: Optional<String>,
-  val contributorHealth: UByte,
+  val contributorName: String?,
+  val contributorStatus: UByte,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorStruct {\n")
     append("\tcontributorNodeID : $contributorNodeID\n")
     append("\tcontributorEndpointID : $contributorEndpointID\n")
     append("\tcontributorName : $contributorName\n")
-    append("\tcontributorHealth : $contributorHealth\n")
+    append("\tcontributorStatus : $contributorStatus\n")
     append("}\n")
   }
 
@@ -51,11 +50,12 @@ class AmbientSensingUnionClusterUnionContributorStruct(
       } else {
         putNull(ContextSpecificTag(TAG_CONTRIBUTOR_ENDPOINT_ID))
       }
-      if (contributorName.isPresent) {
-        val optcontributorName = contributorName.get()
-        put(ContextSpecificTag(TAG_CONTRIBUTOR_NAME), optcontributorName)
+      if (contributorName != null) {
+        put(ContextSpecificTag(TAG_CONTRIBUTOR_NAME), contributorName)
+      } else {
+        putNull(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
       }
-      put(ContextSpecificTag(TAG_CONTRIBUTOR_HEALTH), contributorHealth)
+      put(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS), contributorStatus)
       endStructure()
     }
   }
@@ -64,7 +64,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
     private const val TAG_CONTRIBUTOR_NODE_ID = 0
     private const val TAG_CONTRIBUTOR_ENDPOINT_ID = 1
     private const val TAG_CONTRIBUTOR_NAME = 2
-    private const val TAG_CONTRIBUTOR_HEALTH = 3
+    private const val TAG_CONTRIBUTOR_STATUS = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -86,12 +86,13 @@ class AmbientSensingUnionClusterUnionContributorStruct(
           null
         }
       val contributorName =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_CONTRIBUTOR_NAME)))
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
+          null
         }
-      val contributorHealth = tlvReader.getUByte(ContextSpecificTag(TAG_CONTRIBUTOR_HEALTH))
+      val contributorStatus = tlvReader.getUByte(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS))
 
       tlvReader.exitContainer()
 
@@ -99,7 +100,7 @@ class AmbientSensingUnionClusterUnionContributorStruct(
         contributorNodeID,
         contributorEndpointID,
         contributorName,
-        contributorHealth,
+        contributorStatus,
       )
     }
   }

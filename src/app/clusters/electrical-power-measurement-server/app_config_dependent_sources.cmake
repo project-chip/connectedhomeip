@@ -20,12 +20,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/electrical-power-measurement-server.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.cpp"
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementCluster.h"
-    "${CLUSTER_DIR}/ElectricalPowerMeasurementDelegate.h"
-)

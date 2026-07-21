@@ -432,6 +432,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     std::string type = GetFullType(service.mType, service.mProtocol);
     std::string matterHostname;
     CHIP_ERROR error          = CHIP_NO_ERROR;
+    int avahiRet              = AVAHI_OK;
     AvahiStringList * text    = nullptr;
     AvahiEntryGroup * group   = nullptr;
     const char * mainHostname = nullptr;
@@ -446,7 +447,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     if (publishedgroups_it != mPublishedGroups.end())
     {
         // same service was already published, we need to de-publish it first
-        int avahiRet = avahi_entry_group_free(publishedgroups_it->second);
+        avahiRet = avahi_entry_group_free(publishedgroups_it->second);
         if (avahiRet != AVAHI_OK)
         {
             ChipLogError(DeviceLayer, "Cannot remove avahi group: %s", avahi_strerror(avahiRet));
@@ -471,6 +472,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     {
         // we need to establish a matter hostname separately from the platform's default hostname
         char b[chip::Inet::IPAddress::kMaxStringLength];
+        size_t numAddressesAdded = 0;
         SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
         ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
         matterHostname = std::string(service.mHostName) + ".local";
@@ -504,31 +506,65 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
                     AvahiIfIndex thisinterface = static_cast<AvahiIfIndex>(addr_it.GetInterfaceId().GetPlatformInterface());
                     // Note: NO_REVERSE publish flag is needed because otherwise we can't have more than one hostname
                     //   for reverse resolving IP addresses back to hostnames
-                    VerifyOrExit(avahi_entry_group_add_address(group,                        // group
-                                                               thisinterface,                // interface
-                                                               ToAvahiProtocol(addr.Type()), // protocol
-                                                               AVAHI_PUBLISH_NO_REVERSE,     // publish flags
-                                                               matterHostname.c_str(),       // hostname
-                                                               &a                            // address
-                                                               ) == 0,
-                                 error = CHIP_ERROR_INTERNAL);
+                    avahiRet = avahi_entry_group_add_address(group,                        // group
+                                                             thisinterface,                // interface
+                                                             ToAvahiProtocol(addr.Type()), // protocol
+                                                             AVAHI_PUBLISH_NO_REVERSE,     // publish flags
+                                                             matterHostname.c_str(),       // hostname
+                                                             &a);
+                    if (avahiRet != AVAHI_OK)
+                    {
+                        ChipLogError(DeviceLayer, "Cannot add avahi group address for %s (%d) for %s: %d: %s", b,
+                                     static_cast<int>(thisinterface), matterHostname.c_str(), avahiRet, avahi_strerror(avahiRet));
+
+                        ExitNow(error = CHIP_ERROR_INTERNAL);
+                    }
+
+                    ChipLogDetail(DeviceLayer, "Added address %s (if=%d) for %s", b, static_cast<int>(thisinterface),
+                                  matterHostname.c_str());
+
+                    numAddressesAdded++;
                 }
             }
         }
+
+        // A dedicated Matter hostname is only resolvable if at least one A/AAAA
+        // record backs it. Publishing SRV/PTR/TXT without any address records
+        // yields a service that browses but can never be resolved, and nothing
+        // downstream would ever detect or repair it. Fail loudly instead so the
+        // caller can retry (for example, on a subsequent connectivity-change event).
+
+        if (numAddressesAdded == 0)
+        {
+            ChipLogError(DeviceLayer,
+                         "No publishable addresses for hostname %s (interface id=%d): "
+                         "advertising interface has no usable addresses yet; "
+                         "refusing to publish unresolvable service %s",
+                         matterHostname.c_str(), service.mInterface.GetPlatformInterface(), key.c_str());
+
+            ExitNow(error = CHIP_ERROR_INCORRECT_STATE);
+        }
+
+        ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", numAddressesAdded, matterHostname.c_str());
     }
 
     // create the service
     SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
 
-    VerifyOrExit(avahi_entry_group_add_service_strlst(group, interface, protocol,        // group, interface, protocol
-                                                      static_cast<AvahiPublishFlags>(0), // publish flags
-                                                      service.mName,                     // service name
-                                                      type.c_str(),                      // type
-                                                      nullptr,                           // domain
-                                                      matterHostname.c_str(),            // host
-                                                      service.mPort,                     // port
-                                                      text) == 0,                        // TXT records StringList
-                 error = CHIP_ERROR_INTERNAL);
+    avahiRet = avahi_entry_group_add_service_strlst(group, interface, protocol,        // group, interface, protocol
+                                                    static_cast<AvahiPublishFlags>(0), // publish flags
+                                                    service.mName,                     // service name
+                                                    type.c_str(),                      // type
+                                                    nullptr,                           // domain
+                                                    matterHostname.c_str(),            // host
+                                                    service.mPort,                     // port
+                                                    text);                             // TXT records StringList
+    if (avahiRet != AVAHI_OK)
+    {
+        ChipLogError(DeviceLayer, "Cannot add avahi service string list: %d: %s", avahiRet, avahi_strerror(avahiRet));
+
+        ExitNow(error = CHIP_ERROR_INTERNAL);
+    }
 
     // add the subtypes
     for (size_t i = 0; i < service.mSubTypeSize; i++)
@@ -537,9 +573,15 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
 
         sstream << service.mSubTypes[i] << "._sub." << type;
 
-        VerifyOrExit(avahi_entry_group_add_service_subtype(group, interface, protocol, static_cast<AvahiPublishFlags>(0),
-                                                           service.mName, type.c_str(), nullptr, sstream.str().c_str()) == 0,
-                     error = CHIP_ERROR_INTERNAL);
+        avahiRet = avahi_entry_group_add_service_subtype(group, interface, protocol, static_cast<AvahiPublishFlags>(0),
+                                                         service.mName, type.c_str(), nullptr, sstream.str().c_str());
+
+        if (avahiRet != AVAHI_OK)
+        {
+            ChipLogError(DeviceLayer, "Cannot add avahi service string subtype: %d: %s", avahiRet, avahi_strerror(avahiRet));
+
+            ExitNow(error = CHIP_ERROR_INTERNAL);
+        }
     }
     VerifyOrExit(avahi_entry_group_commit(group) == 0, error = CHIP_ERROR_INTERNAL);
 

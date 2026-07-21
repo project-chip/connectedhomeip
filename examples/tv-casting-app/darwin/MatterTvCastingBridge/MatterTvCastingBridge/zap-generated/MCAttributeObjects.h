@@ -197,6 +197,12 @@
 @interface MCMediaPlaybackClusterAvailableTextTracksAttribute : MCAttribute <NSArray *>
 @end
 
+@interface MCMediaPlaybackClusterAvailableCommandsAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaPlaybackClusterContentInfoAttribute : MCAttribute <MCMediaPlaybackClusterContentInfoStruct *>
+@end
+
 @interface MCMediaPlaybackClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>
 @end
 
@@ -235,6 +241,12 @@
 @end
 
 @interface MCContentLauncherClusterSupportedStreamingProtocolsAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCContentLauncherClusterMovableAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCContentLauncherClusterPresetsAttribute : MCAttribute <NSArray *>
 @end
 
 @interface MCContentLauncherClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>

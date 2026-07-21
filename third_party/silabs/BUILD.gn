@@ -61,7 +61,7 @@ if (chip_with_lwip) {
 }
 
 if (wifi_soc != true) {  # CCP board
-  # Openthread GSDK libraries configurations
+  # Openthread SISDK libraries configurations
 
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {
@@ -174,6 +174,9 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/examples/apps/cli/cli_uart.cpp",
           "${openthread_root}/src/cli/cli.cpp",
           "${openthread_root}/src/cli/cli.hpp",
+          "${openthread_root}/src/cli/cli_api.cpp",
+          "${openthread_root}/src/cli/cli_ba.cpp",
+          "${openthread_root}/src/cli/cli_ba.hpp",
           "${openthread_root}/src/cli/cli_bbr.cpp",
           "${openthread_root}/src/cli/cli_bbr.hpp",
           "${openthread_root}/src/cli/cli_br.cpp",
@@ -263,7 +266,12 @@ if (wifi_soc != true) {  # CCP board
         silabs_family = "efr32mg24"
       }
 
-      libs = [ "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a" ]
+      compiler = "gcc"
+      if (is_clang) {
+        compiler = "llvm"
+      }
+
+      libs = [ "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_${compiler}.a" ]
     }
   }
 }

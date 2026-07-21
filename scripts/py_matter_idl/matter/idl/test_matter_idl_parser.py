@@ -25,7 +25,6 @@ except ModuleNotFoundError:
     from matter.idl.matter_idl_parser import CreateParser
 
 import unittest
-from typing import Optional
 
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -38,7 +37,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
 class GeneratorContentStorage(GeneratorStorage):
     def __init__(self):
         super().__init__()
-        self.content: Optional[str] = None
+        self.content: str | None = None
 
     def get_existing_data(self, relative_path: str):
         # Force re-generation each time

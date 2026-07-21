@@ -16,7 +16,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 log = logging.getLogger(__name__)
 
@@ -38,8 +38,8 @@ class Route:
     method: str
     path: str
     response: RouteResponse
-    body: Optional[Any] = None
-    query: Optional[QueryConfig] = None
+    body: Any | None = None
+    query: QueryConfig | None = None
 
 
 @dataclass

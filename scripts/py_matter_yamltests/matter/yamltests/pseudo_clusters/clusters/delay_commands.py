@@ -17,7 +17,7 @@ import asyncio
 import sys
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ..pseudo_cluster import PseudoCluster
 from .accessory_server_bridge import AccessoryServerBridge
@@ -41,23 +41,23 @@ class MockTestStep:
     endpoint: int
     node_id: int
 
-    group_id: Optional[int] = None
+    group_id: int | None = None
     is_attribute: bool = True
     is_event: bool = False
-    arguments: Optional[Any] = None
-    responses: Optional[Any] = None
-    event: Optional[str] = None
+    arguments: Any | None = None
+    responses: Any | None = None
+    event: str | None = None
 
-    min_interval: Optional[int] = None
-    max_interval: Optional[int] = None
-    keep_subscriptions: Optional[bool] = None
-    timed_interaction_timeout_ms: Optional[int] = None
-    timeout: Optional[int] = None
-    event_number: Optional[int] = None
-    busy_wait_ms: Optional[int] = None
-    identity: Optional[str] = None
+    min_interval: int | None = None
+    max_interval: int | None = None
+    keep_subscriptions: bool | None = None
+    timed_interaction_timeout_ms: int | None = None
+    timeout: int | None = None
+    event_number: int | None = None
+    busy_wait_ms: int | None = None
+    identity: str | None = None
     fabric_filtered: bool = True
-    data_version: Optional[int] = None
+    data_version: int | None = None
     label: str = "MockTestStep"
     is_pics_enabled: bool = True
 

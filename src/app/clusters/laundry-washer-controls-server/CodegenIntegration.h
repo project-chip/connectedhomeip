@@ -17,56 +17,39 @@
 
 #pragma once
 
-#include "laundry-washer-controls-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include "LaundryWasherControlsCluster.h"
 
-#include <protocols/interaction_model/StatusCode.h>
+namespace chip::app::Clusters::LaundryWasherControls {
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace LaundryWasherControls {
+namespace LaundryWasherControlsServer {
 
 /**
- * @brief LaundryWasherControls Server Plugin class
+ * Set the delegate of laundry washer server at endpoint x
+ * @param endpoint ID of the endpoint
+ * @param delegate The delegate at the endpoint.
+ * The delegate should be valid until the cluster on the endpoint is destroyed. This will probably happen at the end of the program.
+ * @note This function can be called only after Server::Init is called
  */
-class LaundryWasherControlsServer : public AttributeAccessInterface
-{
-public:
-    LaundryWasherControlsServer() : AttributeAccessInterface(Optional<EndpointId>::Missing(), LaundryWasherControls::Id) {}
-    static LaundryWasherControlsServer & Instance();
+void SetDelegate(EndpointId endpoint, Delegate & delegate);
 
-    static constexpr uint8_t kMaxSpinSpeedLength = 64;
+/// Same as SetDelegate, kept for backward compatibility. Use SetDelegate instead.
+/// @param delegate SHOULD NOT be nullptr.
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-    /**
-     * Set the default delegate of laundry washer server at endpoint x
-     * @param endpoint ID of the endpoint
-     * @param delegate The default delegate at the endpoint
-     */
-    static void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+/**
+ * API to set/get the SpinSpeedCurrent attribute
+ */
+CHIP_ERROR SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
+CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
 
-    /**
-     * API to set/get the SpinSpeedCurrent attribute
-     */
-    Protocols::InteractionModel::Status SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
-    Protocols::InteractionModel::Status GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+/**
+ * API to set/get the NumberOfRinses attribute
+ */
+CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
+CHIP_ERROR GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
-    /**
-     * API to set/get the NumberOfRinses attribute
-     */
-    Protocols::InteractionModel::Status SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
-    Protocols::InteractionModel::Status GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
+} // namespace LaundryWasherControlsServer
 
-private:
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSupportedRinses(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+LaundryWasherControlsCluster * FindClusterOnEndpoint(EndpointId endpoint);
 
-    static LaundryWasherControlsServer sInstance;
-};
-
-} // namespace LaundryWasherControls
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::LaundryWasherControls

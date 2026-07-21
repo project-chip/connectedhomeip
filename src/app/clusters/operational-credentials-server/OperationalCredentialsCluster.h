@@ -33,6 +33,17 @@ namespace Clusters {
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
+    /// Number of vendor_reserved fields supported in CSRResponse NOCSRElements (context tags 3, 4, 5).
+    static constexpr size_t kMaxCSRVendorReservedFields = 3;
+
+    /// Identifies which vendor_reserved field to set in the CSRResponse NOCSRElements.
+    enum class CSRVendorReservedField : uint8_t
+    {
+        kVendorReserved1 = 0, // context tag 3
+        kVendorReserved2 = 1, // context tag 4
+        kVendorReserved3 = 2, // context tag 5
+    };
+
     struct Context
     {
         FabricTable & fabricTable;
@@ -52,6 +63,22 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
+
+    /**
+     * @brief Set vendor-specific data to be included in CSRResponse NOCSRElements.
+     *
+     * The caller retains ownership of the underlying memory, which must remain valid for the
+     * lifetime of this cluster instance. Pass an empty ByteSpan to clear a field.
+     *
+     * Note: the resulting nocsr_elements_message (CSR + nonce + all vendor_reserved fields)
+     * SHALL be no more than RESP_MAX (900) bytes per the Matter spec. Oversized data causes
+     * CSRRequest to fail with CHIP_ERROR_MESSAGE_TOO_LONG at construction time.
+     *
+     * @param field  Which vendor_reserved field to set.
+     * @param data   Vendor-specific data; empty span clears the field.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if field is out of range.
+     */
+    CHIP_ERROR SetCSRVendorReserved(CSRVendorReservedField field, ByteSpan data);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -74,6 +101,7 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
+    ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields] = {};
 };
 
 } // namespace Clusters

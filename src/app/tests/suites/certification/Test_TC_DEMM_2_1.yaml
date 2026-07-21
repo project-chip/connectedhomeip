@@ -96,7 +96,7 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute"
-      PICS: DEMM.S.A0001 && DEMM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: DEMM.S.M.CAN_TEST_MODE_FAILURE && DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -111,7 +111,7 @@ tests:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.DEMM.MODE_CHANGE_FAIL"
       PICS:
-          DEMM.S.M.CAN_TEST_MODE_FAILURE && DEMM.S.C00.Rsp &&
+          DEMM.S.M.CAN_TEST_MODE_FAILURE && DEMM.S.M.CAN_MANUALLY_CONTROLLED &&
           PICS_SKIP_SAMPLE_APP
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
@@ -136,7 +136,7 @@ tests:
                 value: "y"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: DEMM.S.A0001
+      PICS: DEMM.S.M.CAN_TEST_MODE_FAILURE && DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -160,7 +160,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: DEMM.S.A0001 && DEMM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -173,7 +173,7 @@ tests:
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.DEMM.MODE_CHANGE_OK"
-      PICS: DEMM.S.C00.Rsp
+      PICS: DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -187,8 +187,8 @@ tests:
     - label:
           "Step 12: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
-          PIXIT.RVCRUNM.MODE_CHANGE_OK"
-      PICS: DEMM.S.A0001
+          PIXIT.DEMM.MODE_CHANGE_OK"
+      PICS: DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -197,7 +197,7 @@ tests:
     - label:
           "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
           to invalid_mode_th"
-      PICS: DEMM.S.C00.Rsp
+      PICS: DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "ChangeToMode"
       arguments:
           values:
@@ -211,8 +211,8 @@ tests:
     - label:
           "Step 14: TH reads from the DUT the CurrentMode attribute. Verify that
           the DUT response contains an integer value equal to
-          PIXIT.RVCRUNM.MODE_CHANGE_OK"
-      PICS: DEMM.S.A0001
+          PIXIT.DEMM.MODE_CHANGE_OK"
+      PICS: DEMM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

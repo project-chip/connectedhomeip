@@ -47,6 +47,9 @@ extern void setNvm3End(uint32_t addr);
 #endif
 
 extern uint8_t linker_nvm_end[];
+#ifdef _SILICON_LABS_32B_SERIES_3
+extern uint8_t linker_static_secure_tokens_begin; // Defined by the linker script
+#endif
 
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
@@ -164,6 +167,10 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
 #endif // SLI_SI91X_MCU_INTERFACE
+#ifdef _SILICON_LABS_32B_SERIES_3
+        uint32_t tokenStartAddr = reinterpret_cast<uint32_t>(&linker_static_secure_tokens_begin);
+        base_addr               = tokenStartAddr + FLASH_PAGE_SIZE;
+#endif
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);

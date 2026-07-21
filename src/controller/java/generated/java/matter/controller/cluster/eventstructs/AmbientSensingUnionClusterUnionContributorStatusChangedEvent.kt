@@ -24,20 +24,20 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-  val statusChangedContributor:
-    List<matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>
+  val contributorStatusChange:
+    List<matter.controller.cluster.structs.AmbientSensingUnionClusterContributorStatusChangeStruct>
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n")
-    append("\tstatusChangedContributor : $statusChangedContributor\n")
+    append("\tcontributorStatusChange : $contributorStatusChange\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_STATUS_CHANGED_CONTRIBUTOR))
-      for (item in statusChangedContributor.iterator()) {
+      startArray(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS_CHANGE))
+      for (item in contributorStatusChange.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
       endArray()
@@ -46,21 +46,22 @@ class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
   }
 
   companion object {
-    private const val TAG_STATUS_CHANGED_CONTRIBUTOR = 0
+    private const val TAG_CONTRIBUTOR_STATUS_CHANGE = 0
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val statusChangedContributor =
+      val contributorStatusChange =
         buildList<
-          matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+          matter.controller.cluster.structs.AmbientSensingUnionClusterContributorStatusChangeStruct
         > {
-          tlvReader.enterArray(ContextSpecificTag(TAG_STATUS_CHANGED_CONTRIBUTOR))
+          tlvReader.enterArray(ContextSpecificTag(TAG_CONTRIBUTOR_STATUS_CHANGE))
           while (!tlvReader.isEndOfContainer()) {
             this.add(
-              matter.controller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct
+              matter.controller.cluster.structs
+                .AmbientSensingUnionClusterContributorStatusChangeStruct
                 .fromTlv(AnonymousTag, tlvReader)
             )
           }
@@ -69,7 +70,7 @@ class AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
 
       tlvReader.exitContainer()
 
-      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(statusChangedContributor)
+      return AmbientSensingUnionClusterUnionContributorStatusChangedEvent(contributorStatusChange)
     }
   }
 }

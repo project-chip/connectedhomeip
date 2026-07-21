@@ -34,16 +34,15 @@ log = logging.getLogger(__name__)
 test_environ = os.environ.copy()
 
 
-def ensure_network_namespace_availability():
+def ensure_namespace_availability():
     if os.getuid() == 0:
         log.debug("Current user is root")
         log.warning("Running as root and this will change global namespaces.")
         return
 
-    os.execvpe(
-        "unshare", ["unshare", "--map-root-user", "-n", "-m", sys.executable,
-                    sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
-        test_environ)
+    os.execvpe("unshare",
+               ["unshare", "--map-root-user", "-m", sys.executable, sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
+               test_environ)
 
 
 def ensure_private_state():
@@ -51,15 +50,11 @@ def ensure_private_state():
 
     log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        log.error("Failed to make / private")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
+        raise RuntimeError("Failed to make / private. Are you using --privileged if running in docker?")
 
     log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        log.error("Failed to mount /run as a temporary filesystem")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
+        raise RuntimeError("Failed to mount /run as a temporary filesystem. Are you using --privileged if running in docker?")
 
 
 @dataclasses.dataclass

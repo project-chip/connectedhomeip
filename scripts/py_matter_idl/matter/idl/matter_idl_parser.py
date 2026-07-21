@@ -16,7 +16,6 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Optional
 
 import click
 from lark import Lark
@@ -727,7 +726,7 @@ class ParserWithLines:
             }
         )
 
-    def parse(self, file: str, file_name: Optional[str] = None):
+    def parse(self, file: str, file_name: str | None = None):
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
 

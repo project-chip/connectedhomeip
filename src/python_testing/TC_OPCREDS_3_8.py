@@ -43,7 +43,6 @@ import logging
 import re
 import sys
 from binascii import hexlify, unhexlify
-from typing import Optional
 
 import nest_asyncio
 from ecdsa import NIST256p, VerifyingKey
@@ -166,7 +165,7 @@ def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         client_challenge: bytes,
                                         fabric_index: int,
                                         vendor_fabric_binding_message: bytes,
-                                        vid_verification_statement: Optional[bytes] = None) -> bytes:
+                                        vid_verification_statement: bytes | None = None) -> bytes:
     assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
     assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
     # Valid fabric indices are [1..254]. 255 is forbidden.

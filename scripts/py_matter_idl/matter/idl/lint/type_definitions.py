@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
+from collections.abc import MutableMapping
 from dataclasses import dataclass, field
-from typing import MutableMapping, Optional
 
 from matter.idl.matter_idl_types import Idl, ParseMetaData
 
@@ -27,8 +27,8 @@ class MissingIdlError(Exception):
 @dataclass
 class LocationInFile:
     file_name: str
-    line: Optional[int]
-    column: Optional[int]
+    line: int | None
+    column: int | None
 
     def __init__(self, file_name: str, meta: ParseMetaData):
         self.file_name = file_name
@@ -41,9 +41,9 @@ class LintError:
     """Represents a lint error, potentially at a specific location in a file"""
 
     message: str
-    location: Optional[LocationInFile] = field(default=None)
+    location: LocationInFile | None = field(default=None)
 
-    def __init__(self, text: str, location: Optional[LocationInFile] = None):
+    def __init__(self, text: str, location: LocationInFile | None = None):
         self.message = text
         if location:
             self.message += " at %s:%d:%d" % (location.file_name,
@@ -72,7 +72,7 @@ class AttributeRequirement:
     name: str  # the name of this attribute. Expect it to be exposed properly
 
     # Optional filters to apply to specific locations
-    filter_cluster: Optional[int] = field(default=None)
+    filter_cluster: int | None = field(default=None)
 
 
 @dataclass
@@ -100,7 +100,7 @@ class ErrorAccumulatingRule(LintRule):
         self._lint_errors.append(
             LintError("%s: %s" % (self.name, text), location))
 
-    def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
+    def _ParseLocation(self, meta: ParseMetaData | None) -> LocationInFile | None:
         """Create a location in the current file that is being parsed. """
         if not meta or not self._idl or not self._idl.parse_file_name:
             return None
@@ -150,7 +150,7 @@ class ClusterValidationRule(ErrorAccumulatingRule):
     def RejectClusterInEndpoint(self, requirement: ClusterRequirement):
         self._rejected_clusters.append(requirement)
 
-    def _ClusterCode(self, name: str, location: Optional[LocationInFile]):
+    def _ClusterCode(self, name: str, location: LocationInFile | None):
         """Finds the server cluster definition with the given name.
 
         On error returns None and _lint_errors is updated internlly
@@ -232,7 +232,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         """Mark a cluster (or cluster/attribute) as denied"""
         self._deny_attributes.append(what)
 
-    def _ServerClusterDefinition(self, name: str, location: Optional[LocationInFile]):
+    def _ServerClusterDefinition(self, name: str, location: LocationInFile | None):
         """Finds the server cluster definition with the given name.
 
         On error returns None and _lint_errors is updated internlly

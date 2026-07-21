@@ -25,6 +25,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/camera-av-stream-management-server",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",

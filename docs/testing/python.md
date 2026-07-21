@@ -845,6 +845,7 @@ for that run, e.g.:
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
 #     factory-reset: <true|false>
+#     timeout: <float>   [optional]
 #     quiet: <true|false>
 # === END CI TEST ARGUMENTS ===
 ```
@@ -862,6 +863,13 @@ for that run, e.g.:
     before the test.
 
     -   Example: `true`
+
+-   `timeout`: Sets the timeout of the test script. When this timeout expires
+    the test run is considered failed. The value is in seconds.
+
+    -   Example: `700.6`
+    -   Default: Value of test script `--timeout` argument plus slack time,
+        otherwise `matter.testing.defaults.TestingDefaults.DEFAULT_TIMEOUT_S`
 
 -   `quiet`: Sets the verbosity level of the test run. When set to True, the
     test run will be quieter.

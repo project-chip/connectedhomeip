@@ -386,6 +386,80 @@ TEST_F_FROM_FIXTURE(VendorIdVerificationClientTest, TestVerificationFailsDueToIn
     EXPECT_EQ(mVerificationResult, CHIP_ERROR_TLV_UNDERRUN);
 }
 
+// Minimal concrete subclass used to exercise the protected GuardWithLiveness() primitive
+// directly. These tests pin the property that a wrapped callback becomes a safe no-op once the
+// object is destroyed, while still forwarding through to the wrapped callable while alive.
+class GuardTestClient : public VendorIdVerificationClient
+{
+public:
+    using VendorIdVerificationClient::GuardWithLiveness;
+
+protected:
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId, Credentials::CertificateKeyId &, ByteSpan &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnVendorIdVerificationComplete(const CHIP_ERROR &) override {}
+};
+
+TEST(VendorIdVerificationClientLiveness, CallbackRunsWhileObjectAlive)
+{
+    GuardTestClient client;
+    int calls    = 0;
+    auto guarded = client.GuardWithLiveness([&calls]() { ++calls; });
+
+    guarded();
+
+    EXPECT_EQ(calls, 1);
+}
+
+TEST(VendorIdVerificationClientLiveness, CallbackIsNoOpAfterObjectDestroyed)
+{
+    int calls = 0;
+    std::function<void()> guarded;
+    {
+        GuardTestClient client;
+        guarded = client.GuardWithLiveness([&calls]() { ++calls; });
+    }
+
+    // The object backing the liveness token is gone; an in-flight callback delivered after
+    // teardown must self-reap into a no-op rather than run through freed state.
+    guarded();
+
+    EXPECT_EQ(calls, 0);
+}
+
+TEST(VendorIdVerificationClientLiveness, ForwardsArgumentsWhileAlive)
+{
+    GuardTestClient client;
+    int captured = 0;
+    auto guarded = client.GuardWithLiveness([&captured](int value) { captured = value; });
+
+    guarded(42);
+
+    EXPECT_EQ(captured, 42);
+}
+
+TEST(VendorIdVerificationClientLiveness, AllGuardsFromOneObjectDieTogether)
+{
+    int success = 0;
+    int failure = 0;
+    std::function<void()> onSuccess;
+    std::function<void()> onFailure;
+    {
+        // Mirrors the two GuardWithLiveness() wraps issued together in VerifyVendorId().
+        GuardTestClient client;
+        onSuccess = client.GuardWithLiveness([&success]() { ++success; });
+        onFailure = client.GuardWithLiveness([&failure]() { ++failure; });
+    }
+
+    onSuccess();
+    onFailure();
+
+    EXPECT_EQ(success, 0);
+    EXPECT_EQ(failure, 0);
+}
+
 } // namespace JCM
 } // namespace Credentials
 } // namespace chip

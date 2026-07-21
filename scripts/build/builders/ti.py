@@ -14,7 +14,6 @@
 
 import os
 from enum import Enum, auto
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -81,7 +80,7 @@ class TIBuilder(GnBuilder):
                  output_dir_lock: OutDirLock,
                  board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
-                 openthread_ftd: Optional[bool] = None):
+                 openthread_ftd: bool | None = None):
         super().__init__(root=app.BuildRoot(root, board), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app

@@ -26,12 +26,12 @@
 
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -151,7 +151,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
 void AppTask::OnEnterActiveMode()
 {
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(true);
 #endif
 }
@@ -159,7 +159,7 @@ void AppTask::OnEnterActiveMode()
 // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
 void AppTask::OnEnterIdleMode()
 {
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(false);
 #endif
 }

@@ -16,7 +16,7 @@
 #
 
 import xml.etree.ElementTree as ElementTree
-from typing import Callable
+from collections.abc import Callable
 
 from mobly import asserts
 

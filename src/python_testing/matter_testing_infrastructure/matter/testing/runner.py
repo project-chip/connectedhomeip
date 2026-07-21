@@ -71,7 +71,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
+def default_paa_rootstore_from_root(root_path: pathlib.Path) -> pathlib.Path | None:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
 
     This attempts to find {root_path}/credentials/development/paa-root-certs.
@@ -223,8 +223,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         """
         This method is called when the test runner needs to prompt the user for input.
 
@@ -336,7 +336,8 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = parse_matter_test_args()
+    p = matter_test_args_parser()
+    matter_test_config = convert_args_to_matter_config(p.parse_args())
 
     # Find the test class in the test script.
     test_class = _find_test_class()
@@ -553,8 +554,8 @@ class MockTestRunner:
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
+                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -942,7 +943,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[list[str]] = None):
+def matter_test_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1081,7 +1082,4 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    if not argv:
-        argv = sys.argv[1:]
-
-    return convert_args_to_matter_config(parser.parse_args(argv))
+    return parser

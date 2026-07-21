@@ -19,7 +19,7 @@ import itertools
 import logging
 import os
 import subprocess
-from typing import Iterable, Mapping, Optional
+from collections.abc import Iterable, Mapping
 
 import dateutil  # type: ignore
 import dateutil.parser  # type: ignore
@@ -89,7 +89,7 @@ class Gh:
 
     def __init__(self, config: Config):
         self.config = config
-        self.ghapi: Optional[ghapi.all.GhApi] = None
+        self.ghapi: ghapi.all.GhApi | None = None
         self.deleted_artifacts: set[int] = set()
 
         owner = config['github.owner']

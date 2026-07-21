@@ -1767,6 +1767,110 @@
 }
 @end
 
+@implementation MCContentLauncherClusterContentReplicationRequestCommand
+- (void)invoke:(id)request
+                 context:(void * _Nullable)context
+              completion:(void (^_Nonnull __strong)(void *, NSError *, id))completion
+    timedInvokeTimeoutMs:(NSNumber * _Nullable)timedInvokeTimeoutMs
+{
+    MCCommandTemplate<chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type> * mcCommand = new MCCommandTemplate<chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type>(
+        self.cppCommand,
+        [self](id objCRequest) {
+            return [self getCppRequestFromObjC:objCRequest];
+        },
+        [self](std::any cppResponse) {
+            return [self getObjCResponseFromCpp:cppResponse];
+        });
+    mcCommand->invoke(
+        request, context, [mcCommand, completion](void * context, NSError * err, id response) {
+            completion(context, err, response);
+            delete mcCommand;
+        }, timedInvokeTimeoutMs);
+}
+
+- (std::any)getCppRequestFromObjC:(MCContentLauncherClusterContentReplicationRequestParams *)objcRequest
+{
+    VerifyOrReturnValue(objcRequest != nil, nullptr);
+    std::any anyCppRequest = [objcRequest getCppRequestFromObjCRequest];
+    if (anyCppRequest.has_value()) {
+        try {
+            // Extract the object from std::any and convert it to a std::shared_ptr
+            auto & cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type &>(anyCppRequest);
+            return std::any(std::make_shared<chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type>(cppRequest));
+        } catch (const std::bad_any_cast & e) {
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+- (id)getObjCResponseFromCpp:(std::any)cppResponse
+{
+    MCContentLauncherClusterContentReplicationResponseParams * objCResponse = nil;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type::ResponseType>)) {
+        objCResponse = [[MCContentLauncherClusterContentReplicationResponseParams
+            alloc] init];
+        // Set the ObjC response fields using the given cpp Response
+        err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCContentLauncherClusterContentReplicationRequestCommand getObjCResponseFromCpp() failed"));
+    }
+    return objCResponse;
+}
+@end
+
+@implementation MCContentLauncherClusterPlayPresetCommand
+- (void)invoke:(id)request
+                 context:(void * _Nullable)context
+              completion:(void (^_Nonnull __strong)(void *, NSError *, id))completion
+    timedInvokeTimeoutMs:(NSNumber * _Nullable)timedInvokeTimeoutMs
+{
+    MCCommandTemplate<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> * mcCommand = new MCCommandTemplate<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type>(
+        self.cppCommand,
+        [self](id objCRequest) {
+            return [self getCppRequestFromObjC:objCRequest];
+        },
+        [self](std::any cppResponse) {
+            return [self getObjCResponseFromCpp:cppResponse];
+        });
+    mcCommand->invoke(
+        request, context, [mcCommand, completion](void * context, NSError * err, id response) {
+            completion(context, err, response);
+            delete mcCommand;
+        }, timedInvokeTimeoutMs);
+}
+
+- (std::any)getCppRequestFromObjC:(MCContentLauncherClusterPlayPresetParams *)objcRequest
+{
+    VerifyOrReturnValue(objcRequest != nil, nullptr);
+    std::any anyCppRequest = [objcRequest getCppRequestFromObjCRequest];
+    if (anyCppRequest.has_value()) {
+        try {
+            // Extract the object from std::any and convert it to a std::shared_ptr
+            auto & cppRequest = std::any_cast<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type &>(anyCppRequest);
+            return std::any(std::make_shared<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type>(cppRequest));
+        } catch (const std::bad_any_cast & e) {
+            return nullptr;
+        }
+    }
+    return nullptr;
+}
+
+- (id)getObjCResponseFromCpp:(std::any)cppResponse
+{
+    MCNullObjectType * objCResponse = nil;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (cppResponse.type() == typeid(std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type::ResponseType>)) {
+        objCResponse = [[MCNullObjectType
+            alloc] init];
+        // Set the ObjC response fields using the given cpp Response
+        err = [objCResponse setObjCResponseFromCppResponse:cppResponse];
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nil, ChipLogError(AppServer, "MCContentLauncherClusterPlayPresetCommand getObjCResponseFromCpp() failed"));
+    }
+    return objCResponse;
+}
+@end
+
 // ApplicationLauncher cluster:
 
 @implementation MCApplicationLauncherClusterLaunchAppCommand

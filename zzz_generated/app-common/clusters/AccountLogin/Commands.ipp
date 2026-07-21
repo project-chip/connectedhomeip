@@ -151,6 +151,76 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
     }
 }
 } // namespace Logout
+namespace GetDeviceAuthURI {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetDeviceAuthURI
+namespace GetDeviceAuthURIResponse {
+
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUserCode), userCode);
+    encoder.Encode(to_underlying(Fields::kVerificationURI), verificationURI);
+    encoder.Encode(to_underlying(Fields::kVerificationURIComplete), verificationURIComplete);
+    encoder.Encode(to_underlying(Fields::kExpiresIn), expiresIn);
+    encoder.Encode(to_underlying(Fields::kInterval), interval);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUserCode))
+        {
+            err = DataModel::Decode(reader, userCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kVerificationURI))
+        {
+            err = DataModel::Decode(reader, verificationURI);
+        }
+        else if (__context_tag == to_underlying(Fields::kVerificationURIComplete))
+        {
+            err = DataModel::Decode(reader, verificationURIComplete);
+        }
+        else if (__context_tag == to_underlying(Fields::kExpiresIn))
+        {
+            err = DataModel::Decode(reader, expiresIn);
+        }
+        else if (__context_tag == to_underlying(Fields::kInterval))
+        {
+            err = DataModel::Decode(reader, interval);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetDeviceAuthURIResponse
 } // namespace Commands
 } // namespace AccountLogin
 } // namespace Clusters

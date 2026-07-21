@@ -577,6 +577,18 @@
     return cppAttribute != nil ? [[MCMediaPlaybackClusterAvailableTextTracksAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
 }
 
+- (id)availableCommandsAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id);
+    return cppAttribute != nil ? [[MCMediaPlaybackClusterAvailableCommandsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)contentInfoAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id);
+    return cppAttribute != nil ? [[MCMediaPlaybackClusterContentInfoAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
 - (id)generatedCommandListAttribute
 {
     void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id);
@@ -671,6 +683,18 @@
     return cppCommand != nil ? [[MCContentLauncherClusterLaunchURLCommand alloc] initWithCppCommand:cppCommand] : nil;
 }
 
+- (id)contentReplicationRequestCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id);
+    return cppCommand != nil ? [[MCContentLauncherClusterContentReplicationRequestCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)playPresetCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id);
+    return cppCommand != nil ? [[MCContentLauncherClusterPlayPresetCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
 // ContentLauncher cluster attributes:
 
 - (id)acceptHeaderAttribute
@@ -683,6 +707,18 @@
 {
     void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     return cppAttribute != nil ? [[MCContentLauncherClusterSupportedStreamingProtocolsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)movableAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Movable::Id);
+    return cppAttribute != nil ? [[MCContentLauncherClusterMovableAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)presetsAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Presets::Id);
+    return cppAttribute != nil ? [[MCContentLauncherClusterPresetsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
 }
 
 - (id)generatedCommandListAttribute

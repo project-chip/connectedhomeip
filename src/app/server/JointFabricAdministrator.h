@@ -53,6 +53,17 @@ public:
 
     void SetVidVerificationForFabric(chip::FabricIndex fabricIndex) { mVidVerificationFabricIndex = fabricIndex; }
     void ClearVidVerificationForFabric() { mVidVerificationFabricIndex.reset(); }
+
+    /**
+     * Clear cached VID-verification state when its fabric is removed.
+     */
+    void OnFabricRemoved(chip::FabricIndex removedFabricIndex)
+    {
+        if (mVidVerificationFabricIndex.has_value() && (mVidVerificationFabricIndex.value() == removedFabricIndex))
+        {
+            mVidVerificationFabricIndex.reset();
+        }
+    }
     bool WasVidVerificationExecutedForFabric(chip::FabricIndex fabricIndex) const
     {
         return mVidVerificationFabricIndex.has_value() && (mVidVerificationFabricIndex.value() == fabricIndex);

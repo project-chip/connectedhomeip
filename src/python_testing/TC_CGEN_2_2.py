@@ -62,7 +62,7 @@ class TC_CGEN_2_2(MatterBaseTest):
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
-    default_failsafe = 1
+    default_failsafe = 20
     RUN_TEST_CI = "CI Test"
     RUN_TEST_CERT = "Cert Test"
 

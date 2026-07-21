@@ -61,6 +61,7 @@ SECTIONS
   {
     . = ALIGN(8);
     __StackLimit = .;
+    PROVIDE(__stack_limit = __StackLimit);
     KEEP(*(.stack*))
     . = ALIGN(4);
     __StackTop = .;

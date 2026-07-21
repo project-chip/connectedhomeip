@@ -14,9 +14,25 @@
 #   limitations under the License.
 #
 
-if SOC_FAMILY_NXP_RW
+if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
 
 rsource "../cmake/Kconfig.matter.nxp"
+
+# These options should be moved to a common application layer Kconfig file, which does not exist yet.
+# For now, they are added here to avoid dupplication in the different application Kconfig files.
+config CHIP_APP_IDENTIFY
+    bool "App Identify"
+    default y
+    help
+      Enable application common clusters implementation for the Identify cluster.
+      Registers the Identify Clusters only for CHIP_APP_IDENTIFY_ENDPOINT.
+      If needed, specific application code must register the cluster for the other endpoints.
+
+config CHIP_APP_IDENTIFY_ENDPOINT
+	int "Endpoint ID for Identify cluster"
+	default 1
+	help
+      Set the endpoint ID for the Identify cluster implementation.
 
 config CHIP_APP_OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
@@ -37,4 +53,4 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
 	endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
-endif # SOC_FAMILY_NXP_RW
+endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW

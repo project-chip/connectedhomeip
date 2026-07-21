@@ -71,7 +71,7 @@ public:
             WiFiPAFSession * pInInfo = reinterpret_cast<WiFiPAFSession *>(c);
             if ((elem->mWiFiPafLayer != nullptr) && (elem->mSessionInfo.id == pInInfo->id) &&
                 (elem->mSessionInfo.peer_id == pInInfo->peer_id) &&
-                !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, sizeof(uint8_t) * 6))
+                !memcmp(elem->mSessionInfo.peer_addr, pInInfo->peer_addr, kMACAddressLength))
             {
                 ChipLogProgress(WiFiPAF, "Find: Found WiFiPAFEndPoint[%zu]", i);
                 return elem;

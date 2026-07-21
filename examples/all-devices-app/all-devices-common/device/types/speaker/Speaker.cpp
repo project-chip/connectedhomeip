@@ -1,0 +1,113 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <device/types/speaker/Speaker.h>
+#include <devices/Types.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+using namespace chip::app::Clusters;
+
+namespace chip {
+namespace app {
+
+Speaker::Speaker(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate,
+                 TimerDelegate & timerDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSpeaker, 1)),
+    mLevelDelegate(levelDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(timerDelegate)
+{}
+
+CHIP_ERROR Speaker::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+{
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+
+    // Identify
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
+    // OnOff (Mute)
+    OnOffCluster::Context onOffContext{ mTimerDelegate };
+    onOffContext.defaults.onOff = true;
+
+    mOnOffCluster.Create(endpoint, onOffContext);
+    mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
+    ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
+
+    // Level Control (Volume)
+    LevelControlCluster::Config lcConfig(mTimerDelegate, mLevelDelegate);
+    lcConfig.WithOnOff(mOnOffCluster.Cluster());
+
+    // TODO: The following attributes/features are not required for a Speaker device type.
+    // Enable them here temporarily to fully test the LevelControl in CI.
+    // When we have a proper level light device type these can be removed.
+    lcConfig.WithInitialCurrentLevel(100);
+    lcConfig.WithOnOffTransitionTime(0);
+    lcConfig.WithOnTransitionTime(0);
+    lcConfig.WithOffTransitionTime(0);
+    lcConfig.WithLighting(DataModel::NullNullable);
+    lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
+
+    mLevelControlCluster.Create(endpoint, lcConfig);
+    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
+    ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
+
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
+}
+
+void Speaker::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    UnregisterDescriptor(provider);
+    if (mLevelControlCluster.IsConstructed())
+    {
+        if (mOnOffCluster.IsConstructed())
+        {
+            mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
+        }
+        LogErrorOnFailure(provider.RemoveCluster(&mLevelControlCluster.Cluster()));
+        mLevelControlCluster.Destroy();
+    }
+    if (mOnOffCluster.IsConstructed())
+    {
+        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
+        LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+        mOnOffCluster.Destroy();
+    }
+    if (mIdentifyCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+        mIdentifyCluster.Destroy();
+    }
+}
+
+Clusters::OnOffCluster & Speaker::OnOffCluster()
+{
+    VerifyOrDie(mOnOffCluster.IsConstructed());
+    return mOnOffCluster.Cluster();
+}
+
+Clusters::LevelControlCluster & Speaker::LevelControlCluster()
+{
+    VerifyOrDie(mLevelControlCluster.IsConstructed());
+    return mLevelControlCluster.Cluster();
+}
+
+} // namespace app
+} // namespace chip

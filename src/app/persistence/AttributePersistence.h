@@ -73,6 +73,27 @@ public:
         return success;
     }
 
+    /// Stores a native-endianness value of type `T` into the persistence provider.
+    /// On success, returns `CHIP_NO_ERROR`.
+    /// On failure, returns the error code.
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
+    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, const T & value)
+    {
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(T) });
+    }
+
+    /// Nullable
+    /// Stores a native-endianness value of type `T` into the persistence provider.
+    /// On success, returns `CHIP_NO_ERROR`.
+    /// On failure, returns the error code.
+    template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>> * = nullptr>
+    CHIP_ERROR StoreNativeEndianValue(const ConcreteAttributePath & path, const DataModel::Nullable<T> & value)
+    {
+        typename NumericAttributeTraits<T>::StorageType storageValue;
+        NullableToStorage(value, storageValue);
+        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+    }
+
     /// Performs all the steps of:
     ///   - decode the given raw data
     ///   - validate that the decoded value is different from the current one

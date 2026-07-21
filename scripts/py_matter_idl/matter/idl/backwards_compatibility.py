@@ -16,7 +16,8 @@ import dataclasses
 import enum
 import logging
 import sys
-from typing import Callable, Optional, Protocol, TypeVar
+from collections.abc import Callable
+from typing import Protocol, TypeVar
 
 import click
 import coloredlogs
@@ -100,7 +101,7 @@ class CompatibilityChecker:
         if a != b:
             self._mark_incompatible(f"{location} has field changes")
 
-    def _check_enum_compatible(self, cluster_name: str, original: Enum, updated: Optional[Enum]):
+    def _check_enum_compatible(self, cluster_name: str, original: Enum, updated: Enum | None):
         if not updated:
             self._mark_incompatible(
                 f"Enumeration {cluster_name}::{original.name} was deleted")
@@ -122,7 +123,7 @@ class CompatibilityChecker:
                 self._mark_incompatible(
                     f"Enumeration {cluster_name}::{original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
-    def _check_bitmap_compatible(self, cluster_name: str, original: Bitmap, updated: Optional[Bitmap]):
+    def _check_bitmap_compatible(self, cluster_name: str, original: Bitmap, updated: Bitmap | None):
         if not updated:
             self._mark_incompatible(
                 f"Bitmap {cluster_name}::{original.name} was deleted")
@@ -144,7 +145,7 @@ class CompatibilityChecker:
                 self._mark_incompatible(
                     f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
-    def _check_event_compatible(self, cluster_name: str, event: Event, updated_event: Optional[Event]):
+    def _check_event_compatible(self, cluster_name: str, event: Event, updated_event: Event | None):
         if not updated_event:
             self._mark_incompatible(
                 f"Event {cluster_name}::{event.name} was removed")
@@ -157,7 +158,7 @@ class CompatibilityChecker:
         self._check_field_lists_are_the_same(
             f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
 
-    def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Optional[Command]):
+    def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Command | None):
         log.debug("  Checking command '%s::%s'", cluster_name, command.name)
         if not updated_command:
             self._mark_incompatible(
@@ -180,7 +181,7 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Command {cluster_name}::{command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
-    def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Optional[Struct]):
+    def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Struct | None):
         log.debug("  Checking struct '%s'", original.name)
         if not updated:
             self._mark_incompatible(
@@ -202,7 +203,7 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Struct {cluster_name}::{original.name} has modified qualities")
 
-    def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Optional[Attribute]):
+    def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Attribute | None):
         log.debug("  Checking attribute '%s::%s'", cluster_name, original.definition.name)
         if not updated:
             self._mark_incompatible(
@@ -292,7 +293,7 @@ class CompatibilityChecker:
 
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
-    def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
+    def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Cluster | None):
         log.debug("Checking cluster '%s'", original_cluster.name)
         if not updated_cluster:
             self._mark_incompatible(

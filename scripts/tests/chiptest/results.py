@@ -23,7 +23,7 @@ import logging
 import threading
 import time
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from types import TracebackType
@@ -31,7 +31,6 @@ from typing import Any, TypeAlias
 
 from chiptest.concurrency.context import TerminableThread
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
-from chiptest.log_config import LogConfig
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +66,7 @@ class TestResult:
     """Summary of execution of a single test."""
 
     name: str
+    worker_id: int
     iteration: int
     status: TestStatus
     duration_seconds: float
@@ -81,47 +81,44 @@ class TestResult:
         self.status = TestStatus(self.status)
 
     @classmethod
-    def run_test(cls, name: str, iteration: int, dry_run: bool, log_config: LogConfig, test_func: Callable[[], None]) -> TestResult:
-        """Run a test and generate execution summary.
-
-        Mind that it catches any exception and saves it in the result. It's up to the caller to reraise the exception.
+    @contextlib.contextmanager
+    def measure_execution(cls, name: str, worker_id: int, iteration: int, dry_run: bool) -> Iterator[TestResult]:
         """
-        with log_config.fmt_context(task=name, level=log_config.level_tests):
-            log.info("%s", "Would run test" if dry_run else "Starting test")
+        Measure execution of a context and generate test result.
 
-            result = cls(name, iteration, TestStatus.FAILED, duration_seconds=0, exception=None)
-            test_start = test_end = time.monotonic()
+        Mind that it catches any exception and saves them in the result without reraising. It's up to the caller to reraise the
+        exception.
+        """
+        log.info("%s", "Would run test" if dry_run else "Starting test")
+        result = cls(name, worker_id, iteration, TestStatus.DRY_RUN if dry_run else TestStatus.PASSED, 0.0)
+        test_start = time.monotonic()
+        try:
             try:
-                test_func()
-                test_end = time.monotonic()
-                result.status = TestStatus.DRY_RUN if dry_run else TestStatus.PASSED
-            except BaseException as e:
-                test_end = time.monotonic()
-                result.exception = e
-
-                if isinstance(e, KeyboardInterrupt):
-                    result.status = TestStatus.CANCELLED
-                else:
-                    result.status = TestStatus.FAILED
-                    if (pcap_path := Path("thread.pcap")).exists():
-                        print("base64 -d - >thread.pcap <<EOF")
-                        print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
-                        print("EOF")
+                yield result
             finally:
-                result.duration_seconds = test_end - test_start
+                result.duration_seconds = time.monotonic() - test_start
+        except BaseException as e:
+            result.exception = e
 
-                symbol = result.status.symbol
-                match result.status:
-                    case TestStatus.PASSED:
-                        log.info("%s Completed in %0.2f seconds", symbol, result.duration_seconds)
-                    case TestStatus.CANCELLED:
-                        log.warning("%s Cancelled after %0.2f seconds", symbol, result.duration_seconds)
-                    case TestStatus.FAILED:
-                        assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
-                        log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
-                                  exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
+            if isinstance(e, KeyboardInterrupt):
+                result.status = TestStatus.CANCELLED
+            else:
+                result.status = TestStatus.FAILED
+                if (pcap_path := Path("thread.pcap")).exists():
+                    print("base64 -d - >thread.pcap <<EOF")
+                    print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
+                    print("EOF")
 
-            return result
+        symbol = result.status.symbol
+        match result.status:
+            case TestStatus.PASSED:
+                log.info("%s Completed in %0.2f seconds", symbol, result.duration_seconds)
+            case TestStatus.CANCELLED:
+                log.warning("%s Cancelled after %0.2f seconds", symbol, result.duration_seconds)
+            case TestStatus.FAILED:
+                assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
+                log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
+                          exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
 
 @dataclass
@@ -392,9 +389,6 @@ class ResultError(Exception):
     """Exception raised when processing results."""
 
 
-ResultQueueT: TypeAlias = CancellableQueue[TestResult]
-
-
 @dataclass(eq=False)
 class ResultProcessingThread(TerminableThread):
     """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
@@ -402,13 +396,11 @@ class ResultProcessingThread(TerminableThread):
     summary: RunSummary
     expected_failures: int
     keep_going: bool
-    summary_file: Path | None
+    result_queue: CancellableQueue[TestResult]
+    exception: BaseException | None = None
 
     def __post_init__(self) -> None:
         super().__init__(name="Results")
-
-        self.result_queue: ResultQueueT = CancellableQueue()
-        self.exception: BaseException | None = None
 
     def run(self) -> None:
         try:
@@ -420,6 +412,7 @@ class ResultProcessingThread(TerminableThread):
         except BaseException as e:
             self.exception = e
         finally:
+            self.result_queue.close()
             log.debug("Result processing thread finished")
 
     def _process_result(self, result: TestResult) -> None:
@@ -448,6 +441,11 @@ class ResultProcessingThread(TerminableThread):
             # Close the result queue to unblock the thread if it's waiting for results.
             self.result_queue.close()
 
+            if isinstance(self.exception, KeyboardInterrupt):
+                raise self.exception
+            if self.exception is not None:
+                raise ResultError("Result processing thread terminated with an exception") from self.exception
+
             if not self.resource_thread_join():
                 raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
         except Exception as e:
@@ -458,9 +456,3 @@ class ResultProcessingThread(TerminableThread):
             if not self.resource_thread_join():
                 raise RuntimeError(
                     "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
-        finally:
-            # We don't take the lock to ensure there is no deadlock in case of the thread being stuck on acquiring the lock. This
-            # may lead to incomplete or corrupted summary, but it's better than hanging indefinitely.
-            self.summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-            if self.summary_file is not None:
-                self.summary.write_json(self.summary_file)

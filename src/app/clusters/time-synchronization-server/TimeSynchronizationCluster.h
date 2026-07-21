@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
@@ -31,8 +32,6 @@
 
 #include <app/server/Server.h>
 
-// NOTE: this is part of AppConfig, so this has to be checked for AFTER the inclusion
-//       of that header
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/ReadClient.h>
 #endif

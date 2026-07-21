@@ -1691,6 +1691,10 @@ NS_ASSUME_NONNULL_BEGIN
         _playbackPreferences = nil;
 
         _useCurrentContext = nil;
+
+        _contentAppVendorID = nil;
+
+        _contentAppProductID = nil;
     }
     return self;
 }
@@ -1704,13 +1708,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.data = self.data;
     other.playbackPreferences = self.playbackPreferences;
     other.useCurrentContext = self.useCurrentContext;
+    other.contentAppVendorID = self.contentAppVendorID;
+    other.contentAppProductID = self.contentAppProductID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; playbackPreferences:%@; useCurrentContext:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data, _playbackPreferences, _useCurrentContext];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; playbackPreferences:%@; useCurrentContext:%@; contentAppVendorID:%@; contentAppProductID:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data, _playbackPreferences, _useCurrentContext, _contentAppVendorID, _contentAppProductID];
     return descriptionString;
 }
 
@@ -1868,6 +1874,28 @@ NS_ASSUME_NONNULL_BEGIN
             definedValue_0 = self.useCurrentContext.boolValue;
         }
     }
+    {
+        if (self.contentAppVendorID != nil) {
+            auto & definedValue_0 = cppStruct.contentAppVendorID.Emplace();
+            if (self.contentAppVendorID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.contentAppVendorID.unsignedShortValue;
+            }
+        }
+    }
+    {
+        if (self.contentAppProductID != nil) {
+            auto & definedValue_0 = cppStruct.contentAppProductID.Emplace();
+            if (self.contentAppProductID == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.contentAppProductID.unsignedShortValue;
+            }
+        }
+    }
 
     return std::any(cppStruct);
 }
@@ -1889,6 +1917,18 @@ NS_ASSUME_NONNULL_BEGIN
         _displayString = nil;
 
         _brandingInformation = nil;
+
+        _playbackPreferences = nil;
+
+        _contentType = nil;
+
+        _contentHeaders = nil;
+
+        _offsetMillisecs = nil;
+
+        _queueType = nil;
+
+        _nextUrl = nil;
     }
     return self;
 }
@@ -1900,13 +1940,19 @@ NS_ASSUME_NONNULL_BEGIN
     other.contentURL = self.contentURL;
     other.displayString = self.displayString;
     other.brandingInformation = self.brandingInformation;
+    other.playbackPreferences = self.playbackPreferences;
+    other.contentType = self.contentType;
+    other.contentHeaders = self.contentHeaders;
+    other.offsetMillisecs = self.offsetMillisecs;
+    other.queueType = self.queueType;
+    other.nextUrl = self.nextUrl;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; playbackPreferences:%@; contentType:%@; contentHeaders:%@; offsetMillisecs:%@; queueType:%@; nextUrl:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation, _playbackPreferences, _contentType, _contentHeaders, _offsetMillisecs, _queueType, _nextUrl];
     return descriptionString;
 }
 
@@ -2014,6 +2060,166 @@ NS_ASSUME_NONNULL_BEGIN
             }
         }
     }
+    {
+        if (self.playbackPreferences != nil) {
+            auto & definedValue_0 = cppStruct.playbackPreferences.Emplace();
+            definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+            definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+            if (self.playbackPreferences.textTrack.characteristics != nil) {
+                auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
+                {
+                    using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                    using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                    if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
+                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_4);
+                        for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
+                            if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
+                            listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
+                        }
+                        definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
+                    } else {
+                        definedValue_3 = ListType_4();
+                    }
+                }
+            }
+            definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+            if (self.playbackPreferences.audioTracks != nil) {
+                auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
+                {
+                    using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                    using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                    if (self.playbackPreferences.audioTracks.count != 0) {
+                        auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
+                        if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_3);
+                        for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
+                            if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_3 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
+                            listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
+                            if (element_3.characteristics != nil) {
+                                auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
+                                {
+                                    using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
+                                    using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
+                                    if (element_3.characteristics.count != 0) {
+                                        auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
+                                        if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        listFreer.add(listHolder_6);
+                                        for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
+                                            if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
+                                                // Wrong kind of value.
+                                                return CHIP_ERROR_INVALID_ARGUMENT;
+                                            }
+                                            auto element_6 = (NSNumber *) element_3.characteristics[i_6];
+                                            listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
+                                        }
+                                        definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
+                                    } else {
+                                        definedValue_5 = ListType_6();
+                                    }
+                                }
+                            }
+                            listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+                        }
+                        definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
+                    } else {
+                        definedValue_2 = ListType_3();
+                    }
+                }
+            }
+        }
+    }
+    {
+        if (self.contentType != nil) {
+            auto & definedValue_0 = cppStruct.contentType.Emplace();
+            if (self.contentType == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = AsCharSpan(self.contentType);
+            }
+        }
+    }
+    {
+        if (self.contentHeaders != nil) {
+            auto & definedValue_0 = cppStruct.contentHeaders.Emplace();
+            if (self.contentHeaders == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                {
+                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    if (self.contentHeaders.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.contentHeaders.count);
+                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listFreer.add(listHolder_2);
+                        for (size_t i_2 = 0; i_2 < self.contentHeaders.count; ++i_2) {
+                            if (![self.contentHeaders[i_2] isKindOfClass:[NSString class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_2 = (NSString *) self.contentHeaders[i_2];
+                            listHolder_2->mList[i_2] = AsCharSpan(element_2);
+                        }
+                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.contentHeaders.count);
+                    } else {
+                        nonNullValue_1 = ListType_2();
+                    }
+                }
+            }
+        }
+    }
+    {
+        if (self.offsetMillisecs != nil) {
+            auto & definedValue_0 = cppStruct.offsetMillisecs.Emplace();
+            if (self.offsetMillisecs == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.offsetMillisecs.unsignedIntValue;
+            }
+        }
+    }
+    {
+        if (self.queueType != nil) {
+            auto & definedValue_0 = cppStruct.queueType.Emplace();
+            if (self.queueType == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.queueType.unsignedCharValue);
+            }
+        }
+    }
+    {
+        if (self.nextUrl != nil) {
+            auto & definedValue_0 = cppStruct.nextUrl.Emplace();
+            if (self.nextUrl == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = AsCharSpan(self.nextUrl);
+            }
+        }
+    }
 
     return std::any(cppStruct);
 }
@@ -2078,6 +2284,256 @@ NS_ASSUME_NONNULL_BEGIN
             self.data = nil;
         }
     }
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCContentLauncherClusterContentReplicationRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCContentLauncherClusterContentReplicationRequestParams alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type cppStruct;
+    ListFreer listFreer;
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCContentLauncherClusterContentReplicationResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _replicationInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCContentLauncherClusterContentReplicationResponseParams alloc] init];
+
+    other.status = self.status;
+    other.replicationInfo = self.replicationInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; replicationInfo:%@; >", NSStringFromClass([self class]), _status, _replicationInfo];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    // Default implementation
+    return CHIP_NO_ERROR;
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppResponse
+{
+    std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType> responseSharedPtr = std::any_cast<std::shared_ptr<const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType>>(cppResponse);
+    const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType cppDecodableStruct = *responseSharedPtr;
+
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppDecodableStruct.status)];
+    }
+    {
+        if (cppDecodableStruct.replicationInfo.HasValue()) {
+            if (cppDecodableStruct.replicationInfo.Value().IsNull()) {
+                self.replicationInfo = nil;
+            } else {
+                self.replicationInfo = [MCContentLauncherClusterReplicationInfo new];
+                if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.HasValue()) {
+                    if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().IsNull()) {
+                        self.replicationInfo.launchUrlInfo = nil;
+                    } else {
+                        self.replicationInfo.launchUrlInfo = [MCContentLauncherClusterLaunchUrlInfo new];
+                        self.replicationInfo.launchUrlInfo.url = AsString(cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().url);
+                        if (self.replicationInfo.launchUrlInfo.url == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.data = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.data = AsString(cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().data.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.data == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.data = nil;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.contentType = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.contentType = AsString(cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentType.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.contentType == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.contentType = nil;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.contentHeaders = nil;
+                            } else {
+                                { // Scope for our temporary variables
+                                    auto * array_8 = [NSMutableArray new];
+                                    auto iter_8 = cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().contentHeaders.Value().Value().begin();
+                                    while (iter_8.Next()) {
+                                        auto & entry_8 = iter_8.GetValue();
+                                        NSString * newElement_8;
+                                        newElement_8 = AsString(entry_8);
+                                        if (newElement_8 == nil) {
+                                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                            return err;
+                                        }
+                                        [array_8 addObject:newElement_8];
+                                    }
+                                    CHIP_ERROR err = iter_8.GetStatus();
+                                    if (err != CHIP_NO_ERROR) {
+                                        return err;
+                                    }
+                                    self.replicationInfo.launchUrlInfo.contentHeaders = array_8;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.contentHeaders = nil;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.offsetMillisecs = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.offsetMillisecs = [NSNumber numberWithUnsignedInt:cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().offsetMillisecs.Value().Value()];
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.offsetMillisecs = nil;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.queueType = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.queueType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().queueType.Value().Value())];
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.queueType = nil;
+                        }
+                        if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.HasValue()) {
+                            if (cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.Value().IsNull()) {
+                                self.replicationInfo.launchUrlInfo.nextUrl = nil;
+                            } else {
+                                self.replicationInfo.launchUrlInfo.nextUrl = AsString(cppDecodableStruct.replicationInfo.Value().Value().launchUrlInfo.Value().Value().nextUrl.Value().Value());
+                                if (self.replicationInfo.launchUrlInfo.nextUrl == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    return err;
+                                }
+                            }
+                        } else {
+                            self.replicationInfo.launchUrlInfo.nextUrl = nil;
+                        }
+                    }
+                } else {
+                    self.replicationInfo.launchUrlInfo = nil;
+                }
+                if (cppDecodableStruct.replicationInfo.Value().Value().contentAppInfo.HasValue()) {
+                    if (cppDecodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().IsNull()) {
+                        self.replicationInfo.contentAppInfo = nil;
+                    } else {
+                        self.replicationInfo.contentAppInfo = [MCContentLauncherClusterContentAppInfo new];
+                        self.replicationInfo.contentAppInfo.contentAppVendorID = [NSNumber numberWithUnsignedShort:cppDecodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().contentAppVendorID];
+                        self.replicationInfo.contentAppInfo.contentAppProductID = [NSNumber numberWithUnsignedShort:cppDecodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().contentAppProductID];
+                        self.replicationInfo.contentAppInfo.data = AsString(cppDecodableStruct.replicationInfo.Value().Value().contentAppInfo.Value().Value().data);
+                        if (self.replicationInfo.contentAppInfo.data == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                    }
+                } else {
+                    self.replicationInfo.contentAppInfo = nil;
+                }
+            }
+        } else {
+            self.replicationInfo = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+
+@implementation MCContentLauncherClusterPlayPresetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MCContentLauncherClusterPlayPresetParams alloc] init];
+
+    other.presetID = self.presetID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; >", NSStringFromClass([self class]), _presetID];
+    return descriptionString;
+}
+
+- (std::any)getCppRequestFromObjCRequest
+{
+    chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type cppStruct;
+    ListFreer listFreer;
+    {
+        cppStruct.presetID = self.presetID.unsignedCharValue;
+    }
+
+    return std::any(cppStruct);
+}
+
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
+{
+    // Default implementation
     return CHIP_NO_ERROR;
 }
 @end

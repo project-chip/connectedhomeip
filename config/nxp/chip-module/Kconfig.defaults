@@ -18,7 +18,7 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
-if SOC_FAMILY_NXP_RW
+if SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW
 
 if CHIP
 
@@ -45,6 +45,10 @@ config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
 
 config CHIP_TASK_PRIORITY
 	default 5
+
+config CHIP_TASK_STACK_SIZE
+	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
+	default 10240
 
 config MAX_EVENT_QUEUE_SIZE
 	default 64
@@ -118,6 +122,9 @@ config LOG_BACKEND_UART
 config SHELL_LOG_BACKEND
 	default n
 
+config LOG_RUNTIME_DEFAULT_LEVEL
+	default 4 #debug
+
 endif # LOG_MODE_DEFERRED
 
 config LOG_BUFFER_SIZE
@@ -136,7 +143,7 @@ config LOG_DEFAULT_LEVEL
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
 
-endif
+endif # LOG
 
 config PRINTK_SYNC
 	default y
@@ -172,13 +179,11 @@ config MAIN_STACK_SIZE
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 6144 if NET_L2_OPENTHREAD
 	default 3072
-
-config CHIP_TASK_STACK_SIZE
-	int "Matter task stack size"
-	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
-	default 8192
-	help
-	  Set the stack size (in bytes) for the chip task (CHIP event loop).
+	  
+# AEAD ITS transform module encryption key provider
+choice SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER
+	default SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER_ENTRY_UID_HASH if SOC_SERIES_MCXW7XX
+endchoice
 
 config INIT_STACKS
 	default y
@@ -229,6 +234,9 @@ config NET_TC_TX_SKIP_FOR_HIGH_PRIO
 config NET_CONTEXT_PRIORITY
 	default y
 
+config NET_CONTEXT_RECV_PKTINFO
+	default y
+
 # Network buffers
 config NET_PKT_RX_COUNT
 	default 14
@@ -265,13 +273,46 @@ config OPENTHREAD_PING_SENDER
 config OPENTHREAD_SLAAC
 	default y
 
-# Increase number of message buffers in the buffer pool
+# Number of message buffers in the buffer pool
 config OPENTHREAD_NUM_MESSAGE_BUFFERS
+	default 30 if SOC_SERIES_MCXW7XX
 	default 256
 
 # Enable IPv6 fragmentation support
 config OPENTHREAD_IP6_FRAGM
 	default y
+
+# Enable CSL Receiver support
+config OPENTHREAD_CSL_RECEIVER
+	default y if SOC_SERIES_MCXW7XX
+
+# CSL receiver wake up margin in microseconds
+config OPENTHREAD_CSL_RECEIVE_TIME_AHEAD
+	default 2500 if SOC_SERIES_MCXW7XX
+
+# CSL transmitter request time ahead
+config OPENTHREAD_CSL_REQUEST_TIME_AHEAD
+	default 2500 if SOC_SERIES_MCXW7XX
+
+# Minimum receiving time before start of MHR
+config OPENTHREAD_MIN_RECEIVE_ON_AHEAD
+	default 320 if SOC_SERIES_MCXW7XX
+
+# Minimum receiving time after start of MHR
+config OPENTHREAD_MIN_RECEIVE_ON_AFTER
+	default 64 if SOC_SERIES_MCXW7XX
+
+# Software transmission security logic
+config OPENTHREAD_MAC_SOFTWARE_TX_SECURITY_ENABLE
+	default n if SOC_SERIES_MCXW7XX
+
+# Enable Domain Unicast Address feature
+config OPENTHREAD_DUA
+	default y if SOC_SERIES_MCXW7XX
+
+# Enable Multicast Listener Registration support
+config OPENTHREAD_MLR
+	default y if SOC_SERIES_MCXW7XX
 
 if OPENTHREAD_DEBUG
 
@@ -534,9 +575,11 @@ config LOG_PROCESS_THREAD_STACK_SIZE
 	default 1536
 
 config HEAP_MEM_POOL_SIZE
+	default 25600 if SOC_SERIES_MCXW7XX
 	default 122880
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
+	default 8192 if SOC_SERIES_MCXW7XX # 8 kB
 	default 28672 # 28 kB
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
@@ -544,7 +587,7 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2048 if CHIP_WIFI
 
 choice LIBC_IMPLEMENTATION
-	default NEWLIB_LIBC
+	default PICOLIBC
 endchoice
 
 if CHIP_ETHERNET
@@ -567,43 +610,37 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_ENTROPY_C
 	default y
 
-config MBEDTLS_ENTROPY_POLL_ZEPHYR
-	default y
-
 config MBEDTLS_SSL_MAX_CONTENT_LEN
+	default 768 if SOC_SERIES_MCXW7XX
 	default 8192
 
 config MBEDTLS_ENABLE_HEAP
 	default y
 
 config MBEDTLS_HEAP_SIZE
+	default 8192 if SOC_SERIES_MCXW7XX
 	default 15360
-
-config MBEDTLS_CIPHER_AES_ENABLED
-	default y
-
-config MBEDTLS_CIPHER_CCM_ENABLED
-	default y
 
 config MBEDTLS_CTR_DRBG_C
 	default y
 
-config MBEDTLS_CIPHER_MODE_CBC_ENABLED
+config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 	default y
-
-config MBEDTLS_ECP_C
-	default y
-
-config MBEDTLS_ECP_DP_SECP256R1_ENABLED
-	default y
-
-config MBEDTLS_HKDF_C
-    default y
 
 choice CHIP_CRYPTO
     default CHIP_CRYPTO_PSA
 
 endchoice
+
+if CHIP_CRYPTO_PSA
+
+config MBEDTLS_PSA_CRYPTO_STORAGE_C
+	default y
+
+config SECURE_STORAGE
+	default y
+
+endif # CHIP_CRYPTO_PSA
 
 config WIFI_NM_WPA_SUPPLICANT_CRYPTO_MBEDTLS_PSA
 	default y if WIFI_NM_WPA_SUPPLICANT && CHIP_CRYPTO_PSA
@@ -661,18 +698,10 @@ choice POSIX_AEP_CHOICE
 endchoice
 
 config CHIP_SE05X
-	bool "Enable SE05X secure element support"
 	select SE05X_LIB
 	select I2C
 	select PINCTRL
-	help
-		Enable support for NXP SE05X secure element.
-		The SE05X provides hardware-based cryptographic operations,
-		secure key storage, and device attestation capabilities.
-		When enabled, cryptographic operations (ECDSA, ECDH, etc.)
-		will be offloaded to the SE05X hardware instead of using
-		software implementations.
 
 endif # CHIP
 
-endif # SOC_FAMILY_NXP_RW
+endif # SOC_FAMILY_NXP_RW || SOC_FAMILY_MCXW

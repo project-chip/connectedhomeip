@@ -151,6 +151,47 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace MessageComplete
+namespace MessageNotPresented {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kMessageID        = 0,
+    kRemovedFromQueue = 1,
+    kFabricIndex      = 254,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MessageNotPresented::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    chip::ByteSpan messageID;
+    bool removedFromQueue         = static_cast<bool>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MessageNotPresented::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+
+    chip::ByteSpan messageID;
+    bool removedFromQueue         = static_cast<bool>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MessageNotPresented
 } // namespace Events
 } // namespace Messages
 } // namespace Clusters

@@ -23,7 +23,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/realtek/freertos/FactoryDataProvider.h>
 #if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
-#include "rtk/include/nsc_veneer_customize.h"
+#include "nsc_veneer_customize.h"
 #endif
 namespace chip {
 namespace DeviceLayer {

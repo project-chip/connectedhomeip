@@ -68,7 +68,7 @@ class FakeReset(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
     command_id: typing.ClassVar[int] = 0x00000000
     is_client: typing.ClassVar[bool] = True
-    response_type: typing.ClassVar[typing.Optional[str]] = None
+    response_type: typing.ClassVar[str | None] = None
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
@@ -85,7 +85,7 @@ class FakeModifyEnabledAlarms(ClusterCommand):
     cluster_id: typing.ClassVar[int] = 0x00000057
     command_id: typing.ClassVar[int] = 0x00000001
     is_client: typing.ClassVar[bool] = True
-    response_type: typing.ClassVar[typing.Optional[str]] = None
+    response_type: typing.ClassVar[str | None] = None
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:

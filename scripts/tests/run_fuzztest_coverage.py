@@ -23,7 +23,6 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from typing import Optional
 
 import click
 import coloredlogs  # type: ignore
@@ -45,9 +44,9 @@ class FuzzTestContext:
     fuzz_test_binary_name: str
     build_target_name: str
     is_coverage_instrumented: bool
-    selected_fuzz_test_case: Optional[str] = None
-    coverage_output_base_name: Optional[str] = None
-    run_mode: Optional[FuzzTestMode] = None
+    selected_fuzz_test_case: str | None = None
+    coverage_output_base_name: str | None = None
+    run_mode: FuzzTestMode | None = None
 
 
 FUZZTEST_TOOLCHAIN_MARKER_DIR = "chip_pw_fuzztest"

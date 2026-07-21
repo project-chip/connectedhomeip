@@ -19,7 +19,9 @@
 
 #include "silabs_utils.h"
 #include "SoftwareFaultReports.h"
+#include <FreeRTOS.h>
 #include <MatterConfig.h>
+#include <task.h>
 
 void appError(int err)
 {

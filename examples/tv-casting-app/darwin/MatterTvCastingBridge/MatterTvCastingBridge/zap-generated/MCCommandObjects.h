@@ -140,6 +140,12 @@
 @interface MCContentLauncherClusterLaunchURLCommand : MCCommand <MCContentLauncherClusterLaunchURLParams *, MCContentLauncherClusterLauncherResponseParams *>
 @end
 
+@interface MCContentLauncherClusterContentReplicationRequestCommand : MCCommand <MCContentLauncherClusterContentReplicationRequestParams *, MCContentLauncherClusterContentReplicationResponseParams *>
+@end
+
+@interface MCContentLauncherClusterPlayPresetCommand : MCCommand <MCContentLauncherClusterPlayPresetParams *, MCNullObjectType *>
+@end
+
 // ApplicationLauncher cluster:
 
 @interface MCApplicationLauncherClusterLaunchAppCommand : MCCommand <MCApplicationLauncherClusterLaunchAppParams *, MCApplicationLauncherClusterLauncherResponseParams *>

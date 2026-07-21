@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +16,11 @@
  *
  */
 
-#include "service-area-delegate.h"
-#include "service-area-server.h"
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Commands.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
-#include <app/InteractionModelEngine.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -44,95 +33,131 @@ namespace Clusters {
 namespace ServiceArea {
 
 // ****************************************************************************
-// Service Area Server Instance
+// Service Area Cluster
 
-Instance::Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId, BitMask<Feature> aFeature) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-    mStorageDelegate(storageDelegate), mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(Id), mFeature(aFeature)
+ServiceAreaCluster::ServiceAreaCluster(EndpointId endpointId, StorageDelegate & storageDelegate, Delegate & delegate,
+                                       BitMask<ServiceArea::Feature> feature, OptionalAttributeSet optionalAttributes) :
+    DefaultServerCluster({ endpointId, Id }),
+    mStorageDelegate(storageDelegate), mDelegate(delegate), mFeature(feature), mOptionalAttributes(optionalAttributes)
 {
-    ChipLogProgress(Zcl, "Service Area: Instance constructor");
-    mDelegate->SetInstance(this);
-}
-
-Instance::~Instance()
-{
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-CHIP_ERROR Instance::Init()
-{
-    ChipLogProgress(Zcl, "Service Area: INIT");
-
-    // Check if the cluster has been selected in zap
-    VerifyOrReturnError(emberAfContainsServer(mEndpointId, Id), CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "Service Area: The cluster with Id %lu was not enabled in zap.", long(Id)));
-
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(mStorageDelegate->Init());
-
-    return mDelegate->Init();
+    ChipLogProgress(Zcl, "Service Area: cluster constructor");
 }
 
 //*************************************************************************
 // core functions
 
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus ServiceAreaCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                AttributeValueEncoder & encoder)
 {
-    ChipLogDetail(Zcl, "Service Area: Reading attribute with ID " ChipLogFormatMEI, ChipLogValueMEI(aPath.mAttributeId));
+    ChipLogDetail(Zcl, "Service Area: Reading attribute with ID " ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
 
-    switch (aPath.mAttributeId)
+    using namespace ServiceArea::Attributes;
+    switch (request.path.mAttributeId)
     {
-
-    case Attributes::SupportedAreas::Id:
-        return ReadSupportedAreas(aEncoder);
-
-    case Attributes::SupportedMaps::Id:
-        return ReadSupportedMaps(aEncoder);
-
-    case Attributes::SelectedAreas::Id:
-        return ReadSelectedAreas(aEncoder);
-
-    case Attributes::CurrentArea::Id:
-        return aEncoder.Encode(GetCurrentArea());
-
-    case Attributes::EstimatedEndTime::Id:
-        return aEncoder.Encode(GetEstimatedEndTime());
-
-    case Attributes::Progress::Id:
-        return ReadProgress(aEncoder);
-
-    case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
-
+    case ClusterRevision::Id:
+        return encoder.Encode(ServiceArea::kRevision);
+    case SupportedAreas::Id:
+        return ReadSupportedAreas(encoder);
+    case SupportedMaps::Id:
+        return ReadSupportedMaps(encoder);
+    case SelectedAreas::Id:
+        return ReadSelectedAreas(encoder);
+    case CurrentArea::Id:
+        return encoder.Encode(GetCurrentArea());
+    case EstimatedEndTime::Id:
+        return encoder.Encode(GetEstimatedEndTime());
+    case Progress::Id:
+        return ReadProgress(encoder);
+    case FeatureMap::Id:
+        return encoder.Encode(static_cast<uint32_t>(mFeature.Raw()));
     default:
-        ChipLogProgress(Zcl, "Service Area: Unsupported attribute with ID " ChipLogFormatMEI, ChipLogValueMEI(aPath.mAttributeId));
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-
-    return CHIP_NO_ERROR;
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+std::optional<DataModel::ActionReturnStatus> ServiceAreaCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                               chip::TLV::TLVReader & input_arguments,
+                                                                               CommandHandler * handler)
 {
-    switch (handlerContext.mRequestPath.mCommandId)
+    using namespace ServiceArea::Commands;
+    switch (request.path.mCommandId)
     {
-    case Commands::SelectAreas::Id:
-        return CommandHandlerInterface::HandleCommand<Commands::SelectAreas::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSelectAreasCmd(ctx, req); });
-
-    case Commands::SkipArea::Id:
-        return CommandHandlerInterface::HandleCommand<Commands::SkipArea::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleSkipAreaCmd(ctx, req); });
+    case SelectAreas::Id: {
+        SelectAreas::DecodableType req;
+        ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+        return HandleSelectAreasCmd(request, req, handler);
     }
+    case SkipArea::Id: {
+        VerifyOrReturnValue(SupportsSkipArea(), Status::UnsupportedCommand);
+        SkipArea::DecodableType req;
+        ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
+        return HandleSkipAreaCmd(request, req, handler);
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+CHIP_ERROR ServiceAreaCluster::Attributes(const ConcreteClusterPath & path,
+                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const DataModel::AttributeEntry optionalAttrs[] = {
+        ServiceArea::Attributes::SupportedMaps::kMetadataEntry,
+        ServiceArea::Attributes::CurrentArea::kMetadataEntry,
+        ServiceArea::Attributes::EstimatedEndTime::kMetadataEntry,
+        ServiceArea::Attributes::Progress::kMetadataEntry,
+    };
+
+    OptionalAttributeSet enabledOptionalAttributes = mOptionalAttributes;
+    if (!mFeature.Has(Feature::kMaps))
+    {
+        enabledOptionalAttributes.template Set<ServiceArea::Attributes::SupportedMaps::Id>(false);
+    }
+    if (!mFeature.Has(Feature::kProgressReporting))
+    {
+        enabledOptionalAttributes.template Set<ServiceArea::Attributes::Progress::Id>(false);
+    }
+
+    return listBuilder.Append(Span(ServiceArea::Attributes::kMandatoryMetadata), Span(optionalAttrs), enabledOptionalAttributes);
+}
+
+bool ServiceAreaCluster::SupportsSkipArea() const
+{
+    if (mOptionalAttributes.IsSet(ServiceArea::Attributes::CurrentArea::Id))
+    {
+        return true;
+    }
+
+    return mFeature.Has(Feature::kProgressReporting) && mOptionalAttributes.IsSet(ServiceArea::Attributes::Progress::Id);
+}
+
+CHIP_ERROR ServiceAreaCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kSelectAreasCommand = ServiceArea::Commands::SelectAreas::kMetadataEntry;
+    static constexpr DataModel::AcceptedCommandEntry kSkipAreaCommand    = ServiceArea::Commands::SkipArea::kMetadataEntry;
+
+    if (SupportsSkipArea())
+    {
+        static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+            kSelectAreasCommand,
+            kSkipAreaCommand,
+        };
+        return builder.ReferenceExisting(Span(kCommands));
+    }
+
+    static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+        kSelectAreasCommand,
+    };
+    return builder.ReferenceExisting(Span(kCommands));
 }
 
 //*************************************************************************
 // attribute readers
 
-CHIP_ERROR Instance::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServiceAreaCluster::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
 {
     if (GetNumberOfSupportedAreas() == 0)
     {
@@ -151,7 +176,7 @@ CHIP_ERROR Instance::ReadSupportedAreas(AttributeValueEncoder & aEncoder)
     });
 }
 
-CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServiceAreaCluster::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
 {
     if (GetNumberOfSupportedMaps() == 0)
     {
@@ -170,7 +195,7 @@ CHIP_ERROR Instance::ReadSupportedMaps(AttributeValueEncoder & aEncoder)
     });
 }
 
-CHIP_ERROR Instance::ReadSelectedAreas(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServiceAreaCluster::ReadSelectedAreas(AttributeValueEncoder & aEncoder)
 {
     if (GetNumberOfSelectedAreas() == 0)
     {
@@ -189,7 +214,7 @@ CHIP_ERROR Instance::ReadSelectedAreas(AttributeValueEncoder & aEncoder)
     });
 }
 
-CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ServiceAreaCluster::ReadProgress(AttributeValueEncoder & aEncoder)
 {
     if (GetNumberOfProgressElements() == 0)
     {
@@ -211,17 +236,21 @@ CHIP_ERROR Instance::ReadProgress(AttributeValueEncoder & aEncoder)
 //*************************************************************************
 // command handlers
 
-void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::SelectAreas::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+ServiceAreaCluster::HandleSelectAreasCmd(const DataModel::InvokeRequest & request, const Commands::SelectAreas::DecodableType & req,
+                                         CommandHandler * handler)
 {
     ChipLogDetail(Zcl, "Service Area: HandleSelectAreasCmd");
 
     // On receipt of this command the device SHALL respond with a SelectAreasResponse command.
-    auto exitResponse = [ctx](SelectAreasStatus status, CharSpan statusText) {
+    auto exitResponse = [&request, handler](SelectAreasStatus status,
+                                            CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
         Commands::SelectAreasResponse::Type response{
             .status     = status,
             .statusText = statusText,
         };
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
     };
 
     size_t numberOfAreas = 0;
@@ -229,16 +258,14 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     {
         if (CHIP_NO_ERROR != req.newAreas.ComputeSize(&numberOfAreas))
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
+            return Status::InvalidCommand;
         }
 
         // If the device determines that it can't operate at all locations from the list,
         // the SelectAreasResponse command's Status field SHALL indicate InvalidSet.
         if (numberOfAreas > kMaxNumSelectedAreas)
         {
-            exitResponse(SelectAreasStatus::kInvalidSet, "invalid number of locations"_span);
-            return;
+            return exitResponse(SelectAreasStatus::kInvalidSet, "invalid number of locations"_span);
         }
     }
 
@@ -279,10 +306,9 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
 
             // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
             // If the Status field is set to UnsupportedArea, the StatusText field SHALL be an empty string.
-            if (!mStorageDelegate->IsSupportedArea(selectedArea))
+            if (!mStorageDelegate.IsSupportedArea(selectedArea))
             {
-                exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
-                return;
+                return exitResponse(SelectAreasStatus::kUnsupportedArea, ""_span);
             }
 
             // check to see if parameter list and attribute still match
@@ -301,8 +327,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         // after iterating with Next through DecodableType - check for failure
         if (CHIP_NO_ERROR != iAreaIter.GetStatus())
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
+            return Status::InvalidCommand;
         }
     }
 
@@ -313,8 +338,7 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // the StatusText field MAY be supplied with a human-readable string or include an empty string.
     if (matchesCurrentSelectedAreas)
     {
-        exitResponse(SelectAreasStatus::kSuccess, ""_span);
-        return;
+        return exitResponse(SelectAreasStatus::kSuccess, ""_span);
     }
 
     char delegateStatusBuffer[kMaxSizeStatusText];
@@ -325,10 +349,9 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // if the Status field is set to InvalidInMode, the StatusText field SHOULD indicate why the request is not allowed,
     // given the current mode of the device, which may involve other clusters.
     // (note - locationStatusText to be filled out by delegated function for if return value is false)
-    if (!mDelegate->IsSetSelectedAreasAllowed(delegateStatusText))
+    if (!mDelegate.IsSetSelectedAreasAllowed(delegateStatusText))
     {
-        exitResponse(SelectAreasStatus::kInvalidInMode, delegateStatusText);
-        return;
+        return exitResponse(SelectAreasStatus::kInvalidInMode, delegateStatusText);
     }
 
     // Reset in case the delegate accidentally modified this string.
@@ -337,10 +360,9 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
     // ask the device to handle SelectAreas Command
     // (note - locationStatusText to be filled out by delegated function for kInvalidInMode and InvalidSet)
     auto locationStatus = SelectAreasStatus::kSuccess;
-    if (!mDelegate->IsValidSelectAreasSet(selectedAreasSpan, locationStatus, delegateStatusText))
+    if (!mDelegate.IsValidSelectAreasSet(selectedAreasSpan, locationStatus, delegateStatusText))
     {
-        exitResponse(locationStatus, delegateStatusText);
-        return;
+        return exitResponse(locationStatus, delegateStatusText);
     }
 
     {
@@ -348,50 +370,52 @@ void Instance::HandleSelectAreasCmd(HandlerContext & ctx, const Commands::Select
         // indicated by the entries of the newArea field, when requested to operate,
         // the SelectAreasResponse command SHALL have the Status field set to Success,
         // and the SelectedAreas attribute SHALL be set to the value of the newAreas field.
-        mStorageDelegate->ClearSelectedAreasRaw();
+        mStorageDelegate.ClearSelectedAreasRaw();
 
         if (numberOfAreas != 0)
         {
             uint32_t ignored;
             for (uint32_t areaId : selectedAreasSpan)
             {
-                mStorageDelegate->AddSelectedAreaRaw(areaId, ignored);
+                mStorageDelegate.AddSelectedAreaRaw(areaId, ignored);
             }
         }
 
         NotifySelectedAreasChanged();
     }
 
-    exitResponse(SelectAreasStatus::kSuccess, ""_span);
+    return exitResponse(SelectAreasStatus::kSuccess, ""_span);
 }
 
-void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus> ServiceAreaCluster::HandleSkipAreaCmd(const DataModel::InvokeRequest & request,
+                                                                                   const Commands::SkipArea::DecodableType & req,
+                                                                                   CommandHandler * handler)
 {
     ChipLogDetail(Zcl, "Service Area: HandleSkipArea");
 
     // On receipt of this command the device SHALL respond with a SkipAreaResponse command.
-    auto exitResponse = [ctx](SkipAreaStatus status, CharSpan statusText) {
+    auto exitResponse = [&request, handler](SkipAreaStatus status,
+                                            CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
         Commands::SkipAreaResponse::Type response{
             .status     = status,
             .statusText = statusText,
         };
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
     };
 
     // If the SelectedAreas attribute is empty, the SkipAreaResponse command’s Status field SHALL indicate InvalidAreaList.
     if (GetNumberOfSelectedAreas() == 0)
     {
-        exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
-        return;
+        return exitResponse(SkipAreaStatus::kInvalidAreaList, ""_span);
     }
 
     // If the SkippedArea field does not match an entry in the SupportedAreas attribute, the SkipAreaResponse command’s Status field
     // SHALL indicate InvalidSkippedArea.
-    if (!mStorageDelegate->IsSupportedArea(req.skippedArea))
+    if (!mStorageDelegate.IsSupportedArea(req.skippedArea))
     {
         ChipLogError(Zcl, "SkippedArea (%" PRIu32 ") is not in the SupportedAreas attribute.", req.skippedArea);
-        exitResponse(SkipAreaStatus::kInvalidSkippedArea, ""_span);
-        return;
+        return exitResponse(SkipAreaStatus::kInvalidSkippedArea, ""_span);
     }
 
     // have the device attempt to skip
@@ -401,52 +425,51 @@ void Instance::HandleSkipAreaCmd(HandlerContext & ctx, const Commands::SkipArea:
     char skipStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan skipStatusText(skipStatusBuffer);
 
-    if (!mDelegate->HandleSkipArea(req.skippedArea, skipStatusText))
+    if (!mDelegate.HandleSkipArea(req.skippedArea, skipStatusText))
     {
-        exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
-        return;
+        return exitResponse(SkipAreaStatus::kInvalidInMode, skipStatusText);
     }
 
-    exitResponse(SkipAreaStatus::kSuccess, ""_span);
+    return exitResponse(SkipAreaStatus::kSuccess, ""_span);
 }
 
 //*************************************************************************
 // attribute notifications
 
-void Instance::NotifySupportedAreasChanged()
+void ServiceAreaCluster::NotifySupportedAreasChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::SupportedAreas::Id);
+    NotifyAttributeChanged(Attributes::SupportedAreas::Id);
 }
 
-void Instance::NotifySupportedMapsChanged()
+void ServiceAreaCluster::NotifySupportedMapsChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::SupportedMaps::Id);
+    NotifyAttributeChanged(Attributes::SupportedMaps::Id);
 }
 
-void Instance::NotifySelectedAreasChanged()
+void ServiceAreaCluster::NotifySelectedAreasChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::SelectedAreas::Id);
+    NotifyAttributeChanged(Attributes::SelectedAreas::Id);
 }
 
-void Instance::NotifyCurrentAreaChanged()
+void ServiceAreaCluster::NotifyCurrentAreaChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentArea::Id);
+    NotifyAttributeChanged(Attributes::CurrentArea::Id);
 }
 
-void Instance::NotifyEstimatedEndTimeChanged()
+void ServiceAreaCluster::NotifyEstimatedEndTimeChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::EstimatedEndTime::Id);
+    NotifyAttributeChanged(Attributes::EstimatedEndTime::Id);
 }
 
-void Instance::NotifyProgressChanged()
+void ServiceAreaCluster::NotifyProgressChanged()
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Progress::Id);
+    NotifyAttributeChanged(Attributes::Progress::Id);
 }
 
 // ****************************************************************************
 //  Supported Areas manipulators
 
-bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
+bool ServiceAreaCluster::IsValidSupportedArea(const AreaStructureWrapper & aArea)
 {
     // If the LocationInfo field is null, the LandmarkInfo field SHALL NOT be null.
     // If the LandmarkInfo field is null, the LocationInfo field SHALL NOT be null.
@@ -481,7 +504,7 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
         }
 
         // If the SupportedMaps attribute is not null, mapID SHALL be the ID of an entry from the SupportedMaps attribute.
-        if (!mStorageDelegate->IsSupportedMap(aArea.mapID.Value()))
+        if (!mStorageDelegate.IsSupportedMap(aArea.mapID.Value()))
         {
             ChipLogError(Zcl, "IsValidSupportedArea %" PRIu32 " - map Id %" PRIu32 " is not in supported map list", aArea.areaID,
                          aArea.mapID.Value());
@@ -501,27 +524,27 @@ bool Instance::IsValidSupportedArea(const AreaStructureWrapper & aArea)
     return true;
 }
 
-bool Instance::IsUniqueSupportedArea(const AreaStructureWrapper & aArea, bool ignoreAreaId)
+bool ServiceAreaCluster::IsUniqueSupportedArea(const AreaStructureWrapper & aArea, bool ignoreAreaId)
 {
-    BitMask<AreaStructureWrapper::IsEqualConfig> config;
-
-    if (ignoreAreaId)
-    {
-        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreAreaID);
-    }
-
-    // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the
-    // MapID and LocationInfo fields. If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for
-    // the LocationInfo field.
-    if (GetNumberOfSupportedMaps() == 0)
-    {
-        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreMapId);
-    }
-
-    uint8_t locationIndex = 0;
+    uint32_t locationIndex = 0;
     AreaStructureWrapper entry;
     while (GetSupportedAreaByIndex(locationIndex++, entry))
     {
+        if (!ignoreAreaId && (aArea.areaID == entry.areaID))
+        {
+            return false;
+        }
+
+        // If the SupportedMaps attribute is not empty, each entry in this list SHALL have a unique value for the combination of
+        // the MapID and AreaInfo fields. If the SupportedMaps attribute is empty, each entry in this list SHALL have a unique
+        // value for the AreaInfo field.
+        BitMask<AreaStructureWrapper::IsEqualConfig> config;
+        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreAreaID);
+        if (GetNumberOfSupportedMaps() == 0)
+        {
+            config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreMapId);
+        }
+
         if (aArea.IsEqual(entry, config))
         {
             return false;
@@ -531,7 +554,7 @@ bool Instance::IsUniqueSupportedArea(const AreaStructureWrapper & aArea, bool ig
     return true;
 }
 
-bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
+bool ServiceAreaCluster::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
 {
     if (mEstimatedEndTime == aEstimatedEndTime)
     {
@@ -539,7 +562,7 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     }
 
     // The value of this attribute SHALL only be reported in the following cases:
-    // - when it changes from null.
+    // - when it changes to or from null.
     if (mEstimatedEndTime.IsNull())
     {
         return true;
@@ -551,9 +574,10 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
         return true;
     }
 
+    // - when it changes to null
     if (aEstimatedEndTime.IsNull())
     {
-        return false;
+        return true;
     }
 
     // From this point we know that mEstimatedEndTime and aEstimatedEndTime are not null and not the same.
@@ -568,7 +592,7 @@ bool Instance::ReportEstimatedEndTimeChange(const DataModel::Nullable<uint32_t> 
     return (aEstimatedEndTime.Value() < mEstimatedEndTime.Value());
 }
 
-void Instance::HandleSupportedAreasUpdated()
+void ServiceAreaCluster::HandleSupportedAreasUpdated()
 {
     // If there are no more Supported Areas, clear all selected areas, current area, and progress.
     if (GetNumberOfSupportedAreas() == 0)
@@ -589,7 +613,7 @@ void Instance::HandleSupportedAreasUpdated()
 
         while (GetSelectedAreaByIndex(i, areaId))
         {
-            if (!mStorageDelegate->IsSupportedArea(areaId))
+            if (!mStorageDelegate.IsSupportedArea(areaId))
             {
                 areasToRemoveSpan[areasToRemoveIndex] = areaId;
                 areasToRemoveIndex++;
@@ -610,7 +634,7 @@ void Instance::HandleSupportedAreasUpdated()
     // Set current Area to null if current area is not in the supported areas attribute.
     {
         auto currentAreaId = GetCurrentArea();
-        if (!currentAreaId.IsNull() && !mStorageDelegate->IsSupportedArea(currentAreaId.Value()))
+        if (!currentAreaId.IsNull() && !mStorageDelegate.IsSupportedArea(currentAreaId.Value()))
         {
             SetCurrentArea(DataModel::NullNullable);
         }
@@ -624,9 +648,9 @@ void Instance::HandleSupportedAreasUpdated()
         uint32_t progressToRemoveBuffer[kMaxNumProgressElements];
         Span<uint32_t> progressToRemoveSpan(progressToRemoveBuffer);
 
-        while (mStorageDelegate->GetProgressElementByIndex(i, tempProgressElement))
+        while (mStorageDelegate.GetProgressElementByIndex(i, tempProgressElement))
         {
-            if (mStorageDelegate->IsSupportedArea(tempProgressElement.areaID))
+            if (!mStorageDelegate.IsSupportedArea(tempProgressElement.areaID))
             {
                 progressToRemoveSpan[progressToRemoveIndex] = tempProgressElement.areaID;
                 progressToRemoveIndex++;
@@ -637,7 +661,7 @@ void Instance::HandleSupportedAreasUpdated()
 
         for (auto areaId : progressToRemoveSpan)
         {
-            if (!mStorageDelegate->RemoveProgressElementRaw(areaId))
+            if (!mStorageDelegate.RemoveProgressElementRaw(areaId))
             {
                 ChipLogError(Zcl, "HandleSupportedAreasUpdated: Failed to remove progress element with area ID %" PRIu32 "",
                              areaId);
@@ -646,25 +670,25 @@ void Instance::HandleSupportedAreasUpdated()
     }
 }
 
-uint32_t Instance::GetNumberOfSupportedAreas()
+uint32_t ServiceAreaCluster::GetNumberOfSupportedAreas()
 {
-    return mStorageDelegate->GetNumberOfSupportedAreas();
+    return mStorageDelegate.GetNumberOfSupportedAreas();
 }
 
-bool Instance::GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea)
+bool ServiceAreaCluster::GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    return mStorageDelegate->GetSupportedAreaByIndex(listIndex, aSupportedArea);
+    return mStorageDelegate.GetSupportedAreaByIndex(listIndex, aSupportedArea);
 }
 
-bool Instance::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
+bool ServiceAreaCluster::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    return mStorageDelegate->GetSupportedAreaById(aAreaId, listIndex, aSupportedArea);
+    return mStorageDelegate.GetSupportedAreaById(aAreaId, listIndex, aSupportedArea);
 }
 
-bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
+bool ServiceAreaCluster::AddSupportedArea(AreaStructureWrapper & aNewArea)
 {
     // Does device mode allow this attribute to be updated?
-    if (!mDelegate->IsSupportedAreasChangeAllowed())
+    if (!mDelegate.IsSupportedAreasChangeAllowed())
     {
         return false;
     }
@@ -695,7 +719,7 @@ bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
 
     // Add the SupportedArea to the SupportedAreas attribute.
     uint32_t ignoredIndex;
-    if (!mStorageDelegate->AddSupportedAreaRaw(aNewArea, ignoredIndex))
+    if (!mStorageDelegate.AddSupportedAreaRaw(aNewArea, ignoredIndex))
     {
         return false;
     }
@@ -704,7 +728,7 @@ bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
     return true;
 }
 
-bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
+bool ServiceAreaCluster::ModifySupportedArea(AreaStructureWrapper & aNewArea)
 {
     bool mapIDChanged = false;
     uint32_t listIndex;
@@ -723,7 +747,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
             (!aNewArea.mapID.IsNull() && !supportedArea.mapID.IsNull() && (aNewArea.mapID.Value() != supportedArea.mapID.Value())))
         {
             // does device mode allow this attribute to be updated?
-            if (!mDelegate->IsSupportedAreasChangeAllowed())
+            if (!mDelegate.IsSupportedAreasChangeAllowed())
             {
                 return false;
             }
@@ -746,7 +770,7 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
         }
 
         // Replace the supported location with the modified location.
-        if (!mStorageDelegate->ModifySupportedAreaRaw(listIndex, aNewArea))
+        if (!mStorageDelegate.ModifySupportedAreaRaw(listIndex, aNewArea))
         {
             return false;
         }
@@ -761,15 +785,15 @@ bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
     return true;
 }
 
-bool Instance::ClearSupportedAreas()
+bool ServiceAreaCluster::ClearSupportedAreas()
 {
     // does device mode allow this attribute to be updated?
-    if (!mDelegate->IsSupportedAreasChangeAllowed())
+    if (!mDelegate.IsSupportedAreasChangeAllowed())
     {
         return false;
     }
 
-    if (mStorageDelegate->ClearSupportedAreasRaw())
+    if (mStorageDelegate.ClearSupportedAreasRaw())
     {
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -779,9 +803,9 @@ bool Instance::ClearSupportedAreas()
     return false;
 }
 
-bool Instance::RemoveSupportedArea(uint32_t areaId)
+bool ServiceAreaCluster::RemoveSupportedArea(uint32_t areaId)
 {
-    if (mStorageDelegate->RemoveSupportedAreaRaw(areaId))
+    if (mStorageDelegate.RemoveSupportedAreaRaw(areaId))
     {
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -793,22 +817,22 @@ bool Instance::RemoveSupportedArea(uint32_t areaId)
 //*************************************************************************
 // Supported Maps manipulators
 
-uint32_t Instance::GetNumberOfSupportedMaps()
+uint32_t ServiceAreaCluster::GetNumberOfSupportedMaps()
 {
-    return mStorageDelegate->GetNumberOfSupportedMaps();
+    return mStorageDelegate.GetNumberOfSupportedMaps();
 }
 
-bool Instance::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
+bool ServiceAreaCluster::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    return mStorageDelegate->GetSupportedMapByIndex(listIndex, aSupportedMap);
+    return mStorageDelegate.GetSupportedMapByIndex(listIndex, aSupportedMap);
 }
 
-bool Instance::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
+bool ServiceAreaCluster::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
-    return mStorageDelegate->GetSupportedMapById(aMapId, listIndex, aSupportedMap);
+    return mStorageDelegate.GetSupportedMapById(aMapId, listIndex, aSupportedMap);
 }
 
-bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
+bool ServiceAreaCluster::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
 {
     // check max# of list entries
     if (GetNumberOfSupportedMaps() >= kMaxNumSupportedMaps)
@@ -850,7 +874,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // add to supported maps attribute
         MapStructureWrapper newMap(aMapId, aMapName);
         uint32_t ignoredIndex;
-        if (!mStorageDelegate->AddSupportedMapRaw(newMap, ignoredIndex))
+        if (!mStorageDelegate.AddSupportedMapRaw(newMap, ignoredIndex))
         {
             return false;
         }
@@ -861,7 +885,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
     return true;
 }
 
-bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
+bool ServiceAreaCluster::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 {
     uint32_t modifiedIndex;
     MapStructureWrapper modifiedMap;
@@ -889,12 +913,7 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
     while (GetSupportedMapByIndex(loopIndex, entry))
     {
-        if (modifiedIndex == loopIndex)
-        {
-            continue; // don't check local modified map against its own list entry
-        }
-
-        if (entry.IsNameEqual(newMapName))
+        if (modifiedIndex != loopIndex && entry.IsNameEqual(newMapName))
         {
             ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
                          NullTerminated(entry.GetName()).c_str());
@@ -904,7 +923,7 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
         ++loopIndex;
     }
 
-    if (!mStorageDelegate->ModifySupportedMapRaw(modifiedIndex, modifiedMap))
+    if (!mStorageDelegate.ModifySupportedMapRaw(modifiedIndex, modifiedMap))
     {
         return false;
     }
@@ -914,15 +933,15 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
     return true;
 }
 
-bool Instance::ClearSupportedMaps()
+bool ServiceAreaCluster::ClearSupportedMaps()
 {
     // does device mode allow this attribute to be updated?
-    if (!mDelegate->IsSupportedMapChangeAllowed())
+    if (!mDelegate.IsSupportedMapChangeAllowed())
     {
         return false;
     }
 
-    if (mStorageDelegate->ClearSupportedMapsRaw())
+    if (mStorageDelegate.ClearSupportedMapsRaw())
     {
         ClearSupportedAreas();
         NotifySupportedMapsChanged();
@@ -932,9 +951,9 @@ bool Instance::ClearSupportedMaps()
     return false;
 }
 
-bool Instance::RemoveSupportedMap(uint32_t mapId)
+bool ServiceAreaCluster::RemoveSupportedMap(uint32_t mapId)
 {
-    if (!mStorageDelegate->RemoveSupportedMapRaw(mapId))
+    if (!mStorageDelegate.RemoveSupportedMapRaw(mapId))
     {
         return false;
     }
@@ -955,11 +974,11 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
         uint32_t supportedAreaIdsSize = 0;
         uint32_t supportedAreasIndex  = 0;
         AreaStructureWrapper tempSupportedArea;
-        while (mStorageDelegate->GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
+        while (mStorageDelegate.GetSupportedAreaByIndex(supportedAreasIndex, tempSupportedArea))
         {
             if (tempSupportedArea.mapID == mapId)
             {
-                supportedAreaIdsSpan[supportedAreasIndex] = tempSupportedArea.areaID;
+                supportedAreaIdsSpan[supportedAreaIdsSize] = tempSupportedArea.areaID;
                 supportedAreaIdsSize++;
             }
             supportedAreasIndex++;
@@ -972,7 +991,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
     {
         for (uint32_t supportedAreaId : supportedAreaIdsSpan)
         {
-            mStorageDelegate->RemoveSupportedAreaRaw(supportedAreaId);
+            mStorageDelegate.RemoveSupportedAreaRaw(supportedAreaId);
         }
         HandleSupportedAreasUpdated();
         NotifySupportedAreasChanged();
@@ -984,17 +1003,17 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
 //*************************************************************************
 // Selected Areas manipulators
 
-uint32_t Instance::GetNumberOfSelectedAreas()
+uint32_t ServiceAreaCluster::GetNumberOfSelectedAreas()
 {
-    return mStorageDelegate->GetNumberOfSelectedAreas();
+    return mStorageDelegate.GetNumberOfSelectedAreas();
 }
 
-bool Instance::GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea)
+bool ServiceAreaCluster::GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea)
 {
-    return mStorageDelegate->GetSelectedAreaByIndex(listIndex, selectedArea);
+    return mStorageDelegate.GetSelectedAreaByIndex(listIndex, selectedArea);
 }
 
-bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
+bool ServiceAreaCluster::AddSelectedArea(uint32_t & aSelectedArea)
 {
     // check max# of list entries
     if (GetNumberOfSelectedAreas() >= kMaxNumSelectedAreas)
@@ -1004,14 +1023,14 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
     }
 
     // each item in this list SHALL match the AreaID field of an entry on the SupportedAreas attribute's list
-    if (!mStorageDelegate->IsSupportedArea(aSelectedArea))
+    if (!mStorageDelegate.IsSupportedArea(aSelectedArea))
     {
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - not a supported location", aSelectedArea);
         return false;
     }
 
     // each entry in this list SHALL have a unique value
-    if (mStorageDelegate->IsSelectedArea(aSelectedArea))
+    if (mStorageDelegate.IsSelectedArea(aSelectedArea))
     {
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - duplicated location", aSelectedArea);
         return false;
@@ -1021,19 +1040,19 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
     char locationStatusBuffer[kMaxSizeStatusText];
     MutableCharSpan locationStatusText(locationStatusBuffer);
 
-    if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
+    if (!mDelegate.IsSetSelectedAreasAllowed(locationStatusText))
     {
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, NullTerminated(locationStatusText).c_str());
         return false;
     }
 
     uint32_t ignoredIndex;
-    return mStorageDelegate->AddSelectedAreaRaw(aSelectedArea, ignoredIndex);
+    return mStorageDelegate.AddSelectedAreaRaw(aSelectedArea, ignoredIndex);
 }
 
-bool Instance::ClearSelectedAreas()
+bool ServiceAreaCluster::ClearSelectedAreas()
 {
-    if (mStorageDelegate->ClearSelectedAreasRaw())
+    if (mStorageDelegate.ClearSelectedAreasRaw())
     {
         NotifySelectedAreasChanged();
         return true;
@@ -1042,9 +1061,9 @@ bool Instance::ClearSelectedAreas()
     return false;
 }
 
-bool Instance::RemoveSelectedAreas(uint32_t areaId)
+bool ServiceAreaCluster::RemoveSelectedAreas(uint32_t areaId)
 {
-    if (mStorageDelegate->RemoveSelectedAreasRaw(areaId))
+    if (mStorageDelegate.RemoveSelectedAreasRaw(areaId))
     {
         NotifySelectedAreasChanged();
         return true;
@@ -1056,16 +1075,16 @@ bool Instance::RemoveSelectedAreas(uint32_t areaId)
 //*************************************************************************
 // Current Area manipulators
 
-DataModel::Nullable<uint32_t> Instance::GetCurrentArea()
+DataModel::Nullable<uint32_t> ServiceAreaCluster::GetCurrentArea()
 {
     return mCurrentArea;
 }
 
-bool Instance::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea)
+bool ServiceAreaCluster::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea)
 {
     // If not null, the value of this attribute SHALL match the AreaID field of an entry on the SupportedAreas attribute's
     // list.
-    if ((!aCurrentArea.IsNull()) && (!mStorageDelegate->IsSupportedArea(aCurrentArea.Value())))
+    if ((!aCurrentArea.IsNull()) && (!mStorageDelegate.IsSupportedArea(aCurrentArea.Value())))
     {
         ChipLogError(Zcl, "SetCurrentArea %" PRIu32 " - location is not supported", aCurrentArea.Value());
         return false;
@@ -1091,12 +1110,12 @@ bool Instance::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea
 //*************************************************************************
 // Estimated End Time manipulators
 
-DataModel::Nullable<uint32_t> Instance::GetEstimatedEndTime()
+DataModel::Nullable<uint32_t> ServiceAreaCluster::GetEstimatedEndTime()
 {
     return mEstimatedEndTime;
 }
 
-bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
+bool ServiceAreaCluster::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
 {
     // EstimatedEndTime SHALL be null if the CurrentArea attribute is null.
     if (mCurrentArea.IsNull() && !aEstimatedEndTime.IsNull())
@@ -1121,22 +1140,23 @@ bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstima
 //*************************************************************************
 // Progress list manipulators
 
-uint32_t Instance::GetNumberOfProgressElements()
+uint32_t ServiceAreaCluster::GetNumberOfProgressElements()
 {
-    return mStorageDelegate->GetNumberOfProgressElements();
+    return mStorageDelegate.GetNumberOfProgressElements();
 }
 
-bool Instance::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool ServiceAreaCluster::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    return mStorageDelegate->GetProgressElementByIndex(listIndex, aProgressElement);
+    return mStorageDelegate.GetProgressElementByIndex(listIndex, aProgressElement);
 }
 
-bool Instance::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool ServiceAreaCluster::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
+                                                Structs::ProgressStruct::Type & aProgressElement)
 {
-    return mStorageDelegate->GetProgressElementById(aAreaId, listIndex, aProgressElement);
+    return mStorageDelegate.GetProgressElementById(aAreaId, listIndex, aProgressElement);
 }
 
-bool Instance::AddPendingProgressElement(uint32_t aAreaId)
+bool ServiceAreaCluster::AddPendingProgressElement(uint32_t aAreaId)
 {
     // create progress element
     Structs::ProgressStruct::Type inactiveProgress = { aAreaId, OperationalStatusEnum::kPending };
@@ -1149,14 +1169,14 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
     }
 
     // For each entry in this list, the AreaID field SHALL match an entry on the SupportedAreas attribute's list.
-    if (!mStorageDelegate->IsSupportedArea(aAreaId))
+    if (!mStorageDelegate.IsSupportedArea(aAreaId))
     {
         ChipLogError(Zcl, "AddPendingProgressElement - not a supported location %" PRIu32 "", aAreaId);
         return false;
     }
 
     // Each entry in this list SHALL have a unique value for the AreaID field.
-    if (mStorageDelegate->IsProgressElement(aAreaId))
+    if (mStorageDelegate.IsProgressElement(aAreaId))
     {
         ChipLogError(Zcl, "AddPendingProgressElement - progress element already exists for location %" PRIu32 "", aAreaId);
         return false;
@@ -1164,7 +1184,7 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
 
     uint32_t ignoredIndex;
 
-    if (!mStorageDelegate->AddProgressElementRaw(inactiveProgress, ignoredIndex))
+    if (!mStorageDelegate.AddProgressElementRaw(inactiveProgress, ignoredIndex))
     {
         return false;
     }
@@ -1173,7 +1193,7 @@ bool Instance::AddPendingProgressElement(uint32_t aAreaId)
     return true;
 }
 
-bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatus)
+bool ServiceAreaCluster::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatus)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
@@ -1196,11 +1216,11 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
     // TotalOperationalTime SHALL be null if the Status field is not set to Completed or Skipped.
     if ((opStatus != OperationalStatusEnum::kCompleted) && (opStatus != OperationalStatusEnum::kSkipped))
     {
-        progressElement.totalOperationalTime.Emplace(DataModel::NullNullable);
+        progressElement.totalOperationalTime.ClearValue();
     }
 
     // add the updated element to the progress attribute
-    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate.ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1209,7 +1229,8 @@ bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatu
     return true;
 }
 
-bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
+bool ServiceAreaCluster::SetProgressTotalOperationalTime(uint32_t aAreaId,
+                                                         const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
@@ -1227,8 +1248,8 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
     }
 
     // This attribute SHALL be null if the Status field is not set to Completed or Skipped
-    if (((progressElement.status == OperationalStatusEnum::kCompleted) ||
-         (progressElement.status == OperationalStatusEnum::kSkipped)) &&
+    if ((progressElement.status != OperationalStatusEnum::kCompleted &&
+         progressElement.status != OperationalStatusEnum::kSkipped) &&
         !aTotalOperationalTime.IsNull())
     {
         ChipLogError(Zcl,
@@ -1243,7 +1264,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
     progressElement.totalOperationalTime.Emplace(aTotalOperationalTime);
 
     // add the updated element to the progress attribute
-    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate.ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1252,7 +1273,7 @@ bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel
     return true;
 }
 
-bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
+bool ServiceAreaCluster::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;
@@ -1273,7 +1294,7 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
     progressElement.estimatedTime.Emplace(aEstimatedTime);
 
     // add the updated element to the progress attribute
-    if (!mStorageDelegate->ModifyProgressElementRaw(listIndex, progressElement))
+    if (!mStorageDelegate.ModifyProgressElementRaw(listIndex, progressElement))
     {
         return false;
     }
@@ -1282,9 +1303,9 @@ bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nulla
     return true;
 }
 
-bool Instance::ClearProgress()
+bool ServiceAreaCluster::ClearProgress()
 {
-    if (mStorageDelegate->ClearProgressRaw())
+    if (mStorageDelegate.ClearProgressRaw())
     {
         NotifyProgressChanged();
         return true;
@@ -1293,9 +1314,9 @@ bool Instance::ClearProgress()
     return false;
 }
 
-bool Instance::RemoveProgressElement(uint32_t areaId)
+bool ServiceAreaCluster::RemoveProgressElement(uint32_t areaId)
 {
-    if (mStorageDelegate->RemoveProgressElementRaw(areaId))
+    if (mStorageDelegate.RemoveProgressElementRaw(areaId))
     {
         NotifyProgressChanged();
         return true;
@@ -1306,7 +1327,7 @@ bool Instance::RemoveProgressElement(uint32_t areaId)
 
 // attribute manipulators - Feature Map
 
-bool Instance::HasFeature(Feature feature) const
+bool ServiceAreaCluster::HasFeature(Feature feature) const
 {
     return mFeature.Has(feature);
 }

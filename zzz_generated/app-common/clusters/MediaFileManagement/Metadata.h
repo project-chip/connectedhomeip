@@ -62,15 +62,15 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(DeleteFile::Id, 
 } // namespace DeleteFile
 namespace RequestSharedFiles {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RequestSharedFiles::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kView);
+                                                                Access::Privilege::kOperate);
 } // namespace RequestSharedFiles
 namespace GetSharedFile {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetSharedFile::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kView);
+                                                                Access::Privilege::kOperate);
 } // namespace GetSharedFile
 namespace OfferFile {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(OfferFile::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kView);
+                                                                Access::Privilege::kOperate);
 } // namespace OfferFile
 
 } // namespace Commands

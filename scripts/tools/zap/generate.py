@@ -24,9 +24,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional
 
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
@@ -39,7 +39,7 @@ DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
 
 @dataclass
 class CmdLineArgs:
-    zapFile: Optional[str]
+    zapFile: str | None
     zclFile: str
     templateFile: str
     outputDir: str
@@ -48,9 +48,9 @@ class CmdLineArgs:
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
-    lock_file: Optional[str] = None
+    lock_file: str | None = None
     delete_output_dir: bool = False
-    matter_file_name: Optional[str] = None
+    matter_file_name: str | None = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(

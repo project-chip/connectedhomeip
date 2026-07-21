@@ -188,6 +188,12 @@ config CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 		The application can provide its own singleton, for example by creating
 		a class that inherits from FactoryDataProviderImpl and overrides only the methods that need customization.
 
+config NXP_FACTORY_DAC_BLOB_GENERATION
+	bool "Enable factory DAC private key blob generation"
+	help
+		Enable factory DAC private key blob generation for secure storage.
+		To be used only during factory process.
+
 endif
 
 if CHIP_FACTORY_DATA_BUILD
@@ -266,5 +272,15 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif #CHIP_FACTORY_DATA_BUILD
+
+config CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
+	bool "Custom diagnostic data provider singleton implementation"
+	help
+		Allows to use a custom diagnostic data provider singleton implementation.
+		If enabled, the user must define GetDiagnosticDataProviderImpl() returning
+		a DiagnosticDataProvider reference. The platform default singleton wrapper
+		is not compiled, but DiagnosticDataProviderImpl remains available as a base class.
+		This is useful when an application needs to customize the diagnostic
+		data provider behavior, for example to override GetActiveHardwareFaults().
 
 endif # CHIP

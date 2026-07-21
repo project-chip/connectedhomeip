@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -52,7 +53,7 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(InitArguments && aArgs) :
-    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mContext(aArgs.context), mDelegate(aArgs.delegate),
+    DefaultServerCluster({ aArgs.endpointId, CameraAvStreamManagement::Id }), mDelegate(aArgs.delegate),
     mEnabledFeatures(aArgs.features), mOptionalAttrs(aArgs.optionalAttrs), mMaxConcurrentEncoders(aArgs.maxConcurrentEncoders),
     mMaxEncodedPixelRate(aArgs.maxEncodedPixelRate), mVideoSensorParams(std::move(aArgs.videoSensorParams)),
     mNightVisionUsesInfrared(aArgs.nightVisionUsesInfrared), mMinViewPortResolution(std::move(aArgs.minViewPort)),
@@ -155,7 +156,13 @@ CHIP_ERROR CameraAVStreamManagementCluster::Init()
                          mPath.mEndpointId));
     }
 
-    LoadPersistentAttributes();
+    // Load persisted attributes now that the cluster context is available (set during Startup()).
+    // Init() is expected to be called after Startup(); the IsStarted() guard prevents callers that
+    // invoke Init() without an established context from dereferencing a null context.
+    if (IsStarted())
+    {
+        LoadPersistentAttributes();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -1101,9 +1108,11 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
 {
     if (mNightVision != aNightVision)
     {
-        mNightVision = aNightVision;
-        auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
-        ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mNightVision)));
+        mNightVision     = aNightVision;
+        auto path        = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id);
+        auto nightVision = to_underlying(mNightVision);
+        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+            path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVision), sizeof(nightVision))));
         mDelegate.OnAttributeChanged(Attributes::NightVision::Id);
         NotifyAttributeChanged(Attributes::NightVision::Id);
     }
@@ -1116,7 +1125,9 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum
     {
         mNightVisionIllum = aNightVisionIllum;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id);
-        ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mNightVisionIllum)));
+        auto nightVisionIllum = to_underlying(mNightVisionIllum);
+        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+            path, ByteSpan(reinterpret_cast<const uint8_t *>(&nightVisionIllum), sizeof(nightVisionIllum))));
         mDelegate.OnAttributeChanged(Attributes::NightVisionIllum::Id);
         NotifyAttributeChanged(Attributes::NightVisionIllum::Id);
     }
@@ -1277,8 +1288,9 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
     {
         mStatusLightBrightness = aStatusLightBrightness;
         auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
-        ReturnErrorOnFailure(
-            mContext.safeAttributePersistenceProvider.WriteScalarValue(path, to_underlying(mStatusLightBrightness)));
+        auto statusLightBrightness = to_underlying(mStatusLightBrightness);
+        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(
+            path, ByteSpan(reinterpret_cast<const uint8_t *>(&statusLightBrightness), sizeof(statusLightBrightness))));
         mDelegate.OnAttributeChanged(Attributes::StatusLightBrightness::Id);
         NotifyAttributeChanged(Attributes::StatusLightBrightness::Id);
     }
@@ -1287,324 +1299,339 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
 
 void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+
     // Load HDR Mode Enabled
-    bool storedHDRModeEnabled = false;
-    err                       = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::HDRModeEnabled::Id),
-        storedHDRModeEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mHDRModeEnabled = storedHDRModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded HDRModeEnabled as %u", mPath.mEndpointId, mHDRModeEnabled);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mHDRModeEnabled);
+        const bool defaultValue = mHDRModeEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::HDRModeEnabled::Id),
+                mHDRModeEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded HDRModeEnabled as %u", mPath.mEndpointId, mHDRModeEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the HDRModeEnabled from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mHDRModeEnabled);
+        }
     }
 
     // Load AllocatedVideoStreams
-    err = LoadAllocatedStreams<Attributes::AllocatedVideoStreams::Id>();
-    if (err != CHIP_NO_ERROR)
+    if (LoadAllocatedStreams<Attributes::AllocatedVideoStreams::Id>() != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated video streams from the KVS.", mPath.mEndpointId);
     }
     // Load AllocatedAudioStreams
-    err = LoadAllocatedStreams<Attributes::AllocatedAudioStreams::Id>();
-    if (err != CHIP_NO_ERROR)
+    if (LoadAllocatedStreams<Attributes::AllocatedAudioStreams::Id>() != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated audio streams from the KVS.", mPath.mEndpointId);
     }
 
     // Load AllocatedSnapshotStreams
-    err = LoadAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>();
-    if (err != CHIP_NO_ERROR)
+    if (LoadAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>() != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated snapshot streams from the KVS.", mPath.mEndpointId);
     }
 
     // Load StreamUsagePriorities
-    err = LoadStreamUsagePriorities();
-    if (err != CHIP_NO_ERROR)
+    if (LoadStreamUsagePriorities() != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StreamUsagePriorities from the KVS.", mPath.mEndpointId);
     }
 
     // Load SoftRecordingPrivacyModeEnabled
-    bool softRecordingPrivacyModeEnabled = false;
-    err                                  = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SoftRecordingPrivacyModeEnabled::Id),
-        softRecordingPrivacyModeEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftRecordingPrivacyModeEnabled as %u", mPath.mEndpointId,
-                      mSoftRecordingPrivacyModeEnabled);
-    }
-    else
-    {
-        ChipLogDetail(
-            Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftRecordingPrivacyModeEnabled from the KVS. Defaulting to %u",
-            mPath.mEndpointId, mSoftRecordingPrivacyModeEnabled);
+        const bool defaultValue = mSoftRecordingPrivacyModeEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::SoftRecordingPrivacyModeEnabled::Id),
+                                                        mSoftRecordingPrivacyModeEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftRecordingPrivacyModeEnabled as %u", mPath.mEndpointId,
+                          mSoftRecordingPrivacyModeEnabled);
+        }
+        else
+        {
+            ChipLogDetail(
+                Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftRecordingPrivacyModeEnabled from the KVS. Defaulting to %u",
+                mPath.mEndpointId, mSoftRecordingPrivacyModeEnabled);
+        }
     }
 
     // Load SoftLivestreamPrivacyModeEnabled
-    bool softLivestreamPrivacyModeEnabled = false;
-    err                                   = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SoftLivestreamPrivacyModeEnabled::Id),
-        softLivestreamPrivacyModeEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyModeEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftLivestreamPrivacyModeEnabled as %u", mPath.mEndpointId,
-                      mSoftLivestreamPrivacyModeEnabled);
-    }
-    else
-    {
-        ChipLogDetail(
-            Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftLivestreamPrivacyModeEnabled from the KVS. Defaulting to %u",
-            mPath.mEndpointId, mSoftLivestreamPrivacyModeEnabled);
-    }
-
-    // Load NightVision
-    uint8_t nightVision = 0;
-    err                 = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id), nightVision);
-    if (err == CHIP_NO_ERROR)
-    {
-        mNightVision = static_cast<TriStateAutoEnum>(nightVision);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVision as %d", mPath.mEndpointId, to_underlying(mNightVision));
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVision from the KVS. Defaulting to %d",
-                      mPath.mEndpointId, to_underlying(mNightVision));
+        const bool defaultValue = mSoftLivestreamPrivacyModeEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::SoftLivestreamPrivacyModeEnabled::Id),
+                                                        mSoftLivestreamPrivacyModeEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SoftLivestreamPrivacyModeEnabled as %u", mPath.mEndpointId,
+                          mSoftLivestreamPrivacyModeEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl,
+                          "CameraAVStreamMgmt[ep=%d]: Unable to load the SoftLivestreamPrivacyModeEnabled from the KVS. Defaulting "
+                          "to %u",
+                          mPath.mEndpointId, mSoftLivestreamPrivacyModeEnabled);
+        }
     }
 
-    // Load NightVisionIllum
-    uint8_t nightVisionIllum = 0;
-    err                      = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id), nightVisionIllum);
-    if (err == CHIP_NO_ERROR)
+    // Load NightVision (stored as underlying uint8_t)
     {
-        mNightVisionIllum = static_cast<TriStateAutoEnum>(nightVisionIllum);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVisionIllum as %d", mPath.mEndpointId,
-                      to_underlying(mNightVisionIllum));
+        uint8_t nightVision        = to_underlying(mNightVision);
+        const uint8_t defaultValue = nightVision;
+        if (attrPersistence.LoadNativeEndianValue<uint8_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id), nightVision,
+                defaultValue))
+        {
+            mNightVision = static_cast<TriStateAutoEnum>(nightVision);
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVision as %d", mPath.mEndpointId,
+                          to_underlying(mNightVision));
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVision from the KVS. Defaulting to %d",
+                          mPath.mEndpointId, to_underlying(mNightVision));
+        }
     }
-    else
+
+    // Load NightVisionIllum (stored as underlying uint8_t)
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVisionIllum from the KVS. Defaulting to %d",
-                      mPath.mEndpointId, to_underlying(mNightVisionIllum));
+        uint8_t nightVisionIllum   = to_underlying(mNightVisionIllum);
+        const uint8_t defaultValue = nightVisionIllum;
+        if (attrPersistence.LoadNativeEndianValue<uint8_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id),
+                nightVisionIllum, defaultValue))
+        {
+            mNightVisionIllum = static_cast<TriStateAutoEnum>(nightVisionIllum);
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVisionIllum as %d", mPath.mEndpointId,
+                          to_underlying(mNightVisionIllum));
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the NightVisionIllum from the KVS. Defaulting to %d",
+                          mPath.mEndpointId, to_underlying(mNightVisionIllum));
+        }
     }
 
     // Load Viewport
-    Globals::Structs::ViewportStruct::Type viewport;
-    err = LoadViewport(viewport);
-    if (err == CHIP_NO_ERROR)
     {
-        mViewport = viewport;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded Viewport", mPath.mEndpointId);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the Viewport from the KVS.", mPath.mEndpointId);
+        Globals::Structs::ViewportStruct::Type viewport;
+        if (LoadViewport(viewport) == CHIP_NO_ERROR)
+        {
+            mViewport = viewport;
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded Viewport", mPath.mEndpointId);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the Viewport from the KVS.", mPath.mEndpointId);
+        }
     }
 
     // Load SpeakerMuted
-    bool speakerMuted = false;
-    err               = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerMuted::Id), speakerMuted);
-    if (err == CHIP_NO_ERROR)
     {
-        mSpeakerMuted = speakerMuted;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerMuted as %u", mPath.mEndpointId, mSpeakerMuted);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerMuted from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mSpeakerMuted);
+        const bool defaultValue = mSpeakerMuted;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerMuted::Id), mSpeakerMuted,
+                defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerMuted as %u", mPath.mEndpointId, mSpeakerMuted);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerMuted from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mSpeakerMuted);
+        }
     }
 
     // Load SpeakerVolumeLevel
-    uint8_t speakerVolumeLevel = 0;
-    err                        = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerVolumeLevel::Id),
-        speakerVolumeLevel);
-    if (err == CHIP_NO_ERROR)
     {
-        mSpeakerVolumeLevel = speakerVolumeLevel;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerVolumeLevel as %u", mPath.mEndpointId, mSpeakerVolumeLevel);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerVolumeLevel from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mSpeakerVolumeLevel);
+        const uint8_t defaultValue = mSpeakerVolumeLevel;
+        if (attrPersistence.LoadNativeEndianValue<uint8_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::SpeakerVolumeLevel::Id),
+                mSpeakerVolumeLevel, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded SpeakerVolumeLevel as %u", mPath.mEndpointId,
+                          mSpeakerVolumeLevel);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the SpeakerVolumeLevel from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mSpeakerVolumeLevel);
+        }
     }
 
     // Load MicrophoneMuted
-    bool microphoneMuted = false;
-    err                  = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneMuted::Id), microphoneMuted);
-    if (err == CHIP_NO_ERROR)
     {
-        mMicrophoneMuted = microphoneMuted;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneMuted as %u", mPath.mEndpointId, mMicrophoneMuted);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneMuted from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mMicrophoneMuted);
+        const bool defaultValue = mMicrophoneMuted;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneMuted::Id),
+                mMicrophoneMuted, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneMuted as %u", mPath.mEndpointId, mMicrophoneMuted);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneMuted from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mMicrophoneMuted);
+        }
     }
 
     // Load MicrophoneVolumeLevel
-    uint8_t microphoneVolumeLevel = 0;
-    err                           = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneVolumeLevel::Id),
-        microphoneVolumeLevel);
-    if (err == CHIP_NO_ERROR)
     {
-        mMicrophoneVolumeLevel = microphoneVolumeLevel;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneVolumeLevel as %u", mPath.mEndpointId,
-                      mMicrophoneVolumeLevel);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneVolumeLevel from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mMicrophoneVolumeLevel);
+        const uint8_t defaultValue = mMicrophoneVolumeLevel;
+        if (attrPersistence.LoadNativeEndianValue<uint8_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneVolumeLevel::Id),
+                mMicrophoneVolumeLevel, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneVolumeLevel as %u", mPath.mEndpointId,
+                          mMicrophoneVolumeLevel);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneVolumeLevel from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mMicrophoneVolumeLevel);
+        }
     }
 
     // Load MicrophoneAGCEnabled
-    bool microphoneAGCEnabled = false;
-    err                       = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneAGCEnabled::Id),
-        microphoneAGCEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mMicrophoneAGCEnabled = microphoneAGCEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneAGCEnabled as %u", mPath.mEndpointId,
-                      mMicrophoneAGCEnabled);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneAGCEnabled from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mMicrophoneAGCEnabled);
+        const bool defaultValue = mMicrophoneAGCEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::MicrophoneAGCEnabled::Id),
+                mMicrophoneAGCEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded MicrophoneAGCEnabled as %u", mPath.mEndpointId,
+                          mMicrophoneAGCEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the MicrophoneAGCEnabled from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mMicrophoneAGCEnabled);
+        }
     }
 
     // Load ImageRotation
-    uint16_t imageRotation = 0;
-    err                    = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageRotation::Id), imageRotation);
-    if (err == CHIP_NO_ERROR)
     {
-        mImageRotation = imageRotation;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageRotation as %u", mPath.mEndpointId, mImageRotation);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageRotation from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mImageRotation);
+        const uint16_t defaultValue = mImageRotation;
+        if (attrPersistence.LoadNativeEndianValue<uint16_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageRotation::Id),
+                mImageRotation, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageRotation as %u", mPath.mEndpointId, mImageRotation);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageRotation from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mImageRotation);
+        }
     }
 
     // Load ImageFlipHorizontal
-    bool imageFlipHorizontal = false;
-    err                      = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipHorizontal::Id),
-        imageFlipHorizontal);
-    if (err == CHIP_NO_ERROR)
     {
-        mImageFlipHorizontal = imageFlipHorizontal;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipHorizontal as %u", mPath.mEndpointId, mImageFlipHorizontal);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipHorizontal from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mImageFlipHorizontal);
+        const bool defaultValue = mImageFlipHorizontal;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipHorizontal::Id),
+                mImageFlipHorizontal, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipHorizontal as %u", mPath.mEndpointId,
+                          mImageFlipHorizontal);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipHorizontal from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mImageFlipHorizontal);
+        }
     }
 
     // Load ImageFlipVertical
-    bool imageFlipVertical = false;
-    err                    = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipVertical::Id),
-        imageFlipVertical);
-    if (err == CHIP_NO_ERROR)
     {
-        mImageFlipVertical = imageFlipVertical;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipVertical as %u", mPath.mEndpointId, mImageFlipVertical);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipVertical from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mImageFlipVertical);
+        const bool defaultValue = mImageFlipVertical;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::ImageFlipVertical::Id),
+                mImageFlipVertical, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded ImageFlipVertical as %u", mPath.mEndpointId, mImageFlipVertical);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the ImageFlipVertical from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mImageFlipVertical);
+        }
     }
 
     // Load LocalVideoRecordingEnabled
-    bool localVideoRecordingEnabled = false;
-    err                             = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::LocalVideoRecordingEnabled::Id),
-        localVideoRecordingEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mLocalVideoRecordingEnabled = localVideoRecordingEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalVideoRecordingEnabled as %u", mPath.mEndpointId,
-                      mLocalVideoRecordingEnabled);
-    }
-    else
-    {
-        ChipLogDetail(Zcl,
-                      "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalVideoRecordingEnabled from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mLocalVideoRecordingEnabled);
+        const bool defaultValue = mLocalVideoRecordingEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::LocalVideoRecordingEnabled::Id),
+                mLocalVideoRecordingEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalVideoRecordingEnabled as %u", mPath.mEndpointId,
+                          mLocalVideoRecordingEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl,
+                          "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalVideoRecordingEnabled from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mLocalVideoRecordingEnabled);
+        }
     }
 
     // Load LocalSnapshotRecordingEnabled
-    bool localSnapshotRecordingEnabled = false;
-    err                                = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::LocalSnapshotRecordingEnabled::Id),
-        localSnapshotRecordingEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mLocalSnapshotRecordingEnabled = localSnapshotRecordingEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalSnapshotRecordingEnabled as %u", mPath.mEndpointId,
-                      mLocalSnapshotRecordingEnabled);
-    }
-    else
-    {
-        ChipLogDetail(Zcl,
-                      "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalSnapshotRecordingEnabled from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mLocalSnapshotRecordingEnabled);
+        const bool defaultValue = mLocalSnapshotRecordingEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id,
+                                                                              Attributes::LocalSnapshotRecordingEnabled::Id),
+                                                        mLocalSnapshotRecordingEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded LocalSnapshotRecordingEnabled as %u", mPath.mEndpointId,
+                          mLocalSnapshotRecordingEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl,
+                          "CameraAVStreamMgmt[ep=%d]: Unable to load the LocalSnapshotRecordingEnabled from the KVS. Defaulting "
+                          "to %u",
+                          mPath.mEndpointId, mLocalSnapshotRecordingEnabled);
+        }
     }
 
     // Load StatusLightEnabled
-    bool statusLightEnabled = false;
-    err                     = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightEnabled::Id),
-        statusLightEnabled);
-    if (err == CHIP_NO_ERROR)
     {
-        mStatusLightEnabled = statusLightEnabled;
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightEnabled as %u", mPath.mEndpointId, mStatusLightEnabled);
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightEnabled from the KVS. Defaulting to %u",
-                      mPath.mEndpointId, mStatusLightEnabled);
+        const bool defaultValue = mStatusLightEnabled;
+        if (attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightEnabled::Id),
+                mStatusLightEnabled, defaultValue))
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightEnabled as %u", mPath.mEndpointId,
+                          mStatusLightEnabled);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightEnabled from the KVS. Defaulting to %u",
+                          mPath.mEndpointId, mStatusLightEnabled);
+        }
     }
 
-    // Load StatusLightBrightness
-    uint8_t statusLightBrightness = 0;
-    err                           = mContext.safeAttributePersistenceProvider.ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id),
-        statusLightBrightness);
-    if (err == CHIP_NO_ERROR)
+    // Load StatusLightBrightness (stored as underlying uint8_t)
     {
-        mStatusLightBrightness = static_cast<Globals::ThreeLevelAutoEnum>(statusLightBrightness);
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightBrightness as %d", mPath.mEndpointId,
-                      to_underlying(mStatusLightBrightness));
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
-                      mPath.mEndpointId, to_underlying(mStatusLightBrightness));
+        uint8_t statusLightBrightness = to_underlying(mStatusLightBrightness);
+        const uint8_t defaultValue    = statusLightBrightness;
+        if (attrPersistence.LoadNativeEndianValue<uint8_t>(
+                ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id),
+                statusLightBrightness, defaultValue))
+        {
+            mStatusLightBrightness = static_cast<Globals::ThreeLevelAutoEnum>(statusLightBrightness);
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightBrightness as %d", mPath.mEndpointId,
+                          to_underlying(mStatusLightBrightness));
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
+                          mPath.mEndpointId, to_underlying(mStatusLightBrightness));
+        }
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
@@ -1628,7 +1655,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreViewport(const Globals::Structs
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    return mContext.safeAttributePersistenceProvider.SafeWriteValue(path, bufferSpan);
+    return mContext->attributeStorage.WriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::LoadViewport(Globals::Structs::ViewportStruct::Type & viewport)
@@ -1637,7 +1664,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadViewport(Globals::Structs::Viewp
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
-    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mContext->attributeStorage.ReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 
@@ -1667,7 +1694,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreStreamUsagePriorities()
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
-    return mContext.safeAttributePersistenceProvider.SafeWriteValue(path, bufferSpan);
+    return mContext->attributeStorage.WriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::LoadStreamUsagePriorities()
@@ -1676,7 +1703,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadStreamUsagePriorities()
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
-    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mContext->attributeStorage.ReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
     reader.Init(bufferSpan);
@@ -1768,7 +1795,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreAllocatedStreams()
     size_t len = writer.GetLengthWritten();
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
-    ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.SafeWriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(path, ByteSpan(buffer, len)));
 
     ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
     return CHIP_NO_ERROR;
@@ -1785,7 +1812,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     auto path      = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
     auto & streams = (*this).*Traits::kStreamVectorMember;
 
-    CHIP_ERROR err = mContext.safeAttributePersistenceProvider.SafeReadValue(path, span);
+    CHIP_ERROR err = mContext->attributeStorage.ReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();

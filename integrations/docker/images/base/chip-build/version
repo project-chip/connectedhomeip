@@ -1,1 +1,1 @@
-202 : [Silabs] Update Silabs Zephyr Docker image (86c6d6a)
+206 : [Silabs] Prevent removal of libble_bgapi_gatt_client.a

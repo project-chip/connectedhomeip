@@ -39,7 +39,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from sphinx.application import Sphinx
 
@@ -60,7 +60,7 @@ def adjust_includes(
     link_prefixes: list[str],
     extensions: list[str],
     targets: list[Path],
-    dstpath: Optional[Path] = None,
+    dstpath: Path | None = None,
 ) -> None:
     """Adjust included content paths.
 

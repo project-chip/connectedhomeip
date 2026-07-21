@@ -18,18 +18,18 @@
 
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <device/api/Interface.h>
 #include <devices/Types.h>
-#include <devices/interface/DeviceInterface.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>
+#include <device/types/root-node/WifiRootNode.h>
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
 #else
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif
 #else
-#include <devices/root-node/RootNodeDevice.h>
+#include <device/types/root-node/RootNode.h>
 #endif
 
 namespace chip::app {
@@ -49,30 +49,30 @@ public:
 #endif
     };
 
-    AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> features = {}) :
+    AppRootNode(const RootNode::Context & context, BitFlags<EnabledFeatures> features = {}) :
         mEnabledFeatures(features),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver }),
+        mWiFiRootNode(context, { .wifiDriver = mWiFiDriver }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mRootNodeDevice(context)
+        mRootNode(context)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
         mWiFiDriver.Set5gSupport(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
     }
 
-    SingleEndpointDevice & RootDevice()
+    SingleEndpoint & RootDevice()
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
         {
-            return mWiFiRootNodeDevice;
+            return mWiFiRootNode;
         }
 #endif
-        return mRootNodeDevice;
+        return mRootNode;
     }
 
-    RootNodeDevice & GetRootNodeDevice() { return mRootNodeDevice; }
+    RootNode & GetRootNode() { return mRootNode; }
 
 private:
     BitFlags<EnabledFeatures> mEnabledFeatures;
@@ -85,11 +85,11 @@ private:
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWiFiDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
-    WifiRootNodeDevice mWiFiRootNodeDevice;
+    WifiRootNode mWiFiRootNode;
 #else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    RootNodeDevice mRootNodeDevice;
+    RootNode mRootNode;
 };
 
 } // namespace chip::app

@@ -19,6 +19,8 @@
 
 #include <app/EventLogging.h>
 
+#include <limits>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

@@ -20,23 +20,20 @@ import("${chip_root}/src/platform/realtek/zephyr/args.gni")
 assert(chip_device_platform == "realtek_zephyr")
 
 static_library("realtek_zephyr") {
-  sources = [
+  # Common sources shared across all Realtek IC types.
+  _common_sources = [
     "../../SingletonConfigurationManager.cpp",
-    "../../Zephyr/BLEAdvertisingArbiter.cpp",
-    "../../Zephyr/BLEAdvertisingArbiter.h",
-    "../../Zephyr/BLEManagerImpl.cpp",
     "../../Zephyr/ConfigurationManagerImpl.cpp",
     "../../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../../Zephyr/DiagnosticDataProviderImpl.h",
     "../../Zephyr/DiagnosticDataProviderImplGetter.cpp",
     "../../Zephyr/KeyValueStoreManagerImpl.cpp",
+    "../../Zephyr/KeyValueStoreManagerImpl.h",
     "../../Zephyr/PlatformManagerImpl.cpp",
     "../../Zephyr/SysHeapMalloc.h",
     "../../Zephyr/SystemTimeSupport.cpp",
     "../../Zephyr/ZephyrConfig.cpp",
     "../../Zephyr/ZephyrConfig.h",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -45,11 +42,28 @@ static_library("realtek_zephyr") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
     "bee4-mbedtls-config.h",
   ]
+
+  if (chip_realtek_ic_type == "rtl87x2g") {
+    sources = _common_sources + [
+                "../../Zephyr/BLEAdvertisingArbiter.cpp",
+                "../../Zephyr/BLEAdvertisingArbiter.h",
+                "../../Zephyr/BLEManagerImpl.cpp",
+                "BLEManagerImpl.h",
+                "BlePlatformConfig.h",
+              ]
+  } else if (chip_realtek_ic_type == "rtl87x3g") {
+    sources = _common_sources + [
+                "rtl87x3g/BLEManagerImpl.cpp",
+                "rtl87x3g/BLEManagerImpl.h",
+                "rtl87x3g/BlePlatformConfig.h",
+              ]
+  } else {
+    assert(false, "Unsupported IC type: " + chip_realtek_ic_type)
+  }
 
   deps = [ "${chip_root}/src/platform/logging:headers" ]
 

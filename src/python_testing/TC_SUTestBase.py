@@ -20,7 +20,6 @@ import subprocess
 import tempfile
 from os import path
 from time import sleep
-from typing import Optional
 
 from mobly import asserts
 
@@ -43,8 +42,8 @@ log = logging.getLogger(__name__)
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
-    current_provider_app_proc: Optional[OTAProviderSubprocess] = None
-    provider_app_path: Optional[str] = None
+    current_provider_app_proc: OTAProviderSubprocess | None = None
+    provider_app_path: str | None = None
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -54,8 +53,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        port: int = 5541,
                        storage_dir='/tmp',
                        extra_args: list = [],
-                       kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
+                       kvs_path: str | None = None,
+                       log_file: str | None = None, expected_output: str = "Server initialization complete",
                        timeout: int = 30):
         """Start the provider process using the provided configuration.
 
@@ -242,8 +241,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
                                       expected_previous_state,
                                       expected_new_state,
-                                      expected_target_version: Optional[int] = None,
-                                      expected_reason: Optional[int] = None):
+                                      expected_target_version: int | None = None,
+                                      expected_reason: int | None = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -266,8 +265,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                          provider_node_id: int,
-                         requestor_node_id: Optional[int] = None,
-                         acl_entries: Optional[list[AccessControlEntryStruct]] = None,
+                         requestor_node_id: int | None = None,
+                         acl_entries: list[AccessControlEntryStruct] | None = None,
                          ):
         """Create ACL entries to allow OTA requestors to access the provider.
 

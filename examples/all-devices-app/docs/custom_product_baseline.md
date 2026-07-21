@@ -48,14 +48,14 @@ endpoints and Interaction Model clusters.
 
 ### The Device Manager Header (`MyBulbDeviceManager.h`)
 
-Instantiate device classes (such as `LoggingDimmableLightDevice`) directly.
+Instantiate device classes (such as `LoggingDimmableLight`) directly.
 
 ```cpp
 #pragma once
 
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <device/types/dimmable-light/LoggingDimmableLight.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -108,7 +108,7 @@ CHIP_ERROR MyBulbDeviceManager::Init(PersistentStorageDelegate & storageDelegate
     mDataModelProvider = std::make_unique<CodeDrivenDataModelProvider>(storageDelegate, mAttributePersistence);
 
     // 2. Instantiate the precise C++ functional device object for our Smart Bulb
-    mMainLightEndpoint = std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
+    mMainLightEndpoint = std::make_unique<LoggingDimmableLight>(LoggingDimmableLight::Context{
         .groupDataProvider = groupDataProvider,
         .fabricTable       = fabricTable,
         .timerDelegate     = mTimerDelegate,
@@ -168,8 +168,8 @@ void ApplicationShutdownHook()
 
 1. **Link Specific Devices**: In `BUILD.gn` or `CMakeLists.txt`, link directly
    against required device modules (e.g.,
-   `all-devices-common/devices/dimmable-light`) rather than `device-factory` to
-   minimize RAM and Flash usage.
+   `all-devices-common/device/types/dimmable-light`) rather than
+   `device-factory` to minimize RAM and Flash usage.
 2. **Statically Define Topologies**: Configure fixed `EndpointId` parameters
    instead of using auto-incrementing IDs to ensure a fixed data model.
 3. **Persist Hardware State**: Replace simulated cluster implementations with

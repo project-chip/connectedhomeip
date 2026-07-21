@@ -54,9 +54,9 @@ class Step:
     def __init__(
         self,
         app: App,
-        timeout_sec: Optional[int] = DEFAULT_TIMEOUT_SEC,
-        output_msg: Optional[list[str]] = None,
-        input_cmd: Optional[str] = None,
+        timeout_sec: int | None = DEFAULT_TIMEOUT_SEC,
+        output_msg: list[str] | None = None,
+        input_cmd: str | None = None,
     ):
         # Validate that either `output_msg` or `input_cmd` is provided, but not both.
         if output_msg is not None and input_cmd is not None:

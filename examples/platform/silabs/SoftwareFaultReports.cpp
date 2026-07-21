@@ -17,7 +17,6 @@
  */
 
 #include "SoftwareFaultReports.h"
-#include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
 #ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
@@ -71,16 +70,15 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
     VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
 
-    TaskStatus_t taskDetails;
-    TaskHandle_t taskHandle = xTaskGetCurrentTaskHandle();
-    vTaskGetInfo(taskHandle, &taskDetails, pdFALSE, eInvalid);
+    osThreadId_t threadId = osThreadGetId();
+    const char * taskName = (threadId != nullptr) ? osThreadGetName(threadId) : nullptr;
 
     char threadName[kMaxThreadNameLength + 1];
-    Platform::CopyString(threadName, taskDetails.pcTaskName);
+    Platform::CopyString(threadName, (taskName != nullptr) ? taskName : "");
 
     SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
     softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
-    softwareFault.id = taskDetails.xTaskNumber;
+    softwareFault.id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(threadId));
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
@@ -88,7 +86,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.
     // Depending on the task at fault, it is possible the event can't be transmitted.
-    osDelay(pdMS_TO_TICKS(1000));
+    osDelay(osKernelGetTickFreq());
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
@@ -106,7 +104,7 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
     ChipLogError(NotSpecified, "%s", faultMessage);
     SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
-    configASSERT((volatile void *) NULL);
+    __disable_irq();
 }
 #endif
 
@@ -164,7 +162,7 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
-    configASSERTNULL(NULL);
+    __disable_irq();
 }
 
 /*
@@ -250,7 +248,7 @@ extern "C" void vApplicationMallocFailedHook(void)
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
-    configASSERT((volatile void *) NULL);
+    __disable_irq();
 }
 /*-----------------------------------------------------------*/
 
@@ -270,7 +268,7 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
-    configASSERT((volatile void *) NULL);
+    __disable_irq();
 }
 
 extern "C" void vApplicationTickHook(void) {}

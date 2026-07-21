@@ -27,7 +27,7 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: simplicity_sdk, version: 2024.12.2}
+sdk: {id: silabs.simplicity_sdk, version: 2026.6.0}
 toolchain_settings: []
 
 component:
@@ -57,7 +57,8 @@ component:
 - {id: freertos_heap_3}
 - {id: iostream_rtt}
 - {id: toolchain_gcc}
-- {id: brd4002a}
+- id: brd4002b
+  condition: [hardware_board_rb]
 - {id: rail_util_pti}
 - {id: rail_lib_multiprotocol}
 - {id: rail_util_power_manager_init}
@@ -78,6 +79,14 @@ component:
 - {id: ot_psa_crypto}
 - {id: ot_platform_abstraction}
 - {id: sl_ot_custom_cli}
+- id: dmadrv
+  condition: [device_series_2]
+- id: dmadrv
+  condition: [device_series_3]
+- id: bootloader_interface
+  condition: [device_series_2]
+- id: bootloader_interface_s3
+  condition: [device_series_3]
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib
 # - {id: mbedtls_tls_server} # Requried by COAP lib

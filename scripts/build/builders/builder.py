@@ -24,7 +24,8 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Callable, Concatenate, ParamSpec, TypeVar
+from typing import Concatenate, ParamSpec, TypeVar
+from collections.abc import Callable
 
 from runner.runner import Runner
 

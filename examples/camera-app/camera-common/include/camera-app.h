@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include "camera-device-interface.h"
+#include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -51,7 +52,7 @@ private:
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelManagementCluster>
         mAVSettingsUserLevelMgmtServer;
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster>
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster>
         mAVStreamMgmtServer;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 

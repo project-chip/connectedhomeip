@@ -18,7 +18,7 @@
 import datetime
 import random
 import string
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -48,9 +48,9 @@ class TLSUtils:
     and node/endpoint-scoped TLS commands.
     """
 
-    def __init__(self, matter_test: MatterBaseTest, endpoint: Optional[int] = None,
-                 dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
-                 node_id: Optional[int] = None, fabric_index: Optional[int] = None):
+    def __init__(self, matter_test: MatterBaseTest, endpoint: int | None = None,
+                 dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                 node_id: int | None = None, fabric_index: int | None = None):
         self.test = matter_test
         self.endpoint = endpoint
         self.dev_ctrl = dev_ctrl

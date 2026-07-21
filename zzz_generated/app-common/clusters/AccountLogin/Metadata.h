@@ -17,10 +17,14 @@ namespace app {
 namespace Clusters {
 namespace AccountLogin {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
+namespace OAuthLoggedIn {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OAuthLoggedIn::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace OAuthLoggedIn
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };
@@ -47,6 +51,12 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
     Access::Privilege::kOperate);
 } // namespace Logout
+namespace GetDeviceAuthURI {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    GetDeviceAuthURI::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kAdminister);
+} // namespace GetDeviceAuthURI
 
 } // namespace Commands
 

@@ -27,6 +27,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Messages::Id
             return Messages::kMetadataEntry;
         case ActiveMessageIDs::Id:
             return ActiveMessageIDs::kMetadataEntry;
+        case SupportedLanguageCodes::Id:
+            return SupportedLanguageCodes::kMetadataEntry;
+        case SupportedMimeTypes::Id:
+            return SupportedMimeTypes::kMetadataEntry;
         default:
             return std::nullopt;
         }
