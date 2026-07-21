@@ -56,4 +56,20 @@ public interface ContentLaunchManager {
    */
   ContentLaunchResponse launchUrl(
       String url, String display, ContentLaunchBrandingInformation branding);
+
+  /** Request content replication information for the currently playing content. */
+  ContentLaunchResponse contentReplicationRequest();
+
+  /**
+   * Play a preset identified by its ID.
+   *
+   * @param presetID The ID of the preset to play.
+   */
+  ContentLaunchResponse playPreset(int presetID);
+
+  /** @return Whether the currently playing content can be moved to another device. */
+  boolean getMovable();
+
+  /** @return The list of available content presets. */
+  ContentLaunchPreset[] getPresets();
 }

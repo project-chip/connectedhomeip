@@ -75,6 +75,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
       "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
+      "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
       "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
