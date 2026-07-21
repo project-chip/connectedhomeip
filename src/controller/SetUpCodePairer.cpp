@@ -33,6 +33,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
+#include <utility>
 #include <vector>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
@@ -590,7 +591,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
         SetUpCodePairerParameters params;
         params.SetPeerAddress(Transport::PeerAddress::BLE());
         params.mLongDiscriminator = matchedLongDiscriminator;
-        mDiscoveredParameters.emplace_front(params);
+        mDiscoveredParameters.emplace_front(std::move(params));
     }
     else
     {

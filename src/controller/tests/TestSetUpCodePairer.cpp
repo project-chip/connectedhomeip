@@ -25,14 +25,28 @@
 #include <lib/core/CHIPError.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <cstdint>
 #include <memory>
 #include <optional>
+#include <type_traits>
 
 using namespace chip;
 using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
+
+template <typename T>
+static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(unsigned int value)
+{
+    return static_cast<T>(value);
+}
+
+template <typename T>
+static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConnectionObject(unsigned int value)
+{
+    return reinterpret_cast<T>(static_cast<uintptr_t>(value));
+}
 
 // DeviceCommissioner is too large to embed in a test fixture (it exceeds
 // the pw_unit_test light backend's static memory pool).  Heap-allocate it
@@ -168,7 +182,7 @@ TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
 {
     Access().SetWaitingForPASE(true);
 
-    auto * connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(0x1234);
+    BLE_CONNECTION_OBJECT connObj = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(0x1234);
     Access().CallOnDiscoveredDeviceOverBle(connObj, std::optional<uint16_t>{ 3840 });
 
     ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
