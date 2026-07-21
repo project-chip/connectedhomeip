@@ -618,10 +618,6 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conf
         if len(ops) > 1:
             raise ConformanceException(f'OPTIONAL term found with more than one subelement {list(element)}')
         return optional_wrapper(ops[0], choice)
-    if element.tag == DESCRIBED_CONFORM:
-        if len(ops) > 1:
-            raise ConformanceException(f'DESCRIBED term found with more than one subelement {list(element)}')
-        return optional_wrapper(ops[0], choice)
     if element.tag == MANDATORY_CONFORM:
         if len(ops) > 1:
             raise ConformanceException(f'MANDATORY term found with more than one subelement {list(element)}')
