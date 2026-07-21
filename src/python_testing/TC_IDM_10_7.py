@@ -51,7 +51,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
                      "Commissioning successful."),
             TestStep(7, "Discovery of full Data Model (over the operational channel) with a wildcard read.",
                      "Wildcard read successful."),
-            TestStep(8, "Lmited and Full Data Model comparison: For each endpoint, compare the Descriptor Cluster present in the Limited Data Model and full Data Model.",
+            TestStep(8, "Limited and Full Data Model comparison: For each endpoint, compare the Descriptor Cluster present in the Limited Data Model and full Data Model.",
                      "The Descriptor Clusters should be exactly the same (DeviceTypeList, ServerList, ClientList, PartsList, TagList, EndpointUniqueID)."),
         ]
 
