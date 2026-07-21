@@ -39,8 +39,8 @@ from mobly import asserts
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.default_checker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAULT_INJECTION, FLAG_FIXED_LABEL_DEFAULT_VALUES,
-                                            FLAG_FIXED_LABEL_EMPTY, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI, FLAG_UNIT_TESTING,
-                                            FLAG_VENDOR_ID, FLAG_VENDOR_NAME, FLAG_MANUFACTURING_DATE, DefaultChecker)
+                                            FLAG_FIXED_LABEL_EMPTY, FLAG_MANUFACTURING_DATE, FLAG_PRODUCT_NAME, FLAG_SAMPLE_MEI,
+                                            FLAG_UNIT_TESTING, FLAG_VENDOR_ID, FLAG_VENDOR_NAME, DefaultChecker)
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
@@ -69,12 +69,14 @@ class TC_DefaultChecker(BasicCompositionTests, DefaultChecker):
                 TestStep(7, f"If the {FLAG_FAULT_INJECTION} flag is not set, check for the presence of a fault injection cluster on any endpoint",
                          "Fault injection cluster does not appear on any endpoint"),
                 TestStep(8, f"If the {FLAG_SAMPLE_MEI} flag is not set, check for the presence of a sample mei cluster on any endpoint",
-                         "Sample MEI cluster does not appear on any endpoint"),            
-                TestStep(9, f"If the {FLAG_FIXED_LABEL_EMPTY} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list is not empty", "List is not empty"),
+                         "Sample MEI cluster does not appear on any endpoint"),
+                TestStep(
+                    9, f"If the {FLAG_FIXED_LABEL_EMPTY} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list is not empty", "List is not empty"),
                 TestStep(10, f"If the {FLAG_FIXED_LABEL_DEFAULT_VALUES} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list does not contain any of the default labels", "List does not contain default labels"),
-                TestStep(11, f"If the {FLAG_MANUFACTURING_DATE} flag is not set, and the BasicInformation clusters ManufacturingDate attr is present on the device, check that the devices manufacturing date does not equal the SDK default manufacturing date", "Devices manufacturing date does not equal SDK default manufacturing date"),
+                TestStep(11, f"If the {FLAG_MANUFACTURING_DATE} flag is not set, and the BasicInformation clusters ManufacturingDate attr is present on the device, check that the devices manufacturing date does not equal the SDK default manufacturing date",
+                         "Devices manufacturing date does not equal SDK default manufacturing date"),
                 TestStep(12, "Fail on any problems")
-        ]
+                ]
 
     def desc_TC_IDM_13_1(self):
         return "[TC-IDM-13.1] Accidental defaults check - [DUT as Server]"
