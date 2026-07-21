@@ -1380,7 +1380,7 @@ def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traver
     # Intent here is to make user aware of typos in paths instead of silently having
     # empty parsing
     if found_xmls < 1:
-        raise SpecParsingException(f'No data model files found in specified directory {top!r}')
+        raise SpecParsingException(f'No data model files found in specified directory {top:!r}')
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
@@ -1873,7 +1873,10 @@ def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Tr
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
     if not cluster_definition_xml:
-        cluster_dir = get_data_model_directory(data_model_directory, DataModelLevel.kCluster)
+        cluster_dir = data_model_directory
+        if not isinstance(data_model_directory, PrebuiltDataModelDirectory):
+            # Transform this into the cluster directory
+            cluster_dir = data_model_directory.joinpath('..', 'clusters')
         cluster_definition_xml, _ = build_xml_clusters(cluster_dir)
 
     found_xmls = 0
