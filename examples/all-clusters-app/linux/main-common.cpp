@@ -190,6 +190,10 @@ LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 extern void MatterDishwasherAlarmServerInit();
 #endif
 
+#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+extern void MatterRefrigeratorAlarmServerInit();
+#endif
+
 void ApplicationInit()
 {
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
@@ -201,6 +205,9 @@ void ApplicationInit()
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
+#endif
+#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+    MatterRefrigeratorAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
