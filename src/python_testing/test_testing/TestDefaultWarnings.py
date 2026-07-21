@@ -91,9 +91,10 @@ class TestDefaultChecker(MatterBaseTest):
         run_check('20200101', set_override=False, expect_problem=True)
         run_check('20200102', set_override=False, expect_problem=False)
         run_check('20200102', set_override=True, expect_problem=False)
+        run_check('20200101', set_override=True, expect_problem=False)
         run_check('20200101-test1', set_override=False, expect_problem=True)
         run_check('20200102-test2', set_override=False, expect_problem=False)
-        asserts.assert_equal(self.skipped, 1, "Some override tests did not mark steps skipped")
+        asserts.assert_equal(self.skipped, 2, "Some override tests did not mark steps skipped")
 
     def test_vendor_name_is_not_default_check(self):
         def run_check(vendor_name: str, set_override: bool, expect_problem: bool):

@@ -113,7 +113,9 @@ class DefaultChecker:
             val = basic_info[attr]
             sdk_default_date = "20200101"
             if val[:8] == sdk_default_date:
-                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"WARNING: Manufacturing date ({val}) should not be the same as SDK default manufacturing date ({sdk_default_date})")
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Manufacturing date ({val}) should not be the same as SDK default manufacturing date ({sdk_default_date})")
+        else:
+            self.mark_current_step_skipped()
         return None
 
     @warning_wrapper(FLAG_UNIT_TESTING)
