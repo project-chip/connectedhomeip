@@ -40,7 +40,7 @@ constexpr uint8_t kPointerTag       = 0xC0;
 CHIP_ERROR DnsWriter::Require(size_t additional)
 {
     VerifyOrReturnError(mOk, CHIP_ERROR_BUFFER_TOO_SMALL);
-    if (mOffset + additional > mSize)
+    if (additional > (mSize - mOffset))
     {
         mOk = false;
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -80,7 +80,7 @@ CHIP_ERROR DnsWriter::PutBytes(const uint8_t * data, size_t len)
 
 CHIP_ERROR DnsWriter::OverwriteU16(size_t offset, uint16_t value)
 {
-    VerifyOrReturnError(offset + 2 <= mSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(mSize >= 2 && offset <= (mSize - 2), CHIP_ERROR_BUFFER_TOO_SMALL);
     mBuffer[offset]     = static_cast<uint8_t>(value >> 8);
     mBuffer[offset + 1] = static_cast<uint8_t>(value & 0xFF);
     return CHIP_NO_ERROR;
@@ -97,7 +97,7 @@ CHIP_ERROR DnsWriter::PutHeader(uint16_t id, uint16_t flags, uint16_t qdcount, u
     return CHIP_NO_ERROR;
 }
 
-void DnsWriter::PatchHeaderCounts(uint16_t qdcount, uint16_t ancount, uint16_t nscount, uint16_t arcount)
+CHIP_ERROR DnsWriter::PatchHeaderCounts(uint16_t qdcount, uint16_t ancount, uint16_t nscount, uint16_t arcount)
 {
     constexpr size_t kDnsHeaderQdcountOffset = 4;
     constexpr size_t kDnsHeaderAncountOffset = 6;
@@ -110,6 +110,7 @@ void DnsWriter::PatchHeaderCounts(uint16_t qdcount, uint16_t ancount, uint16_t n
     ReturnErrorOnFailure(OverwriteU16(kDnsHeaderNscountOffset, nscount));
     ReturnErrorOnFailure(OverwriteU16(kDnsHeaderArcountOffset, arcount));
     mOk = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DnsWriter::PutName(const char * name)
@@ -220,7 +221,10 @@ CHIP_ERROR DnsWriter::PutTxt(const char * name, RecordClass recordClass, uint32_
 
         ReturnErrorOnFailure(Require(1 + stringLen));
         mBuffer[mOffset++] = static_cast<uint8_t>(stringLen);
-        memcpy(mBuffer + mOffset, entry.mKey, keyLen);
+        if (entry.mKey != nullptr)
+        {
+            memcpy(mBuffer + mOffset, entry.mKey, keyLen);
+        }
         mOffset += keyLen;
         if (entry.mData != nullptr)
         {
@@ -394,13 +398,14 @@ CHIP_ERROR DnsReader::ReadRecordHeader(RecordHeader & out)
     out.type        = static_cast<RecordType>(type);
     out.recordClass = static_cast<RecordClass>(recordClass);
     out.rdataOffset = mOffset;
-    VerifyOrReturnError(mOffset + out.rdlength <= mSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(out.rdlength <= (mSize - mOffset), CHIP_ERROR_BUFFER_TOO_SMALL);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DnsReader::SkipRecordData(const RecordHeader & header)
 {
-    VerifyOrReturnError(header.rdataOffset + header.rdlength <= mSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(header.rdataOffset <= mSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(header.rdlength <= (mSize - header.rdataOffset), CHIP_ERROR_BUFFER_TOO_SMALL);
     mOffset = header.rdataOffset + header.rdlength;
     return CHIP_NO_ERROR;
 }

@@ -265,7 +265,7 @@ TEST(TestSrpDnsMessage, PatchHeaderCounts)
     ASSERT_TRUE(Inet::IPAddress::FromString("2001:db8::1", address));
     ASSERT_EQ(writer.PutAaaa("host.default.service.arpa", RecordClass::kIn, 120, address), CHIP_NO_ERROR);
 
-    writer.PatchHeaderCounts(1, 0, 1, 0);
+    ASSERT_EQ(writer.PatchHeaderCounts(1, 0, 1, 0), CHIP_NO_ERROR);
     ASSERT_TRUE(writer.Ok());
 
     DnsReader reader(buffer, writer.Length());
@@ -348,7 +348,7 @@ TEST(TestSrpDnsMessage, PartialCompressedNameDecode)
     // Wire: "x.y" at offset 12, then "z" + pointer-to-12 => "z.x.y".
     uint8_t buffer[64];
     memset(buffer, 0, sizeof(buffer));
-    size_t o = 12;
+    size_t o    = 12;
     buffer[o++] = 1;
     buffer[o++] = 'x';
     buffer[o++] = 1;
