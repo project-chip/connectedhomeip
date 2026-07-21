@@ -20,6 +20,7 @@ import("../lwip.gni")
 config("lwip_config") {
   include_dirs = [
     "${chip_root}/src/lwip/silabs",
+    "${chip_root}/src/lwip/silabs/config",
     "${chip_root}/src/lwip/freertos",
   ]
 }
@@ -29,7 +30,7 @@ lwip_target("silabs_lwip") {
     "${chip_root}/src/lwip/freertos/arch/sys_arch.h",
     "${chip_root}/src/lwip/silabs/arch/cc.h",
     "${chip_root}/src/lwip/silabs/arch/perf.h",
-    "${chip_root}/src/lwip/silabs/lwipopts.h",
+    "${chip_root}/src/lwip/silabs/config/lwipopts.h",
     "${chip_root}/src/lwip/silabs/lwippools.h",
   ]
 
