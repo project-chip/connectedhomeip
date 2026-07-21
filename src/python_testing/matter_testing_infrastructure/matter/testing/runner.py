@@ -781,15 +781,13 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         if not (args.chip_tool_common_storage_path and args.chip_tool_fabric_storage_path):
             LOGGER.error("Error: One must specify both chip-tool common and chip-tool fabric storage paths")
             sys.exit(1)
-        elif args.storage_path is not None:
+        if args.storage_path is not None:
             LOGGER.error("Error: Cannot specify both --storage-path and chip-tool storage paths")
             sys.exit(1)
-        else:
-            config.chip_tool_common_storage_path = pathlib.Path(args.chip_tool_common_storage_path)
-            config.chip_tool_fabric_storage_path = pathlib.Path(args.chip_tool_fabric_storage_path)
+        config.chip_tool_common_storage_path = pathlib.Path(args.chip_tool_common_storage_path)
+        config.chip_tool_fabric_storage_path = pathlib.Path(args.chip_tool_fabric_storage_path)
     else:
-        config.storage_path = pathlib.Path(
-            TestingDefaults.STORAGE_PATH) if args.storage_path is None else pathlib.Path(args.storage_path)
+        config.storage_path = pathlib.Path(args.storage_path or TestingDefaults.STORAGE_PATH)
     config.logs_path = pathlib.Path(TestingDefaults.LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
