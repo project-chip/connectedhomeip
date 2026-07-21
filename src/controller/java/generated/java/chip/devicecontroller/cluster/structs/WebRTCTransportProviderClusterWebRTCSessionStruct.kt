@@ -36,7 +36,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val audioStreams: Optional<List<UInt>>,
   val fabricIndex: UInt
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -145,7 +145,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -159,7 +159,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -182,7 +182,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
-        fabricIndex)
+        fabricIndex
+      )
     }
   }
 }
