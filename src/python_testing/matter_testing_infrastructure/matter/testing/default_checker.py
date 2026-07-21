@@ -108,13 +108,12 @@ class DefaultChecker:
     def check_default_manufacturing_date(self):
         cluster = Clusters.BasicInformation
         attr = cluster.Attributes.ManufacturingDate
-        if attr in self.endpoints[0][cluster]:
-            val = self.endpoints[0][cluster][attr]
+        basic_info = self.endpoints[0][cluster]
+        if attr in basic_info:
+            val = basic_info[attr]
             sdk_default_date = "20200101"
             if val[:8] == sdk_default_date:
-                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Manufacturing date ({val}) should not be the same as SDK default manufacturing date ({sdk_default_date})")
-        else:
-            self.mark_current_step_skipped()
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"WARNING: Manufacturing date ({val}) should not be the same as SDK default manufacturing date ({sdk_default_date})")
         return None
 
     @warning_wrapper(FLAG_UNIT_TESTING)
