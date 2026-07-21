@@ -42,15 +42,6 @@ declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
 
-  # Enable memory sanitizer
-  is_msan = false
-
-  # MSAN builds need an instrumented C++ runtime and dependencies.
-  # build_examples.py resolves this in host.py and passes it as a GN arg
-  # (default: ~/.cache/matter/msan_sysroot, overridable via SYSROOT_MSAN).
-  # Raw `gn gen` users must set SYSROOT_MSAN or pass --args='msan_sysroot="..."'.
-  msan_sysroot = getenv("SYSROOT_MSAN")
-
   # enable undefined behavior sanitizer
   is_ubsan = false
 

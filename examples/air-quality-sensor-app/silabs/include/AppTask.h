@@ -23,18 +23,18 @@
  * Includes
  *********************************************************/
 
+#include <cstdint>
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "AirQualitySensorUI.h"
 #endif
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "SensorManager.h"
+#include <app/ConcreteAttributePath.h>
 #include <ble/BLEEndPoint.h>
-#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -59,7 +59,7 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
-    static AppTask & GetAppTask() { return sAppTask; }
+    static AppTask & GetAppTask();
 
     /**
      * @brief AppTask task main loop function
@@ -71,9 +71,14 @@ public:
     CHIP_ERROR StartAppTask();
 
     /**
-     * @brief Request an update of the Air Quality Senor LCD UI
+     * @brief Request an update of the Air Quality Sensor LCD UI
      */
     void UpdateAirQualitySensorUI();
+
+    /**
+     * @brief Update the Air Quality cluster attribute
+     */
+    static void WriteAirQualityToAttribute(intptr_t context);
 
     /**
      * @brief Event handler when a button is pressed
@@ -85,24 +90,42 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-private:
-    static AppTask sAppTask;
+    /**
+     * @brief Matter stack callback triggered after a server attribute changes.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
+    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value);
 
     /**
-     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
+     * @brief Read the current raw air quality sensor value into @p air_quality.
      *
-     * @return CHIP_ERROR
+     * Calls `AirQualitySensor::GetAirQuality` when `USE_AIR_QUALITY_SENSOR` is set,
+     * otherwise steps through a simulated table. On error @p air_quality is left untouched and
+     * the caller skips scheduling a cluster update for that tick.
      */
+    CHIP_ERROR GetAirQualityValue(int32_t & air_quality);
+
+    /**
+     * @brief Reads new generated sensor value, stores it, and updates local Air Quality attribute.
+     *
+     * @param arg CMSIS timer callback argument
+     */
+    static void SensorTimerEventHandler(void * arg);
+
+protected:
     CHIP_ERROR AppInit() override;
 
     /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
+     * @brief Bring up the air quality sensor app: Matter manager, sensor timer, sensor driver, first reading.
      *
-     * @param aEvent button event being processed
+     * @return CHIP_NO_ERROR on success, otherwise APP_ERROR_CREATE_TIMER_FAILED if the sensor timer
+     *         could not be created, or MATTER_PLATFORM_ERROR(...) if the air quality sensor driver
+     *         init fails when USE_AIR_QUALITY_SENSOR is set.
      */
-    static void ButtonHandler(AppEvent * aEvent);
-
-    static void AirQualitySensorActionEventHandler(AppEvent * aEvent);
+    CHIP_ERROR InitAirQualitySensor();
 };

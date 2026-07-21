@@ -22,7 +22,7 @@ source_set("boolean-state-sensor-accessor") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",

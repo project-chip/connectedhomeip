@@ -259,7 +259,12 @@ public:
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
      */
-    bool IsGroupRequest() { return mGroupRequest; }
+    bool IsGroupRequest() const { return mGroupRequest; }
+
+    /**
+     * Check whether the SuppressResponse flag is set.
+     */
+    bool IsResponseSuppressed() const { return mSuppressResponse; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
@@ -436,7 +441,7 @@ private:
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
-    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest && !mSuppressResponse; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.

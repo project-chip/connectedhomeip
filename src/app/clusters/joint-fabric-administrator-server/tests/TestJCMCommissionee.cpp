@@ -376,6 +376,7 @@ protected:
     void TestReadAdminNOCsPopulatesCommissionerCerts();
     void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
     void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
+    void FailSafeAsyncReadUseAfterFree();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
@@ -762,6 +763,78 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationDoesNotU
     commissionee->mSessionHolder.Release();
 
     commissionee->VerifyTrustAgainstCommissionerAdmin();
+}
+// Regression for the JCMCommissionee heap use-after-free when a FailSafe teardown destroys the
+// commissionee while a Controller::ReadAttribute is in flight.
+//
+// MECHANISM: JCMCommissionee issues attribute reads whose [this]-capturing callbacks are owned by a
+// heap TypedReadAttributeCallback that adopts the ReadClient and outlives the commissionee. On
+// FailSafe expiry, OnFailSafeTimerExpired -> CleanupAnnounceJFA -> mActiveCommissionee.reset()
+// destroys the commissionee; a late OnAttributeData/OnError then runs the read callback through the
+// freed `this`. This test stashes the read's error callback, deletes the commissionee (standing in
+// for the failsafe-driven reset()), then delivers the late response.
+//
+//   Without the fix: ASan heap-use-after-free in TrustVerificationStageFinished.
+//   With the fix:    the read callbacks are wrapped by VendorIdVerificationClient::GuardWithLiveness,
+//                    so once the commissionee is destroyed the late callback is a no-op (the trust
+//                    verification completion is never re-entered).
+class DeferredReadJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    ReadErrorHandler pendingError;
+    bool hasPending = false;
+
+protected:
+    // Drive verification straight into the AdministratorFabricIndex read stage.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kReadingCommissionerAdminFabricIndex)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
+    }
+
+    // Model an in-flight ReadClient: stash the [this]-capturing error callback and return success,
+    // so the stage reports kAsync and the commissionee stays alive awaiting the response.
+    CHIP_ERROR
+    ReadAdminFabricIndexAttribute(std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)>,
+                                  ReadErrorHandler onError) override
+    {
+        pendingError = std::move(onError);
+        hasPending   = true;
+        return CHIP_NO_ERROR;
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, FailSafeAsyncReadUseAfterFree)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // Sentinel that the trust-verification completion would flip if the late callback re-entered the
+    // (destroyed) state machine. The liveness guard must prevent that, so it stays false.
+    bool completionInvoked = false;
+    auto * commissionee =
+        new DeferredReadJCMCommissionee(handle, EndpointId{ 42 }, [&completionInvoked](CHIP_ERROR) { completionInvoked = true; });
+
+    // Launch verification -> issues the (deferred) AdministratorFabricIndex read; object stays alive.
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+    ASSERT_TRUE(commissionee->hasPending);
+    ASSERT_FALSE(completionInvoked);
+
+    // Copy the in-flight callback out, then simulate OnFailSafeTimerExpired ->
+    // mActiveCommissionee.reset() destroying the commissionee mid-read.
+    auto savedError = commissionee->pendingError;
+    delete commissionee;
+
+    // Late ReadClient response. Without the fix this fires this->TrustVerificationStageFinished on the
+    // freed object (ASan heap-use-after-free). With the liveness guard it is a no-op.
+    savedError(nullptr, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_FALSE(completionInvoked);
 }
 
 } // namespace JointFabricAdministrator
