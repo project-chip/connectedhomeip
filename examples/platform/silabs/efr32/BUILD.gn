@@ -74,33 +74,21 @@ source_set("openthread_core_config_efr32_chip_examples") {
   }
 }
 
-source_set("matter-shell") {
-  defines = [ "ENABLE_CHIP_SHELL" ]
-
-  sources = [ "${silabs_common_plat_dir}/MatterShell.cpp" ]
-  include_dirs = [
-    ".",
-    "${silabs_common_plat_dir}",
-  ]
-
-  public_deps = [
-    "${chip_root}/examples/shell/shell_common:shell_common",
-    "${chip_root}/src/lib/shell:shell",
-    "${chip_root}/src/lib/shell:shell_core",
-  ]
-}
-
 config("efr32-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
     include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
-    defines += [ "DISPLAY_ENABLED" ]
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=1" ]
+  } else {
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=0" ]
   }
 
   if (show_qr_code) {
-    defines += [ "QR_CODE_ENABLED" ]
+    defines += [ "SL_MATTER_QR_CODE_ENABLED=1" ]
+  } else {
+    defines += [ "SL_MATTER_QR_CODE_ENABLED=0" ]
   }
 
   if (chip_enable_ota_requestor) {
@@ -204,7 +192,7 @@ source_set("efr32-common") {
   }
 
   if (chip_build_libshell) {
-    deps += [ ":matter-shell" ]
+    deps += [ "${silabs_common_plat_dir}/shell:matter-shell" ]
 
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
@@ -228,8 +216,8 @@ source_set("efr32-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.h",
-      "${silabs_common_plat_dir}/Si70xxSensorGsdk.cpp",
+      "${silabs_common_plat_dir}/sensors/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/sensors/Si70xxSensorGsdk.cpp",
     ]
     public_deps +=
         [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]

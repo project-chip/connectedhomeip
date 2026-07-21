@@ -61,8 +61,12 @@ auto seedProvider = [](auto filterFunction) -> std::vector<std::string> {
     // The seed directory ships in the source tree but is absent in the OSS-Fuzz runner, which
     // runs fuzzers from a temporary directory without the build tree (check_build does so
     // deliberately, to reject $OUT-relative dependencies). Skip file-based seeding instead of
-    // aborting when the directory is missing; on OSS-Fuzz the seeds are supplied via the
-    // libFuzzer seed corpus (<target>_seed_corpus.zip) instead.
+    // aborting when the directory is missing. This ReadFilesFromDirectory path therefore supplies
+    // seeds only for LOCAL runs (where the CWD contains the tree). On OSS-Fuzz the same directory
+    // reaches the fuzzer through a separate, location-independent channel: the project's oss-fuzz
+    // build.sh (projects/connectedhomeip/build.sh) zips it into a per-target
+    // <target>_seed_corpus.zip that libFuzzer loads as its initial corpus. The two are independent
+    // -- do not assume this call contributes seeds on the platform.
     // Non-throwing overload: a permission/I/O error must not abort the harness (the build
     // disables exceptions), which would defeat the purpose of tolerating a missing directory.
     std::error_code ec;
@@ -676,6 +680,71 @@ FUZZ_TEST(FuzzChipCert, ValidateSignedChipCertFuzz)
 // op-cert signatures; the ASN.1<->CHIP-epoch conversion parses X.509 NotBefore/NotAfter from peer op-certs
 // and DACs. Ported here so the FuzzTest coverage workflow sees them.
 
+// Domain seeds for the raw<->DER ECDSA conversions. Arbitrary<std::string>() alone starts from
+// empty/short strings that miss the >= 64-byte gate in ConvertECDSASignatureRawToDER and hand
+// ConvertIntegerDERToRaw only trivial inputs, so the DER emit branches stay cold. A valid 64-byte
+// raw signature and a well-formed DER ECDSA-Sig-Value cover the zero-pad / no-pad integer arms.
+inline std::vector<std::string> EcdsaSignatureSeeds()
+{
+    std::vector<std::string> seeds;
+
+    // 64-byte raw P-256 signature (r || s): r's leading 0x80 exercises the DER positive-integer
+    // zero-pad branch, s does not (no-pad branch); the whole is also a valid 64-byte positive integer.
+    std::string raw(Crypto::kP256_ECDSA_Signature_Length_Raw, '\x11');
+    raw[0]                                            = static_cast<char>(0x80);
+    raw[Crypto::kP256_ECDSA_Signature_Length_Raw / 2] = '\x22';
+    seeds.push_back(std::move(raw));
+
+    // Well-formed DER ECDSA-Sig-Value: SEQUENCE { INTEGER r(32B), INTEGER s(32B) }.
+    std::string der;
+    der.push_back('\x30');
+    der.push_back('\x44');
+    der.push_back('\x02');
+    der.push_back('\x20');
+    der.append(32, '\x33');
+    der.push_back('\x02');
+    der.push_back('\x20');
+    der.append(32, '\x44');
+    seeds.push_back(std::move(der));
+
+    return seeds;
+}
+
+// Domain seeds for the ASN.1 <-> CHIP-epoch conversions. ASN1ToChipEpochTime reads the fuzzed
+// bytes as a raw ASN1UniversalTime struct (see the harness below), so a seed must be valid struct
+// bytes for CalendarToChipEpochTime's success arm to run -- blind bytes almost never form a legal
+// Year/Month/Day/.../Second tuple, leaving that path and the 99991231235959Z sentinel branch cold.
+inline std::vector<std::string> Asn1TimeStructSeeds()
+{
+    auto asStructBytes = [](const chip::ASN1::ASN1UniversalTime & t) {
+        return std::string(reinterpret_cast<const char *>(&t), sizeof(t));
+    };
+
+    std::vector<std::string> seeds;
+
+    // A valid calendar time -> CalendarToChipEpochTime success arm.
+    chip::ASN1::ASN1UniversalTime valid{};
+    valid.Year   = 2023;
+    valid.Month  = 6;
+    valid.Day    = 15;
+    valid.Hour   = 12;
+    valid.Minute = 30;
+    valid.Second = 0;
+    seeds.push_back(asStructBytes(valid));
+
+    // The X.509 'no well-defined expiration' sentinel 99991231235959Z -> kNullCertTime branch.
+    chip::ASN1::ASN1UniversalTime sentinel{};
+    sentinel.Year   = 9999;
+    sentinel.Month  = 12;
+    sentinel.Day    = 31;
+    sentinel.Hour   = 23;
+    sentinel.Minute = 59;
+    sentinel.Second = 59;
+    seeds.push_back(asStructBytes(sentinel));
+
+    return seeds;
+}
+
 void EcdsaSignatureConvertFuzz(const std::string & bytes)
 {
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -704,7 +773,7 @@ void EcdsaSignatureConvertFuzz(const std::string & bytes)
     chip::Platform::MemoryShutdown();
 }
 
-FUZZ_TEST(FuzzChipCert, EcdsaSignatureConvertFuzz).WithDomains(Arbitrary<std::string>());
+FUZZ_TEST(FuzzChipCert, EcdsaSignatureConvertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(EcdsaSignatureSeeds()));
 
 void Asn1ChipEpochTimeFuzz(const std::string & bytes, uint32_t epochCandidate)
 {
@@ -727,7 +796,9 @@ void Asn1ChipEpochTimeFuzz(const std::string & bytes, uint32_t epochCandidate)
     chip::Platform::MemoryShutdown();
 }
 
-FUZZ_TEST(FuzzChipCert, Asn1ChipEpochTimeFuzz).WithDomains(Arbitrary<std::string>(), Arbitrary<uint32_t>());
+FUZZ_TEST(FuzzChipCert, Asn1ChipEpochTimeFuzz)
+    .WithDomains(Arbitrary<std::string>().WithSeeds(Asn1TimeStructSeeds()),
+                 Arbitrary<uint32_t>().WithSeeds({ 0u, 680000000u, 729942000u }));
 
 /*-----------------------------------  Seed-corpus guard  -----------------------------------*/
 /******************************************************************************************************************* */
@@ -736,8 +807,10 @@ FUZZ_TEST(FuzzChipCert, Asn1ChipEpochTimeFuzz).WithDomains(Arbitrary<std::string
 // (runs in the FuzzTest binary's unit-test mode, i.e. CI) fails loudly if the in-tree seed
 // directory exists but yields an implausibly small corpus (wrong CWD, broken filter, or a
 // moved/emptied seed dir). It intentionally passes when the directory is absent: on OSS-Fuzz the
-// fuzzers run from a temp CWD and seeds arrive via <target>_seed_corpus.zip, so a missing dir is
-// expected there and must not fail the build.
+// fuzzers run from a temp CWD and seeds arrive via <target>_seed_corpus.zip (packaged by the
+// oss-fuzz build.sh; see seedProvider above), so a missing dir is expected there and must not fail
+// the build. Note this guard validates the LOCAL file-seed corpus only -- it does not, and cannot,
+// verify OSS-Fuzz seed delivery, which is the build.sh zip's responsibility.
 TEST(FuzzChipCertSeeds, SeedCorpusIsPresent)
 {
     std::error_code ec;

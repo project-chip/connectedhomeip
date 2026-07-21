@@ -3855,6 +3855,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     }
     valueCopy.removeMember("responses");
 
+    if (value.isMember("languageCode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "languageCode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.languageCode, value["languageCode"]));
+    }
+    valueCopy.removeMember("languageCode");
+
+    if (value.isMember("messageURI"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "messageURI");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.messageURI, value["messageURI"]));
+    }
+    valueCopy.removeMember("messageURI");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -3867,6 +3881,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Messages::Structs::Mes
     ComplexArgumentParser::Finalize(request.duration);
     ComplexArgumentParser::Finalize(request.messageText);
     ComplexArgumentParser::Finalize(request.responses);
+    ComplexArgumentParser::Finalize(request.languageCode);
+    ComplexArgumentParser::Finalize(request.messageURI);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
