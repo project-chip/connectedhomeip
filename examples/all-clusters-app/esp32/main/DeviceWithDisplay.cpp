@@ -221,8 +221,8 @@ public:
                 uint8_t saturation = 0;
                 ColorControlServer::Instance().GetCurrentSaturation(1, saturation);
                 ColorControlServer::Instance().moveToHueAndSaturationCommand(1, static_cast<uint16_t>(n), saturation,
-                                                                            /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                            /*isEnhanced=*/false);
+                                                                             /*transitionTime=*/0, executeIfOff, executeIfOff,
+                                                                             /*isEnhanced=*/false);
             }
             else if (name == "Current Saturation")
             {
@@ -234,8 +234,8 @@ public:
                 uint8_t hue = 0;
                 ColorControlServer::Instance().GetCurrentHue(1, hue);
                 ColorControlServer::Instance().moveToHueAndSaturationCommand(1, hue, static_cast<uint8_t>(n),
-                                                                            /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                            /*isEnhanced=*/false);
+                                                                             /*transitionTime=*/0, executeIfOff, executeIfOff,
+                                                                             /*isEnhanced=*/false);
             }
             else if (name == "Illuminance")
             {
@@ -786,8 +786,8 @@ void SetupPretendDevices()
         using OptBits = app::Clusters::ColorControl::OptionsBitmap;
         BitMask<OptBits> executeIfOff(OptBits::kExecuteIfOff);
         ColorControlServer::Instance().moveToHueAndSaturationCommand(1, /*hue=*/200, /*saturation=*/150,
-                                                                    /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                    /*isEnhanced=*/false);
+                                                                     /*transitionTime=*/0, executeIfOff, executeIfOff,
+                                                                     /*isEnhanced=*/false);
     }
 
     AddDevice("Window Covering");

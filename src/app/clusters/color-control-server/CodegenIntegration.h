@@ -67,13 +67,13 @@ ColorControlDelegate * GetDelegate(EndpointId endpoint);
 class ColorControlServer
 {
 public:
-    using StepModeEnum   = chip::app::Clusters::ColorControl::StepModeEnum;
-    using MoveModeEnum   = chip::app::Clusters::ColorControl::MoveModeEnum;
-    using DirectionEnum  = chip::app::Clusters::ColorControl::DirectionEnum;
-    using Feature        = chip::app::Clusters::ColorControl::Feature;
-    using OptionsBitmap  = chip::app::Clusters::ColorControl::OptionsBitmap;
-    using ColorModeEnum  = chip::app::Clusters::ColorControl::ColorModeEnum;
-    using Status         = chip::Protocols::InteractionModel::Status;
+    using StepModeEnum  = chip::app::Clusters::ColorControl::StepModeEnum;
+    using MoveModeEnum  = chip::app::Clusters::ColorControl::MoveModeEnum;
+    using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
+    using Feature       = chip::app::Clusters::ColorControl::Feature;
+    using OptionsBitmap = chip::app::Clusters::ColorControl::OptionsBitmap;
+    using ColorModeEnum = chip::app::Clusters::ColorControl::ColorModeEnum;
+    using Status        = chip::Protocols::InteractionModel::Status;
 
     static ColorControlServer & Instance();
 

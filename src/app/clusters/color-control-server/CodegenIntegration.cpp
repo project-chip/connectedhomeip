@@ -254,9 +254,9 @@ ColorControlServer::Status ColorControlServer::GetColorMode(EndpointId endpoint,
     // colorMode is derived from enhancedColorMode; the enhanced-hue variant has no legacy ColorMode
     // equivalent, so clamp it down to CurrentHueAndCurrentSaturation (§3.2.7.10 / §3.2.7.11).
     EnhancedColorModeEnum enhanced = cluster->GetEnhancedColorMode();
-    value = (enhanced == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
-        ? ColorModeEnum::kCurrentHueAndCurrentSaturation
-        : static_cast<ColorModeEnum>(enhanced);
+    value                          = (enhanced == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
+                                 ? ColorModeEnum::kCurrentHueAndCurrentSaturation
+                                 : static_cast<ColorModeEnum>(enhanced);
     return Status::Success;
 }
 

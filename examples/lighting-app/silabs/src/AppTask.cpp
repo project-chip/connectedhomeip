@@ -28,9 +28,9 @@
 #endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
