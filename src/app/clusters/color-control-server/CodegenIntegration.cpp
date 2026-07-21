@@ -205,6 +205,61 @@ bool ColorControlServer::HasFeature(EndpointId endpoint, Feature feature)
     return cluster != nullptr && cluster->HasFeature(feature);
 }
 
+// Legacy attribute read accessors. Kept in the pre-migration accessor shape (out-param + Status) so
+// callers never touch the internal ColorControlCluster type; see CodegenIntegration.h for rationale.
+ColorControlServer::Status ColorControlServer::GetCurrentHue(EndpointId endpoint, uint8_t & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    value = cluster->CurrentHue();
+    return Status::Success;
+}
+
+ColorControlServer::Status ColorControlServer::GetCurrentSaturation(EndpointId endpoint, uint8_t & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    value = cluster->Saturation();
+    return Status::Success;
+}
+
+ColorControlServer::Status ColorControlServer::GetCurrentX(EndpointId endpoint, uint16_t & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    value = cluster->CurrentX();
+    return Status::Success;
+}
+
+ColorControlServer::Status ColorControlServer::GetCurrentY(EndpointId endpoint, uint16_t & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    value = cluster->CurrentY();
+    return Status::Success;
+}
+
+ColorControlServer::Status ColorControlServer::GetColorTemperatureMireds(EndpointId endpoint, uint16_t & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    value = cluster->ColorTempMireds();
+    return Status::Success;
+}
+
+ColorControlServer::Status ColorControlServer::GetColorMode(EndpointId endpoint, ColorModeEnum & value)
+{
+    auto * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
+    // colorMode is derived from enhancedColorMode; the enhanced-hue variant has no legacy ColorMode
+    // equivalent, so clamp it down to CurrentHueAndCurrentSaturation (§3.2.7.10 / §3.2.7.11).
+    EnhancedColorModeEnum enhanced = cluster->GetEnhancedColorMode();
+    value = (enhanced == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
+        ? ColorModeEnum::kCurrentHueAndCurrentSaturation
+        : static_cast<ColorModeEnum>(enhanced);
+    return Status::Success;
+}
+
 ColorControlServer::Status ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);

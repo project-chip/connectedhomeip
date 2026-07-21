@@ -67,16 +67,34 @@ ColorControlDelegate * GetDelegate(EndpointId endpoint);
 class ColorControlServer
 {
 public:
-    using StepModeEnum  = chip::app::Clusters::ColorControl::StepModeEnum;
-    using MoveModeEnum  = chip::app::Clusters::ColorControl::MoveModeEnum;
-    using DirectionEnum = chip::app::Clusters::ColorControl::DirectionEnum;
-    using Feature       = chip::app::Clusters::ColorControl::Feature;
-    using OptionsBitmap = chip::app::Clusters::ColorControl::OptionsBitmap;
-    using Status        = chip::Protocols::InteractionModel::Status;
+    using StepModeEnum   = chip::app::Clusters::ColorControl::StepModeEnum;
+    using MoveModeEnum   = chip::app::Clusters::ColorControl::MoveModeEnum;
+    using DirectionEnum  = chip::app::Clusters::ColorControl::DirectionEnum;
+    using Feature        = chip::app::Clusters::ColorControl::Feature;
+    using OptionsBitmap  = chip::app::Clusters::ColorControl::OptionsBitmap;
+    using ColorModeEnum  = chip::app::Clusters::ColorControl::ColorModeEnum;
+    using Status         = chip::Protocols::InteractionModel::Status;
 
     static ColorControlServer & Instance();
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
+
+    // Legacy attribute read accessors.
+    //
+    // These deliberately preserve the pre-migration generated-accessor signature
+    // (endpoint + out-param + Status) instead of returning the ColorControlCluster instance:
+    // application code (examples, platform glue) keeps reading color state without depending on the
+    // internal code-driven cluster type. Each resolves the per-endpoint cluster via
+    // ColorControl::FindClusterOnEndpoint and returns its live value, or Status::UnsupportedEndpoint
+    // (leaving `value` untouched) when no Color Control server is registered on the endpoint.
+    Status GetCurrentHue(chip::EndpointId endpoint, uint8_t & value);
+    Status GetCurrentSaturation(chip::EndpointId endpoint, uint8_t & value);
+    Status GetCurrentX(chip::EndpointId endpoint, uint16_t & value);
+    Status GetCurrentY(chip::EndpointId endpoint, uint16_t & value);
+    Status GetColorTemperatureMireds(chip::EndpointId endpoint, uint16_t & value);
+    // ColorMode is derived from the cluster's EnhancedColorMode; the enhanced-hue variant is clamped
+    // down to the legacy CurrentHueAndCurrentSaturation value here so callers see a legal ColorMode.
+    Status GetColorMode(chip::EndpointId endpoint, ColorModeEnum & value);
 
     Status stopAllColorTransitions(chip::EndpointId endpoint);
     Status stopMoveStepCommand(chip::EndpointId endpoint,

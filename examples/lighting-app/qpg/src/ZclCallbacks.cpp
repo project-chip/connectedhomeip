@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/util/af-types.h>
 #include <assert.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -80,14 +81,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
-                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+                Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentY(endpoint, xy.y);
                 assert(status == Protocols::InteractionModel::Status::Success);
             }
             if (attributeId == ColorControl::Attributes::CurrentY::Id)
             {
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
-                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+                Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentX(endpoint, xy.x);
                 assert(status == Protocols::InteractionModel::Status::Success);
             }
 
@@ -110,21 +111,21 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 // We only support 8-bit hue. Assuming hue is linear, normalize 16-bit to 8-bit.
                 hsv.h = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) >> 8);
                 // get saturation from cluster value storage
-                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentSaturation(endpoint, hsv.s);
                 assert(status == Protocols::InteractionModel::Status::Success);
             }
             else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
             {
                 hsv.h = *value;
                 // get saturation from cluster value storage
-                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentSaturation(endpoint, hsv.s);
                 assert(status == Protocols::InteractionModel::Status::Success);
             }
             else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
             {
                 hsv.s = *value;
                 // get hue from cluster value storage
-                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+                Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentHue(endpoint, hsv.h);
                 assert(status == Protocols::InteractionModel::Status::Success);
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
@@ -182,9 +183,9 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     }
 
     HsvColor_t hsv;
-    status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+    status = ColorControlServer::Instance().GetCurrentHue(endpoint, hsv.h);
     assert(status == Protocols::InteractionModel::Status::Success);
-    status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+    status = ColorControlServer::Instance().GetCurrentSaturation(endpoint, hsv.s);
     assert(status == Protocols::InteractionModel::Status::Success);
     ChipLogProgress(Zcl, "restore HSV color: %u|%u", hsv.h, hsv.s);
     LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);

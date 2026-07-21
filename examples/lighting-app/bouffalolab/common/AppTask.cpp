@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 
 #include <app/server/Dnssd.h>
@@ -280,14 +281,15 @@ void AppTask::LightingUpdate(app_event_t status)
                     break;
                 }
 
-                if (Protocols::InteractionModel::Status::Success !=
-                    Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
+                // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param +
+                // Status shape) so we do not depend on the internal cluster type.
+                if (Protocols::InteractionModel::Status::Success != ColorControlServer::Instance().GetCurrentHue(endpoint, hue))
                 {
                     break;
                 }
 
                 if (Protocols::InteractionModel::Status::Success !=
-                    Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpoint, &sat))
+                    ColorControlServer::Instance().GetCurrentSaturation(endpoint, sat))
                 {
                     break;
                 }
