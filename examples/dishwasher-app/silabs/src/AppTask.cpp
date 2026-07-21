@@ -101,7 +101,7 @@ CHIP_ERROR AppTask::AppInit()
     GetDishwasherManager()->UpdateOperationState(state);
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI((GetDishwasherManager()->GetOperationalState() == OperationalStateEnum::kRunning));
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
@@ -222,7 +222,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
 
 void AppTask::ActionCompleted()
 {
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI((GetDishwasherManager()->GetOperationalState() == OperationalStateEnum::kRunning));
 #endif
 }

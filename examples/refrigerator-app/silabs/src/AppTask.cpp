@@ -26,13 +26,18 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "RefrigeratorUI.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+<<<<<<< HEAD
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+    =======
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
+    >>>>>>> f1683e68e0 (update DISPLAY_ENABLED define (#73069))
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "EventHandlerLibShell.h"
@@ -60,7 +65,7 @@
 #define APP_FUNCTION_BUTTON 0
 #define APP_REFRIGERATOR 1
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;

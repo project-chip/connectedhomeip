@@ -77,7 +77,7 @@ CHIP_ERROR AppTask::AppInit()
     sAlarmLED.Set(false);
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(false);
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI

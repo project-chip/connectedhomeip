@@ -73,7 +73,9 @@ config("siwx917-common-config") {
   if (!disable_lcd) {
     include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
-    defines += [ "DISPLAY_ENABLED" ]
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=1" ]
+  } else {
+    defines += [ "SL_MATTER_DISPLAY_ENABLED=0" ]
   }
 
   if (show_qr_code) {
