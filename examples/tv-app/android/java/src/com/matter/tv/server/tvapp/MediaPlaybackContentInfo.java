@@ -31,7 +31,8 @@ public class MediaPlaybackContentInfo {
   public String season;
   public String episode;
 
-  public MediaPlaybackContentInfo(int contentType, String title, String show, String season, String episode) {
+  public MediaPlaybackContentInfo(
+      int contentType, String title, String show, String season, String episode) {
     this.contentType = contentType;
     this.title = title;
     this.show = show;
