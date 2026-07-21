@@ -155,7 +155,6 @@ class CertificateAuthority:
                 # If we're here, it's likely because we're loading .ini files
                 caList[str(self._caIndex)] = replFabricEntry
             elif (replFabricEntry not in caList[str(self._caIndex)]):
-                LOGGER.warning(self._caIndex)
                 caList[str(self._caIndex)].append(replFabricEntry)
 
             self._persistentStorage.SetKey(key='caList', value=caList)
