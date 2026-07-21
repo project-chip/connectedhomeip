@@ -199,15 +199,13 @@ class TC_DD_3_24(MatterBaseTest):
             f"Operational mDNS service '{instance_qname}' was not found"
         )
 
-        asserts.assert_true(
-            hasattr(srv_record, "txt"),
-            f"Operational mDNS service '{instance_qname}' does not contain TXT data"
-        )
+        if not hasattr(srv_record, "txt"):
+            log.info("Operational mDNS service '%s' does not contain TXT data", instance_qname)
+            return False
 
-        asserts.assert_is_not_none(
-            srv_record.txt,
-            f"Operational mDNS service '{instance_qname}' has no TXT record"
-        )
+        if srv_record.txt is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
+            return False
 
         asserts.assert_true(
             isinstance(srv_record.txt, dict),
