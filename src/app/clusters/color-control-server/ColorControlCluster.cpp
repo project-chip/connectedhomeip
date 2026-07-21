@@ -365,7 +365,7 @@ bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
         // Point-to-point: signedDelta is the signed arc to travel over durationMs.
         const float t     = std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
         done              = (t >= 1.f);
-        const int32_t arc = done ? tx.signedDelta                            // exact endpoint, no drift
+        const int32_t arc = done ? tx.signedDelta                                                // exact endpoint, no drift
                                  : static_cast<int32_t>(static_cast<float>(tx.signedDelta) * t); // 16-bit circular interpolation
         eh                = static_cast<uint16_t>((static_cast<int32_t>(tx.startHue) + arc) & 0xFFFF);
     }
@@ -404,10 +404,9 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
     const bool done        = (t >= 1.f);
 
     // Saturation is linear (not circular) and 8-bit. Exact target on the last tick avoids drift.
-    const uint8_t sat =
-        done ? tx.targetSat
-             : static_cast<uint8_t>(tx.startSat +
-                                    static_cast<int32_t>(static_cast<float>(int32_t(tx.targetSat) - tx.startSat) * t));
+    const uint8_t sat = done
+        ? tx.targetSat
+        : static_cast<uint8_t>(tx.startSat + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetSat) - tx.startSat) * t));
 
     // NETWORK REPORTING is throttled (§3.2.7.2): silent mid-transition, report at the end.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
@@ -522,12 +521,12 @@ bool ColorControlCluster::TickXY(XYTransition & tx, uint64_t now)
     const bool done  = doneX && doneY; // XY is done only when BOTH axes arrive
 
     // CIE X/Y are 16-bit and linear. Exact target on each axis's last tick avoids drift.
-    const uint16_t x =
-        done ? tx.targetX
-             : static_cast<uint16_t>(tx.startX + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetX) - tx.startX) * tX));
-    const uint16_t y =
-        done ? tx.targetY
-             : static_cast<uint16_t>(tx.startY + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetY) - tx.startY) * tY));
+    const uint16_t x = done
+        ? tx.targetX
+        : static_cast<uint16_t>(tx.startX + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetX) - tx.startX) * tX));
+    const uint16_t y = done
+        ? tx.targetY
+        : static_cast<uint16_t>(tx.startY + static_cast<int32_t>(static_cast<float>(int32_t(tx.targetY) - tx.startY) * tY));
 
     // NETWORK REPORTING is throttled (3.2.7.2): silent mid-transition, report only when BOTH done.
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
