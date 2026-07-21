@@ -168,10 +168,7 @@ protected:
     void DrainSystemLayer()
     {
         EXPECT_EQ(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                      [](intptr_t) -> void {
-                          EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
-                      },
-                      0),
+                      [](intptr_t) -> void { EXPECT_EQ(chip::DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }, 0),
                   CHIP_NO_ERROR);
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
     }
