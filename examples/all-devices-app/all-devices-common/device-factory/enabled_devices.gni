@@ -87,6 +87,10 @@ _available_devices = [
     "DIMMABLE_PLUG_IN_UNIT",
   ],
   [
+    "dimmer-switch",
+    "DIMMER_SWITCH",
+  ],
+  [
     "dishwasher",
     "DISHWASHER",
   ],

@@ -52,6 +52,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/DimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-light/impl/LoggingDimmableLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dimmable-plug-in-unit/DimmablePlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/dimmer-switch/DimmerSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/dishwasher/Dishwasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/fan/Fan.cpp"
@@ -164,6 +165,7 @@ foreach(_key
         device-energy-management
         dimmable-light
         dimmable-plug-in-unit
+        dimmer-switch
         dishwasher
         extractor-hood
         fan

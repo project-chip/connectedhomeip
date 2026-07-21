@@ -38,6 +38,7 @@ executable("all-devices-app") {
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler:binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
@@ -48,6 +49,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmer-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan",
