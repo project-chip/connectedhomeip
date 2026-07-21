@@ -392,7 +392,7 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --product_name "not-specified" \
 --date "2022-02-02" \
 --hw_ver 1 \
---hw_ver_str "prerelase" \
+--hw_ver_str "prerelease" \
 --dac_cert "credentials/development/attestation/Matter-Development-DAC-FFF1-8006-Cert.der" \
 --dac_key "credentials/development/attestation/Matter-Development-DAC-FFF1-8006-Key.der" \
 --pai_cert "credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.der" \
@@ -802,7 +802,7 @@ them as an additional option for the west command. For example (replace
 `nrf52840dk_nrf52840` with own board name):
 
 ```
-$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y --DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
+$ west build -b nrf52840dk_nrf52840 -- -DCONFIG_CHIP_FACTORY_DATA=y -DSB_CONFIG_MATTER_FACTORY_DATA_GENERATE=y --DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF11
 ```
 
 Alternatively, you can add the relevant Kconfig option lines to the example's
