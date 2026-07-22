@@ -2155,9 +2155,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-<<<<<<< HEAD
+
+<< << << < HEAD
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
-=======
+== == == =
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
         """Commission a single DUT devices over NTL.
         The discovery_cap_bitmask is patched to keep only the NTL bit ON.
@@ -2229,7 +2230,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return result
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
->>>>>>> 130cdd24ac (Add nfc discovery in setupcodepairer final (#72715))
+>>>>>> > 130cdd24ac(Add nfc discovery in setupcodepairer final(  # 72715))
         """Open a commissioning window on the target device.
 
         Args:
@@ -2243,13 +2244,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             AssertionError: If opening the commissioning window fails.
         """
-        rnd_discriminator = random.randint(0, 4095)
+        rnd_discriminator=random.randint(0, 4095)
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
+            commissioning_params=await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
 
@@ -2258,7 +2259,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool=True, verify_wildcard_subscription: Optional[bool]=None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -2275,9 +2276,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             The attribute value.
         """
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
-        data = result[endpoint]
-        attr_ret = list(data.values())[0][attribute]
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+        data=result[endpoint]
+        attr_ret=list(data.values())[0][attribute]
 
         # Route this read through the same subscription-cache check used by
         # read_single_attribute_check_success so that any test calling this
@@ -2285,7 +2286,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Downstream skip conditions (C/Q attributes, no active subscription,
         # cross-fabric reads, ACL-removed fallback) are evaluated inside
         # verify_attribute_subscription_value.
-        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        read_ok=attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
         if read_ok and node_id == self.dut_node_id and self._effective_verify_wildcard_subscription(verify_wildcard_subscription):
             await self.verify_attribute_subscription_value(
                 attribute=attribute,
@@ -2299,8 +2300,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_all_endpoints(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None,
-            verify_wildcard_subscription: Optional[bool] = None):
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None,
+            verify_wildcard_subscription: Optional[bool]=None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
         Args:
@@ -2319,16 +2320,16 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         # mypy expects tuple-shaped items here. Some tests crash when attribute requests are wrapped in a single-element tuple here.
         # We pass the plain attribute to avoid the runtime issue; so we ignore that type.
-        read_response = await dev_ctrl.ReadAttribute(node_id, [attribute])  # type: ignore[list-item]
-        attrs = {}
+        read_response=await dev_ctrl.ReadAttribute(node_id, [attribute])  # type: ignore[list-item]
+        attrs={}
         for endpoint in read_response:
-            attr_ret = read_response[endpoint][cluster][attribute]
-            attrs[endpoint] = attr_ret
+            attr_ret=read_response[endpoint][cluster][attribute]
+            attrs[endpoint]=attr_ret
 
         # Verify each endpoint's value against the background wildcard-subscription
         # cache, mirroring the single-endpoint path in read_single_attribute_check_success.
@@ -2350,25 +2351,25 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None, fabric_filtered: bool=True, assert_on_error: bool=True, test_name: str="", payloadCapability: int=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: Optional[bool]=None) -> object:
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
-        attr_ret = result[endpoint][cluster][attribute]
-        read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
-        desired_type = attribute.attribute_type.Type
-        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
-        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = matchers.is_type(attr_ret, desired_type)
+            endpoint=self.get_endpoint()
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
+        attr_ret=result[endpoint][cluster][attribute]
+        read_err_msg=f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
+        desired_type=attribute.attribute_type.Type
+        type_err_msg=f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        read_ok=attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        type_ok=matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
         else:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+            location=AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
@@ -2405,10 +2406,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             self,
             attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             read_value: Any,
-            endpoint_id: Optional[int] = None,
-            test_name: str = "",
-            assert_on_error: bool = True,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None) -> bool:
+            endpoint_id: Optional[int]=None,
+            test_name: str="",
+            assert_on_error: bool=True,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None) -> bool:
         """Compare a freshly-read attribute value against the background wildcard subscription cache.
 
         Called automatically from the base-class read helpers so any single-attribute read
@@ -2460,11 +2461,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             True if the values match or the check was skipped; False on mismatch.
         """
         if endpoint_id is None:
-            endpoint_id = self.get_endpoint()
+            endpoint_id=self.get_endpoint()
 
-        cluster_id: int = attribute.cluster_id
-        attr_id: int = attribute.attribute_id
-        location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attr_id)
+        cluster_id: int=attribute.cluster_id
+        attr_id: int=attribute.attribute_id
+        location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attr_id)
 
         # C/Q-quality attributes are never stored in the subscription cache because they
         # are not required to report on every change.  Skip without error.
@@ -2488,10 +2489,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             except AttributeError:
                 pass
 
-        cached_value = self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
+        cached_value=self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
 
         if cached_value is None:
-            problem = (
+            problem=(
                 f"Attribute {attribute.__name__} (cluster 0x{cluster_id:04X}, "
                 f"attr 0x{attr_id:04X}) on endpoint {endpoint_id} "
                 f"has no value in subscription cache — never reported via subscription"
@@ -2510,7 +2511,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             )
             for attempt in range(3):
                 await asyncio.sleep(1)
-                cached_value = self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
+                cached_value=self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
                 if cached_value == read_value:
                     LOGGER.info(
                         "[verify_subscription] %s on endpoint %s matched after %ds retry: %s",
@@ -2543,7 +2544,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
                 return True
 
-            problem = (
+            problem=(
                 f"Subscription cache mismatch for {attribute.__name__} "
                 f"(cluster 0x{cluster_id:04X}, attr 0x{attr_id:04X}) "
                 f"on endpoint {endpoint_id}: "
@@ -2562,7 +2563,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
         return True
 
-    @staticmethod
+    @ staticmethod
     def _fabric_filtered_match(read_value: Any, cached_value: Any) -> bool:
         """Check whether a read-vs-cache mismatch is caused by fabric-scoped filtering.
 
@@ -2596,11 +2597,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not all(hasattr(entry, 'fabricIndex') for entry in cached_value):
             return False
 
-        read_fabric_indices = {entry.fabricIndex for entry in read_value if hasattr(entry, 'fabricIndex')}
+        read_fabric_indices={entry.fabricIndex for entry in read_value if hasattr(entry, 'fabricIndex')}
         if not read_fabric_indices:
             return False
 
-        filtered_cache = [entry for entry in cached_value if entry.fabricIndex in read_fabric_indices]
+        filtered_cache=[entry for entry in cached_value if entry.fabricIndex in read_fabric_indices]
         return filtered_cache == read_value
 
     async def _is_subscription_acl_removed(self) -> bool:
@@ -2611,13 +2612,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         if self.subscription_controller is None:
             return False
-        sub_node_id = self.matter_test_config.controller_node_id + 123456
+        sub_node_id=self.matter_test_config.controller_node_id + 123456
         try:
-            acl_result = await self.default_controller.ReadAttribute(
+            acl_result=await self.default_controller.ReadAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
             )
-            current_acl = acl_result[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+            current_acl=acl_result[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
             return all(not (entry.subjects and sub_node_id in entry.subjects) for entry in current_acl)
         except Exception as e:
             LOGGER.warning("[verify_subscription] Could not read ACL to check for conflict: %s", e)
@@ -2626,7 +2627,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def poll_until_attributes_in_range(
             self, cluster: ClusterObjects.Cluster,
             attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
-            timeout_sec: int = 1) -> None:
+            timeout_sec: int=1) -> None:
         """Poll attributes until each value falls within [min_value, max_value].
 
         Args:
@@ -2638,42 +2639,42 @@ class MatterBaseTest(base_test.BaseTestClass):
             TimeoutError: If any attribute does not reach its expected range before timeout.
         """
         for attribute, min_value, max_value in attribute_bounds:
-            deadline = time.monotonic() + timeout_sec
-            value = await self.read_single_attribute_check_success(cluster, attribute)
+            deadline=time.monotonic() + timeout_sec
+            value=await self.read_single_attribute_check_success(cluster, attribute)
             while value < min_value or value > max_value:  # type: ignore[operator]
                 if time.monotonic() >= deadline:
                     raise TimeoutError(
                         f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
                 await asyncio.sleep(0.1)
-                value = await self.read_single_attribute_check_success(cluster, attribute)
+                value=await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None,
+            fabric_filtered: bool=True, assert_on_error: bool=True, test_name: str="") -> object:
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
-        attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        error_type_ok = attr_ret is not None and isinstance(
+            endpoint=self.get_endpoint()
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        attr_ret=result[endpoint][cluster][attribute]
+        err_msg="Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+        error_type_ok=attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
         if assert_on_error:
             asserts.assert_true(error_type_ok, err_msg)
             asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
         elif not error_type_ok or attr_ret.Reason.status != error:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+            location=AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
             self.record_error(test_name=test_name, location=location, problem=err_msg)
             return None
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int]=None, expect_success: bool=True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -2682,12 +2683,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Status code is returned.
         """
-        dev_ctrl = self.default_controller
-        node_id = self.dut_node_id
+        dev_ctrl=self.default_controller
+        node_id=self.dut_node_id
         if endpoint_id is None:
-            endpoint_id = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+            endpoint_id=0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
-        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
+        write_result=await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
         if expect_success:
             asserts.assert_equal(write_result[0].Status, Status.Success,
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
@@ -2695,11 +2696,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def read_from_app_pipe(
         self,
-        app_pipe_out: Optional[str] = None,
-        timeout: float = 2.0,
-        max_bytes: int = 66536,
-        chunk: int = 4096,
-        ip_env_var: Optional[str] = None,
+        app_pipe_out: Optional[str]=None,
+        timeout: float=2.0,
+        max_bytes: int=66536,
+        chunk: int=4096,
+        ip_env_var: Optional[str]=None,
     ) -> Any:
         """
         Read an out-of-band command from a Matter app.
@@ -2713,7 +2714,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             - LINUX_DUT_USER: required when <ip_env_var> is set.
         """
         if app_pipe_out is None:
-            app_pipe_out = self.matter_test_config.pipe_name_out
+            app_pipe_out=self.matter_test_config.pipe_name_out
 
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -2722,7 +2723,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: Optional[str]=os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2732,40 +2733,40 @@ class MatterBaseTest(base_test.BaseTestClass):
             # and we need explicit timeout handling and a hard size limit for safety. We also
             # preserve any extra bytes (e.g. multiple queued messages) across calls.
             if not hasattr(self, "_app_pipe_out_buf"):
-                self._app_pipe_out_buf = bytearray()
+                self._app_pipe_out_buf=bytearray()
 
-            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            fd=os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
             try:
-                buf: bytearray = self._app_pipe_out_buf
+                buf: bytearray=self._app_pipe_out_buf
 
                 while True:
                     if b"\n" in buf:
-                        line, _, rest = buf.partition(b"\n")
-                        self._app_pipe_out_buf = bytearray(rest)
+                        line, _, rest=buf.partition(b"\n")
+                        self._app_pipe_out_buf=bytearray(rest)
 
-                        line = line.strip()
+                        line=line.strip()
                         if not line:
                             continue
                         return json.loads(line.decode("utf-8"))
 
                     if buf:
                         try:
-                            obj = json.loads(buf.decode("utf-8"))
-                            self._app_pipe_out_buf = bytearray()
+                            obj=json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf=bytearray()
                             return obj
                         except json.JSONDecodeError:
                             pass
 
-                    r, _, _ = select.select([fd], [], [], timeout)
+                    r, _, _=select.select([fd], [], [], timeout)
                     if not r:
                         raise TimeoutError(f"No data within {timeout}")
 
-                    chunk_bytes = os.read(fd, chunk)
+                    chunk_bytes=os.read(fd, chunk)
                     if not chunk_bytes:
                         if buf:
                             try:
-                                obj = json.loads(buf.decode("utf-8"))
-                                self._app_pipe_out_buf = bytearray()
+                                obj=json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf=bytearray()
                                 return obj
                             except json.JSONDecodeError as ex:
                                 raise EOFError(f"Incomplete JSON response: {ex}") from ex
@@ -2779,16 +2780,16 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         LOGGER.info("Using DUT IP address: %s", dut_ip)
 
-        dut_uname = os.getenv("LINUX_DUT_USER")
+        dut_uname=os.getenv("LINUX_DUT_USER")
         asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
         LOGGER.info("Using DUT user name: %s", dut_uname)
 
         # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
-        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
-        out_str = out.decode("utf-8").strip()
+        out=subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str=out.decode("utf-8").strip()
         return json.loads(out_str)
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str]=None, ip_env_var: Optional[str]=None):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -2811,7 +2812,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
         if app_pipe is None:
-            app_pipe = self.matter_test_config.pipe_name
+            app_pipe=self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -2823,9 +2824,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
 
-        command = json.dumps(command_dict)
+        command=json.dumps(command_dict)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: Optional[str]=os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2840,18 +2841,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             LOGGER.info("Using DUT IP address: %s", dut_ip)
 
-            dut_uname = os.getenv('LINUX_DUT_USER')
+            dut_uname=os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info("Using DUT user name: %s", dut_uname)
-            command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            command_fixed=shlex.quote(json.dumps(command_dict))
+            cmd="echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            timedRequestTimeoutMs: OptionalTimeout = None,
-            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None,
+            timedRequestTimeoutMs: OptionalTimeout=None,
+            payloadCapability: int=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
 
         Args:
@@ -2866,16 +2867,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             Command response object.
         """
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
+            endpoint=self.get_endpoint()
 
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           payloadCapability=payloadCapability)
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes]=None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -2887,11 +2888,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes(list(range(16)))
+                enableKey=bytes(list(range(16)))
             else:
-                enableKey = self.matter_test_config.global_test_params['enableKey']
+                enableKey=self.matter_test_config.global_test_params['enableKey']
 
-        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
+        eventTrigger=self._update_legacy_test_event_triggers(eventTrigger)
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
@@ -2904,10 +2905,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def check_test_event_triggers_enabled(self):
         """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
            It will assert and fail the test if not True."""
-        full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
-        cluster = Clusters.Objects.GeneralDiagnostics
+        full_attr=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        cluster=Clusters.Objects.GeneralDiagnostics
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-        test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
+        test_event_enabled=await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
     def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
@@ -2922,19 +2923,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             ValueError: If target endpoint is out of valid range.
         """
-        target_endpoint = 0
+        target_endpoint=0
 
         if self.matter_test_config.legacy:
             LOGGER.info("Legacy test event trigger activated")
         else:
             LOGGER.info("Legacy test event trigger deactivated")
-            target_endpoint = self.get_endpoint()
+            target_endpoint=self.get_endpoint()
 
         if not (0 <= target_endpoint <= 0xFFFF):
             raise ValueError("Target endpoint should be between 0 and 0xFFFF")
 
         # Clean endpoint target
-        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+        eventTrigger=eventTrigger & ~ (0xFFFF << 32)
 
         # Sets endpoint in eventTrigger
         eventTrigger |= (target_endpoint & 0xFFFF) << 32
@@ -2945,7 +2946,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Utility Helpers (Problem Recording, User Input)
     #
 
-    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record an error-level problem during test execution.
 
         Args:
@@ -2956,7 +2957,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
-    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record a warning-level problem during test execution.
 
         Args:
@@ -2967,7 +2968,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
-    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record a note-level problem during test execution.
 
         Args:
@@ -2980,8 +2981,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def wait_for_user_input(self,
                             prompt_msg: str,
-                            prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> Optional[str]:
+                            prompt_msg_placeholder: str="Submit anything to continue",
+                            default_value: str="y") -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
@@ -2996,9 +2997,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         # TODO(#31928): Remove any assumptions of test params for endpoint ID.
 
         # Get the endpoint user param instead of `--endpoint-id` result, if available, temporarily.
-        endpoint_id = self.user_params.get("endpoint", None)
+        endpoint_id=self.user_params.get("endpoint", None)
         if endpoint_id is None or not isinstance(endpoint_id, int):
-            endpoint_id = self.matter_test_config.endpoint
+            endpoint_id=self.matter_test_config.endpoint
 
         if self.runner_hook:
             # TODO(#31928): Add endpoint support to hooks.
@@ -3034,7 +3035,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Only run when TC is being executed in TH
         if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
             # Convert bytes to comma separated hex string
-            hex_string = ', '.join(f'{byte:02x}' for byte in image)
+            hex_string=', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
@@ -3043,7 +3044,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
-                result = input()
+                result=input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
@@ -3054,13 +3055,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Helper to show a prompt and wait for user validation in TH."""
         # Only run when TC is being executed in TH
         if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
-            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method=getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
             LOGGER.info("========= USER PROMPT for %s =========", validation_name)
 
             try:
-                result = input()
+                result=input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError(error_message)
             except EOFError:
@@ -3162,7 +3163,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             None
         """
         # Check if restart flag file is available (indicates test runner supports app restart)
-        restart_flag_file = self.get_restart_flag_file()
+        restart_flag_file=self.get_restart_flag_file()
 
         if not restart_flag_file:
             # No restart flag file: ask user to manually reboot
@@ -3176,7 +3177,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 # Create the restart flag file to signal the test runner
                 # Allow for multiple reboots like SW update tests do using the "restart" mode
-                restart_text = "restart"
+                restart_text="restart"
                 with open(restart_flag_file, "w") as f:
                     f.write(restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
@@ -3192,7 +3193,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error("Failed to reboot app: %s", e)
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
+    async def request_device_factory_reset(self, reset_ctrl: bool=False) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments and also manual
@@ -3208,7 +3209,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             None
         """
         # Check if restart flag file is available (indicates test runner supports app factory reset)
-        restart_flag_file = self.get_restart_flag_file()
+        restart_flag_file=self.get_restart_flag_file()
 
         if not restart_flag_file:
             # No restart flag file: ask user to manually factory reset
@@ -3219,7 +3220,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("Manual device factory reset completed")
 
         else:
-            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
+            restart_flag_text="factory reset" if reset_ctrl else "factory reset app only"
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
@@ -3233,7 +3234,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
 
             except Exception as e:
-                err = f"Failed to {restart_flag_text}: {e}"
+                err=f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
 
@@ -3241,7 +3242,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Wait for the monitor thread to remove the flag file
         # The monitor deletes the flag file AFTER the restart completes, so this ensures
         # the app has fully rebooted and is ready before we continue
-        start_time = time.time()
+        start_time=time.time()
         while os.path.exists(restart_flag_file):
             if time.time() - start_time > timeout_sec:
                 asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
@@ -3266,11 +3267,11 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     Returns:
         The result returned by the awaited `body` function.
     """
-    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    timeout=self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
     return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
-EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+EndpointCheckFunction=typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
@@ -3285,7 +3286,7 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [
+    wildcard=await self.default_controller.Read(self.dut_node_id, [
         (Clusters.Descriptor,),  # single-element tuple needs trailing comma
         Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
