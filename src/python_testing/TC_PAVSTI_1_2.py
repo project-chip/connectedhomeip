@@ -329,7 +329,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                                    self.dut_node_id,
                                    self.get_endpoint())
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=avsmAttr.HardPrivacyModeOn):
+        if self.attribute_guard(endpoint=endpoint, attribute=avsmAttr.HardPrivacyModeOn):
             self.step(7)
             # For CI: Use app pipe to simulate physical privacy switch being turned on
             # For manual testing: User should physically turn on the privacy switch

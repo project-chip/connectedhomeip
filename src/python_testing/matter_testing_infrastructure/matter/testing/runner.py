@@ -38,10 +38,12 @@ from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
+import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
 
@@ -364,6 +366,117 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
+async def read_global_wildcard_async(default_controller, node_id):
+    """Perform the global wildcard read (Descriptor cluster + AttributeList / FeatureMap /
+    AcceptedCommandList on every endpoint) with a 60-second timeout.
+    """
+    return await asyncio.wait_for(
+        default_controller.Read(
+            node_id,
+            [
+                (Clusters.Descriptor),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+            ],
+        ),
+        timeout=60,
+    )
+
+
+def read_global_wildcard(event_loop, default_controller, node_id):
+    """Sync wrapper around :func:`read_global_wildcard_async` for callers outside an event loop."""
+    return event_loop.run_until_complete(
+        read_global_wildcard_async(default_controller, node_id)
+    )
+
+
+async def _prepopulate_wildcard_via_case(default_controller, node_id, test_config):
+    """Device is already on this fabric — read via CASE, no side effects.
+
+    Any downstream setup_class_helper will also reach the device via CASE.
+    """
+    try:
+        stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
+        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+            stored_global_wildcard)
+    except Exception:
+        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+
+
+async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_test_config, test_config):
+    """Device is not commissioned — attempt PASE if credentials are available.
+
+    The session is kept alive afterwards so that downstream consumers
+    (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
+    reuse it via FindOrEstablishPASESession instead of forcing the device
+    to reopen its commissioning window.
+    """
+    setup_code: str | None = None
+    if matter_test_config.manual_code:
+        setup_code = matter_test_config.manual_code[0]
+    elif matter_test_config.qr_code_content:
+        setup_code = matter_test_config.qr_code_content[0]
+    elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
+        setup_code = default_controller.CreateManualCode(
+            matter_test_config.discriminators[0],
+            matter_test_config.setup_passcodes[0],
+        )
+
+    if setup_code is None:
+        LOGGER.warning(
+            "Device not commissioned and no setup code available — "
+            "skipping global wildcard pre-population"
+        )
+        return
+
+    try:
+        commissionee = await default_controller.FindOrEstablishPASESession(
+            setupCode=setup_code, nodeId=node_id
+        )
+        if commissionee is None:
+            LOGGER.error("FindOrEstablishPASESession returned None")
+            return
+
+        stored_global_wildcard = await read_global_wildcard_async(default_controller, node_id)
+        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+            stored_global_wildcard)
+        LOGGER.info(
+            "Keeping PASE session alive for downstream reuse "
+            "(CommissionDeviceTest or setup_class_helper)"
+        )
+    except Exception:
+        LOGGER.warning(
+            "Could not pre-populate global wildcard before commissioning",
+            exc_info=True
+        )
+
+
+async def _prepopulate_global_wildcard(default_controller, node_id, matter_test_config, test_config):
+    """Route to CASE or PASE pre-population based on the device's commissioning status.
+
+    A failure to determine the commissioning status is treated as "not commissioned",
+    matching the previous sync behavior.
+    """
+    # Local import to avoid circular dependency.
+    from matter.testing.commissioning import is_commissioned
+
+    try:
+        already_commissioned = await is_commissioned(default_controller, node_id)
+    except Exception:
+        LOGGER.warning(
+            "Could not determine commissioning status for node %s, assuming not commissioned",
+            node_id
+        )
+        already_commissioned = False
+
+    if already_commissioned:
+        await _prepopulate_wildcard_via_case(default_controller, node_id, test_config)
+    else:
+        await _prepopulate_wildcard_via_pase(
+            default_controller, node_id, matter_test_config, test_config)
+
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
@@ -434,9 +547,6 @@ def run_tests_no_exit(
             matter_test_config)
         test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
-        # Execute the test class with the config
-        ok = True
-
         test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
@@ -459,14 +569,29 @@ def run_tests_no_exit(
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
+            node_id = matter_test_config.dut_node_ids[0]
+
+            # Discovery tests (TC_DD_*) verify the device's advertising state
+            # directly. Opening a PASE session from the runner would suppress
+            # commissionable advertisement and cause those tests to fail, so
+            # skip the pre-PASE wildcard read for them entirely.
+            if not getattr(test_class, "runner_prepopulates_global_wildcard", True):
+                LOGGER.info(
+                    "%s opted out of the pre-PASE wildcard read; skipping so the "
+                    "device remains free to advertise",
+                    test_class.__name__
+                )
+            else:
+                event_loop.run_until_complete(
+                    _prepopulate_global_wildcard(
+                        default_controller, node_id, matter_test_config, test_config)
+                )
+
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
                 runner.add_test_class(test_config, test_class, tests)
 
             if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
                 hooks.start(count=1)
                 # Mobly gives the test run time in seconds, lets be a bit more
                 # precise

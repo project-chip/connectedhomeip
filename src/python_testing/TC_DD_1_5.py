@@ -32,6 +32,7 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_1_5(MatterBaseTest):
+    runner_prepopulates_global_wildcard = False
     disable_wildcard_subscription = True
 
     def desc_TC_DD_1_5(self) -> str:

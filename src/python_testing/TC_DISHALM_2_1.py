@@ -197,7 +197,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         self.step(3)
         latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
         latch_value = None
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=latch_attribute):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=latch_attribute):
             latch_value = await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute, "Latch")
 
         self.step(4)
