@@ -30,8 +30,8 @@ The supported JSON keys are:
 | JSON Key                    | Type                    | Description                                                                         |
 | :-------------------------- | :---------------------- | :---------------------------------------------------------------------------------- |
 | `dac_cert`                  | Hex String              | DER-encoded Device Attestation Certificate (DAC).                                   |
-| `dac_private_key`           | Hex String              | 32-byte SECP256r1 private key scalar used to sign the device attestation challenge. |
-| `dac_public_key`            | Hex String _(Optional)_ | 65-byte uncompressed SECP256r1 public key corresponding to `dac_private_key`.       |
+| `dac_private_key`           | Hex String              | 32-byte P-256 ECDSA private key scalar used to sign the device attestation challenge. |
+| `dac_public_key`            | Hex String _(Optional)_ | 65-byte uncompressed P-256 public key corresponding to `dac_private_key`.             |
 | `pai_cert`                  | Hex String              | DER-encoded Product Attestation Intermediate (PAI) certificate.                     |
 | `certification_declaration` | Hex String              | CMS-signed DER-encoded Certification Declaration (CD) payload.                      |
 | `firmware_information`      | Hex String _(Optional)_ | Optional firmware information payload.                                              |
