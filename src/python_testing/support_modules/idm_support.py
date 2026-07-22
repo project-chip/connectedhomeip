@@ -39,6 +39,7 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -1167,18 +1168,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     def get_mrp_retransmission_timeout_sec(self, dev_ctrl: ChipDeviceCtrl) -> float:
         """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
-        session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
-        # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
-        # idle=500ms, active=300ms.
-        negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else 500
-        negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else 300
-
-        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
-        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
-
-        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
-        backoff_sum = 1 + 1.6 + 2.56 + 4.096
-        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+        return compute_mrp_retransmission_timeout_sec(dev_ctrl, self.dut_node_id)
 
     def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
         """Get list of writable attribute IDs for a cluster.

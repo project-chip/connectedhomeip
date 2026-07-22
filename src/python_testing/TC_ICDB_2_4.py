@@ -301,7 +301,8 @@ class TC_ICDB_2_4(ICDBaseTest):
         th1_checkin_timeout_s = self.checkin_resume_wait_s(
             max_interval_s=th1_max_interval_s,
             active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s,
-            maximum_check_in_backoff_s=maximum_check_in_backoff_s)
+            maximum_check_in_backoff_s=maximum_check_in_backoff_s,
+            dev_ctrl=self.th1, node_id=self.dut_node_id)
 
         # Verify TH1 receives a check-in from the DUT once its subscription is dropped
         await self.assert_checkin_received(self.th1, self.dut_node_id, th1_checkin_timeout_s)
@@ -316,7 +317,8 @@ class TC_ICDB_2_4(ICDBaseTest):
         th2_subscription.Shutdown()
         th2_checkin_timeout_s = self.checkin_resume_wait_s(
             max_interval_s=th2_max_interval_s,
-            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s)
+            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s,
+            dev_ctrl=self.th2, node_id=self.th2_dut_node_id)
 
         # Verify TH1 and TH2 each receive a check-in from the DUT once no subscription covers them
         await asyncio.gather(

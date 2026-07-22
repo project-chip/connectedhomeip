@@ -33,7 +33,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, compute_mrp_retransmission_timeout_sec
 
 log = logging.getLogger(__name__)
 
@@ -264,7 +264,8 @@ class ICDBaseTest(MatterBaseTest):
 
     def checkin_resume_wait_s(self, *, max_interval_s: float,
                               active_mode_duration_ms: int, idle_mode_duration_s: int,
-                              maximum_check_in_backoff_s: int | None = None) -> float:
+                              maximum_check_in_backoff_s: int | None = None,
+                              dev_ctrl=None, node_id: int | None = None) -> float:
         """Seconds to allow for the DUT to resume check-ins after a subscriber drops locally.
 
         A TH subscription Shutdown() sends nothing to the DUT. It only notices the subscriber is
@@ -273,9 +274,8 @@ class ICDBaseTest(MatterBaseTest):
         on the following idle-to-active transition. The wait is therefore the sum of:
 
           - MaxInterval: the next report cannot come due (so detection cannot start) before this.
-          - one FullCycle: generous slack covering the MRP retransmission window before the report
-            is declared undeliverable. The real bound is a few seconds; a FullCycle is used here
-            rather than computing the exact MRP value from the session parameters.
+          - the worst-case MRP retransmission window, after which the report is declared
+            undeliverable, computed from the negotiated session parameters.
           - the resume term: the check-in fires on the next idle-to-active transition.
 
         The resume term is one FullCycle for a first resumed check-in. When the awaited check-in may
@@ -284,16 +284,22 @@ class ICDBaseTest(MatterBaseTest):
         term widens to max(FullCycle, MaximumCheckInBackoff) so a spec-compliant backoff cannot time
         the wait out.
 
+        dev_ctrl/node_id identify the session whose parameters bound the MRP window; they default to
+        the test's default controller and DUT node id.
+
         The wait must stay silent (no polling), so the DUT can actually go idle and cycle. Derived
         from the DUT's own timing values, so there are no hard-coded durations.
         """
+        dev_ctrl = dev_ctrl if dev_ctrl is not None else self.default_controller
+        node_id = node_id if node_id is not None else self.dut_node_id
+        mrp_slack_s = compute_mrp_retransmission_timeout_sec(dev_ctrl, node_id)
         full_cycle_s = self.compute_wait_time(ICDTransition.FullCycle,
                                               active_mode_duration_ms=active_mode_duration_ms,
                                               idle_mode_duration_s=idle_mode_duration_s)
         resume_s = full_cycle_s if maximum_check_in_backoff_s is None else max(full_cycle_s, maximum_check_in_backoff_s)
-        wait_s = max_interval_s + full_cycle_s + resume_s
-        log.info("Check-in resume wait: MaxInterval=%ss + MRP-slack(FullCycle)=%.1fs + resume=%.1fs = %.1fs",
-                 max_interval_s, full_cycle_s, resume_s, wait_s)
+        wait_s = max_interval_s + mrp_slack_s + resume_s
+        log.info("Check-in resume wait: MaxInterval=%ss + MRP-slack=%.1fs + resume=%.1fs = %.1fs",
+                 max_interval_s, mrp_slack_s, resume_s, wait_s)
         return wait_s
 
     async def assert_checkin_received(self, dev_ctrl, node_id: int, timeout_s: float) -> None:
