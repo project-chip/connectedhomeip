@@ -80,9 +80,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             }
             auto remoteSensing = valueRemoteSensing.Raw();
             AttributePersistence persistence(mContext->attributeStorage);
-            auto result = persistence.DecodeAndStoreNativeEndianValue(
-                { request.path.mEndpointId, Thermostat::Id, RemoteSensing::Id }, decoder, remoteSensing);
-            if (!result.IsSuccess())
+            auto result = persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing);
+            if (result != CHIP_NO_ERROR)
             {
                 return result;
             }
@@ -109,8 +108,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             return status;
         }
         AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.DecodeAndStoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id }, decoder,
-                                                           requestedSystemMode);
+        return persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id }, requestedSystemMode);
     }
     case TemperatureSetpointHold::Id: {
         TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
