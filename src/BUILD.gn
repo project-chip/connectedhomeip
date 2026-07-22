@@ -98,6 +98,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/laundry-washer-controls-server/tests",
       "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
+      "${chip_root}/src/app/clusters/media-file-management-server/tests",
       "${chip_root}/src/app/clusters/media-playback-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
       "${chip_root}/src/app/clusters/mode-base-server/tests",
