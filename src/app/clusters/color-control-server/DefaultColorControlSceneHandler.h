@@ -183,7 +183,8 @@ public:
                 break;
             case Attributes::EnhancedColorMode::Id:
                 VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-                VerifyOrReturnError(p.valueUnsigned8.Value() <= to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation),
+                VerifyOrReturnError(p.valueUnsigned8.Value() <=
+                                        to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation),
                                     CHIP_ERROR_INVALID_ARGUMENT);
                 targetColorMode = static_cast<EnhancedColorModeEnum>(p.valueUnsigned8.Value());
                 break;
