@@ -8484,42 +8484,6 @@ bool emberAfMediaFileManagementClusterOfferFileCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::MediaFileManagement::Commands::OfferFile::DecodableType & commandData);
 /**
- * @brief Audio Control Cluster Mute Command callback (from client)
- */
-bool emberAfAudioControlClusterMuteCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::AudioControl::Commands::Mute::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster Unmute Command callback (from client)
- */
-bool emberAfAudioControlClusterUnmuteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::Unmute::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster ToggleMuted Command callback (from client)
- */
-bool emberAfAudioControlClusterToggleMutedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::ToggleMuted::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster SetVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterSetVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::SetVolume::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster IncreaseVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterIncreaseVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::IncreaseVolume::DecodableType & commandData);
-/**
- * @brief Audio Control Cluster DecreaseVolume Command callback (from client)
- */
-bool emberAfAudioControlClusterDecreaseVolumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::AudioControl::Commands::DecreaseVolume::DecodableType & commandData);
-/**
  * @brief AV Analysis Cluster EnableContextTriggers Command callback (from client)
  */
 bool emberAfAvAnalysisClusterEnableContextTriggersCallback(

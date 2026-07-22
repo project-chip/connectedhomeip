@@ -32,6 +32,7 @@ source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/all-clusters-energy-mode-stubs.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/audio-control-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
@@ -79,6 +80,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/audio-control-server",
     "${chip_root}/src/app/clusters/groupcast",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
