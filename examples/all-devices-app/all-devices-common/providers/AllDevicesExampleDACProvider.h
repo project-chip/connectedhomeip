@@ -40,9 +40,8 @@ namespace DeviceLayer {
 class AllDevicesExampleDACProvider : public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
-    // Defined in .cpp to allow std::unique_ptr<FileProviderContext> with forward-declared FileProviderContext.
-    AllDevicesExampleDACProvider();
-    ~AllDevicesExampleDACProvider() override;
+    AllDevicesExampleDACProvider()          = default;
+    ~AllDevicesExampleDACProvider() override = default;
 
     /**
      * @brief Initializes the DAC credentials provider.
@@ -60,10 +59,7 @@ public:
 
 private:
     Credentials::DeviceAttestationCredentialsProvider * mDelegate = nullptr;
-
-    // Use PIMPL idiom to avoid leaking TestHarnessDACProvider test headers into the public provider interface.
-    struct FileProviderContext;
-    std::unique_ptr<FileProviderContext> mFileContext;
+    std::unique_ptr<Credentials::DeviceAttestationCredentialsProvider> mDynamicProvider;
 };
 
 } // namespace DeviceLayer

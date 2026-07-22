@@ -27,14 +27,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-struct AllDevicesExampleDACProvider::FileProviderContext
-{
-    Credentials::Examples::TestHarnessDACProvider provider;
-};
-
-AllDevicesExampleDACProvider::AllDevicesExampleDACProvider()  = default;
-AllDevicesExampleDACProvider::~AllDevicesExampleDACProvider() = default;
-
 CHIP_ERROR AllDevicesExampleDACProvider::Init(const std::optional<std::string> & filePath)
 {
     if (filePath.has_value() && !filePath.value().empty())
@@ -42,14 +34,14 @@ CHIP_ERROR AllDevicesExampleDACProvider::Init(const std::optional<std::string> &
         std::ifstream jsonFile(filePath.value().c_str(), std::ifstream::binary);
         VerifyOrReturnError(jsonFile.is_open(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        auto fileContext = std::make_unique<FileProviderContext>();
-        fileContext->provider.Init(filePath.value().c_str());
-        mFileContext = std::move(fileContext);
-        mDelegate    = &mFileContext->provider;
+        auto fileProvider = std::make_unique<Credentials::Examples::TestHarnessDACProvider>();
+        fileProvider->Init(filePath.value().c_str());
+        mDynamicProvider = std::move(fileProvider);
+        mDelegate        = mDynamicProvider.get();
     }
     else
     {
-        mFileContext.reset();
+        mDynamicProvider.reset();
         mDelegate = Credentials::Examples::GetExampleDACProvider();
     }
     return CHIP_NO_ERROR;
