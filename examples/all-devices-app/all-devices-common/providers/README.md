@@ -27,17 +27,17 @@ file is parsed by `TestHarnessDACProvider`
 
 The supported JSON keys are:
 
-| JSON Key                    | Type                    | Description                                                                         |
-| :-------------------------- | :---------------------- | :---------------------------------------------------------------------------------- |
-| `dac_cert`                  | Hex String              | DER-encoded Device Attestation Certificate (DAC).                                   |
+| JSON Key                    | Type                    | Description                                                                           |
+| :-------------------------- | :---------------------- | :------------------------------------------------------------------------------------ |
+| `dac_cert`                  | Hex String              | DER-encoded Device Attestation Certificate (DAC).                                     |
 | `dac_private_key`           | Hex String              | 32-byte P-256 ECDSA private key scalar used to sign the device attestation challenge. |
 | `dac_public_key`            | Hex String _(Optional)_ | 65-byte uncompressed P-256 public key corresponding to `dac_private_key`.             |
-| `pai_cert`                  | Hex String              | DER-encoded Product Attestation Intermediate (PAI) certificate.                     |
-| `certification_declaration` | Hex String              | CMS-signed DER-encoded Certification Declaration (CD) payload.                      |
-| `firmware_information`      | Hex String _(Optional)_ | Optional firmware information payload.                                              |
-| `basic_info_pid`            | Integer _(Optional)_    | Expected Product ID matching the test vector.                                       |
-| `description`               | String _(Optional)_     | Human-readable description of the test scenario.                                    |
-| `is_success_case`           | Boolean _(Optional)_    | Indicates whether the test vector is expected to pass or fail attestation.          |
+| `pai_cert`                  | Hex String              | DER-encoded Product Attestation Intermediate (PAI) certificate.                       |
+| `certification_declaration` | Hex String              | CMS-signed DER-encoded Certification Declaration (CD) payload.                        |
+| `firmware_information`      | Hex String _(Optional)_ | Optional firmware information payload.                                                |
+| `basic_info_pid`            | Integer _(Optional)_    | Expected Product ID matching the test vector.                                         |
+| `description`               | String _(Optional)_     | Human-readable description of the test scenario.                                      |
+| `is_success_case`           | Boolean _(Optional)_    | Indicates whether the test vector is expected to pass or fail attestation.            |
 
 ### Pre-Existing Test Vectors
 
