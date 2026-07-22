@@ -175,11 +175,11 @@ certification.
 The `all-devices-app` implementation provides a decoupled provider architecture:
 
 -   **Reference Provider**:
-    [`AllDevicesExampleDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/all-devices-common/providers/AllDevicesExampleDACProvider.h)
+    [`AllDevicesExampleDACProvider`](../all-devices-common/providers/AllDevicesExampleDACProvider.h)
     located in
-    [`all-devices-common/providers/`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/all-devices-common/providers/).
+    [`all-devices-common/providers/`](../all-devices-common/providers/).
 -   **POSIX Simulator Boot**: In
-    [`posix/main.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/posix/main.cpp#L347-L352),
+    [`posix/main.cpp`](../posix/main.cpp),
     the application initializes `AllDevicesExampleDACProvider` with
     `AppOptions::GetConfig().dacProvider`. This allows passing
     `--dac_provider <path.json>` on the command line to dynamically load JSON
@@ -187,9 +187,9 @@ The `all-devices-app` implementation provides a decoupled provider architecture:
     SDK's built-in example credentials
     (`chip::Credentials::Examples::GetExampleDACProvider()`).
 -   **Embedded MCU Boot**: On hardware targets like ESP32
-    ([`esp32/main/main.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/esp32/main/main.cpp#L416-L424))
+    ([`esp32/main/main.cpp`](../esp32/main/main.cpp))
     or Silicon Labs
-    ([`silabs/src/AppTask.cpp`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/examples/all-devices-app/silabs/src/AppTask.cpp#L167)),
+    ([`silabs/src/AppTask.cpp`](../silabs/src/AppTask.cpp)),
     the platform boots with a hardware `FactoryDataProvider` that reads
     credentials from encrypted flash partitions.
 
@@ -200,7 +200,7 @@ disk**. In real products:
 
 1. **Implement `DeviceAttestationCredentialsProvider`**: Implement the pure
    abstract interface
-   [`chip::Credentials::DeviceAttestationCredentialsProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/credentials/DeviceAttestationCredsProvider.h#L34-L70).
+   [`chip::Credentials::DeviceAttestationCredentialsProvider`](../../../src/credentials/DeviceAttestationCredsProvider.h).
    Cryptographic signing operations (`SignWithDeviceAttestationKey`) must
    delegate directly to your secure hardware without exporting the private key
    into system RAM.
@@ -208,10 +208,10 @@ disk**. In real products:
     - **Linux / Android Gateways**: Delegate signing to a Hardware Secure
       Element (e.g. `ATECC608`, NXP `SE050` via I2C/PKCS#11), TPM, or platform
       Secure Enclave / TrustZone (see
-      [`TrustyDACProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/Linux/DeviceAttestationCredsTrusty.h#L26-L45)).
+      [`TrustyDACProvider`](../../../src/platform/Linux/DeviceAttestationCredsTrusty.h)).
     - **Embedded MCUs (ESP32, Nordic, Silicon Labs)**: Use the platform's
       hardware factory data provider (e.g.,
-      [`ESP32FactoryDataProvider`](file:///usr/local/google/home/sergiosoares/connectedhomeip2/src/platform/ESP32/ESP32FactoryDataProvider.h))
+      [`ESP32FactoryDataProvider`](../../../src/platform/ESP32/ESP32FactoryDataProvider.h))
       to read factory-flashed credentials and utilize on-chip crypto hardware.
 3. **Register at Boot**: Register your hardware provider before initializing the
    Matter server or starting the event loop:

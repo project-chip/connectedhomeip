@@ -40,6 +40,7 @@ namespace DeviceLayer {
 class AllDevicesExampleDACProvider : public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
+    // Defined in .cpp to allow std::unique_ptr<FileProviderContext> with forward-declared FileProviderContext.
     AllDevicesExampleDACProvider();
     ~AllDevicesExampleDACProvider() override;
 
