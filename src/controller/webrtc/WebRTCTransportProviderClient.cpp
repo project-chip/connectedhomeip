@@ -327,8 +327,10 @@ void WebRTCTransportProviderClient::HandleProvideOfferResponse(TLV::TLVReader da
     session.streamUsage    = mCurrentStreamUsage;
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
-    session.videoStreamID = value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
-    session.audioStreamID = value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.videoStreamID =
+        value.videoStreamID.HasValue() ? value.videoStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
+    session.audioStreamID =
+        value.audioStreamID.HasValue() ? value.audioStreamID : MakeOptional(DataModel::MakeNullable<uint16_t>());
 
     WebRTCTransportRequestorManager::Instance().UpsertSession(session);
 }
