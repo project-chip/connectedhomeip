@@ -94,7 +94,7 @@ CHIP_ERROR LoggingAmbientContextSensor::SetSensorFusionSupported(const Span<Sema
     {
         const auto & src = sensorFusionSupportedList[i];
         auto & dst       = mSensorFusionSupportedBuf[i];
-        dst = src;
+        dst              = src;
     }
 
     return CHIP_NO_ERROR;

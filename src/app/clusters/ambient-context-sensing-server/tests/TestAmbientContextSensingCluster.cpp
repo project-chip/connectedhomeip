@@ -43,9 +43,9 @@ using PredictedActivityDecodable         = AmbientContextSensing::Structs::Predi
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-constexpr BitFlags<Feature> kFeaturesAllForACSTest{ Feature::kHumanActivity, Feature::kObjectCounting,
+constexpr BitFlags<Feature> kFeaturesAllForACSTest{ Feature::kHumanActivity,        Feature::kObjectCounting,
                                                     Feature::kObjectIdentification, Feature::kSoundIdentification,
-                                                    Feature::kPredictedActivity, Feature::kSensorFusion };
+                                                    Feature::kPredictedActivity,    Feature::kSensorFusion };
 static SemanticTagType g_kACTSupportedArray[] = {
     {
         .namespaceID = kNamespaceIdentifiedHumanActivity,
@@ -125,10 +125,10 @@ public:
 
     uint64_t GetEpochNow() override;
 
-    TestACSDelegate(const TestACSDelegate &)                  = delete;
-    TestACSDelegate & operator=(const TestACSDelegate &)      = delete;
-    TestACSDelegate(TestACSDelegate &&)                       = delete;
-    TestACSDelegate & operator=(TestACSDelegate &&)           = delete;
+    TestACSDelegate(const TestACSDelegate &)             = delete;
+    TestACSDelegate & operator=(const TestACSDelegate &) = delete;
+    TestACSDelegate(TestACSDelegate &&)                  = delete;
+    TestACSDelegate & operator=(TestACSDelegate &&)      = delete;
 
     static constexpr uint8_t kMaxACTypeSupportedForTest       = 10;
     static constexpr uint8_t kMaxPredictedActivityForTest     = 3;
@@ -193,7 +193,7 @@ CHIP_ERROR TestACSDelegate::SetSensorFusionSupported(const Span<SemanticTagType>
     {
         const auto & src = sensorFusionSupportedList[i];
         auto & dst       = mSensorFusionSupportedBuf[i];
-        dst = src;
+        dst              = src;
     }
 
     return CHIP_NO_ERROR;
@@ -966,12 +966,12 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
     EXPECT_EQ(size, 3u);
 
     auto it = out.begin();
-    auto i = 0;
+    auto i  = 0;
     while (it.Next())
     {
         EXPECT_EQ(it.GetValue().namespaceID, sensorFusionSupportedArray[i].namespaceID);
-	EXPECT_EQ(it.GetValue().tag, sensorFusionSupportedArray[i].tag);
-	i++;
+        EXPECT_EQ(it.GetValue().tag, sensorFusionSupportedArray[i].tag);
+        i++;
     }
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

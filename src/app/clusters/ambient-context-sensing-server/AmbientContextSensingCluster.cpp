@@ -31,8 +31,8 @@ AmbientContextSensingCluster::AmbientContextSensingCluster(EndpointId endpointId
     mOptionalAttributeSet(config.mOptionalAttributeBits), mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
     VerifyOrDie(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
-           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
-           mFeatureMap.Has(Feature::kSensorFusion));
+                mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
+                mFeatureMap.Has(Feature::kSensorFusion));
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -435,14 +435,16 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const Span<Predict
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
 {
     VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupported, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrDie(mACSDelegate != nullptr);
 
     ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
     ReturnErrorOnFailure(mACSDelegate->SetSensorFusionSupported(sensorFusionSupportedList));
-    mSensorFusionSupportedList = Span<SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
+    mSensorFusionSupportedList =
+        Span<SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
     NotifyAttributeChanged(Attributes::SensorFusionSupported::Id);
     return CHIP_NO_ERROR;
 }
@@ -860,11 +862,12 @@ bool AmbientContextSensingCluster::IsSupportedType(const AmbientContextSensing::
     const auto & supportedList = mAmbientContextTypeSupportedList;
 
     return std::any_of(supportedList.begin(), supportedList.end(), [&sensedType](const auto & supported) {
-            return sensedType.namespaceID == supported.namespaceID && sensedType.tag == supported.tag;
-        });
+        return sensedType.namespaceID == supported.namespaceID && sensedType.tag == supported.tag;
+    });
 }
 
-CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
 {
     VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
 

@@ -50,9 +50,9 @@ public:
     static constexpr uint8_t kMaxACTypeSupportedForLog       = 20;
     static constexpr uint8_t kMaxPredictedActivityForLog     = 3;
     static constexpr uint8_t kMaxSensorFusionSupportedForLog = 20;
-    static constexpr BitFlags<Feature> kFeatureAllForLog{ Feature::kHumanActivity, Feature::kObjectCounting,
+    static constexpr BitFlags<Feature> kFeatureAllForLog{ Feature::kHumanActivity,        Feature::kObjectCounting,
                                                           Feature::kObjectIdentification, Feature::kSoundIdentification,
-                                                          Feature::kPredictedActivity, Feature::kSensorFusion };
+                                                          Feature::kPredictedActivity,    Feature::kSensorFusion };
 
 private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForLog];
