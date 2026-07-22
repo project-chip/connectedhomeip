@@ -551,9 +551,9 @@ bool FanControlCluster::SetSpeedCurrent(uint8_t value)
 void FanControlCluster::StoreFanModePersistence()
 {
     VerifyOrReturn(mContext != nullptr);
-    const FanModeEnum value = mFanMode;
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id),
-                                                            ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
+    AttributePersistence attrPersistence{ mContext->attributeStorage };
+    LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), mFanMode));
 }
 
 } // namespace chip::app::Clusters
