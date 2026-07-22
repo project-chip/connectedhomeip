@@ -545,6 +545,7 @@ enum class Fields : uint8_t
 {
     kName     = 0,
     kMyBitmap = 1,
+    kMyEnum   = 2,
 };
 
 struct Type
@@ -552,6 +553,7 @@ struct Type
 public:
     chip::CharSpan name;
     DataModel::Nullable<chip::BitMask<Globals::TestGlobalBitmap>> myBitmap;
+    Optional<DataModel::Nullable<Globals::TestGlobalEnum>> myEnum;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

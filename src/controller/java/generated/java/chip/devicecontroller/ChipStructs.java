@@ -24639,21 +24639,26 @@ public static class CommodityMeteringClusterMeteredQuantityStruct {
 public static class UnitTestingClusterTestGlobalStruct {
   public String name;
   public @Nullable Long myBitmap;
+  public @Nullable Optional<Integer> myEnum;
   private static final long NAME_ID = 0L;
   private static final long MY_BITMAP_ID = 1L;
+  private static final long MY_ENUM_ID = 2L;
 
   public UnitTestingClusterTestGlobalStruct(
     String name,
-    @Nullable Long myBitmap
+    @Nullable Long myBitmap,
+    @Nullable Optional<Integer> myEnum
   ) {
     this.name = name;
     this.myBitmap = myBitmap;
+    this.myEnum = myEnum;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NAME_ID, new StringType(name)));
     values.add(new StructElement(MY_BITMAP_ID, myBitmap != null ? new UIntType(myBitmap) : new NullType()));
+    values.add(new StructElement(MY_ENUM_ID, myEnum != null ? myEnum.<BaseTLVType>map((nonOptionalmyEnum) -> new UIntType(nonOptionalmyEnum)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -24664,6 +24669,7 @@ public static class UnitTestingClusterTestGlobalStruct {
     }
     String name = null;
     @Nullable Long myBitmap = null;
+    @Nullable Optional<Integer> myEnum = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -24675,11 +24681,17 @@ public static class UnitTestingClusterTestGlobalStruct {
           UIntType castingValue = element.value(UIntType.class);
           myBitmap = castingValue.value(Long.class);
         }
+      } else if (element.contextTagNum() == MY_ENUM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          myEnum = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new UnitTestingClusterTestGlobalStruct(
       name,
-      myBitmap
+      myBitmap,
+      myEnum
     );
   }
 
@@ -24692,6 +24704,9 @@ public static class UnitTestingClusterTestGlobalStruct {
     output.append("\n");
     output.append("\tmyBitmap: ");
     output.append(myBitmap);
+    output.append("\n");
+    output.append("\tmyEnum: ");
+    output.append(myEnum);
     output.append("\n");
     output.append("}\n");
     return output.toString();
