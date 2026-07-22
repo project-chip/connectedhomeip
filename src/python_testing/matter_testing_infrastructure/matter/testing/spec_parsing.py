@@ -240,6 +240,10 @@ class XmlCommand:
     name: str
     conformance: ConformanceCallable
     privilege: int
+    # Field ID to command field definition (including per-field constraints).
+    # XmlDataTypeComponent is reused here because command fields carry the same
+    # shape as struct fields in the data model XML (id/name/type/quality/constraint).
+    fields: dict[uint, XmlDataTypeComponent] = field(default_factory=dict)
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -1163,6 +1167,36 @@ class ClusterParser:
                                            privilege=get_access_privilege_or_unknown(privilege)))
         return commands
 
+    def parse_command_fields(self, element: ElementTree.Element) -> dict[uint, XmlDataTypeComponent]:
+        """Parse the <field> children of a command element, including per-field constraints.
+
+        Command fields use the same XML shape as struct fields (id/name/type plus
+        optional <quality> and <constraint> children), so they are represented with
+        XmlDataTypeComponent. Constraints are parsed with parse_attribute_constraints,
+        which handles the full constraint vocabulary (min/max/between, minLength/
+        maxLength, minCount/maxCount, allowed, and attribute references).
+        """
+        fields: dict[uint, XmlDataTypeComponent] = {}
+        location = ClusterPathLocation(0, int(self._cluster_id) if self._cluster_id is not None else 0)
+        for xml_field in element.findall('./field'):
+            if 'id' not in xml_field.attrib or 'name' not in xml_field.attrib:
+                self._problems.append(ProblemNotice(
+                    "Spec XML Parsing", location=location, severity=ProblemSeverity.WARNING,
+                    problem=f"Field in command {element.attrib.get('name', '?')} with no id or name"))
+                continue
+            fid = uint(int(xml_field.attrib['id'], 0))
+            fields[fid] = XmlDataTypeComponent(
+                value=fid,
+                name=xml_field.attrib['name'],
+                conformance=self._parse_field_conformance(xml_field),
+                summary=xml_field.attrib.get('summary', None),
+                type_info=xml_field.attrib.get('type', None),
+                is_optional=self._isOptionalField(xml_field),
+                is_nullable=self._isNullableField(xml_field),
+                constraints=self.parse_attribute_constraints(xml_field),
+            )
+        return fields
+
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
         commands: dict[uint, XmlCommand] = {}
         for element, conformance_xml, access_xml in self.command_elements:
@@ -1177,7 +1211,8 @@ class ClusterParser:
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                              privilege=get_access_privilege_or_unknown(privilege))
+                                              privilege=get_access_privilege_or_unknown(privilege),
+                                              fields=self.parse_command_fields(element))
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
