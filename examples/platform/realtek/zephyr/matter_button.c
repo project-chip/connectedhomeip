@@ -39,7 +39,8 @@ static const struct gpio_dt_spec buttons[] = {
 
 #define DEBOUNCE_MS DT_PROP_OR(DT_PATH(buttons), debounce_interval_ms, 30)
 
-struct button_state {
+struct button_state
+{
     struct k_work_delayable work;
     uint8_t index;
 };
@@ -47,11 +48,11 @@ static struct button_state button_state[NUMBER_OF_BUTTONS];
 static struct gpio_callback button_cb_data;
 static button_handler_t button_handler_cb;
 
-static void button_work_handler(struct k_work *work)
+static void button_work_handler(struct k_work * work)
 {
-    struct k_work_delayable *dwork = k_work_delayable_from_work(work);
-    struct button_state *state = CONTAINER_OF(dwork, struct button_state, work);
-    uint8_t i = state->index;
+    struct k_work_delayable * dwork = k_work_delayable_from_work(work);
+    struct button_state * state     = CONTAINER_OF(dwork, struct button_state, work);
+    uint8_t i                       = state->index;
     int pressed;
 
     pressed = gpio_pin_get_dt(&buttons[i]);
@@ -80,7 +81,7 @@ static void button_work_handler(struct k_work *work)
     }
 }
 
-void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
 {
     uint8_t i;
 
