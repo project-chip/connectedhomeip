@@ -42,10 +42,9 @@
 
 import asyncio
 import logging
-import os
 
 from mobly import asserts
-from support_modules.icd_support import ICDBaseTest, ICDTransition, assert_subscription_heartbeat_received
+from support_modules.icd_support import ICDBaseTest, assert_subscription_heartbeat_received
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -82,22 +81,26 @@ On a real DUT, use the --timeout <seconds> script argument if IdleModeDuration i
 cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
 commands = cluster.Commands
-ClientTypeEnum = cluster.Enums.ClientTypeEnum
 
 ONE_HOUR_S = 3600
 
 
 class TC_ICDB_2_4(ICDBaseTest):
 
+    # DUT can take more than one cycle to detect a dropped subscriber and resume check-ins, default_timeout
+    # is raised to accommodate that (can be overridden by a --timeout on the command line)
+    @property
+    def default_timeout(self) -> int:
+        return 5 * 60
+
     @async_test_body
     async def setup_class(self):
-        # *** PRECONDITION ***
-        # Commission DUT to TH1 with ICD registration
-        # Commission DUT to TH2 with ICD registration
         super().setup_class()
 
-        # TH1 commissions DUT (ICD registration done explicitly via RegisterClient in the test body)
+        # TH1 commissions DUT with ICD registration (registers as a kPermanent ICD client during
+        # commissioning, which also stores the symmetric key client-side so received check-ins decrypt).
         self.th1 = self.default_controller
+        self.th1.EnableICDRegistration(self.th1.GenerateICDRegistrationParameters())
         setup_payload_info = get_setup_payload_info_config(self.matter_test_config)
         info = setup_payload_info[0]
         commissioning_info = CommissioningInfo(
@@ -112,8 +115,8 @@ class TC_ICDB_2_4(ICDBaseTest):
         status = await commission_device(self.th1, self.dut_node_id, info, commissioning_info)
         asserts.assert_true(status, f"Failed to commission DUT to TH1's fabric: {status}")
 
-        # TH2 commissions DUT on a separate fabric (ICD registration done explicitly via RegisterClient in the test body)
-        self.th2 = self.create_new_controller()
+        # TH2 commissions DUT on a separate fabric with ICD registration (same client receive-stack arming as TH1)
+        self.th2 = self.create_new_controller(enable_icd_registration=True)
 
         # TH2 commissions DUT
         ecw = await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id, timeout=600)
@@ -136,15 +139,15 @@ class TC_ICDB_2_4(ICDBaseTest):
     def steps_TC_ICDB_2_4(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commission DUT to TH1 and TH2."),
-            TestStep(1, "TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject. TH1 reads the RegisteredClients attribute.", """
+            TestStep(1, "TH1 reads the RegisteredClients attribute (TH1 was registered as an ICD client during commissioning).", """
                      TH1 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID."""),
-            TestStep(2, "TH2 sends the RegisterClient command to the DUT with TH2's node ID as checkInNodeID and monitoredSubject. TH2 reads the RegisteredClients attribute.", """
+            TestStep(2, "TH2 reads the RegisteredClients attribute (TH2 was registered as an ICD client during commissioning).", """
                      TH2 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH2's node ID."""),
-            TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes.",
+            TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold, and MaximumCheckInBackoff attributes.",
                      "Store values for later use."),
             TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor=0 and MaxIntervalCeiling=IdleModeDuration.", """
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
@@ -152,14 +155,14 @@ class TC_ICDB_2_4(ICDBaseTest):
                      No check-in message is sent to TH1 or TH2 while subscriptions are active.
                      Verify TH1 and TH2 each receive a subscription report within MaxInterval.
                      Verify ICDCounter is unchanged, confirming no check-in messages were sent."""),
-            TestStep(6, "Deactivate the subscription between DUT and TH1, and wait for 1 full active-idle-active cycle.", """
-                     DUT starts sending check-in messages to TH1
-                     Verify ICDCounter has incremented for TH1 after subscription shutdown and waiting for 1 full active-idle-active cycle.
+            TestStep(6, "Deactivate the subscription between DUT and TH1, then wait for the DUT to detect the dropped subscriber and resume check-ins to TH1.", """
+                     DUT starts sending check-in messages to TH1.
+                     Verify TH1 receives a check-in from the DUT within the detection-aware timeout.
                      Verify TH2 receives a subscription report within MaxInterval."""),
-            TestStep(7, "Deactivate subscriptions between DUT and TH2, and wait for 1 full active-idle-active cycle.", """
-                     DUT starts sending check-in messages both to TH1 and TH2
-                     ICDCounter increments once per check-in per client, so expecting at least 2 increments
-                     Verify ICDCounter has incremented by at least 2 after TH1 and TH2 subscriptions are shutdown and waiting for 1 full active-idle-active cycle."""),
+            TestStep(7, "Deactivate the subscription between DUT and TH2, then wait for the DUT to resume check-ins on both fabrics.", """
+                     DUT sends check-in messages to both TH1 and TH2 once no subscription covers them.
+                     Verify TH1 receives a check-in from the DUT within the detection-aware timeout.
+                     Verify TH2 receives a check-in from the DUT within the detection-aware timeout."""),
         ]
 
     def pics_TC_ICDB_2_4(self) -> list[str]:
@@ -176,17 +179,9 @@ class TC_ICDB_2_4(ICDBaseTest):
         self.step("precondition")
 
         # *** STEP 1 ***
-        # TH1 sends the RegisterClient command to the DUT with TH1's node ID as checkInNodeID and monitoredSubject.
+        # TH1 reads the RegisteredClients attribute (TH1 was registered as an ICD client during commissioning)
         self.step(1)
-        th1_checkin_key = os.urandom(16)
         th1_check_in_node_id = self.th1.nodeId
-        await self.send_single_icdm_command(commands.RegisterClient(
-            checkInNodeID=th1_check_in_node_id,
-            monitoredSubject=th1_check_in_node_id,
-            key=th1_checkin_key,
-            clientType=ClientTypeEnum.kPermanent,
-        ))
-        log.info("TH1 RegisterClient SUCCESS for checkInNodeID=%s", th1_check_in_node_id)
 
         # TH1 reads RegisteredClients to verify registration
         th1_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
@@ -203,17 +198,9 @@ class TC_ICDB_2_4(ICDBaseTest):
                              f"monitoredSubject ({rc_th1.monitoredSubject}) must match TH1's node ID ({th1_check_in_node_id})")
 
         # *** STEP 2 ***
-        # TH2 sends the RegisterClient command to the DUT with TH2's node ID as checkInNodeID and monitoredSubject.
+        # TH2 reads the RegisteredClients attribute (TH2 was registered as an ICD client during commissioning)
         self.step(2)
-        th2_checkin_key = os.urandom(16)
         th2_check_in_node_id = self.th2.nodeId
-        await self.send_single_icdm_command(commands.RegisterClient(
-            checkInNodeID=th2_check_in_node_id,
-            monitoredSubject=th2_check_in_node_id,
-            key=th2_checkin_key,
-            clientType=ClientTypeEnum.kPermanent,
-        ), controller=self.th2, node_id=self.th2_dut_node_id)
-        log.info("TH2 RegisterClient SUCCESS for checkInNodeID=%s", th2_check_in_node_id)
 
         # TH2 reads RegisteredClients to verify registration
         th2_registered_clients = await self.read_icdm_attribute_expect_success(
@@ -232,14 +219,16 @@ class TC_ICDB_2_4(ICDBaseTest):
                              f"monitoredSubject ({rc_th2.monitoredSubject}) must match TH2's node ID ({th2_check_in_node_id})")
 
         # *** STEP 3 ***
-        # TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes
+        # TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold, and MaximumCheckInBackoff attributes
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
+        maximum_check_in_backoff_s = await self.read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
         log.info("IdleModeDuration: %ss", idle_mode_duration_s)
         log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
         log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
+        log.info("MaximumCheckInBackoff: %ss", maximum_check_in_backoff_s)
 
         # *** STEP 4 ***
         # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling
@@ -304,47 +293,40 @@ class TC_ICDB_2_4(ICDBaseTest):
         )
 
         # *** STEP 6 ***
-        # Deactivate the subscription between DUT and TH1, and wait for 1 full active-idle-active cycle
+        # Deactivate the subscription between DUT and TH1, then wait for the DUT to detect the dropped
+        # subscriber and resume check-ins to TH1
         #   - DUT starts sending check-in messages to TH1
         self.step(6)
-
-        # Verify ICDCounter has incremented for TH1 after subscription shutdown
-        # and waiting for 1 full active-idle-active cycle
-        icd_counter_before_th1_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         th1_subscription.Shutdown()
-        await self.wait_for_transition(
-            ICDTransition.FullCycle,
-            active_mode_duration_ms=active_mode_duration_ms,
-            idle_mode_duration_s=idle_mode_duration_s)
-        icd_counter_after_th1_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        asserts.assert_greater(icd_counter_after_th1_shutdown, icd_counter_before_th1_shutdown,
-                               f"ICDCounter should have incremented after TH1 subscription shutdown. "
-                               f"Before: {icd_counter_before_th1_shutdown}, After: {icd_counter_after_th1_shutdown}")
+        th1_checkin_timeout_s = self.checkin_resume_wait_s(
+            max_interval_s=th1_max_interval_s,
+            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s,
+            maximum_check_in_backoff_s=maximum_check_in_backoff_s,
+            dev_ctrl=self.th1, node_id=self.dut_node_id)
+
+        # Verify TH1 receives a check-in from the DUT once its subscription is dropped
+        await self.assert_checkin_received(self.th1, self.dut_node_id, th1_checkin_timeout_s)
 
         # Verify TH2 subscription is still active
         await assert_subscription_heartbeat_received(th2_subscription, th2_max_interval_s)
 
         # *** STEP 7 ***
-        # Deactivate subscriptions between DUT and TH2, and wait for 1 full active-idle-active cycle
-        #   - DUT starts sending check-in messages both to TH1 and TH2
-        #   - ICDCounter increments once per check-in per client, so expecting at least 2 increments
+        # Deactivate the subscription between DUT and TH2, then wait for the DUT to resume check-ins on both fabrics
+        #   - DUT sends check-in messages to both TH1 and TH2 once no subscription covers them
         self.step(7)
-
-        # Verify ICDCounter has incremented by at least 2 after TH1 and TH2 subscriptions are shutdown
-        # and waiting for 1 full active-idle-active cycle
-        icd_counter_before_th2_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         th2_subscription.Shutdown()
-        await self.wait_for_transition(ICDTransition.FullCycle,
-                                       active_mode_duration_ms=active_mode_duration_ms,
-                                       idle_mode_duration_s=idle_mode_duration_s)
-        icd_counter_after_th2_shutdown = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        icd_counter_increment = icd_counter_after_th2_shutdown - icd_counter_before_th2_shutdown
-        asserts.assert_greater_equal(icd_counter_increment, 2,
-                                     f"ICDCounter should have incremented by at least 2 (one check-in per client: TH1 and TH2)."
-                                     f"Before: {icd_counter_before_th2_shutdown}, After: {icd_counter_after_th2_shutdown}, "
-                                     f"Increment: {icd_counter_increment}")
+        th2_checkin_timeout_s = self.checkin_resume_wait_s(
+            max_interval_s=th2_max_interval_s,
+            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s,
+            dev_ctrl=self.th2, node_id=self.th2_dut_node_id)
 
-        log.info("TH1 and TH2 subscriptions have been shut down; ICDCounter checks above verify transition back to check-in state.")
+        # Verify TH1 and TH2 each receive a check-in from the DUT once no subscription covers them
+        await asyncio.gather(
+            self.assert_checkin_received(self.th1, self.dut_node_id, th1_checkin_timeout_s),
+            self.assert_checkin_received(self.th2, self.th2_dut_node_id, th2_checkin_timeout_s),
+        )
+
+        log.info("TH1 and TH2 each received a check-in; DUT has resumed check-in state on both fabrics.")
 
 
 if __name__ == "__main__":
