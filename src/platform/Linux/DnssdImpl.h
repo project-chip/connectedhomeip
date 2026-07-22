@@ -135,7 +135,7 @@ private:
         AvahiIfIndex mInterface;
         std::string mProtocol;
         std::atomic_bool mStopped{ false };
-        AvahiServiceBrowser * mBrowser;
+        AvahiServiceBrowser * mBrowser = nullptr;
     };
 
     struct ResolveContext
@@ -162,12 +162,12 @@ private:
         }
     };
 
-    MdnsAvahi() : mClient(nullptr) {}
+    MdnsAvahi() = default;
     static MdnsAvahi sInstance;
 
     bool ClientHasFailed() const;
 
-    CHIP_ERROR ResetClientForLookup();
+    CHIP_ERROR RebuildClient();
 
     /// Allocates a new resolve context with a unique `mNumber`
     ResolveContext * AllocateResolveContext();
@@ -191,11 +191,11 @@ private:
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata);
 
-    DnssdAsyncReturnCallback mInitCallback;
-    DnssdAsyncReturnCallback mErrorCallback;
-    void * mAsyncReturnContext;
+    DnssdAsyncReturnCallback mInitCallback  = nullptr;
+    DnssdAsyncReturnCallback mErrorCallback = nullptr;
+    void * mAsyncReturnContext              = nullptr;
 
-    AvahiClient * mClient;
+    AvahiClient * mClient = nullptr;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
@@ -204,7 +204,7 @@ private:
     size_t mResolveCount = 0;
     std::list<ResolveContext *> mAllocatedResolves;
 
-    size_t mBrowseCount = 0;
+    std::list<BrowseContext *> mAllocatedBrowses;
 };
 
 } // namespace Dnssd
