@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <memory>
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -567,8 +568,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestVideoStreamDeepCopy)
     videoStream2.videoStreamName = CharSpan(videoName2.data(), videoName2.size());
 
     // Add video streams
-    transportOptionsStorage.AddVideoStream(videoStream1);
-    transportOptionsStorage.AddVideoStream(videoStream2);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream1));
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream2));
 
     // Clear original strings to verify deep copy
     videoName1.clear();
@@ -607,8 +608,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestAudioStreamDeepCopy)
     audioStream2.audioStreamName = CharSpan(audioName2.data(), audioName2.size());
 
     // Add audio streams
-    transportOptionsStorage.AddAudioStream(audioStream1);
-    transportOptionsStorage.AddAudioStream(audioStream2);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream1));
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream2));
 
     // Clear original strings to verify deep copy
     audioName1.clear();
@@ -639,7 +640,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestClearVideoStreams)
     std::string videoName       = "TestStream";
     videoStream.videoStreamID   = 1;
     videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
-    transportOptionsStorage.AddVideoStream(videoStream);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream));
 
     // Verify it was added
     EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
@@ -661,7 +662,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestClearAudioStreams)
     std::string audioName       = "TestAudio";
     audioStream.audioStreamID   = 1;
     audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
-    transportOptionsStorage.AddAudioStream(audioStream);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream));
 
     // Verify it was added
     EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
@@ -690,7 +691,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateVideoStreamsList)
     std::string videoName       = "Stream1";
     videoStream.videoStreamID   = 1;
     videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
-    transportOptionsStorage.AddVideoStream(videoStream);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream));
 
     // Verify list is updated
     EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
@@ -713,7 +714,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestUpdateAudioStreamsList)
     std::string audioName       = "Audio1";
     audioStream.audioStreamID   = 1;
     audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
-    transportOptionsStorage.AddAudioStream(audioStream);
+    EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream));
 
     // Verify list is updated
     EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
@@ -732,7 +733,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleVideoStreamNamesNoCorruptio
         std::string name            = "VideoStream" + std::to_string(i);
         videoStream.videoStreamID   = static_cast<uint16_t>(i);
         videoStream.videoStreamName = CharSpan(name.data(), name.size());
-        transportOptionsStorage.AddVideoStream(videoStream);
+        EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream));
     }
 
     // Verify all streams are stored correctly without corruption
@@ -760,7 +761,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleAudioStreamNamesNoCorruptio
         std::string name            = "AudioStream" + std::to_string(i);
         audioStream.audioStreamID   = static_cast<uint16_t>(i);
         audioStream.audioStreamName = CharSpan(name.data(), name.size());
-        transportOptionsStorage.AddAudioStream(audioStream);
+        EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream));
     }
 
     // Verify all streams are stored correctly without corruption
@@ -768,6 +769,348 @@ TEST_F(TestPushAVStreamTransportStorage, TestMultipleAudioStreamNamesNoCorruptio
     EXPECT_EQ(audioList.size(), (size_t) 5);
 
     for (size_t i = 0; i < 5; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestAddVideoStreamBufferFullDefenseInDepth)
+{
+    // Verify that AddVideoStream stops accepting entries once the flat buffer is full (16 entries).
+    // This is a defense-in-depth check: the validator should reject >16 before we get here,
+    // but the storage must also not overflow if the validator is bypassed.
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Fill the buffer to capacity (16 entries)
+    for (size_t i = 0; i < kMaxVideoStreams; i++)
+    {
+        Structs::VideoStreamStruct::Type videoStream;
+        std::string name            = "VideoStream" + std::to_string(i);
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = CharSpan(name.data(), name.size());
+        EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(videoStream));
+    }
+
+    EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.videoStreams.Value().size(), kMaxVideoStreams);
+
+    // The 17th AddVideoStream should return an error (defense-in-depth)
+    Structs::VideoStreamStruct::Type extraStream;
+    std::string extraName       = "ExtraStream";
+    extraStream.videoStreamID   = 99;
+    extraStream.videoStreamName = CharSpan(extraName.data(), extraName.size());
+    EXPECT_NE(CHIP_NO_ERROR, transportOptionsStorage.AddVideoStream(extraStream));
+
+    // Size should remain at kMaxVideoStreams, not 17
+    EXPECT_EQ(transportOptionsStorage.videoStreams.Value().size(), kMaxVideoStreams);
+
+    // Verify existing data is not corrupted
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = transportOptionsStorage.videoStreams.Value();
+    for (size_t i = 0; i < kMaxVideoStreams; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestAddAudioStreamBufferFullDefenseInDepth)
+{
+    // Verify that AddAudioStream stops accepting entries once the flat buffer is full (16 entries).
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Fill the buffer to capacity (16 entries)
+    for (size_t i = 0; i < kMaxAudioStreams; i++)
+    {
+        Structs::AudioStreamStruct::Type audioStream;
+        std::string name            = "AudioStream" + std::to_string(i);
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = CharSpan(name.data(), name.size());
+        EXPECT_EQ(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(audioStream));
+    }
+
+    EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.audioStreams.Value().size(), kMaxAudioStreams);
+
+    // The 17th AddAudioStream should return an error (defense-in-depth)
+    Structs::AudioStreamStruct::Type extraStream;
+    std::string extraName       = "ExtraStream";
+    extraStream.audioStreamID   = 99;
+    extraStream.audioStreamName = CharSpan(extraName.data(), extraName.size());
+    EXPECT_NE(CHIP_NO_ERROR, transportOptionsStorage.AddAudioStream(extraStream));
+
+    // Size should remain at kMaxAudioStreams, not 17
+    EXPECT_EQ(transportOptionsStorage.audioStreams.Value().size(), kMaxAudioStreams);
+
+    // Verify existing data is not corrupted
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = transportOptionsStorage.audioStreams.Value();
+    for (size_t i = 0; i < kMaxAudioStreams; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestCopyConstructedStorageRetainsStreamNamesAfterSourceDestruction)
+{
+    // Verify that copy-constructed TransportOptionsStorage retains valid stream names
+    // even after the source is destroyed (deep copy correctness).
+    constexpr size_t kStreamCount = 3;
+    // Heap-allocate to avoid exceeding stack usage limit on embedded targets
+    auto copiedStorage = std::make_unique<TransportOptionsStorage>();
+    {
+        auto sourceStorage = std::make_unique<TransportOptionsStorage>();
+        for (size_t i = 0; i < kStreamCount; i++)
+        {
+            Structs::VideoStreamStruct::Type videoStream;
+            std::string name            = "VideoStream" + std::to_string(i);
+            videoStream.videoStreamID   = static_cast<uint16_t>(i);
+            videoStream.videoStreamName = CharSpan(name.data(), name.size());
+            EXPECT_EQ(CHIP_NO_ERROR, sourceStorage->AddVideoStream(videoStream));
+        }
+        for (size_t i = 0; i < kStreamCount; i++)
+        {
+            Structs::AudioStreamStruct::Type audioStream;
+            std::string name            = "AudioStream" + std::to_string(i);
+            audioStream.audioStreamID   = static_cast<uint16_t>(i);
+            audioStream.audioStreamName = CharSpan(name.data(), name.size());
+            EXPECT_EQ(CHIP_NO_ERROR, sourceStorage->AddAudioStream(audioStream));
+        }
+        *copiedStorage = *sourceStorage;
+    }
+    // sourceStorage is now destroyed; verify copiedStorage still has valid data
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = copiedStorage->videoStreams.Value();
+    EXPECT_EQ(videoList.size(), kStreamCount);
+    for (size_t i = 0; i < kStreamCount; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = copiedStorage->audioStreams.Value();
+    EXPECT_EQ(audioList.size(), kStreamCount);
+    for (size_t i = 0; i < kStreamCount; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestCopyAssignedStorageRetainsStreamNamesAfterSourceDestruction)
+{
+    // Verify that copy-assigned TransportOptionsStorage retains valid stream names
+    // even after the source is destroyed (deep copy correctness).
+    constexpr size_t kStreamCount = 3;
+    // Heap-allocate to avoid exceeding stack usage limit on embedded targets
+    auto copiedStorage = std::make_unique<TransportOptionsStorage>();
+    {
+        auto sourceStorage = std::make_unique<TransportOptionsStorage>();
+        for (size_t i = 0; i < kStreamCount; i++)
+        {
+            Structs::VideoStreamStruct::Type videoStream;
+            std::string name            = "VideoStream" + std::to_string(i);
+            videoStream.videoStreamID   = static_cast<uint16_t>(i);
+            videoStream.videoStreamName = CharSpan(name.data(), name.size());
+            EXPECT_EQ(CHIP_NO_ERROR, sourceStorage->AddVideoStream(videoStream));
+        }
+        for (size_t i = 0; i < kStreamCount; i++)
+        {
+            Structs::AudioStreamStruct::Type audioStream;
+            std::string name            = "AudioStream" + std::to_string(i);
+            audioStream.audioStreamID   = static_cast<uint16_t>(i);
+            audioStream.audioStreamName = CharSpan(name.data(), name.size());
+            EXPECT_EQ(CHIP_NO_ERROR, sourceStorage->AddAudioStream(audioStream));
+        }
+        *copiedStorage = *sourceStorage;
+    }
+    // sourceStorage is now destroyed; verify copiedStorage still has valid data
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = copiedStorage->videoStreams.Value();
+    EXPECT_EQ(videoList.size(), kStreamCount);
+    for (size_t i = 0; i < kStreamCount; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = copiedStorage->audioStreams.Value();
+    EXPECT_EQ(audioList.size(), kStreamCount);
+    for (size_t i = 0; i < kStreamCount; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTypeOperatorTruncation)
+{
+    // Test that operator=(DecodableType) correctly truncates when given >16 streams.
+    // This is the defense-in-depth path that protects against malformed TLV payloads
+    // that might bypass cluster-level validation.
+
+    // Create a DecodableType transport options with 20 video streams (>kMaxVideoStreams=16)
+    TransportOptionsDecodableStruct transportOptionsDecodable;
+    transportOptionsDecodable.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptionsDecodable.videoStreamID.ClearValue();
+    transportOptionsDecodable.audioStreamID.ClearValue();
+    transportOptionsDecodable.TLSEndpointID = 1;
+    std::string url                         = "https://192.168.1.100:554/stream/";
+    transportOptionsDecodable.url           = Span(url.data(), url.size());
+    transportOptionsDecodable.expiryTime.ClearValue();
+
+    // Create minimal valid trigger options
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kCommand;
+    triggerOptions.motionZones.ClearValue();
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.ClearValue();
+    triggerOptions.maxPreRollLen.ClearValue();
+    transportOptionsDecodable.triggerOptions = triggerOptions;
+
+    // Create minimal valid container options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    ContainerOptionsStruct containerOptions;
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    transportOptionsDecodable.containerOptions = containerOptions;
+
+    // Create 20 video streams (>kMaxVideoStreams=16)
+    // Keep names in a separate vector to maintain lifetime (avoid dangling pointer)
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    std::vector<std::string> videoStreamNames;
+    videoStreams.reserve(20);
+    videoStreamNames.reserve(20);
+    for (size_t i = 0; i < 20; i++)
+    {
+        videoStreamNames.push_back("VideoStream" + std::to_string(i));
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = Span(videoStreamNames.back().data(), videoStreamNames.back().size());
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    // Heap-allocate TLV buffer to avoid exceeding stack usage limit on embedded targets
+    auto videoTlvBuffer = std::make_unique<uint8_t[]>(2048);
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer.get(), 2048);
+    TLV::TLVWriter videoArrayWriter;
+    CHIP_ERROR err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer.get(), static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptionsDecodable.videoStreams.SetValue(videoDecodableList);
+
+    // Create 20 audio streams (>kMaxAudioStreams=16)
+    // Keep names in a separate vector to maintain lifetime (avoid dangling pointer)
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    std::vector<std::string> audioStreamNames;
+    audioStreams.reserve(20);
+    audioStreamNames.reserve(20);
+    for (size_t i = 0; i < 20; i++)
+    {
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = Span(audioStreamNames.back().data(), audioStreamNames.back().size());
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    // Heap-allocate TLV buffer to avoid exceeding stack usage limit on embedded targets
+    auto audioTlvBuffer = std::make_unique<uint8_t[]>(2048);
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer.get(), 2048);
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer.get(), static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptionsDecodable.audioStreams.SetValue(audioDecodableList);
+
+    // Now assign to TransportOptionsStorage using operator=(DecodableType)
+    // This should truncate at kMaxVideoStreams/kMaxAudioStreams (16 each)
+    // Heap-allocate to avoid exceeding stack usage limit on embedded targets
+    auto storage = std::make_unique<TransportOptionsStorage>();
+    *storage     = transportOptionsDecodable;
+
+    // Verify truncation occurred - should have exactly kMaxVideoStreams (16) video streams
+    EXPECT_TRUE(storage->videoStreams.HasValue());
+    EXPECT_EQ(storage->videoStreams.Value().size(), kMaxVideoStreams);
+
+    // Verify truncation occurred - should have exactly kMaxAudioStreams (16) audio streams
+    EXPECT_TRUE(storage->audioStreams.HasValue());
+    EXPECT_EQ(storage->audioStreams.Value().size(), kMaxAudioStreams);
+
+    // Verify the first 16 video streams are correct (no corruption)
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = storage->videoStreams.Value();
+    for (size_t i = 0; i < kMaxVideoStreams; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+
+    // Verify the first 16 audio streams are correct (no corruption)
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = storage->audioStreams.Value();
+    for (size_t i = 0; i < kMaxAudioStreams; i++)
     {
         std::string expectedName = "AudioStream" + std::to_string(i);
         std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());

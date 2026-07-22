@@ -119,8 +119,8 @@ private:
     bool mIsInitialized = false;
 
     // Paths for objects published by this service
-    GAutoPtr<char> mRootPath;
-    GAutoPtr<char> mServicePath;
+    GCharPtr mRootPath;
+    GCharPtr mServicePath;
 
     // Objects (interfaces) published by this service
     GAutoPtr<GDBusObjectManagerServer> mRoot;
@@ -134,7 +134,7 @@ private:
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;
-    GAutoPtr<char> mPeerDevicePath;
+    GCharPtr mPeerDevicePath;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;
