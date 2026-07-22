@@ -58,8 +58,7 @@ DataModel::ActionReturnStatus MediaFileManagementCluster::ReadAttribute(const Da
     case AvailableStorage::Id:
         return encoder.Encode(mDelegate.GetAvailableStorage());
     case AvailableFiles::Id:
-        return encoder.EncodeList(
-            [this](const auto & listEncoder) -> CHIP_ERROR { return this->ReadAvailableFiles(listEncoder); });
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR { return this->ReadAvailableFiles(listEncoder); });
     case SupportedMimeTypes::Id:
         return encoder.EncodeList(
             [this](const auto & listEncoder) -> CHIP_ERROR { return this->ReadSupportedMimeTypes(listEncoder); });

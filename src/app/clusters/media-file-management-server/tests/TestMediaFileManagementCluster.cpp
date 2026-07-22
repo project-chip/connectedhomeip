@@ -81,8 +81,9 @@ public:
         return Status::Success;
     }
 
-    Status HandleRequestSharedFiles(const CharSpan & clientName, uint16_t requestID,
-                                    const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override
+    Status
+    HandleRequestSharedFiles(const CharSpan & clientName, uint16_t requestID,
+                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override
     {
         mRequestSharedFilesCalled = true;
         return Status::Success;
@@ -101,14 +102,14 @@ public:
         return Status::Success;
     }
 
-    uint64_t mTotalStorage       = 1000000;
-    uint64_t mAvailableStorage   = 500000;
-    size_t mFileCount            = 2;
-    size_t mMimeTypeCount        = 3;
-    bool mAddFileCalled          = false;
+    uint64_t mTotalStorage         = 1000000;
+    uint64_t mAvailableStorage     = 500000;
+    size_t mFileCount              = 2;
+    size_t mMimeTypeCount          = 3;
+    bool mAddFileCalled            = false;
     bool mRequestSharedFilesCalled = false;
-    bool mOfferFileCalled        = false;
-    uint64_t mDeletedFileID      = 0;
+    bool mOfferFileCalled          = false;
+    uint64_t mDeletedFileID        = 0;
 };
 
 struct TestMediaFileManagementCluster : public ::testing::Test
@@ -232,8 +233,7 @@ TEST_F(TestMediaFileManagementCluster, InvokeSharingCommandWithoutFeatureFails)
 
     auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
     EXPECT_FALSE(result.IsSuccess());
-    EXPECT_EQ(result.GetStatusCode(),
-              Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
+    EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
     EXPECT_FALSE(delegate.mOfferFileCalled);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
