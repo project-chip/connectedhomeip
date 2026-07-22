@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/clusters/color-control-server/ColorControlSceneInvalidator.h>
 #include <app/util/config.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
@@ -38,12 +39,20 @@ void RegisterSceneHandler(EndpointId endpoint);
 void UnregisterSceneHandler(EndpointId endpoint);
 /// Mark every fabric's stored scenes stale because the live color changed.
 void MarkScenesInvalid(EndpointId endpoint);
+/// The scene-invalidation hook injected into ColorControlCluster::Config so a color change can mark stored
+/// scenes stale. Never null in this build; the core cluster only sees the abstract interface.
+ColorControlSceneInvalidator * GetSceneInvalidator();
 
 #else
 
 inline void RegisterSceneHandler(EndpointId) {}
 inline void UnregisterSceneHandler(EndpointId) {}
 inline void MarkScenesInvalid(EndpointId) {}
+/// No Scene Management coupling in this build: leaves ColorControlCluster::Config::sceneInvalidator null.
+inline ColorControlSceneInvalidator * GetSceneInvalidator()
+{
+    return nullptr;
+}
 
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 

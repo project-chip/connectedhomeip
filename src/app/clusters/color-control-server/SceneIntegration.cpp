@@ -18,6 +18,7 @@
 #include <app/clusters/color-control-server/SceneIntegration.h>
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
+#include <app/clusters/color-control-server/ColorControlSceneInvalidator.h>
 #include <clusters/ColorControl/ClusterId.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h> // nogncheck
 
@@ -57,6 +58,27 @@ void UnregisterSceneHandler(EndpointId endpoint)
 void MarkScenesInvalid(EndpointId endpoint)
 {
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
+}
+
+namespace {
+
+// Concrete scene-invalidation hook injected into the core ColorControlCluster. Living in this codegen-layer
+// file keeps the core cluster free of the ScenesServer / Ember dependency: the core only ever sees the
+// abstract ColorControlSceneInvalidator interface. A single stateless instance backs every endpoint (the
+// endpoint is passed per call), mirroring sColorControlSceneHandler.
+class SceneInvalidator : public ColorControlSceneInvalidator
+{
+public:
+    void InvalidateScenes(EndpointId endpoint) override { MarkScenesInvalid(endpoint); }
+};
+
+SceneInvalidator gSceneInvalidator;
+
+} // namespace
+
+ColorControlSceneInvalidator * GetSceneInvalidator()
+{
+    return &gSceneInvalidator;
 }
 
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

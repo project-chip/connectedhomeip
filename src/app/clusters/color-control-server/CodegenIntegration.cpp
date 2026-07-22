@@ -19,6 +19,7 @@
 #include <app/clusters/color-control-server/CodegenIntegration.h>
 #include <app/clusters/color-control-server/ColorControlCluster.h>
 #include <app/clusters/color-control-server/ColorControlDelegate.h>
+#include <app/clusters/color-control-server/SceneIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/BitFlags.h>
@@ -73,6 +74,11 @@ public:
 
         ColorControlCluster::Config config(delegate);
         config.mFeatures.SetRaw(featureMap);
+
+        // Inject the Scene Management coupling so a color change marks stored scenes stale. The concrete
+        // invalidator lives in the codegen layer (SceneIntegration.cpp); the core cluster only sees the
+        // abstract interface, so this keeps it ember-free. Null when Scene Management is not built.
+        config.sceneInvalidator = ColorControl::GetSceneInvalidator();
 
         // Color-temperature physical limits + couple-to-level minimum are Fixed (F) attributes whose ZAP
         // defaults live in ember storage; seed the cluster's runtime CTConfig from them when CT is advertised.
@@ -133,10 +139,16 @@ void MatterColorControlClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+
+    // Register the scene handler so AddScene/StoreScene serialize the color state into the scene EFS and
+    // RecallScene applies it back. Compiles to a no-op when Scene Management is not built.
+    ColorControl::RegisterSceneHandler(endpointId);
 }
 
 void MatterColorControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
+    ColorControl::UnregisterSceneHandler(endpointId);
+
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
