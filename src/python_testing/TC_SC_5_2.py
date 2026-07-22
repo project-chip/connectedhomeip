@@ -64,6 +64,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -298,6 +299,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 6a: AddGroup 0x0201 as group command via GroupID 0x0101
             self.step("6a")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0201))
+            await asyncio.sleep(3)
 
             # Step 6b: ViewGroup 0x0201 to confirm success
             self.step("6b")
@@ -317,6 +319,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 7b: AddGroup 0x0202 as group command via GroupID 0x0101
             self.step("7b")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0202))
+            await asyncio.sleep(3)
 
             # Step 7c: ViewGroup 0x0202 to confirm rejection
             self.step("7c")
@@ -335,6 +338,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 8b: AddGroup 0x0203 as group command via GroupID 0x0102
             self.step("8b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0203))
+            await asyncio.sleep(3)
 
             # Step 8c: ViewGroup 0x0203 to confirm rejection
             self.step("8c")
@@ -354,6 +358,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 9b: AddGroup 0x0204 as group command via GroupID 0x0102
             self.step("9b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0204))
+            await asyncio.sleep(3)
 
             # Step 9c: ViewGroup 0x0204 to confirm rejection
             self.step("9c")
@@ -363,6 +368,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 10a: RemoveGroup 0x0101 as group command via GroupID 0x0300
             self.step("10a")
             dev_ctrl.SendGroupCommand(groupId0300, Clusters.Groups.Commands.RemoveGroup(groupId0101))
+            await asyncio.sleep(3)
 
             # Step 10b: ViewGroup 0x0101 to confirm removal
             self.step("10b")
