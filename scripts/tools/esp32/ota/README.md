@@ -19,24 +19,24 @@ A multi-image bundle is the standard Matter OTA header wrapping a payload of:
 MultiImageHeader | SubImageHeader[0..N-1] | binary[0] | ... | binary[N-1]
 ```
 
-where `MultiImageHeader` is an 8-byte preamble (magic `"MIOT"` + image count) and
-each 48-byte `SubImageHeader` records a binary's image ID, expected version,
+where `MultiImageHeader` is an 8-byte preamble (magic `"MIOT"` + image count)
+and each 48-byte `SubImageHeader` records a binary's image ID, expected version,
 offset, length, and SHA-256 digest.
 
 ## Subcommands
 
-| Subcommand | Purpose |
-| --- | --- |
-| `create` | Create a single-image OTA file (same as `ota_image_tool.py`). |
-| `create-multi` | Create a multi-image OTA bundle from a CSV manifest. |
-| `show` | Print the OTA header; multi-image bundles are decoded automatically. |
-| `extract` | Write a copy of an OTA file with the Matter OTA header removed. |
-| `change_header` | Rewrite header fields (vendor/product ID, version, ...) in place. |
+| Subcommand      | Purpose                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| `create`        | Create a single-image OTA file (same as `ota_image_tool.py`).        |
+| `create-multi`  | Create a multi-image OTA bundle from a CSV manifest.                 |
+| `show`          | Print the OTA header; multi-image bundles are decoded automatically. |
+| `extract`       | Write a copy of an OTA file with the Matter OTA header removed.      |
+| `change_header` | Rewrite header fields (vendor/product ID, version, ...) in place.    |
 
 ## Creating a multi-image bundle
 
-`create-multi` takes the same header options as `create` (vendor ID, product
-ID, version, digest algorithm) plus a **CSV manifest** describing the component
+`create-multi` takes the same header options as `create` (vendor ID, product ID,
+version, digest algorithm) plus a **CSV manifest** describing the component
 binaries, and an output path:
 
 ```
@@ -76,5 +76,5 @@ For a multi-image bundle this prints the Matter OTA header followed by the
 `MultiImageHeader` and each `SubImageHeader` (image ID, version, offset, length,
 SHA-256).
 
-See [Multi-Image OTA](../../../../docs/platforms/esp32/multi_image_ota.md) for how
-the bundle is consumed on the device.
+See [Multi-Image OTA](../../../../docs/platforms/esp32/multi_image_ota.md) for
+how the bundle is consumed on the device.

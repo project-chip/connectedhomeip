@@ -326,7 +326,7 @@ def main():
     add_header_arguments(multi_parser, required=True)
     multi_parser.add_argument('input_csv',
                               help=f'Input CSV manifest (columns: id, version, path) listing components binaries '
-                                   f'(application image (id: {APP_IMAGE_ID}) should be present in the csv)')
+                              f'(application image (id: {APP_IMAGE_ID}) should be present in the csv)')
     multi_parser.add_argument('output_file', help='Path to output OTA image file')
 
     show_parser = subcommands.add_parser('show', help='Show OTA image info')

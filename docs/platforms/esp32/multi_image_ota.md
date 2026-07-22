@@ -82,21 +82,21 @@ fields are **little-endian**.
 
 **Fixed preamble (8 bytes):**
 
-| Offset | Size | Field | Semantics |
-| --- | --- | --- | --- |
-| 0 | 4 | `magic` | Must equal `0x4D494F54` (`"MIOT"`). |
-| 4 | 1 | `numImages` | Number of `SubImageHeader` entries (1–255; `0` is rejected). |
-| 5 | 3 | `reserved` | Must be zero. |
+| Offset | Size | Field       | Semantics                                                    |
+| ------ | ---- | ----------- | ------------------------------------------------------------ |
+| 0      | 4    | `magic`     | Must equal `0x4D494F54` (`"MIOT"`).                          |
+| 4      | 1    | `numImages` | Number of `SubImageHeader` entries (1–255; `0` is rejected). |
+| 5      | 3    | `reserved`  | Must be zero.                                                |
 
 **`SubImageHeader` (48 bytes each):**
 
-| Offset | Size | Field | Semantics |
-| --- | --- | --- | --- |
-| 0 | 4 | `imageId` | Selects the sub-image processor. Must be non-zero. |
-| 4 | 4 | `version` | Expected installed version of this binary. |
-| 8 | 4 | `offset` | Byte offset of the binary from payload start. |
-| 12 | 4 | `length` | Exact byte count of the binary (must be > 0). |
-| 16 | 32 | `sha256` | SHA-256 of the binary's on-wire bytes. |
+| Offset | Size | Field     | Semantics                                          |
+| ------ | ---- | --------- | -------------------------------------------------- |
+| 0      | 4    | `imageId` | Selects the sub-image processor. Must be non-zero. |
+| 4      | 4    | `version` | Expected installed version of this binary.         |
+| 8      | 4    | `offset`  | Byte offset of the binary from payload start.      |
+| 12     | 4    | `length`  | Exact byte count of the binary (must be > 0).      |
+| 16     | 32   | `sha256`  | SHA-256 of the binary's on-wire bytes.             |
 
 The header is `8 + numImages * 48` bytes on the wire.
 
@@ -110,8 +110,8 @@ The header is `8 + numImages * 48` bytes on the wire.
 -   Entries are **contiguous**: entry 0 starts right after the header, and each
     subsequent `offset` equals the previous `offset + length`.
 -   The offsets and lengths sum exactly to the outer header's `payloadSize`.
--   There is **exactly one** application image (`imageId = kAppImageProcessorTag`)
-    and it is the **last** entry.
+-   There is **exactly one** application image
+    (`imageId = kAppImageProcessorTag`) and it is the **last** entry.
 
 The application image is mandatory because the Matter `softwareVersion` is
 compiled into it — without a new app image the device could never report the
@@ -124,11 +124,11 @@ Only two rules are enforced in code: `imageId` must be non-zero, and exactly one
 entry must use `kAppImageProcessorTag` (`1`). The recommended convention for the
 rest:
 
-| Range | Owner | Use |
-| --- | --- | --- |
-| `0x00000000` | — | Invalid; rejected at parse time. |
-| `0x00000001`–`0x000000FF` | Platform | Well-known platform images. `kAppImageProcessorTag = 1` is the application firmware. |
-| `0x00000100`–`0xFFFFFFFF` | Manufacturer | Any value you choose; no central registry. |
+| Range                     | Owner        | Use                                                                                  |
+| ------------------------- | ------------ | ------------------------------------------------------------------------------------ |
+| `0x00000000`              | —            | Invalid; rejected at parse time.                                                     |
+| `0x00000001`–`0x000000FF` | Platform     | Well-known platform images. `kAppImageProcessorTag = 1` is the application firmware. |
+| `0x00000100`–`0xFFFFFFFF` | Manufacturer | Any value you choose; no central registry.                                           |
 
 The `imageId`-to-meaning mapping is a stable ABI contract between the device
 firmware and the tool that packages the bundle.
@@ -148,25 +148,25 @@ class SubImageProcessor
 };
 ```
 
-| Method | When it is called | Contract |
-| --- | --- | --- |
-| `Init(entry)` | Once, when the dispatcher reaches this entry, before `IsReadyForOTA()`. | Light-weight. `entry` is valid only for the call. Defer heavy I/O to the first `Write()`. |
-| `IsInitialized()` | To decide whether to fan out `Abort()`/`Apply()`. | Return whether `Init()` ran. |
-| `IsReadyForOTA(state)` | Immediately after `Init()`. | Set `state` from **cached** data; must return in milliseconds (no bus round-trips). |
-| `Write(block)` | Per chunk, only when `state == kReady`. | Write the bytes handed in. Bytes arrive sequentially from byte 0, exactly `length` bytes total, raw binary only (headers already stripped). |
-| `Finish()` | Once, after all bytes are delivered **and** the SHA-256 is verified. | Close/commit the staged image (e.g. `esp_ota_end`). |
-| `Abort(context)` | On any error or cancellation, for every `Init()`-ed processor. | Discard partial state, release resources, do not block. |
-| `Apply()` | Once per `Init()`-ed processor during the apply phase. | Commit/activate the staged image (e.g. `esp_ota_set_boot_partition`). |
+| Method                 | When it is called                                                       | Contract                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Init(entry)`          | Once, when the dispatcher reaches this entry, before `IsReadyForOTA()`. | Light-weight. `entry` is valid only for the call. Defer heavy I/O to the first `Write()`.                                                   |
+| `IsInitialized()`      | To decide whether to fan out `Abort()`/`Apply()`.                       | Return whether `Init()` ran.                                                                                                                |
+| `IsReadyForOTA(state)` | Immediately after `Init()`.                                             | Set `state` from **cached** data; must return in milliseconds (no bus round-trips).                                                         |
+| `Write(block)`         | Per chunk, only when `state == kReady`.                                 | Write the bytes handed in. Bytes arrive sequentially from byte 0, exactly `length` bytes total, raw binary only (headers already stripped). |
+| `Finish()`             | Once, after all bytes are delivered **and** the SHA-256 is verified.    | Close/commit the staged image (e.g. `esp_ota_end`).                                                                                         |
+| `Abort(context)`       | On any error or cancellation, for every `Init()`-ed processor.          | Discard partial state, release resources, do not block.                                                                                     |
+| `Apply()`              | Once per `Init()`-ed processor during the apply phase.                  | Commit/activate the staged image (e.g. `esp_ota_set_boot_partition`).                                                                       |
 
 `IsReadyForOTA()` reports one of the `DeviceState` values below. A missing
 registration (no processor for the `imageId`) is treated as `kAlreadyUpToDate`.
 A skip is permanent for the cycle — the Provider will not re-send skipped bytes.
 
-| `DeviceState` | Dispatcher action | Recorded result |
-| --- | --- | --- |
-| `kReady` | Stream bytes via `Write()`. | `kWritten` (after verify + `Finish()`). |
-| `kAlreadyUpToDate` | Skip the entry. | `kSkippedUpToDate` |
-| `kNotReady` | Skip the entry. | `kSkippedNotReady` |
+| `DeviceState`      | Dispatcher action           | Recorded result                         |
+| ------------------ | --------------------------- | --------------------------------------- |
+| `kReady`           | Stream bytes via `Write()`. | `kWritten` (after verify + `Finish()`). |
+| `kAlreadyUpToDate` | Skip the entry.             | `kSkippedUpToDate`                      |
+| `kNotReady`        | Skip the entry.             | `kSkippedNotReady`                      |
 
 ## Download and Apply Flow
 
@@ -297,7 +297,9 @@ After the update completes and the device reboots, confirm the new version:
 ```
 
 ## Behavior Notes
--   **No resume across disconnects.** A reboot mid-download restarts from byte 0.
+
+-   **No resume across disconnects.** A reboot mid-download restarts from
+    byte 0.
 
 -   **Header RAM.** `numImages` may be up to 255, but the header is buffered in
     RAM (`8 + numImages * 48` bytes); keep the count small on constrained

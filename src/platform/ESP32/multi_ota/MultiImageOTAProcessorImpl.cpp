@@ -482,17 +482,19 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
 
         // The app image must be the last entry, and there must be exactly one.
         VerifyOrReturnError(mMultiOTAImageHeader.subImages.back().imageId == kAppImageProcessorTag,
-                            CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "App image is not the last entry in the payload"));
+                            CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                            ChipLogError(SoftwareUpdate, "App image is not the last entry in the payload"));
 
         const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
-        VerifyOrReturnError(mParams.totalFileBytes <= UINT32_MAX, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Total file bytes is too large"));
+        VerifyOrReturnError(mParams.totalFileBytes <= UINT32_MAX, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                            ChipLogError(SoftwareUpdate, "Total file bytes is too large"));
 
         uint64_t expectedOffset = headerSize;
         size_t appImageCount    = 0;
         for (const auto & subImage : mMultiOTAImageHeader.subImages)
         {
-            VerifyOrReturnError(subImage.length > 0, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " length is 0",
-                                subImage.imageId));
+            VerifyOrReturnError(subImage.length > 0, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                                ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " length is 0", subImage.imageId));
             VerifyOrReturnError(subImage.offset == expectedOffset, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
                                 ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " offset is not correct", subImage.imageId));
             expectedOffset += subImage.length;
@@ -501,8 +503,10 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
                 appImageCount++;
             }
         }
-        VerifyOrReturnError(expectedOffset == mParams.totalFileBytes, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "Processed header size is not same as reported"));
-        VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER, ChipLogError(SoftwareUpdate, "App image count is not 1"));
+        VerifyOrReturnError(expectedOffset == mParams.totalFileBytes, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                            ChipLogError(SoftwareUpdate, "Processed header size is not same as reported"));
+        VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER,
+                            ChipLogError(SoftwareUpdate, "App image count is not 1"));
 
         VerifyOrReturnError(mSubImageResults.Alloc(mMultiOTAImageHeader.subImages.size()), CHIP_ERROR_NO_MEMORY);
         mSubImageResultCount = 0;
