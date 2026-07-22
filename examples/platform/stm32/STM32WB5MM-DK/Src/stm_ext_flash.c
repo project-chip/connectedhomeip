@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "stm_ext_flash.h"
 #include "cmsis_os.h"

@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "flash_wb.h"
 #include "stm_ext_flash.h"

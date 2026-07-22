@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __HW_CONF_H
 #define __HW_CONF_H

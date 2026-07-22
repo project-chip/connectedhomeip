@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef APP_CONF_H
 #define APP_CONF_H

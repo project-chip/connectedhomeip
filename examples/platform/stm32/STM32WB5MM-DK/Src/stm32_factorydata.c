@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "stm32_factorydata.h"
 #include "stm_ext_flash.h"

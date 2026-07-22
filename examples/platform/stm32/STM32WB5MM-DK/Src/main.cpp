@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "AppTask.h"

@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /**
  * @file
  *   This file implements logging functions to used in Application examples.

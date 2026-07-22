@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes ------------------------------------------------------------------*/
 #include "app_matter.h"
 #include "common_blesvc.h"

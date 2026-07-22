@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef S25FL128S_CONF_H
 #define S25FL128S_CONF_H

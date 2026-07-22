@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __BLE_DBG_CONF_H
 #define __BLE_DBG_CONF_H

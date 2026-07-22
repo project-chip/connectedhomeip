@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef STM32WB5MM_DK_CONF_H
 #define STM32WB5MM_DK_CONF_H

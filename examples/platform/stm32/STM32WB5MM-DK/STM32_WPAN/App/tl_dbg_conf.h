@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TL_DBG_CONF_H
 #define __TL_DBG_CONF_H

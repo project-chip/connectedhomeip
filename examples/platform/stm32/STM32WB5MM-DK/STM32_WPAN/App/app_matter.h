@@ -18,7 +18,6 @@
  */
 /* USER CODE END Header */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __APP_MATTER_H
 #define __APP_MATTER_H

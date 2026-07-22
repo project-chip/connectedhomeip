@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Includes */
 #include <errno.h>
 #include <stdio.h>

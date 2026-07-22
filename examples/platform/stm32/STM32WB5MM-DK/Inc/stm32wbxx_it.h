@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32WBxx_IT_H
 #define __STM32WBxx_IT_H
