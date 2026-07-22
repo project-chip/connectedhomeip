@@ -252,7 +252,7 @@ public:
 
     // Pigweed test pure virtual will get overriden
     // TODO: why is a context a Test?
-    virtual void PigweedTestBody() {}
+    virtual void PigweedTestBody() override {}
 
     // These functions wrap spLoopbackTransportManager methods
     static auto & GetSystemLayer() { return spLoopbackTransportManager->GetSystemLayer(); }
@@ -295,10 +295,10 @@ public:
     }
 
     // Performs setup for each individual test in the test suite
-    virtual void SetUp() { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
+    virtual void SetUp() override { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
 
     // Performs teardown for each individual test in the test suite
-    virtual void TearDown() { MessagingContext::Shutdown(); }
+    virtual void TearDown() override { MessagingContext::Shutdown(); }
 
     static LoopbackTransportManager * spLoopbackTransportManager;
 };
