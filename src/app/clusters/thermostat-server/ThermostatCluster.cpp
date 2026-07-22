@@ -397,6 +397,18 @@ Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
 
 Status ThermostatCluster::OnAtomicWriteRollback(AttributeId attributeId)
 {
+    switch (attributeId)
+    {
+    case Presets::Id:
+        if (mDelegate == nullptr)
+        {
+            return Status::InvalidInState;
+        }
+        mDelegate->ClearPendingPresetList();
+        break;
+    default:
+        break;
+    }
     return Status::Success;
 }
 

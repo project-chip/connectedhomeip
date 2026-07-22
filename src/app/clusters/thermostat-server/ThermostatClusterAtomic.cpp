@@ -287,10 +287,6 @@ bool AtomicWriteSession::SetAtomicWrite(ScopedNodeId originatorNodeId, AtomicWri
 
 void AtomicWriteSession::ResetAtomicWrite()
 {
-    if (mDelegate != nullptr)
-    {
-        // TODO: mDelegate->ClearPendingPresetList();
-    }
     ClearTimer(this);
 
     mWriteState = AtomicWriteState::Closed;
