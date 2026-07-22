@@ -220,14 +220,14 @@ default; otherwise to the `default` argument passed to `self.pixit`.
 The declared `value_type` determines the command-line flag used to supply the
 value:
 
-| Python type     | Command-line flag           |
-| --------------- | --------------------------- |
-| `str`           | `--string-arg name:value`   |
-| `int`           | `--int-arg name:value`      |
-| `bool`          | `--bool-arg name:value`     |
-| `float`         | `--float-arg name:value`    |
-| `bytes`         | `--hex-arg name:value`      |
-| `list` / `dict` | `--json-arg name:value`     |
+| Python type     | Command-line flag         |
+| --------------- | ------------------------- |
+| `str`           | `--string-arg name:value` |
+| `int`           | `--int-arg name:value`    |
+| `bool`          | `--bool-arg name:value`   |
+| `float`         | `--float-arg name:value`  |
+| `bytes`         | `--hex-arg name:value`    |
+| `list` / `dict` | `--json-arg name:value`   |
 
 Supplying a value whose type does not match the declaration causes setup to fail
 with a message that names the expected flag.
@@ -256,30 +256,30 @@ class TC_Example(MatterBaseTest):
 ```
 
 The signature is `harness_params(*required, optional=())`. The positional names
-are required and cause setup to fail when unsatisfied. Names listed in `optional`
-are recorded for documentation and failure output but do not affect validation.
-A name that is not present in the registry raises `ValueError` when the decorator
-is applied. The registry defines the following names:
+are required and cause setup to fail when unsatisfied. Names listed in
+`optional` are recorded for documentation and failure output but do not affect
+validation. A name that is not present in the registry raises `ValueError` when
+the decorator is applied. The registry defines the following names:
 
-| Name                   | Description                       | Supplied via                                        | Sensitive |
-| ---------------------- | --------------------------------- | --------------------------------------------------- | --------- |
-| `discriminator`        | Long discriminator                | `--discriminator` (or `--qr-code` / `--manual-code`)|           |
-| `passcode`             | Setup passcode (PASE)             | `--passcode` (or `--qr-code` / `--manual-code`)     | Yes       |
-| `wifi_ssid`            | Wi-Fi SSID                        | `--wifi-ssid`                                       |           |
-| `wifi_passphrase`      | Wi-Fi passphrase                  | `--wifi-passphrase`                                 | Yes       |
-| `commissioning_method` | Commissioning method              | `--commissioning-method`                            |           |
-| `dut_node_id`          | DUT node id on the fabric         | `--dut-node-id`                                     |           |
-| `endpoint`             | Endpoint under test               | `--endpoint`                                        |           |
-| `thread_dataset`       | Thread operational dataset hex    | `--thread-dataset-hex`                              | Yes       |
-| `commissionee_ip`      | Commissionee IP (on-network-ip)   | `--ip-addr`                                         |           |
+| Name                   | Description                     | Supplied via                                         | Sensitive |
+| ---------------------- | ------------------------------- | ---------------------------------------------------- | --------- |
+| `discriminator`        | Long discriminator              | `--discriminator` (or `--qr-code` / `--manual-code`) |           |
+| `passcode`             | Setup passcode (PASE)           | `--passcode` (or `--qr-code` / `--manual-code`)      | Yes       |
+| `wifi_ssid`            | Wi-Fi SSID                      | `--wifi-ssid`                                        |           |
+| `wifi_passphrase`      | Wi-Fi passphrase                | `--wifi-passphrase`                                  | Yes       |
+| `commissioning_method` | Commissioning method            | `--commissioning-method`                             |           |
+| `dut_node_id`          | DUT node id on the fabric       | `--dut-node-id`                                      |           |
+| `endpoint`             | Endpoint under test             | `--endpoint`                                         |           |
+| `thread_dataset`       | Thread operational dataset hex  | `--thread-dataset-hex`                               | Yes       |
+| `commissionee_ip`      | Commissionee IP (on-network-ip) | `--ip-addr`                                          |           |
 
 The `discriminator` and `passcode` parameters are satisfied by their direct flag
 or by `--qr-code` / `--manual-code`. When supplied through a setup code, the
 decoded numeric value is not stored on `MatterTestConfig`, so
-`self.harness_param` returns `None` and the failure output shows `<from
---qr-code>` or `<from setup code>` in place of the value. A test that requires
-the numeric discriminator or passcode should obtain it through `--discriminator`
-or `--passcode` rather than a setup code.
+`self.harness_param` returns `None` and the failure output shows
+`<from --qr-code>` or `<from setup code>` in place of the value. A test that
+requires the numeric discriminator or passcode should obtain it through
+`--discriminator` or `--passcode` rather than a setup code.
 
 ### Validation and failure output
 
