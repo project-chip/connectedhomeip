@@ -156,6 +156,195 @@ locally, these are specified on the command line. When running in the test
 harness, these are specified in the test parameters section of the test
 configuration.
 
+## Declarative PIXITs and harness parameters
+
+The Python testing framework provides a declarative way for a test to state the
+parameters it requires. A test implemented as a `MatterBaseTest` subclass in
+`src/python_testing` declares its parameters using decorators; the declarations
+are validated in `setup_test()` before the test body runs, and the declared
+values are recorded in the failure output. This makes a test's required inputs
+explicit and self-documenting, and surfaces a missing or mistyped value up front
+rather than partway through the test. Two categories of parameter are supported:
+
+-   PIXITs are test-specific values such as application paths, timeouts, or
+    trigger keys. They are declared with `@pixit`, read with `self.pixit(name)`,
+    and supplied through `user_params` using the `--*-arg` command-line flags.
+    They are defined in `matter.testing.pixit`.
+-   Harness parameters are the standard runner and commissioning flags such as
+    the discriminator, passcode, and Wi-Fi credentials. They are declared with
+    `@harness_params`, read with `self.harness_param(name)`, and resolved from
+    `MatterTestConfig`. The set of valid names is fixed by a registry in
+    `matter.testing.harness_params`.
+
+### Declaring PIXITs
+
+Each PIXIT a test requires is declared with a `@pixit` decorator. Multiple
+decorators may be stacked, and they must be placed above `@async_test_body` and
+`@run_if_endpoint_matches` so that validation runs before the test body.
+
+```python
+from matter.testing.pixit import pixit
+from matter.testing.matter_testing import MatterBaseTest, async_test_body
+
+
+class TC_Example(MatterBaseTest):
+
+    @pixit("th_server_app_path", str, "Path to the TH server application")
+    @pixit("timeout_sec", int, "Timeout in seconds", required=False, default=30)
+    @async_test_body
+    async def test_TC_Example_1_1(self):
+        app_path = self.pixit("th_server_app_path")
+        timeout = self.pixit("timeout_sec")
+```
+
+The decorator signature is
+`pixit(name, value_type, description, required=True, default, sensitive=False)`,
+where:
+
+-   `name` is the key in `user_params`, also used on the command line as
+    `--<flag> name:value`.
+-   `value_type` is the expected Python type, enforced with `isinstance` during
+    setup.
+-   `description` is the text shown in error messages and failure output.
+-   `required`, when `True` (the default), causes setup to fail if the value is
+    absent.
+-   `default` is the value returned for an optional PIXIT that was not supplied;
+    it is ignored when `required` is `True`.
+-   `sensitive`, when `True`, causes the value to be redacted in the failure
+    output.
+
+A value is read with `self.pixit(name)`, which resolves to the value in
+`user_params` when present; otherwise, for an optional PIXIT, to the decorator
+default; otherwise to the `default` argument passed to `self.pixit`.
+
+The declared `value_type` determines the command-line flag used to supply the
+value:
+
+| Python type     | Command-line flag           |
+| --------------- | --------------------------- |
+| `str`           | `--string-arg name:value`   |
+| `int`           | `--int-arg name:value`      |
+| `bool`          | `--bool-arg name:value`     |
+| `float`         | `--float-arg name:value`    |
+| `bytes`         | `--hex-arg name:value`      |
+| `list` / `dict` | `--json-arg name:value`     |
+
+Supplying a value whose type does not match the declaration causes setup to fail
+with a message that names the expected flag.
+
+### Declaring harness parameters
+
+The standard commissioning and runner flags are populated on `MatterTestConfig`
+by `runner.py`. A test declares the ones it depends on so that they are
+validated during setup and recorded in the failure output. The names must exist
+in the registry; their descriptions and command-line hints are taken from the
+registry rather than repeated on each test.
+
+```python
+from matter.testing.harness_params import harness_params
+from matter.testing.pixit import pixit
+
+
+class TC_Example(MatterBaseTest):
+
+    @harness_params("discriminator", "passcode", optional=("endpoint",))
+    @pixit("th_server_app_path", str, "Path to the TH server application")
+    @async_test_body
+    async def test_TC_Example_1_1(self):
+        disc = self.harness_param("discriminator")
+        path = self.pixit("th_server_app_path")
+```
+
+The signature is `harness_params(*required, optional=())`. The positional names
+are required and cause setup to fail when unsatisfied. Names listed in `optional`
+are recorded for documentation and failure output but do not affect validation.
+A name that is not present in the registry raises `ValueError` when the decorator
+is applied. The registry defines the following names:
+
+| Name                   | Description                       | Supplied via                                        | Sensitive |
+| ---------------------- | --------------------------------- | --------------------------------------------------- | --------- |
+| `discriminator`        | Long discriminator                | `--discriminator` (or `--qr-code` / `--manual-code`)|           |
+| `passcode`             | Setup passcode (PASE)             | `--passcode` (or `--qr-code` / `--manual-code`)     | Yes       |
+| `wifi_ssid`            | Wi-Fi SSID                        | `--wifi-ssid`                                       |           |
+| `wifi_passphrase`      | Wi-Fi passphrase                  | `--wifi-passphrase`                                 | Yes       |
+| `commissioning_method` | Commissioning method              | `--commissioning-method`                            |           |
+| `dut_node_id`          | DUT node id on the fabric         | `--dut-node-id`                                     |           |
+| `endpoint`             | Endpoint under test               | `--endpoint`                                        |           |
+| `thread_dataset`       | Thread operational dataset hex    | `--thread-dataset-hex`                              | Yes       |
+| `commissionee_ip`      | Commissionee IP (on-network-ip)   | `--ip-addr`                                         |           |
+
+The `discriminator` and `passcode` parameters are satisfied by their direct flag
+or by `--qr-code` / `--manual-code`. When supplied through a setup code, the
+decoded numeric value is not stored on `MatterTestConfig`, so
+`self.harness_param` returns `None` and the failure output shows `<from
+--qr-code>` or `<from setup code>` in place of the value. A test that requires
+the numeric discriminator or passcode should obtain it through `--discriminator`
+or `--passcode` rather than a setup code.
+
+### Validation and failure output
+
+`setup_test()` validates the declared PIXITs against `user_params` and the
+declared harness parameters against `MatterTestConfig`. If a required value is
+missing, or a PIXIT value has the wrong type, the test fails immediately with a
+single message that lists the missing values and the flags used to supply them:
+
+```
+Test 'test_TC_Example_1_1' is missing required PIXIT value(s):
+
+Missing required PIXITs:
+  - th_server_app_path (str): Path to the TH server application
+    Provide via: --string-arg th_server_app_path:<value>
+
+Available optional PIXITs:
+  - timeout_sec (int): Timeout in seconds
+    Default: 30
+    Override via: --int-arg timeout_sec:<value>
+
+Test 'test_TC_Example_1_1' is missing required harness parameter(s):
+
+Missing required harness (pass via command line):
+  - discriminator: Long discriminator for commissioning (or use --qr-code / --manual-code).
+    Provide via: --discriminator <value>  or  --qr-code <payload>  or  --manual-code <code>
+```
+
+When a non-commissioning test fails, all declared parameters are recorded in the
+log, including those that were present, to aid debugging. Values declared as
+sensitive are shown as `***REDACTED***`; this applies to PIXITs declared with
+`sensitive=True` and to the registry parameters `passcode`, `wifi_passphrase`,
+and `thread_dataset`. Byte values are shown as their length rather than their
+contents.
+
+Tests that do not use these decorators are unaffected; validation and failure
+output apply only when the decorators are present.
+
+### Command-line example
+
+A test declaring both PIXITs and harness parameters:
+
+```python
+@harness_params("discriminator", "passcode", "commissioning_method")
+@pixit("th_server_app_path", str, "Path to the TH server application")
+@pixit("timeout_sec", int, "Timeout in seconds", required=False, default=30)
+@async_test_body
+async def test_TC_Example_1_1(self):
+    ...
+```
+
+is run with:
+
+```bash
+python3 src/python_testing/TC_Example.py \
+    --commissioning-method on-network \
+    --discriminator 3840 \
+    --passcode 20202021 \
+    --string-arg th_server_app_path:/path/to/th-server \
+    --int-arg timeout_sec:60
+```
+
+The `--commissioning-method`, `--discriminator`, and `--passcode` flags satisfy
+the harness declarations, and the `--string-arg` and `--int-arg` flags satisfy
+the PIXITs.
+
 ## PICS for test selection
 
 The official source that the CSA certification team uses to determine if all the

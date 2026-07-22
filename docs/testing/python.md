@@ -471,6 +471,10 @@ See
     -   use --int-arg, --bool-arg etc on the command line to specify PIXITs
     -   Warn users if they don’t set required values, add instructions in the
         comments
+    -   for a declarative alternative, declare required/optional PIXITs and
+        harness parameters up front with the `@pixit` / `@harness_params`
+        decorators — see
+        [Declarative PIXITs and harness parameters](./pics_and_pixit.md#declarative-pixits-and-harness-parameters)
 -   pixit_value = self.user_params.get("pixit_name", default)
 
 ## Support functionality
