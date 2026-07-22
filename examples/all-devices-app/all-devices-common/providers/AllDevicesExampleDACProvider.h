@@ -40,7 +40,7 @@ namespace DeviceLayer {
 class AllDevicesExampleDACProvider : public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
-    AllDevicesExampleDACProvider()          = default;
+    AllDevicesExampleDACProvider()           = default;
     ~AllDevicesExampleDACProvider() override = default;
 
     /**
