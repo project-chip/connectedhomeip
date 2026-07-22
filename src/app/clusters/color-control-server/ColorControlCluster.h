@@ -217,6 +217,11 @@ public:
     ColorControl::EnhancedColorModeEnum GetEnhancedColorMode() const;
     bool SupportsMode(ColorControl::EnhancedColorModeEnum mode) const;
 
+    // Repoint the delegate after construction. Needed because applications register their delegate (via
+    // CodegenIntegration's SetDefaultDelegate) at a point that may be after this cluster was constructed.
+    // Takes a reference so the bound delegate is always non-null.
+    void SetDelegate(ColorControlDelegate & delegate) { mDelegate = &delegate; }
+
     // ---- Command handlers ----
     // Public (application-facing / unit-testable, like LevelControl's command API). The spec does not
     // require these to be private; exposing them lets callers and tests drive commands directly.
@@ -286,7 +291,11 @@ private:
     uint64_t mColorLoopStartTimeMs = 0; // SystemClock() reading at the moment the loop started
 
     // ---- Cluster state (initialized from Config in the constructor) ----
-    ColorControlDelegate & mDelegate;             // reference → must be set in the ctor init list
+    // Pointer (not a reference) so it can be repointed after construction: applications register their
+    // delegate via CodegenIntegration's SetDefaultDelegate, which on Linux runs in ApplicationInit() — after
+    // Server::Init() has already constructed this cluster. Bound to a non-null delegate at construction and
+    // only ever repointed to another non-null delegate (see SetDelegate), so call sites never null-check.
+    ColorControlDelegate * mDelegate;
     BitMask<ColorControl::Feature> mFeatures{};   // advertised features
     ColorControl::ColorValue mColorValue;         // active color; its alternative encodes the mode
     Transition mTransition;                       // active driver (monostate == stable)

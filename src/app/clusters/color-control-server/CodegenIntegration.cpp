@@ -45,12 +45,12 @@ static_assert(kColorControlMaxClusterCount <= kEmberInvalidEndpointIndex, "Color
 
 // A single shared no-op delegate for endpoints that have no application delegate registered.
 //
-// ColorControlCluster requires a non-null ColorControlDelegate&, and every base-class method is a no-op: the
+// ColorControlCluster requires a non-null ColorControlDelegate, and every base-class method is a no-op: the
 // color-science Convert* are never reached on a single-feature device (it cannot switch into a mode it does
 // not advertise), and hardware On*Changed are simply not delivered. So one stateless instance safely backs
 // every delegate-less endpoint. Applications that need conversions or hardware output register their own
-// delegate via SetDefaultDelegate BEFORE the cluster is constructed; the binding is fixed at construction and
-// is not repointable afterwards (no consumer needs that).
+// delegate via SetDefaultDelegate, which may run either before or after the cluster is constructed: the
+// binding is repointable (ColorControlCluster::SetDelegate), so a late registration still takes effect.
 ColorControlDelegate gDefaultColorControlDelegate;
 
 struct ClusterWithDelegate
@@ -190,9 +190,21 @@ void SetDefaultDelegate(EndpointId endpoint, ColorControlDelegate * delegate)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep < kColorControlMaxClusterCount)
+    if (ep >= kColorControlMaxClusterCount)
     {
-        gClusters[ep].userDelegate = delegate;
+        ChipLogError(Zcl, "SetDefaultDelegate failed: endpoint %d not registered yet", endpoint);
+        return;
+    }
+
+    // Stash for CreateRegistration, which binds the delegate whenever the cluster is (re)constructed.
+    gClusters[ep].userDelegate = delegate;
+
+    // The cluster is typically already constructed by the time an application registers its delegate (on
+    // Linux, SetDefaultDelegate runs in ApplicationInit(), after Server::Init() constructed the cluster). The
+    // delegate binding is repointable, so update the live cluster too — otherwise the registration is lost.
+    if (gClusters[ep].server.IsConstructed())
+    {
+        gClusters[ep].server.Cluster().SetDelegate(delegate != nullptr ? *delegate : gDefaultColorControlDelegate);
     }
 }
 
@@ -360,7 +372,7 @@ ColorControlServer::colorLoopCommand(EndpointId endpoint, const ColorControl::Co
 {
     auto * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnValue(cluster != nullptr, Status::UnsupportedEndpoint);
-    return cluster->ColorLoopSet(commandData.updateFlags, commandData.action, commandData.direction, commandData.time,
+    return cluster->colorLoopSet(commandData.updateFlags, commandData.action, commandData.direction, commandData.time,
                                  commandData.startHue, commandData.optionsMask, commandData.optionsOverride);
 }
 

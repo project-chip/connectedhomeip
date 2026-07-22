@@ -63,7 +63,7 @@ static constexpr uint8_t MAX_CURRENT_LEVEL = 0xFE;
 } // namespace
 
 ColorControlCluster::ColorControlCluster(EndpointId endpoint, const Config & config) :
-    DefaultServerCluster({ endpoint, ColorControl::Id }), mDelegate(config.mDelegate), mFeatures(config.mFeatures),
+    DefaultServerCluster({ endpoint, ColorControl::Id }), mDelegate(&config.mDelegate), mFeatures(config.mFeatures),
     mColorValue(config.mColorValue), mColorLoop(config.mColorLoop), mCT(config.ctConfig), mStaticConfig(config.sc),
     mOnOff(config.onOff), mSceneInvalidator(config.sceneInvalidator)
 {
@@ -393,14 +393,14 @@ bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
     {
         SetAttributeValue(ehs->enhancedHue, eh, EnhancedCurrentHue::Id, change); // store 16-bit + report
         NotifyAttributeChanged(CurrentHue::Id, change);                          // projection: hue() = eh >> 8
-        mDelegate.OnColorHSChanged(mPath.mEndpointId, ehs->hue(), ehs->saturation);
+        mDelegate->OnColorHSChanged(mPath.mEndpointId, ehs->hue(), ehs->saturation);
     }
     else
     {
         auto & hs = std::get<HueSatColor>(mColorValue);
         SetAttributeValue(hs.hue, static_cast<uint8_t>(eh >> 8), CurrentHue::Id, change); // store 8-bit + report
         NotifyAttributeChanged(EnhancedCurrentHue::Id, change);                           // projection: enhancedHue() = hue << 8
-        mDelegate.OnColorHSChanged(mPath.mEndpointId, hs.hue, hs.saturation);
+        mDelegate->OnColorHSChanged(mPath.mEndpointId, hs.hue, hs.saturation);
     }
 
     // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so
@@ -429,13 +429,13 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
     if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
     {
         SetAttributeValue(ehs->saturation, sat, CurrentSaturation::Id, change);
-        mDelegate.OnColorHSChanged(mPath.mEndpointId, ehs->hue(), ehs->saturation);
+        mDelegate->OnColorHSChanged(mPath.mEndpointId, ehs->hue(), ehs->saturation);
     }
     else
     {
         auto & hs = std::get<HueSatColor>(mColorValue);
         SetAttributeValue(hs.saturation, sat, CurrentSaturation::Id, change);
-        mDelegate.OnColorHSChanged(mPath.mEndpointId, hs.hue, hs.saturation);
+        mDelegate->OnColorHSChanged(mPath.mEndpointId, hs.hue, hs.saturation);
     }
 
     // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so
@@ -465,7 +465,7 @@ bool ColorControlCluster::TickCT(CTTransition & tx, uint64_t now)
     // In CT mode mColorValue is always CTColor (variant/mode kept in lockstep), so get<> is safe.
     auto & ct = std::get<CTColor>(mColorValue);
     SetAttributeValue(ct.mireds, mireds, ColorTemperatureMireds::Id, change);
-    mDelegate.OnColorCTChanged(mPath.mEndpointId, ct.mireds);
+    mDelegate->OnColorCTChanged(mPath.mEndpointId, ct.mireds);
 
     // HARDWARE OUTPUT is continuous, NOT throttled (§3.2.8): the delegate owns no timer, so
     // OnColorHSChanged fires EVERY tick (exact target on the last one) regardless of the
@@ -517,7 +517,7 @@ bool ColorControlCluster::TickColorLoop(uint64_t now)
     auto & ehs = std::get<EnhancedHueSatColor>(mColorValue);
     SetAttributeValue(ehs.enhancedHue, eh, EnhancedCurrentHue::Id, AttributeChangeType::kQuiet); // store 16-bit
     NotifyAttributeChanged(CurrentHue::Id, AttributeChangeType::kQuiet);                         // projection
-    mDelegate.OnColorHSChanged(mPath.mEndpointId, ehs.hue(), ehs.saturation);
+    mDelegate->OnColorHSChanged(mPath.mEndpointId, ehs.hue(), ehs.saturation);
 
     return true; // keep the tick alive until ColorLoopSet(Deactivate)
 }
@@ -548,7 +548,7 @@ bool ColorControlCluster::TickXY(XYTransition & tx, uint64_t now)
     auto & xy = std::get<XYColor>(mColorValue);
     SetAttributeValue(xy.x, x, CurrentX::Id, change);
     SetAttributeValue(xy.y, y, CurrentY::Id, change);
-    mDelegate.OnColorXYChanged(mPath.mEndpointId, xy.x, xy.y);
+    mDelegate->OnColorXYChanged(mPath.mEndpointId, xy.x, xy.y);
 
     // HARDWARE OUTPUT is continuous, NOT throttled (3.2.8): the delegate owns no timer, so
     // OnColorXYChanged fires EVERY tick (exact target on the last one) regardless of the
@@ -621,12 +621,12 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         XYColor next{};
         std::visit(
             overloaded{ [&](const HueSatColor & hs) {
-                           mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue, hs.saturation, next.x, next.y);
+                           mDelegate->ConvertHueSatToXY(mPath.mEndpointId, hs.hue, hs.saturation, next.x, next.y);
                        },
                         [&](const EnhancedHueSatColor & hs) {
-                            mDelegate.ConvertHueSatToXY(mPath.mEndpointId, hs.hue(), hs.saturation, next.x, next.y);
+                            mDelegate->ConvertHueSatToXY(mPath.mEndpointId, hs.hue(), hs.saturation, next.x, next.y);
                         },
-                        [&](const CTColor & ct) { mDelegate.ConvertMiredsToXY(mPath.mEndpointId, ct.mireds, next.x, next.y); },
+                        [&](const CTColor & ct) { mDelegate->ConvertMiredsToXY(mPath.mEndpointId, ct.mireds, next.x, next.y); },
                         [](const XYColor &) {} },
             mColorValue);
         mColorValue = next; // the variant assignment IS the store
@@ -656,12 +656,12 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
                        },
                        [&](const XYColor & xy) {
                            uint8_t h = 0;
-                           mDelegate.ConvertXYToHueSat(mPath.mEndpointId, xy.x, xy.y, h, sat);
+                           mDelegate->ConvertXYToHueSat(mPath.mEndpointId, xy.x, xy.y, h, sat);
                            eh = static_cast<uint16_t>(uint16_t(h) << 8);
                        },
                        [&](const CTColor & ct) {
                            uint8_t h = 0;
-                           mDelegate.ConvertMiredsToHueSat(mPath.mEndpointId, ct.mireds, h, sat);
+                           mDelegate->ConvertMiredsToHueSat(mPath.mEndpointId, ct.mireds, h, sat);
                            eh = static_cast<uint16_t>(uint16_t(h) << 8);
                        },
                    },
@@ -684,12 +684,12 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         if (std::holds_alternative<CTColor>(mColorValue))
             return;
         CTColor next{};
-        std::visit(overloaded{ [&](const XYColor & xy) { mDelegate.ConvertXYToMireds(mPath.mEndpointId, xy.x, xy.y, next.mireds); },
+        std::visit(overloaded{ [&](const XYColor & xy) { mDelegate->ConvertXYToMireds(mPath.mEndpointId, xy.x, xy.y, next.mireds); },
                                [&](const HueSatColor & hs) {
-                                   mDelegate.ConvertHueSatToMireds(mPath.mEndpointId, hs.hue, hs.saturation, next.mireds);
+                                   mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue, hs.saturation, next.mireds);
                                },
                                [&](const EnhancedHueSatColor & hs) {
-                                   mDelegate.ConvertHueSatToMireds(mPath.mEndpointId, hs.hue(), hs.saturation, next.mireds);
+                                   mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue(), hs.saturation, next.mireds);
                                },
                                [](const CTColor &) {} },
                    mColorValue);
@@ -1687,12 +1687,12 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const EnhancedHueSatColor & e) -> uint8_t { return e.hue(); },
                                              [&](const XYColor & c) -> uint8_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertXYToHueSat(ep, c.x, c.y, h, s);
+                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
                                                  return h;
                                              },
                                              [&](const CTColor & ct) -> uint8_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertMiredsToHueSat(ep, ct.mireds, h, s);
+                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
                                                  return h;
                                              },
                                          },
@@ -1704,12 +1704,12 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const EnhancedHueSatColor & e) -> uint16_t { return e.enhancedHue; },
                                              [&](const XYColor & c) -> uint16_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertXYToHueSat(ep, c.x, c.y, h, s);
+                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
                                                  return static_cast<uint16_t>(static_cast<uint16_t>(h) << 8);
                                              },
                                              [&](const CTColor & ct) -> uint16_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertMiredsToHueSat(ep, ct.mireds, h, s);
+                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
                                                  return static_cast<uint16_t>(static_cast<uint16_t>(h) << 8);
                                              },
                                          },
@@ -1721,12 +1721,12 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const EnhancedHueSatColor & e) -> uint8_t { return e.saturation; },
                                              [&](const XYColor & c) -> uint8_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertXYToHueSat(ep, c.x, c.y, h, s);
+                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
                                                  return s;
                                              },
                                              [&](const CTColor & ct) -> uint8_t {
                                                  uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate.ConvertMiredsToHueSat(ep, ct.mireds, h, s);
+                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
                                                  return s;
                                              },
                                          },
@@ -1737,17 +1737,17 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const XYColor & c) -> uint16_t { return c.x; },
                                              [&](const HueSatColor & hs) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
+                                                 mDelegate->ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
                                                  return x;
                                              },
                                              [&](const EnhancedHueSatColor & e) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
+                                                 mDelegate->ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
                                                  return x;
                                              },
                                              [&](const CTColor & ct) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertMiredsToXY(ep, ct.mireds, x, y);
+                                                 mDelegate->ConvertMiredsToXY(ep, ct.mireds, x, y);
                                                  return x;
                                              },
                                          },
@@ -1758,17 +1758,17 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const XYColor & c) -> uint16_t { return c.y; },
                                              [&](const HueSatColor & hs) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
+                                                 mDelegate->ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
                                                  return y;
                                              },
                                              [&](const EnhancedHueSatColor & e) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
+                                                 mDelegate->ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
                                                  return y;
                                              },
                                              [&](const CTColor & ct) -> uint16_t {
                                                  uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate.ConvertMiredsToXY(ep, ct.mireds, x, y);
+                                                 mDelegate->ConvertMiredsToXY(ep, ct.mireds, x, y);
                                                  return y;
                                              },
                                          },
@@ -1779,17 +1779,17 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                              [&](const CTColor & ct) -> uint16_t { return ct.mireds; },
                                              [&](const XYColor & c) -> uint16_t {
                                                  uint16_t m = CTColor{}.mireds;
-                                                 mDelegate.ConvertXYToMireds(ep, c.x, c.y, m);
+                                                 mDelegate->ConvertXYToMireds(ep, c.x, c.y, m);
                                                  return m;
                                              },
                                              [&](const HueSatColor & hs) -> uint16_t {
                                                  uint16_t m = CTColor{}.mireds;
-                                                 mDelegate.ConvertHueSatToMireds(ep, hs.hue, hs.saturation, m);
+                                                 mDelegate->ConvertHueSatToMireds(ep, hs.hue, hs.saturation, m);
                                                  return m;
                                              },
                                              [&](const EnhancedHueSatColor & e) -> uint16_t {
                                                  uint16_t m = CTColor{}.mireds;
-                                                 mDelegate.ConvertHueSatToMireds(ep, e.hue(), e.saturation, m);
+                                                 mDelegate->ConvertHueSatToMireds(ep, e.hue(), e.saturation, m);
                                                  return m;
                                              },
                                          },
