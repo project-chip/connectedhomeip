@@ -51,6 +51,8 @@ struct HueTransition
     uint16_t startHue;
     int32_t signedDelta;
     uint64_t startTimeMs;
+    // Milliseconds to travel signedDelta. 0 == immediate (transitionTime 0), kIndefiniteHueMoveMs ==
+    // MoveHue rate move (signedDelta is hue-units/second, runs until StopHueAxis).
     uint32_t durationMs;
 };
 

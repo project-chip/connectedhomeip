@@ -53,6 +53,10 @@ static constexpr uint8_t MAX_SATURATION_VALUE = 254;
 
 static constexpr uint16_t MAX_INT16U_VALUE = 0xFFFF; // RemainingTime sentinel for indefinite moves
 
+// HueTransition::durationMs sentinel for a MoveHue rate move (no endpoint; runs until StopHueAxis).
+// Safely above any real point-to-point duration (kMaxTransitionTime deciseconds * 100).
+static constexpr uint32_t kIndefiniteHueMoveMs = UINT32_MAX;
+
 static constexpr uint8_t MIN_CURRENT_LEVEL = 0x01;
 static constexpr uint8_t MAX_CURRENT_LEVEL = 0xFE;
 
@@ -238,12 +242,12 @@ void ColorControlCluster::ArmTick()
     }
     LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kTickMs), &TimerCallback, this));
 }
-// Remaining time on one axis, in 1/10 s, from its wall-clock anchor. durationMs == 0 means a rate-based
-// (indefinite) move — MoveHue/MoveSaturation/MoveColorTemperature and the color loop — which has no end,
-// so RemainingTime is MAX_INT16U until a Stop clears the axis (§3.2.7.4).
+// Remaining time on one axis, in 1/10 s, from its wall-clock anchor. durationMs == kIndefiniteHueMoveMs
+// is the MoveHue rate move, which has no end, so RemainingTime is MAX_INT16U until a Stop clears the
+// axis (§3.2.7.4). durationMs == 0 is an immediate (transitionTime 0) move → 0 remaining.
 inline uint16_t RemainingTenths(uint64_t startTimeMs, uint32_t durationMs, uint64_t now)
 {
-    if (durationMs == 0)
+    if (durationMs == kIndefiniteHueMoveMs)
         return MAX_INT16U_VALUE;
     const uint64_t endMs = startTimeMs + durationMs;
     if (now >= endMs)
@@ -360,7 +364,7 @@ bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
     uint16_t eh            = 0;
     bool done              = false;
 
-    if (tx.durationMs == 0)
+    if (tx.durationMs == kIndefiniteHueMoveMs)
     {
         // Indefinite rate move (MoveHue): signedDelta is hue-units per second, wrapping forever
         // until StopHueAxis. Position = start + rate * elapsed, taken mod 65536 (circular).
@@ -370,9 +374,10 @@ bool ColorControlCluster::TickHue(HueTransition & tx, uint64_t now)
     }
     else
     {
-        // Point-to-point: signedDelta is the signed arc to travel over durationMs.
-        const float t     = std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
-        done              = (t >= 1.f);
+        // Point-to-point: signedDelta is the signed arc to travel over durationMs. durationMs == 0
+        // means transitionTime == 0 → jump to the endpoint on the first tick (avoids div-by-zero).
+        done              = (tx.durationMs == 0) || (elapsed >= tx.durationMs);
+        const float t     = done ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
         const int32_t arc = done ? tx.signedDelta                                                // exact endpoint, no drift
                                  : static_cast<int32_t>(static_cast<float>(tx.signedDelta) * t); // 16-bit circular interpolation
         eh                = static_cast<uint16_t>((static_cast<int32_t>(tx.startHue) + arc) & 0xFFFF);
@@ -1080,7 +1085,7 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
            .startHue    = GetEnhancedHue(), // 16-bit canonical current
            .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
            .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = 0, // 0 == indefinite rate move (TickHue runs until StopHueAxis)
+           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
     };
     SetQuietReportRemainingTime(MAX_INT16U_VALUE, /*isNewTransition=*/true); // indefinite
     ArmTick();

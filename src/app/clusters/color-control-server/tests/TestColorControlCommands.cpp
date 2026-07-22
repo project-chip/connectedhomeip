@@ -227,6 +227,21 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturation)
     EXPECT_EQ(c.Saturation(), 150);
 }
 
+// transitionTime == 0 is an immediate jump, NOT an indefinite rate move: the hue must land on the
+// target and stay put. Regression for durationMs == 0 being misread as a MoveHue rate move, which
+// reinterpreted the arc as hue-units/sec so EnhancedCurrentHue kept climbing (and wrapping) past the
+// target — surfacing in TC-CC-10.1 as a stored scene value above the polled range.
+TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturationImmediateDoesNotDrift)
+{
+    ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
+    EXPECT_EQ(c.moveToHueAndSaturation(20000, 50, /*transitionTime=*/0, /*isEnhanced=*/true), Status::Success);
+    Tick(c, 1); // first tick materializes the immediate move
+    EXPECT_EQ(c.EnhancedHue(), 20000);
+    EXPECT_EQ(c.Saturation(), 50);
+    Tick(c, 2000); // seconds later it must not have moved
+    EXPECT_EQ(c.EnhancedHue(), 20000);
+}
+
 // ---------------------------------------------------------------------------- Color (X/Y)
 
 TEST_F(TestColorControlCommands, MoveToColor)
