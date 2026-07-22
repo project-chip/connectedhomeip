@@ -27,6 +27,8 @@ chip-tool  ──Matter (TCP/IP)──►  Commissioning Proxy App  ──Wi-Fi 
     -   [1.2 Software Prerequisites](#12-software-prerequisites)
         -   [1.2.1 USB dongle software](#121-usb-dongle-software)
         -   [1.2.2 Build machine](#122-on-the-build-machine-ubuntu-2204-2404-x86-64)
+        -   [1.2.3 Configuring BLE](#123-configuring-ble)
+        -   [1.2.4 Configuring the UART serial console](#124-configuring-the-uart-serial-console)
 -   [2. Build wpa_supplicant with the Matter NAN patch (Commissioning Proxy RPi only)](#2-build-wpa_supplicant-with-the-matter-nan-patch-commissioning-proxy-rpi-only)
     -   [2.1 What the patch does](#21-what-the-patch-does)
         -   [2.1.1 Create the patch file](#211-create-the-wpa-supplicant-matter-patch-patch-file)
@@ -97,6 +99,132 @@ sudo apt-get install -y git docker.io python3 python3-pip \
     libdbus-1-dev build-essential
 sudo usermod -aG docker $USER   # log out and back in after this
 ```
+
+### 1.2.3 Configuring BLE
+
+When using the **BLE transport** (the proxy acts as a BLE central, the End Device
+as a BLE peripheral) each RPi needs a working BlueZ stack. A freshly imaged
+Ubuntu often ships without BlueZ installed and without passwordless sudo for the
+`ubuntu` user.
+
+Install BlueZ and start the daemon on **both the Proxy RPi and the ED RPi**:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y bluez bluez-tools
+sudo systemctl enable --now bluetooth
+```
+
+`bluetoothctl list` is the authoritative readiness check — it must print a
+`Controller` line:
+
+```bash
+bluetoothctl list
+# Controller D8:3A:DD:08:0E:B2 ubuntu [default]
+```
+
+A `Controller` line proves BlueZ is installed, `bluetoothd` is running, and the
+kernel sees an HCI controller. Do not rely on `hciconfig` or
+`/sys/class/bluetooth/hci0` alone — either can be present while the other half is
+missing.
+
+> **Start order matters.** The app must attach to the `org.bluez` D-Bus service
+> *after* `bluetoothd` is up. If the proxy or ED app was started before BlueZ was
+> installed/running, it fails at runtime with
+> `Ble Error 0x00000401: BLE adapter unavailable`. Install BlueZ first, then
+> (re)start the app.
+
+If the `ubuntu` user cannot run `sudo` without a password (common on fresh
+images), add a NOPASSWD drop-in — this is also required for the UART serial mode
+below:
+
+```bash
+echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/ubuntu-nopasswd
+sudo chmod 0440 /etc/sudoers.d/ubuntu-nopasswd
+sudo visudo -c          # must print "parsed OK"
+```
+
+> Use a drop-in under `/etc/sudoers.d/` rather than editing `/etc/sudoers`
+> directly, and always run `visudo -c` before logging out — a malformed sudoers
+> file locks you out.
+
+### 1.2.4 Configuring the UART serial console
+
+The End Device can be driven over its **UART login console** — a robust fallback
+shell for when Wi-Fi/Ethernet drops during PAF/BLE tests, and the control channel
+used by the test harness's `standalone-serial` mode. The steps below configure a
+Raspberry Pi 4B End Device to expose a login console on the **mini-UART
+`/dev/ttyS0`** (GPIO 14/15).
+
+> **Do not disable the on-board Bluetooth.** The console is deliberately placed
+> on the mini-UART, not the PL011, so `dtoverlay=disable-bt` is **not** set. This
+> keeps the on-board BT controller (`hci0`) available for BLE commissioning.
+> Never add `disable-bt` on the ED — it breaks BLE tests.
+
+**1. Boot-side UART configuration** (run on the ED, then reboot):
+
+```bash
+grep -q '^enable_uart=1' /boot/firmware/config.txt || echo 'enable_uart=1' | sudo tee -a /boot/firmware/config.txt
+grep -q 'console=ttyS0,115200' /boot/firmware/cmdline.txt || sudo sed -i 's/$/ console=ttyS0,115200/' /boot/firmware/cmdline.txt
+sudo reboot
+```
+
+`serial-getty@ttyS0.service` is auto-generated on each boot from the `console=`
+kernel argument, so it survives reboots — an `enabled-runtime` status is expected,
+not a fault.
+
+**2. Wiring** (USB-UART adapter on the host → GPIO header on the ED):
+
+| Adapter pin | ED header pin | Signal                              |
+| ----------- | ------------- | ----------------------------------- |
+| RX          | pin 8         | GPIO14 / TXD (read the console here) |
+| TX          | pin 10        | GPIO15 / RXD                        |
+| GND         | pin 6         | Common ground (required)            |
+
+> A missing common ground is the most common fault — the symptom is *both*
+> directions dead while each device passes its own loopback. On the 40-pin header
+> the **even pins (6, 8, 10) are the outer row against the board edge**. Verify,
+> don't guess.
+
+**3. (Optional) Autologin for `standalone-serial` test mode.** The harness's
+`standalone-serial` mode expects the `ubuntu` user to be logged in automatically
+on the serial console:
+
+```bash
+sudo mkdir -p /etc/systemd/system/serial-getty@ttyS0.service.d
+sudo tee /etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf >/dev/null <<'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin ubuntu --keep-baud 115200,57600,38400,9600 ttyS0 $TERM
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart serial-getty@ttyS0.service
+```
+
+The empty `ExecStart=` line is required — a systemd drop-in must clear the
+inherited `ExecStart` before overriding it. This mode also needs passwordless
+sudo (see [1.2.3](#123-configuring-ble)) so the harness can write to
+`/dev/ttyS0`, and `pyserial` installed in **both** the system `python3` and the
+`matter_venv`.
+
+**4. Verify.** From the host, open the console and press Enter — a
+`ubuntu login:` prompt should appear:
+
+```bash
+screen /dev/ttyUSB0 115200
+```
+
+> **`Errno 16` "Device or resource busy" on `/dev/ttyUSB0`.** A detached `screen`
+> (or `minicom`/other process) is still holding the port — `screen` auto-detaches
+> when its window closes and keeps the port open exclusively, so closing the
+> window is not the same as releasing the port. Release it:
+>
+> ```bash
+> screen -ls                       # list sessions
+> screen -X -S <id> quit           # quit the one holding the port
+> screen -wipe                     # clean up dead entries
+> sudo fuser -v /dev/ttyUSB0       # show any remaining holder, then kill its PID
+> ```
 
 <hr>
 
