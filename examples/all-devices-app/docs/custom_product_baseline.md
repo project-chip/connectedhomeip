@@ -178,20 +178,18 @@ The `all-devices-app` implementation provides a decoupled provider architecture:
     [`AllDevicesExampleDACProvider`](../all-devices-common/providers/AllDevicesExampleDACProvider.h)
     located in
     [`all-devices-common/providers/`](../all-devices-common/providers/).
--   **POSIX Simulator Boot**: In
-    [`posix/main.cpp`](../posix/main.cpp),
-    the application initializes `AllDevicesExampleDACProvider` with
+-   **POSIX Simulator Boot**: In [`posix/main.cpp`](../posix/main.cpp), the
+    application initializes `AllDevicesExampleDACProvider` with
     `AppOptions::GetConfig().dacProvider`. This allows passing
     `--dac_provider <path.json>` on the command line to dynamically load JSON
     test vectors during CI/WOCA certification testing, or falling back to the
     SDK's built-in example credentials
     (`chip::Credentials::Examples::GetExampleDACProvider()`).
 -   **Embedded MCU Boot**: On hardware targets like ESP32
-    ([`esp32/main/main.cpp`](../esp32/main/main.cpp))
-    or Silicon Labs
-    ([`silabs/src/AppTask.cpp`](../silabs/src/AppTask.cpp)),
-    the platform boots with a hardware `FactoryDataProvider` that reads
-    credentials from encrypted flash partitions.
+    ([`esp32/main/main.cpp`](../esp32/main/main.cpp)) or Silicon Labs
+    ([`silabs/src/AppTask.cpp`](../silabs/src/AppTask.cpp)), the platform boots
+    with a hardware `FactoryDataProvider` that reads credentials from encrypted
+    flash partitions.
 
 ### Transitioning to Production Hardware
 
