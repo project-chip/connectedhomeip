@@ -154,7 +154,7 @@ jobs:
         id: ccache
         uses: ./.github/actions/setup-ccache
         with:
-          build-variant: python-${{ matrix.container }}
+          build-variant: python
       - name: Build Python components
         shell: bash
         run: |
