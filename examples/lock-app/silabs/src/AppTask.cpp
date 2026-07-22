@@ -310,7 +310,7 @@ CHIP_ERROR AppTask::InitLock()
         GetLCD().ShowQRCode(true);
     }
 #endif // SL_MATTER_QR_CODE_ENABLED
-#endif // SL_MATTER_DISPLAY_ENABLED
+#endif // DISPLAY_ENABLED
 
     return CHIP_NO_ERROR;
 }
@@ -734,9 +734,9 @@ bool AppTask::InitiateLockAction(LockAction aAction, bool fromButton)
         ChipLogDetail(Zcl, "%s Action has been initiated", locked ? "Lock" : "Unlock");
         sLockLED.Set(!locked);
 
-#if SL_MATTER_DISPLAY_ENABLED
+#ifdef DISPLAY_ENABLED
         AppInstance().GetLCD().WriteDemoUI(locked);
-#endif // SL_MATTER_DISPLAY_ENABLED
+#endif // DISPLAY_ENABLED
     }
     else if (aAction == LockAction::kUnlatch)
     {
