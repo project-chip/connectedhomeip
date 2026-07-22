@@ -60,6 +60,7 @@ source_set("clusters") {
     "laundry-washer-controls-server",
     "level-control",
     "localization-configuration-server",
+    "media-file-management-server",
     "microwave-oven-control-server",
     "mode-base-server",
     "network-commissioning",
