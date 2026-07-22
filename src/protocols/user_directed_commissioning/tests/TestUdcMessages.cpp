@@ -552,7 +552,6 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
     EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
-
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
