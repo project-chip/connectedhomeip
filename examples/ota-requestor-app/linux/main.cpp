@@ -17,6 +17,8 @@
  */
 
 #include "AppMain.h"
+#include "OTAConsentHandler.h"
+#include "OtaRequestorAppCommandDelegate.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
@@ -84,9 +86,11 @@ constexpr uint16_t kOptionWatchdogTimeout      = 'w';
 constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
 
+NamedPipeCommands sChipNamedPipeCommands;
+OtaRequestorAppCommandDelegate sOtaRequestorAppCommandDelegate;
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
-chip::Optional<bool> gRequestorCanConsent;
+// chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize]  = "/tmp/test.bin";
 bool gAutoApplyImage                            = false;
 bool gSendNotifyUpdateApplied                   = true;
@@ -151,7 +155,7 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 bool CustomOTARequestorDriver::CanConsent()
 {
-    return gRequestorCanConsent.ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
+    return gConsentHandler.GetRequestorConsent().ValueOr(DeviceLayer::ExtendedOTARequestorDriver::CanConsent());
 }
 
 void CustomOTARequestorDriver::UpdateDownloaded()
@@ -232,11 +236,26 @@ static void InitOTARequestor(void)
     {
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
         gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+        gConsentHandler.SetUserConsentState(gUserConsentState);
     }
 
     if (gMaxBDXBlockSize)
     {
         gRequestorUser.SetMaxDownloadBlockSize(*gMaxBDXBlockSize);
+    }
+
+    std::string path     = LinuxDeviceOptions::GetInstance().app_pipe;
+    std::string path_out = LinuxDeviceOptions::GetInstance().app_pipe_out;
+
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaRequestorAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
+    }
+    else
+    {
+        sOtaRequestorAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
     }
 }
 
@@ -252,11 +271,11 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionRequestorCanConsent:
         if (strcmp(aValue, "true") == 0)
         {
-            gRequestorCanConsent.SetValue(true);
+            gConsentHandler.SetRequestorCanConsent(true);
         }
         else if (strcmp(aValue, "false") == 0)
         {
-            gRequestorCanConsent.SetValue(false);
+            gConsentHandler.SetRequestorCanConsent(false);
         }
         else
         {
