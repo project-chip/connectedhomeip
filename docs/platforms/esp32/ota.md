@@ -1,6 +1,6 @@
 # Matter OTA
 
-> To update several component firmwares (e.g. a co-processor plus the
+> To update several component firmware images (e.g. a co-processor plus the
 > application) in a single OTA session, see
 > [Multi-Image OTA](multi_image_ota.md).
 

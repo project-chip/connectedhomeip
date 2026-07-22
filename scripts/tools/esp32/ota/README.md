@@ -47,7 +47,7 @@ binaries, and an output path:
 
 The manifest has a header row with three columns — `id`, `version`, `path`:
 
-```csv
+```text
 id,version,path
 0x00000100,2,build/coprocessor.bin
 0x00000001,2,build/my-app.bin

@@ -2,7 +2,7 @@
 
 Matter's OTA Requestor normally downloads a single binary per OTA session and
 hands every byte to one image processor. Multi-image OTA lets a device update
-**several component firmwares in one OTA session** — for example a radio
+**several component firmware images in one OTA session** — for example a radio
 co-processor or a peripheral MCU alongside the ESP32 application firmware — by
 bundling every binary into a single `.ota` file with a structured header. The
 device downloads the bundle once, routes each binary's bytes to the component
@@ -200,7 +200,7 @@ persists nothing across a reboot; these are the application's control points.
 
 Called on `Finalize()`, after a successful download and before the apply phase.
 It receives one `SubImageResult { tag, version, status }` per entry. Return
-`true` (the default) to apply, or `false` to veto: every initialised
+`true` (the default) to apply, or `false` to veto: every initialized
 sub-processor is aborted, the staged image is discarded, and the device stays on
 the old firmware. Because the device still reports the old `softwareVersion`,
 the next periodic `QueryImage` is offered the same bundle again.
@@ -245,7 +245,7 @@ new firmware. Returning an error rejects the image.
     `IsReadyForOTA` fast — decide readiness from cached state, never a live bus
     round-trip.
 
-3.  **Register it before the requestor is initialised.** In the ESP32 example
+3.  **Register it before the requestor is initialized.** In the ESP32 example
     (`examples/platform/esp32/ota/OTAHelper.cpp`) the application sub-processor
     is registered automatically inside `OTAHelpers::InitOTARequestor()`:
 
