@@ -3,6 +3,11 @@ FROM ubuntu:24.04 AS chip-build-cert
 LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
 
+# COMMITHASH defines the target commit to build from. Must be passed in using --build-arg.
+ARG COMMITHASH
+# Fail if COMMITHASH is not provided
+RUN set -eu; [ -n "$COMMITHASH" ]
+
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
     "linux/amd64") \
@@ -127,8 +132,6 @@ RUN set -x \
     && : # last line
 
 # Stage 1.5: Bootstrap Matter.
-# COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 # This does a shallower checkout of the repo
 RUN echo "Cloning at commit: ${COMMITHASH}" \
     && mkdir /root/connectedhomeip \
@@ -181,8 +184,8 @@ RUN case ${TARGETPLATFORM} in \
 ARG BUILD_EXAMPLES_ARGS="--pw-command-launcher=ccache --build-profile=release-size --pregen-dir ./zzz_pregenerated"
 
 RUN printf '%s\n' \
-    chip-tool-ipv6only \
-    chip-cert-ipv6only-platform-mdns-nfc-commission \
+    chip-tool-ipv6only-platform-mdns-nfc-commission \
+    chip-cert-ipv6only-platform-mdns \
     shell-ipv6only-platform-mdns \
     fabric-admin-rpc-ipv6only \
     fabric-bridge-rpc-ipv6only \
