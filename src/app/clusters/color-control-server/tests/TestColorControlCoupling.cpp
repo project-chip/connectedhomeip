@@ -94,6 +94,8 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
     EXPECT_EQ(cluster.moveToColorTemp(200, 10, none, none), Status::Success);
     Complete(cluster);
     EXPECT_EQ(cluster.ColorTempMireds(), 200u);
+
+    onOff.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecutes)

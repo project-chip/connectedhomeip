@@ -87,6 +87,8 @@ TEST_F(TestColorControlAttributes, FeatureMapAndColorCapabilities)
     uint16_t revision = 0;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision).IsSuccess());
     EXPECT_GT(revision, 0);
+
+    c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestColorControlAttributes, OptionsWriteRoundTrip)
@@ -101,6 +103,8 @@ TEST_F(TestColorControlAttributes, OptionsWriteRoundTrip)
     BitMask<OptionsBitmap> readBack;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::Options::Id, readBack).IsSuccess());
     EXPECT_EQ(readBack.Raw(), options.Raw());
+
+    c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestColorControlAttributes, StartUpColorTemperatureWriteRoundTripAndConstraint)
@@ -120,6 +124,8 @@ TEST_F(TestColorControlAttributes, StartUpColorTemperatureWriteRoundTripAndConst
     // Above the spec max (0xFEFF) is rejected.
     EXPECT_EQ(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(0xFF00)),
               Status::ConstraintError);
+
+    c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestColorControlAttributes, AttributesListIsFeatureGated)
@@ -153,6 +159,8 @@ TEST_F(TestColorControlAttributes, StartupAppliesStartUpColorTemperature)
     // §3.2.11.10: startup forces color-temperature mode at the configured value.
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(c.ColorTempMireds(), 300);
+
+    c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

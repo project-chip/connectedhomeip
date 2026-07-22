@@ -106,6 +106,9 @@ struct TestColorControlPersistence : public ::testing::Test
         ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(b.GetEnhancedColorMode(), expectedMode);
         verify(b);
+
+        b.Shutdown(ClusterShutdownType::kClusterShutdown);
+        a.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 };
 
@@ -158,6 +161,9 @@ TEST_F(TestColorControlPersistence, StopFreezesAndPersistsCurrentValue)
     ColorControlCluster b(kEp, CtConfig());
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.ColorTempMireds(), frozen);
+
+    b.Shutdown(ClusterShutdownType::kClusterShutdown);
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
@@ -175,6 +181,9 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(b.ColorTempMireds(), 320u);
+
+    b.Shutdown(ClusterShutdownType::kClusterShutdown);
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // Issue 3: a color loop running at shutdown resumes on the next boot instead of lying dormant.
@@ -207,6 +216,9 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
     const uint16_t before = b.EnhancedHue();
     Tick(b, 1000);
     EXPECT_NE(b.EnhancedHue(), before);
+
+    b.Shutdown(ClusterShutdownType::kClusterShutdown);
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A loop that is active but dormant (CT owns the output via StartUpColorTemperatureMireds) must NOT be
@@ -233,6 +245,9 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     EXPECT_EQ(b.ColorLoopActive(), 1);                                                   // still active...
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds); // ...but CT owns the output
     EXPECT_EQ(b.ColorTempMireds(), 300u);
+
+    b.Shutdown(ClusterShutdownType::kClusterShutdown);
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
