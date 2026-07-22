@@ -46,7 +46,7 @@ class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 public:
     // As per spec, 9 attributes are scenable in the color control cluster. If new scenable
     // attributes are added, this value should be updated.
-    static constexpr uint8_t kColorControlScenableAttributesCount = 9;
+    static constexpr uint8_t kColorControlScenableAttributesCount = 10;
 
     DefaultColorControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
     ~DefaultColorControlSceneHandler() override = default;
@@ -76,12 +76,18 @@ public:
             AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentX::Id, cluster->CurrentX(), attributeCount);
             AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentY::Id, cluster->CurrentY(), attributeCount);
         }
-        if (cluster->HasFeature(Feature::kEnhancedHue))
-        {
-            AddAttributeValuePair<uint16_t>(pairs, Attributes::EnhancedCurrentHue::Id, cluster->EnhancedHue(), attributeCount);
-        }
         if (cluster->HasFeature(Feature::kHueAndSaturation))
         {
+            // When EnhancedHue is supported, EnhancedCurrentHue is the 16-bit superset and
+            // CurrentHue is just a projection of it (hue == enhancedHue >> 8).
+            if (cluster->HasFeature(Feature::kEnhancedHue))
+            {
+                AddAttributeValuePair<uint16_t>(pairs, Attributes::EnhancedCurrentHue::Id, cluster->EnhancedHue(), attributeCount);
+            }
+            else
+            {
+                AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentHue::Id, cluster->CurrentHue(), attributeCount);
+            }
             AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentSaturation::Id, cluster->Saturation(), attributeCount);
         }
         if (cluster->HasFeature(Feature::kColorLoop))
@@ -127,7 +133,8 @@ public:
         // before EnhancedColorMode is even seen. No clamping here — the cluster clamps in HandleApplyScene.
         auto targetColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
         uint16_t x = 0, y = 0, enhancedHue = 0, mireds = 0;
-        uint8_t saturation = 0;
+        uint8_t hue = 0, saturation = 0;
+        bool hasCurrentHue = false;
         ColorLoopState loop;
 
         auto it = attributeValueList.begin();
@@ -147,6 +154,12 @@ public:
             case Attributes::EnhancedCurrentHue::Id:
                 VerifyOrReturnError(p.valueUnsigned16.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 enhancedHue = p.valueUnsigned16.Value();
+                break;
+            case Attributes::CurrentHue::Id:
+                // HS-only devices scene the 8-bit hue directly (they have no EnhancedCurrentHue).
+                VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                hue           = p.valueUnsigned8.Value();
+                hasCurrentHue = true;
                 break;
             case Attributes::CurrentSaturation::Id:
                 VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -170,10 +183,9 @@ public:
                 break;
             case Attributes::EnhancedColorMode::Id:
                 VerifyOrReturnError(p.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-                if (p.valueUnsigned8.Value() <= to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation))
-                {
-                    targetColorMode = static_cast<EnhancedColorModeEnum>(p.valueUnsigned8.Value());
-                }
+                VerifyOrReturnError(p.valueUnsigned8.Value() <= to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                targetColorMode = static_cast<EnhancedColorModeEnum>(p.valueUnsigned8.Value());
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -193,7 +205,9 @@ public:
             target = EnhancedHueSatColor{ .enhancedHue = enhancedHue, .saturation = saturation };
             break;
         case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
-            target = HueSatColor{ .hue = static_cast<uint8_t>(enhancedHue >> 8), .saturation = saturation };
+            // Prefer a directly-scened CurrentHue (HS-only devices); otherwise project from the
+            // 16-bit EnhancedCurrentHue that EnhancedHue devices save.
+            target = HueSatColor{ .hue = hasCurrentHue ? hue : static_cast<uint8_t>(enhancedHue >> 8), .saturation = saturation };
             break;
         case EnhancedColorModeEnum::kColorTemperatureMireds:
             target = CTColor{ .mireds = mireds };
@@ -236,7 +250,7 @@ private:
     }
 };
 
-static DefaultColorControlSceneHandler sColorControlSceneHandler;
+inline DefaultColorControlSceneHandler sColorControlSceneHandler;
 
 } // namespace chip::app::Clusters
 #endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

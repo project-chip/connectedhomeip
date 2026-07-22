@@ -197,7 +197,7 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
     const BitMask<UpdateFlagsBitmap> flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                                                  .Set(UpdateFlagsBitmap::kUpdateDirection)
                                                  .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(a.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
+    EXPECT_EQ(a.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
                              /*time=*/30, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(a.ColorLoopActive(), 1);
@@ -228,7 +228,7 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     ColorControlCluster a(kEp, LoopConfig());
     Testing::ClusterTester tester(a);
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_EQ(a.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
+    EXPECT_EQ(a.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
                              ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 0, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);

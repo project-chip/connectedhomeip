@@ -234,7 +234,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturation)
 TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturationImmediateDoesNotDrift)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
-    EXPECT_EQ(c.moveToHueAndSaturation(20000, 50, /*transitionTime=*/0, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.moveToHueAndSaturation(20000, 50, /*transitionTimeDs=*/0, /*isEnhanced=*/true), Status::Success);
     Tick(c, 1); // first tick materializes the immediate move
     EXPECT_EQ(c.EnhancedHue(), 20000);
     EXPECT_EQ(c.Saturation(), 50);
@@ -350,7 +350,7 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
     ColorControlCluster c(kEp, LoopConfig());
 
     // Update time and direction (no action): the color-loop attributes change, loop stays inactive.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
+    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
                              ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, /*time=*/30,
                              /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
@@ -359,20 +359,20 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
     EXPECT_EQ(c.ColorLoopActive(), 0);
 
     // Activate.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
+    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
                              ColorLoopActionEnum::kActivateFromColorLoopStartEnhancedHue, ColorLoopDirectionEnum::kIncrement, 0, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 
     // Deactivate.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kDeactivate,
+    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kDeactivate,
                              ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 0);
 
     // Unknown action is rejected.
-    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kUnknownEnumValue,
+    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kUnknownEnumValue,
                              ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::InvalidCommand);
 }
@@ -494,7 +494,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickAdvancesEnhancedHueUp)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
     // 10 s / revolution, increment (up), starting from the current enhanced hue.
-    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
+    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
                              /*time=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(c.ColorLoopActive(), 1);
@@ -516,7 +516,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kDecrement,
+    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kDecrement,
                              /*time=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
@@ -533,7 +533,7 @@ TEST_F(TestColorControlCommands, ColorLoopKeepsRunningThroughHueCommand)
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 

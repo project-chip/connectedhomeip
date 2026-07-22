@@ -1296,7 +1296,7 @@ void ColorControlCluster::stopColorLoop()
  * @return Status::Success when successful,
  *         Status::InvalidCommand when an unknown action or direction is provided
  */
-Status ColorControlCluster::ColorLoopSet(BitMask<UpdateFlagsBitmap> updateFlags, ColorLoopActionEnum action,
+Status ColorControlCluster::colorLoopSet(BitMask<UpdateFlagsBitmap> updateFlags, ColorLoopActionEnum action,
                                          ColorLoopDirectionEnum direction, uint16_t time, uint16_t startHue,
                                          BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
@@ -1627,7 +1627,7 @@ std::optional<DataModel::ActionReturnStatus> ColorControlCluster::InvokeCommand(
     case Commands::ColorLoopSet::Id: {
         Commands::ColorLoopSet::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
-        return ColorLoopSet(data.updateFlags, data.action, data.direction, data.time, data.startHue, data.optionsMask,
+        return colorLoopSet(data.updateFlags, data.action, data.direction, data.time, data.startHue, data.optionsMask,
                             data.optionsOverride);
     }
     case Commands::StopMoveStep::Id: {

@@ -254,7 +254,7 @@ public:
                          OptMask optionsMask = {}, OptMask optionsOverride = {});
     Status stepColorTemp(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, uint16_t minFieldMireds,
                          uint16_t maxFieldMireds, OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status ColorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
+    Status colorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
                         ColorControl::ColorLoopDirectionEnum direction, uint16_t time, uint16_t startHue,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsMask,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsOverride);
