@@ -86,9 +86,25 @@
  */
 #define MATTER_BINDING_TABLE_SIZE 64
 
-// Enable some test-only interaction model APIs.
+// CONFIG_BUILD_FOR_HOST_UNIT_TEST gates *data members* in core types such as
+// CASESession (mStopHandshakeAtState) and, transitively, the layout of the
+// Server singleton (which embeds CASESession via CASEServer/CASESessionManager
+// ahead of its FabricTable). This header is the global project-config include
+// (chip_project_config_include in args.gni), so it is seen by EVERY translation
+// unit in the tv-casting-app build, both the app sources and the core src/*
+// library. It MUST therefore resolve to a single value across the whole link.
+//
+// Do NOT reintroduce a per-target `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=...`
+// override in any BUILD.gn: that reaches only some TUs, leaving the rest to pick
+// up the value below. The resulting ODR mismatch changes the offset of
+// Server::mFabrics between TUs and crashes at startup in
+// FabricTable::AddFabricDelegate (garbage mDelegateListRoot).
+//
+// The tv-casting-app has no host-unit-test target and uses none of the gated
+// test-only hooks, so this defaults to 0 (also excluding that test-only code
+// from the size-optimized APK).
 #ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 0
 #endif
 
 #define CHIP_ENABLE_ROTATING_DEVICE_ID 1
