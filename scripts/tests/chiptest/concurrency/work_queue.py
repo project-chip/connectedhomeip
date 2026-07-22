@@ -166,6 +166,8 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
         # during proxy round-trips) and be lost. Relying on the notify() edge alone would then
         # block forever with an item already enqueued; polling the state bounds that to one
         # interval. Polling also keeps the wait KeyboardInterrupt-catchable.
+        if timeout is not None and timeout < 0:
+            raise ValueError("'timeout' must be a non-negative number")
         end = None if timeout is None else time.monotonic() + timeout
         while True:
             with self._cond:
