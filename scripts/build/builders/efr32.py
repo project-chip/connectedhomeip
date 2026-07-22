@@ -138,18 +138,15 @@ class Efr32Board(Enum):
     BRD4317A = 3
     BRD4318A = 4
     BRD4319A = 5
-    BRD4186A = 6
-    BRD4187A = 7
-    BRD2601B = 8
-    BRD4187C = 9
-    BRD4186C = 10
-    BRD4338A = 11
-    BRD2703A = 12
-    BRD2605A = 13
-    BRD4343A = 14
-    BRD4342A = 15
-    BRD2708A = 16
-    BRD2911A = 17
+    BRD4187C = 6
+    BRD4186C = 7
+    BRD4338A = 8
+    BRD2703A = 9
+    BRD2605A = 10
+    BRD4343A = 11
+    BRD4342A = 12
+    BRD2708A = 13
+    BRD2911A = 14
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -162,12 +159,6 @@ class Efr32Board(Enum):
             return 'BRD4318A'
         if self == Efr32Board.BRD4319A:
             return 'BRD4319A'
-        if self == Efr32Board.BRD4186A:
-            return 'BRD4186A'
-        if self == Efr32Board.BRD4187A:
-            return 'BRD4187A'
-        if self == Efr32Board.BRD2601B:
-            return 'BRD2601B'
         if self == Efr32Board.BRD4186C:
             return 'BRD4186C'
         if self == Efr32Board.BRD4187C:

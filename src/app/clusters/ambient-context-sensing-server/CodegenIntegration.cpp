@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "CodegenIntegration.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
@@ -46,15 +47,14 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        AmbientContextSensingCluster::Config config(endpointId, AmbientContextSensing::AmbientContextSensingDelegate::GetInstance(),
-                                                    gDefaultTimerDelegate);
-        config.WithFeatures(static_cast<Feature>(featureMap));
+        AmbientContextSensingCluster::Config config(gDefaultTimerDelegate);
+        config.WithFeatures(BitMask<AmbientContextSensing::Feature>(featureMap));
         config.WithOptionalAttributes(optionalAttributeBits);
         constexpr chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
             .holdTimeMin = kDefaultHoldTimeMin, .holdTimeMax = kDefaultHoldTimeMax, .holdTimeDefault = kDefaultHoldTimeDefault
         };
         config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits);
-        gServers[clusterInstanceIndex].Create(config);
+        gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
     }
 

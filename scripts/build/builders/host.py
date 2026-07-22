@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 from enum import Enum, auto
 from platform import uname
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -468,15 +467,15 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None,
-                 chip_casting_simplified: Optional[bool] = None,
+                 enable_dnssd_tests: bool | None = None,
+                 chip_casting_simplified: bool | None = None,
                  disable_shell=False,
                  use_googletest=False,
                  enable_webrtc=False,
-                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
                  unified=False,
-                 chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
                  ):
         """
@@ -550,7 +549,13 @@ class HostBuilder(GnBuilder):
         if use_msan:
             if not runner.dry_run:
                 _msan_validate_sysroot(chip_root)
-            self.extra_gn_options.append('is_msan=true')
+            if fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+                # pw_fuzzer FuzzTest targets build in the chip_pw_fuzztest secondary toolchain,
+                # which does not consume chip's global is_msan/sanitize_default. Drive MSAN via
+                # the toolchain arg instead (it swaps pigweed's ASan for chip's sanitize_memory).
+                self.extra_gn_options.append('chip_pw_fuzz_msan=true')
+            else:
+                self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
             self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 

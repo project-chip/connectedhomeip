@@ -209,13 +209,13 @@ restylers:
           - "**/*.yml"
           - "**/*.yaml"
     - name: shellharden
-      image: restyled/restyler-shellharden:v4.1.1-2
+      image: public.ecr.aws/restyled-io/restyler-shellharden:v4.3
       enabled: true
       include:
           - "**/*.sh"
           - "**/*.bash"
     - name: shfmt
-      image: restyled/restyler-shfmt:v3.0.1
+      image: public.ecr.aws/restyled-io/restyler-shfmt:v3.13
       enabled: true
       command:
           - shfmt

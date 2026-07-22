@@ -163,6 +163,7 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
     void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
@@ -178,6 +179,8 @@ public:
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+#else
+    inline void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex) {}
 #endif
 
     void PostNetworkConnect();
@@ -324,12 +327,6 @@ private:
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     WiFiPAFAdvertiseParam mPafAdvParam;
-    // Handler ID for the nandiscovery-result signal connected by _WiFiPAFSubscribe
-    // (connect path).  Disconnected once a session match is found so that
-    // subsequent discovery callbacks from the same publisher do not flood the
-    // event loop.  The wpa_supplicant subscribe slot itself is left active so
-    // NAN Follow-up frames can still be sent.
-    gulong mConnectDiscoverySignalId = 0;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;

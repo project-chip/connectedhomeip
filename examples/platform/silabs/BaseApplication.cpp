@@ -32,12 +32,12 @@
 
 #define APP_ACTION_BUTTON 1
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #ifdef ENABLE_CHIP_SHELL
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
@@ -136,8 +136,8 @@ osMessageQueueId_t sAppEventQueue;
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
 
-bool sIsEnabled  = false;
-bool sIsAttached = false;
+[[maybe_unused]] bool sIsEnabled  = false;
+[[maybe_unused]] bool sIsAttached = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sHaveBLEConnections = false;
@@ -162,7 +162,7 @@ constexpr osThreadAttr_t appTaskAttr = { .name       = APP_TASK_NAME,
                                          .stack_size = APP_TASK_STACK_SIZE,
                                          .priority   = osPriorityNormal };
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 SilabsLCD slLCD;
 #endif
 
@@ -214,14 +214,14 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         // After the device is provisioned and the commissioning passed
         // resetting the isCommissioningStarted to false
         isComissioningStarted = false;
-#ifdef DISPLAY_ENABLED
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
         BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
     }
 }
 
@@ -289,6 +289,8 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
+
+    mIsApplicationInitialized = true;
     return err;
 }
 
@@ -296,7 +298,7 @@ CHIP_ERROR BaseApplication::BaseInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) APP_TASK_NAME);
 #endif
 
@@ -623,9 +625,9 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             }
             // Print the QR Code
             OutputQrCode(false);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
             PostUpdateDisplayEvent(SilabsLCD::Screen_e::CycleScreen);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
         }
     }
 }
@@ -788,7 +790,7 @@ void BaseApplication::LightTimerEventHandler(void * timerCbArg)
     LightEventHandler();
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 SilabsLCD & BaseApplication::GetLCD(void)
 {
     return slLCD;
@@ -955,7 +957,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
             }
         }
 #endif // SL_MATTER_ENABLE_AWS
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
         SilabsLCD::Screen_e screen;
         AppTask::GetLCD().GetScreen(screen);
         // Update the LCD screen with SSID and connected state
@@ -963,7 +965,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         {
             PostUpdateDisplayEvent(SilabsLCD::Screen_e::StatusScreen);
         }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
         {
@@ -1018,13 +1020,13 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
             slLCD.ShowQRCode(true);
         }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
         PrintQrCodeURL(setupPayload);
     }
@@ -1043,6 +1045,8 @@ bool BaseApplication::GetProvisionStatus()
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    // Verify that the App layer is initialized before propagating attribute changes callback to it.
+    VerifyOrReturn(CustomerAppTask::GetAppTask().IsApplicationInitialized());
     // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
     CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
 }

@@ -125,23 +125,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     InArgs.publish_id = publish_id;
 
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreplied",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnReplied(obj);
-                     }),
-                     this);
-
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nanpublish-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanPublishTerminated(term_publish_id, reason);
-        }),
-        this);
     return CHIP_NO_ERROR;
 }
 
@@ -174,7 +157,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     ChipLogProgress(Controller, "WiFi-PAF: OnDiscoveryResult");
     uint32_t subscribe_id;
     uint32_t peer_publish_id;
-    uint8_t peer_addr[6];
+    uint8_t peer_addr[kMACAddressLength];
     uint32_t srv_proto_type;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -230,6 +213,11 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
         return;
     }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult received for non-subscriber session");
+        return;
+    }
     // The connect and background-scan discovery handlers are both connected to the
     // shared "nandiscovery-result" signal, so GLib delivers every discovery to both.
     // Act only on discovery for THIS session's own subscribe (pPafInfo->id was set to
@@ -269,20 +257,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     pPafInfo->id      = subscribe_id;
     pPafInfo->peer_id = peer_publish_id;
-    memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-
-    // Disconnect the discovery signal handler so that continued NAN publisher
-    // activity on the commissionee side does not flood OnDiscoveryResult at
-    // ~100/s after the session is established.  The wpa_supplicant subscribe
-    // slot itself is intentionally left active — NAN Follow-up frames require
-    // an active subscribe in order to be transmitted by wpa_supplicant.
-    if (mConnectDiscoverySignalId != 0)
-    {
-        g_signal_handler_disconnect(mWpaSupplicant.iface.get(), mConnectDiscoverySignalId);
-        mConnectDiscoverySignalId = 0;
-        ChipLogProgress(DeviceLayer, "WiFi-PAF: OnDiscoveryResult: disconnected discovery signal handler");
-    }
-
+    memcpy(pPafInfo->peer_addr, peer_addr, kMACAddressLength);
     /*
         Indicate the connection event
     */
@@ -296,7 +271,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     ChipLogProgress(Controller, "WiFi-PAF: OnReplied");
     uint32_t publish_id;
     uint32_t peer_subscribe_id;
-    uint8_t peer_addr[6];
+    uint8_t peer_addr[kMACAddressLength];
     uint32_t srv_proto_type;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -356,11 +331,15 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
     if (pPafInfo == nullptr)
     {
-        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %u", publish_id);
         return;
     }
-    if ((pPafInfo->role == WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher) && (pPafInfo->peer_id == peer_subscribe_id) &&
-        !memcmp(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6))
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied received for non-publisher session");
+        return;
+    }
+    if ((pPafInfo->peer_id == peer_subscribe_id) && !memcmp(pPafInfo->peer_addr, peer_addr, kMACAddressLength))
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, reentrance, publish_id: %u ", publish_id);
         return;
@@ -377,7 +356,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
-    memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
+    memcpy(pPafInfo->peer_addr, peer_addr, kMACAddressLength);
     auto handleInitiated = [](intptr_t arg) {
         WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
         LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
@@ -436,6 +415,17 @@ void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * re
     ChipLogProgress(Controller, "WiFi-PAF: Publish terminated (%u, %s)", public_id, reason);
     WiFiPAFSession sessionInfo  = { .id = public_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (pPafInfo == nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanPublishTerminated, no valid session with publish_id: %u", public_id);
+        return;
+    }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanPublishTerminated received for non-publisher session");
+        return;
+    }
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
@@ -444,6 +434,17 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
     WiFiPAFSession sessionInfo  = { .id = subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (pPafInfo == nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanSubscribeTerminated, no valid session with subscribe_id: %u", subscribe_id);
+        return;
+    }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanSubscribeTerminated received for non-subscriber session");
+        return;
+    }
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
     /*
         Indicate the connection event
@@ -515,6 +516,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     }
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     GVariantBuilder builder;
     GVariant * args = nullptr;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -540,31 +542,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
         pPafInfo->id   = subscribe_id;
         pPafInfo->role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     }
-
-    if (mConnectDiscoverySignalId != 0)
-    {
-        g_signal_handler_disconnect(mWpaSupplicant.iface.get(), mConnectDiscoverySignalId);
-        mConnectDiscoverySignalId = 0;
-    }
-    mConnectDiscoverySignalId =
-        g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                             return self->OnDiscoveryResult(obj);
-                         }),
-                         this);
-
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
-        }),
-        this);
 
     return CHIP_NO_ERROR;
 }
@@ -1137,6 +1114,37 @@ void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+void ConnectivityManagerImpl::PostWpaInterfaceProxyReady()
+{
+    g_signal_connect(mWpaSupplicant.iface.get(), "nanreplied",
+                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnReplied(obj);
+                     }),
+                     this);
+    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
+                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnNanReceive(obj);
+                     }),
+                     this);
+    g_signal_connect(
+        mWpaSupplicant.iface.get(), "nanpublish-terminated",
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->OnNanPublishTerminated(term_publish_id, reason);
+        }),
+        this);
+    g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
+                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
+                         return self->OnDiscoveryResult(obj);
+                     }),
+                     this);
+    g_signal_connect(
+        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
+        }),
+        this);
+}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 

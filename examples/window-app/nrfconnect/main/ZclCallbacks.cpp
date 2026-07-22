@@ -30,6 +30,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 
 using namespace ::chip;
@@ -81,55 +82,34 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
-    const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
-        if (status != Protocols::InteractionModel::Status::Success)
+    auto wc = FindClusterOnEndpoint(endpoint);
+    VerifyOrDie(wc != nullptr);
+
+    const BitFlags<Feature> features = wc->GetFeatureMap();
+
+    // The position attributes only exist on position-aware configurations. Initialize any null values to 0 so the
+    // device reports a concrete starting position, but only for the lift/tilt features this endpoint actually supports.
+    if (features.Has(Feature::kPositionAwareLift))
+    {
+        if (wc->GetCurrentPositionLiftPercent100ths().IsNull())
         {
-            ChipLogError(Zcl, "Failed to set WindowCovering %s: %x", attributeName, to_underlying(status));
+            wc->SetCurrentPositionLiftPercent100ths(0);
         }
-    };
-
-    app::DataModel::Nullable<chip::Percent100ths> currentPercent100ths;
-    app::DataModel::Nullable<chip::Percent100ths> targetPercent100ths;
-    app::DataModel::Nullable<chip::Percent> currentPercentage;
-    Protocols::InteractionModel::Status status;
-
-    status = Attributes::CurrentPositionLiftPercentage::Get(endpoint, currentPercentage);
-    if (currentPercentage.IsNull())
-    {
-        logOnFailure(Attributes::CurrentPositionLiftPercentage::Set(endpoint, 0), "current position lift percentage");
+        if (wc->GetTargetPositionLiftPercent100ths().IsNull())
+        {
+            wc->SetTargetPositionLiftPercent100ths(0);
+        }
     }
 
-    status = Attributes::CurrentPositionTiltPercentage::Get(endpoint, currentPercentage);
-    if (currentPercentage.IsNull())
+    if (features.Has(Feature::kPositionAwareTilt))
     {
-        logOnFailure(Attributes::CurrentPositionTiltPercentage::Set(endpoint, 0), "current position tilt percentage");
-    }
-
-    status = Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, currentPercent100ths);
-    if (currentPercent100ths.IsNull())
-    {
-        currentPercent100ths.SetNonNull(0);
-        logOnFailure(Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, 0), "current position lift percent 100ths");
-    }
-
-    status = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, targetPercent100ths);
-    if (targetPercent100ths.IsNull())
-    {
-        logOnFailure(Attributes::TargetPositionLiftPercent100ths::Set(endpoint, currentPercent100ths),
-                     "target position lift percent 100ths");
-    }
-
-    status = Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, currentPercent100ths);
-    if (currentPercent100ths.IsNull())
-    {
-        currentPercent100ths.SetNonNull(0);
-        logOnFailure(Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, 0), "current position tilt percent 100ths");
-    }
-
-    status = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, targetPercent100ths);
-    if (targetPercent100ths.IsNull())
-    {
-        logOnFailure(Attributes::TargetPositionTiltPercent100ths::Set(endpoint, currentPercent100ths),
-                     "target position tilt percent 100ths");
+        if (wc->GetCurrentPositionTiltPercent100ths().IsNull())
+        {
+            wc->SetCurrentPositionTiltPercent100ths(0);
+        }
+        if (wc->GetTargetPositionTiltPercent100ths().IsNull())
+        {
+            wc->SetTargetPositionTiltPercent100ths(0);
+        }
     }
 }
