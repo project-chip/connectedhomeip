@@ -51,11 +51,11 @@
 #endif // SL_WIFI
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
-#include "Rpc.h"
+#include "pigweed_rpc/Rpc.h"
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
-#include "MatterShell.h"
+#include "shell/MatterShell.h"
 #endif
 
 #ifdef HEAP_MONITORING
