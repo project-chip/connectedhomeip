@@ -56,9 +56,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from matter.clusters import Objects as Clusters
 from matter.testing.decorators import async_test_body
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from matter.testing.device_conformance_tests import DeviceConformanceTests
+from matter.testing.matter_testing import ProblemSeverity
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
@@ -68,6 +70,31 @@ class TC_DeviceConformance(DeviceConformanceTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper()
+
+    def _filter_unsupported_described_conformance(self, problems, success):
+        # TODO: Remove allow_unsupported_described_conformance after 1.6.1 once <describedConform /> is supported in spec parsing
+        allow_unsupported_described_conformance = self.user_params.get(
+            "allow_unsupported_described_conformance", True)
+
+        # Curated list of cluster features using <describedConform /> that are currently unhandled in spec parsing
+        described_conformance_ignore_features = {
+            Clusters.AccessControl.id: [0x04],
+        }
+
+        if allow_unsupported_described_conformance and not success:
+            filtered_problems = []
+            for p in problems:
+                if p.location and p.location.cluster_id in described_conformance_ignore_features:
+                    ignored_masks = described_conformance_ignore_features[p.location.cluster_id]
+                    if any(f"0x{mask:02x}" in p.problem for mask in ignored_masks):
+                        continue
+                filtered_problems.append(p)
+
+            if len(filtered_problems) < len(problems):
+                problems = filtered_problems
+                success = not any(p.severity == ProblemSeverity.ERROR for p in problems)
+
+        return success, problems
 
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
@@ -79,6 +106,8 @@ class TC_DeviceConformance(DeviceConformanceTests):
         success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification,
                                                    self.is_pics_sdk_ci_only,
                                                    allow_provisional_test_event_only_disallowed_for_certification)
+        # TODO: Remove this filter after 1.6.1 once <describedConform /> is supported in spec parsing
+        success, problems = self._filter_unsupported_described_conformance(problems, success)
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with conformance")
