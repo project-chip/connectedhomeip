@@ -153,7 +153,7 @@ TEST_F(TestMediaFileManagementManager, StatePersistsAcrossInstances)
     uint64_t savedID = 0;
     {
         MediaFileManagementManager mgr(dir);
-        auto r = AddFile(mgr, "persisted.mp4", 4096, "video/mp4", "bdx://n/p.jpg");
+        auto r  = AddFile(mgr, "persisted.mp4", 4096, "video/mp4", "bdx://n/p.jpg");
         savedID = r.fileID.Value();
     }
 

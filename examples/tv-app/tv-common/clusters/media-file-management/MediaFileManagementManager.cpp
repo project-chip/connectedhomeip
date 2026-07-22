@@ -200,8 +200,7 @@ CHIP_ERROR MediaFileManagementManager::GetFileAtIndex(size_t index, Structs::Fil
 CHIP_ERROR MediaFileManagementManager::GetSupportedMimeTypeAtIndex(size_t index, MutableCharSpan & mimeType)
 {
     VerifyOrReturnError(index < kSupportedMimeTypes.size(), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-    return CopyCharSpanToMutableCharSpan(
-        CharSpan(kSupportedMimeTypes[index].data(), kSupportedMimeTypes[index].size()), mimeType);
+    return CopyCharSpanToMutableCharSpan(CharSpan(kSupportedMimeTypes[index].data(), kSupportedMimeTypes[index].size()), mimeType);
 }
 
 Status MediaFileManagementManager::HandleAddFile(const CharSpan & name, uint64_t size, const CharSpan & mimeType,
@@ -237,8 +236,8 @@ Status MediaFileManagementManager::HandleAddFile(const CharSpan & name, uint64_t
     mFiles.push_back(std::move(entry));
     SaveIndex();
 
-    ChipLogProgress(Zcl, "MediaFileManagementManager: added file id %llu (%llu bytes)",
-                    static_cast<unsigned long long>(assignedID), static_cast<unsigned long long>(size));
+    ChipLogProgress(Zcl, "MediaFileManagementManager: added file id %llu (%llu bytes)", static_cast<unsigned long long>(assignedID),
+                    static_cast<unsigned long long>(size));
 
     response.status = FileStatusEnum::kSuccess;
     response.fileID.SetNonNull(assignedID);
@@ -258,8 +257,7 @@ Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
             return Status::Success;
         }
     }
-    ChipLogProgress(Zcl, "MediaFileManagementManager: DeleteFile - id %llu not found",
-                    static_cast<unsigned long long>(fileID));
+    ChipLogProgress(Zcl, "MediaFileManagementManager: DeleteFile - id %llu not found", static_cast<unsigned long long>(fileID));
     return Status::NotFound;
 }
 
