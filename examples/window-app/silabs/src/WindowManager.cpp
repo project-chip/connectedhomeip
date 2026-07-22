@@ -678,7 +678,11 @@ void WindowManager::UpdateLCD()
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         auto wc = FindClusterOnEndpoint(cover.mEndpoint);
-        VerifyOrReturn(wc != nullptr);
+        if (wc == nullptr)
+        {
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+            return;
+        }
         Type type = TypeGet(cover.mEndpoint);
 
         lift = wc->GetCurrentPositionLiftPercent100ths();
