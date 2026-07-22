@@ -163,7 +163,7 @@ parameters it requires. A test implemented as a `MatterBaseTest` subclass in
 `src/python_testing` declares its parameters using decorators; the declarations
 are validated in `setup_test()` before the test body runs, and the declared
 values are recorded in the failure output. This makes a test's required inputs
-explicit and self-documenting, and surfaces a missing or mistyped value up front
+explicit and self-documenting, and surfaces a missing or incorrectly typed value up front
 rather than partway through the test. Two categories of parameter are supported:
 
 -   PIXITs are test-specific values such as application paths, timeouts, or
