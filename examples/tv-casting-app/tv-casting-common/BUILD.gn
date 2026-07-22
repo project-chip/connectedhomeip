@@ -47,9 +47,13 @@ config("config") {
       "-flto=thin",
     ]
 
-    # Disable host unit-test hooks to exclude test-only code paths
-    # (CASESession, ExchangeContext, FabricTable, MRP) from the binary.
-    defines += [ "CONFIG_BUILD_FOR_HOST_UNIT_TEST=0" ]
+    # NOTE: Host unit-test hooks are disabled globally via
+    # CONFIG_BUILD_FOR_HOST_UNIT_TEST=0 in CHIPProjectAppConfig.h (the project
+    # config include), which every TU in this build sees. Do NOT add a
+    # per-target `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=0` here: that macro changes
+    # the layout of core types (CASESession, and thus the Server singleton /
+    # its FabricTable), and a per-target define reaches only some TUs, producing
+    # an ODR mismatch that crashes at startup in FabricTable::AddFabricDelegate.
   }
 }
 
