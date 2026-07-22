@@ -963,7 +963,7 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
     EXPECT_EQ(tester.ReadAttribute(Attributes::SensorFusionSupported::Id, out), CHIP_NO_ERROR);
     size_t size = 0;
     EXPECT_EQ(out.ComputeSize(&size), CHIP_NO_ERROR);
-    EXPECT_EQ(size, 3u);
+    ASSERT_EQ(size, 3u);
 
     auto it = out.begin();
     auto i  = 0;

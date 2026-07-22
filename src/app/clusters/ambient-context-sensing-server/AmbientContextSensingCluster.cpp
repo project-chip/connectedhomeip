@@ -444,7 +444,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
     ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
     ReturnErrorOnFailure(mACSDelegate->SetSensorFusionSupported(sensorFusionSupportedList));
     mSensorFusionSupportedList =
-        Span<SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
+        Span<AmbientContextSensing::SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
     NotifyAttributeChanged(Attributes::SensorFusionSupported::Id);
     return CHIP_NO_ERROR;
 }
