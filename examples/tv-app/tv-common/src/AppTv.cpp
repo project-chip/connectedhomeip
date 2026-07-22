@@ -377,8 +377,10 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(contentLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::AcceptHeader::Id, ARRAY, kDescriptorAttributeArraySize,
                           0), /* accept header list */
     DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::SupportedStreamingProtocols::Id, BITMAP32, 1,
-                              0),                                                           /* streaming protocols */
-    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
+                              0),                                                       /* streaming protocols */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Movable::Id, BOOLEAN, 1, 0), /* movable */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Presets::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* presets */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0),                       /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Media Playback cluster attributes
@@ -390,7 +392,10 @@ DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::CurrentState::Id, ENUM8, 1,
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::PlaybackSpeed::Id, SINGLE, 1, 0),   /* playback speed */
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::SeekRangeEnd::Id, INT64U, 1, 0),    /* seek range end */
     DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::SeekRangeStart::Id, INT64U, 1, 0),  /* seek range start */
-    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::FeatureMap::Id, BITMAP32, 4, 0),    /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::AvailableCommands::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0),                                                         /* available commands */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::ContentInfo::Id, STRUCT, 1, 0),  /* content info */
+    DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Target Navigator cluster attributes
@@ -439,10 +444,13 @@ constexpr CommandId accountLoginOutgoingCommands[] = {
 constexpr CommandId contentLauncherIncomingCommands[] = {
     app::Clusters::ContentLauncher::Commands::LaunchContent::Id,
     app::Clusters::ContentLauncher::Commands::LaunchURL::Id,
+    app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id,
+    app::Clusters::ContentLauncher::Commands::PlayPreset::Id,
     kInvalidCommandId,
 };
 constexpr CommandId contentLauncherOutgoingCommands[] = {
     app::Clusters::ContentLauncher::Commands::LauncherResponse::Id,
+    app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id,
     kInvalidCommandId,
 };
 // TODO: Sort out when the optional commands here should be listed.
