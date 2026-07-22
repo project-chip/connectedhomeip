@@ -72,8 +72,38 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     result = mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
                                             MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
 
+<<<<<<< HEAD
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+=======
+        psa_status_t status =
+            mbedtls_pk_get_psa_attributes(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), PSA_KEY_USAGE_VERIFY_MESSAGE, &attributes);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
+
+        // PSA import validates key type and curve (P-256) via attributes; non-matching keys are rejected here.
+        status = mbedtls_pk_import_into_psa(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), &attributes, &key_id);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
+
+        status = psa_export_public_key(key_id, Uint8::to_uchar(pubkey), pubkey.Length(), &pubkey_size);
+        psa_destroy_key(key_id);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+    }
+#else
+    {
+        mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+        VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_WRONG_KEY_TYPE);
+
+        // Copy the public key from the CSR
+        result =
+            mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                           MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
+
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+    }
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+>>>>>>> 8d8de11a5e ([crypto] Validate CSR subject key type on mbedTLS backend (#73112))
 
     // Convert DER signature to raw signature
     error = EcdsaAsn1SignatureToRaw(kP256_FE_Length,
