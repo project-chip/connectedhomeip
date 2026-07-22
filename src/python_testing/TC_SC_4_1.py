@@ -95,6 +95,14 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 
 TCP_PICS_STR = "MCORE.SC.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
+
+# Timeout for a single subtype PTR browse:
+#   - Browses that get an answer end early via MdnsDiscovery's discovery-silence
+#     monitor; the full 5s is only paid by candidates that never answer.
+#   - Sized so an unanswered browse still spans the initial mDNS query plus two
+#     retransmissions (RFC 6762 §5.2: queries at ~0/1/3s) before the subtype is
+#     treated as not advertised.
+#   - Candidates browse concurrently, so a verification pass pays one 5s window total.
 SUBTYPE_BROWSE_TIMEOUT_SEC = 5
 
 
