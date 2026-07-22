@@ -86,6 +86,20 @@ CHIP_ERROR LoggingAmbientContextSensor::SetPredictedActivity(const Span<Predicte
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LoggingAmbientContextSensor::SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList)
+{
+    VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupportedForLog, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (size_t i = 0; i < sensorFusionSupportedList.size(); i++)
+    {
+        const auto & src = sensorFusionSupportedList[i];
+        auto & dst       = mSensorFusionSupportedBuf[i];
+        dst = src;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 AmbientContextSensed * LoggingAmbientContextSensor::AllocDetection()
 {
     for (uint8_t id = 0; id < kMaxSimultaneousDetectionLimit; id++)

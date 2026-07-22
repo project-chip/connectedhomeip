@@ -40,21 +40,25 @@ public:
     SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) override;
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
+    CHIP_ERROR SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList) override;
+    SemanticTagType * GetSensorFusionSupportedBuf() override { return mSensorFusionSupportedBuf; };
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
     uint64_t GetEpochNow() override;
 
     // Use the smaller value for not consuming too much resources
-    static constexpr uint8_t kMaxACTypeSupportedForLog   = 20;
-    static constexpr uint8_t kMaxPredictedActivityForLog = 3;
+    static constexpr uint8_t kMaxACTypeSupportedForLog       = 20;
+    static constexpr uint8_t kMaxPredictedActivityForLog     = 3;
+    static constexpr uint8_t kMaxSensorFusionSupportedForLog = 20;
     static constexpr BitFlags<Feature> kFeatureAllForLog{ Feature::kHumanActivity, Feature::kObjectCounting,
                                                           Feature::kObjectIdentification, Feature::kSoundIdentification,
-                                                          Feature::kPredictedActivity };
+                                                          Feature::kPredictedActivity, Feature::kSensorFusion };
 
 private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForLog];
 
     PredictActivity mPredictActivityBuf[kMaxPredictedActivityForLog];
+    SemanticTagType mSensorFusionSupportedBuf[kMaxSensorFusionSupportedForLog];
 
     // From spec, constraint of AmbientContextType is 1 to SimultaneousDetectionLimit.
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];

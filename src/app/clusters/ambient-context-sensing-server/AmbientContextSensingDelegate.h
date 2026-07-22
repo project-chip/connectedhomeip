@@ -40,6 +40,7 @@ constexpr uint8_t kMaxSimultaneousDetectionLimit = 10;
 constexpr uint16_t kMinObjectCount               = 1;
 constexpr uint8_t kMaxPredictedACType            = 100;
 constexpr uint8_t kMaxPredictedActivity          = 20;
+constexpr uint8_t kMaxSensorFusionSupported      = 50;
 constexpr uint8_t kMinCrowdCount                 = 1;
 constexpr uint8_t kMaxCrowdCount                 = 254;
 
@@ -86,6 +87,12 @@ public:
 
     // Return the stored PredictedActivity
     virtual PredictActivity * GetPredictedActivityBuf() = 0;
+
+    // Save the SensorFusionSupported attribute passed from the caller
+    virtual CHIP_ERROR SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList) = 0;
+
+    // Return the stored sensorFusionSupported buffer
+    virtual SemanticTagType * GetSensorFusionSupportedBuf() = 0;
 
     // Get the pointer of the structure from the delegate module
     virtual AmbientContextSensed * AllocDetection() = 0;
