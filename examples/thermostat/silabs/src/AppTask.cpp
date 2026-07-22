@@ -36,7 +36,6 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <thermostat-delegate-impl.h>
 #include <cmsis_os2.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
@@ -44,6 +43,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformError.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <thermostat-delegate-impl.h>
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 #include "Si70xxSensor.h"
