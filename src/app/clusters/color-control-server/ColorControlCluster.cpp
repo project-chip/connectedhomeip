@@ -684,15 +684,16 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         if (std::holds_alternative<CTColor>(mColorValue))
             return;
         CTColor next{};
-        std::visit(overloaded{ [&](const XYColor & xy) { mDelegate->ConvertXYToMireds(mPath.mEndpointId, xy.x, xy.y, next.mireds); },
-                               [&](const HueSatColor & hs) {
-                                   mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue, hs.saturation, next.mireds);
-                               },
-                               [&](const EnhancedHueSatColor & hs) {
-                                   mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue(), hs.saturation, next.mireds);
-                               },
-                               [](const CTColor &) {} },
-                   mColorValue);
+        std::visit(
+            overloaded{ [&](const XYColor & xy) { mDelegate->ConvertXYToMireds(mPath.mEndpointId, xy.x, xy.y, next.mireds); },
+                        [&](const HueSatColor & hs) {
+                            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue, hs.saturation, next.mireds);
+                        },
+                        [&](const EnhancedHueSatColor & hs) {
+                            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue(), hs.saturation, next.mireds);
+                        },
+                        [](const CTColor &) {} },
+            mColorValue);
         mColorValue = next; // the variant assignment IS the store
         NotifyAttributeChanged(ColorTemperatureMireds::Id, AttributeChangeType::kQuiet);
         break;
