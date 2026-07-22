@@ -87,7 +87,7 @@ CHIP_ERROR MediaFileManagementCluster::ReadSupportedMimeTypes(const AttributeVal
 {
     for (size_t i = 0; i < kMaxSupportedMimeTypes; i++)
     {
-        char buffer[kMaxMimeTypeLength];
+        char buffer[kMaxMimeTypeLength] = {};
         MutableCharSpan mimeType(buffer);
         CHIP_ERROR err = mDelegate.GetSupportedMimeTypeAtIndex(i, mimeType);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -189,6 +189,7 @@ CHIP_ERROR MediaFileManagementCluster::GeneratedCommands(const ConcreteClusterPa
 
 void MediaFileManagementCluster::GenerateSharedFilesAddedEvent(uint16_t requestID, uint16_t responseID)
 {
+    VerifyOrReturn(mContext != nullptr, ChipLogError(Zcl, "MediaFileManagementCluster: mContext is null, cannot generate event"));
     Events::SharedFilesAdded::Type event;
     event.requestID  = requestID;
     event.responseID = responseID;
