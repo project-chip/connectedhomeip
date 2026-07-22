@@ -426,7 +426,8 @@ CHIP_ERROR MdnsAvahi::RebuildClient()
     mClient          = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
     if (mClient == nullptr || avahiError != 0)
     {
-        ChipLogError(DeviceLayer, "Failed to rebuild Avahi client: %s", avahi_strerror(avahiError));
+        ChipLogError(DeviceLayer, "Failed to rebuild Avahi client: %d: %s", avahiError,
+                     avahiError == AVAHI_OK ? "no error reported" : avahi_strerror(avahiError));
         if (mClient != nullptr)
         {
             avahi_client_free(mClient);
@@ -757,7 +758,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     browseContext->mReceivedAllCached = false;
     browseContext->mStopped.store(false);
 
-    if (mClient == nullptr)
+    if (ClientHasFailed())
     {
         CHIP_ERROR error = RebuildClient();
         if (error != CHIP_NO_ERROR)
@@ -859,12 +860,15 @@ void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBro
     // If we were already asked to stop, no need to send a callback - no one is listening.
     if (!context->mStopped.load())
     {
-        // since this is continuous browse, finalBrowse will always be false.
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), false, CHIP_NO_ERROR);
+        // The callback may start a lookup that rebuilds the Avahi client and deletes
+        // this context. Move everything needed by the callback to local storage first.
+        DnssdBrowseCallback callback = context->mCallback;
+        void * callbackContext       = context->mContext;
+        std::vector<DnssdService> services;
+        services.swap(context->mServices);
 
-        // Clearing records/services already passed to application through delegate. Keeping it may cause
-        // duplicates in next query / retry attempt as currently found will also come again from cache.
-        context->mServices.clear();
+        // since this is continuous browse, finalBrowse will always be false.
+        callback(callbackContext, services.data(), services.size(), false, CHIP_NO_ERROR);
     }
     else
     {
@@ -1038,6 +1042,11 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
                               Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
                               void * context)
 {
+    if (ClientHasFailed())
+    {
+        ReturnErrorOnFailure(RebuildClient());
+    }
+
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
     ResolveContext * resolveContext = AllocateResolveContext();
     if (resolveContext == nullptr)
@@ -1060,18 +1069,6 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mTransport   = ToAvahiProtocol(transportType);
     resolveContext->mAddressType = ToAvahiProtocol(addressType);
     resolveContext->mFullType    = GetFullType(type, protocol);
-
-    if (mClient == nullptr)
-    {
-        mAllocatedResolves.remove(resolveContext);
-        error = RebuildClient();
-        if (error != CHIP_NO_ERROR)
-        {
-            chip::Platform::Delete(resolveContext);
-            return error;
-        }
-        mAllocatedResolves.push_back(resolveContext);
-    }
 
     resolveContext->mResolver =
         avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
