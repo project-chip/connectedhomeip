@@ -1,61 +1,22 @@
-/**
-  ******************************************************************************
-  * @file    stm32wb5mm_dk_qspi.c
-  * @author  MCD Application Team
-  * @brief   This file includes a standard driver for the S25FL128S QSPI
-  *          memory mounted on STM32WB5MM-DK board.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  @verbatim
-  ==============================================================================
-                     ##### How to use this driver #####
-  ==============================================================================
-  [..]
-   (#) This driver is used to drive the S25FL128S QSPI external
-       memory mounted on STM32WB5MM-DK board.
-
-   (#) This driver needs a specific component driver (S25FL128S) to be included with.
-
-   (#) Initialization steps:
-       (++) Initialize the QPSI external memory using the BSP_QSPI_Init() function. This
-            function includes the MSP layer hardware resources initialization and the
-            QSPI interface with the external memory.
-
-   (#) QSPI memory operations
-       (++) QSPI memory can be accessed with read/write operations once it is
-            initialized.
-            Read/write operation can be performed with AHB access using the functions
-            BSP_QSPI_Read()/BSP_QSPI_Write().
-       (++) The function BSP_QSPI_GetInfo() returns the configuration of the QSPI memory.
-            (see the QSPI memory data sheet)
-       (++) Perform erase block operation using the function BSP_QSPI_Erase_Block() and by
-            specifying the block address. You can perform an erase operation of the whole
-            chip by calling the function BSP_QSPI_Erase_Chip().
-       (++) The function BSP_QSPI_GetStatus() returns the current status of the QSPI memory.
-            (see the QSPI memory data sheet)
-       (++) The function BSP_QSPI_EnableMemoryMappedMode enables the QSPI memory mapped mode.
-       (++) The function BSP_QSPI_DisableMemoryMappedMode disables the QSPI memory mapped mode.
-       (++) The function BSP_QSPI_ReadID() returns 3 bytes memory IDs: Manufacturer ID,
-             Memory type, Memory density.
-  @endverbatim
-  ******************************************************************************
-  */
-
-/* Includes ------------------------------------------------------------------*/
-#include "stm32wb5mm_dk_qspi.h"
-
-/** @addtogroup BSP
- * @{
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
+
+#include "stm32wb5mm_dk_qspi.h"
 
 /** @addtogroup STM32WB5MM_DK
  * @{

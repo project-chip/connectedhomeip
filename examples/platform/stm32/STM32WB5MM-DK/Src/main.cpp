@@ -1,40 +1,21 @@
-/**
- ******************************************************************************
- * @file           : app_main.cpp
- * @author 		   : MCD Application Team
- * @brief          : Main program body
- ******************************************************************************
- * @attention
+/*
  *
- * Copyright (c) 2019-2021 STMicroelectronics.
- * All rights reserved.
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- ******************************************************************************
- @verbatim
- ==============================================================================
- ##### IMPORTANT NOTE #####
- ==============================================================================
-
- This application requests having the stm32wb5x_BLE_Thread_ForMatter_fw.bin binary
- flashed on the Wireless Coprocessor.
- If it is not the case, you need to use STM32CubeProgrammer to load the appropriate
- binary.
-
- All available binaries are located under following directory:
- /Projects/STM32_Copro_Wireless_Binaries
-
- Refer to UM2237 to learn how to use/install STM32CubeProgrammer.
- Refer to /Projects/STM32_Copro_Wireless_Binaries/ReleaseNote.html for the
- detailed procedure to change the Wireless Coprocessor binary.
-
- @endverbatim
- ******************************************************************************
- ******************************************************************************
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"

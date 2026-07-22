@@ -1,74 +1,21 @@
-/**
- ******************************************************************************
- * @file    system_stm32wbxx.c
- * @author  MCD Application Team
- * @brief   CMSIS Cortex Device Peripheral Access Layer System Source File
+/*
  *
- *   This file provides two functions and one global variable to be called from
- *   user application:
- *      - SystemInit(): This function is called at startup just after reset and
- *                      before branch to main program. This call is made inside
- *                      the "startup_stm32wbxx.s" file.
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
- *      - SystemCoreClock variable: Contains the core clock (HCLK), it can be used
- *                                  by the user application to setup the SysTick
- *                                  timer or configure other parameters.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *      - SystemCoreClockUpdate(): Updates the variable SystemCoreClock and must
- *                                 be called whenever the core clock is changed
- *                                 during program execution.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *   After each device reset the MSI (4 MHz) is used as system clock source.
- *   Then SystemInit() function is called, in "startup_stm32wbxx.s" file, to
- *   configure the system clock before to branch to main program.
- *
- *   This file configures the system clock as follows:
- *=============================================================================
- *-----------------------------------------------------------------------------
- *        System Clock source                    | MSI
- *-----------------------------------------------------------------------------
- *        SYSCLK(Hz)                             | 4000000
- *-----------------------------------------------------------------------------
- *        HCLK(Hz)                               | 4000000
- *-----------------------------------------------------------------------------
- *        AHB Prescaler                          | 1
- *-----------------------------------------------------------------------------
- *        APB1 Prescaler                         | 1
- *-----------------------------------------------------------------------------
- *        APB2 Prescaler                         | 1
- *-----------------------------------------------------------------------------
- *        PLL_M                                  | 1
- *-----------------------------------------------------------------------------
- *        PLL_N                                  | 8
- *-----------------------------------------------------------------------------
- *        PLL_P                                  | 7
- *-----------------------------------------------------------------------------
- *        PLL_Q                                  | 2
- *-----------------------------------------------------------------------------
- *        PLL_R                                  | 2
- *-----------------------------------------------------------------------------
- *        PLLSAI1_P                              | NA
- *-----------------------------------------------------------------------------
- *        PLLSAI1_Q                              | NA
- *-----------------------------------------------------------------------------
- *        PLLSAI1_R                              | NA
- *-----------------------------------------------------------------------------
- *        Require 48MHz for USB OTG FS,          | Disabled
- *        SDIO and RNG clock                     |
- *-----------------------------------------------------------------------------
- *=============================================================================
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2019-2021 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
+
 
 /** @addtogroup CMSIS
  * @{

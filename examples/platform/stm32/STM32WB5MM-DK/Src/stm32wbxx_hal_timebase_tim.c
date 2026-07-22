@@ -1,60 +1,21 @@
 /* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file    stm32wbxx_hal_timebase_tim.c
-  * @author  MCD Application Team
-  * @brief   HAL time base based on the hardware TIM.
-  *
-  *          This file overrides the native HAL time base functions (defined as weak)
-  *          the TIM time base:
-  *           + Initializes the TIM peripheral to generate a Period elapsed Event each 1ms
-  *           + HAL_IncTick is called inside HAL_TIM_PeriodElapsedCallback ie each 1ms
-  *
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) STMicroelectronics</center></h2>
-(-2021) STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
- @verbatim
-  ==============================================================================
-                        ##### How to use this driver #####
-  ==============================================================================
-    [..]
-    This file must be copied to the application folder and modified as follows:
-    (#) Rename it to 'stm32wbxx_hal_timebase_tim.c'
-    (#) Add this file and the TIM HAL driver files to your project and make sure
-       HAL_TIM_MODULE_ENABLED is defined in stm32wbxx_hal_conf.h
-
-    [..]
-    (@) The application needs to ensure that the time base is always set to 1 millisecond
-       to have correct HAL operation.
-
-  @endverbatim
-  ******************************************************************************
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
-  */
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
