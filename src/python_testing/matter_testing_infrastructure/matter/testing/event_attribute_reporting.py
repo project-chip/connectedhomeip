@@ -584,6 +584,9 @@ class AttributeSubscriptionHandler:
         forbidden_values: set,
         timeout_sec: float,
         reporter=None,
+        expected_attribute: ClusterObjects.ClusterAttributeDescriptor | None = None,
+        stall_timeout_sec: float | None = None,
+        liveness_matcher=None,
     ) -> float:
         """Consume reports from the queue until ``target_value`` is first observed.
 
@@ -592,7 +595,8 @@ class AttributeSubscriptionHandler:
         within ``timeout_sec``. Works with a single attribute subscription queue, so it is
         the caller's responsibility to ensure that only relevant reports are enqueued (e.g.
         by using a dedicated subscription or flushing irrelevant reports before calling this
-        method).
+        method), unless ``expected_attribute`` is provided to filter a multi-attribute
+        (cluster-wide) subscription queue.
 
         Unlike :meth:`await_all_expected_report_matches`, each report is evaluated exactly
         once at dequeue time, with no polling re-evaluation drift. Works with a single
@@ -602,21 +606,43 @@ class AttributeSubscriptionHandler:
             target_value: The ``.value`` to wait for.
             forbidden_values: Set of ``.value`` objects that must not appear before
                 ``target_value``.
-            timeout_sec: Maximum time to wait for ``target_value``.
+            timeout_sec: Maximum time to wait for ``target_value``.  When
+                ``stall_timeout_sec`` is also given, this acts as the overall budget cap
+                while stall detection provides the liveness bound.
             reporter: Optional ``StepReporter`` instance; each dequeued value is recorded.
+            expected_attribute: If provided, only reports for this attribute descriptor are
+                checked against ``target_value``/``forbidden_values``; reports for other
+                attributes are ignored (except for liveness).  Required for cluster-wide
+                subscriptions: cluster enums compare equal to plain ints, so e.g. an
+                ``UpdateStateProgress`` report of ``5`` would otherwise falsely match
+                ``UpdateStateEnum.kApplying``.
+            stall_timeout_sec: If provided, fail when no liveness report has been observed
+                for this long.  This allows an arbitrarily long overall wait (bounded only
+                by ``timeout_sec``) as long as the DUT demonstrably makes progress.
+            liveness_matcher: Optional ``callable(report) -> bool`` deciding whether a
+                dequeued report counts as progress and resets the stall timer.  When None,
+                every dequeued report counts.
 
         Returns:
             ``time.time()`` captured at the moment ``target_value`` was observed.
         """
         t_start = time.time()
         deadline = t_start + timeout_sec
+        last_liveness = t_start
 
         while True:
-            remaining = deadline - time.time()
+            now = time.time()
+            remaining = deadline - now
             if remaining <= 0:
                 asserts.fail(
-                    f"Timeout ({timeout_sec}s) waiting for {target_value!r}: "
+                    f"Timeout ({timeout_sec:.1f}s budget exhausted) waiting for {target_value!r}: "
                     "target value not observed in time"
+                )
+            if stall_timeout_sec is not None and now - last_liveness >= stall_timeout_sec:
+                asserts.fail(
+                    f"Stall detected: no progress reports for {stall_timeout_sec:.1f}s "
+                    f"while waiting for {target_value!r} "
+                    f"(elapsed {now - t_start:.1f}s of {timeout_sec:.1f}s budget)"
                 )
             try:
                 report = self._q.get(block=True, timeout=min(1.0, remaining))
@@ -627,6 +653,12 @@ class AttributeSubscriptionHandler:
             elapsed = time.time() - t_start
             if reporter is not None:
                 reporter.record(f"UpdateState: {val} at +{elapsed:.1f}s")
+
+            if liveness_matcher is None or liveness_matcher(report):
+                last_liveness = time.time()
+
+            if expected_attribute is not None and report.attribute != expected_attribute:
+                continue
 
             if val in forbidden_values:
                 asserts.fail(

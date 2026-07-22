@@ -19,7 +19,7 @@ import logging
 import subprocess
 import tempfile
 from os import path
-from time import sleep
+from time import monotonic, sleep
 
 from mobly import asserts
 
@@ -44,6 +44,38 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
     current_provider_app_proc: OTAProviderSubprocess | None = None
     provider_app_path: str | None = None
+    _test_budget_deadline: float | None = None
+
+    def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
+        """Record the overall time budget of the running test body.
+
+        Call at the top of the test body.  The budget is the same value the framework
+        passes to ``asyncio.wait_for`` around the test body (``--timeout`` from the
+        command line, or ``default_timeout``), minus ``safety_margin_sec`` so that waits
+        sized via :meth:`remaining_test_budget_sec` fail with a clear assertion inside
+        the step instead of being cancelled opaquely by ``asyncio.wait_for``.
+
+        Together with :meth:`remaining_test_budget_sec` this lets device-dependent waits
+        (OTA download, firmware apply, BDX recovery) share a single operator-set budget
+        instead of hard-coded per-step timeouts that cannot be known for a real DUT.
+        """
+        total_sec = self.matter_test_config.timeout or self.default_timeout
+        self._test_budget_deadline = monotonic() + total_sec - safety_margin_sec
+        log.info("Test budget clock started: %.0fs total, %.0fs safety margin", total_sec, safety_margin_sec)
+
+    def remaining_test_budget_sec(self, reserve_sec: float = 0.0, minimum_sec: float = 30.0) -> float:
+        """Return the remaining test time budget available for the next wait.
+
+        Args:
+            reserve_sec: Time to keep aside for waits that are still ahead and whose
+                duration is known up front (e.g. spec-mandated minimum query intervals).
+            minimum_sec: Floor for the returned value so a wait never receives a
+                zero/negative timeout — exhausting the budget then fails inside the wait
+                with a descriptive message rather than instantly.
+        """
+        if self._test_budget_deadline is None:
+            asserts.fail("remaining_test_budget_sec() called before start_test_budget_clock()")
+        return max(minimum_sec, self._test_budget_deadline - monotonic() - reserve_sec)
 
     def start_provider(self,
                        provider_app_path: str = "",
