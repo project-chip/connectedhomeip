@@ -347,12 +347,120 @@ exit:
 
 void MdnsAvahi::Shutdown()
 {
+    ++mClientGeneration;
+    ++mShutdownGeneration;
+
     TEMPORARY_RETURN_IGNORED StopPublish();
+
+    // Release child objects before their client. Avahi would otherwise destroy the
+    // child objects while leaving the Matter lookup contexts with stale pointers.
+    for (auto * resolve : mAllocatedResolves)
+    {
+        chip::Platform::Delete(resolve);
+    }
+    mAllocatedResolves.clear();
+    for (auto * browse : mAllocatedBrowses)
+    {
+        if (browse->mBrowser != nullptr)
+        {
+            avahi_service_browser_free(browse->mBrowser);
+            browse->mBrowser = nullptr;
+        }
+        chip::Platform::Delete(browse);
+    }
+    mAllocatedBrowses.clear();
+
     if (mClient)
     {
         avahi_client_free(mClient);
         mClient = nullptr;
     }
+
+    mInitCallback       = nullptr;
+    mErrorCallback      = nullptr;
+    mAsyncReturnContext = nullptr;
+}
+
+bool MdnsAvahi::ClientHasFailed() const
+{
+    return mClient == nullptr || avahi_client_get_state(mClient) == AVAHI_CLIENT_FAILURE;
+}
+
+CHIP_ERROR MdnsAvahi::RebuildClient()
+{
+    VerifyOrReturnError(mPublishedGroups.empty(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitCallback != nullptr && mErrorCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogError(DeviceLayer, "Avahi client failed; rebuilding it and cancelling outstanding lookups");
+    ++mClientGeneration;
+    const uint64_t shutdownGeneration = mShutdownGeneration;
+
+    // Detach the contexts first because their callbacks may start new DNS-SD operations.
+    std::list<ResolveContext *> staleResolves;
+    staleResolves.swap(mAllocatedResolves);
+    std::list<BrowseContext *> staleBrowses;
+    staleBrowses.swap(mAllocatedBrowses);
+
+    // Avahi client destruction also destroys its child objects. Release the tracked
+    // objects now and clear their pointers so deleting the contexts cannot free them twice.
+    for (auto * resolve : staleResolves)
+    {
+        if (resolve->mResolver != nullptr)
+        {
+            avahi_service_resolver_free(resolve->mResolver);
+            resolve->mResolver = nullptr;
+        }
+    }
+    for (auto * browse : staleBrowses)
+    {
+        if (browse->mBrowser != nullptr)
+        {
+            avahi_service_browser_free(browse->mBrowser);
+            browse->mBrowser = nullptr;
+        }
+    }
+
+    if (mClient != nullptr)
+    {
+        avahi_client_free(mClient);
+        mClient = nullptr;
+    }
+
+    int avahiError   = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mClient          = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
+    if (mClient == nullptr || avahiError != 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to rebuild Avahi client: %d: %s", avahiError,
+                     avahiError == AVAHI_OK ? "no error reported" : avahi_strerror(avahiError));
+        if (mClient != nullptr)
+        {
+            avahi_client_free(mClient);
+            mClient = nullptr;
+        }
+        error = CHIP_ERROR_OPEN_FAILED;
+    }
+
+    // Notify callers only after the replacement client has been created, or after a
+    // failed rebuild has left mClient in a consistent state.
+    for (auto * resolve : staleResolves)
+    {
+        if (mShutdownGeneration == shutdownGeneration)
+        {
+            resolve->mCallback(resolve->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_FORCED_RESET);
+        }
+        chip::Platform::Delete(resolve);
+    }
+    for (auto * browse : staleBrowses)
+    {
+        if (mShutdownGeneration == shutdownGeneration && !browse->mStopped.load())
+        {
+            browse->mCallback(browse->mContext, nullptr, 0, true, CHIP_ERROR_FORCED_RESET);
+        }
+        chip::Platform::Delete(browse);
+    }
+
+    return error;
 }
 
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
@@ -641,9 +749,18 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
                              chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                              intptr_t * browseIdentifier)
 {
+    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+
+    // Recover a failed client before allocating state so a rebuild failure needs no cleanup.
+    if (ClientHasFailed())
+    {
+        ReturnErrorOnFailure(RebuildClient());
+    }
+
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
-    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
+    VerifyOrReturnError(browseContext != nullptr, CHIP_ERROR_NO_MEMORY);
+    AvahiIfIndex avahiInterface = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
 
     browseContext->mInstance    = this;
     browseContext->mContext     = context;
@@ -660,14 +777,30 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
 
     browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
+    if (browser == nullptr && ClientHasFailed())
+    {
+        CHIP_ERROR error = RebuildClient();
+        if (error != CHIP_NO_ERROR)
+        {
+            chip::Platform::Delete(browseContext);
+            *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+            return error;
+        }
+        browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
+                                            static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
+    }
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
+        ChipLogError(DeviceLayer, "Avahi browse setup failed: %s",
+                     mClient ? avahi_strerror(avahi_client_errno(mClient)) : "no mClient");
         chip::Platform::Delete(browseContext);
         *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
     }
     else
     {
+        browseContext->mBrowser = browser;
+        mAllocatedBrowses.push_back(browseContext);
         *browseIdentifier = reinterpret_cast<intptr_t>(browseContext);
     }
 
@@ -733,17 +866,55 @@ void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBro
     // If we were already asked to stop, no need to send a callback - no one is listening.
     if (!context->mStopped.load())
     {
-        // since this is continuous browse, finalBrowse will always be false.
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), false, CHIP_NO_ERROR);
+        // The callback may rebuild or shut down the Avahi client. Detach this context
+        // so those operations cannot recursively notify or delete it.
+        MdnsAvahi * instance = context->mInstance;
+        instance->mAllocatedBrowses.remove(context);
 
-        // Clearing records/services already passed to application through delegate. Keeping it may cause
-        // duplicates in next query / retry attempt as currently found will also come again from cache.
-        context->mServices.clear();
+        DnssdBrowseCallback callback = context->mCallback;
+        void * callbackContext       = context->mContext;
+        uint64_t clientGeneration    = instance->mClientGeneration;
+        uint64_t shutdownGeneration  = instance->mShutdownGeneration;
+        std::vector<DnssdService> services;
+        services.swap(context->mServices);
+
+        // since this is continuous browse, finalBrowse will always be false.
+        callback(callbackContext, services.data(), services.size(), false, CHIP_NO_ERROR);
+
+        if (instance->mShutdownGeneration != shutdownGeneration)
+        {
+            // Client destruction released the browser while this context was detached.
+            context->mBrowser = nullptr;
+            chip::Platform::Delete(context);
+        }
+        else if (instance->mClientGeneration != clientGeneration)
+        {
+            // A rebuild released the old browser. Complete this detached lookup
+            // sequentially rather than recursively from RebuildClient().
+            context->mBrowser = nullptr;
+            if (!context->mStopped.load())
+            {
+                callback(callbackContext, nullptr, 0, true, CHIP_ERROR_FORCED_RESET);
+            }
+            chip::Platform::Delete(context);
+        }
+        else if (context->mStopped.load())
+        {
+            avahi_service_browser_free(browser);
+            context->mBrowser = nullptr;
+            chip::Platform::Delete(context);
+        }
+        else
+        {
+            instance->mAllocatedBrowses.push_back(context);
+        }
     }
     else
     {
         // browse is stopped, so free browse handle and context
+        context->mInstance->mAllocatedBrowses.remove(context);
         avahi_service_browser_free(browser);
+        context->mBrowser = nullptr;
         chip::Platform::Delete(context);
     }
 }
@@ -757,8 +928,10 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     switch (event)
     {
     case AVAHI_BROWSER_FAILURE:
-        context->mCallback(context->mContext, nullptr, 0, true, CHIP_ERROR_INTERNAL);
+        context->mInstance->mAllocatedBrowses.remove(context);
         avahi_service_browser_free(browser);
+        context->mBrowser = nullptr;
+        context->mCallback(context->mContext, nullptr, 0, true, CHIP_ERROR_INTERNAL);
         chip::Platform::Delete(context);
         break;
     case AVAHI_BROWSER_NEW:
@@ -766,7 +939,9 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         if (context->mStopped.load())
         {
             // browse is stopped, so free browse handle and context
+            context->mInstance->mAllocatedBrowses.remove(context);
             avahi_service_browser_free(browser);
+            context->mBrowser = nullptr;
             chip::Platform::Delete(context);
             break;
         }
@@ -879,6 +1054,23 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
     }
 }
 
+void MdnsAvahi::FinalizeResolve(ResolveContext * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                CHIP_ERROR error)
+{
+    // A resolve is terminal, so detach the context and release its resolver before invoking the
+    // callback. The callback may start a new lookup that re-enters RebuildClient() or Shutdown();
+    // detaching keeps those from freeing this resolver a second time or invoking the callback again.
+    mAllocatedResolves.remove(context);
+    if (context->mResolver != nullptr)
+    {
+        avahi_service_resolver_free(context->mResolver);
+        context->mResolver = nullptr;
+    }
+
+    context->mCallback(context->mContext, result, addresses, error);
+    chip::Platform::Delete(context);
+}
+
 void MdnsAvahi::StopResolve(const char * name)
 {
     // Cancel and delete any pending resolves for this instance name.
@@ -897,8 +1089,7 @@ void MdnsAvahi::StopResolve(const char * name)
 
     for (auto * context : contexts)
     {
-        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-        chip::Platform::Delete(context);
+        FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
     }
 }
 
@@ -906,6 +1097,11 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
                               Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
                               void * context)
 {
+    if (ClientHasFailed())
+    {
+        ReturnErrorOnFailure(RebuildClient());
+    }
+
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
     ResolveContext * resolveContext = AllocateResolveContext();
     if (resolveContext == nullptr)
@@ -933,9 +1129,26 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
         avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
                                    nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
                                    reinterpret_cast<void *>(resolveContext->mNumber));
+    if (resolveContext->mResolver == nullptr && ClientHasFailed())
+    {
+        mAllocatedResolves.remove(resolveContext);
+        error = RebuildClient();
+        if (error != CHIP_NO_ERROR)
+        {
+            chip::Platform::Delete(resolveContext);
+            return error;
+        }
+        mAllocatedResolves.push_back(resolveContext);
+        resolveContext->mResolver =
+            avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
+                                       nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
+                                       reinterpret_cast<void *>(resolveContext->mNumber));
+    }
     // Otherwise the resolver will be freed in the callback
     if (resolveContext->mResolver == nullptr)
     {
+        ChipLogError(DeviceLayer, "Avahi resolve setup failed: %s",
+                     mClient ? avahi_strerror(avahi_client_errno(mClient)) : "no mClient");
         error = CHIP_ERROR_INTERNAL;
         FreeResolveContext(resolveContext->mNumber);
     }
@@ -971,14 +1184,13 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
-                context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                sInstance.FreeResolveContext(handle);
+                sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
             }
             return;
         }
         ChipLogError(DeviceLayer, "Avahi resolve failed");
-        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-        break;
+        sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+        return;
     case AVAHI_RESOLVER_FOUND:
         DnssdService result = {};
 
@@ -1055,16 +1267,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
+            sInstance.FinalizeResolve(context, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
         }
         else
         {
-            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), result_err);
+            sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), result_err);
         }
-        break;
+        return;
     }
-
-    sInstance.FreeResolveContext(handle);
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
