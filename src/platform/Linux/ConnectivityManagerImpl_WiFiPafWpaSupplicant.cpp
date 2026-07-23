@@ -23,6 +23,7 @@
 
 #include <glib.h>
 
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -184,8 +185,9 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
-           &peer_addr[4], &peer_addr[5]);
+    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
+                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+                   ChipLogError(DeviceLayer, "WiFi-PAF: OnDiscoveryResult: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
@@ -216,10 +218,24 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult received for non-subscriber session");
         return;
     }
-    if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != UINT32_MAX))
+    // The connect and background-scan discovery handlers are both connected to the
+    // shared "nandiscovery-result" signal, so GLib delivers every discovery to both.
+    // Act only on discovery for THIS session's own subscribe (pPafInfo->id was set to
+    // the connect subscribe_id in _WiFiPAFSubscribe); a (possibly stale) background-
+    // scan subscribe cross-fires here and must not hijack or overwrite the connect
+    // session — before or after it is established.  Matching on subscribe_id rather
+    // than on "peer_id already set" keeps a legitimate re-discovery on the connect's
+    // own (re)subscribe working for the controller path.
+    if (pPafInfo->id != subscribe_id)
     {
-        // Reentrance, depends on wpa_supplicant behaviors
-        ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u ", subscribe_id);
+        ChipLogDetail(DeviceLayer, "WiFi-PAF: DiscoveryResult, subscribe_id=%u not for this session (id=%u), ignoring",
+                      subscribe_id, pPafInfo->id);
+        return;
+    }
+    if (pPafInfo->peer_id != UINT32_MAX)
+    {
+        // Reentrance: a duplicate discovery for our own, already-established session.
+        ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u", subscribe_id);
         return;
     }
     if (srv_proto_type != nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER)
@@ -283,8 +299,9 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
-           &peer_addr[4], &peer_addr[5]);
+    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
+                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+                   ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied: malformed peer_addr '%s'", addr_str));
 
     value = g_variant_lookup_value(reply_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
@@ -371,8 +388,9 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
     chip::Platform::CopyString(addr_str, paddr);
-    sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
-           &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
+    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1],
+                          &RxInfo.peer_addr[2], &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]) == 6,
+                   ChipLogError(DeviceLayer, "WiFi-PAF: OnNanReceive: malformed peer_addr '%s'", addr_str));
 
     // Read the rx_data
     gsize bufferLen;
@@ -512,8 +530,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
-    mOnPafSubscribeComplete = onSuccess;
-    mOnPafSubscribeError    = onError;
+    mPendingConnectSubscribeId = subscribe_id;
+    mOnPafSubscribeComplete    = onSuccess;
+    mOnPafSubscribeError       = onError;
 
     WiFiPAFSession sessionInfo  = { .discriminator = PafPublish_ssi.DevInfo };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
@@ -620,6 +639,481 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
     }
     return CHIP_ERROR_INTERNAL;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+static uint16_t FreqToBand(uint32_t freq)
+{
+    // 2.4 GHz: channels 1–13 (2412–2472 MHz) plus channel 14 (2484 MHz).
+    if ((freq >= 2412 && freq <= 2472) || freq == 2484)
+        return static_cast<uint16_t>(0x0001u); // k2g4
+    // 5 GHz: main range plus the two additional channels above the main range.
+    if ((freq >= 5035 && freq <= 5945) || freq == 5960 || freq == 5980)
+        return static_cast<uint16_t>(0x0004u); // k5g
+    return 0;
+}
+
+// Context for dispatching background-scan discovery results onto the CHIP event loop.
+namespace {
+struct BgScanWorkCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl::BgScanDiscoveryCallback cb;
+    void * cbCtx;
+    chip::DeviceLayer::NanPeerInfo peer;
+};
+} // namespace
+
+void ConnectivityManagerImpl::WiFiPAFDisconnectPublishReceiveHandler()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    if (!mWpaSupplicant.iface)
+        return;
+
+    // Disconnect all "nanreceive" handlers on the interface that were registered
+    // with this ConnectivityManagerImpl as user-data.  This removes the handler
+    // added by _WiFiPAFPublish so that a subsequent _WiFiPAFSubscribe call
+    // registers exactly one handler and packets are not delivered twice.
+    guint sig = g_signal_lookup("nanreceive", G_OBJECT_TYPE(mWpaSupplicant.iface.get()));
+    g_signal_handlers_disconnect_matched(mWpaSupplicant.iface.get(),
+                                         static_cast<GSignalMatchType>(G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA), sig, 0, nullptr,
+                                         nullptr, this);
+}
+
+void ConnectivityManagerImpl::DisconnectScanSignals()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    if (!mWpaSupplicant.iface)
+        return;
+
+    GObject * obj = G_OBJECT(mWpaSupplicant.iface.get());
+    for (gulong & id : mScanSignalIds)
+    {
+        if (id != 0)
+        {
+            g_signal_handler_disconnect(obj, id);
+            id = 0;
+        }
+    }
+}
+
+// Scan for Matter PAF devices, but don't connect
+void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
+{
+    uint32_t peer_publish_id;
+    uint8_t peer_addr[6];
+    uint32_t srv_proto_type;
+    uint32_t subscribe_id;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    if (g_variant_n_children(discov_info) == 0)
+    {
+        return;
+    }
+
+    // Read the data from dbus
+    GAutoPtr<GVariant> dataValue;
+    GVariant * value;
+
+    value = g_variant_lookup_value(discov_info, "subscribe_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &subscribe_id);
+    ChipLogDetail(DeviceLayer, "ScanDiscoveryResult: subscribe_id=%u", subscribe_id);
+
+    // Ignore results from orphaned wpa_supplicant subscriptions (e.g. from
+    // previous process runs that weren't cancelled). Only accept results from
+    // the currently active scan subscription.
+    {
+        uint32_t expected = (mBgScanCb != nullptr) ? mBgScanSubscribeId : mActiveScanSubscribeId;
+        if (expected == 0 || subscribe_id != expected)
+        {
+            ChipLogProgress(DeviceLayer, "ScanDiscoveryResult: ignoring stale subscribe_id=%u (expected=%u)", subscribe_id,
+                            expected);
+            return;
+        }
+    }
+
+    value = g_variant_lookup_value(discov_info, "publish_id", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &peer_publish_id);
+    char addr_str[20];
+    char * paddr;
+    value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "&s", &paddr);
+    chip::Platform::CopyString(addr_str, paddr);
+    VerifyOrReturn(sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2],
+                          &peer_addr[3], &peer_addr[4], &peer_addr[5]) == 6,
+                   ChipLogError(DeviceLayer, "WiFi-PAF: ScanDiscoveryResult: malformed peer_addr '%s'", addr_str));
+    value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
+    dataValue.reset(value);
+    g_variant_get(dataValue.get(), "u", &srv_proto_type);
+
+    // Read the variable length Extended data from the SSI, as per R1.5 Section 5.4.2.6.3
+    size_t bufferLen;
+    value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
+    dataValue.reset(value);
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: ScanDiscoveryResult SSI too short"));
+    auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
+
+    NanPeerInfo peer;
+    peer.vid           = pPublishSSI->VendorId;
+    peer.pid           = pPublishSSI->ProductId;
+    peer.opcode        = pPublishSSI->DevOpCode;
+    peer.discriminator = pPublishSSI->DevInfo;
+    std::memcpy(peer.mac, peer_addr, sizeof(peer_addr));
+    // ExtendedData (optional, core R1.4.2 5.4.2.6.3) follows the mandatory
+    // PAFPublishSSI struct.
+    if (bufferLen > sizeof(PAFPublishSSI))
+    {
+        const auto * bytes = static_cast<const uint8_t *>(ssibuf);
+        peer.storage.assign(bytes + sizeof(PAFPublishSSI), bytes + bufferLen);
+        peer.hasExtendedData = true;
+    }
+
+    // Set WiFiBand from the frequency used when the scan was started.
+    peer.band = FreqToBand(mScanFreq);
+
+    // The bg-scan callback uses SystemLayer and cluster APIs which require
+    // the CHIP stack lock.  ScanDiscoveryResult runs on a GLib/dbus thread,
+    // so schedule the callback on the CHIP event loop instead of calling directly.
+    if (mBgScanCb != nullptr)
+    {
+        auto * workCtx      = new BgScanWorkCtx{ mBgScanCb, mBgScanCbCtx, peer };
+        CHIP_ERROR schedErr = chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            +[](intptr_t arg) {
+                auto * w = reinterpret_cast<BgScanWorkCtx *>(arg);
+                w->cb(w->cbCtx, w->peer);
+                delete w;
+            },
+            reinterpret_cast<intptr_t>(workCtx));
+        if (schedErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ScanDiscoveryResult: ScheduleWork failed: %" CHIP_ERROR_FORMAT, schedErr.Format());
+            delete workCtx;
+        }
+    }
+
+    // Do not log if already present
+    auto [it, inserted] = mNanScanPeers.insert(peer);
+    if (!inserted)
+    {
+        return;
+    }
+
+    ChipLogProgress(DeviceLayer, "Discovered Device: %s() Subscribe_id:%u peer_publish_id:%u srv_proto_type:%u", __func__,
+                    subscribe_id, peer_publish_id, srv_proto_type);
+    ChipLogProgress(DeviceLayer, "\tDiscriminator:%u Opcode:%u PID:0x%X VID:0x%X", pPublishSSI->DevInfo, pPublishSSI->DevOpCode,
+                    pPublishSSI->ProductId, pPublishSSI->VendorId);
+    ChipLogProgress(DeviceLayer, "\tpeer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]", peer_addr[0], peer_addr[1], peer_addr[2],
+                    peer_addr[3], peer_addr[4], peer_addr[5]);
+    ChipLogProgress(DeviceLayer, "\tSSI Buffer Len:%lu", bufferLen);
+
+    if (peer.hasExtendedData && !peer.storage.empty())
+    {
+        chip::ByteSpan s(peer.storage.data(), peer.storage.size());
+        constexpr size_t kMaxBytesToPrint     = 20;
+        const size_t bytesToPrint             = (s.size() > kMaxBytesToPrint) ? kMaxBytesToPrint : s.size();
+        char hexBuf[2 * kMaxBytesToPrint + 1] = { 0 };
+        CHIP_ERROR err =
+            chip::Encoding::BytesToHex(s.data(), bytesToPrint, hexBuf, sizeof(hexBuf), chip::Encoding::HexFlags::kUppercase);
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(DeviceLayer, "\tExtendedData (%lu bytes, showing %lu): %s", static_cast<unsigned long>(s.size()),
+                            static_cast<unsigned long>(bytesToPrint), hexBuf);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "\tExtendedData, BytesToHex failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "\tNo Extended Data");
+    }
+}
+
+void ConnectivityManagerImpl::ScanNanReceive(GVariant * obj)
+{
+    ChipLogError(DeviceLayer, "Commissioning Proxy: Unexpected ScanNanReceive");
+}
+
+void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason)
+{
+    ChipLogProgress(DeviceLayer, "Commissioning Proxy: Subscription terminated (%u, %s)", subscribe_id, reason);
+    // This handler shares the "nansubscribe-terminated" signal with the connect
+    // path (OnNanSubscribeTerminated).  Act only on a subscribe_id that belongs to
+    // a scan; otherwise a terminating connect subscribe would remove the connect
+    // session's PAF entry out from under an in-flight ProxyConnect.
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        if (subscribe_id != mActiveScanSubscribeId && subscribe_id != mBgScanSubscribeId)
+        {
+            return;
+        }
+    }
+    WiFiPAFSession sessionInfo  = { .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext)
+{
+    // Read/modify the shared scan-callback state under the lock; ScanDiscoveryResult
+    // reads these members on the GLib/D-Bus thread under the same lock.
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        // Cannot start a one-shot scan while a background scan is running.
+        VerifyOrReturnError(mBgScanCb == nullptr, CHIP_ERROR_BUSY);
+        mScanCb        = cb;
+        mScanCbContext = cbContext;
+        // Drop peers left over from a previous scan so this one-shot response
+        // reports only devices discovered within this scan window.
+        mNanScanPeers.clear();
+    }
+
+    CHIP_ERROR result = StartWiFiManagementSync();
+    if (result != CHIP_NO_ERROR)
+    {
+        // Reset the scan-callback state set above so a transient WiFi-management
+        // startup failure does not leave mScanCb non-null forever, which would wedge
+        // every subsequent background scan into CHIP_ERROR_BUSY for the process life.
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        mScanCb        = nullptr;
+        mScanCbContext = nullptr;
+        return result;
+    }
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFScan: starting one-shot NAN discovery (maxTime=%us)", scanMaxTime);
+
+    guint subscribe_id;
+    GAutoPtr<GError> err;
+    enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
+    uint8_t is_active                             = false; // passive subscribe = discovery mode
+    // Set the NAN TTL to match the chip-level scan window.  A longer TTL leaves
+    // subscribe_id alive in wpa_supplicant after FinishWiFiPAFScan cancels it,
+    // causing stale nandiscovery-result events during the next scan that mask
+    // results from the new subscribe_id (wpa_supplicant is edge-triggered).
+    unsigned int ttl  = scanMaxTime;
+    unsigned int freq = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    mScanFreq = static_cast<uint32_t>(freq);
+    GVariantBuilder builder;
+    GVariant * args = nullptr;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "srv_name", g_variant_new_string(srv_name));
+    g_variant_builder_add(&builder, "{sv}", "srv_proto_type", g_variant_new_byte(srv_proto_type));
+    g_variant_builder_add(&builder, "{sv}", "active", g_variant_new_boolean(is_active));
+    g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
+    g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
+    g_variant_builder_add(&builder, "{sv}", "discovery_only", g_variant_new_boolean(TRUE));
+    args = g_variant_builder_end(&builder);
+    wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
+
+    if (err.get() != nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFiPAFScan: nansubscribe failed: %s", err->message);
+        ChipLogError(DeviceLayer, "WiFiPAFScan: Check wpa_supplicant supports discovery_only flag");
+        mScanCb        = nullptr;
+        mScanCbContext = nullptr;
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFScan: subscribe_id=%u freq=%u", subscribe_id, freq);
+    mActiveScanSubscribeId      = static_cast<uint32_t>(subscribe_id);
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+    auto pPafInfo = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (pPafInfo != nullptr)
+    {
+        pPafInfo->id   = subscribe_id;
+        pPafInfo->role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
+    }
+
+    mScanSignalIds[0] = g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanDiscoveryResult(obj); }),
+                                         this);
+    mScanSignalIds[1] = g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanNanReceive(obj); }),
+                                         this);
+    mScanSignalIds[2] = g_signal_connect(
+        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->ScanNanSubscribeTerminated(term_subscribe_id, reason);
+        }),
+        this);
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFScan: timeout in %d seconds on subscribe_id %u", scanMaxTime, subscribe_id);
+    auto * ctx = new ScanTimerCtx{ this, subscribe_id };
+    SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(scanMaxTime * 1000),
+        +[](System::Layer *, void * context) {
+            auto * timerCtx = static_cast<ScanTimerCtx *>(context);
+            timerCtx->self->FinishWiFiPAFScan(timerCtx);
+            delete timerCtx;
+        },
+        ctx);
+
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
+{
+    ChipLogProgress(DeviceLayer, "FinishWiFiPAFScan: subscribe_id %u", ctx->subscribe_id);
+    DisconnectScanSignals();
+    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
+    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
+    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
+    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
+    // scan's subscribe_id above is sufficient to tear down the scan.
+
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+
+    // Hold the mutex while collecting and clearing mNanScanPeers so that a
+    // ScanDiscoveryResult running concurrently on the GLib/D-Bus thread cannot
+    // write to the set at the same time.  Moving mActiveScanSubscribeId = 0
+    // inside the lock ensures any ScanDiscoveryResult that acquires the lock
+    // after us sees expected == 0 and correctly discards the late event.
+    std::vector<NanPeerInfo> results;
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        results.reserve(mNanScanPeers.size());
+        for (auto & p : mNanScanPeers)
+            results.push_back(p);
+        mNanScanPeers.clear();
+        mActiveScanSubscribeId = 0;
+        mScanFreq              = 0;
+    }
+
+    if (mScanCb != nullptr)
+        mScanCb(mScanCbContext, results);
+
+    mScanCb        = nullptr;
+    mScanCbContext = nullptr;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
+{
+    VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Read/modify the shared scan-callback state under the lock; ScanDiscoveryResult
+    // reads these members on the GLib/D-Bus thread under the same lock.
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        VerifyOrReturnError(mScanCb == nullptr, CHIP_ERROR_BUSY);
+        // Already running — update callback and return success.
+        if (mBgScanCb != nullptr)
+        {
+            mBgScanCb    = cb;
+            mBgScanCbCtx = cbCtx;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    CHIP_ERROR result = StartWiFiManagementSync();
+    VerifyOrReturnError(result == CHIP_NO_ERROR, result);
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFStartBackgroundScan: starting continuous NAN discovery");
+
+    guint subscribe_id;
+    GAutoPtr<GError> err;
+    enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
+    uint8_t is_active                             = false; // passive subscribe = discovery mode
+    unsigned int ttl                              = 0;     // 0 = infinite in wpa_supplicant
+    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    mScanFreq = static_cast<uint32_t>(freq);
+    GVariantBuilder builder;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "srv_name", g_variant_new_string(srv_name));
+    g_variant_builder_add(&builder, "{sv}", "srv_proto_type", g_variant_new_byte(srv_proto_type));
+    g_variant_builder_add(&builder, "{sv}", "active", g_variant_new_boolean(is_active));
+    g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
+    g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
+    g_variant_builder_add(&builder, "{sv}", "discovery_only", g_variant_new_boolean(TRUE));
+    GVariant * args = g_variant_builder_end(&builder);
+    wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
+
+    if (err.get() != nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFiPAFStartBackgroundScan: nansubscribe failed: %s", err->message);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFStartBackgroundScan: subscribe_id=%u freq=%u", subscribe_id, freq);
+
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+
+    mScanSignalIds[0] = g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanDiscoveryResult(obj); }),
+                                         this);
+    mScanSignalIds[1] = g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
+                                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj,
+                                                        ConnectivityManagerImpl * self) { return self->ScanNanReceive(obj); }),
+                                         this);
+    mScanSignalIds[2] = g_signal_connect(
+        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
+        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
+            return self->ScanNanSubscribeTerminated(term_subscribe_id, reason);
+        }),
+        this);
+
+    mBgScanCb          = cb;
+    mBgScanCbCtx       = cbCtx;
+    mBgScanSubscribeId = static_cast<uint32_t>(subscribe_id);
+
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
+{
+    // Snapshot and clear the shared bg-scan state under the lock so a
+    // ScanDiscoveryResult running on the GLib/D-Bus thread (which reads these
+    // members under the same lock) cannot observe a half-torn-down scan.  Once
+    // mBgScanCb/mBgScanSubscribeId are cleared, a late discovery is discarded.
+    uint32_t subscribeId = 0;
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        if (mBgScanCb == nullptr)
+            return;
+        subscribeId        = mBgScanSubscribeId;
+        mBgScanCb          = nullptr;
+        mBgScanCbCtx       = nullptr;
+        mBgScanSubscribeId = 0;
+        mScanFreq          = 0;
+        // Clear accumulated peers so they cannot leak into a subsequent one-shot
+        // scan's ProxyScanResponse (and so a long-lived bg scan does not grow the
+        // set without bound).
+        mNanScanPeers.clear();
+    }
+
+    ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", subscribeId);
+
+    // DisconnectScanSignals() and _WiFiPAFCancelSubscribe() each take
+    // mWpaSupplicantMutex internally, so they MUST be called without holding it.
+    DisconnectScanSignals();
+    CHIP_ERROR cancelErr = _WiFiPAFCancelSubscribe(subscribeId);
+    if (cancelErr != CHIP_NO_ERROR)
+        ChipLogDetail(DeviceLayer, "WiFiPAFStopBackgroundScan: CancelSubscribe: %" CHIP_ERROR_FORMAT, cancelErr.Format());
+
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribeId };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    CHIP_ERROR rmErr            = WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (rmErr != CHIP_NO_ERROR)
+        ChipLogDetail(DeviceLayer, "WiFiPAFStopBackgroundScan: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 void ConnectivityManagerImpl::PostWpaInterfaceProxyReady()
 {
