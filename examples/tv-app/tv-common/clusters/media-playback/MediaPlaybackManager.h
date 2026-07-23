@@ -43,6 +43,8 @@ public:
     CHIP_ERROR HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetAvailableCommands(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetContentInfo(AttributeValueEncoder & aEncoder) override;
 
     void HandlePlay(CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandlePause(CommandResponseHelper<PlaybackResponseType> & helper) override;
@@ -125,6 +127,10 @@ protected:
 
 private:
     // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap = 3;
-    static constexpr uint16_t kClusterRevision    = 2;
+    static constexpr uint32_t kEndpointFeatureMap =
+        chip::BitFlags<chip::app::Clusters::MediaPlayback::Feature>(
+            chip::app::Clusters::MediaPlayback::Feature::kAdvancedSeek, chip::app::Clusters::MediaPlayback::Feature::kVariableSpeed,
+            chip::app::Clusters::MediaPlayback::Feature::kTextTracks, chip::app::Clusters::MediaPlayback::Feature::kAudioTracks,
+            chip::app::Clusters::MediaPlayback::Feature::kAudioAdvance)
+            .Raw();
 };

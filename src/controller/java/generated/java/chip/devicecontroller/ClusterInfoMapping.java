@@ -9712,6 +9712,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedMessagesClusterSupportedLanguageCodesAttributeCallback implements ChipClusters.MessagesCluster.SupportedLanguageCodesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<String> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMessagesClusterSupportedMimeTypesAttributeCallback implements ChipClusters.MessagesCluster.SupportedMimeTypesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<String> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedMessagesClusterGeneratedCommandListAttributeCallback implements ChipClusters.MessagesCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -29035,6 +29077,12 @@ public class ClusterInfoMapping {
     CommandParameterInfo messagespresentMessagesRequestmessageTextCommandParameterInfo = new CommandParameterInfo("messageText", String.class, String.class);
     messagespresentMessagesRequestCommandParams.put("messageText",messagespresentMessagesRequestmessageTextCommandParameterInfo);
 
+
+    CommandParameterInfo messagespresentMessagesRequestlanguageCodeCommandParameterInfo = new CommandParameterInfo("languageCode", Optional.class, String.class);
+    messagespresentMessagesRequestCommandParams.put("languageCode",messagespresentMessagesRequestlanguageCodeCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequestmessageURICommandParameterInfo = new CommandParameterInfo("messageURI", Optional.class, String.class);
+    messagespresentMessagesRequestCommandParams.put("messageURI",messagespresentMessagesRequestmessageURICommandParameterInfo);
     InteractionInfo messagespresentMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
@@ -29053,6 +29101,10 @@ public class ClusterInfoMapping {
         commandArguments.get("messageText")
         , (Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>>)
         commandArguments.get("responses")
+        , (Optional<String>)
+        commandArguments.get("languageCode")
+        , (Optional<String>)
+        commandArguments.get("messageURI")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

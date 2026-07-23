@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "MatterShell.h"
+#include "shell/MatterShell.h"
 #include "streamer.h"
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>

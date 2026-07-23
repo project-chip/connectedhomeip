@@ -4292,6 +4292,82 @@ public static class MessagesClusterMessageCompleteEvent {
     return output.toString();
   }
 }
+public static class MessagesClusterMessageNotPresentedEvent {
+  public byte[] messageID;
+  public Boolean removedFromQueue;
+  public Integer fabricIndex;
+  private static final long MESSAGE_ID_ID = 0L;
+  private static final long REMOVED_FROM_QUEUE_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public MessagesClusterMessageNotPresentedEvent(
+    byte[] messageID,
+    Boolean removedFromQueue,
+    Integer fabricIndex
+  ) {
+    this.messageID = messageID;
+    this.removedFromQueue = removedFromQueue;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_ID_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(REMOVED_FROM_QUEUE_ID, new BooleanType(removedFromQueue)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageNotPresentedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Boolean removedFromQueue = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == REMOVED_FROM_QUEUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          removedFromQueue = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageNotPresentedEvent(
+      messageID,
+      removedFromQueue,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageNotPresentedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tremovedFromQueue: ");
+    output.append(removedFromQueue);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterPowerAdjustStartEvent {
 
   public DeviceEnergyManagementClusterPowerAdjustStartEvent(
