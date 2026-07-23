@@ -284,7 +284,7 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
     // currentEnergyBalance
     // In bounds
     uint8_t i = 0;
-    for (; i < testDelegate.GetNumEnergyBalances(kTestEndpointId); ++i)
+    for (; i < static_cast<uint8_t>(testDelegate.GetNumEnergyBalances(kTestEndpointId)); ++i)
     {
         CurrentEnergyBalance::TypeInfo::Type currentEnergyBalanceWrite = i;
         ASSERT_EQ(tester.WriteAttribute(CurrentEnergyBalance::Id, currentEnergyBalanceWrite), CHIP_NO_ERROR);
@@ -302,7 +302,7 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
     // lowPowerModeSensitivity
     // In bounds
     i = 0;
-    for (; i < testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId); ++i)
+    for (; i < static_cast<uint8_t>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId)); ++i)
     {
         CurrentLowPowerModeSensitivity::TypeInfo::Type currentLowPowerModeSensitivityWrite = i;
         ASSERT_EQ(tester.WriteAttribute(CurrentLowPowerModeSensitivity::Id, currentLowPowerModeSensitivityWrite), CHIP_NO_ERROR);
@@ -326,7 +326,7 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
     EnergyPreferenceCluster cluster(kTestEndpointId, bothFeatures);
 
     // currentEnergyBalance
-    for (CurrentEnergyBalance::TypeInfo::Type i = 0; i < testDelegate.GetNumEnergyBalances(kTestEndpointId); ++i)
+    for (CurrentEnergyBalance::TypeInfo::Type i = 0; i < static_cast<CurrentEnergyBalance::TypeInfo::Type>(testDelegate.GetNumEnergyBalances(kTestEndpointId)); ++i)
     {
         EXPECT_EQ(cluster.SetCurrentEnergyBalance(i), CHIP_NO_ERROR);
     }
@@ -339,7 +339,7 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // lowPowerModeSensitivity
-    for (CurrentLowPowerModeSensitivity::TypeInfo::Type i = 0; i < testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId);
+    for (CurrentLowPowerModeSensitivity::TypeInfo::Type i = 0; i < static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId));
          ++i)
     {
         EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(i), CHIP_NO_ERROR);
