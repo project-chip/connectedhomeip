@@ -50,6 +50,8 @@ public:
     {
         BitMask<ModeSelect::Feature> featureMap;
         OptionalAttributeSet optionalAttributeSet;
+        chip::CharSpan description;
+        DataModel::Nullable<uint16_t> standardNamespace;
         bool onOffValueForStartUp = false;
         DataModel::Nullable<uint8_t> initialStartUpMode; // ZAP default; fallback when no persisted value
         DataModel::Nullable<uint8_t> initialOnMode;      // ZAP default; fallback when no persisted value
@@ -97,6 +99,8 @@ private:
     Delegate & mDelegate;
     const BitMask<ModeSelect::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
+    chip::CharSpan mDescription;
+    DataModel::Nullable<uint16_t> mStandardNamespace;
     const bool mOnOffValueForStartUp;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 
