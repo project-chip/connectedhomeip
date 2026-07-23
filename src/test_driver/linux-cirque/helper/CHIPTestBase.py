@@ -364,8 +364,7 @@ class CHIPVirtualHome:
         for device in self.non_ap_devices:
             ret_log = self.get_device_log(device['id'])
             # Use this format for easier sort
-            f_name = '{}-{}-{}.log'.format(device['type'],
-                                           timestamp, device['id'][:8])
+            f_name = f"{device['type']}-{timestamp}-{device['id'][:8]}.log"
             self.logger.debug("device log name: \n%s", f_name)
             with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)
@@ -384,7 +383,7 @@ class CHIPVirtualHome:
         self.logger.info("device: %s: writing ssid, psk to wpa_supplicant config", self.get_device_pretty_id(device_id))
 
         write_psk_command = "".join(
-            ["sh -c 'wpa_passphrase {} {} >> ".format(ssid, psk),
+            [f"sh -c 'wpa_passphrase {ssid} {psk} >> ",
              "/etc/wpa_supplicant/wpa_supplicant.conf'"])
 
         return self.execute_device_cmd(device_id, write_psk_command)
@@ -403,7 +402,7 @@ class CHIPVirtualHome:
         return "<unknown>"
 
     def get_device_pretty_id(self, device_id):
-        return "{}({}...)".format(self.get_device_pretty_name(device_id), device_id[:8])
+        return f"{self.get_device_pretty_name(device_id)}({device_id[:8]}...)"
 
     @property
     def default_base_image(cls):

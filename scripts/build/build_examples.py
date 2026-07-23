@@ -53,8 +53,7 @@ def ValidateRepoPath(context, parameter, value):
     for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
         expected_file = os.path.join(value, name)
         if not os.path.exists(expected_file):
-            raise click.BadParameter("'%s' does not look like a valid repository path: "
-                                     "%s not found." % (value, expected_file))
+            raise click.BadParameter(f"'{value}' does not look like a valid repository path: {expected_file} not found.")
     return value
 
 
@@ -65,8 +64,7 @@ def ValidateTargetNames(context, parameter, values):
     for value in values:
         if not any(target.StringIntoTargetParts(value.lower())
                    for target in build.targets.BUILD_TARGETS):
-            raise click.BadParameter(
-                "'%s' is not a valid target name." % value)
+            raise click.BadParameter(f"'{value}' is not a valid target name.")
     return values
 
 

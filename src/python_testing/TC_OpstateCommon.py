@@ -201,8 +201,7 @@ class TC_OPSTATE_BASE:
 
         for item in expected_contains:
             if item not in attr_value:
-                asserts.fail("Entry (%s), not found! The returned value SHALL include all the entries: [%s]!" % (
-                    item, expected_contains))
+                asserts.fail(f"Entry ({item}), not found! The returned value SHALL include all the entries: [{expected_contains}]!")
 
     ############################
     #   TEST CASE 1.1

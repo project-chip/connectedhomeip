@@ -215,7 +215,7 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
         pai = result.certificate
         asserts.assert_less_equal(len(pai), 600, "PAI cert must be at most 600 bytes")
-        key = 'pai_{}'.format(dut_index)
+        key = f'pai_{dut_index}'
         self.record_data({key: hex_from_bytes(pai)})
 
         self.step(f'{dut_index}.2')
@@ -223,7 +223,7 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
         dac = result.certificate
         asserts.assert_less_equal(len(dac), 600, "DAC cert must be at most 600 bytes")
-        key = 'dac_{}'.format(dut_index)
+        key = f'dac_{dut_index}'
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
@@ -231,7 +231,7 @@ class TC_DA_1_7(MatterBaseTest):
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
-            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
+            asserts.fail(f"DUT {dut_index} PAI ({hex_from_bytes(pai_akid)}) not matched in PAA trust store")
 
         filename, paa_cert = paa_by_skid[pai_akid]
         log.info("Matched PAA file %s, subject: %s", filename, paa_cert.subject)
@@ -241,7 +241,7 @@ class TC_DA_1_7(MatterBaseTest):
             public_key.verify(signature=pai_cert.signature, data=pai_cert.tbs_certificate_bytes,
                               signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature as e:
-            asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
+            asserts.fail(f"DUT {dut_index}: Failed to verify PAI signature against PAA public key: {e}")
         log.info("Validated PAI signature against PAA")
 
         log.info("DUT %s Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs", dut_index)
@@ -263,7 +263,7 @@ class TC_DA_1_7(MatterBaseTest):
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
         log.info("Subject public key pk: %s", hex_from_bytes(pk))
-        key = 'pk_{}'.format(dut_index)
+        key = f'pk_{dut_index}'
         self.record_data({key: hex_from_bytes(pk)})
         return pk
 

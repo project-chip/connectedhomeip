@@ -53,7 +53,7 @@ def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
         return AccessPrivilege.MANAGE
     if role.lower() == 'administer':
         return AccessPrivilege.ADMINISTER
-    raise Exception('Unknown ACL role: %r' % role)
+    raise Exception(f'Unknown ACL role: {role!r}')
 
 
 def AttrsToAttribute(attrs) -> Attribute:

@@ -91,8 +91,8 @@ def _metadata(project_config):
     missing = [key for key in ("vendor_id", "product_id", "version", "version_str") if key not in values]
     if missing:
         raise ValueError(
-            "Missing OTA metadata: %s. Set BOUFFALOLAB_OTA_* environment variables or define them in CHIPProjectConfig.h."
-            % ", ".join(missing)
+            f"Missing OTA metadata: {', '.join(missing)}. Set BOUFFALOLAB_OTA_* environment variables or define them in "
+            "CHIPProjectConfig.h."
         )
 
     values["vendor_id"] = _any_base_int(values["vendor_id"])
@@ -113,12 +113,7 @@ def _metadata_suffix(metadata):
     if not version_str:
         version_str = "unknown"
 
-    return "_vid-0x%04x_pid-0x%04x_vn-%s_vs-%s" % (
-        metadata["vendor_id"],
-        metadata["product_id"],
-        metadata["version"],
-        version_str,
-    )
+    return f"_vid-0x{metadata['vendor_id']:04x}_pid-0x{metadata['product_id']:04x}_vn-{metadata['version']}_vs-{version_str}"
 
 
 def _payload_output_name(payload_path, metadata):
@@ -130,10 +125,10 @@ def _payload_output_name(payload_path, metadata):
             stem = name[: -len(suffix)]
             if stem.endswith(metadata_suffix):
                 return name
-            return "%s%s%s" % (stem, metadata_suffix, suffix)
+            return f"{stem}{metadata_suffix}{suffix}"
     if name.endswith(metadata_suffix):
         return name
-    return "%s%s" % (name, metadata_suffix)
+    return f"{name}{metadata_suffix}"
 
 
 def _matter_output_name(payload_path, metadata):
@@ -141,7 +136,7 @@ def _matter_output_name(payload_path, metadata):
     name = payload.name
     if name.endswith(".matter"):
         name = name[: -len(".matter")]
-    return "%s.matter" % _payload_output_name(name, metadata)
+    return f"{_payload_output_name(name, metadata)}.matter"
 
 
 def _ensure_clean_ota_dir(work_dir):
@@ -198,11 +193,11 @@ def build_iot_sdk_ota(flash_script, project_config):
     payloads = sorted(path for path in ota_dir.iterdir() if path.suffix in (".ota", ".hash"))
     generated = sorted(ota_dir.glob("*.matter"))
     if not payloads and not generated:
-        raise FileNotFoundError("No OTA images generated in %s" % ota_dir)
+        raise FileNotFoundError(f"No OTA images generated in {ota_dir}")
 
     renamed = []
     for payload in payloads:
-        old_matter = Path("%s.matter" % payload)
+        old_matter = Path(f"{payload}.matter")
         matter_target = ota_dir / _matter_output_name(payload, metadata)
 
         if old_matter.exists():
@@ -233,7 +228,7 @@ def build_bouffalo_sdk_ota(build_out_dir, output_dir, project_config):
     ota_dir = _ensure_clean_ota_dir(output_dir)
     payloads = sorted(glob.glob(str(Path(build_out_dir) / "*.ota")))
     if not payloads:
-        raise FileNotFoundError("No Bouffalo SDK OTA payloads found in %s" % build_out_dir)
+        raise FileNotFoundError(f"No Bouffalo SDK OTA payloads found in {build_out_dir}")
 
     generated = []
     for payload in payloads:
