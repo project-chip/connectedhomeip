@@ -14,8 +14,10 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libTestTLSCertificateManagementCluster"
@@ -32,4 +34,26 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
   ]
+}
+
+if (pw_enable_fuzz_test_targets) {
+  # Fuzzes the TlsCertificateManagement storage engine (CertificateTableImpl):
+  # variable-length DER cert bytes copied into the fixed-size persistence
+  # buffers + the pubkey-extract path.
+  chip_pw_fuzz_target("fuzz-tls-certificate-management-pw") {
+    test_source = [ "FuzzTLSCertificateManagementPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/app/clusters/tls-certificate-management-server",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
+      "${chip_root}/src/credentials",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/core:string-builder-adapters",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/platform",
+      "${chip_root}/src/platform/logging:default",
+      "${chip_root}/src/protocols",
+    ]
+  }
 }
