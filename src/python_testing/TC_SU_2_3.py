@@ -206,7 +206,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
         self.terminate_provider()
-
+        self.current_provider_app_proc = None
         self.step(2)
         # NOTE: Step skipped not implemented in spec.
 
