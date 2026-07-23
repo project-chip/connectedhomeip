@@ -42,7 +42,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             ? std::string(languageCode.Value().data(), languageCode.Value().size())
             : std::string(),
         (messageUri.HasValue() && !messageUri.Value().empty()) ? std::string(messageUri.Value().data(), messageUri.Value().size())
-                                                                : std::string());
+                                                               : std::string());
     if (responses.HasValue())
     {
         auto iter = responses.Value().begin();

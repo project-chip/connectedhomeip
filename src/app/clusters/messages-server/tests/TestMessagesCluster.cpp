@@ -36,11 +36,11 @@ constexpr EndpointId kTestEndpointId = 1;
 class FakeMessagesDelegate : public Delegate
 {
 public:
-    CHIP_ERROR HandlePresentMessagesRequest(
-        const ByteSpan &, const MessagePriorityEnum &, const chip::BitMask<MessageControlBitmap> &,
-        const DataModel::Nullable<uint32_t> &, const DataModel::Nullable<uint64_t> &, const CharSpan &,
-        const chip::Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::Type>> &,
-        const chip::Optional<CharSpan> &, const chip::Optional<CharSpan> &) override
+    CHIP_ERROR
+    HandlePresentMessagesRequest(const ByteSpan &, const MessagePriorityEnum &, const chip::BitMask<MessageControlBitmap> &,
+                                 const DataModel::Nullable<uint32_t> &, const DataModel::Nullable<uint64_t> &, const CharSpan &,
+                                 const chip::Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::Type>> &,
+                                 const chip::Optional<CharSpan> &, const chip::Optional<CharSpan> &) override
     {
         return CHIP_NO_ERROR;
     }
@@ -84,7 +84,7 @@ Commands::PresentMessagesRequest::Type MakeValidRequest()
 
     Commands::PresentMessagesRequest::Type request;
     request.messageID   = ByteSpan(kMessageId);
-    request.priority     = MessagePriorityEnum::kLow;
+    request.priority    = MessagePriorityEnum::kLow;
     request.messageText = "Hello"_span;
     return request;
 }
@@ -130,8 +130,8 @@ TEST_F(TestMessagesCluster, ValidRequestSucceeds)
 TEST_F(TestMessagesCluster, InvalidMessageIdLengthRejected)
 {
     static const uint8_t kShortId[4] = { 0, 1, 2, 3 };
-    auto request                    = MakeValidRequest();
-    request.messageID               = ByteSpan(kShortId);
+    auto request                     = MakeValidRequest();
+    request.messageID                = ByteSpan(kShortId);
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::ConstraintError);
 }
 
@@ -141,7 +141,7 @@ TEST_F(TestMessagesCluster, MessageTextTooLongRejected)
     memset(longText, 'a', sizeof(longText) - 1);
     longText[sizeof(longText) - 1] = '\0';
 
-    auto request         = MakeValidRequest();
+    auto request        = MakeValidRequest();
     request.messageText = CharSpan::fromCharString(longText);
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::ConstraintError);
 }
@@ -285,7 +285,7 @@ TEST_F(TestMessagesCluster, ResponsesWithConfirmationResponseFeatureSucceeds)
     option.label             = MakeOptional("Yes"_span);
 
     mDelegate.SetFeatureMap(to_underlying(Feature::kConfirmationResponse));
-    auto request       = MakeValidRequest();
+    auto request      = MakeValidRequest();
     request.responses = MakeOptional(DataModel::List<const Structs::MessageResponseOptionStruct::Type>(&option, 1));
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::Success);
 }
@@ -300,7 +300,7 @@ TEST_F(TestMessagesCluster, TooManyResponseOptionsRejected)
     }
 
     mDelegate.SetFeatureMap(to_underlying(Feature::kConfirmationResponse));
-    auto request       = MakeValidRequest();
+    auto request      = MakeValidRequest();
     request.responses = MakeOptional(DataModel::List<const Structs::MessageResponseOptionStruct::Type>(options, 5));
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::ConstraintError);
 }
@@ -312,7 +312,7 @@ TEST_F(TestMessagesCluster, ResponseOptionMissingIdRejected)
     // messageResponseID intentionally omitted.
 
     mDelegate.SetFeatureMap(to_underlying(Feature::kConfirmationResponse));
-    auto request       = MakeValidRequest();
+    auto request      = MakeValidRequest();
     request.responses = MakeOptional(DataModel::List<const Structs::MessageResponseOptionStruct::Type>(&option, 1));
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::InvalidCommand);
 }
@@ -328,7 +328,7 @@ TEST_F(TestMessagesCluster, ResponseOptionLabelTooLongRejected)
     option.label             = MakeOptional(CharSpan::fromCharString(longLabel));
 
     mDelegate.SetFeatureMap(to_underlying(Feature::kConfirmationResponse));
-    auto request       = MakeValidRequest();
+    auto request      = MakeValidRequest();
     request.responses = MakeOptional(DataModel::List<const Structs::MessageResponseOptionStruct::Type>(&option, 1));
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::ConstraintError);
 }
