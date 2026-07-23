@@ -40,11 +40,7 @@ void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
     otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
     otaChange.OtaStateChanged.newState = newState;
     CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
-    }
+    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 } // namespace
@@ -52,11 +48,7 @@ void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
 bool MultiImageOTAProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        return false;
-    }
-
+    VerifyOrReturnError(requestor != nullptr, false);
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
 
@@ -68,18 +60,11 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ConfirmCurrentImage()
 CHIP_ERROR MultiImageOTAProcessorImpl::ConfirmOTASuccess()
 {
     OTARequestorInterface * requestor = GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);
 
     uint32_t currentVersion;
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
-    if (currentVersion != requestor->GetTargetVersion())
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
+    VerifyOrReturnError(currentVersion == requestor->GetTargetVersion(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
@@ -110,11 +95,8 @@ CHIP_ERROR MultiImageOTAProcessorImpl::Abort()
 CHIP_ERROR MultiImageOTAProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     CHIP_ERROR err = SetBlock(block);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format()));
     LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this)));
     return CHIP_NO_ERROR;
 }
@@ -123,7 +105,6 @@ CHIP_ERROR MultiImageOTAProcessorImpl::RegisterProcessor(ImageProcessorEntry & e
 {
     VerifyOrReturnError(entry.processor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(entry.tag != 0, CHIP_ERROR_INVALID_ARGUMENT);
-
     for (auto * current = mRegistryHead; current != nullptr; current = current->next)
     {
         VerifyOrReturnError(current->tag != entry.tag, CHIP_ERROR_DUPLICATE_KEY_ID);
@@ -137,16 +118,8 @@ CHIP_ERROR MultiImageOTAProcessorImpl::RegisterProcessor(ImageProcessorEntry & e
 void MultiImageOTAProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<MultiImageOTAProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
-    else if (imageProcessor->mDownloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "mDownloader is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor->mDownloader, ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mMultiOTAImageHeaderParser.Init();
@@ -185,11 +158,7 @@ void MultiImageOTAProcessorImpl::HandleFinalize(intptr_t context)
 void MultiImageOTAProcessorImpl::HandleAbort(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<MultiImageOTAProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     const AbortReason reason = (imageProcessor->mLastErr != CHIP_NO_ERROR) ? AbortReason::kError : AbortReason::kCancelled;
     imageProcessor->AbortSubProcessors(reason, imageProcessor->mLastErr);
@@ -201,16 +170,8 @@ void MultiImageOTAProcessorImpl::HandleAbort(intptr_t context)
 void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<MultiImageOTAProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
-    else if (imageProcessor->mDownloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "mDownloader is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor->mDownloader, ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     ByteSpan block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
 
@@ -388,11 +349,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
 void MultiImageOTAProcessorImpl::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<MultiImageOTAProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
-        return;
-    }
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
 
@@ -435,11 +392,8 @@ CHIP_ERROR MultiImageOTAProcessorImpl::SetBlock(ByteSpan & block)
         mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format()));
     return CHIP_NO_ERROR;
 }
 
@@ -520,16 +474,14 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
 
 CHIP_ERROR MultiImageOTAProcessorImpl::GetSubProcessor(OTAProcessorTag tag, SubImageProcessor *& processor) const
 {
-    processor                   = nullptr;
-    ImageProcessorEntry * entry = mRegistryHead;
-    while (entry != nullptr)
+    processor = nullptr;
+    for (ImageProcessorEntry * entry = mRegistryHead; entry != nullptr; entry = entry->next)
     {
         if (entry->tag == tag)
         {
             processor = entry->processor;
             return CHIP_NO_ERROR;
         }
-        entry = entry->next;
     }
     return CHIP_ERROR_NOT_FOUND;
 }

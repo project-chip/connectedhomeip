@@ -40,7 +40,7 @@
 #include "esp_check.h"
 #include "esp_rcp_ota.h"
 #include "esp_rcp_update.h"
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
 
 using namespace chip::DeviceLayer;
 using namespace chip;
@@ -134,7 +134,7 @@ esp_err_t OTARcpProcessorImpl::OnOtaRcpAbort()
 }
 
 OTARcpProcessorImpl gOtaRcpDelegate;
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
 
 // WARNING: This is just an example for using key for decrypting the encrypted OTA image
 // Please do not use it as is for production use cases
@@ -167,7 +167,7 @@ void OTAHelpers::InitOTARequestor()
         gImageProcessor.SetOTADownloader(&gDownloader);
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && !defined(CONFIG_ENABLE_MULTI_IMAGE_OTA)
         gImageProcessor.SetOtaRcpDelegate(&gOtaRcpDelegate);
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
@@ -176,7 +176,7 @@ void OTAHelpers::InitOTARequestor()
         LogErrorOnFailure(gAppImageProcessor.InitEncryptedOTA(sOTADecryptionKey));
 #else
         gImageProcessor.InitEncryptedOTA(sOTADecryptionKey);
-#endif
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
         if (gUserConsentState != chip::ota::UserConsentState::kUnknown)

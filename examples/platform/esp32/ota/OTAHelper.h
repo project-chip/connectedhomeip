@@ -22,7 +22,7 @@
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
 #include <lib/core/CHIPError.h>
 #include <platform/ESP32/multi_ota/MultiImageOTAProcessorImpl.h>
-#endif
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 
 class OTAHelpers
 {
@@ -37,7 +37,7 @@ public:
 
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
     CHIP_ERROR RegisterSubImageProcessor(chip::ImageProcessorEntry & entry);
-#endif
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 };
 
 namespace chip {

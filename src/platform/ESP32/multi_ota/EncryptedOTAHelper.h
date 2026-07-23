@@ -27,8 +27,7 @@ namespace chip {
  * @brief Adds pre-encrypted OTA support to a sub-image processor (esp_encrypted_img).
  *
  * Inherited by a processor that handles encrypted images: the key is supplied once via the public
- * InitEncryptedOTA(), and the protected hooks decrypt each chunk during the transfer. The mechanics
- * are protected so inheriting the helper does not widen the processor's public interface.
+ * InitEncryptedOTA(), and the protected hooks decrypt each chunk during the transfer.
  */
 class EncryptedOTAHelper
 {

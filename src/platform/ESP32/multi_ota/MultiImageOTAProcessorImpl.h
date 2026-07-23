@@ -63,6 +63,9 @@ public:
     /**
      * @brief Registers a sub-processor for an image-ID tag.
      *
+     * The order of registration determines the order of Apply(), Abort() calls.
+     * The app image, which is registered first, ends up last in the list and is applied last.
+     *
      * @param entry Entry node to register. Ownership remains with the caller.
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the
      *         processor is null or the tag is 0, or
@@ -76,8 +79,8 @@ public:
      * Called after a successful download, before the apply phase. The application
      * can inspect the per-sub-image results and decide whether to proceed.
      *
-     * Runs on the Matter thread and must not block. The default implementation
-     * always returns true.
+     * Invoked on the CHIP (Matter) event loop thread; must not block. The
+     * default implementation always returns true.
      *
      * @return true to apply the update; false to discard it.
      */
@@ -90,7 +93,7 @@ public:
      * confirms the running software version matches the target version. Override
      * this method to perform custom validation instead.
      *
-     * Runs on the Matter thread early during boot and must not block.
+     * Invoked on the CHIP (Matter) event loop thread; must not block.
      *
      * @return CHIP_NO_ERROR to accept the new image; otherwise an error to reject it.
      */

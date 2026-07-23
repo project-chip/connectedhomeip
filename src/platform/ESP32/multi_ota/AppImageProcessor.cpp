@@ -50,7 +50,7 @@ CHIP_ERROR AppImageProcessor::Init(const SubImageHeader &)
     mPatchHeaderRead     = 0;
     mImgHeaderVerified   = false;
     mImgHeaderRead       = 0;
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
     return CHIP_NO_ERROR;
 }
 
@@ -80,7 +80,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         esp_err_t err = esp_ota_begin(mPartition, OTA_SIZE_UNKNOWN, &mOtaHandle);
 #else
         esp_err_t err = esp_ota_begin(mPartition, OTA_WITH_SEQUENTIAL_WRITES, &mOtaHandle);
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
         VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,
                             ChipLogError(SoftwareUpdate, "esp_ota_begin failed: %s", esp_err_to_name(err)));
 
@@ -89,7 +89,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         {
             ReturnErrorOnFailure(DecryptStart());
         }
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
         esp_delta_ota_cfg_t cfg     = {};
@@ -99,7 +99,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         mDeltaHandle                = esp_delta_ota_init(&cfg);
         VerifyOrReturnError(mDeltaHandle != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(SoftwareUpdate, "esp_delta_ota_init failed"));
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
     }
 
     // Decrypt chunk if needed
@@ -110,7 +110,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         ReturnErrorOnFailure(Decrypt(block, bytes));
         VerifyOrReturnError(!bytes.empty(), CHIP_NO_ERROR);
     }
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
     // Apply as a delta patch, or write straight to the partition.
 #ifdef CONFIG_ENABLE_DELTA_OTA
@@ -132,7 +132,7 @@ CHIP_ERROR AppImageProcessor::Finish()
     {
         ReturnErrorOnFailure(DecryptEnd());
     }
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 #ifdef CONFIG_ENABLE_DELTA_OTA
     if (mDeltaHandle != nullptr)
     {
@@ -144,7 +144,7 @@ CHIP_ERROR AppImageProcessor::Finish()
         VerifyOrReturnError(derr == ESP_OK, CHIP_ERROR_INTERNAL,
                             ChipLogError(SoftwareUpdate, "esp_delta_ota_deinit failed: %s", esp_err_to_name(derr)));
     }
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
 
     esp_err_t err = esp_ota_end(mOtaHandle);
     VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,
@@ -167,7 +167,7 @@ void AppImageProcessor::Abort(AbortContext & context)
     }
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     DecryptAbort();
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 #ifdef CONFIG_ENABLE_DELTA_OTA
     if (mDeltaHandle != nullptr)
     {
@@ -178,7 +178,7 @@ void AppImageProcessor::Abort(AbortContext & context)
     mPatchHeaderRead     = 0;
     mImgHeaderVerified   = false;
     mImgHeaderRead       = 0;
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
     mPartition   = nullptr;
     mInitialized = false;
 }
@@ -197,7 +197,7 @@ CHIP_ERROR AppImageProcessor::Apply()
                                                                HandleRestart, nullptr));
 #else
     ChipLogProgress(SoftwareUpdate, "Please reboot the device manually to apply the new image");
-#endif
+#endif // CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     return CHIP_NO_ERROR;
 }
 
@@ -237,23 +237,17 @@ esp_err_t AppImageProcessor::WritePatchedOutput(const uint8_t * buf, size_t size
         mImgHeaderRead = 0;
 
         const esp_image_header_t * header = reinterpret_cast<const esp_image_header_t *>(mImgHeader);
-        if (header->chip_id != CONFIG_IDF_FIRMWARE_CHIP_ID)
-        {
-            ChipLogError(SoftwareUpdate, "Delta: chip id mismatch (got %d, expected %d)", header->chip_id,
-                         CONFIG_IDF_FIRMWARE_CHIP_ID);
-            return ESP_ERR_INVALID_VERSION;
-        }
+        VerifyOrReturnValue(header->chip_id == CONFIG_IDF_FIRMWARE_CHIP_ID, ESP_ERR_INVALID_VERSION,
+                            ChipLogError(SoftwareUpdate, "Delta: chip id mismatch (got %d, expected %d)", header->chip_id,
+                                         CONFIG_IDF_FIRMWARE_CHIP_ID));
         mImgHeaderVerified = true;
-
+        // Write the image header, then fall through to write the rest of this chunk.
         esp_err_t err = esp_ota_write(mOtaHandle, mImgHeader, sizeof(esp_image_header_t));
         VerifyOrReturnValue(err == ESP_OK, err);
     }
 
     // The image header may have consumed the whole chunk; nothing left to write.
-    if (size == index)
-    {
-        return ESP_OK;
-    }
+    VerifyOrReturnValue(size != index, ESP_OK);
     return esp_ota_write(mOtaHandle, buf + index, size - index);
 }
 

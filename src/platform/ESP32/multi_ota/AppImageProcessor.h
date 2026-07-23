@@ -23,12 +23,12 @@
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
 #include "EncryptedOTAHelper.h"
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #ifdef CONFIG_ENABLE_DELTA_OTA
 #include <esp_app_format.h>
 #include <esp_delta_ota.h>
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
 
 namespace chip {
 
@@ -40,7 +40,7 @@ class AppImageProcessor : public SubImageProcessor
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     ,
                           public EncryptedOTAHelper
-#endif
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 {
 public:
     CHIP_ERROR Init(const SubImageHeader & entry) override;
@@ -76,7 +76,7 @@ private:
     bool mImgHeaderVerified = false;
     size_t mImgHeaderRead   = 0;
     uint8_t mImgHeader[sizeof(esp_image_header_t)];
-#endif
+#endif // CONFIG_ENABLE_DELTA_OTA
 };
 
 } // namespace chip

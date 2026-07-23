@@ -25,9 +25,9 @@ namespace chip {
 enum class DeviceState : uint8_t
 {
     kUnknown,
-    kReady,           // proceed — Dispatcher calls Init() then Write()
-    kNotReady,        // skip — component unavailable; blocks softwareVersion confirmation
-    kAlreadyUpToDate, // skip — component already at targetVersion; counts as verified
+    kReady,           // proceed — stream chunks to Write()
+    kNotReady,        // skip — component unavailable or not ready this cycle
+    kAlreadyUpToDate, // skip — component already at target version
 };
 
 enum class AbortReason : uint8_t
@@ -45,6 +45,8 @@ struct AbortContext
 
 /**
  * @brief Handles a single sub-image in a multi-image OTA bundle.
+ *
+ * All methods are invoked on the CHIP (Matter) event loop thread and must not block.
  */
 class SubImageProcessor
 {
