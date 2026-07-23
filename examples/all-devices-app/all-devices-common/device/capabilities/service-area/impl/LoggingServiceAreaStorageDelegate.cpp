@@ -69,8 +69,8 @@ bool LoggingServiceAreaStorageDelegate::AddSupportedAreaRaw(const AreaStructureW
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedAreaRaw %u - supported areas list is already at maximum size %u", newArea.areaID,
-                 static_cast<unsigned>(kMaxNumSupportedAreas));
+    ChipLogError(Zcl, "AddSupportedAreaRaw %u - supported areas list is already at maximum size %u",
+                 static_cast<unsigned>(newArea.areaID), static_cast<unsigned>(kMaxNumSupportedAreas));
 
     return false;
 }
@@ -81,8 +81,8 @@ bool LoggingServiceAreaStorageDelegate::ModifySupportedAreaRaw(uint32_t listInde
     // etc.
     if (modifiedArea.areaID != mSupportedAreas[listIndex].areaID)
     {
-        ChipLogError(Zcl, "ModifySupportedAreaRaw - areaID's do not match, new areaID %u, existing areaID %u", modifiedArea.areaID,
-                     mSupportedAreas[listIndex].areaID);
+        ChipLogError(Zcl, "ModifySupportedAreaRaw - areaID's do not match, new areaID %u, existing areaID %u",
+                     static_cast<unsigned>(modifiedArea.areaID), static_cast<unsigned>(mSupportedAreas[listIndex].areaID));
         return false;
     }
 
@@ -164,8 +164,8 @@ bool LoggingServiceAreaStorageDelegate::AddSupportedMapRaw(const MapStructureWra
         return true;
     }
 
-    ChipLogError(Zcl, "AddSupportedMapRaw %u - supported maps list is already at maximum size %u", newMap.mapID,
-                 static_cast<unsigned>(kMaxNumSupportedMaps));
+    ChipLogError(Zcl, "AddSupportedMapRaw %u - supported maps list is already at maximum size %u",
+                 static_cast<unsigned>(newMap.mapID), static_cast<unsigned>(kMaxNumSupportedMaps));
 
     return false;
 }
@@ -176,8 +176,8 @@ bool LoggingServiceAreaStorageDelegate::ModifySupportedMapRaw(uint32_t listIndex
     // etc.
     if (modifiedMap.mapID != mSupportedMaps[listIndex].mapID)
     {
-        ChipLogError(Zcl, "ModifySupportedMapRaw - mapID's do not match, new mapID %u, existing mapID %u", modifiedMap.mapID,
-                     mSupportedMaps[listIndex].mapID);
+        ChipLogError(Zcl, "ModifySupportedMapRaw - mapID's do not match, new mapID %u, existing mapID %u",
+                     static_cast<unsigned>(modifiedMap.mapID), static_cast<unsigned>(mSupportedMaps[listIndex].mapID));
         return false;
     }
 
@@ -240,8 +240,8 @@ bool LoggingServiceAreaStorageDelegate::AddSelectedAreaRaw(uint32_t aAreaId, uin
         return true;
     }
 
-    ChipLogError(Zcl, "AddSelectedAreaRaw %u - selected areas list is already at maximum size %u", aAreaId,
-                 static_cast<unsigned>(kMaxNumSelectedAreas));
+    ChipLogError(Zcl, "AddSelectedAreaRaw %u - selected areas list is already at maximum size %u",
+                 static_cast<unsigned>(aAreaId), static_cast<unsigned>(kMaxNumSelectedAreas));
 
     return false;
 }
@@ -322,8 +322,8 @@ bool LoggingServiceAreaStorageDelegate::AddProgressElementRaw(const Structs::Pro
         return true;
     }
 
-    ChipLogError(Zcl, "AddProgressElementRaw %u - progress list is already at maximum size %u", newProgressElement.areaID,
-                 static_cast<unsigned>(kMaxNumProgressElements));
+    ChipLogError(Zcl, "AddProgressElementRaw %u - progress list is already at maximum size %u",
+                 static_cast<unsigned>(newProgressElement.areaID), static_cast<unsigned>(kMaxNumProgressElements));
 
     return false;
 }
@@ -334,7 +334,8 @@ bool LoggingServiceAreaStorageDelegate::ModifyProgressElementRaw(uint32_t listIn
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {
         ChipLogError(Zcl, "ModifyProgressElementRaw - areaID's do not match, new areaID %u, existing areaID %u",
-                     modifiedProgressElement.areaID, mProgressList[listIndex].areaID);
+                     static_cast<unsigned>(modifiedProgressElement.areaID),
+                     static_cast<unsigned>(mProgressList[listIndex].areaID));
         return false;
     }
 
