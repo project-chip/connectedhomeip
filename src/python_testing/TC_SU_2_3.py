@@ -96,7 +96,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             logger.info("Terminating existing OTA Provider")
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
-        super().teardown_test()
+        return await super().teardown_test()
 
     @async_test_body
     async def test_TC_SU_2_3(self):
