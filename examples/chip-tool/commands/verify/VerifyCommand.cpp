@@ -81,14 +81,30 @@ void VerifyCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommiss
                                                  const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                                  chip::Credentials::AttestationVerificationResult attestationResult)
 {
-    ByteSpan dac = info.dacDerBuffer();
-    ByteSpan pai = info.paiDerBuffer();
+    ByteSpan dac          = info.dacDerBuffer();
+    ByteSpan pai          = info.paiDerBuffer();
+    Optional<ByteSpan> cd = info.cdBuffer();
 
     mDacDerBuffer      = dac;
     mPaiDerBuffer      = pai;
+    mCdBuffer          = cd;
     mVendorId          = info.BasicInformationVendorId();
     mProductId         = info.BasicInformationProductId();
     mAttestationResult = attestationResult;
+
+    uint8_t paiAkidBuf[chip::Crypto::kAuthorityKeyIdentifierLength];
+    chip::MutableByteSpan paiAkid(paiAkidBuf);
+    if (chip::Crypto::ExtractAKIDFromX509Cert(pai, paiAkid) == CHIP_NO_ERROR)
+    {
+        chip::MutableByteSpan paaDerBuffer(mPaaCertBuf);
+
+        const chip::Credentials::AttestationTrustStore * trustStore = chip::Credentials::GetTestAttestationTrustStore();
+
+        if (trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer) == CHIP_NO_ERROR)
+        {
+            mPaaDerBuffer = Optional(ByteSpan(paaDerBuffer.data(), paaDerBuffer.size()));
+        }
+    }
 
     CHIP_ERROR err = CurrentCommissioner().StopPairing(mNodeId);
     VerifyOrDie(err == CHIP_NO_ERROR);
@@ -141,11 +157,38 @@ void VerifyCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & n
 void VerifyCommand::PrintDeviceInformation()
 {
 
-    printf("VendorId: %d\n", mVendorId);
-    printf("ProductId: %d\n", mProductId);
+    printf("VendorId: 0x%04X\n", mVendorId);
+    printf("ProductId: 0x%04X\n", mProductId);
 
-    PrintCert("DAC", mDacDerBuffer);
-    PrintCert("PAI", mPaiDerBuffer);
+    printf("DAC:\n");
+    PrintCert("CERTIFICATE", mDacDerBuffer);
+    printf("PAI:\n");
+    PrintCert("CERTIFICATE", mPaiDerBuffer);
+
+    if (mCdBuffer.HasValue())
+    {
+        auto & cdBuffer = mCdBuffer.Value();
+        printf("CD:\n");
+        for (size_t i = 0; i < cdBuffer.size(); i++)
+        {
+            printf("%02x", cdBuffer[i]);
+        }
+        printf("\n");
+    }
+    else
+    {
+        printf("No CD\n");
+    }
+
+    if (mPaaDerBuffer.HasValue())
+    {
+        printf("PAA:\n");
+        PrintCert("CERTIFICATE", mPaaDerBuffer.Value());
+    }
+    else
+    {
+        printf("No PAA\n");
+    }
 
     if (mAttestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
     {

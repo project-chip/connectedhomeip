@@ -104,7 +104,9 @@ private:
     // Device attestation information
     chip::ByteSpan mDacDerBuffer;
     chip::ByteSpan mPaiDerBuffer;
-    chip::ByteSpan mCdBuffer;
+    chip::Optional<chip::ByteSpan> mCdBuffer;
+    uint8_t mPaaCertBuf[chip::Credentials::kMaxDERCertLength];
+    chip::Optional<chip::ByteSpan> mPaaDerBuffer;
     uint16_t mVendorId;
     uint16_t mProductId;
     chip::Credentials::AttestationVerificationResult mAttestationResult;
