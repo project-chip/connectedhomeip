@@ -23,6 +23,7 @@ nxp:
     - "third_party/simw-top-mini/**"
     - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
+    - ".github/workflows/examples-nxp.yaml"
 
 silabs:
   maintainers:
@@ -67,6 +68,41 @@ telink:
     - "config/telink/**"
     - "scripts/tools/telink/**"
 
+realtek:
+  maintainers:
+    - pankore
+    - shensaifeng
+  paths:
+    - "src/platform/realtek/**"
+    - "src/platform/Ameba/**"
+    - "examples/platform/realtek/**"
+    - "examples/platform/ameba/**"
+    - "examples/**/realtek/**"
+    - "examples/**/ameba/**"
+    - "config/realtek/**"
+    - "config/ameba/**"
+    - "scripts/tools/realtek/**"
+
+mediatek:
+  maintainers:
+    - RyanHo-MTK
+    - as23999
+  paths:
+    - "src/platform/mt793x/**"
+    - "examples/lighting-app/genio/**"
+    - "third_party/mt793x_sdk/**"
+
+stm32:
+  maintainers:
+    - STYoannZamaron
+    - Pierre-B-GHub
+  paths:
+    - "src/platform/stm32/**"
+    - "examples/platform/stm32/**"
+    - "examples/**/stm32/**"
+    - "config/stm32/**"
+    - "third_party/st/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -89,19 +125,6 @@ telink:
 #     - "examples/platform/tizen/**"
 #     - "examples/**/tizen/**"
 #     - "config/tizen/**"
-# 
-# realtek:
-#   maintainers:
-#     - pankore
-#   paths:
-#     - "src/platform/realtek/**"
-#     - "src/platform/Ameba/**"
-#     - "examples/platform/realtek/**"
-#     - "examples/platform/ameba/**"
-#     - "examples/**/realtek/**"
-#     - "examples/**/ameba/**"
-#     - "config/realtek/**"
-#     - "config/ameba/**"
 # 
 # asr:
 #   maintainers:
@@ -140,28 +163,12 @@ telink:
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
-# 
-# stm32:
-#   maintainers:
-#     - STYoannZamaron
-#   paths:
-#     - "src/platform/stm32/**"
-#     - "examples/platform/stm32/**"
-#     - "examples/**/stm32/**"
-#     - "config/stm32/**"
-# 
+#
 # webos:
 #   maintainers:
 #     - joonhaengHeo
 #   paths:
 #     - "src/platform/webos/**"
-# 
-# mt793x:
-#   maintainers:
-#     - pakls
-#   paths:
-#     - "src/platform/mt793x/**"
-#     - "examples/platform/mt793x/**"
 # 
 # ti:
 #   maintainers:

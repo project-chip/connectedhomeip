@@ -32,16 +32,17 @@ import textwrap
 import threading
 import time
 import typing
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
-from typing import Any, Callable, Optional, TypeAlias
+from typing import Any, TypeAlias
 
 import matter.testing.matchers as matchers
 
 # isort: off
 
-from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
+from matter import ChipDeviceCtrl, discovery  # Needed before matter.FabricAdmin
 import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 import matter.CertificateAuthority
 
@@ -59,12 +60,15 @@ from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
-from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                          get_setup_payload_info_config)
+from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_device,
+                                          commission_devices, get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
+                                           resolve_harness_value)
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
@@ -98,7 +102,27 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
-def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+def compute_mrp_retransmission_timeout_sec(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, node_id: int) -> float:
+    """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+    session_params = dev_ctrl.GetRemoteSessionParameters(node_id)
+    # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
+    # idle=500ms, active=300ms.
+    negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else None
+    negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else None
+    if negotiated_idle_interval_ms is None:
+        negotiated_idle_interval_ms = 500
+    if negotiated_active_interval_ms is None:
+        negotiated_active_interval_ms = 300
+
+    # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+    base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+    # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+    backoff_sum = 1 + 1.6 + 2.56 + 4.096
+    return base_interval_ms * backoff_sum * 1.375 / 1000.0
+
+
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
     created_codes = []
     for idx, discriminator in enumerate(matter_test_config.discriminators):
         created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
@@ -114,7 +138,7 @@ class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
-    timestamp_utc: Optional[datetime] = None
+    timestamp_utc: datetime | None = None
 
 
 class AttributeMatcher:
@@ -209,7 +233,7 @@ class BackgroundWildcardSubscriptionCache:
         _lock: Threading lock for thread-safe access to internal data structures.
     """
 
-    def __init__(self, excluded_attribute_ids: Optional[frozenset[tuple[int, int]]] = None):
+    def __init__(self, excluded_attribute_ids: frozenset[tuple[int, int]] | None = None):
         """Initialize the background wildcard subscription cache.
 
         Parameters:
@@ -218,7 +242,7 @@ class BackgroundWildcardSubscriptionCache:
                 XmlAttribute.changes_omitted / XmlAttribute.quieter_reporting flags in
                 spec_parsing to exclude C- and Q-quality attributes from subscription checks.
         """
-        self._subscription: Optional[Any] = None
+        self._subscription: Any | None = None
         self._excluded_attribute_ids: frozenset[tuple[int, int]] = excluded_attribute_ids or frozenset()
         self._q: queue.Queue = queue.Queue()
         self._attribute_reports: dict[tuple, list[AttributeValue]] = {}
@@ -406,7 +430,7 @@ class BackgroundWildcardSubscriptionCache:
         with self._lock:
             return list(self._attribute_reports.keys())
 
-    def get_latest_value(self, endpoint_id: int, cluster_id: int, attr_id: int) -> Optional[Any]:
+    def get_latest_value(self, endpoint_id: int, cluster_id: int, attr_id: int) -> Any | None:
         """Return the most recently reported value for the given attribute, or None if not yet seen.
 
         Parameters:
@@ -524,7 +548,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
+        self.cached_steps: dict[str, list[TestStep] | None] = {}
         self.cleanup_config = TestCleanupConfig()
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
@@ -689,7 +713,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             or getattr(self, "disable_wildcard_subscription", False)
         )
 
-    def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: Optional[bool]) -> bool:
+    def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: bool | None) -> bool:
         """Resolve whether to compare a read against the wildcard subscription cache."""
         if verify_wildcard_subscription is not None:
             return verify_wildcard_subscription
@@ -1407,6 +1431,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._teardown_ran = False
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
+        self._validate_test_parameters()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
         # in teardown_class. Skip when the DUT is not known to be available: unit tests
         # never commission a device so _dut_confirmed_available stays False, and
@@ -1517,6 +1542,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing failure information.
         """
         self.failed = True
+        if not self.is_commissioning:
+            test_method = getattr(self, self.current_test_info.name, None)
+            param_dump = format_declared_parameters_for_failure(
+                test_method, self.user_params, self.matter_test_config
+            )
+            if param_dump:
+                LOGGER.error(param_dump)
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
 
@@ -1692,7 +1724,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.matter_test_config.dut_node_ids[0]
 
     @property
-    def first_setup_code(self) -> Optional[str]:
+    def first_setup_code(self) -> str | None:
         return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
@@ -1707,6 +1739,68 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Parameter Getters
     #
+
+    def pixit(self, name: str, default: Any = None) -> Any:
+        """Get a declared PIXIT value by name.
+
+        Retrieves the value from user_params. If not found, optional PIXITs may
+        fall back to the default specified in the @pixit decorator; required
+        PIXITs do not use decorator defaults (setup validation must supply them).
+        Otherwise falls back to the ``default`` argument of this method.
+
+        Args:
+            name: The PIXIT parameter name (as declared in @pixit).
+            default: Fallback default if no value is found and no decorator default exists.
+
+        Returns:
+            The PIXIT value, or the default.
+        """
+        value = self.user_params.get(name)
+        if value is not None:
+            return value
+
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method:
+            for pixit_def in get_pixit_definitions(test_method):
+                if pixit_def.name == name:
+                    if (not pixit_def.required
+                            and pixit_def.default is not _PIXIT_NO_DEFAULT):
+                        return pixit_def.default
+                    return default
+        return default
+
+    def harness_param(self, name: str) -> Any:
+        """Return a declared harness parameter value from ``matter_test_config``.
+
+        Returns the direct config value when available. For ``discriminator`` /
+        ``passcode`` satisfied only via ``--qr-code`` or ``--manual-code``, returns
+        ``None`` because the decoded value is not on ``MatterTestConfig``.
+
+        Args:
+            name: Logical name declared with ``@harness_params`` (registry key).
+
+        Raises:
+            ValueError: If ``name`` is not a registered harness parameter.
+        """
+        return resolve_harness_value(name, self.matter_test_config)
+
+    def _validate_test_parameters(self):
+        """Validate declared PIXITs and harness parameters before each test.
+
+        Called from setup_test(). Fails with a combined message if any required
+        PIXIT or harness parameter is missing.
+        """
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method is None:
+            return
+
+        error_msg = format_missing_test_parameters(
+            test_name, test_method, self.user_params, self.matter_test_config
+        )
+        if error_msg:
+            asserts.fail(error_msg)
 
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
@@ -1802,7 +1896,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep] | None:
         """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
 
         Checks for an explicit steps_* method first. If none exists, falls back to
@@ -1824,7 +1918,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.cached_steps[test] = steps
         return steps
 
-    def get_restart_flag_file(self) -> Optional[str]:
+    def get_restart_flag_file(self) -> str | None:
         if self.matter_test_config.restart_flag_file is None:
             return None
         return str(self.matter_test_config.restart_flag_file)
@@ -1841,7 +1935,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
-    def _get_defined_pics(self, test: str) -> Optional[list[str]]:
+    def _get_defined_pics(self, test: str) -> list[str] | None:
         """Retrieve PICS list from a 'pics_*' function or @pics decorator.
 
         The pics_* method takes precedence over the @pics decorator.
@@ -2155,7 +2249,77 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+    async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
+        """Commission a single DUT devices over NTL.
+        The discovery_cap_bitmask is patched to keep only the NTL bit ON.
+
+        Uses the default controller to commission a device over NTL based on setup payload
+        and commissioning configuration.
+
+        Returns:
+            True if commissioning succeeded, False otherwise.
+        """
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+
+        LOGGER.info(
+            "commission_ntl_device. Payload fields: passcode=%s discriminator=%s short_discriminator=%s vendor_id=%s product_id=%s discovery_cap_bitmask=%s commissioning_flow=%s",
+            setup_payload.setup_passcode,
+            setup_payload.long_discriminator,
+            setup_payload.short_discriminator,
+            setup_payload.vendor_id,
+            setup_payload.product_id,
+            format(setup_payload.rendezvous_information, '03b'),
+            setup_payload.commissioning_flow,
+        )
+
+        # Ensure exactly one DUT node id is configured
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        LOGGER.info("Configured DUT node ids: %s", dut_node_ids)
+        asserts.assert_equal(len(dut_node_ids), 1, "Expected exactly one DUT node id in matter_test_config.dut_node_ids")
+        dut_node_id = dut_node_ids[0]
+
+        # Retrieve the long_discriminator
+        long_discriminator = setup_payload.long_discriminator
+        asserts.assert_is_not_none(long_discriminator, "Expected setup payload to contain a long discriminator")
+        long_discriminator = typing.cast(int, long_discriminator)
+
+        # Create a new SetupPayload where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
+        ntl_onboarding_data = SetupPayload().GenerateQrCode(
+            passcode=setup_payload.setup_passcode,
+            vendorId=setup_payload.vendor_id,
+            productId=setup_payload.product_id,
+            discriminator=long_discriminator,
+            customFlow=setup_payload.commissioning_flow,
+            capabilities=0b10000,
+            version=setup_payload.version
+        )
+
+        # Create SetupPayloadInfo from Onboarding data
+        ntl_setup_payload_info = SetupPayloadInfo()
+        ntl_setup_payload_info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+        ntl_setup_payload_info.filter_value = long_discriminator
+        ntl_setup_payload_info.passcode = setup_payload.setup_passcode
+        ntl_setup_payload_info.setup_code = ntl_onboarding_data
+
+        commissioning_info: CommissioningInfo = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
+        )
+
+        pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
+        result = bool(pairing_status)
+        if result:
+            self._dut_confirmed_available = True
+        return result
+
+    async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
 
         Args:
@@ -2184,7 +2348,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True, verify_wildcard_subscription: bool | None = None) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -2225,8 +2389,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_all_endpoints(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None,
-            verify_wildcard_subscription: Optional[bool] = None):
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None,
+            verify_wildcard_subscription: bool | None = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
         Args:
@@ -2276,7 +2440,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: Optional[bool] = None) -> object:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD, verify_wildcard_subscription: bool | None = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -2331,10 +2495,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             self,
             attribute: type[ClusterObjects.ClusterAttributeDescriptor],
             read_value: Any,
-            endpoint_id: Optional[int] = None,
+            endpoint_id: int | None = None,
             test_name: str = "",
             assert_on_error: bool = True,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None) -> bool:
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None) -> bool:
         """Compare a freshly-read attribute value against the background wildcard subscription cache.
 
         Called automatically from the base-class read helpers so any single-attribute read
@@ -2575,7 +2739,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
+            error: Status, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -2599,7 +2763,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: int | None = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -2621,11 +2785,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def read_from_app_pipe(
         self,
-        app_pipe_out: Optional[str] = None,
+        app_pipe_out: str | None = None,
         timeout: float = 2.0,
         max_bytes: int = 66536,
         chunk: int = 4096,
-        ip_env_var: Optional[str] = None,
+        ip_env_var: str | None = None,
     ) -> Any:
         """
         Read an out-of-band command from a Matter app.
@@ -2648,7 +2812,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: str | None = os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2714,7 +2878,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         out_str = out.decode("utf-8").strip()
         return json.loads(out_str)
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: str | None = None, ip_env_var: str | None = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -2751,7 +2915,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         command = json.dumps(command_dict)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: str | None = os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -2775,7 +2939,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
+            dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             timedRequestTimeoutMs: OptionalTimeout = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
@@ -2801,7 +2965,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           payloadCapability=payloadCapability)
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes | None = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -2907,7 +3071,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def wait_for_user_input(self,
                             prompt_msg: str,
                             prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> Optional[str]:
+                            default_value: str = "y") -> str | None:
         """Ask for user input and wait for it.
 
         Args:

@@ -9755,6 +9755,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             Messages(0L),
             ActiveMessageIDs(1L),
+            SupportedLanguageCodes(2L),
+            SupportedMimeTypes(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -9782,7 +9784,8 @@ public class ClusterIDMapping {
         public enum Event {
             MessageQueued(0L),
             MessagePresented(1L),
-            MessageComplete(2L),;
+            MessageComplete(2L),
+            MessageNotPresented(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9822,7 +9825,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),LanguageCode(7),MessageURI(8),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;
@@ -18781,6 +18784,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
+            OAuthLoggedIn(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18829,7 +18833,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetSetupPIN(0L),
             Login(2L),
-            Logout(3L),;
+            Logout(3L),
+            GetDeviceAuthURI(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;

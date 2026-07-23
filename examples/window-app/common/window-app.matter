@@ -515,10 +515,7 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1903,7 +1900,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2862,7 +2859,7 @@ endpoint 1 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 0;
     persist  attribute currentPositionTiltPercentage default = 0;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths;
     ram      attribute targetPositionTiltPercent100ths;
     ram      attribute endProductType default = 0x00;
@@ -2873,7 +2870,7 @@ endpoint 1 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x0;
-    ram      attribute safetyStatus default = 0x0000;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2944,7 +2941,7 @@ endpoint 2 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 0;
     persist  attribute currentPositionTiltPercentage default = 0;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths;
     ram      attribute targetPositionTiltPercent100ths;
     ram      attribute endProductType default = 0x00;
@@ -2955,7 +2952,7 @@ endpoint 2 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
-    ram      attribute safetyStatus default = 0x0000;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

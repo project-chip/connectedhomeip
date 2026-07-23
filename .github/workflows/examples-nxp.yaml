@@ -45,6 +45,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build-nxp:200
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
@@ -147,7 +148,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:200
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:203
+            volumes:
+                - "/:/runner-root-volume"
 
         steps:
             - name: Checkout

@@ -389,7 +389,7 @@ jobs:
                      --commissioning-method ble-thread \
                      --summary-file test-summaries/ble-thread.json \
                   "
-                  rm -rf tmp/
+                  rm -rf /tmp/otbr-agent
 
             - name: Run Thread-MeshCoP commissioning test
               env:
@@ -410,7 +410,7 @@ jobs:
                      --commissioning-method thread-meshcop \
                      --summary-file test-summaries/thread-meshcop.json \
                   "
-                  rm -rf tmp/
+                  rm -rf /tmp/otbr-agent
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -1181,6 +1181,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDefaultWarnings.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestIdChecks.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestMatterTestingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPixitSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestPics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingDataType.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingDeviceType.py'
@@ -1295,6 +1296,11 @@ jobs:
           - name: Checkout
             uses: actions/checkout@v7
 
+          # The gh-pages Allure history is handled several times over on this
+          # runner (checkout, history copy, deploy clone), so free up disk first.
+          - name: Maximize runner disk
+            uses: ./.github/actions/maximize-runner-disk
+
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
             with:
@@ -1324,7 +1330,7 @@ jobs:
                 gh_pages: gh-pages
                 allure_history: allure-history
                 subfolder: allure-report/ci_tests
-                keep_reports: 2000
+                keep_reports: 200
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
@@ -1343,7 +1349,9 @@ jobs:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 publish_dir: allure-history/allure-report/ci_tests
                 destination_dir: allure-report/ci_tests
-                keep_files: true
+                # keep_files: false prunes reports beyond keep_reports from the
+                # branch; scoped to destination_dir, so other subfolders are kept.
+                keep_files: false
 
           - name: Notify Slack on Failure
             if: failure()

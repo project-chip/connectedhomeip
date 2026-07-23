@@ -2311,6 +2311,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRAccountLoginClusterGetDeviceAuthURIParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRAccountLoginClusterGetDeviceAuthURIResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRContentControlClusterUpdatePINParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
