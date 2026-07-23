@@ -86,7 +86,8 @@ class TC_SC_5_2(MatterBaseTest):
 
     async def wait_groupcast_to_unicast_settle_delay(self):
         logger.info(
-            f"Waiting before doing unicast action for {self.groupcast_settle_delay_seconds:.1f} after the multicast action."
+            "Waiting before doing unicast action for %.1f seconds after the multicast action.",
+            self.groupcast_settle_delay_seconds
         )
         await asyncio.sleep(self.groupcast_settle_delay_seconds)
 
@@ -166,8 +167,7 @@ class TC_SC_5_2(MatterBaseTest):
         raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
         if raw_delay is not None:
             self.groupcast_settle_delay_seconds = float(raw_delay)
-            logger.info(
-                f"Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided ({self.groupcast_settle_delay_seconds:.1f} s)")
+            logger.info("Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided (%.1f s)", self.groupcast_settle_delay_seconds)
         elif self.is_pics_sdk_ci_only:
             self.groupcast_settle_delay_seconds = 1.0
             logger.info("CI detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 1 second")
