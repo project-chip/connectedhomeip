@@ -535,6 +535,12 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             mCurrentPASEParameters.SetValue(params);
         }
 
+        // Remember whether this PASE attempt is over NFC so that, if it
+        // fails, OnStatusUpdate can propagate the failure immediately rather
+        // than waiting for BLE/mDNS discovery (which can't produce a useful
+        // alternative for an NFC-tapped target).
+        mLastPASETransportWasNfc = (params.GetPeerAddress().GetTransportType() == Transport::Type::kNfc);
+
         CHIP_ERROR err;
         if (mConnectionType == SetupCodePairerBehaviour::kCommission)
         {
@@ -800,6 +806,29 @@ bool SetUpCodePairer::DiscoveryInProgress() const
     return false;
 }
 
+bool SetUpCodePairer::NonNetworkDiscoveryInProgress() const
+{
+    for (int transport = 0; transport < kTransportTypeCount; ++transport)
+    {
+        // The IP (DNS-SD) transport is always started by Connect() and does
+        // not self-clear for a freshly-tapped NFC target, so it would mask an
+        // otherwise-actionable NFC PASE failure. Ignore it here; the genuine
+        // "another candidate may still arrive" transports are BLE/Wi-Fi
+        // PAF/Thread/NFC.
+        if (transport == kIPTransport)
+        {
+            continue;
+        }
+
+        if (mWaitingForDiscovery[transport])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void SetUpCodePairer::StopPairingIfTransportsExhausted(CHIP_ERROR err)
 {
     if (mWaitingForPASE || !mDiscoveredParameters.empty() || DiscoveryInProgress() || mRemoteId == kUndefinedNodeId)
@@ -835,7 +864,8 @@ void SetUpCodePairer::ResetDiscoveryState()
 
     mDiscoveredParameters.clear();
     mCurrentPASEParameters.ClearValue();
-    mLastPASEError = CHIP_NO_ERROR;
+    mLastPASEError           = CHIP_NO_ERROR;
+    mLastPASETransportWasNfc = false;
 
     mSetupPayloads.clear();
 
@@ -864,23 +894,51 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     if (status == DevicePairingDelegate::Status::SecurePairingFailed)
     {
-        // If we're still waiting on discovery, don't propagate this failure
-        // (which is due to PASE failure with something we discovered, but the
-        // "something" may not have been the right thing) for now.  Wait until
-        // discovery completes.  Then we will either succeed and notify
-        // accordingly or time out and land in OnStatusUpdate again, but at that
-        // point we will not be waiting on discovery anymore.
-        if (!mDiscoveredParameters.empty())
-        {
-            ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
-            return;
-        }
-
-        if (DiscoveryInProgress())
+        // For NFC, we tapped a specific tag — there is no "other device to
+        // try" that could satisfy the request. Waiting for further BLE/mDNS
+        // discovery just adds a silent delay (commissioning times out ~28s
+        // later) and hides a definitive failure (e.g. SPAKE2+ MAC verify ==
+        // setup code mismatch) behind a generic "couldn't complete" error.
+        // Propagate the failure immediately in the NFC case so the user gets
+        // a fast, actionable signal — but ONLY when no other discovered
+        // candidate is queued and no *non-network* transport discovery is in
+        // flight. We deliberately use NonNetworkDiscoveryInProgress() (not
+        // DiscoveryInProgress()) here: Connect() unconditionally starts DNS-SD
+        // for every payload, so mWaitingForDiscovery[kIPTransport] is
+        // effectively always set during commissioning and never self-clears
+        // for a freshly-tapped NFC target (which does not advertise on DNS-SD
+        // until after commissioning). Gating on DiscoveryInProgress() would
+        // therefore always observe true and this fast-fail would never fire in
+        // a real NFC flow. Excluding the IP transport still protects
+        // multi-transport setup-code scenarios where a BLE/Wi-Fi PAF/Thread
+        // candidate may still arrive and succeed even after an NFC PASE
+        // attempt failed.
+        if (mLastPASETransportWasNfc && mDiscoveredParameters.empty() && !NonNetworkDiscoveryInProgress())
         {
             ChipLogProgress(Controller,
-                            "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
-            return;
+                            "SecurePairingFailed over NFC with no other candidates or discovery in flight; "
+                            "propagating immediately (no other discovered device can satisfy an NFC-tapped target)");
+        }
+        else
+        {
+            // If we're still waiting on discovery, don't propagate this failure
+            // (which is due to PASE failure with something we discovered, but the
+            // "something" may not have been the right thing) for now.  Wait until
+            // discovery completes.  Then we will either succeed and notify
+            // accordingly or time out and land in OnStatusUpdate again, but at that
+            // point we will not be waiting on discovery anymore.
+            if (!mDiscoveredParameters.empty())
+            {
+                ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
+                return;
+            }
+
+            if (DiscoveryInProgress())
+            {
+                ChipLogProgress(Controller,
+                                "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
+                return;
+            }
         }
     }
 
@@ -938,6 +996,39 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
         }
     }
     mCurrentPASEParameters.ClearValue();
+
+    // For NFC, the user tapped a specific tag — that is the unique target.
+    // If PASE against the NFC-discovered peer failed and we have no other
+    // queued candidates, no further DNS-SD discovery can satisfy the
+    // request: the freshly-tapped accessory is not advertising on DNS-SD
+    // yet (it only does so post-commissioning), so DNS-SD will not surface
+    // it. Stop the always-on DNS-SD discovery so the actual PASE error
+    // propagates to the delegate immediately rather than being hidden
+    // behind the ~28s discovery timeout (which would in turn deliver a
+    // generic CHIP_ERROR_TIMEOUT, swallowing the real failure cause).
+    //
+    // This MUST mirror the NFC fast-fail gate in OnStatusUpdate. Both
+    // callbacks fire back-to-back for a single PASE failure
+    // (DeviceCommissioner::OnSessionEstablishmentError calls
+    // OnStatusUpdate(SecurePairingFailed) and then
+    // RendezvousCleanup -> OnPairingComplete(err)), so they must agree on
+    // whether to defer to a still-pending non-network candidate. We
+    // therefore gate on !NonNetworkDiscoveryInProgress() (not the
+    // IP-inclusive DiscoveryInProgress()) and stop only DNS-SD (not all
+    // transports): a concurrently-discovering BLE/Wi-Fi PAF/Thread/NFC
+    // transport that OnStatusUpdate just deferred to may still surface an
+    // alternative candidate for the same device, and tearing it down here
+    // would regress multi-transport (e.g. NFC+BLE) setup-code commissioning
+    // to a premature fast-fail. When such a transport is in flight we leave
+    // discovery alone and let TryNextRendezvousParameters() keep waiting.
+    if (mLastPASETransportWasNfc && mDiscoveredParameters.empty() && !NonNetworkDiscoveryInProgress() && DiscoveryInProgress())
+    {
+        ChipLogProgress(Controller,
+                        "PASE over NFC failed with no other candidates queued and no alternative-candidate transport "
+                        "discovering; stopping in-flight DNS-SD and propagating the failure (no other discovered device "
+                        "can satisfy an NFC-tapped target)");
+        LogErrorOnFailure(StopDiscoveryOverDNSSD());
+    }
 
     // We failed to establish PASE.  Try the next thing we have discovered, if
     // any.
