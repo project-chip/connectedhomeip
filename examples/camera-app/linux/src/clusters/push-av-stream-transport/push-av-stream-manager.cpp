@@ -41,6 +41,8 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
         for (auto & kv : mTransportMap)
         {
             mMediaController->UnregisterTransport(kv.second.get());
+            // Release the referenced streams so the HAL pipelines are stopped when no consumer remains.
+            ReleaseStreamsForConnection(kv.first);
         }
     }
     mTransportMap.clear();
@@ -119,16 +121,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
 
     std::vector<uint16_t> videoStreams;
     std::vector<uint16_t> audioStreams;
-
-    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
-    {
-        videoStreams.push_back(transportOptions.videoStreamID.Value().Value());
-    }
-
-    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
-    {
-        audioStreams.push_back(transportOptions.audioStreamID.Value().Value());
-    }
+    GetReferencedStreams(transportOptions, audioStreams, videoStreams);
 
     ChipLogProgress(Camera,
                     "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreams count: [%u], "
@@ -136,6 +129,11 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
                     connectionID, static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
     mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreams, audioStreams);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
+
+    // Acquire the referenced audio/video streams so the HAL pipelines are started for this consumer. Stream pipelines are
+    // started lazily on the first acquire and stopped on the last release.
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(audioStreams,
+                                                                                                                  videoStreams);
 
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
@@ -184,6 +182,44 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     return Status::Success;
 }
 
+void PushAvStreamTransportManager::ReleaseStreamsForConnection(uint16_t connectionID)
+{
+    if (mCameraDevice == nullptr)
+    {
+        return;
+    }
+
+    auto optsIt = mTransportOptionsMap.find(connectionID);
+    if (optsIt == mTransportOptionsMap.end())
+    {
+        return;
+    }
+
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
+    GetReferencedStreams(optsIt->second, audioStreams, videoStreams);
+
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(audioStreams,
+                                                                                                                  videoStreams);
+}
+
+void PushAvStreamTransportManager::GetReferencedStreams(const TransportOptionsStruct & transportOptions,
+                                                        std::vector<uint16_t> & audioStreams, std::vector<uint16_t> & videoStreams)
+{
+    videoStreams.clear();
+    audioStreams.clear();
+
+    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
+    {
+        videoStreams.push_back(transportOptions.videoStreamID.Value().Value());
+    }
+
+    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
+    {
+        audioStreams.push_back(transportOptions.audioStreamID.Value().Value());
+    }
+}
+
 Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePushTransport(const uint16_t connectionID)
 {
     if (mTransportMap.find(connectionID) == mTransportMap.end())
@@ -193,6 +229,10 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
     }
     mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
+
+    // Release the referenced audio/video streams so the HAL pipelines can be stopped once no consumer remains.
+    ReleaseStreamsForConnection(connectionID);
+
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
 
@@ -229,7 +269,47 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                   "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
+    // Capture the streams referenced before the modification so the HAL pipeline acquire/release stays balanced if the
+    // modification changes which streams the connection references.
+    std::vector<uint16_t> oldAudioStreams;
+    std::vector<uint16_t> oldVideoStreams;
+    auto optsIt = mTransportOptionsMap.find(connectionID);
+    if (optsIt != mTransportOptionsMap.end())
+    {
+        GetReferencedStreams(optsIt->second, oldAudioStreams, oldVideoStreams);
+    }
+
     mTransportOptionsMap[connectionID] = transportOptions;
+
+    std::vector<uint16_t> newAudioStreams;
+    std::vector<uint16_t> newVideoStreams;
+    GetReferencedStreams(mTransportOptionsMap[connectionID], newAudioStreams, newVideoStreams);
+
+    // Release the streams that are no longer referenced and acquire the newly referenced ones. Unchanged streams are omitted
+    // from both lists so the controller skips them, avoiding an unnecessary HAL pipeline stop/start.
+    if (mCameraDevice != nullptr && (oldAudioStreams != newAudioStreams || oldVideoStreams != newVideoStreams))
+    {
+        std::vector<uint16_t> audioToRelease;
+        std::vector<uint16_t> videoToRelease;
+        std::vector<uint16_t> audioToAcquire;
+        std::vector<uint16_t> videoToAcquire;
+
+        if (oldAudioStreams != newAudioStreams)
+        {
+            audioToRelease = oldAudioStreams;
+            audioToAcquire = newAudioStreams;
+        }
+        if (oldVideoStreams != newVideoStreams)
+        {
+            videoToRelease = oldVideoStreams;
+            videoToAcquire = newVideoStreams;
+        }
+
+        TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(
+            audioToRelease, videoToRelease);
+        TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(
+            audioToAcquire, videoToAcquire);
+    }
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
@@ -631,6 +711,10 @@ CHIP_ERROR PushAvStreamTransportManager::LoadCurrentConnections(std::vector<Tran
 {
     ChipLogProgress(Zcl, "Push AV Current Connections loaded");
 
+    // TODO: This is currently a no-op, so persisted Push AV connections are not restored after a reboot. When restoring
+    // connections here, each restored connection that should resume streaming must also re-acquire its referenced streams via
+    // GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(); otherwise the HAL pipelines will not restart (and
+    // the destructor's ReleaseStreamsForConnection would underflow the reference count on streams that were never acquired).
     return CHIP_NO_ERROR;
 }
 
