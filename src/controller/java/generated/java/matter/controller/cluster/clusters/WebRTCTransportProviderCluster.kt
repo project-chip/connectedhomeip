@@ -73,15 +73,13 @@ class WebRTCTransportProviderCluster(
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
-    
+
     data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
   }
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
   sealed class AcceptedCommandListAttributeSubscriptionState {
     data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
@@ -99,7 +97,7 @@ class WebRTCTransportProviderCluster(
     data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
-  }  
+  }
 
   suspend fun solicitOffer(
     streamUsage: UByte,
@@ -112,7 +110,7 @@ class WebRTCTransportProviderCluster(
     SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
     videoStreams: List<UShort>?,
     audioStreams: List<UShort>?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): SolicitOfferResponse {
     val commandId: UInt = 0u
 
@@ -221,7 +219,7 @@ class WebRTCTransportProviderCluster(
             }
           }
       } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
-        audioStreamID_decoded = 
+        audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -235,7 +233,7 @@ class WebRTCTransportProviderCluster(
             } else {
               tlvReader.getNull(tag)
               null
-            }  
+            }
           }
       } else {
         tlvReader.skipElement()
@@ -582,7 +580,7 @@ class WebRTCTransportProviderCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { 
+          requireNotNull(attributeData) {
             "Currentsessions attribute not found in Node State update"
           }
 
@@ -593,7 +591,8 @@ class WebRTCTransportProviderCluster(
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
                 add(
-                  WebRTCTransportProviderClusterWebRTCSessionStruct.fromTlv(AnonymousTag, tlvReader))
+                  WebRTCTransportProviderClusterWebRTCSessionStruct.fromTlv(AnonymousTag, tlvReader)
+                )
               }
               tlvReader.exitContainer()
             }
@@ -613,10 +612,7 @@ class WebRTCTransportProviderCluster(
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val readRequest = ReadRequest(
-      eventPaths = emptyList(),
-      attributePaths = listOf(attributePath)
-    )
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
@@ -656,7 +652,7 @@ class WebRTCTransportProviderCluster(
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -681,8 +677,8 @@ class WebRTCTransportProviderCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
-             
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
           requireNotNull(attributeData) {
             "Generatedcommandlist attribute not found in Node State update"
           }
@@ -753,7 +749,7 @@ class WebRTCTransportProviderCluster(
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-    )
+      )
 
     val subscribeRequest: SubscribeRequest =
       SubscribeRequest(
@@ -778,7 +774,7 @@ class WebRTCTransportProviderCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Acceptedcommandlist attribute not found in Node State update"
@@ -875,7 +871,7 @@ class WebRTCTransportProviderCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
 
@@ -963,7 +959,7 @@ class WebRTCTransportProviderCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
 

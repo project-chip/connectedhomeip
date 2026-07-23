@@ -89,7 +89,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         for (item in optaudioStreams.iterator()) {
           put(AnonymousTag, item)
         }
-      endArray()
+        endArray()
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -145,7 +145,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
@@ -159,7 +159,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           Optional.of(
             buildList<UShort> {
               tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while(!tlvReader.isEndOfContainer()) {
+              while (!tlvReader.isEndOfContainer()) {
                 add(tlvReader.getUShort(AnonymousTag))
               }
               tlvReader.exitContainer()
