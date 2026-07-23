@@ -29,6 +29,9 @@ from .gn import GnBuilder
 _MSAN_DEFAULT_SYSROOT = Path.home() / '.cache/matter/msan_sysroot'
 _MSAN_BUILD_SCRIPT = 'scripts/build/build_msan_sysroot.sh'
 
+_ASAN_LIBCXX_DEFAULT = Path.home() / '.cache/matter/asan_libcxx'
+_ASAN_LIBCXX_BUILD_SCRIPT = 'scripts/build/build_asan_libcxx.sh'
+
 
 def _msan_sysroot_path() -> Path:
     """Resolve the MSAN sysroot path that GN will reference.
@@ -68,6 +71,47 @@ def _msan_validate_sysroot(chip_root: str) -> None:
         '\n'
         'First-time build: 5-15 min, ~4 GB on disk during build\n'
         'Override path with: export SYSROOT_MSAN=<path>',
+        file=sys.stderr,
+    )
+    sys.exit(result.returncode)
+
+
+def _asan_libcxx_path() -> Path:
+    """Resolve the ASAN libc++ install path that GN will reference."""
+    return Path(os.getenv('SYSROOT_ASAN_LIBCXX', _ASAN_LIBCXX_DEFAULT)).absolute()
+
+
+def _asan_libcxx_validate(chip_root: str) -> None:
+    """Fail fast if the ASAN libc++ is missing or stale.
+
+    Delegates the freshness check to build_asan_libcxx.sh --check so the
+    hash logic has a single source of truth in bash. Passes the resolved
+    path explicitly so the script checks the same one GN will use.
+    """
+    sysroot = _asan_libcxx_path()
+    script = Path(chip_root) / _ASAN_LIBCXX_BUILD_SCRIPT
+    result = subprocess.run(
+        [script, '--out-dir', sysroot, '--check'],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        return
+
+    detail = result.stderr.strip() or result.stdout.strip() or '<no output>'
+    print(
+        '\n'
+        f'ASAN libcxx check failed: {detail}\n'
+        '\n'
+        'ASAN uses -fsanitize-address-field-padding=1, which is ABI-breaking:\n'
+        'libc++/libc++abi/libunwind have to be rebuilt with the same flag or\n'
+        'their class layouts mismatch user code and trigger intra-object-overflow\n'
+        'false positives in ifstream::init and similar.\n'
+        '\n'
+        'Build it with:\n'
+        f'    {_ASAN_LIBCXX_BUILD_SCRIPT}\n'
+        '\n'
+        'First-time build: 3-5 min, ~3 GB on disk during build\n'
+        'Override path with: export SYSROOT_ASAN_LIBCXX=<path>',
         file=sys.stderr,
     )
     sys.exit(result.returncode)
@@ -542,6 +586,15 @@ class HostBuilder(GnBuilder):
 
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
+            # The field-padding libcxx is only built for Linux x86_64; other
+            # platforms (Darwin, cross-built arm/embedded) keep using the
+            # Pigweed-shipped libc++ and the BUILD.gn gate handles the rest.
+            if (board == HostBoard.NATIVE
+                    and uname().system == 'Linux'
+                    and uname().machine == 'x86_64'):
+                if not runner.dry_run:
+                    _asan_libcxx_validate(chip_root)
+                self.extra_gn_options.append(f'asan_libcxx_dir="{_asan_libcxx_path()}"')
 
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
