@@ -760,7 +760,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
     VerifyOrReturnError(browseContext != nullptr, CHIP_ERROR_NO_MEMORY);
-    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
+    AvahiIfIndex avahiInterface = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
 
     browseContext->mInstance    = this;
     browseContext->mContext     = context;
