@@ -966,7 +966,7 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
     ASSERT_EQ(size, std::size(sensorFusionSupportedArray));
 
     auto it = out.begin();
-    auto i  = 0;
+    auto i  = size_t(0);
     while (it.Next())
     {
         EXPECT_LT(static_cast<size_t>(i), std::size(sensorFusionSupportedArray));
