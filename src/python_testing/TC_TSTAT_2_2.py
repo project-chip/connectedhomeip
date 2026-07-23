@@ -41,7 +41,7 @@ from mobly import asserts
 from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -98,9 +98,11 @@ class TC_TSTAT_2_2(MatterBaseTest):
             TestStep("11b", "Test Harness Writes the value below MinSetpointDeadBand"),
             TestStep("11c", "Test Harness Writes the min limit of MinSetpointDeadBand"),
             TestStep("12", "Test Harness Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is true"),
-            TestStep("13", "Sets OccupiedCoolingSetpoint to default value"),
+            TestStep("13a", "Test Harness sends SetpointRaiseLower Heat down and verifies setpoint change"),
+            TestStep("13b", "Test Harness sends SetpointRaiseLower Heat on device without heating feature; expect INVALID_COMMAND"),
             TestStep("14", "Sets OccupiedHeatingSetpoint to default value"),
-            TestStep("15", "Test Harness Sends SetpointRaise Command Cool Only"),
+            TestStep("15a", "Test Harness sends SetpointRaiseLower Cool down and verifies setpoint change"),
+            TestStep("15b", "Test Harness sends SetpointRaiseLower Cool on device without cooling feature; expect INVALID_COMMAND"),
             TestStep("16", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
@@ -238,6 +240,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
         hasCoolingFeature = self.check_pics("TSTAT.S.F01")
         # Thermostat is capable of managing a heating device
         hasHeatingFeature = self.check_pics("TSTAT.S.F00")
+        # Does the device implement the SetpointRaiseLower command?
+        hasSetpointRaiseLowerCommand = self.check_pics("TSTAT.S.C00.Rsp")
         # Supports Occupied and Unoccupied setpoints
         hasOccupancyFeature = self.check_pics("TSTAT.S.F02")
 
@@ -655,21 +659,43 @@ class TC_TSTAT_2_2(MatterBaseTest):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating)
 
-        self.step("13")
+        self.step("13a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30)
 
+        self.step("13b")
+        if self.pics_guard(hasSetpointRaiseLowerCommand and not hasHeatingFeature):
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(
+                        mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30),
+                    endpoint=endpoint)
+                asserts.fail("Expected INVALID_COMMAND for Heat mode on device without heating feature")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand)
+
         self.step("14")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30)
 
-        self.step("15")
+        self.step("15a")
         if self.pics_guard(hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30)
+
+        self.step("15b")
+        if self.pics_guard(hasSetpointRaiseLowerCommand and not hasCoolingFeature):
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(
+                        mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30),
+                    endpoint=endpoint)
+                asserts.fail("Expected INVALID_COMMAND for Cool mode on device without cooling feature")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand)
 
         self.step("16")
         if self.pics_guard(hasCoolingFeature):
