@@ -40,6 +40,10 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
+// Invoked each time the device creates a ReadClient (i.e. each time a
+// SubscribeRequest goes out on the wire). Tests use this to count the number of
+// subscriptions actually set up. See #72721.
+@property (atomic, copy, nullable) dispatch_block_t onReadClientCreated;
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
