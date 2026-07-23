@@ -84,7 +84,25 @@ namespace FaultInjection {
     X(ClearInMemoryAllocatedVideoStreams, 34)            /**< Empty in-memory allocated video streams during attribute read */     \
     X(ClearInMemoryAllocatedAudioStreams, 35)            /**< Empty in-memory allocated audio streams during attribute read */     \
     X(ClearInMemoryAllocatedSnapshotStreams, 36)         /**< Empty in-memory allocated snapshot streams during attribute read */  \
-    X(LoadPersistentCameraAVSMAttributes, 37)            /**< Load persisted Camera AVSM attributes during attribute read */
+    X(LoadPersistentCameraAVSMAttributes, 37)            /**< Load persisted Camera AVSM attributes during attribute read */       \
+    /* SECURITY-SENSITIVE FAULT INJECTION HOOKS — DO NOT ENABLE IN BUILDS THAT SHIP THE FaultInjection                           \
+     * cluster: The four CHIP_FAULT_INJECT hooks below (CASESigma2WrongFabricId, CASESigma2WrongPeerNodeId,                        \
+     * CASECorruptSigma2ResumeMIC, CASESigma3WrongFabricId) corrupt authentication-derived values                                  \
+     * (responderFabricId / responderNodeId / initiatorFabricId / sigma2ResumeMIC) AFTER a successful                              \
+     * VerifyCredentials call. If a device ships with both CHIP_WITH_NLFAULTINJECTION and the Matter                               \
+     * FaultInjection cluster compiled in, a single network call to FailAtFault can DoS all subsequent                             \
+     * CASE handshakes from every commissioner on every fabric until reboot. Vendor ZAP configurations                             \
+     * that copy all-clusters-app must NOT enable nlfaultinjection on shipping firmware. The existing                              \
+     * TODO at CHIPFaultInjection.h:30 (#30453) about release-build enablement must be resolved before                             \
+     * adding any further remotely-reachable fault surface. */                                                                     \
+    X(CASESigma2WrongFabricId, 38)   /**< Flip the local responderFabricId after a successful VerifyCredentials in HandleSigma2 to \
+                                        drive CHIP_ERROR_CASE_WRONG_FABRIC */                                                      \
+    X(CASESigma2WrongPeerNodeId, 39) /**< Flip the local responderNodeId after a successful VerifyCredentials in HandleSigma2 to   \
+                                        drive CHIP_ERROR_CASE_WRONG_PEER_NODEID */                                                 \
+    X(CASECorruptSigma2ResumeMIC, 40) /**< Corrupt sigma2ResumeMIC after generation in PrepareSigma2Resume so the initiator's      \
+                                         HandleSigma2Resume MIC check fails with CHIP_ERROR_CASE_RESUME_MIC_MISMATCH */            \
+    X(CASESigma3WrongFabricId, 41)    /**< Force a CASE Sigma3 responder-side fabric ID mismatch to verify                         \
+                                         CHIP_ERROR_CASE_WRONG_FABRIC surfaces from HandleSigma3b. */
 
 // END-IF-CHANGE-ALSO-CHANGE(src/controller/python/matter/fault_injection/__init__.py)
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
@@ -132,6 +150,10 @@ static_assert(kFault_ClearInMemoryAllocatedSnapshotStreams == 36,
               "Test plan specification and automation code relies on this value being 36");
 static_assert(kFault_LoadPersistentCameraAVSMAttributes == 37,
               "Test plan specification and automation code relies on this value being 37");
+static_assert(kFault_CASESigma2WrongFabricId == 38, "Test plan specification and automation code relies on this value being 38");
+static_assert(kFault_CASESigma2WrongPeerNodeId == 39, "Test plan specification and automation code relies on this value being 39");
+static_assert(kFault_CASECorruptSigma2ResumeMIC == 40, "Test plan specification and automation code relies on this value being 40");
+static_assert(kFault_CASESigma3WrongFabricId == 41, "Test plan specification and automation code relies on this value being 41");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
