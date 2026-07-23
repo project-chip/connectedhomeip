@@ -17,14 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${COMMISSIONING_PROXY_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 1
+#       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg ed_app_path:${ED_APP}
 #       --int-arg ed_discriminator:3841 ed_passcode:20202021
@@ -35,6 +35,9 @@
 # === END CI TEST ARGUMENTS ===
 
 """TC-COMPRO-2.2 — Commissioning Proxy cluster: Proxy Scan feature functionality.
+
+For the test rig topology, the Python wheel requirement and how to run this
+suite, see ``support_modules/compro_support.py``.
 
 Verifies that ProxyScanRequest returns an empty list when no ED is commissionable,
 and returns a populated result list (with correct fields) when an ED is commissionable.
@@ -49,7 +52,7 @@ Example usage (WiFi-PAF ED):
         --passcode 20202021 \\
         --storage-path /tmp/compro_admin_storage.json \\
         --paa-trust-store-path /path/to/paa-trust-store \\
-        --endpoint 1 \\
+        --endpoint 5 \\
         --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
         --string-arg ed_transport:wifipaf \\

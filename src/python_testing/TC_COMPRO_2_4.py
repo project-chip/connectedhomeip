@@ -17,14 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${COMMISSIONING_PROXY_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 1
+#       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg ed_app_path:${ED_APP} wifi_ssid:MyNetwork wifi_password:MyPassword
 #       --int-arg ed_discriminator:3841 ed_passcode:20202021
@@ -35,6 +35,9 @@
 # === END CI TEST ARGUMENTS ===
 
 """TC-COMPRO-2.4 — Commissioning Proxy cluster: Proxy Connect, Message and Disconnect.
+
+For the test rig topology, the Python wheel requirement and how to run this
+suite, see ``support_modules/compro_support.py``.
 
 The Python TH drives the full commissioning tunnel for each transport advertised
 by the DUT.  Steps 4–9 iterate once per transport bit in valid_transports
@@ -95,7 +98,7 @@ Example — both transports, remote ED RPi:
         --passcode 20202021 \\
         --storage-path /tmp/compro_admin_storage.json \\
         --paa-trust-store-path ~/matter_tests/paa-trust-store \\
-        --endpoint 1 \\
+        --endpoint 5 \\
         --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
         --string-arg ed_ssh_host:172.16.62.110 \\
@@ -112,7 +115,7 @@ Example — WiFiPAF only (single transport), remote ED RPi:
         --passcode 20202021 \\
         --storage-path /tmp/compro_admin_storage.json \\
         --paa-trust-store-path ~/matter_tests/paa-trust-store \\
-        --endpoint 1 \\
+        --endpoint 5 \\
         --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
         --string-arg ed_ssh_host:172.16.62.110 \\
@@ -342,7 +345,11 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                     timeout=proxy_connect_timeout,
                     wiFiBand=single_band,
                 ),
-                interactionTimeoutMs=None,
+                # Async ProxyConnect: the invoke wait is governed by
+                # interactionTimeoutMs, so it must cover proxy_connect_timeout;
+                # None caps it at the ~13s MRP default and guillotines
+                # slower-but-valid transport connects.
+                interactionTimeoutMs=proxy_connect_timeout * 1000 + 10000,
             )
             current_session_id = connect_response.sessionID
             asserts.assert_true(

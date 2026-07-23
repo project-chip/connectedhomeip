@@ -16,12 +16,300 @@
 
 """Shared base class and fixtures for Commissioning Proxy (COMPRO) cluster tests.
 
+This module is the single home for the TC_COMPRO_2_1..2_9 setup instructions.
+Each ``TC_COMPRO_2_x.py`` documents its own steps and arguments; read this module
+for the rig topology, the Python wheel requirement, and how to run the suite.
+
+Test rig topology
+-----------------
+The suite exercises commissioning *through a proxy*, so it needs three separate
+Matter roles.  This is based on three Raspberry Pis (but can be other devices),
+any mix works as long as the three roles are distinct.  All IPs below are
+examples — the rig is DHCP, so confirm current addresses before every run.
+
+===================  ================================  =========================================
+Role                 What runs on it                   Why it is separate
+===================  ================================  =========================================
+TH (test harness)    These Python tests, under the     It is the Matter Commissioner
+                     ``matter`` virtual environment.    (``self.default_controller``).  It
+                     Acts as ``default_controller``.    commissions the *proxy* over the
+                                                        network, then drives the
+                                                        CommissioningProxy cluster and (for
+                                                        2.4) calls ``CommissionViaProxy`` to
+                                                        tunnel PASE + commissioning to the ED.
+CP (the DUT)         The commissioning-proxy app:       This is the device under test.  The
+                                                        whole point is that the TH commissions
+                     ``all-devices-app                  an ED it cannot reach directly — only
+                     --device commissioning-proxy:5``   the proxy can, over BLE / Wi-Fi-PAF.
+                     Exposes the CommissioningProxy     Launch it with the transport flags
+                     cluster.                           matching its build (``--wifi
+                                                        --wifipaf freq_list=2437`` for PAF;
+                                                        none for a BLE-only build).
+ED (end device)      ``chip-lighting-app`` with the     The commissionable target.  Tests
+                     transport under test (``--wifipaf  toggle it commissionable/not at
+                     ``/``--wifi``/BLE).  Driven by     specific steps, and it must be
+                     ``EDFixture`` (below).             reachable *only* via the proxy path
+                                                        (see ED reachability, below).
+===================  ================================  =========================================
+
+Python environment and wheels (on the TH)
+------------------------------------------
+The tests import ``matter.*`` (not ``chip.*``) and run inside a venv that has two
+wheels installed:
+
+* ``matter_clusters`` (pure-python) — the ``CommissioningProxy`` cluster bindings
+  (``ProxyConnectRequest`` / ``ProxyMessageRequest`` / ``ProxyDisconnectRequest``
+  etc.).  Needed by *every* test.
+* ``matter_core`` (native, ``cp3xx-abi3``) — provides the ``CommissionViaProxy``
+  controller API (``ChipDeviceCtrl.CommissionViaProxy`` → ``pychip_DeviceController_
+  CommissionViaProxy`` in ``ChipDeviceController-ScriptBinding.cpp``) and the
+  ``ProxyTransport`` raw transport it depends on.  ``TC_COMPRO_2_4`` calls this,
+  so 2.4 will not run against a stock upstream wheel — ``matter_core`` MUST be
+  built from this branch.
+
+Build both wheels **for the TH's architecture** (the lab TH is arm64, so build on
+an arm64 host — an x86 wheel cannot run there)::
+
+  # on an arm64 build host checked out on this branch
+  source scripts/activate.sh
+  ninja -C out/python_lib python_wheels
+  # wheels land in out/python_lib/controller/python/:
+  #   matter_core-1.0.0-cp3xx-abi3-linux_aarch64.whl
+  #   matter_clusters-1.0.0-py3-none-any.whl
+
+Install into the TH venv (both together for a fresh install; matter_core cannot be
+installed without matter_clusters)::
+
+  pip install --force-reinstall matter_core-*.whl matter_clusters-*.whl
+
+When only the generated cluster bindings changed, the pure-python wheel can be
+reinstalled on its own with ``pip install --force-reinstall --no-deps
+matter_clusters-*.whl``.
+
+Running a test (from the TH)
+----------------------------
+First activate the venv that has the two wheels installed (above); the tests
+import ``matter.*`` and ``mobly`` from it, so running under the system Python
+fails immediately with ``ModuleNotFoundError: No module named 'mobly'``::
+
+  source <venv>/bin/activate
+
+The TH first commissions the proxy (the DUT) on-network, then runs the cluster
+steps.  The all-devices-app launched as ``--device commissioning-proxy:5`` exposes
+the CommissioningProxy cluster on endpoint 5, so pass ``--endpoint 5``
+(``cp_endpoint`` honours ``--endpoint``)::
+
+  python3 TC_COMPRO_2_4.py \\
+      --commissioning-method on-network \\
+      --discriminator <proxy-discriminator> --passcode 20202021 \\
+      --storage-path /tmp/compro_admin_storage.json \\
+      --paa-trust-store-path ~/matter_tests/paa-trust-store \\
+      --endpoint 5 \\
+      --string-arg wifi_ssid:MyNetwork wifi_password:MyPassword \\
+      --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
+      --string-arg ed_ssh_host:<ED-ip> \\
+      --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
+      --int-arg ed_discriminator:3840 ed_passcode:20202021
+
+``--paa-trust-store-path`` must point at the PAA certificates for the ED's DAC, or
+tunnelled commissioning fails attestation.  See each test's own docstring for its
+full argument list.
+
+The ``--PICS`` line shown in each file's CI-arguments block is a *repo-relative*
+path (``src/app/tests/suites/certification/ci-pics-values``) that only resolves
+when run from an SDK checkout.  Running by hand from ``~/matter_tests`` it raises
+``FileNotFoundError``; omit ``--PICS`` (the test then runs unconditionally, which
+is what you want with the DUT in front of you) or pass an absolute path to the
+file in a full checkout.
+
+ED reachability (why the extra plumbing)
+----------------------------------------
+For the test to prove the proxy path — and not silently commission the ED over a
+stray Ethernet link — the ED must be reachable ONLY via the proxy transport:
+
+* In remote-SSH mode ``EDFixture`` runs a script on the ED via passwordless sudo
+  that iptables-blocks the commissioner's eth0 path for the duration of the test
+  and clears it afterwards.  It is not shipped (it hardcodes host paths and the
+  commissioner IP); build your own — see "Remote-SSH ED — eth0 block (minimum to
+  rebuild)" below.
+* In standalone-serial mode eth0 is *physically* disconnected and the ED is driven
+  over its UART login console, so no iptables block is needed.
+
+Helper scripts (what runs where, and what this repo contains)
+-------------------------------------------------------------
+Precedence: a helper is shipped in this repo only when it is (a) invoked by the
+test code and (b) portable — no hardcoded host paths, IPs, sudo/systemd policy or
+specific hardware.  Everything else is rig provisioning: it is described here so
+you can build an equivalent for your own setup, but intentionally not shipped,
+because a file hardcoding one lab's layout would mislead others.
+
+Shipped in this repo (runs on the TH):
+
+* ``support_modules/serial_console.py`` — pyserial CLI + ``SerialConsole`` class
+  used by ``EDFixture`` standalone-serial mode.  Portable and invoked by the
+  tests, so it lives in the repo.
+
+Rig provisioning you supply yourself (not shipped) — build only what your chosen
+ED mode needs:
+
+* **TH — dispatcher (optional).**  A small script that resets the proxy
+  KVS, launches the proxy with the transport flags matching its build, applies the
+  ED-reachability convention below, then loops ``python3 TC_COMPRO_2_x.py ...`` N
+  times and collects logs.  Convenient for soak runs; the single-invocation command
+  under "Running a test" is the ground truth, so this is purely a convenience you
+  can write for your rig.
+* **CP — none.**  The proxy/DUT only runs the commissioning-proxy app binary; it
+  needs no helper scripts.
+* **ED — for remote-SSH mode:** an eth0-block script invoked by ``EDFixture`` via
+  passwordless sudo, plus a matching sudoers drop-in.  See "Remote-SSH ED — eth0
+  block (minimum to rebuild)" below.
+* **ED — for standalone-serial mode:** a ``serial-getty@ttyS0`` autologin drop-in
+  (``agetty --autologin``) with ``enable_uart=1`` / ``console=ttyS0,115200`` so
+  ``serial_console.py`` can log in, and pyserial installed in the Python that runs
+  the tests.
+* **ED — Wi-Fi-PAF hardware:** if the ED uses a separate Wi-Fi-PAF radio, whatever
+  init your hardware needs to bring the NAN interface up before the test.
+
+Remote-SSH ED — eth0 block (minimum to rebuild)
+-----------------------------------------------
+``EDFixture`` (SSH mode) runs a script on the ED via passwordless sudo — at the
+path in ``EDFixture._BLOCK_SCRIPT`` — with ``up`` when a test starts and ``down``
+when it stops.  It is not shipped because it hardcodes the commissioner IP and host
+paths.  The minimum a replacement must do, all interface-scoped to eth0 so only the
+proxy path is exercised:
+
+* ``up`` — keep SSH from the commissioner, drop the rest of the commissioner's eth0
+  ingress, and drop eth0 mDNS in both directions (``--dport 5353`` and
+  ``--sport 5353``; repeat with ``ip6tables`` for IPv6)::
+
+    iptables  -I INPUT  -i eth0 -s <commissioner-ip> -p tcp --dport 22 -j ACCEPT
+    iptables  -I INPUT  -i eth0 -s <commissioner-ip> -j DROP
+    iptables  -I OUTPUT -o eth0 -p udp --dport 5353 -j DROP
+    iptables  -I OUTPUT -o eth0 -p udp --sport 5353 -j DROP
+
+* ``down`` — remove exactly those rules (SSH must keep working).
+* Recommended: self-disarm on a timer (drop the rules after, say, 20 min) so a
+  crashed test cannot strand the ED off-network.
+
+Grant the test user passwordless sudo for just this script (a sudoers drop-in).
+The block is optional hardening — without it the ED is still commissioned; you only
+lose the guarantee that the proxy transport (not eth0) carried the commissioning.
+
+Standalone-serial ED — RPi step-by-step setup
+---------------------------------------------
+This mode drives the ED entirely over its UART login console with eth0 physically
+disconnected, so the Wi-Fi-only path is exercised with no Ethernet to mask an
+association or discovery failure.  Wiring::
+
+  TH --USB-UART (e.g. CP2102 -> /dev/ttyUSB0)-- ED UART header (ttyS0 login)
+
+The ED is reachable only over Wi-Fi (operational CASE) and the serial console
+(lifecycle control), so if Wi-Fi never comes up the console is still available for
+diagnosis.
+
+On the TH (one-time):
+
+1. Wire a USB-to-UART adapter from the TH to the ED's UART header (GND, TX<->RX,
+   RX<->TX).  It enumerates on the TH as, e.g., ``/dev/ttyUSB0``.
+2. Let the test user open the port without sudo, and install pyserial into the
+   venv that runs the tests::
+
+     sudo usermod -aG dialout "$USER"      # log out/in afterwards
+     pip install pyserial                  # into the test venv
+
+On the ED (one-time; do this over eth0 or a manual serial session, before
+unplugging eth0):
+
+3. Give the UART a password-free login so the harness can script it.  Create the
+   directory, then the drop-in file::
+
+     sudo install -d /etc/systemd/system/serial-getty@ttyS0.service.d
+
+   Create ``/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf`` with::
+
+     [Service]
+     ExecStart=
+     ExecStart=-/sbin/agetty --autologin ubuntu --keep-baud 115200,57600,38400,9600 %I $TERM
+
+   then apply it::
+
+     sudo systemctl daemon-reload
+     sudo systemctl restart serial-getty@ttyS0
+
+   The serial console must also be enabled: ``enable_uart=1`` in
+   ``/boot/firmware/config.txt`` and ``console=ttyS0,115200`` on the kernel command
+   line (the default on the Raspberry Pi images used here).
+
+4. Physically unplug the ED's eth0 for the run.
+Verify the channel — nothing else may hold the port, as ``serial_console.py`` opens
+it exclusively::
+
+  python3 support_modules/serial_console.py --port /dev/ttyUSB0 wait-shell
+  python3 support_modules/serial_console.py --port /dev/ttyUSB0 run "hostname; whoami"
+
+Then run any ED test as shown under "Running a test", replacing the
+``ed_ssh_host:<ED-ip>`` argument with ``ed_serial_port:/dev/ttyUSB0``.  ``EDFixture``
+finds the CLI via the ``ED_SERIAL_CLI`` env var, defaulting to the
+``serial_console.py`` shipped next to this module.
+
+Troubleshooting:
+
+* ``serial.SerialException`` / port busy — an interactive ``screen`` / ``picocom``
+  still holds the port; detach it first (the CLI opens the port exclusively).
+* ``ModuleNotFoundError: serial`` — pyserial is missing from the interpreter running
+  the tests; install it into the test venv.
+* CLI exits 255 with no output — the exit-code marker was not parsed; use the
+  shipped ``serial_console.py`` (it emits the marker via a shell variable so the
+  echoed command line never contains the expanded marker).
+* Garbled output when the ED app starts — kernel console spew on ``ttyS0`` from the
+  Wi-Fi/PAF driver interleaves with output; quiet it on the ED with
+  ``sudo sysctl -w kernel.printk='3 4 1 3'``.
+* ED app appears to exit immediately — a stale instance or a busy NAN/Wi-Fi
+  interface; factory-reset / clear the ED's state first.  The app is launched with
+  ``nohup`` so it survives the serial session closing.
+
+Between runs
+------------
+Commissioning state survives a test run in two places; understanding them tells you
+what to keep or clear before the next run.  (The ED is not one of them: ``EDFixture``
+deletes the ED's KVS every time it starts the ED, and the tests unpair the ED from
+the controller between iterations, so the ED always begins uncommissioned — nothing
+to clean by hand.)
+
+* **TH commissioner storage** — the file passed as ``--storage-path`` (e.g.
+  ``/tmp/compro_admin_storage.json``).  It holds the TH's fabric and a record of the
+  proxy (the DUT) it commissioned, so a later run can reconnect to the proxy without
+  commissioning it again.  ``commission_if_needed()`` (in this module) reads this
+  file and, if the proxy node is already present, drops the
+  ``--commissioning-method`` / ``--discriminator`` / ``--passcode`` arguments and
+  connects to the stored node instead of re-commissioning.
+* **Proxy (CP) KVS** — the proxy app's own persistent store (``/tmp/chip_*`` for the
+  app's default ``--KVS``).  It holds the proxy's membership in the TH's fabric; keep
+  it and the proxy stays paired to the TH.
+
+Two ways to start the next run:
+
+* **Quick restart (reuse the commissioned proxy).**  Leave the TH storage file and
+  the proxy KVS in place.  ``commission_if_needed()`` skips the initial commissioning
+  and connects to the already-commissioned proxy — fastest while iterating on the
+  cluster steps with an unchanged proxy binary.
+* **Full clean (re-commission the proxy).**  Remove the TH storage file (on the TH)
+  *and* the proxy KVS (``/tmp/chip_*`` on the proxy).  Use this when the proxy binary
+  changed, when you want a pristine fabric, or when storage got into a bad state; the
+  next run commissions the proxy from scratch.
+
+Clear **both** or neither.  If only one side is wiped they disagree — the TH storage
+still claims the proxy is commissioned while the proxy KVS no longer holds the fabric
+(or vice versa) — and the next run fails trying to reach a proxy that no longer
+recognises it.
+
 End Device (ED) fixture control
 --------------------------------
 Tests that require an ED in commissionable state accept an optional ``ed_app_path``
-argument.  When provided, the fixture starts/stops the ED subprocess automatically
-(locally, or over SSH when ``ed_ssh_host`` is also set).  When omitted, the test
-pauses and prompts the operator at the relevant steps.
+argument.  When provided, the fixture starts/stops the ED automatically: locally as
+a subprocess, over SSH when ``ed_ssh_host`` is set, or over the ED's serial login
+console when ``ed_serial_port`` is set.  When omitted, the test pauses and prompts
+the operator at the relevant steps.
 
 Pass arguments on the command line with ``--string-arg`` / ``--int-arg``, e.g.:
 
@@ -39,6 +327,14 @@ AddOrUpdateWifiNetwork + ConnectNetwork after the BLE channel comes up;
   --string-arg ed_app_path:/path/to/ed-app ed_ssh_host:192.168.1.10
   --string-arg ed_ssh_user:ubuntu ed_extra_args:--wifi
   --string-arg ed_transport:ble
+  --int-arg ed_discriminator:3841 ed_passcode:20202021
+
+Standalone-serial ED (eth0 physically disconnected; the ED is driven entirely
+over its UART login console.  ``ed_serial_port`` takes precedence over
+``ed_ssh_host``)::
+
+  --string-arg ed_app_path:/path/to/ed-app ed_serial_port:/dev/ttyUSB0
+  --string-arg ed_transport:wifipaf 'ed_extra_args:--wifi --wifipaf freq_list=2437'
   --int-arg ed_discriminator:3841 ed_passcode:20202021
 
 ``ed_transport`` defaults to ``wifipaf`` when omitted.
@@ -63,8 +359,9 @@ from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
 
-# Commissioning Proxy cluster is registered on endpoint 1 in the reference app.
-COMPRO_ENDPOINT = 1
+# The all-devices-app exposes the Commissioning Proxy cluster on endpoint 5
+# (launched as "--device commissioning-proxy:5").  Overridable via --endpoint.
+COMPRO_ENDPOINT = 5
 
 # Default node ID assigned by the Matter test framework (TestingDefaults.DUT_NODE_ID).
 _DEFAULT_DUT_NODE_ID = 0x12344321
@@ -370,9 +667,9 @@ class EDFixture:
     # runs so the commissioner is forced onto the WiFi path post-
     # ConnectNetwork.  Without this, TC_COMPRO_2_4 (and friends) can
     # silently pass over eth0 even when WiFi association never happened.
-    # See project_eth0_path_masks_paf_bugs and ~/README-test-rig.md on
-    # the ED.  The ED-side script is idempotent and self-disarms after
-    # ~20 min of inactivity, so a crashed test won't leave the rig stuck.
+    # The ED-side script (see _BLOCK_SCRIPT below) is idempotent and
+    # self-disarms after ~20 min of inactivity, so a crashed test won't
+    # leave the rig stuck.
     # ------------------------------------------------------------------
 
     _BLOCK_SCRIPT = "/home/ubuntu/scripts/block-eth0-from-commissioner.sh"
@@ -455,9 +752,8 @@ class COMPROBaseTest(MatterBaseTest):
     def cp_endpoint(self) -> int:
         """Endpoint on which the Commissioning Proxy cluster is exposed.
 
-        Honours the ``--endpoint`` argument so the same tests run against the
-        standalone reference app (endpoint 1) and the all-clusters-app, which
-        exposes the cluster on a dedicated endpoint. Falls back to
+        Honours the ``--endpoint`` argument.  The all-devices-app exposes the
+        cluster on endpoint 5 (``--device commissioning-proxy:5``); falls back to
         ``COMPRO_ENDPOINT`` when ``--endpoint`` is not supplied.
         """
         configured = self.matter_test_config.endpoint

@@ -17,14 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${COMMISSIONING_PROXY_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 1
+#       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -33,6 +33,9 @@
 # === END CI TEST ARGUMENTS ===
 
 """TC-COMPRO-2.9 — Commissioning Proxy cluster: Device Type Requirements with DUT as Server.
+
+For the test rig topology, the Python wheel requirement and how to run this
+suite, see ``support_modules/compro_support.py``.
 
 Verifies that the Commissioning By Proxy device type (0x0092) requirements
 are met:
@@ -56,7 +59,7 @@ Example:
         --passcode 20202021 \\
         --storage-path /tmp/compro_admin_storage.json \\
         --paa-trust-store-path ~/matter_tests/paa-trust-store \\
-        --endpoint 1
+        --endpoint 5
     ```
 """
 
