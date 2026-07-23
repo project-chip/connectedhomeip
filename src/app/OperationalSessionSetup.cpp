@@ -63,12 +63,12 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
         }
 #endif
 
-        mState = aTargetState;
-
         if (aTargetState != State::Connecting)
         {
             CleanupCASEClient();
         }
+
+        mState = aTargetState;
     }
 }
 
@@ -504,6 +504,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
 
+    CleanupCASEClient();
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -531,6 +532,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     {
         // Got an invalid session, just dispatch an error.  We have to do this
         // so we don't leak.
+        CleanupCASEClient();
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
 
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -544,10 +546,36 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 
 void OperationalSessionSetup::CleanupCASEClient()
 {
-    if (mCASEClient)
+    CASEClient * caseClient = mCASEClient;
+    if (caseClient == nullptr)
     {
-        mClientPool->Release(mCASEClient);
-        mCASEClient = nullptr;
+        return;
+    }
+
+    CASEClientPoolDelegate * clientPool = mClientPool;
+    mCASEClient                         = nullptr;
+
+    auto releaseClient = [clientPool, caseClient]() { clientPool->Release(caseClient); };
+
+    if (mState != State::Connecting)
+    {
+        releaseClient();
+        return;
+    }
+
+    auto * systemLayer = GetSystemLayer();
+    VerifyOrReturn(systemLayer != nullptr,
+                   ChipLogError(Discovery,
+                                "Cannot schedule deferred CASEClient release without a SystemLayer; leaking client to avoid "
+                                "re-entrant destruction"));
+
+    CHIP_ERROR err = systemLayer->ScheduleLambda(releaseClient);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery,
+                     "Failed to schedule deferred CASEClient release: %" CHIP_ERROR_FORMAT
+                     "; leaking client to avoid re-entrant destruction",
+                     err.Format());
     }
 }
 
@@ -571,8 +599,10 @@ OperationalSessionSetup::~OperationalSessionSetup()
 
     if (mCASEClient)
     {
-        // Make sure we don't leak it.
+        // Make sure we don't leak it. CASESession delegate callbacks detach
+        // mCASEClient before releasing this object.
         mClientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -766,7 +796,8 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     VerifyOrDie(mRemainingAttempts > 0);
     // Try again, but not if things are in shutdown such that we can't get
     // to a system layer, and not if we've run out of attempts.
-    if (!mInitParams.exchangeMgr->GetSessionManager() || !mInitParams.exchangeMgr->GetSessionManager()->SystemLayer())
+    auto * systemLayer = GetSystemLayer();
+    if (systemLayer == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -819,7 +850,7 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     }
     timerDelay = std::chrono::duration_cast<System::Clock::Seconds16>(actualTimerDelay);
 
-    CHIP_ERROR err = mInitParams.exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(actualTimerDelay, TrySetupAgain, this);
+    CHIP_ERROR err = systemLayer->StartTimer(actualTimerDelay, TrySetupAgain, this);
 
     // TODO: If responseWasBusy, should we increment, mRemainingAttempts and
     // mResolveAttemptsAllowed, since we were explicitly told to retry?  Hard to
@@ -838,10 +869,7 @@ void OperationalSessionSetup::CancelSessionSetupReattempt()
     // If we can't get a system layer, there is no way for us to cancel things
     // at this point, but hopefully that's because everything is torn down
     // anyway and hence the timer will not fire.
-    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
-    VerifyOrReturn(sessionManager != nullptr);
-
-    auto * systemLayer = sessionManager->SystemLayer();
+    auto * systemLayer = GetSystemLayer();
     VerifyOrReturn(systemLayer != nullptr);
 
     systemLayer->CancelTimer(TrySetupAgain, this);
@@ -923,14 +951,6 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
-void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
-{
-    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Setting fallback resolve result",
-                    ChipLogValueScopedNodeId(mPeerId));
-    mFallbackResolveResult.SetValue(result);
-}
-
 System::Layer * OperationalSessionSetup::GetSystemLayer()
 {
     auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
@@ -939,6 +959,14 @@ System::Layer * OperationalSessionSetup::GetSystemLayer()
         return nullptr;
     }
     return sessionManager->SystemLayer();
+}
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
+{
+    ChipLogProgress(Discovery, "OperationalSessionSetup[" ChipLogFormatScopedNodeId "]: Setting fallback resolve result",
+                    ChipLogValueScopedNodeId(mPeerId));
+    mFallbackResolveResult.SetValue(result);
 }
 
 CHIP_ERROR OperationalSessionSetup::StartFallbackTimer()
