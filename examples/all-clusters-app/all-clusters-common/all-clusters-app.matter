@@ -8469,8 +8469,8 @@ endpoint 1 {
     callback attribute remainingTime;
     callback attribute currentX;
     callback attribute currentY;
-    callback attribute driftCompensation;
-    callback attribute compensationText;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
     callback attribute colorTemperatureMireds;
     callback attribute colorMode;
     callback attribute options;

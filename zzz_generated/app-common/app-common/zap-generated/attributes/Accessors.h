@@ -3223,6 +3223,15 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace ColorControl {
 namespace Attributes {
 
+namespace DriftCompensation {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum * value); // DriftCompensationEnum
+} // namespace DriftCompensation
+
+namespace CompensationText {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+} // namespace CompensationText
+
 namespace Primary1X {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace Primary1X
