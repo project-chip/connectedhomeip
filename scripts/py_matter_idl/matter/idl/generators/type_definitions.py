@@ -15,7 +15,6 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
@@ -271,11 +270,11 @@ class TypeLookupContext:
 
     """
 
-    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+    def __init__(self, idl: matter_idl_types.Idl, cluster: matter_idl_types.Cluster | None):
         self.idl = idl
         self.cluster = cluster
 
-    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+    def find_enum(self, name) -> matter_idl_types.Enum | None:
         """
         Find the first enumeration matching the given name for the given
         lookup rules (searches cluster first, then global).
@@ -286,14 +285,14 @@ class TypeLookupContext:
 
         return None
 
-    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+    def find_struct(self, name) -> matter_idl_types.Struct | None:
         for s in self.all_structs:
             if s.name == name:
                 return s
 
         return None
 
-    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+    def find_bitmap(self, name) -> matter_idl_types.Bitmap | None:
         for s in self.all_bitmaps:
             if s.name == name:
                 return s
@@ -431,7 +430,7 @@ def IsSignedDataType(data_type: DataType) -> bool:
     return sized_type.is_signed
 
 
-def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
+def GetDataTypeSizeInBits(data_type: DataType) -> int | None:
     """
     Returns the size in bits for a given data type or None if the data type can not be found.
     """

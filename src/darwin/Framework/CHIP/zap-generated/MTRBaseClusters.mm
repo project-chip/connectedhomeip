@@ -49271,6 +49271,78 @@ public:
                                      completion:completion];
 }
 
+- (void)readAttributeSupportedLanguageCodesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = Messages::Attributes::SupportedLanguageCodes::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeSupportedLanguageCodesWithParams:(MTRSubscribeParams * _Nonnull)params
+                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                             reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = Messages::Attributes::SupportedLanguageCodes::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeSupportedLanguageCodesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = Messages::Attributes::SupportedLanguageCodes::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeSupportedMimeTypesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = Messages::Attributes::SupportedMimeTypes::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeSupportedMimeTypesWithParams:(MTRSubscribeParams * _Nonnull)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = Messages::Attributes::SupportedMimeTypes::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeSupportedMimeTypesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = Messages::Attributes::SupportedMimeTypes::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = Messages::Attributes::GeneratedCommandList::TypeInfo;
@@ -99567,6 +99639,78 @@ public:
                                      completion:completion];
 }
 
+- (void)readAttributeAvailableCommandsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = MediaPlayback::Attributes::AvailableCommands::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeAvailableCommandsWithParams:(MTRSubscribeParams * _Nonnull)params
+                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = MediaPlayback::Attributes::AvailableCommands::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeAvailableCommandsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = MediaPlayback::Attributes::AvailableCommands::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+- (void)readAttributeContentInfoWithCompletion:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = MediaPlayback::Attributes::ContentInfo::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeContentInfoWithParams:(MTRSubscribeParams * _Nonnull)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = MediaPlayback::Attributes::ContentInfo::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeContentInfoWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = MediaPlayback::Attributes::ContentInfo::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = MediaPlayback::Attributes::GeneratedCommandList::TypeInfo;
@@ -104762,6 +104906,73 @@ public:
                                      responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
+}
+- (void)getDeviceAuthURIWithCompletion:(void (^)(MTRAccountLoginClusterGetDeviceAuthURIResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self getDeviceAuthURIWithParams:nil completion:completion];
+}
+- (void)getDeviceAuthURIWithParams:(MTRAccountLoginClusterGetDeviceAuthURIParams * _Nullable)params completion:(void (^)(MTRAccountLoginClusterGetDeviceAuthURIResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRAccountLoginClusterGetDeviceAuthURIParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = AccountLogin::Commands::GetDeviceAuthURI::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRAccountLoginClusterGetDeviceAuthURIResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)readAttributeOAuthLoggedInWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = AccountLogin::Attributes::OAuthLoggedIn::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+                                            params:nil
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+- (void)subscribeAttributeOAuthLoggedInWithParams:(MTRSubscribeParams * _Nonnull)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = AccountLogin::Attributes::OAuthLoggedIn::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void)readAttributeOAuthLoggedInWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = AccountLogin::Attributes::OAuthLoggedIn::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion

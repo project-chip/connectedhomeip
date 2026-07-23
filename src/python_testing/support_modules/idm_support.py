@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -39,6 +39,7 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -61,7 +62,7 @@ class WritableAttributeInfo:
     attribute: type[ClusterObjects.ClusterAttributeDescriptor]
     cluster_class: type[ClusterObjects.Cluster]
     datatype: str
-    constraints: Optional[Constraints]
+    constraints: Constraints | None
 
 
 @dataclass
@@ -249,7 +250,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     async def find_timed_write_attribute(
         self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+    ) -> tuple[int | None, type[ClusterObjects.ClusterAttributeDescriptor] | None]:
         """
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
@@ -408,7 +409,7 @@ class IDMBaseTest(BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> int | None:
         """Resolve a dynamic constraint reference by reading the attribute value."""
         ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
         if not ref_attr:
@@ -776,7 +777,7 @@ class IDMBaseTest(BasicCompositionTests):
         self,
         endpoint_id: int,
         attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
-    ) -> Optional[Status]:
+    ) -> Status | None:
         """
         Attempts to write `attr_class` on `endpoint_id` using a small set
         of dummy values. Returns the resulting Status, or None if no value
@@ -1167,18 +1168,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     def get_mrp_retransmission_timeout_sec(self, dev_ctrl: ChipDeviceCtrl) -> float:
         """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
-        session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
-        # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
-        # idle=500ms, active=300ms.
-        negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else 500
-        negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else 300
-
-        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
-        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
-
-        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
-        backoff_sum = 1 + 1.6 + 2.56 + 4.096
-        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+        return compute_mrp_retransmission_timeout_sec(dev_ctrl, self.dut_node_id)
 
     def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
         """Get list of writable attribute IDs for a cluster.

@@ -1,1 +1,1 @@
-204 : [Silabs] Update efr32 docker to SDK 2026.6.0
+206 : [Silabs] Prevent removal of libble_bgapi_gatt_client.a

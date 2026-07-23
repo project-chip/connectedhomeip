@@ -490,6 +490,16 @@
 - (MCMediaPlaybackClusterAvailableTextTracksAttribute * _Nullable)availableTextTracksAttribute;
 
 /**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterAvailableCommandsAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterAvailableCommandsAttribute * _Nullable)availableCommandsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterContentInfoAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterContentInfoAttribute * _Nullable)contentInfoAttribute;
+
+/**
  * @brief Returns non-nil pointer to MCMediaPlaybackClusterGeneratedCommandListAttribute if supported, nil otherwise.
  */
 - (MCMediaPlaybackClusterGeneratedCommandListAttribute * _Nullable)generatedCommandListAttribute;

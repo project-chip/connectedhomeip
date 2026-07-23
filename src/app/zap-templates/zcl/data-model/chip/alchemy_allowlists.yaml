@@ -24,7 +24,6 @@ MANUAL_ALLOWLIST:
     - global-bitmaps.xml
     - matter-devices.xml
     - measurement-and-sensing.xml
-    - media-playback-cluster.xml
     - mode-base-cluster.xml
     - proxy-configuration-cluster.xml
     - proxy-discovery-cluster.xml

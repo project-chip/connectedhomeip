@@ -69,6 +69,7 @@ bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libbondingdb_stub.a
 bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi.a
 bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a
 bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_client.a
 bluetooth_le_host/build/gcc/cortex-m33/ble_system/release/libble_system.a
 bluetooth_le_host/build/gcc/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a
 bluetooth_le_host/build/gcc/cortex-m33/core/release/libble_host_core.a
@@ -87,6 +88,7 @@ bluetooth_le_host/build/llvm/cortex-m33/bgstack/release/libbondingdb_stub.a
 bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi.a
 bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a
 bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a
+bluetooth_le_host/build/llvm/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_client.a
 bluetooth_le_host/build/llvm/cortex-m33/ble_system/release/libble_system.a
 bluetooth_le_host/build/llvm/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a
 bluetooth_le_host/build/llvm/cortex-m33/core/release/libble_host_core.a

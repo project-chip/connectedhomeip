@@ -227,8 +227,9 @@
 
 import logging
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects

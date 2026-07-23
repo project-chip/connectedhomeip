@@ -6,7 +6,7 @@ import shutil
 import time
 from enum import Enum, auto
 from concurrent.futures import ThreadPoolExecutor
-from typing import Sequence
+from collections.abc import Sequence
 
 from builders.builder import BuilderOptions, Builder, OutDirLock
 from runner.runner import Runner
