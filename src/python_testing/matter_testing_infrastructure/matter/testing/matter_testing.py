@@ -520,9 +520,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     Wildcard subscription (see setup_test):
 
     * Set class attribute requires_dut = False for tests that do not interact with a
-      real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
-      will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is True.
+      DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
+      will skip the background wildcard subscription and the pre-test DUT-state capture,
+      so they don't attempt network operations against a device that isn't there.
+      Default is True.
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
     * When a wildcard subscription is active, read_single_attribute_check_success compares
@@ -554,9 +555,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
         self._framework_cleanup_done = False
-        # Set to True by commission_devices() on success; gates the per-test ACL read in
-        # setup_test so unit tests (which never commission) incur zero network overhead.
-        self._dut_confirmed_available = False
         # Prevents double-execution when the override calls super().teardown_test()
         # and __init_subclass__ also calls it afterward.
         self._teardown_ran = False
@@ -1145,10 +1143,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
 
+        found_any = False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
+            found_any = True
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
@@ -1172,6 +1172,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("[CLN] scenes cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
                 LOGGER.warning("[CLN] scene removal failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] ScenesManagement cluster not present on any endpoint, skipping scene cleanup")
 
     async def _purge_group_memberships(self) -> None:
         """Removes all group memberships from the DUT's group table.
@@ -1433,21 +1435,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.cleanup_config = TestCleanupConfig()
         self._validate_test_parameters()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # in teardown_class. Skip when the DUT is not known to be available: unit tests
-        # never commission a device so _dut_confirmed_available stays False, and
-        # commissioning_method is None, eliminating any network overhead for them.
-        # For runner-commissioned tests commissioning_method is set; for in-test
-        # commissioning the flag is set by commission_devices() on success.
-        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
-        # on the fabric, an operational read there would send CASE Sigma1 to an
-        # uncommissioned device, triggering unexpected DUT behaviour.
-        dut_expected = (
-            not self.is_commissioning
-            and (
-                self._dut_confirmed_available
-                or self.matter_test_config.commissioning_method is not None
-            )
-        )
+        # during framework cleanup. Gated on requires_dut so the capture applies no matter
+        # how or when the DUT is commissioned (runner or in-test), while unit tests skip it.
+        # Skipped while commissioning: the DUT is not on the fabric yet, and an operational
+        # read would send CASE Sigma1 to an uncommissioned device.
+        dut_expected = not self.is_commissioning and self.requires_dut
         if dut_expected:
             try:
                 self._original_acl = self.event_loop.run_until_complete(
@@ -1462,7 +1454,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (requires_dut = True, the default) and unless the test has opted out
+            # DUT (requires_dut = True, the default) and unless the test has opted out
             # via --no-wildcard-subscription or disable_wildcard_subscription = True on
             # the test class (e.g. tests that directly manipulate the ACL or tests that count
             # the TH entries).
@@ -2244,10 +2236,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
-        if result:
-            self._dut_confirmed_available = True
-        return result
+        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
         """Commission a single DUT devices over NTL.
