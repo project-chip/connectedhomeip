@@ -256,15 +256,15 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                         "bits both set but MultiModalMessages feature not supported");
         status = Status::InvalidCommand);
 
-    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kSpokenMessage) || languageCode.HasValue(),
-                 ChipLogProgress(
-                     Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but LanguageCode missing");
-                 status = Status::ConstraintError);
+    VerifyOrExit(
+        !messageControl.Has(MessageControlBitmap::kSpokenMessage) || languageCode.HasValue(),
+        ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback SpokenMessage bit set but LanguageCode missing");
+        status = Status::ConstraintError);
 
-    VerifyOrExit(!messageControl.Has(MessageControlBitmap::kAudioMessage) || messageUri.HasValue(),
-                 ChipLogProgress(
-                     Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but MessageURI missing");
-                 status = Status::ConstraintError);
+    VerifyOrExit(
+        !messageControl.Has(MessageControlBitmap::kAudioMessage) || messageUri.HasValue(),
+        ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback AudioMessage bit set but MessageURI missing");
+        status = Status::ConstraintError);
 
     if (languageCode.HasValue())
     {
