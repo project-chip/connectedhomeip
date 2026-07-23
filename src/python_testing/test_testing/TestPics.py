@@ -15,14 +15,34 @@
 #    limitations under the License.
 #
 
+import os
+import tempfile
+
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.pics import generate_device_element_pics_from_device_wildcard
+from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, base_pics_facts_to_pics_codes,
+                                 derive_base_pics_facts_from_device_wildcard, generate_device_element_pics_from_device_wildcard,
+                                 parse_pics_xml, read_pics_from_file)
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
+
+
+def _make_pics_xml(items: dict[str, bool]) -> str:
+    """
+    Build a minimal PICSGenerator-style clusterPICS XML document from a {pics_code: support} mapping.
+    """
+    rows = "\n".join(
+        f"    <picsItem>\n"
+        f"        <itemNumber>{code}</itemNumber>\n"
+        f"        <support>{str(supported).lower()}</support>\n"
+        f"    </picsItem>"
+        for code, supported in items.items()
+    )
+    return f"<?xml version='1.0' encoding='utf-8'?>\n<clusterPICS>\n{rows}\n</clusterPICS>\n"
 
 
 class TestPicsHelpers(MatterBaseTest):
@@ -124,6 +144,345 @@ class TestPicsHelpers(MatterBaseTest):
         pics_list, problems = generate_device_element_pics_from_device_wildcard(wildcard, xml_cluster)
         asserts.assert_equal(len(problems), 1, "Unexpected problems found generating PICS list")
         check_expected_pics(pics_list)
+
+    def test_base_pics_facts_to_pics_codes(self):
+        # Empty facts must produce an empty code set so a non-commissioned,
+        # non-server fact bundle does not accidentally mark anything.
+        asserts.assert_equal(base_pics_facts_to_pics_codes(BasePicsFacts()), set(),
+                             "Empty BasePicsFacts must produce no PICS codes")
+
+        # Every individual flag, mapped one at a time, must appear in the
+        # tracked-codes set so callers can rely on BASE_PICS_CODES_DERIVED.
+        cases = [
+            (BasePicsFacts(is_commissionee=True), "MCORE.ROLE.COMMISSIONEE"),
+            (BasePicsFacts(is_server=True), "MCORE.IDM.S"),
+            (BasePicsFacts(is_bridge=True), "MCORE.BRIDGE"),
+            (BasePicsFacts(is_ota_requestor=True), "MCORE.OTA.Requestor"),
+            (BasePicsFacts(is_ota_provider=True), "MCORE.OTA.Provider"),
+            (BasePicsFacts(has_groups_on_multiple_endpoints=True), "MCORE.G.MULTIENDPOINT"),
+        ]
+        for facts, expected_code in cases:
+            codes = base_pics_facts_to_pics_codes(facts)
+            asserts.assert_equal(codes, {expected_code}, f"Expected only {expected_code}, got {codes}")
+            asserts.assert_in(expected_code, BASE_PICS_CODES_DERIVED,
+                              f"{expected_code} must be in BASE_PICS_CODES_DERIVED so the test step iterates it")
+
+        # All-on must produce all codes.
+        all_on = BasePicsFacts(
+            is_commissionee=True, is_server=True, is_bridge=True,
+            is_ota_requestor=True, is_ota_provider=True,
+            has_groups_on_multiple_endpoints=True)
+        asserts.assert_equal(base_pics_facts_to_pics_codes(all_on), set(BASE_PICS_CODES_DERIVED),
+                             "All-on facts must produce the full tracked-codes set")
+
+    def test_derive_base_pics_facts_from_device_wildcard(self):
+        xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        desc = Clusters.Descriptor
+        opcreds = Clusters.OperationalCredentials
+        groups = Clusters.Groups
+        ota_req = Clusters.OtaSoftwareUpdateRequestor
+
+        # Minimal "root node plus bridged child with Groups on EP1 and EP2" wildcard.
+        # EP0: root node device type, OpCreds (so endpoint has a server),
+        #      OTA Requestor (server-side).
+        # EP1: Aggregator device type, Groups server.
+        # EP2: Groups server.
+        wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
+
+        wildcard.attributes[0] = {
+            desc: {desc.Attributes.DeviceTypeList: [
+                desc.Structs.DeviceTypeStruct(deviceType=0x16, revision=1)]},
+        }
+        wildcard.attributes[1] = {
+            desc: {desc.Attributes.DeviceTypeList: [
+                desc.Structs.DeviceTypeStruct(deviceType=0x000E, revision=1)]},
+        }
+        wildcard.attributes[2] = {
+            desc: {desc.Attributes.DeviceTypeList: []},
+        }
+
+        # Build minimal global-attribute fills for each cluster the helper
+        # will visit. Empty attribute/command lists are fine for the
+        # rules covered here; event conformance is covered in its own test.
+        def _empty_globals(feature_map=0):
+            return {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: feature_map,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            }
+
+        wildcard.tlvAttributes[0] = {
+            desc.id: _empty_globals(),
+            opcreds.id: _empty_globals(),
+            ota_req.id: _empty_globals(),
+        }
+        wildcard.tlvAttributes[1] = {
+            desc.id: _empty_globals(),
+            groups.id: _empty_globals(),
+        }
+        wildcard.tlvAttributes[2] = {
+            desc.id: _empty_globals(),
+            groups.id: _empty_globals(),
+        }
+
+        facts, problems = derive_base_pics_facts_from_device_wildcard(wildcard, xml_cluster)
+        asserts.assert_equal(problems, [], "Unexpected derivation problems")
+        asserts.assert_true(facts.is_commissionee, "Root node device type on EP0 must derive is_commissionee")
+        asserts.assert_true(facts.is_server, "Standard server clusters on EP0 must derive is_server")
+        asserts.assert_true(facts.is_bridge, "Aggregator device type on EP1 must derive is_bridge")
+        asserts.assert_true(facts.is_ota_requestor, "OTA Requestor cluster on EP0 must derive is_ota_requestor")
+        asserts.assert_false(facts.is_ota_provider, "OTA Provider not present, must not derive is_ota_provider")
+        asserts.assert_true(facts.has_groups_on_multiple_endpoints,
+                            "Groups on EP1 + EP2 must derive has_groups_on_multiple_endpoints")
+
+        # Translator should map this exactly to the expected MCORE set,
+        # excluding the one it doesn't cover (OTA Provider).
+        expected_codes = {
+            "MCORE.ROLE.COMMISSIONEE", "MCORE.IDM.S", "MCORE.BRIDGE",
+            "MCORE.OTA.Requestor", "MCORE.G.MULTIENDPOINT",
+        }
+        asserts.assert_equal(base_pics_facts_to_pics_codes(facts), expected_codes,
+                             "Translator output drifted from the per-rule facts")
+
+    def test_derive_base_pics_facts_groups_on_single_endpoint(self):
+        # Groups cluster on a single endpoint must NOT derive
+        # has_groups_on_multiple_endpoints. The >= 2 threshold is the
+        # whole point of the MCORE.G.MULTIENDPOINT PICS.
+        xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        desc = Clusters.Descriptor
+        groups = Clusters.Groups
+
+        wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
+        wildcard.attributes[0] = {desc: {desc.Attributes.DeviceTypeList: []}}
+        wildcard.attributes[1] = {desc: {desc.Attributes.DeviceTypeList: []}}
+        wildcard.tlvAttributes[0] = {
+            desc.id: {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: 0,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            },
+        }
+        wildcard.tlvAttributes[1] = {
+            desc.id: {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: 0,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            },
+            groups.id: {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: 0,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            },
+        }
+
+        facts, problems = derive_base_pics_facts_from_device_wildcard(wildcard, xml_cluster)
+        asserts.assert_equal(problems, [], "Unexpected derivation problems")
+        asserts.assert_false(facts.has_groups_on_multiple_endpoints,
+                             "Groups on a single endpoint must not derive MCORE.G.MULTIENDPOINT")
+
+    def test_derive_base_pics_facts_mandatory_events(self):
+        # AccessControl on EP0 has spec-MANDATORY events (AccessControlEntryChanged,
+        # AccessControlExtensionChanged). Their conformance evaluates to
+        # mandatory with no feature-map dependency, so they should land in
+        # facts.mandatory_events_by_cluster regardless of feature bits.
+        xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        acl = Clusters.AccessControl
+        desc = Clusters.Descriptor
+
+        # Only run this rule if the chosen DM XML actually has events for
+        # AccessControl; otherwise the test would be tautological.
+        asserts.assert_true(
+            len(xml_cluster[acl.id].events) > 0,
+            "Test fixture assumption broken: AccessControl 1.4.1 must have events in DM XML")
+
+        wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
+        wildcard.attributes[0] = {desc: {desc.Attributes.DeviceTypeList: []}}
+        wildcard.tlvAttributes[0] = {
+            desc.id: {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: 0,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            },
+            acl.id: {
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: [],
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: [],
+                GlobalAttributeIds.FEATURE_MAP_ID: 0,
+                GlobalAttributeIds.CLUSTER_REVISION_ID: 1,
+            },
+        }
+
+        facts, _ = derive_base_pics_facts_from_device_wildcard(wildcard, xml_cluster)
+        ep_events = facts.mandatory_events_by_cluster.get(0, {})
+        acl_mandatory = ep_events.get(acl.id, set())
+        asserts.assert_true(
+            len(acl_mandatory) > 0,
+            "AccessControl spec-mandatory events must be derived for any DUT with AccessControl on EP0")
+
+    def test_read_pics_from_file_endpoint_naming_variants(self):
+        """Endpoint subdir matching tolerates common naming conventions."""
+        test_xml = """<?xml version='1.0' encoding='utf-8'?>
+        <clusterPICS>
+            <picsItem>
+                <itemNumber>TEST.S</itemNumber>
+                <support>true</support>
+            </picsItem>
+        </clusterPICS>
+        """
+        for subdir_name in ['endpoint0', 'EP0', 'ep_0', 'Endpoint 0', '0']:
+            with tempfile.TemporaryDirectory() as d:
+                ep_dir = os.path.join(d, subdir_name)
+                os.makedirs(ep_dir)
+                with open(os.path.join(ep_dir, 'cluster.xml'), 'w') as f:
+                    f.write(test_xml)
+                pics = read_pics_from_file(d)
+                asserts.assert_true(pics.get(0, {}).get('TEST.S'), f'Failed for subdir name: {subdir_name}')
+
+    # ------------------------------------------------------------------
+    # parse_pics_xml: now returns an endpoint-keyed tree {endpoint: {code: bool}}
+    # ------------------------------------------------------------------
+
+    def test_parse_pics_xml_defaults_to_endpoint_0(self):
+        """
+        With no endpoint supplied, codes land under endpoint 0 (device-wide).
+        """
+        xml = _make_pics_xml({'BINFO.S': True, 'BINFO.S.A0000': False})
+        asserts.assert_equal(parse_pics_xml(xml), {0: {'BINFO.S': True, 'BINFO.S.A0000': False}})
+
+    def test_parse_pics_xml_uses_supplied_endpoint(self):
+        """
+        The caller-supplied endpoint becomes the tree key.
+        """
+        xml = _make_pics_xml({'SWTCH.S': True})
+        asserts.assert_equal(parse_pics_xml(xml, endpoint=3), {3: {'SWTCH.S': True}})
+
+    def test_parse_pics_xml_parses_support_true_false(self):
+        result = parse_pics_xml(_make_pics_xml({'A.S': True, 'B.S': False}))[0]
+        asserts.assert_true(result['A.S'], "support 'true' must parse as True")
+        asserts.assert_false(result['B.S'], "support 'false' must parse as False")
+
+    def test_parse_pics_xml_missing_item_number_raises(self):
+        xml = "<clusterPICS><picsItem><support>true</support></picsItem></clusterPICS>"
+        with asserts.assert_raises(ValueError):
+            parse_pics_xml(xml)
+
+    def test_parse_pics_xml_missing_support_raises(self):
+        xml = "<clusterPICS><picsItem><itemNumber>X.S</itemNumber></picsItem></clusterPICS>"
+        with asserts.assert_raises(ValueError):
+            parse_pics_xml(xml)
+
+    # ------------------------------------------------------------------
+    # read_pics_from_file: builds the endpoint tree from a PICSGenerator dir
+    # ------------------------------------------------------------------
+
+    def test_read_pics_from_file_builds_endpoint_tree(self):
+        """
+        Top-level *.xml (Base.xml) -> EP0; endpointN subdirs -> EP N; the
+        EP0 subdir merges with the device-wide top-level codes.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'Base.xml'), 'w') as f:
+                f.write(_make_pics_xml({'MCORE.IDM.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint0'))
+            with open(os.path.join(d, 'endpoint0', 'desc.xml'), 'w') as f:
+                f.write(_make_pics_xml({'DESC.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+
+            tree = read_pics_from_file(d)
+
+        asserts.assert_equal(sorted(tree.keys()), [0, 1])
+        # Base.xml and the endpoint0/ slice both land under endpoint 0.
+        asserts.assert_true(tree[0]['MCORE.IDM.S'], "Base.xml device-wide code must be on endpoint 0")
+        asserts.assert_true(tree[0]['DESC.S'], "endpoint0/ cluster code must merge into endpoint 0")
+        asserts.assert_true(tree[1]['SWTCH.S'], "endpoint1/ cluster code must be on endpoint 1")
+        # Endpoint 0's codes must not bleed into endpoint 1's slice.
+        asserts.assert_not_in('DESC.S', tree[1], "endpoint 0 code leaked into endpoint 1")
+        asserts.assert_not_in('MCORE.IDM.S', tree[1], "device-wide code leaked into endpoint 1")
+
+    def test_read_pics_from_file_preserves_per_endpoint_divergence(self):
+        """
+        The same code may carry different values on different endpoints; the
+        tree must keep them separate (the old flat dict collapsed them).
+        """
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S.F00': True, 'SWTCH.S.F01': False}))
+            os.makedirs(os.path.join(d, 'endpoint3'))
+            with open(os.path.join(d, 'endpoint3', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S.F00': False, 'SWTCH.S.F01': True}))
+
+            tree = read_pics_from_file(d)
+
+        asserts.assert_true(tree[1]['SWTCH.S.F00'], "endpoint 1 F00 must stay True")
+        asserts.assert_false(tree[1]['SWTCH.S.F01'], "endpoint 1 F01 must stay False")
+        asserts.assert_false(tree[3]['SWTCH.S.F00'], "endpoint 3 F00 must stay False")
+        asserts.assert_true(tree[3]['SWTCH.S.F01'], "endpoint 3 F01 must stay True")
+
+    def test_read_pics_from_file_ignores_non_endpoint_subdirs(self):
+        """
+        Directories that don't resolve to an endpoint number are skipped.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, 'notanendpoint'))
+            with open(os.path.join(d, 'notanendpoint', 'x.xml'), 'w') as f:
+                f.write(_make_pics_xml({'X.S': True}))
+            asserts.assert_equal(read_pics_from_file(d), {})
+
+    def test_read_pics_from_file_ci_text_file_lands_on_endpoint_0(self):
+        """
+        A CI-format text file is not endpoint-scoped, so it all lands on EP0.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, 'pics.txt')
+            with open(path, 'w') as f:
+                f.write("TEST.S.A0000=1\nTEST.S.A0001=0\n")
+            asserts.assert_equal(read_pics_from_file(path),
+                                 {0: {'TEST.S.A0000': True, 'TEST.S.A0001': False}})
+
+    # ------------------------------------------------------------------
+    # check_pics: endpoint-aware lookups over the endpoint-keyed tree
+    # ------------------------------------------------------------------
+
+    def test_check_pics_any_endpoint_when_endpoint_omitted(self):
+        """
+        With no endpoint, a code is enabled if it is true on ANY endpoint.
+        """
+        self.matter_test_config.pics = {0: {'MCORE.IDM.S': True}, 3: {'SWTCH.S': True}}
+        asserts.assert_true(self.check_pics('SWTCH.S'), "code true on endpoint 3 must satisfy unscoped check")
+        asserts.assert_true(self.check_pics('MCORE.IDM.S'), "code true on endpoint 0 must satisfy unscoped check")
+        asserts.assert_false(self.check_pics('NOT.PRESENT'), "absent code must be False")
+
+    def test_check_pics_scoped_to_endpoint(self):
+        """
+        With an endpoint, only that endpoint's slice is consulted.
+        """
+        self.matter_test_config.pics = {0: {'SWTCH.S': False}, 3: {'SWTCH.S': True}}
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 0 slice says False")
+        asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 slice says True")
+        # An endpoint with no slice at all returns False rather than raising.
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=9), "unknown endpoint must be False")
+
+    def test_check_pics_no_cross_endpoint_leak(self):
+        """
+        Regression: a code present only on endpoint 3 must not satisfy an
+        endpoint-0-scoped check.
+        """
+        self.matter_test_config.pics = {0: {}, 3: {'SWTCH.S': True}}
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 3 code must not leak into endpoint 0 check")
+        asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 code must be found on endpoint 3")
 
 
 if __name__ == "__main__":

@@ -28,8 +28,10 @@ TEST_CASES = [
 
 
 def main():
-    pics = {"ICDM.S.A0000": True, "ICDM.S.A0001": True, "ICDM.S.A0002": True, "ICDM.S.A0003": False, "ICDM.S.A0004": False,
-            "ICDM.S.A0005": False, "ICDM.S.A0006": False, "ICDM.S.A0007": False, "ICDM.S.A0008": False, "ICDM.S.A0009": False}
+    # PICS are stored as an endpoint-keyed tree {endpoint: {code: bool}}; the
+    # mock serves ICDM on the root endpoint, so key the codes under endpoint 0.
+    pics = {0: {"ICDM.S.A0000": True, "ICDM.S.A0001": True, "ICDM.S.A0002": True, "ICDM.S.A0003": False, "ICDM.S.A0004": False,
+                "ICDM.S.A0005": False, "ICDM.S.A0006": False, "ICDM.S.A0007": False, "ICDM.S.A0008": False, "ICDM.S.A0009": False}}
 
     return run_tests(pics, 'TC_ICDM_2_1', TEST_CASES, 'test_TC_ICDM_2_1')
 

@@ -555,7 +555,7 @@ class MockTestRunner:
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
-                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
+                 pics: dict[int, dict[str, bool]] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
