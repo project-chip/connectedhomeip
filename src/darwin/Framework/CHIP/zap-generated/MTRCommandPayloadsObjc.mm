@@ -43319,6 +43319,17 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
             }
+            if (self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption != nil) {
+                auto & definedValue_4 = definedValue_2.HLSEncryption.Emplace();
+                definedValue_4.kid = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.kid);
+                definedValue_4.baseKey = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.baseKey);
+                definedValue_4.schemeURI = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.schemeURI);
+                definedValue_4.ratchetBits = self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetBits.unsignedCharValue;
+                if (self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime != nil) {
+                    auto & definedValue_6 = definedValue_4.ratchetTime.Emplace();
+                    definedValue_6 = self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime.unsignedCharValue;
+                }
+            }
         }
         if (self.transportOptions.expiryTime != nil) {
             auto & definedValue_1 = encodableStruct.transportOptions.expiryTime.Emplace();
@@ -43615,6 +43626,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                 } else {
                     self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                 }
+                if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.HasValue()) {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = [MTRPushAVStreamTransportClusterHLSEncryptionStruct new];
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.kid = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().kid);
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.baseKey = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().baseKey);
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.schemeURI = AsData(decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().schemeURI);
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetBits = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetBits];
+                    if (decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.HasValue()) {
+                        self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = [NSNumber numberWithUnsignedChar:decodableStruct.transportConfiguration.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.Value()];
+                    } else {
+                        self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = nil;
+                    }
+                } else {
+                    self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = nil;
+                }
             } else {
                 self.transportConfiguration.transportOptions.containerOptions.cmafContainerOptions = nil;
             }
@@ -43906,6 +43931,17 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             if (self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled != nil) {
                 auto & definedValue_4 = definedValue_2.metadataEnabled.Emplace();
                 definedValue_4 = self.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled.boolValue;
+            }
+            if (self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption != nil) {
+                auto & definedValue_4 = definedValue_2.HLSEncryption.Emplace();
+                definedValue_4.kid = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.kid);
+                definedValue_4.baseKey = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.baseKey);
+                definedValue_4.schemeURI = AsByteSpan(self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.schemeURI);
+                definedValue_4.ratchetBits = self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetBits.unsignedCharValue;
+                if (self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime != nil) {
+                    auto & definedValue_6 = definedValue_4.ratchetTime.Emplace();
+                    definedValue_6 = self.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime.unsignedCharValue;
+                }
             }
         }
         if (self.transportOptions.expiryTime != nil) {
@@ -44489,6 +44525,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                         } else {
                             newElement_0.transportOptions.containerOptions.cmafContainerOptions.metadataEnabled = nil;
                         }
+                        if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.HasValue()) {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = [MTRPushAVStreamTransportClusterHLSEncryptionStruct new];
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.kid = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().kid);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.baseKey = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().baseKey);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.schemeURI = AsData(entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().schemeURI);
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetBits = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetBits];
+                            if (entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.HasValue()) {
+                                newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = [NSNumber numberWithUnsignedChar:entry_0.transportOptions.Value().containerOptions.CMAFContainerOptions.Value().HLSEncryption.Value().ratchetTime.Value()];
+                            } else {
+                                newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption.ratchetTime = nil;
+                            }
+                        } else {
+                            newElement_0.transportOptions.containerOptions.cmafContainerOptions.hlsEncryption = nil;
+                        }
                     } else {
                         newElement_0.transportOptions.containerOptions.cmafContainerOptions = nil;
                     }
@@ -44563,6 +44613,141 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionID = @(0);
+
+        _motionZones = nil;
+
+        _motionSensitivity = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams alloc] init];
+
+    other.connectionID = self.connectionID;
+    other.motionZones = self.motionZones;
+    other.motionSensitivity = self.motionSensitivity;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; motionZones:%@; motionSensitivity:%@; >", NSStringFromClass([self class]), _connectionID, _motionZones, _motionSensitivity];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterUpdateMotionZoneOptionsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.connectionID = self.connectionID.unsignedShortValue;
+    }
+    {
+        if (self.motionZones == nil) {
+            encodableStruct.motionZones.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.motionZones.SetNonNull();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.motionZones.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.motionZones.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.motionZones.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.motionZones[i_1], MTRPushAVStreamTransportClusterTransportZoneOptionsStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.motionZones[i_1], NSStringFromClass(MTRPushAVStreamTransportClusterTransportZoneOptionsStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        if (element_1.zone == nil) {
+                            listHolder_1->mList[i_1].zone.SetNull();
+                        } else {
+                            auto & nonNullValue_3 = listHolder_1->mList[i_1].zone.SetNonNull();
+                            nonNullValue_3 = element_1.zone.unsignedShortValue;
+                        }
+                        if (element_1.sensitivity != nil) {
+                            auto & definedValue_3 = listHolder_1->mList[i_1].sensitivity.Emplace();
+                            definedValue_3 = element_1.sensitivity.unsignedCharValue;
+                        }
+                    }
+                    nonNullValue_0 = ListType_1(listHolder_1->mList, self.motionZones.count);
+                } else {
+                    nonNullValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.motionSensitivity != nil) {
+            auto & definedValue_0 = encodableStruct.motionSensitivity.Emplace();
+            if (self.motionSensitivity == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.motionSensitivity.unsignedCharValue;
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRChimeClusterPlayChimeSoundParams
