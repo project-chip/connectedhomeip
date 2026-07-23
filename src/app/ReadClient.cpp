@@ -836,6 +836,20 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            // Per Matter IM spec, an AttributeStatusIB inside an AttributeReportIB always carries an
+            // error status (Success is only valid for AttributeStatusIBs in WriteResponses). A peer
+            // sending Status::Success here is spec-violating; passing it to OnAttributeData with
+            // apData == nullptr breaks the documented callback contract and has caused null derefs
+            // in consumers. Skip the IB instead, mirroring the out-of-range-ID handling above.
+            if (statusIB.IsSuccess())
+            {
+                ChipLogError(DataManagement,
+                             "Skipping AttributeStatusIB with Success status (spec violation): (%d, " ChipLogFormatMEI
+                             ", " ChipLogFormatMEI ")",
+                             attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId),
+                             ChipLogValueMEI(attributePath.mAttributeId));
+                continue;
+            }
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
