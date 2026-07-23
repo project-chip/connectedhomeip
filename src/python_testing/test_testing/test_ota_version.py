@@ -27,7 +27,6 @@ log = logging.getLogger(__name__)
 
 
 class TestCheckSoftwareVersion(MatterBaseTest):
-    requires_dut = False
 
     @async_test_body
     async def setup_class(self):

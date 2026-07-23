@@ -36,6 +36,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
+from pathlib import Path
 from typing import Any, TypeAlias
 
 import matter.testing.matchers as matchers
@@ -514,22 +515,47 @@ class TestCleanupConfig:
         return cls(**{f.name: False for f in fields(cls)})
 
 
+# Directory that holds the framework tests for the test harness itself.
+# MatterBaseTest._wildcard_subscription_enabled_by_location() uses this to decide the
+# default background-wildcard-subscription behavior for tests living here.
+_TEST_TESTING_DIR = "test_testing"
+
+# Tests under test_testing/ default to skipping the background wildcard subscription. Most
+# are framework/parser unit tests with no device to subscribe to (subscribing would hang
+# ~30s per test and blow the CI timeout)
+
+# The tests below are the exception: they run through the real runner against a device and
+# rely on the subscription-cache verification, so they opt back in. (Note: this is purely
+# about the subscription.) There is no static signal that distinguishes "runs against a device"
+# from "wants the subscription", so this list is maintained by hand: add a test_testing/ file here
+# only if it runs through the real runner (not MockTestRunner) against a device AND needs the subscription-cache verification.
+_WILDCARD_SUBSCRIPTION_ENABLED: frozenset[str] = frozenset({
+    "TestCleanupFramework.py",
+    "TestCommissioningStatusDetectionIntegration.py",
+    "TestCommissioningTimeSync.py",
+    "TestCreateNewController.py",
+    "TestMatterDeviceGraph.py",
+    "test_manufacturer_specific_cluster.py",
+})
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     """Base class for Matter Python tests.
 
     Wildcard subscription (see setup_test):
 
-    * Set class attribute requires_dut = False for tests that do not interact with a
-      real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
-      will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is True.
+    * Whether the background wildcard subscription starts is derived from the test's file
+      location by _wildcard_subscription_enabled_by_location(); no per-class flag is needed.
+      Framework tests under test_testing/ default to skipping it (nothing to subscribe to),
+      so they don't hang trying to subscribe to a device that isn't there. The few
+      test_testing/ tests that run against a real device and rely on the subscription are
+      listed in _WILDCARD_SUBSCRIPTION_ENABLED.
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
     """
-    requires_dut: bool = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -712,6 +738,33 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.matter_test_config.no_wildcard_subscription
             or getattr(self, "disable_wildcard_subscription", False)
         )
+
+    def _wildcard_subscription_enabled_by_location(self) -> bool:
+        """
+        Whether this test's file location opts it into the background wildcard subscription.
+        The decision is derived from the test's file location instead of a flag:
+
+        * Tests outside test_testing/ default to enabled (the safe default for real tests).
+        * Tests under test_testing/ default to disabled, except the handful listed in
+          _WILDCARD_SUBSCRIPTION_ENABLED that drive a real DUT and rely on the
+          subscription-cache verification.
+
+        Note this is only about the *background wildcard subscription*, several test_testing/
+        tests exercise a real app but intentionally skip the subscription, so this must not
+        gate DUT-only concerns such as the ACL snapshot (which keys off commissioning state, see setup_test).
+        """
+        try:
+            # getsourcefile resolves a cached .pyc back to its .py source; fall back to
+            # getfile. Both raise TypeError for a class with no resolvable file (e.g. one
+            # defined dynamically), in which case we keep the safe default (enabled).
+            source_file = inspect.getsourcefile(type(self)) or inspect.getfile(type(self))
+        except TypeError:
+            return True
+        test_file = Path(source_file)
+        if _TEST_TESTING_DIR not in test_file.parts:
+            return True
+        # Normalize a possible .pyc (from the getfile fallback) to match the .py allowlist.
+        return f"{test_file.stem}.py" in _WILDCARD_SUBSCRIPTION_ENABLED
 
     def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: bool | None) -> bool:
         """Resolve whether to compare a read against the wildcard subscription cache."""
@@ -1433,9 +1486,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.cleanup_config = TestCleanupConfig()
         self._validate_test_parameters()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # in teardown_class. Skip when the DUT is not known to be available: unit tests
-        # never commission a device so _dut_confirmed_available stays False, and
-        # commissioning_method is None, eliminating any network overhead for them.
+        # in teardown_class. Skip when the DUT is not known to be available: framework
+        # unit tests never commission a device so _dut_confirmed_available stays False,
+        # and commissioning_method is None, eliminating any network overhead for them.
         # For runner-commissioned tests commissioning_method is set; for in-test
         # commissioning the flag is set by commission_devices() on success.
         # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
@@ -1461,18 +1514,17 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self._original_acl = None
 
         if self.runner_hook and not self.is_commissioning:
-            # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (requires_dut = True, the default) and unless the test has opted out
-            # via --no-wildcard-subscription or disable_wildcard_subscription = True on
-            # the test class (e.g. tests that directly manipulate the ACL or tests that count
-            # the TH entries).
+            # Start the background wildcard subscription unless the test has opted out via
+            # --no-wildcard-subscription or disable_wildcard_subscription = True on the test
+            # class (e.g. tests that directly manipulate the ACL or count the TH entries), or
+            # unless the test's location opts it out (see below).
             #
-            # Parser/unit tests under test_testing/ override requires_dut = False so they
-            # don't try to subscribe to a device that isn't there (which would hang ~30s per
-            # test and blow the CI timeout).  Gating on requires_dut rather than on
-            # --commissioning-method keeps this decoupled from harness CLI flags whose
-            # semantics may shift at certification time.
-            if not self._wildcard_subscription_disabled() and self.requires_dut:
+            # _wildcard_subscription_enabled_by_location() allows framework/parser unit tests
+            # under test_testing/ default to skip the subscription so they don't subscribe
+            # to a device that isn't there, while the real-DUT integration tests that also live there
+            # are allowlisted. Keeping this decoupled from --commissioning-method avoids coupling to
+            # harness CLI flags whose semantics may shift at certification time.
+            if not self._wildcard_subscription_disabled() and self._wildcard_subscription_enabled_by_location():
                 self._start_wildcard_subscription()
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)

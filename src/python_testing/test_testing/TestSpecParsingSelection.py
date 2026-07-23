@@ -28,7 +28,6 @@ from matter.tlv import uint
 
 
 class TestSpecParsingSelection(DeviceConformanceTests):
-    requires_dut = False
 
     def setup_class(self):
         super().setup_class()
