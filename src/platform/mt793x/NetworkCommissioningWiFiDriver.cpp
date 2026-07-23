@@ -35,6 +35,17 @@ NetworkCommissioning::WiFiScanResponse * sScanResult;
 GenioScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
 
 using chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+
+// Delay (ms) before we auto-reconnect on boot.  Filogic's wpa_supplicant
+// STA config store is not fully ready when GenioWiFiDriver::Init() runs.
+constexpr uint32_t kBootAutoConnectDelayMs = 2000;
+
+void BootAutoConnectHandler(chip::System::Layer *, void * aContext)
+{
+    auto * driver = static_cast<GenioWiFiDriver *>(aContext);
+    driver->TriggerBootAutoConnect();
+}
+
 } // namespace
 
 CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
@@ -65,8 +76,35 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    // Defer the auto-connect: see kBootAutoConnectDelayMs comment above.
+    // Calling ConnectWiFiNetwork() synchronously from Init() races with
+    // filogic's wpa_supplicant STA config initialization and crashes on
+    // an internal assert.
+    CHIP_ERROR startErr =
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kBootAutoConnectDelayMs), BootAutoConnectHandler, this);
+    if (startErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(NetworkProvisioning,
+                     "GenioWiFiDriver::Init: StartTimer failed (%" CHIP_ERROR_FORMAT "); falling back to immediate connect",
+                     startErr.Format());
+        TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    }
+
     return err;
+}
+
+void GenioWiFiDriver::TriggerBootAutoConnect()
+{
+    ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::TriggerBootAutoConnect");
+
+    if (mSavedNetwork.ssidLen == 0)
+    {
+        ChipLogProgress(NetworkProvisioning, "No saved Wi-Fi credentials; skipping auto-connect");
+        return;
+    }
+
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials,
+                                                mSavedNetwork.credentialsLen);
 }
 
 CHIP_ERROR GenioWiFiDriver::CommitConfiguration()
@@ -176,13 +214,40 @@ CHIP_ERROR GenioWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     return CHIP_NO_ERROR;
 }
 
+void GenioWiFiDriver::ApplyStaProvToSupplicant()
+{
+    // The prov write in ConnectWiFiNetwork() happens while the SoftAP is still
+    // the active port (the STA mode switch is asynchronous), so on a
+    // commissioned reboot the AP->STA transition reloads an empty wpa_supplicant
+    // profile and the SSID is dropped.  DriveStationState() calls this right
+    // before it initiates the connection, once opmode is already STA, so the
+    // write lands on the live STA supplicant.
+    if (mStagingNetwork.ssidLen == 0)
+    {
+        ChipLogProgress(NetworkProvisioning, "ApplyStaProvToSupplicant: no staged SSID, skipping");
+        return;
+    }
+
+    filogic_wifi_sta_prov_t wifi_prov = {};
+    memcpy(wifi_prov.ssid, mStagingNetwork.ssid, mStagingNetwork.ssidLen);
+    memcpy(wifi_prov.psk, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
+    wifi_prov.ssid_len  = mStagingNetwork.ssidLen;
+    wifi_prov.psk_len   = mStagingNetwork.credentialsLen;
+    wifi_prov.auth_mode = WIFI_AUTH_MODE_WPA2_PSK;
+
+    ChipLogProgress(NetworkProvisioning, "ApplyStaProvToSupplicant: SSID %s",
+                    NullTerminated(mStagingNetwork.ssid, mStagingNetwork.ssidLen).c_str());
+
+    filogic_wifi_sta_prov_set_sync(PlatformMgrImpl().mFilogicCtx, &wifi_prov);
+}
+
 void GenioWiFiDriver::OnConnectWiFiNetwork()
 {
     ChipLogProgress(NetworkProvisioning, "GenioWiFiDriver::OnConnectWiFiNetwork");
 
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
