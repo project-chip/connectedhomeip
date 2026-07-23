@@ -23,6 +23,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Humidistat::
         using namespace Clusters::Humidistat::Attributes;
         switch (attributeId)
         {
+        case SupportedModes::Id:
+            return SupportedModes::kMetadataEntry;
         case Mode::Id:
             return Mode::kMetadataEntry;
         case SystemState::Id:
@@ -45,6 +47,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Humidistat::
             return Sleep::kMetadataEntry;
         case Optimal::Id:
             return Optimal::kMetadataEntry;
+        case CondPumpEnabled::Id:
+            return CondPumpEnabled::kMetadataEntry;
+        case CondRunCount::Id:
+            return CondRunCount::kMetadataEntry;
         default:
             return std::nullopt;
         }
