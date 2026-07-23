@@ -42,6 +42,10 @@
 #include "esp_rcp_update.h"
 #endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
 
+#if defined(CONFIG_ENABLE_MULTI_IMAGE_OTA) && defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#include "OTARcpImageProcessor.h"
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA && CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
+
 using namespace chip::DeviceLayer;
 using namespace chip;
 
@@ -60,6 +64,10 @@ BDXDownloader gDownloader;
 MultiImageOTAProcessorImpl gImageProcessor;
 AppImageProcessor gAppImageProcessor;
 ImageProcessorEntry gAppImageEntry{ kAppImageProcessorTag, &gAppImageProcessor };
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+OTARcpImageProcessor gRcpImageProcessor;
+ImageProcessorEntry gRcpImageEntry{ kRcpImageProcessorTag, &gRcpImageProcessor };
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
 #else
 OTAImageProcessorImpl gImageProcessor;
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
@@ -158,7 +166,11 @@ void OTAHelpers::InitOTARequestor()
     {
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
         // Register the application-firmware sub-processor before the requestor is initialised.
+        // The app image is registered first so it is applied last (it triggers the reboot).
         LogErrorOnFailure(gImageProcessor.RegisterProcessor(gAppImageEntry));
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+        LogErrorOnFailure(gImageProcessor.RegisterProcessor(gRcpImageEntry));
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
