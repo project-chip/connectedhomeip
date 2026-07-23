@@ -552,8 +552,8 @@ void FanControlCluster::StoreFanModePersistence()
 {
     VerifyOrReturn(mContext != nullptr);
     AttributePersistence attrPersistence{ mContext->attributeStorage };
-    LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), mFanMode));
+    LogErrorOnFailure(
+        attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), mFanMode));
 }
 
 } // namespace chip::app::Clusters
