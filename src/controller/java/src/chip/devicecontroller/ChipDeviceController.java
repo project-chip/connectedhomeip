@@ -144,7 +144,11 @@ public class ChipDeviceController {
    * @param aOTAProviderDelegate Delegate for OTA Provider
    */
   public void startOTAProvider(OTAProviderDelegate aOTAProviderDelegate) {
-    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate);
+    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate, 1024 /* Default BDX Block Size */);
+  }
+
+  public void startOTAProvider(OTAProviderDelegate aOTAProviderDelegate, int maxBDXBlockSize) {
+    startOTAProvider(deviceControllerPtr, aOTAProviderDelegate, maxBDXBlockSize);
   }
 
   /** Disable OTA Provider server cluster */
@@ -669,7 +673,14 @@ public class ChipDeviceController {
    */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
-    getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
+    getConnectedDevicePointer(deviceControllerPtr, nodeId, false, jniCallback.getCallbackHandle());
+  }
+
+  public void getConnectedDevicePointer(
+      long nodeId, boolean allowLargePayload, GetConnectedDeviceCallback callback) {
+    GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
+    getConnectedDevicePointer(
+        deviceControllerPtr, nodeId, allowLargePayload, jniCallback.getCallbackHandle());
   }
 
   public void releaseConnectedDevicePointer(long devicePtr) {
@@ -1655,7 +1666,8 @@ public class ChipDeviceController {
       AttestationTrustStoreDelegate delegate,
       @Nullable List<byte[]> cdTrustKeys);
 
-  private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
+  private native void startOTAProvider(
+      long deviceControllerPtr, OTAProviderDelegate delegate, int maxBDXBlockSize);
 
   private native void finishOTAProvider(long deviceControllerPtr);
 
@@ -1731,7 +1743,7 @@ public class ChipDeviceController {
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
   private native void getConnectedDevicePointer(
-      long deviceControllerPtr, long deviceId, long callbackHandle);
+      long deviceControllerPtr, long deviceId, boolean allowLargePayload, long callbackHandle);
 
   private native void releaseOperationalDevicePointer(long devicePtr);
 

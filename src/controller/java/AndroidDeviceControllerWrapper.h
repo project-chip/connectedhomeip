@@ -206,7 +206,7 @@ public:
 
     CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate, jobject cdTrustKeys);
 
-    CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
+    CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate, uint16_t maxBDXBlockSize = 1024 /* Default BDX Block Size */);
 
     CHIP_ERROR FinishOTAProvider();
 

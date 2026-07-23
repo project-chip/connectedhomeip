@@ -149,13 +149,16 @@ public:
     static constexpr size_t kLargeBufMaxSize = kLargeBufMaxSizeWithoutReserve - kDefaultHeaderReserve;
 
     /**
-     * Unified constant(both regular and large buffers) for the maximum size that an application can allocate with no
-     * protocol header reserve.
+     * Unified constants (both regular and large buffers) for the maximum buffer sizes.
+     * - kMaxAllocSize: The maximum size that an application can allocate with no protocol header reserve.
+     * - kBufMaxSize: The maximum size that an application can allocate with the default protocol header reserve.
      */
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     static constexpr size_t kMaxAllocSize = kLargeBufMaxSizeWithoutReserve;
+    static constexpr size_t kBufMaxSize   = kLargeBufMaxSize;
 #else
     static constexpr size_t kMaxAllocSize          = kMaxSizeWithoutReserve;
+    static constexpr size_t kBufMaxSize            = kMaxSize;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**

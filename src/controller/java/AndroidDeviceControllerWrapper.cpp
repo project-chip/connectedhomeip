@@ -700,7 +700,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderDelegate)
+CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderDelegate, uint16_t maxBDXBlockSize)
 {
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -710,7 +710,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderD
 
     VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate);
+    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate, maxBDXBlockSize);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
 
