@@ -196,8 +196,7 @@ exit:
     return true;
 }
 
-bool emberAfAccountLoginClusterGetDeviceAuthURICallback(app::CommandHandler * command,
-                                                        const app::ConcreteCommandPath & commandPath,
+bool emberAfAccountLoginClusterGetDeviceAuthURICallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::GetDeviceAuthURI::DecodableType & /* commandData */)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -279,6 +278,7 @@ exit:
         // NodeId nodeId = getNodeId(commandObj);
         EventNumber eventNumber;
         LoggedOutEvent event{ .node = nodeId };
+        event.fabricIndex        = commandObj->GetAccessingFabricIndex();
         CHIP_ERROR logEventError = LogEvent(event, endpoint, eventNumber);
 
         if (CHIP_NO_ERROR != logEventError)
