@@ -45,6 +45,8 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_provider_port:5541
+#       --string-arg app_pipe:/tmp/su_2_3_fifo
+#       --string-arg app_pipe_out:/tmp/su_2_3_fifo_out
 #     factory-reset: true
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
