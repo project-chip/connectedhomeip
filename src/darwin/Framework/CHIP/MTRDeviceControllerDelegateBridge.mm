@@ -179,6 +179,10 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     mCommissioningParameters = nil;
 }
 
+void MTRDeviceControllerDelegateBridge::OnInitialPhaseComplete(chip::PeerId peerId, chip::Transport::Type transportType, bool isUnpowered)
+{
+}
+
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
     MTRDeviceController * strongController = mController;
