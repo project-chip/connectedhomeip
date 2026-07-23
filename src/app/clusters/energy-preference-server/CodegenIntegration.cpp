@@ -28,10 +28,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr size_t kEnergyPreferenceFixedClusterCount =
-    EnergyPreference::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kEnergyPreferenceMaxClusterCount =
-    kEnergyPreferenceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kEnergyPreferenceFixedClusterCount = EnergyPreference::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kEnergyPreferenceMaxClusterCount = kEnergyPreferenceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<EnergyPreferenceCluster> gServers[kEnergyPreferenceMaxClusterCount];
 

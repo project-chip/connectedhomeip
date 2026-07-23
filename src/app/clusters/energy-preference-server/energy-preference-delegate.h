@@ -104,13 +104,15 @@ struct Delegate
 
     /**
      * Callback invoked when the CurrentEnergyBalance attribute is changed on endpoint `aEndpoint`.
-     * @note Do not call SetCurrentEnergyBalance() on the cluster on the same endpoint from this callback to avoid possible infinite recursion.
+     * @note Do not call SetCurrentEnergyBalance() on the cluster on the same endpoint from this callback to avoid possible infinite
+     * recursion.
      */
     virtual void OnCurrentEnergyBalanceChanged(chip::EndpointId aEndpoint, uint8_t currentEnergyBalance) {}
 
     /**
      * Callback invoked when the CurrentLowPowerModeSensitivity attribute is changed on endpoint `aEndpoint`.
-     * @note Do not call SetCurrentLowPowerModeSensitivity() on the cluster on the same endpoint from this callback to avoid possible infinite recursion.
+     * @note Do not call SetCurrentLowPowerModeSensitivity() on the cluster on the same endpoint from this callback to avoid
+     * possible infinite recursion.
      */
     virtual void OnCurrentLowPowerModeSensitivityChanged(chip::EndpointId aEndpoint, uint8_t currentLowPowerModeSensitivity) {}
 };

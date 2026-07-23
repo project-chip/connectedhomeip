@@ -26,7 +26,6 @@ namespace chip::app::Clusters {
 class EnergyPreferenceCluster : public DefaultServerCluster
 {
 public:
-
     EnergyPreferenceCluster(EndpointId endpointId, BitFlags<EnergyPreference::Feature> features) :
         DefaultServerCluster({ endpointId, EnergyPreference::Id }), mFeatures(features)
     {
