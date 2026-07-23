@@ -869,10 +869,10 @@ void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBro
         MdnsAvahi * instance = context->mInstance;
         instance->mAllocatedBrowses.remove(context);
 
-        DnssdBrowseCallback callback   = context->mCallback;
-        void * callbackContext         = context->mContext;
-        uint64_t clientGeneration      = instance->mClientGeneration;
-        uint64_t shutdownGeneration    = instance->mShutdownGeneration;
+        DnssdBrowseCallback callback = context->mCallback;
+        void * callbackContext       = context->mContext;
+        uint64_t clientGeneration    = instance->mClientGeneration;
+        uint64_t shutdownGeneration  = instance->mShutdownGeneration;
         std::vector<DnssdService> services;
         services.swap(context->mServices);
 
