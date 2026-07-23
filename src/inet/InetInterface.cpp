@@ -308,7 +308,44 @@ bool InterfaceIterator::HasBroadcastAddress()
 
 CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+    return InterfaceId(mCurNetif).GetInterfaceType(type);
+}
+
+CHIP_ERROR InterfaceId::GetInterfaceType(InterfaceType & type) const
+{
+    if (mPlatformInterface == nullptr)
+    {
+        type = InterfaceType::Unknown;
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // LwIP netif names are 2-char prefixes followed by a number (see InterfaceId::GetInterfaceName).
+    // Convention used by ESP-IDF / OpenThread integrations:
+    //   "st" / "ap" / "wl" -> WiFi station / soft-AP / generic wlan
+    //   "et"               -> Ethernet (only first two chars compared, so "et" suffices for "eth")
+    //   "ot"               -> OpenThread netif
+    //   "lo"               -> loopback (treated as Unknown for transport ordering)
+    const char c0 = mPlatformInterface->name[0];
+    const char c1 = mPlatformInterface->name[1];
+
+    if ((c0 == 's' && c1 == 't') || (c0 == 'a' && c1 == 'p') || (c0 == 'w' && c1 == 'l'))
+    {
+        type = InterfaceType::WiFi;
+    }
+    else if (c0 == 'e' && c1 == 't')
+    {
+        type = InterfaceType::Ethernet;
+    }
+    else if (c0 == 'o' && c1 == 't')
+    {
+        type = InterfaceType::Thread;
+    }
+    else
+    {
+        type = InterfaceType::Unknown;
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)

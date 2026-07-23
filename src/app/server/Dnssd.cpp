@@ -60,6 +60,34 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
         app::DnssdServer::Instance().StartServer();
         break;
+    case DeviceLayer::DeviceEventType::kThreadConnectivityChange:
+        // Re-publish operational records on every Thread connectivity transition
+        // (Established and Lost). Attach: register fresh AAAA/SRV with the SRP server
+        // now that Thread is up. Detach: refresh the published record set so any
+        // Thread-only addresses are dropped (mDNS) and a follow-up re-attach can
+        // re-register cleanly. Covers both NetworkCommissioning ConnectNetwork-driven
+        // attaches and warm-boot attaches with credentials already provisioned.
+        // See rdar://179244879.
+        app::DnssdServer::Instance().StartServer();
+        break;
+    case DeviceLayer::DeviceEventType::kWiFiConnectivityChange:
+        // Mirror of the Thread path: re-publish on both Connect and Disconnect so the
+        // mDNS/SRP record set tracks the current WiFi-side AAAA/A addresses (gain on
+        // Established, drop on Lost). The kInterfaceIpAddressChanged case below still
+        // covers IPv6 SLAAC and DHCP IPv4 arriving after association.
+        app::DnssdServer::Instance().StartServer();
+        break;
+    case DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
+        // Republish on address *gain* only. Skipping *_Lost avoids advertise thrash when an
+        // address ages out transiently; the next assignment (or a kWiFiConnectivityChange) will
+        // republish. The event payload doesn't carry an interface id, so we cannot scope this
+        // strictly to WiFi — but StartServer is idempotent and cheap enough on ESP32.
+        if (event->InterfaceIpAddressChanged.Type == DeviceLayer::InterfaceIpChangeType::kIpV6_Assigned ||
+            event->InterfaceIpAddressChanged.Type == DeviceLayer::InterfaceIpChangeType::kIpV4_Assigned)
+        {
+            app::DnssdServer::Instance().StartServer();
+        }
+        break;
     default:
         break;
     }

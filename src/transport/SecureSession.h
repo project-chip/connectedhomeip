@@ -205,7 +205,18 @@ public:
     }
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+    void SetPeerAddress(const PeerAddress & address);
+
+    /**
+     * @brief
+     *   Conditionally restamp the SecureSession's PeerAddress to the source address of an inbound
+     *   packet. Rejects candidates whose IPv6 /64 prefix does not match the anchor captured at
+     *   session establishment, since those addresses are likely non-routable from this device
+     *   (e.g. a relay-mangled OMR source on Thread). After kPeerAddressRestampOverrideThreshold
+     *   consecutive rejects from candidates sharing a single new prefix, the anchor is overridden
+     *   so a legitimately relocated peer can still recover.
+     */
+    void RestampPeerAddressIfRoutable(const PeerAddress & candidate);
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
     bool IsCASESession() const { return GetSecureSessionType() == Type::kCASE; }
@@ -243,11 +254,29 @@ public:
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
 
+        // Any inbound traffic proves the peer is reachable; clear the
+        // consecutive-send-failure budget so a future flap starts fresh.
+        mConsecutiveSendFailures = 0;
+
         if (mState == State::kDefunct)
         {
             MoveToState(State::kActive);
         }
     }
+
+    // Hysteresis accessors used by ExchangeContext to gate MarkAsDefunct on
+    // N-consecutive non-MRP send failures (see CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD).
+    // The counter is per-session because multiple exchanges share the failure budget.
+    uint8_t GetConsecutiveSendFailures() const { return mConsecutiveSendFailures; }
+    uint8_t IncrementConsecutiveSendFailures()
+    {
+        if (mConsecutiveSendFailures < UINT8_MAX)
+        {
+            ++mConsecutiveSendFailures;
+        }
+        return mConsecutiveSendFailures;
+    }
+    void ResetConsecutiveSendFailures() { mConsecutiveSendFailures = 0; }
 
     void SetCaseCommissioningSessionStatus(bool isCaseCommissioningSession)
     {
@@ -327,6 +356,11 @@ private:
     const char * StateToString(State state) const;
     void MoveToState(State targetState);
 
+    // Captures the current mPeerAddress's IPv6 /64 prefix as the "known-routable" anchor for this
+    // session. Called whenever SetPeerAddress is invoked explicitly (session establishment or
+    // a SessionManager-initiated peer relocation). Non-IPv6 / non-UDP peers leave the anchor cleared.
+    void CapturePeerAddressAnchor();
+
     friend class SecureSessionDeleter;
     friend class TestSecureSessionTable;
 
@@ -342,6 +376,23 @@ private:
 
     PeerAddress mPeerAddress;
 
+    // After this many consecutive RX restamp rejects from a single candidate /64 prefix, accept
+    // the new prefix. Allows recovery if the peer truly relocated networks while still discarding
+    // a transient burst of relay-mangled / non-routable sources during the same exchange.
+    static constexpr uint8_t kPeerAddressRestampOverrideThreshold = 5;
+
+    // First 8 bytes (IPv6 /64) of the last known-routable peer address. Sourced from
+    // SetPeerAddress (CASE/PASE establishment or explicit UpdateAllSessionsPeerAddress).
+    // Only meaningful when mPeerAddressAnchorValid is true.
+    uint8_t mPeerAddressAnchorPrefix[8] = { 0 };
+    bool mPeerAddressAnchorValid        = false;
+
+    // Tracks a candidate /64 prefix we keep rejecting in the dispatch path; once
+    // mPeerAddressRestampRejectCount reaches kPeerAddressRestampOverrideThreshold the anchor
+    // is replaced.
+    uint8_t mPeerAddressLastRejectedPrefix[8] = { 0 };
+    uint8_t mPeerAddressRestampRejectCount    = 0;
+
     /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
     System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -351,6 +402,10 @@ private:
     SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
+
+    // Count of consecutive non-MRP send failures on this session. Reset on a
+    // successful send and on any inbound RX. See ExchangeContext::SendMessage.
+    uint8_t mConsecutiveSendFailures = 0;
 };
 
 } // namespace Transport
