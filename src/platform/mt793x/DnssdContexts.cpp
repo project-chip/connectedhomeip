@@ -153,7 +153,7 @@ void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
     callback(context, nullptr, nullptr, Error::ToChipError(err));
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
@@ -324,13 +324,13 @@ void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
     callback(context, nullptr, 0, true, Error::ToChipError(err));
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
 {
     callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
@@ -348,7 +348,7 @@ void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
     callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void ResolveContext::DispatchSuccess()
@@ -368,7 +368,7 @@ void ResolveContext::DispatchSuccess()
         break;
     }
 
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
