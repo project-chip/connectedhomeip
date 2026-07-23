@@ -167,7 +167,8 @@ class TC_SC_5_2(MatterBaseTest):
         raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
         if raw_delay is not None:
             self.groupcast_settle_delay_seconds = float(raw_delay)
-            logger.info("Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided (%.1f s)", self.groupcast_settle_delay_seconds)
+            logger.info("Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided (%.1f s)",
+                        self.groupcast_settle_delay_seconds)
         elif self.is_pics_sdk_ci_only:
             self.groupcast_settle_delay_seconds = 1.0
             logger.info("CI detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 1 second")
