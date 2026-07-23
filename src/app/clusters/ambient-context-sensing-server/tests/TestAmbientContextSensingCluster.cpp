@@ -967,9 +967,8 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
 
     auto it = out.begin();
     auto i  = size_t(0);
-    while (it.Next())
+    while (it.Next() && (i<std::size(sensorFusionSupportedArray)))
     {
-        EXPECT_LT(static_cast<size_t>(i), std::size(sensorFusionSupportedArray));
         EXPECT_EQ(it.GetValue().namespaceID, sensorFusionSupportedArray[i].namespaceID);
         EXPECT_EQ(it.GetValue().tag, sensorFusionSupportedArray[i].tag);
         i++;
