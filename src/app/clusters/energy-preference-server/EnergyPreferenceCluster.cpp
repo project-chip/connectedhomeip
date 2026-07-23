@@ -16,23 +16,12 @@ CHIP_ERROR EnergyPreferenceCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     AttributePersistence persistence(context.attributeStorage);
-    uint8_t currentEnergyBalance           = 0;
-    uint8_t currentLowPowerModeSensitivity = 0;
 
-    persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, currentEnergyBalance,
-                                      currentEnergyBalance);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, mCurrentEnergyBalance,
+                                      uint8_t{});
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id },
-                                      currentLowPowerModeSensitivity, currentLowPowerModeSensitivity);
+                                      mCurrentLowPowerModeSensitivity, uint8_t{});
 
-    if (mFeatures.Has(Feature::kEnergyBalance))
-    {
-        ReturnErrorOnFailure(SetCurrentEnergyBalance(currentEnergyBalance));
-    }
-
-    if (mFeatures.Has(Feature::kLowPowerModeSensitivity))
-    {
-        ReturnErrorOnFailure(SetCurrentLowPowerModeSensitivity(currentLowPowerModeSensitivity));
-    }
     return CHIP_NO_ERROR;
 }
 
