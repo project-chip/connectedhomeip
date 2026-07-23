@@ -34,18 +34,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
-import matter.clusters as Clusters
-from matter.interaction_model import Status
+import logging
+
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from itertools import count
 
-import logging
 log = logging.getLogger(__name__)
 
 # Auto-generated from test specification: [TC-HSTAT-2.6] Negative mist test cases with DUT as Server
+
+
 class TC_HSTAT_2_6(MatterBaseTest):
 
     def pics_TC_HSTAT_2_6(self) -> list[str]:
@@ -59,11 +58,16 @@ class TC_HSTAT_2_6(MatterBaseTest):
     def steps_TC_HSTAT_2_6(self):
         return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", ""),
-            TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(3, "TH sends command SetSettings with the Mode field set to Dehumidifier", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(4, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(5, "TH sends command SetSettings with the MistType field set to MistCold", "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
-            TestStep(6, "TH sends command SetSettings with the MistType field set to MistWarm", "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
+            TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(3, "TH sends command SetSettings with the Mode field set to Dehumidifier",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(4, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(5, "TH sends command SetSettings with the MistType field set to MistCold",
+                     "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
+            TestStep(6, "TH sends command SetSettings with the MistType field set to MistWarm",
+                     "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
             TestStep(7, "TH reads from the DUT the MistType attribute.", "Verify that the DUT response contains the NULL value."),
         ]
 
@@ -71,7 +75,7 @@ class TC_HSTAT_2_6(MatterBaseTest):
     async def test_TC_HSTAT_2_6(self):
         self.step(1)
         # Commission DUT to TH (can be skipped if done in a preceding test).
-        # 
+        #
 
         self.step(2)
         # TH sends command On to the On/Off cluster on the same endpoint as this cluster.
