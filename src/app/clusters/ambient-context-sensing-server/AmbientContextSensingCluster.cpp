@@ -60,9 +60,8 @@ CHIP_ERROR AmbientContextSensingCluster::Startup(ServerClusterContext & context)
         if ((SetHoldTime(storedHoldTime) == Protocols::InteractionModel::Status::ConstraintError) && (mContext != nullptr))
         {
             // A value was found in persistence and if stored value is not valid, replace it
-            LogErrorOnFailure(
-                mContext->attributeStorage.WriteValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id },
-                                                      { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+            LogErrorOnFailure(persistence.StoreNativeEndianValue(
+                { mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id }, mHoldTime));
         }
     }
 
@@ -313,10 +312,10 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
         // Save the value to persistence
         if (mContext != nullptr)
         {
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            AttributePersistence persistence(mContext->attributeStorage);
+            LogErrorOnFailure(persistence.StoreNativeEndianValue(
                 { mPath.mEndpointId, AmbientContextSensing::Id, Attributes::ObjectCountConfig::Id },
-                { reinterpret_cast<const uint8_t *>(&mObjectCountConfig.objectCountThreshold),
-                  sizeof(mObjectCountConfig.objectCountThreshold) }));
+                mObjectCountConfig.objectCountThreshold));
         }
     }
     return Protocols::InteractionModel::Status::Success;
@@ -383,9 +382,9 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetHoldTime(uint16_t
     // Save the value to persistence
     if (mContext != nullptr)
     {
-        LogErrorOnFailure(
-            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id },
-                                                  { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+        AttributePersistence persistence(mContext->attributeStorage);
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(
+            { mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id }, mHoldTime));
     }
 
     return Protocols::InteractionModel::Status::Success;

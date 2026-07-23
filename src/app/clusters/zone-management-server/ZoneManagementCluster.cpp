@@ -142,8 +142,7 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     if (mClusterContext.initialSensitivity.has_value())
     {
         mSensitivity = *mClusterContext.initialSensitivity;
-        const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(sensitivityPath, value));
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(sensitivityPath, mSensitivity));
     }
     else
     {
@@ -217,8 +216,8 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
     if (mContext != nullptr)
     {
         const ConcreteAttributePath path(mPath.mEndpointId, mPath.mClusterId, Sensitivity::Id);
-        const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
+        AttributePersistence persistence(mContext->attributeStorage);
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(path, mSensitivity));
     }
 
     return CHIP_NO_ERROR;
@@ -265,8 +264,8 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
         VerifyOrReturnValue(sensitivity != mSensitivity, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
         const ConcreteAttributePath path(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-        CHIP_ERROR err = mContext->attributeStorage.WriteValue(
-            path, ByteSpan(reinterpret_cast<const uint8_t *>(&sensitivity), sizeof(sensitivity)));
+        AttributePersistence persistence(mContext->attributeStorage);
+        CHIP_ERROR err = persistence.StoreNativeEndianValue(path, sensitivity);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT,

@@ -314,9 +314,9 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
     {
         if (mContext != nullptr)
         {
-            uint8_t value = static_cast<uint8_t>(mMode);
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), { &value, sizeof(value) }));
+            AttributePersistence attrPersistence{ mContext->attributeStorage };
+            LogErrorOnFailure(
+                attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Mode::Id), mMode));
         }
 
         if (mDelegate != nullptr)
@@ -331,9 +331,9 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::ModeEnum mode)
     const chip::BitMask<MistTypeBitmap> clearedMistType{};
     if (SetAttributeValue(mMistType, clearedMistType, MistType::Id) && (mContext != nullptr))
     {
-        uint8_t value = mMistType.Raw();
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), mMistType.Raw()));
     }
 
     if (mDelegate != nullptr)
@@ -351,9 +351,9 @@ CHIP_ERROR HumidistatCluster::SetSystemState(Humidistat::SystemStateEnum systemS
     VerifyOrReturnValue(SetAttributeValue(mSystemState, systemState, SystemState::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = static_cast<uint8_t>(mSystemState);
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, SystemState::Id), mSystemState));
     }
 
     if (mDelegate != nullptr)
@@ -398,9 +398,9 @@ CHIP_ERROR HumidistatCluster::SetUserSetpoint(chip::Percent userSetpoint)
 
     if (mContext != nullptr)
     {
-        uint8_t value = mUserSetpoint;
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, UserSetpoint::Id), mUserSetpoint));
     }
 
     if (mDelegate != nullptr)
@@ -422,9 +422,9 @@ CHIP_ERROR HumidistatCluster::SetMistType(chip::BitMask<Humidistat::MistTypeBitm
     VerifyOrReturnValue(SetAttributeValue(mMistType, mistType, MistType::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = mMistType.Raw();
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), mMistType.Raw()));
     }
 
     if (mDelegate != nullptr)
@@ -461,9 +461,9 @@ CHIP_ERROR HumidistatCluster::SetContinuous(bool continuous)
     VerifyOrReturnValue(SetAttributeValue(mContinuous, continuous, Continuous::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = mContinuous ? 1 : 0;
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Continuous::Id), mContinuous));
     }
 
     if (mDelegate != nullptr)
@@ -481,9 +481,9 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
     VerifyOrReturnValue(SetAttributeValue(mSleep, sleep, Sleep::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = mSleep ? 1 : 0;
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id),
-                                                                { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Sleep::Id), mSleep));
     }
 
     if (mDelegate != nullptr)
@@ -503,9 +503,9 @@ CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
     VerifyOrReturnValue(SetAttributeValue(mOptimal, optimal, Optimal::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
     {
-        uint8_t value = mOptimal ? 1 : 0;
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id), { &value, sizeof(value) }));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, Optimal::Id), mOptimal));
     }
 
     if (mDelegate != nullptr)
