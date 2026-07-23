@@ -40,7 +40,8 @@ void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
     otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
     otaChange.OtaStateChanged.newState = newState;
     CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
-    VerifyOrReturn(error == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format()));
+    VerifyOrReturn(error == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format()));
 }
 
 } // namespace

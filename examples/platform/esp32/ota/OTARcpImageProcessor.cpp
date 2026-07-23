@@ -101,4 +101,3 @@ void OTARcpImageProcessor::Abort(AbortContext & context)
 } // namespace chip
 
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA && CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
-
