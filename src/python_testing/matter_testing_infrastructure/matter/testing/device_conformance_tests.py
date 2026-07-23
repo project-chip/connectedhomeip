@@ -110,7 +110,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             return f'Conformance: {str(conformance)}, implemented features: {",".join(codes)}'
 
         def record_problem(location, problem, severity):
-            problems.append(ProblemNotice("IDM-10.2", location, severity, problem, ""))
+            problems.append(ProblemNotice("Conformance test", location, severity, problem, ""))
 
         def record_error(location, problem):
             nonlocal success
