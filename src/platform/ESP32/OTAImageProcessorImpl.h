@@ -18,7 +18,7 @@
 #pragma once
 
 #include "esp_ota_ops.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h> // nogncheck
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
