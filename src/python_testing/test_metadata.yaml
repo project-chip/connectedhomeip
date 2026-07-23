@@ -55,6 +55,15 @@ not_automated:
           of this test
     - name: TC_EEVSE_Utils.py
       reason: Shared code for TC_EEVSE, not a standalone test
+    - name: TC_ELDIST_2_1.py
+      reason:
+          Electrical Distribution Cluster (ELDIST, 0x00A2) server is not yet
+          implemented in any example app (all-clusters-app or otherwise), so the
+          script cannot exercise the DUT. The script self-skips via
+          run_if_endpoint_matches(has_cluster(...)) when the cluster is absent,
+          but the python-test runner is invoked with --fail-on-skipped which
+          converts that to a failure. Remove this entry once the ELDIST cluster
+          server is integrated into an example app.
     - name: TC_EWATERHTRBase.py
       reason: Shared code for TC_EWATERHTR, not a standalone test
     - name: TC_EnergyReporting_Utils.py
