@@ -143,7 +143,7 @@ function setup_sdb() {
     fi
 
     # If target device is specified, use it directly
-    if [ -n "$TARGET_DEVICE" ]; then
+    if [ "$TARGET_DEVICE" != "" ]; then
         SDB_CMD=("sdb" "-s" "$TARGET_DEVICE")
         echo "Connecting to target device $TARGET_DEVICE via SDB..."
         "${SDB_CMD[@]}" root on
@@ -227,7 +227,7 @@ function resolve_binary_path() {
         # If no exact match, try prefix matching to find the full binary name.
         local found
         found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "$binary*" -executable 2>/dev/null | head -1)
-        if [ -n "$found" ]; then
+        if [ "$found" != "" ]; then
             echo "$found"
         fi
     fi
@@ -268,7 +268,7 @@ function format_time_ago() {
 function fetch_recent_crashes() {
     # Get device time as both Unix epoch and formatted string to compute timezone offset
     TARGET_NOW=$("${SDB_CMD[@]}" shell "date +%s" | tr -d '\r' | grep -E '^[0-9]+$' || true)
-    if [ -z "$TARGET_NOW" ]; then
+    if [ "$TARGET_NOW" = "" ]; then
         echo "ERROR: Failed to retrieve current time from target device."
         exit 1
     fi
@@ -297,7 +297,7 @@ function fetch_recent_crashes() {
     # Collect crashes as "EPOCH:PATH" pairs for sorting
     local crash_pairs=()
     for remote_zip in "${remote_files[@]}"; do
-        [ -n "$remote_zip" ] || continue
+        [ "$remote_zip" != "" ] || continue
         [[ "$remote_zip" == *"No such file"* ]] && continue
 
         local filename timestamp_str formatted_time file_epoch
@@ -305,7 +305,7 @@ function fetch_recent_crashes() {
         # Extract timestamp from filename format: APPID_PID_YYYYMMDDHHMMSS.zip
         timestamp_str=$(echo "$filename" | grep -oE '[0-9]{14}' || true)
 
-        if [ -n "$timestamp_str" ]; then
+        if [ "$timestamp_str" != "" ]; then
             formatted_time="${timestamp_str:0:4}-${timestamp_str:4:2}-${timestamp_str:6:2} ${timestamp_str:8:2}:${timestamp_str:10:2}:${timestamp_str:12:2}"
             # Parse on host (host timezone) then apply device timezone offset
             file_epoch=$(date -d "$formatted_time" +%s 2>/dev/null || echo 0)
@@ -324,7 +324,7 @@ function fetch_recent_crashes() {
     CRASH_EPOCHS=()
     local pair
     for pair in "${sorted_pairs[@]}"; do
-        [ -n "$pair" ] || continue
+        [ "$pair" != "" ] || continue
         CRASH_EPOCHS+=("${pair%%:*}")
         VALID_CRASHES+=("${pair#*:}")
     done
@@ -498,7 +498,7 @@ function find_coredump() {
     # First try: find by .coredump extension
     local f
     f=$(find "$dir" -type f -name "*.coredump" -size +0 2>/dev/null | head -1)
-    if [ -n "$f" ]; then
+    if [ "$f" != "" ]; then
         echo "$f"
         return
     fi
@@ -544,7 +544,7 @@ function find_matching_targets() {
         # Check for binary in root and tests/ subfolder
         local binary_path
         binary_path=$(resolve_binary_path "$target" "$binary")
-        [ -n "$binary_path" ] || continue
+        [ "$binary_path" != "" ] || continue
 
         if [ "$is_core_64" = true ]; then
             [[ "$target" != *"arm64"* ]] && [[ "$target" != *"aarch64"* ]] && continue
@@ -606,7 +606,7 @@ function run_gdb_analysis() {
 
     local binary_path
     binary_path=$(resolve_binary_path "$target_dir" "$binary_name")
-    if [ -z "$binary_path" ]; then
+    if [ "$binary_path" = "" ]; then
         echo "WARNING: Could not find binary '$binary_name' in $target_dir"
         return
     fi
@@ -625,11 +625,11 @@ function run_gdb_analysis() {
     local sysroot=""
 
     # Use provided sysroot path if available
-    if [ -n "$SYSROOT_PATH" ]; then
+    if [ "$SYSROOT_PATH" != "" ]; then
         sysroot="$SYSROOT_PATH"
     elif [ -d "$target_dir/system_libs" ]; then
         sysroot="$target_dir/system_libs"
-    elif [ -n "$TIZEN_SDK_ROOT" ]; then
+    elif [ "$TIZEN_SDK_ROOT" != "" ]; then
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             gdb_bin="$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/bin/aarch64-linux-gnu-gdb"
             # Only use SDK sysroot if it actually exists and contains libs
@@ -646,7 +646,7 @@ function run_gdb_analysis() {
         fi
     fi
 
-    if [ -n "$sysroot" ]; then
+    if [ "$sysroot" != "" ]; then
         echo "SYSROOT:         $sysroot"
     else
         echo "SYSROOT:         (none)"
@@ -683,12 +683,12 @@ function run_gdb_analysis() {
     if [ -d "$sysroot" ]; then
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             solib_paths+=("$sysroot/lib64" "$sysroot/usr/lib64")
-            if [ -n "$TIZEN_SDK_ROOT" ]; then
+            if [ "$TIZEN_SDK_ROOT" != "" ]; then
                 solib_paths+=("$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/aarch64-tizen-linux-gnu/lib64")
             fi
         else
             solib_paths+=("$sysroot/lib" "$sysroot/usr/lib")
-            if [ -n "$TIZEN_SDK_ROOT" ]; then
+            if [ "$TIZEN_SDK_ROOT" != "" ]; then
                 solib_paths+=("$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2/arm-tizen-linux-gnueabi/lib")
             fi
         fi
@@ -726,7 +726,7 @@ parse_arguments "$@"
 
 setup_sdb
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     if [ ! -d "$OUT_DIR" ]; then
         echo "ERROR: --out-dir directory does not exist: $OUT_DIR"
         exit 1
@@ -736,7 +736,7 @@ fi
 
 fetch_recent_crashes
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     filter_crashes_for_out_dir "$OUT_DIR"
 else
     filter_matter_crashes
@@ -751,7 +751,7 @@ binary=$(resolve_binary_name "$app_id")
 pull_and_extract_crash "$SELECTED_ZIP"
 
 coredump=$(find_coredump "$LOCAL_TMP_DIR")
-if [ -z "$coredump" ] || [ ! -f "$coredump" ]; then
+if [ "$coredump" = "" ] || [ ! -f "$coredump" ]; then
     echo "ERROR: Could not find a valid core dump file inside the pulled archive."
     if [ "$CLEANUP" = true ]; then rm -rf "$LOCAL_TMP_DIR"; fi
     exit 1
@@ -759,9 +759,9 @@ fi
 
 is_core_64=$(detect_core_is_64bit "$coredump")
 
-if [ -n "$OUT_DIR" ]; then
+if [ "$OUT_DIR" != "" ]; then
     binary_path=$(resolve_binary_path "$OUT_DIR" "$binary")
-    if [ -z "$binary_path" ]; then
+    if [ "$binary_path" = "" ]; then
         echo "ERROR: Binary '$binary' not found in $OUT_DIR"
         if [ "$CLEANUP" = true ]; then rm -rf "$LOCAL_TMP_DIR"; fi
         exit 1
@@ -775,7 +775,7 @@ fi
 # Ensure system libraries are available for GDB analysis.
 # If no sysroot is explicitly set and the build target doesn't have system_libs
 # and the SDK sysroot is missing/incomplete, pull libraries from the device.
-if [ -z "$SYSROOT_PATH" ] && [ ! -d "$SELECTED_TARGET/system_libs" ]; then
+if [ "$SYSROOT_PATH" = "" ] && [ ! -d "$SELECTED_TARGET/system_libs" ]; then
     local_sdk_sysroot=""
     if [[ "$SELECTED_TARGET" == *"arm64"* || "$SELECTED_TARGET" == *"aarch64"* ]]; then
         local_sdk_sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"

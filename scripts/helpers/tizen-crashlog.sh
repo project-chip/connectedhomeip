@@ -117,7 +117,7 @@ function resolve_binary_path() {
         # If no exact match, try prefix matching to find the full binary name.
         local found
         found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "$binary*" -executable 2>/dev/null | head -1)
-        if [ -n "$found" ]; then
+        if [ "$found" != "" ]; then
             echo "$found"
         fi
     fi
@@ -135,7 +135,7 @@ function run_gdb_analysis() {
 
     local binary_path
     binary_path=$(resolve_binary_path "$target_dir" "$binary_name")
-    if [ -z "$binary_path" ]; then
+    if [ "$binary_path" = "" ]; then
         echo "WARNING: Could not find binary '$binary_name' in $target_dir"
         return
     fi
@@ -154,11 +154,11 @@ function run_gdb_analysis() {
     local sysroot=""
 
     # Use provided sysroot path if available
-    if [ -n "$SYSROOT_PATH" ]; then
+    if [ "$SYSROOT_PATH" != "" ]; then
         sysroot="$SYSROOT_PATH"
     elif [ -d "$target_dir/system_libs" ]; then
         sysroot="$target_dir/system_libs"
-    elif [ -n "$TIZEN_SDK_ROOT" ]; then
+    elif [ "$TIZEN_SDK_ROOT" != "" ]; then
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             gdb_bin="$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/bin/aarch64-linux-gnu-gdb"
             sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
@@ -168,7 +168,7 @@ function run_gdb_analysis() {
         fi
     fi
 
-    if [ -n "$sysroot" ]; then
+    if [ "$sysroot" != "" ]; then
         echo "SYSROOT:         $sysroot"
     fi
     echo "--------------------------------------------------------------------------------"
@@ -195,12 +195,12 @@ function run_gdb_analysis() {
     if [ -d "$sysroot" ]; then
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             solib_paths+=("$sysroot/lib64" "$sysroot/usr/lib64")
-            if [ -n "$TIZEN_SDK_ROOT" ]; then
+            if [ "$TIZEN_SDK_ROOT" != "" ]; then
                 solib_paths+=("$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/aarch64-tizen-linux-gnu/lib64")
             fi
         else
             solib_paths+=("$sysroot/lib" "$sysroot/usr/lib")
-            if [ -n "$TIZEN_SDK_ROOT" ]; then
+            if [ "$TIZEN_SDK_ROOT" != "" ]; then
                 solib_paths+=("$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2/arm-tizen-linux-gnueabi/lib")
             fi
         fi
@@ -272,7 +272,7 @@ for entry in "${ALL_FILES[@]}"; do
     # Extract binary name from core filename (core.NAME.PID.TIMESTAMP)
     # Format: core.TestServer.12345.1781607184
     binary=$(echo "$fname" | cut -d'.' -f2)
-    if [ -z "$binary" ]; then
+    if [ "$binary" = "" ]; then
         binary="unknown"
     fi
 
