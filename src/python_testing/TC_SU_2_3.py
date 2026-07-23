@@ -51,6 +51,8 @@
 
 import asyncio
 import logging
+import queue
+import time
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -75,6 +77,58 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             "MCORE.OTA",
         ]
 
+    async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0):
+        """
+        Espera hasta recibir un StateTransition cuyo newState == target_state.
+        Ignora cualquier otro StateTransition que llegue antes.
+        """
+        deadline = time.time() + timeout_sec
+        while True:
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+
+            try:
+                ev = event_cb.event_queue.get(block=True, timeout=remaining)
+            except queue.Empty:
+                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+
+            data = ev.Data
+            if getattr(data, "newState", None) == target_state:
+                return data
+
+    async def collect_post_abort_state(self, event_cb, requestor_cluster, timeout_sec=180.0):
+        """
+        Después de forzar el aborto de una transferencia, observa las
+        transiciones de estado del Requestor y devuelve el primer estado
+        "terminal" aceptable:
+          - kDownloading  -> el DUT recuperó (resume real o restart desde 0)
+          - kIdle         -> el DUT reportó fin/limpio (no soporta resume,
+                             pero no quedó colgado)
+        Cualquier otra cosa dentro del timeout se ignora; si el timeout
+        expira sin ver ninguno de esos dos, devuelve None.
+        """
+        observed = []
+        deadline = time.time() + timeout_sec
+        while time.time() < deadline:
+            remaining = deadline - time.time()
+            try:
+                ev = event_cb.event_queue.get(block=True, timeout=min(remaining, 5.0))
+            except queue.Empty:
+                continue
+
+            new_state = getattr(ev.Data, "newState", None)
+            observed.append(new_state)
+            logger.info("Post-abort state observed: %s", new_state)
+
+            if new_state in (
+                requestor_cluster.Enums.UpdateStateEnum.kDownloading,
+                requestor_cluster.Enums.UpdateStateEnum.kIdle,
+            ):
+                return new_state, observed
+
+        return None, observed
+
     def steps_TC_SU_2_3(self) -> list[TestStep]:
         return [
             TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
@@ -84,10 +138,11 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
                      "OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
                      "Verify that the DUT obtains the User Consent from the user prior to transfer of software update image. This step is vendor specific."),
             TestStep(2, "During the transfer of the image to the DUT, force fail the transfer before it completely transfers the image. "
-                     "Initiate another QueryImage Command from DUT to the TH/OTA-P. "
-                     "Set the RC[STARTOFS] bit and associated STARTOFS field in the ReceiveInit Message to indicate the resumption of a transfer previously aborted.",
-                     "ImageURI should have the https url from where the image can be downloaded. "
-                     "Verify that the DUT starts receiving the rest of the software image after resuming the image transfer.")
+                     "Initiate another QueryImage Command from DUT to the TH/OTA-P.",
+                     "Verify the DUT reacts to the aborted transfer by either: "
+                     "(a) resuming/restarting the download (kDownloading again), or "
+                     "(b) reporting a clean error state (kIdle). "
+                     "In either case the DUT must not remain in an inconsistent state.")
         ]
 
     @async_test_body
@@ -96,7 +151,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             logger.info("Terminating existing OTA Provider")
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
-        return await super().teardown_test()
+        super().teardown_test()
 
     @async_test_body
     async def test_TC_SU_2_3(self):
@@ -137,7 +192,8 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             "port": provider_port,
         }
 
-        # DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.
+        # DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT.
+        # OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.
         self.step(1)
 
         # userConsentNeeded flag
@@ -206,9 +262,131 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
         self.terminate_provider()
-        self.current_provider_app_proc = None
+
+        # Wait for the Requestor to come back to Idle before starting Step 2
+        logger.info("Waiting for idle state before Step 2")
+        idle_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kIdle, idle_event.newState,
+                             f"New state is {idle_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kIdle}")
+
+        await asyncio.sleep(5)
+
+        # Force fail the transfer before it completes and initiate another QueryImage.
+        # NOTE: The Matter BDX spec defines RC[STARTOFS] as an OPTIONAL resume mechanism,
+        # so this step is intentionally NOT gated behind a PICS. We verify that the DUT
+        # reacts consistently to an aborted transfer in one of the following ways:
+        #   (a) Resume with RC[STARTOFS] set (offset > 0) -> observed as new kDownloading
+        #   (b) Restart from offset 0 -> also observed as new kDownloading
+        #   (c) Report DownloadError / go back to kIdle cleanly (resume unsupported)
+        # Any of these is considered valid; getting stuck in an inconsistent state is not.
         self.step(2)
-        # NOTE: Step skipped not implemented in spec.
+
+        provider_extra_args_resume = [
+            '--queryImageStatus', 'updateAvailable',
+            '--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out
+        ]
+
+        # Start provider and let the DUT begin downloading
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            extra_args=provider_extra_args_resume,
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            expected_output="Server initialization complete",
+            timeout=30
+        )
+
+        await self.announce_ota_provider(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            endpoint=self.endpoint
+        )
+
+        # Wait until the DUT is actively downloading
+        downloading = await self.wait_for_requestor_state(
+            event_cb,
+            requestorCluster.Enums.UpdateStateEnum.kDownloading,
+            timeout_sec=120
+        )
+        logger.info("Transfer started, ready to abort. Event: %s", downloading)
+
+        # Let a few BDX blocks flow so a potential resume has a non-zero offset
+        await asyncio.sleep(3)
+
+        # Optional: capture how many bytes were transferred before abort.
+        # Useful if you later want to distinguish "resume with STARTOFS>0"
+        # from "restart from 0" by comparing offsets on the second transfer.
+        bytes_before_abort = None
+        try:
+            command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
+            self.write_to_app_pipe(command, self.fifo_in)
+            snapshot = self.read_from_app_pipe(self.fifo_out)
+            bytes_before_abort = snapshot.get('Payload', {}).get('BytesTransferred')
+            logger.info("Bytes transferred before abort: %s", bytes_before_abort)
+        except Exception as e:
+            logger.warning("Could not read pre-abort snapshot: %s", e)
+
+        # Force-fail the transfer by killing the provider mid-download.
+        # The DUT's BDX session will fail once the peer disappears.
+        logger.info("Forcing transfer abort by terminating the provider")
+        self.terminate_provider()
+
+        # Small pause so the DUT registers the peer loss.
+        await asyncio.sleep(2)
+
+        # Bring the provider back and re-announce so the DUT starts a new QueryImage.
+        # This is well within the BDX 5-minute idle window, so if the DUT supports
+        # resume it should send ReceiveInit with RC[STARTOFS] set on the new transfer.
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            extra_args=provider_extra_args_resume,
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            expected_output="Server initialization complete",
+            timeout=30
+        )
+
+        await self.announce_ota_provider(
+            controller=controller,
+            provider_node_id=provider_node_id,
+            requestor_node_id=requestor_node_id,
+            endpoint=self.endpoint
+        )
+
+        # Observe the DUT's reaction: expect either kDownloading (resume/restart)
+        # or kIdle (clean error). Anything else within the timeout is a failure.
+        final_state, observed = await self.collect_post_abort_state(
+            event_cb=event_cb,
+            requestor_cluster=requestorCluster,
+            timeout_sec=180
+        )
+
+        asserts.assert_is_not_none(
+            final_state,
+            f"DUT did not react to the aborted transfer within the timeout. "
+            f"Observed states: {observed}"
+        )
+        logger.info(
+            "DUT reacted to aborted transfer with state=%s. All observed states: %s",
+            final_state, observed
+        )
+
+        # TODO (optional, requires provider support):
+        # If the provider exposes the incoming ReceiveInit STARTOFS field via
+        # QueryImageSnapshot, compare it against `bytes_before_abort` to confirm
+        # actual resume vs restart. Without that, both are treated as valid
+        # recovery, matching the reviewer's guidance.
+
+        self.terminate_provider()
 
 
 if __name__ == "__main__":

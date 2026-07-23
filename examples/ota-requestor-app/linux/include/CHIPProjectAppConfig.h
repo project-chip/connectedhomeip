@@ -32,6 +32,3 @@
 
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
-
-// Allows HTTPS download
-#define CHIP_DEVICE_CONFIG_ENABLE_OTA_IMAGE_URI 1

@@ -119,8 +119,6 @@ public:
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
-    bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
-    uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
