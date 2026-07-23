@@ -8292,15 +8292,15 @@ endpoint 1 {
 
   server cluster EnergyPreference {
     callback attribute energyBalances;
-    ram      attribute currentEnergyBalance;
+    callback attribute currentEnergyBalance;
     callback attribute energyPriorities;
     callback attribute lowPowerModeSensitivities;
-    ram      attribute currentLowPowerModeSensitivity;
+    callback attribute currentLowPowerModeSensitivity;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster WindowCovering {
