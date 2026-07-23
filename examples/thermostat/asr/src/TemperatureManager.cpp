@@ -20,6 +20,8 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 

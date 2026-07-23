@@ -28,6 +28,7 @@
 #include "SetpointRange.h"
 #include "Setpoints.h"
 #include "Temperature.h"
+#include "app/data-model-provider/ActionReturnStatus.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -140,15 +141,6 @@ bool Setpoints::Valid()
     return true;
 }
 
-/**
- * @brief Fix user limits if they are outside the absolute limits or are inverted
- * @param absoluteLimits The absolute limits for this setpoint mode.
- * @param userLimits The user limits to fix.
- * @param minAttribute The attribute ID of the minimum setpoint.
- * @param maxAttribute The attribute ID of the maximum setpoint.
- * @param changedAttributes Bit flags for attributes that were changed prior to this call
- * @param fixedAttributes Bit flags for attributes that were fixed by this call
- */
 void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpointLimits & userLimits,
                               SetpointAttributes & changedAttributes, SetpointAttributes & fixedAttributes)
 {
@@ -191,15 +183,6 @@ void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpo
     }
 }
 
-/**
- * @brief Fix the user limits to maintain the deadband
- * @param heatLimit The user heat limit.
- * @param coolLimit The user cool limit.
- * @param absoluteHeatLimit The absolute heat limit.
- * @param absoluteCoolLimit The absolute cool limit.
- * @param changedAttributes Bit flags for attributes that were changed prior to this call.
- * @param fixedAttributes Bit flags for attributes that were fixed by this call.
- */
 void Setpoints::FixUserLimitDeadband(OptionalSetpoint & heatLimit, OptionalSetpoint & coolLimit, temperature absoluteHeatLimit,
                                      temperature absoluteCoolLimit, SetpointAttributes & changedAttributes,
                                      SetpointAttributes & fixedAttributes)
@@ -346,12 +329,7 @@ void Setpoints::FixRange(SetpointRange & range, SetpointAttributes & changedAttr
     }
 }
 
-/**
- * @brief Attempt to fix any violations in the setpoints
- * @param changedAttributes Bit flags for attributes that were changed prior to this call
- * @return Status::Success if we were able to fix all violations, otherwise an error status code (e.g. Status::ConstraintError)
- */
-Status Setpoints::Fix(SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::Fix(SetpointAttributes & changedAttributes)
 {
     if (Valid())
     {
@@ -382,8 +360,8 @@ Status Setpoints::Fix(SetpointAttributes & changedAttributes)
     return Valid() ? Status::Success : Status::ConstraintError;
 }
 
-Protocols::InteractionModel::Status Setpoints::ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
-                                                                  SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeRangeHeating(SetpointRange & range, temperature heat, ClampMode clamp,
+                                                            SetpointAttributes & changedAttributes)
 {
     if (!heatSupported)
     {
@@ -392,8 +370,8 @@ Protocols::InteractionModel::Status Setpoints::ChangeRangeHeating(SetpointRange 
     return ChangeRange(range, MakeOptional(heat), Optional<temperature>::Missing(), clamp, changedAttributes);
 }
 
-Protocols::InteractionModel::Status Setpoints::ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
-                                                                  SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeRangeCooling(SetpointRange & range, temperature cool, ClampMode clamp,
+                                                            SetpointAttributes & changedAttributes)
 {
     if (!coolSupported)
     {
@@ -402,12 +380,12 @@ Protocols::InteractionModel::Status Setpoints::ChangeRangeCooling(SetpointRange 
     return ChangeRange(range, Optional<temperature>::Missing(), MakeOptional(cool), clamp, changedAttributes);
 }
 
-Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool, ClampMode clamp,
-                              SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat, Optional<temperature> cool,
+                                                     ClampMode clamp, SetpointAttributes & changedAttributes)
 {
     if (!heat.HasValue() && !cool.HasValue())
     {
-        return Status::InvalidValue;
+        return Status::ConstraintError;
     }
     if (heatSupported && heat.HasValue())
     {
@@ -441,23 +419,26 @@ Status Setpoints::ChangeRange(SetpointRange & range, Optional<temperature> heat,
             changedAttributes.Set(range.cooling.AttributeId());
         }
     }
+    ChipLogProgress(Zcl, "Changed setpoint ranges, calling Fix");
     return Fix(changedAttributes);
 }
 
-Status Setpoints::Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
-                                                temperature min, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMinimum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature min,
+                                                            SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, MakeOptional(min), Optional<temperature>::Missing(), changedAttributes);
 }
 
-Status Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, temperature max,
-                                     SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimitMaximum(UserSetpointLimits & userLimits,
+                                                            AbsoluteSetpointLimits & absoluteLimits, temperature max,
+                                                            SetpointAttributes & changedAttributes)
 {
     return ChangeLimits(userLimits, absoluteLimits, Optional<temperature>::Missing(), MakeOptional(max), changedAttributes);
 }
-
-Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits, Optional<temperature> min,
-                               Optional<temperature> max, SetpointAttributes & changedAttributes)
+DataModel::ActionReturnStatus Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpointLimits & absoluteLimits,
+                                                      Optional<temperature> min, Optional<temperature> max,
+                                                      SetpointAttributes & changedAttributes)
 {
     bool settingMin = min.HasValue();
     bool settingMax = max.HasValue();
@@ -490,217 +471,6 @@ Status Setpoints::ChangeLimits(UserSetpointLimits & userLimits, AbsoluteSetpoint
     }
 
     return Fix(changedAttributes);
-}
-
-typedef Status (*SetpointGetter)(EndpointId endpoint, temperature * value);
-temperature ReadSetpointAttribute(EndpointId endpoint, SetpointGetter getter, temperature defaultValue)
-{
-    temperature temp;
-    if (getter(endpoint, &temp) != Status::Success)
-    {
-        temp = defaultValue;
-    }
-    return temp;
-}
-
-Status LoadSetpoints(EndpointId endpoint, Setpoints & setpoints)
-{
-    BitMask<Feature, uint32_t> featureMap;
-
-    uint32_t flags;
-    if (FeatureMap::Get(endpoint, &flags) == Status::Success)
-    {
-        featureMap.SetRaw(flags);
-    }
-    else
-    {
-        featureMap.Set(Feature::kAutoMode);
-        featureMap.Set(Feature::kHeating);
-        featureMap.Set(Feature::kCooling);
-    }
-
-    setpoints.autoSupported      = featureMap.Has(Feature::kAutoMode);
-    setpoints.heatSupported      = featureMap.Has(Feature::kHeating);
-    setpoints.coolSupported      = featureMap.Has(Feature::kCooling);
-    setpoints.occupancySupported = featureMap.Has(Feature::kOccupancy);
-    setpoints.eventsSupported    = featureMap.Has(Feature::kEvents);
-
-    if (setpoints.autoSupported)
-    {
-        int8_t deadBand;
-        if (MinSetpointDeadBand::Get(endpoint, &deadBand) == Status::Success)
-        {
-            setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
-        }
-        else
-        {
-            setpoints.deadBand = kDefaultDeadBand;
-        }
-    }
-
-    if (setpoints.coolSupported)
-    {
-        setpoints.absoluteCoolLimits.minimum.SetTemperature(
-            ReadSetpointAttribute(endpoint, AbsMinCoolSetpointLimit::Get, kDefaultAbsMinCoolSetpointLimit));
-
-        setpoints.absoluteCoolLimits.maximum.SetTemperature(
-            ReadSetpointAttribute(endpoint, AbsMaxCoolSetpointLimit::Get, kDefaultAbsMaxCoolSetpointLimit));
-
-        temperature limit;
-        if (Attributes::MinCoolSetpointLimit::Get(endpoint, &limit) == Status::Success)
-        {
-            setpoints.userCoolLimits.minimum.SetTemperature(limit);
-        }
-
-        if (Attributes::MaxCoolSetpointLimit::Get(endpoint, &limit) == Status::Success)
-        {
-            setpoints.userCoolLimits.maximum.SetTemperature(limit);
-        }
-
-        temperature occupiedCoolingSetpoint;
-        if (OccupiedCoolingSetpoint::Get(endpoint, &occupiedCoolingSetpoint) != Status::Success)
-        {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
-            return Status::Failure;
-        }
-        setpoints.occupiedRange.cooling.SetTemperature(occupiedCoolingSetpoint);
-
-        if (setpoints.occupancySupported)
-        {
-            temperature unoccupiedCoolingSetpoint;
-            if (UnoccupiedCoolingSetpoint::Get(endpoint, &unoccupiedCoolingSetpoint) != Status::Success)
-            {
-                // We're substituting the failure code here for backwards-compatibility reasons
-                ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
-                return Status::Failure;
-            }
-            setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCoolingSetpoint);
-        }
-    }
-
-    if (setpoints.heatSupported)
-    {
-        setpoints.absoluteHeatLimits.minimum.SetTemperature(
-            ReadSetpointAttribute(endpoint, AbsMinHeatSetpointLimit::Get, kDefaultAbsMinHeatSetpointLimit));
-        setpoints.absoluteHeatLimits.maximum.SetTemperature(
-            ReadSetpointAttribute(endpoint, AbsMaxHeatSetpointLimit::Get, kDefaultAbsMaxHeatSetpointLimit));
-
-        temperature limit;
-        if (Attributes::MinHeatSetpointLimit::Get(endpoint, &limit) == Status::Success)
-        {
-            setpoints.userHeatLimits.minimum.SetTemperature(limit);
-        }
-        if (Attributes::MaxHeatSetpointLimit::Get(endpoint, &limit) == Status::Success)
-        {
-            setpoints.userHeatLimits.maximum.SetTemperature(limit);
-        }
-
-        temperature occupiedHeatingSetpoint;
-        if (OccupiedHeatingSetpoint::Get(endpoint, &occupiedHeatingSetpoint) != Status::Success)
-        {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
-            return Status::Failure;
-        }
-        setpoints.occupiedRange.heating.SetTemperature(occupiedHeatingSetpoint);
-
-        if (setpoints.occupancySupported)
-        {
-            temperature unoccupiedHeatingSetpoint;
-            if (UnoccupiedHeatingSetpoint::Get(endpoint, &unoccupiedHeatingSetpoint) != Status::Success)
-            {
-                // We're substituting the failure code here for backwards-compatibility reasons
-                ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
-                return Status::Failure;
-            }
-            setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeatingSetpoint);
-        }
-    }
-
-    return Status::Success;
-}
-
-Status SaveFirstDirtySetpoint(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & dirtyAttributes)
-{
-    AttributeId firstDirty = dirtyAttributes.FirstDirtyAttribute();
-    if (firstDirty == chip::kInvalidAttributeId)
-    {
-        return Status::Success;
-    }
-    SetpointAttributes firstDirtySet;
-    firstDirtySet.Set(firstDirty);
-    return SaveSetpoints(endpoint, setpoints, firstDirtySet);
-}
-
-Status SaveSetpoints(EndpointId endpoint, Setpoints & setpoints, SetpointAttributes & affectedAttributes)
-{
-    Status status;
-    if (affectedAttributes.Has(Attributes::MinSetpointDeadBand::Id))
-    {
-        int8_t deadband = static_cast<int8_t>(setpoints.deadBand / 10);
-        if ((status = MinSetpointDeadBand::Set(endpoint, deadband)) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
-    {
-        if ((status = MinHeatSetpointLimit::Set(endpoint, setpoints.userHeatLimits.minimum.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
-    {
-        if ((status = MaxHeatSetpointLimit::Set(endpoint, setpoints.userHeatLimits.maximum.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
-    {
-        if ((status = MinCoolSetpointLimit::Set(endpoint, setpoints.userCoolLimits.minimum.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
-    {
-        if ((status = MaxCoolSetpointLimit::Set(endpoint, setpoints.userCoolLimits.maximum.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::OccupiedHeatingSetpoint::Id))
-    {
-        if ((status = OccupiedHeatingSetpoint::Set(endpoint, setpoints.occupiedRange.heating.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::OccupiedCoolingSetpoint::Id))
-    {
-        if ((status = OccupiedCoolingSetpoint::Set(endpoint, setpoints.occupiedRange.cooling.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::UnoccupiedHeatingSetpoint::Id))
-    {
-        if ((status = UnoccupiedHeatingSetpoint::Set(endpoint, setpoints.unoccupiedRange.heating.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    if (affectedAttributes.Has(Attributes::UnoccupiedCoolingSetpoint::Id))
-    {
-        if ((status = UnoccupiedCoolingSetpoint::Set(endpoint, setpoints.unoccupiedRange.cooling.Temperature())) != Status::Success)
-        {
-            return status;
-        }
-    }
-    return Status::Success;
 }
 
 } // namespace Thermostat
