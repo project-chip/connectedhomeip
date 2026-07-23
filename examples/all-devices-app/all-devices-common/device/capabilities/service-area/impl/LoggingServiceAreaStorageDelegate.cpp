@@ -292,7 +292,7 @@ bool LoggingServiceAreaStorageDelegate::GetProgressElementByIndex(uint32_t listI
 }
 
 bool LoggingServiceAreaStorageDelegate::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                                                Structs::ProgressStruct::Type & aProgressElement)
+                                                               Structs::ProgressStruct::Type & aProgressElement)
 {
     listIndex = 0;
 
@@ -329,7 +329,7 @@ bool LoggingServiceAreaStorageDelegate::AddProgressElementRaw(const Structs::Pro
 }
 
 bool LoggingServiceAreaStorageDelegate::ModifyProgressElementRaw(uint32_t listIndex,
-                                                                  const Structs::ProgressStruct::Type & modifiedProgressElement)
+                                                                 const Structs::ProgressStruct::Type & modifiedProgressElement)
 {
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {
