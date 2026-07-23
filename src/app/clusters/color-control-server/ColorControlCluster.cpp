@@ -36,15 +36,6 @@ using chip::Protocols::InteractionModel::Status;
 using chip::System::SystemClock; // bare SystemClock() used throughout for the wall-clock anchor
 
 namespace {
-// std::visit helper: lets each variant alternative be handled by its own lambda inline.
-template <class... Ts>
-struct overloaded : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
 static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
@@ -194,22 +185,25 @@ void ColorControlCluster::PersistCurrentColor()
 {
     VerifyOrReturn(mContext != nullptr);
     PersistValue(Attributes::EnhancedColorMode::Id, GetEnhancedColorMode());
-    std::visit(overloaded{
-                   [&](const XYColor & c) {
-                       PersistValue(CurrentX::Id, c.x);
-                       PersistValue(CurrentY::Id, c.y);
-                   },
-                   [&](const HueSatColor & c) {
-                       PersistValue(CurrentHue::Id, c.hue);
-                       PersistValue(CurrentSaturation::Id, c.saturation);
-                   },
-                   [&](const EnhancedHueSatColor & c) {
-                       PersistValue(EnhancedCurrentHue::Id, c.enhancedHue);
-                       PersistValue(CurrentSaturation::Id, c.saturation);
-                   },
-                   [&](const CTColor & c) { PersistValue(ColorTemperatureMireds::Id, c.mireds); },
-               },
-               mColorValue);
+    if (auto * c = std::get_if<XYColor>(&mColorValue))
+    {
+        PersistValue(CurrentX::Id, c->x);
+        PersistValue(CurrentY::Id, c->y);
+    }
+    else if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+    {
+        PersistValue(CurrentHue::Id, hs->hue);
+        PersistValue(CurrentSaturation::Id, hs->saturation);
+    }
+    else if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+    {
+        PersistValue(EnhancedCurrentHue::Id, e->enhancedHue);
+        PersistValue(CurrentSaturation::Id, e->saturation);
+    }
+    else if (auto * ct = std::get_if<CTColor>(&mColorValue))
+    {
+        PersistValue(ColorTemperatureMireds::Id, ct->mireds);
+    }
 }
 
 void ColorControlCluster::PersistColorLoop()
@@ -278,51 +272,52 @@ void ColorControlCluster::OnTick()
     // Remember whether a driver was running: if it settles this tick we persist the final color once.
     const bool hadTransition = !std::holds_alternative<std::monostate>(mTransition);
 
-    std::visit(overloaded{
-                   [](std::monostate &) {},
-                   [&](XYTransition & tx) {
-                       driverActive = TickXY(tx, now);
-                       if (driverActive) // X and Y share one start; RemainingTime is the slower axis
-                       {
-                           remaining = std::max(RemainingTenths(tx.startTimeMs, tx.durationXMs, now),
-                                                RemainingTenths(tx.startTimeMs, tx.durationYMs, now));
-                       }
-                   },
-                   [&](CTTransition & tx) {
-                       driverActive = TickCT(tx, now);
-                       if (driverActive)
-                       {
-                           remaining = RemainingTenths(tx.startTimeMs, tx.durationMs, now);
-                       }
-                   },
-                   [&](HueSatTransition & hsx) {
-                       // Hue and saturation are independent axes (§3.2.5.2): clearing one leaves
-                       // the other running. Each Tick* returns false when its axis has finished.
-                       // Loop-vs-hue exclusivity is enforced at the commands (they never start a hue
-                       // axis while the loop drives), so this branch stays loop-agnostic.
-                       if (hsx.hue && !TickHue(*hsx.hue, now))
-                       {
-                           hsx.hue.reset();
-                       }
-                       if (hsx.sat && !TickSat(*hsx.sat, now))
-                       {
-                           hsx.sat.reset();
-                       }
-                       // RemainingTime follows the slower axis: a finished axis contributed nothing.
-                       if (hsx.hue)
-                       {
-                           remaining = std::max(remaining, RemainingTenths(hsx.hue->startTimeMs, hsx.hue->durationMs, now));
-                       }
-                       if (hsx.sat)
-                       {
-                           remaining = std::max(remaining, RemainingTenths(hsx.sat->startTimeMs, hsx.sat->durationMs, now));
-                       }
-                       driverActive = hsx.hue.has_value() || hsx.sat.has_value();
-                   },
-               },
-               mTransition);
+    if (auto * xytx = std::get_if<XYTransition>(&mTransition))
+    {
+        driverActive = TickXY(*xytx, now);
+        if (driverActive) // X and Y share one start; RemainingTime is the slower axis
+        {
+            remaining = std::max(RemainingTenths(xytx->startTimeMs, xytx->durationXMs, now),
+                                 RemainingTenths(xytx->startTimeMs, xytx->durationYMs, now));
+        }
+    }
+    else if (auto * cttx = std::get_if<CTTransition>(&mTransition))
+    {
+        driverActive = TickCT(*cttx, now);
+        if (driverActive)
+        {
+            remaining = RemainingTenths(cttx->startTimeMs, cttx->durationMs, now);
+        }
+    }
+    else if (auto * hsx = std::get_if<HueSatTransition>(&mTransition))
+    {
+        // Hue and saturation are independent axes (§3.2.5.2): clearing one leaves
+        // the other running. Each Tick* returns false when its axis has finished.
+        // Loop-vs-hue exclusivity is enforced at the commands (they never start a hue
+        // axis while the loop drives), so this branch stays loop-agnostic.
+        if (hsx->hue && !TickHue(*hsx->hue, now))
+        {
+            hsx->hue.reset();
+        }
+        if (hsx->sat && !TickSat(*hsx->sat, now))
+        {
+            hsx->sat.reset();
+        }
+        // RemainingTime follows the slower axis: a finished axis contributed nothing.
+        if (hsx->hue)
+        {
+            remaining = std::max(remaining, RemainingTenths(hsx->hue->startTimeMs, hsx->hue->durationMs, now));
+        }
+        if (hsx->sat)
+        {
+            remaining = std::max(remaining, RemainingTenths(hsx->sat->startTimeMs, hsx->sat->durationMs, now));
+        }
+        driverActive = hsx->hue.has_value() || hsx->sat.has_value();
+    }
+    // else: monostate — nothing is driving this tick
 
-    // Clear a finished driver AFTER the visit returns (mutating the variant we are visiting is unsafe).
+    // Clear a finished driver AFTER the dispatch above (the get_if pointers alias mTransition, so we
+    // must not reassign the variant while they are still in use).
     if (!driverActive)
     {
         mTransition = std::monostate{};
@@ -619,16 +614,18 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         if (std::holds_alternative<XYColor>(mColorValue))
             return; // no-op
         XYColor next{};
-        std::visit(
-            overloaded{ [&](const HueSatColor & hs) {
-                           mDelegate->ConvertHueSatToXY(mPath.mEndpointId, hs.hue, hs.saturation, next.x, next.y);
-                       },
-                        [&](const EnhancedHueSatColor & hs) {
-                            mDelegate->ConvertHueSatToXY(mPath.mEndpointId, hs.hue(), hs.saturation, next.x, next.y);
-                        },
-                        [&](const CTColor & ct) { mDelegate->ConvertMiredsToXY(mPath.mEndpointId, ct.mireds, next.x, next.y); },
-                        [](const XYColor &) {} },
-            mColorValue);
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(mPath.mEndpointId, hs->hue, hs->saturation, next.x, next.y);
+        }
+        else if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(mPath.mEndpointId, ehs->hue(), ehs->saturation, next.x, next.y);
+        }
+        else if (auto * ct = std::get_if<CTColor>(&mColorValue))
+        {
+            mDelegate->ConvertMiredsToXY(mPath.mEndpointId, ct->mireds, next.x, next.y);
+        }
         mColorValue = next; // the variant assignment IS the store
         NotifyAttributeChanged(CurrentX::Id, AttributeChangeType::kQuiet);
         NotifyAttributeChanged(CurrentY::Id, AttributeChangeType::kQuiet);
@@ -645,27 +642,28 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
 
         uint16_t eh = 0;
         uint8_t sat = 0;
-        std::visit(overloaded{
-                       [&](const HueSatColor & hs) {
-                           eh  = hs.enhancedHue();
-                           sat = hs.saturation;
-                       },
-                       [&](const EnhancedHueSatColor & hs) {
-                           eh  = hs.enhancedHue;
-                           sat = hs.saturation;
-                       },
-                       [&](const XYColor & xy) {
-                           uint8_t h = 0;
-                           mDelegate->ConvertXYToHueSat(mPath.mEndpointId, xy.x, xy.y, h, sat);
-                           eh = static_cast<uint16_t>(uint16_t(h) << 8);
-                       },
-                       [&](const CTColor & ct) {
-                           uint8_t h = 0;
-                           mDelegate->ConvertMiredsToHueSat(mPath.mEndpointId, ct.mireds, h, sat);
-                           eh = static_cast<uint16_t>(uint16_t(h) << 8);
-                       },
-                   },
-                   mColorValue);
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            eh  = hs->enhancedHue();
+            sat = hs->saturation;
+        }
+        else if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            eh  = ehs->enhancedHue;
+            sat = ehs->saturation;
+        }
+        else if (auto * xy = std::get_if<XYColor>(&mColorValue))
+        {
+            uint8_t h = 0;
+            mDelegate->ConvertXYToHueSat(mPath.mEndpointId, xy->x, xy->y, h, sat);
+            eh = static_cast<uint16_t>(uint16_t(h) << 8);
+        }
+        else if (auto * ct = std::get_if<CTColor>(&mColorValue))
+        {
+            uint8_t h = 0;
+            mDelegate->ConvertMiredsToHueSat(mPath.mEndpointId, ct->mireds, h, sat);
+            eh = static_cast<uint16_t>(uint16_t(h) << 8);
+        }
 
         if (toEnhanced)
         {
@@ -684,16 +682,18 @@ void ColorControlCluster::ApplyModeSwitch(EnhancedColorModeEnum target)
         if (std::holds_alternative<CTColor>(mColorValue))
             return;
         CTColor next{};
-        std::visit(
-            overloaded{ [&](const XYColor & xy) { mDelegate->ConvertXYToMireds(mPath.mEndpointId, xy.x, xy.y, next.mireds); },
-                        [&](const HueSatColor & hs) {
-                            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue, hs.saturation, next.mireds);
-                        },
-                        [&](const EnhancedHueSatColor & hs) {
-                            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs.hue(), hs.saturation, next.mireds);
-                        },
-                        [](const CTColor &) {} },
-            mColorValue);
+        if (auto * xy = std::get_if<XYColor>(&mColorValue))
+        {
+            mDelegate->ConvertXYToMireds(mPath.mEndpointId, xy->x, xy->y, next.mireds);
+        }
+        else if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, hs->hue, hs->saturation, next.mireds);
+        }
+        else if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToMireds(mPath.mEndpointId, ehs->hue(), ehs->saturation, next.mireds);
+        }
         mColorValue = next; // the variant assignment IS the store
         NotifyAttributeChanged(ColorTemperatureMireds::Id, AttributeChangeType::kQuiet);
         break;
@@ -1684,119 +1684,132 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(ColorControl::kRevision);
 
-    case CurrentHue::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const HueSatColor & hs) -> uint8_t { return hs.hue; },
-                                             [&](const EnhancedHueSatColor & e) -> uint8_t { return e.hue(); },
-                                             [&](const XYColor & c) -> uint8_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
-                                                 return h;
-                                             },
-                                             [&](const CTColor & ct) -> uint8_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
-                                                 return h;
-                                             },
-                                         },
-                                         mColorValue));
+    case CurrentHue::Id: {
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(hs->hue);
+        }
+        if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(e->hue());
+        }
+        uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            mDelegate->ConvertXYToHueSat(ep, c->x, c->y, h, s);
+        }
+        else
+        {
+            mDelegate->ConvertMiredsToHueSat(ep, std::get<CTColor>(mColorValue).mireds, h, s);
+        }
+        return encoder.Encode(h);
+    }
 
-    case EnhancedCurrentHue::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const HueSatColor & hs) -> uint16_t { return hs.enhancedHue(); },
-                                             [&](const EnhancedHueSatColor & e) -> uint16_t { return e.enhancedHue; },
-                                             [&](const XYColor & c) -> uint16_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
-                                                 return static_cast<uint16_t>(static_cast<uint16_t>(h) << 8);
-                                             },
-                                             [&](const CTColor & ct) -> uint16_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
-                                                 return static_cast<uint16_t>(static_cast<uint16_t>(h) << 8);
-                                             },
-                                         },
-                                         mColorValue));
+    case EnhancedCurrentHue::Id: {
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(hs->enhancedHue());
+        }
+        if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(e->enhancedHue);
+        }
+        uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            mDelegate->ConvertXYToHueSat(ep, c->x, c->y, h, s);
+        }
+        else
+        {
+            mDelegate->ConvertMiredsToHueSat(ep, std::get<CTColor>(mColorValue).mireds, h, s);
+        }
+        return encoder.Encode(static_cast<uint16_t>(static_cast<uint16_t>(h) << 8));
+    }
 
-    case CurrentSaturation::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const HueSatColor & hs) -> uint8_t { return hs.saturation; },
-                                             [&](const EnhancedHueSatColor & e) -> uint8_t { return e.saturation; },
-                                             [&](const XYColor & c) -> uint8_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertXYToHueSat(ep, c.x, c.y, h, s);
-                                                 return s;
-                                             },
-                                             [&](const CTColor & ct) -> uint8_t {
-                                                 uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
-                                                 mDelegate->ConvertMiredsToHueSat(ep, ct.mireds, h, s);
-                                                 return s;
-                                             },
-                                         },
-                                         mColorValue));
+    case CurrentSaturation::Id: {
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(hs->saturation);
+        }
+        if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            return encoder.Encode(e->saturation);
+        }
+        uint8_t h = HueSatColor{}.hue, s = HueSatColor{}.saturation;
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            mDelegate->ConvertXYToHueSat(ep, c->x, c->y, h, s);
+        }
+        else
+        {
+            mDelegate->ConvertMiredsToHueSat(ep, std::get<CTColor>(mColorValue).mireds, h, s);
+        }
+        return encoder.Encode(s);
+    }
 
-    case CurrentX::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const XYColor & c) -> uint16_t { return c.x; },
-                                             [&](const HueSatColor & hs) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
-                                                 return x;
-                                             },
-                                             [&](const EnhancedHueSatColor & e) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
-                                                 return x;
-                                             },
-                                             [&](const CTColor & ct) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertMiredsToXY(ep, ct.mireds, x, y);
-                                                 return x;
-                                             },
-                                         },
-                                         mColorValue));
+    case CurrentX::Id: {
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            return encoder.Encode(c->x);
+        }
+        uint16_t x = XYColor{}.x, y = XYColor{}.y;
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(ep, hs->hue, hs->saturation, x, y);
+        }
+        else if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(ep, e->hue(), e->saturation, x, y);
+        }
+        else
+        {
+            mDelegate->ConvertMiredsToXY(ep, std::get<CTColor>(mColorValue).mireds, x, y);
+        }
+        return encoder.Encode(x);
+    }
 
-    case CurrentY::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const XYColor & c) -> uint16_t { return c.y; },
-                                             [&](const HueSatColor & hs) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertHueSatToXY(ep, hs.hue, hs.saturation, x, y);
-                                                 return y;
-                                             },
-                                             [&](const EnhancedHueSatColor & e) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertHueSatToXY(ep, e.hue(), e.saturation, x, y);
-                                                 return y;
-                                             },
-                                             [&](const CTColor & ct) -> uint16_t {
-                                                 uint16_t x = XYColor{}.x, y = XYColor{}.y;
-                                                 mDelegate->ConvertMiredsToXY(ep, ct.mireds, x, y);
-                                                 return y;
-                                             },
-                                         },
-                                         mColorValue));
+    case CurrentY::Id: {
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            return encoder.Encode(c->y);
+        }
+        uint16_t x = XYColor{}.x, y = XYColor{}.y;
+        if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(ep, hs->hue, hs->saturation, x, y);
+        }
+        else if (auto * e = std::get_if<EnhancedHueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToXY(ep, e->hue(), e->saturation, x, y);
+        }
+        else
+        {
+            mDelegate->ConvertMiredsToXY(ep, std::get<CTColor>(mColorValue).mireds, x, y);
+        }
+        return encoder.Encode(y);
+    }
 
-    case ColorTemperatureMireds::Id:
-        return encoder.Encode(std::visit(overloaded{
-                                             [&](const CTColor & ct) -> uint16_t { return ct.mireds; },
-                                             [&](const XYColor & c) -> uint16_t {
-                                                 uint16_t m = CTColor{}.mireds;
-                                                 mDelegate->ConvertXYToMireds(ep, c.x, c.y, m);
-                                                 return m;
-                                             },
-                                             [&](const HueSatColor & hs) -> uint16_t {
-                                                 uint16_t m = CTColor{}.mireds;
-                                                 mDelegate->ConvertHueSatToMireds(ep, hs.hue, hs.saturation, m);
-                                                 return m;
-                                             },
-                                             [&](const EnhancedHueSatColor & e) -> uint16_t {
-                                                 uint16_t m = CTColor{}.mireds;
-                                                 mDelegate->ConvertHueSatToMireds(ep, e.hue(), e.saturation, m);
-                                                 return m;
-                                             },
-                                         },
-                                         mColorValue));
+    case ColorTemperatureMireds::Id: {
+        if (auto * ct = std::get_if<CTColor>(&mColorValue))
+        {
+            return encoder.Encode(ct->mireds);
+        }
+        uint16_t m = CTColor{}.mireds;
+        if (auto * c = std::get_if<XYColor>(&mColorValue))
+        {
+            mDelegate->ConvertXYToMireds(ep, c->x, c->y, m);
+        }
+        else if (auto * hs = std::get_if<HueSatColor>(&mColorValue))
+        {
+            mDelegate->ConvertHueSatToMireds(ep, hs->hue, hs->saturation, m);
+        }
+        else
+        {
+            const auto & e = std::get<EnhancedHueSatColor>(mColorValue);
+            mDelegate->ConvertHueSatToMireds(ep, e.hue(), e.saturation, m);
+        }
+        return encoder.Encode(m);
+    }
 
     // ColorMode / EnhancedColorMode are DERIVED from the active variant — never stored. Enhanced HS
     // collapses to CurrentHueAndCurrentSaturation(0) in the non-enhanced ColorMode (§3.2).
@@ -1805,14 +1818,8 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
                                   : std::holds_alternative<CTColor>(mColorValue) ? ColorModeEnum::kColorTemperatureMireds
                                                                                  : ColorModeEnum::kCurrentHueAndCurrentSaturation);
     case Attributes::EnhancedColorMode::Id:
-        return encoder.Encode(std::visit(
-            overloaded{
-                [](const XYColor &) { return EnhancedColorModeEnum::kCurrentXAndCurrentY; },
-                [](const HueSatColor &) { return EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation; },
-                [](const EnhancedHueSatColor &) { return EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation; },
-                [](const CTColor &) { return EnhancedColorModeEnum::kColorTemperatureMireds; },
-            },
-            mColorValue));
+        // Derived from the active variant; GetEnhancedColorMode() is the single source of that mapping.
+        return encoder.Encode(GetEnhancedColorMode());
 
     // ---- plain stored state ----
     case RemainingTime::Id:
