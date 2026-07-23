@@ -34,6 +34,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     pre-existing-fabric: true
 # === END CI TEST ARGUMENTS ===
 
 import enum
@@ -384,15 +399,25 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 dev_ctrl=th1_dev_ctrl,
                 node_id=th1_dut_node_id,
                 cluster=opcreds,
-                attribute=opcreds.Attributes.TrustedRootCertificates,
-                fabric_filtered=True
+                attribute=opcreds.Attributes.TrustedRootCertificates
             )
-            asserts.assert_true(len(root_certs) == 1,
-                                f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
 
             log.info("Parsing root certificate for TH1's fabric")
+            th1_root_public_key = th1_dev_ctrl.rootPublicKeyBytes
+            th1_root_cert = None
+            for cert in root_certs:
+                try:
+                    parser = MatterCertParser(cert)
+                    if parser.get_public_key_bytes() == th1_root_public_key:
+                        th1_root_cert = cert
+                        break
+                except (ValueError, IndexError, KeyError, TypeError):
+                    continue
+            asserts.assert_is_not_none(
+                th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
+
             try:
-                th1_root_parser = MatterCertParser(root_certs[0])
+                th1_root_parser = MatterCertParser(th1_root_cert)
                 th1_root_public_key = th1_root_parser.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
@@ -542,7 +567,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         with test_step(5, description="Send bad SignVIDVerificationRequest commands and verify failures"):
             # Must fail with correct client challenge but non-existent fabric.
-            unassigned_fabric_index = get_unassigned_fabric_index(fabric_indices.values())
+            assigned_fabric_indices = [noc_struct.fabricIndex for noc_struct in nocs_list]
+            unassigned_fabric_index = get_unassigned_fabric_index(assigned_fabric_indices)
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=unassigned_fabric_index, clientChallenge=client_challenge))
 

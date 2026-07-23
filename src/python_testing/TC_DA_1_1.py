@@ -33,6 +33,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     pre-existing-fabric: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -72,7 +86,7 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep("precondition", "DUT is commissioned to TH1's fabric", is_commissioning=True),
             TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1"),
             TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
-                     - Verify that TH1's fabric is present in the list
+                     - Verify that TH1's fabric (public key + fabric ID) is present in the list
                      - Locate TH1's NOC entry by matching fabric index"""),
             TestStep(3, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
             TestStep(4, "TH2 opens a PASE session with the DUT"),
@@ -80,7 +94,7 @@ class TC_DA_1_1(MatterBaseTest):
                      - Verify that TH1's fabric (public key + fabric ID) is not present in TH2's Fabrics list"""),
             TestStep(6, "DUT is commissioned to TH2's fabric"),
             TestStep(7, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
-                     - Verify that TH2's FabricID is present in the Fabrics list
+                     - Verify that TH2's fabric (public key + fabric ID) is present in the Fabrics list
                      - Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different"""),
             TestStep(8, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
                      - Locate TH2's NOC entry by matching fabric index
@@ -161,9 +175,13 @@ class TC_DA_1_1(MatterBaseTest):
         fabrics_th1 = await self.read_fabrics(th1)
 
         # Verify that TH1's fabric is present in the list (device may have pre-existing fabrics)
-        th1_fabric = next((f for f in fabrics_th1 if f.fabricID == th1.fabricId), None)
+        th1_fabric = next(
+            (f for f in fabrics_th1 if f.fabricID == th1.fabricId and f.rootPublicKey == th1.rootPublicKeyBytes),
+            None)
         asserts.assert_is_not_none(
-            th1_fabric, f"TH1 FabricID ({th1.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th1]}")
+            th1_fabric,
+            f"TH1 fabric (fabricID={th1.fabricId}, rootPublicKey={th1.rootPublicKeyBytes.hex()}) not found in "
+            f"Fabrics list: {[(f.fabricID, f.rootPublicKey.hex()) for f in fabrics_th1]}")
 
         # Locate TH1's NOC entry by matching fabric index
         th1_noc = next((n for n in nocs_th1 if n.fabricIndex == th1_fabric.fabricIndex), None)
@@ -213,10 +231,14 @@ class TC_DA_1_1(MatterBaseTest):
             attribute=fabrics_attr,
             fabric_filtered=False)
 
-        # Verify that TH2's FabricID is present in the Fabrics list
-        th2_fabric = next((f for f in fabrics_th2 if f.fabricID == th2.fabricId), None)
-        asserts.assert_is_not_none(th2_fabric,
-                                   f"TH2 FabricID ({th2.fabricId}) not found in Fabrics list: {[f.fabricID for f in fabrics_th2]}")
+        # Verify that TH2's fabric is present in the Fabrics list
+        th2_fabric = next(
+            (f for f in fabrics_th2 if f.fabricID == th2.fabricId and f.rootPublicKey == th2.rootPublicKeyBytes),
+            None)
+        asserts.assert_is_not_none(
+            th2_fabric,
+            f"TH2 fabric (fabricID={th2.fabricId}, rootPublicKey={th2.rootPublicKeyBytes.hex()}) not found in "
+            f"Fabrics list: {[(f.fabricID, f.rootPublicKey.hex()) for f in fabrics_th2]}")
 
         # Verify that TH2 and TH1's Fabrics attribute's FabricIDs are different
         asserts.assert_not_equal(th2_fabric.fabricID, th1_fabric.fabricID,
