@@ -73,7 +73,7 @@ from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcas
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import _has_feature, async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -82,6 +82,13 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SC_5_2(MatterBaseTest):
+    groupcast_settle_delay_seconds: float
+
+    async def wait_groupcast_to_unicast_settle_delay(self):
+        logger.info(
+            f"Waiting before doing unicast action for {self.groupcast_settle_delay_seconds:.1f} after the multicast action."
+        )
+        await asyncio.sleep(self.groupcast_settle_delay_seconds)
 
     def desc_TC_SC_5_2(self) -> str:
         return "26.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT"
@@ -155,6 +162,31 @@ class TC_SC_5_2(MatterBaseTest):
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
+
+        raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
+        if raw_delay is not None:
+            self.groupcast_settle_delay_seconds = float(raw_delay)
+            logger.info(f"Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided ({self.groupcast_settle_delay_seconds:.1f} s)")
+        elif self.is_pics_sdk_ci_only:
+            self.groupcast_settle_delay_seconds = 1.0
+            logger.info("CI detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 1 second")
+        else:
+            is_thread_device = any(
+                _has_feature(
+                    self.stored_global_wildcard,
+                    ep,
+                    Clusters.NetworkCommissioning,
+                    Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface,
+                )
+                for ep in self.stored_global_wildcard.attributes
+            )
+            if is_thread_device:
+                self.groupcast_settle_delay_seconds = 5.0
+                logger.info("Thread device detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 5 seconds")
+            else:
+                self.groupcast_settle_delay_seconds = 3.0
+                logger.info("non-Thread device detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 3 seconds")
+
         logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
             logger.info("Running test against endpoint %s groups cluster", endpoint)
@@ -299,7 +331,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 6a: AddGroup 0x0201 as group command via GroupID 0x0101
             self.step("6a")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0201))
-            await asyncio.sleep(3)
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 6b: ViewGroup 0x0201 to confirm success
             self.step("6b")
@@ -319,7 +351,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 7b: AddGroup 0x0202 as group command via GroupID 0x0101
             self.step("7b")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0202))
-            await asyncio.sleep(3)
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 7c: ViewGroup 0x0202 to confirm rejection
             self.step("7c")
@@ -338,7 +370,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 8b: AddGroup 0x0203 as group command via GroupID 0x0102
             self.step("8b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0203))
-            await asyncio.sleep(3)
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 8c: ViewGroup 0x0203 to confirm rejection
             self.step("8c")
@@ -358,7 +390,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 9b: AddGroup 0x0204 as group command via GroupID 0x0102
             self.step("9b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0204))
-            await asyncio.sleep(3)
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 9c: ViewGroup 0x0204 to confirm rejection
             self.step("9c")
@@ -368,7 +400,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 10a: RemoveGroup 0x0101 as group command via GroupID 0x0300
             self.step("10a")
             dev_ctrl.SendGroupCommand(groupId0300, Clusters.Groups.Commands.RemoveGroup(groupId0101))
-            await asyncio.sleep(3)
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 10b: ViewGroup 0x0101 to confirm removal
             self.step("10b")
