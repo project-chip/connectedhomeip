@@ -597,6 +597,61 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     gPairingServer.Shutdown();
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingAccessory;
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    SessionParameters commissionerSessionParams;
+    commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+    pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+    SessionParameters accessorySessionParams;
+    accessorySessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    accessorySessionParams.SetMaxTCPPayloadSize(50000);
+    pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                   nullptr, nullptr, &delegateCommissioner, NullOptional),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
+
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 TEST_F(TestCASESession, ClientReceivesBusyTest)
 {
     TemporarySessionManager sessionManager(*this);
@@ -1001,7 +1056,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     encodeParams.destinationId      = ByteSpan(destinationId);
 
     ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig();
-    encodeParams.initiatorMrpConfig         = &mrpConfig;
+    encodeParams.initiatorSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
@@ -1017,20 +1072,6 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     {
         System::PacketBufferHandle msg;
         // EncodeSigma1 will Succeed when Public Key is provided
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma1(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma1 should fail when MRP config is missing
-        encodeParams.initiatorMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma1(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.initiatorMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma1(msg, encodeParams));
     }
 
@@ -1306,7 +1347,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                             System::Clock::Milliseconds16(4000));
 
-    encodeParams.responderMrpConfig = &mrpConfig;
+    encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
@@ -1356,27 +1397,10 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     // Set encrypted2Length again
     encodeParams.encrypted2Length = kEncrypted2datalen + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma2 should fail when MRP config is missing
-        encodeParams.responderMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma2(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
-        // EncodeSigma2 frees msgR2Encrypted after encoding it
-        encodeParams.msgR2Encrypted.Alloc(encodeParams.encrypted2Length);
-    }
-
     // Round Trip Test: Encode then Parse Sigma2
     {
         System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
 
         System::PacketBufferTLVReader tlvReader;
@@ -1391,7 +1415,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
         EXPECT_TRUE(parsedMessage.responderEphPubKey.data_equal(
             ByteSpan(encodeParams.responderEphPubKey->ConstBytes(), encodeParams.responderEphPubKey->Length())));
 
-        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), mrpConfig);
     }
 
     // Release EphemeralKeyPair
@@ -1575,32 +1599,17 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
     // Set responder MRP Parameters
     ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                             System::Clock::Milliseconds16(4000));
-    encodeParams.responderMrpConfig = &mrpConfig;
+    encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma2Resume should fail when MRP config is missing
-        encodeParams.responderMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
     }
 
     // Round Trip Test: Encode Parse Sigma2Resume
     {
         System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
 
         System::PacketBufferTLVReader tlvReader;
@@ -1613,7 +1622,7 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
         EXPECT_TRUE(parsedMessage.resumptionId.data_equal(encodeParams.resumptionId));
         EXPECT_TRUE(parsedMessage.sigma2ResumeMIC.data_equal(encodeParams.sigma2ResumeMIC));
         EXPECT_EQ(parsedMessage.responderSessionId, encodeParams.responderSessionId);
-        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), mrpConfig);
     }
 }
 
