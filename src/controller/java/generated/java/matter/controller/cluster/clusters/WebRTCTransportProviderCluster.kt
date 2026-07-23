@@ -1040,7 +1040,7 @@ class WebRTCTransportProviderCluster(
           val attributeData =
             subscriptionState.updateState.successes
               .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }        
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
             "Clusterrevision attribute not found in Node State update"
