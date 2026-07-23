@@ -1016,31 +1016,35 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
     ReadClient * foundSubscription = nullptr;
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    for (ReadClient * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // OnUnsolicitedMessageFromPublisher() below can synchronously close and destroy readClient
+        // (a scheduled resubscribe whose session re-establishment fails -> Close -> OnDone unlinks it
+        // from mpActiveReadClientList). Cache the next pointer before the callback and do not
+        // dereference readClient afterwards. Mirrors OnActiveModeNotification / OnPeerTypeChange.
+        ReadClient * nextClient = readClient->GetNextClient();
+
         auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
         if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
         {
+            readClient = nextClient;
             continue;
         }
 
-        // Notify Subscriptions about incoming communication from node
-        readClient->OnUnsolicitedMessageFromPublisher();
-
-        if (!readClient->IsSubscriptionActive())
-        {
-            continue;
-        }
-
-        if (!readClient->IsMatchingSubscriptionId(subscriptionId))
-        {
-            continue;
-        }
-
-        if (!foundSubscription)
+        // Determine whether this is the subscription the report is for before notifying, because the
+        // notification may destroy readClient. An active subscription never has a resubscribe
+        // scheduled (ScheduleResubscription requires the Idle state), so the captured client is never
+        // freed by its own notification and stays valid for the dispatch below.
+        if (foundSubscription == nullptr && readClient->IsSubscriptionActive() &&
+            readClient->IsMatchingSubscriptionId(subscriptionId))
         {
             foundSubscription = readClient;
         }
+
+        // Notify Subscriptions about incoming communication from node.
+        readClient->OnUnsolicitedMessageFromPublisher();
+
+        readClient = nextClient;
     }
 
     if (foundSubscription)
