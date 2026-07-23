@@ -18,7 +18,6 @@
 #include <app/clusters/ambient-context-sensing-server/ambient-context-sensing-namespace.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <cassert>
 #include <chrono>
 #include <clusters/AmbientContextSensing/Metadata.h>
 
@@ -31,8 +30,9 @@ AmbientContextSensingCluster::AmbientContextSensingCluster(EndpointId endpointId
     DefaultServerCluster({ endpointId, AmbientContextSensing::Id }), mFeatureMap(config.mFeatureMap),
     mOptionalAttributeSet(config.mOptionalAttributeBits), mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
-    assert(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
-           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting));
+    VerifyOrDie(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
+                mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
+                mFeatureMap.Has(Feature::kSensorFusion));
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -107,6 +107,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const 
         return encoder.Encode(GetHoldTimeLimits());
     case PredictedActivity::Id:
         return ReadPredictedActivity(encoder);
+    case SensorFusionSupported::Id:
+        return ReadSensorFusionSupported(encoder);
     case FeatureMap::Id:
         return encoder.Encode(GetFeatures());
     case ClusterRevision::Id:
@@ -430,6 +432,20 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const Span<Predict
     ReturnErrorOnFailure(mACSDelegate->SetPredictedActivity(predictedActivityList));
     mPredictedActivityList = Span<PredictActivity>(mACSDelegate->GetPredictedActivityBuf(), predictedActivityList.size());
     NotifyAttributeChanged(Attributes::PredictedActivity::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+{
+    VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrDie(mACSDelegate != nullptr);
+
+    ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
+    ReturnErrorOnFailure(mACSDelegate->SetSensorFusionSupported(sensorFusionSupportedList));
+    mSensorFusionSupportedList =
+        Span<AmbientContextSensing::SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
+    NotifyAttributeChanged(Attributes::SensorFusionSupported::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -836,6 +852,43 @@ CHIP_ERROR AmbientContextSensingCluster::ReadPredictedActivity(AttributeValueEnc
         for (const auto & item : mPredictedActivityList)
         {
             ReturnErrorOnFailure(encode.Encode(item.mInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+bool AmbientContextSensingCluster::IsSupportedType(const AmbientContextSensing::SemanticTagType & sensedType)
+{
+    const auto & supportedList = mAmbientContextTypeSupportedList;
+
+    return std::any_of(supportedList.begin(), supportedList.end(), [&sensedType](const auto & supported) {
+        return sensedType.namespaceID == supported.namespaceID && sensedType.tag == supported.tag;
+    });
+}
+
+CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
+
+    // Sanitize the input parameters
+    for (const auto & item : sensorFusionSupportedList)
+    {
+        VerifyOrReturnError(IsSupportedType(item), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmbientContextSensingCluster::ReadSensorFusionSupported(AttributeValueEncoder & encoder)
+{
+    VerifyOrDie(mACSDelegate != nullptr);
+    VerifyOrReturnValue(!mSensorFusionSupportedList.empty(), encoder.EncodeEmptyList());
+
+    return encoder.EncodeList([this](const auto & encode) -> CHIP_ERROR {
+        for (const auto & item : mSensorFusionSupportedList)
+        {
+            ReturnErrorOnFailure(encode.Encode(item));
         }
         return CHIP_NO_ERROR;
     });
