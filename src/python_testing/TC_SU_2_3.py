@@ -86,7 +86,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             TestStep(2, "During the transfer of the image to the DUT, force fail the transfer before it completely transfers the image. "
                      "Initiate another QueryImage Command from DUT to the TH/OTA-P. "
                      "Set the RC[STARTOFS] bit and associated STARTOFS field in the ReceiveInit Message to indicate the resumption of a transfer previously aborted.",
-                     "ImageURI should have the https url from where the image can be downloaded.",
+                     "ImageURI should have the https url from where the image can be downloaded. "
                      "Verify that the DUT starts receiving the rest of the software image after resuming the image transfer.")
         ]
 
