@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -51,9 +51,4 @@ public:
 
 private:
     static RefrigeratorAlarmServer instance;
-
-    void SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameActive,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameInactive,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 };

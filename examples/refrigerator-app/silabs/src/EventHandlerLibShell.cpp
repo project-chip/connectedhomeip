@@ -22,6 +22,7 @@
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/CodeUtils.h>
 
 constexpr uint8_t kRefEndpointId = 1;
@@ -29,6 +30,7 @@ constexpr uint8_t kRefEndpointId = 1;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::RefrigeratorAlarm;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -149,6 +151,9 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
 CHIP_ERROR RegisterRefrigeratorEvents()
 {
+    BitMask<AlarmMap> supported(AlarmMap::kDoorOpen);
+    RefrigeratorAlarmServer::Instance().SetSupportedValue(kRefEndpointId, supported);
+
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
         { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },
@@ -188,13 +193,19 @@ void EventWorkerFunction(intptr_t context)
     {
     case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, alarmData->doorState);
+        BitMask<AlarmMap> mask(alarmData->doorState);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, mask);
         break;
     }
 
     case RefrigeratorAlarm::Events::Notify::Fields::kState: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
-        RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
+        BitMask<AlarmMap> doorState(alarmData->doorState);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, doorState);
+        if (doorState.Raw() != 0)
+        {
+            RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState);
+        }
         break;
     }
 
