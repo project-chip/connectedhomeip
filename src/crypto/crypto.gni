@@ -46,6 +46,11 @@ declare_args() {
   # see https://www.nxp.com/products/nxp-product-information/nxp-product-programs/edgelock-secure-enclave:EDGELOCK-SECURE-ENCLAVE
   # to get more information.
   chip_with_imx_ele = false
+
+  # Enable support for x509 certificates.
+  # Disable this argument to reduce the code footprint if your device does not
+  # need to manage the x509 certificates.
+  chip_crypto_use_x509 = true
 }
 
 if (chip_crypto == "") {
