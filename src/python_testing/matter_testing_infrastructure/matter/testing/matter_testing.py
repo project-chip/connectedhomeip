@@ -553,6 +553,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
+        # Pre-test snapshot of the DUT's fabric identities
+        self._original_fabrics = None
         self._framework_cleanup_done = False
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
@@ -1054,16 +1056,26 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.warning("[CLN] ACL reset failed: %s", e)
 
     async def _remove_extra_fabrics(self) -> None:
-        """Removes any fabric on the DUT that is not the default controller's fabric."""
-        try:
-            # Read TH1's fabric index on the DUT via the default controller
-            th1_fabric_index = await self.read_single_attribute_check_success(
-                cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
-                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
-                endpoint=0
-            )
+        """Removes fabrics added to the DUT during the test, preserving pre-existing fabrics.
 
-            # Read all fabrics unfiltered so we see every fabric, not just TH1's
+           Each fabric falls into one of two cases:
+
+           (1) Fabrics captured in the pre-test snapshot (pre-existing), these are preserved
+           (2) Fabrics added during the test (not in the pre-test snapshot), these are removed
+
+           Identity is keyed on (rootPublicKey, fabricID) rather than fabricIndex so the decision
+           survives a mid-test factory reset (which wipes fabrics and lets re-commissioning reuse indices).
+
+           Removal is skipped when the snapshot is missing (the DUT was not reachable at setup), or the
+           snapshot exists but no fabrics were added during the test.
+        """
+        if self._original_fabrics is None:
+            LOGGER.info(
+                "[CLN] No fabric snapshot (DUT not reachable at setup): skipping fabric removal (cannot distinguish test-added from pre-existing fabrics)")
+            return
+
+        try:
+            # Read all fabrics unfiltered so we see every fabric, not just the default controller's
             fabrics = typing.cast(
                 list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
                 await self.read_single_attribute_check_success(
@@ -1078,7 +1090,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 "[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: %s", e)
             return
 
-        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+        # Remove (by fabricIndex) only fabrics whose identity was not present before the test ran.
+        extra_fabric_indices = [
+            f.fabricIndex for f in fabrics
+            if (bytes(f.rootPublicKey), f.fabricID) not in self._original_fabrics
+        ]
 
         if not extra_fabric_indices:
             LOGGER.info("[CLN] no extra fabrics to remove")
@@ -1459,6 +1475,22 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
             except Exception:
                 self._original_acl = None
+
+            # Capture the pre-existing fabrics _remove_extra_fabrics uses this snapshot so that
+            # only fabrics added during the test are removed
+            if self._original_fabrics is None:
+                try:
+                    fabrics = self.event_loop.run_until_complete(
+                        self.read_single_attribute_check_success(
+                            cluster=Clusters.OperationalCredentials,
+                            attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+                            endpoint=0,
+                            fabric_filtered=False
+                        )
+                    )
+                    self._original_fabrics = {(bytes(f.rootPublicKey), f.fabricID) for f in fabrics}
+                except Exception:
+                    self._original_fabrics = None
 
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
