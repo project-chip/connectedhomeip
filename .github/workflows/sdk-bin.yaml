@@ -1,0 +1,278 @@
+name: Build Certification Image v2
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  check-or-create-arm64-build-container:
+    permissions:
+        contents: read
+        packages: write
+        attestations: write
+        id-token: write
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      chip-build-checksum: ${{ steps.checksum.outputs.checksum }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            integrations/docker/images/base/chip-build/Dockerfile
+          sparse-checkout-cone-mode: false
+      - name: Calculate checksum of Dockerfile
+        id: checksum
+        run: |
+          checksum=$(sha256sum integrations/docker/images/base/chip-build/Dockerfile | awk '{print $1}')
+          echo "checksum=$checksum" >> $GITHUB_OUTPUT
+      - name: Check if image with checksum tag exists
+        id: check-image
+        uses: tyriis/docker-image-tag-exists@v3.0.0
+        with:
+          registry: ghcr.io
+          repository: project-chip/chip-build-arm64
+          tag: ${{ steps.checksum.outputs.checksum }}
+      - name: Set up Docker Buildx
+        if: steps.check-image.outputs.tag != 'found'
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+      - name: Publish to Registry
+        if: steps.check-image.outputs.tag != 'found'
+        uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
+        with:
+            name: project-chip/chip-build-arm64
+            tags: ${{ steps.checksum.outputs.checksum }}
+            dockerfile: ./integrations/docker/images/base/chip-build/Dockerfile
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: ghcr.io
+
+  load-targets-as-output:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      targets: ${{ steps.set-targets.outputs.targets }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            integrations/docker/images/chip-cert-bins/targets.json
+          sparse-checkout-cone-mode: false
+      - name: Set targets
+        id: set-targets
+        run: |
+          targets=$(cat integrations/docker/images/chip-cert-bins/targets.json | tr -d '\n' | tr -d ' ')
+          echo "targets=$targets" >> $GITHUB_OUTPUT
+
+  build-target:
+    needs: [load-targets-as-output, check-or-create-arm64-build-container]
+    strategy:
+      matrix:
+        target: ${{ fromJSON(needs.load-targets-as-output.outputs.targets) }}
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      - run: |
+          mkdir -p stripped-bins
+      - run: |
+          sed -i 's/treat_warnings_as_errors = true/treat_warnings_as_errors = false/' build/config/compiler/BUILD.gn
+      - name: Setup and Restore Cache
+        id: ccache
+        uses: ./.github/actions/setup-ccache
+        with:
+          build-variant: linux-arm64-${{ matrix.target }}
+      - name: build target
+        run: |
+          ./scripts/run_in_build_env.sh \
+              "./scripts/build/build_examples.py \
+                --build-profile=release-size \
+                --target linux-arm64-${{ matrix.target }} \
+                --pw-command-launcher=ccache \
+                build \
+              "
+      - name: strip and move binary
+        run: |
+          find out/linux-arm64-${{ matrix.target }}-release-size -maxdepth 1 -type f -executable -exec mv {} stripped-bins/ \;
+          find stripped-bins -type f -executable -exec strip --strip-all {} \;
+      - name: Generate OTA image
+        if: startsWith(matrix.target, 'ota-requestor')
+        shell: bash
+        run: |
+              cd stripped-bins
+              ../src/app/ota_image_tool.py create \
+                -v 0xDEAD \
+                -p 0xBEEF \
+                -vn 2 \
+                -vs "2.0" \
+                -da sha256 \
+                chip-ota-requestor-app \
+                ota-requestor-app.ota
+              cd -
+              find stripped-bins -type f -executable -exec strip --strip-all {} \;
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-${{ matrix.target }}
+          path: stripped-bins
+      - name: Ensure only useful ccache is kept
+        if: github.ref == 'refs/heads/master'
+        run: ccache --evict-older-than 1d || true
+      - name: Delete existing ccache before save
+        if: github.ref == 'refs/heads/master'
+        uses: ./.github/actions/delete-cache
+        with:
+          cache-key: ${{ env.CCACHE_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Save ccache
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ env.CCACHE_KEY }}
+
+  build-python:
+    runs-on: ubuntu-24.04-arm
+    needs: check-or-create-arm64-build-container
+    container:
+      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      - name: Setup and Restore Cache
+        id: ccache
+        uses: ./.github/actions/setup-ccache
+        with:
+          build-variant: python
+      - name: Build Python components
+        shell: bash
+        run: |
+              source scripts/activate.sh
+              scripts/build_python.sh \
+                -m platform \
+                -d true \
+                --enable_nfc true \
+                --enable-ccache
+      - name: Move files and install dependencies
+        run: |
+          mkdir -p python_testing/scripts/sdk
+          mkdir -p python_testing/data_model
+          mkdir mock_server
+          mv ./src/python_testing ./python_testing/scripts/sdk
+          mv ./data_model ./python_testing/data_model
+          pip install --break-system-packages -r ./python_testing/scripts/sdk/requirements.txt \
+              && rm ./python_testing/scripts/sdk/requirements.txt
+          pip install --break-system-packages -r ./apps/push_av_server/requirements.txt \
+              && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < ./apps/push_av_server/hypercorn.patch
+          pip install --break-system-packages -r ./python_testing/scripts/sdk/requirements.nfc.txt \
+              && rm ./python_testing/scripts/sdk/requirements.nfc.txt
+          mv ./integrations/mock_server ./mock_server
+      - name: Build Python wheels
+        shell: bash
+        working-directory: ./out
+        run: |
+          pip install --break-system-packages --no-cache-dir \
+            ./python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
+            ./python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
+            ./python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
+            ./python_lib/obj/src/controller/python/matter-controller-wheels/*.whl
+      - name: Save python dist-packages directory
+        id: dist-packages
+        run: |
+          dist_packages=$(python -c "import site; print(site.getsitepackages()[0])")
+          echo "dist_packages=$dist_packages" >> $GITHUB_OUTPUT
+      - name: Save usr/local/bin
+        uses: actions/upload-artifact@v4
+        with:
+          name: user-local-bin-arm64
+          path: /usr/local/bin
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-arm64
+          path: ${{ steps.dist-packages.outputs.dist_packages }}
+      - name: Ensure only useful ccache is kept
+        if: github.ref == 'refs/heads/master'
+        run: ccache --evict-older-than 1d || true
+      - name: Delete existing ccache before save
+        if: github.ref == 'refs/heads/master'
+        uses: ./.github/actions/delete-cache
+        with:
+          cache-key: ${{ env.CCACHE_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Save ccache
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ env.CCACHE_KEY }}
+
+  create-image:
+    needs: [build-target, build-python]
+    runs-on: ubuntu-24.04-arm
+    permissions:
+        contents: read
+        packages: write
+        attestations: write
+        id-token: write
+    steps:
+      - name: Checkout just the files we need to copy to the image
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            integrations/docker/images/chip-cert-bins/Dockerfile-ci
+            examples/fabric-admin/scripts/fabric-sync-app.py
+            src/tools/push_av_server
+            src/python_testing
+            data_model
+            integrations/mock_server
+            credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+            credentials/test/revoked-attestation-certificates/revocation-sets
+      - name: Download example artifacts
+        uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+          path: apps/
+          pattern: linux-arm64-*
+      - name: Download python artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: dist-packages/
+          name: python-linux-arm64
+      - name: Download usr/local/bin artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: usr-local-bin/
+          name: user-local-bin-arm64
+      # Build and push an image using a new Dockerfile that copies the binaries from the downloaded artifacts
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
+        env:
+          COMMITHASH: ${{ github.sha }}
+        with:
+            name: connectedhomeip/chip-cert-bins
+            tags: ${{ github.sha }}
+            dockerfile: ./integrations/docker/images/chip-cert-bins/Dockerfile-ci
+            username: ${{ secrets.CHIP_CERT_BINS_REGISTRY_USER }}
+            password: ${{ secrets.CHIP_CERT_BINS_REGISTRY_TOKEN }}
+            buildargs: COMMITHASH
+            registry: docker.io
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: ./.github/actions/notify-slack-failure
+        with:
+          slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
