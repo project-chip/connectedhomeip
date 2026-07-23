@@ -81,8 +81,7 @@ public:
 
     bool GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement) override;
 
-    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
-                                Structs::ProgressStruct::Type & aProgressElement) override;
+    bool GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement) override;
 
     bool AddProgressElementRaw(const Structs::ProgressStruct::Type & newProgressElement, uint32_t & listIndex) override;
 
