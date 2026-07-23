@@ -49,6 +49,9 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#ifdef CHIP_CONFIG_KVS_PATH
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
+#endif
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -614,16 +617,12 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
 #ifdef CHIP_CONFIG_KVS_PATH
-    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+    // KVS paths are already set by ParseArguments() via SetStoragePaths()
     {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+        std::string kvsPath = chip::DeviceLayer::GetStoragePaths().GetKVSDataFilePath();
+        ChipLogProgress(NotSpecified, "KVS data file: %s", kvsPath.empty() ? "(default)" : kvsPath.c_str());
     }
-    else
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
-    }
-    SuccessOrExit(err);
-#endif
+#endif // CHIP_CONFIG_KVS_PATH
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread

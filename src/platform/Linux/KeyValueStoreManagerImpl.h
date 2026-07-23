@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,15 +36,13 @@ public:
      * @brief
      * Initalize the KVS, must be called before using.
      */
-    CHIP_ERROR Init(const char * file) { return mStorage.Init(file); }
+    CHIP_ERROR Init(const char * file);
 
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0);
     CHIP_ERROR _Delete(const char * key);
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
-    DeviceLayer::Internal::ChipLinuxStorage mStorage;
-
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();

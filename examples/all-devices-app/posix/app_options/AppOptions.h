@@ -43,6 +43,11 @@ public:
         std::optional<uint16_t> productId;
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
+        std::string kvsDirectory;
+        std::string kvsDataFile;
+        std::string kvsFactoryFile;
+        std::string kvsConfigFile;
+        std::string kvsCountersFile;
         bool enableWiFi        = false;
         uint32_t bleController = 0;
     };

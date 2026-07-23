@@ -121,6 +121,8 @@ static_library("Linux") {
     "CHIPLinuxStorage.h",
     "CHIPLinuxStorageIni.cpp",
     "CHIPLinuxStorageIni.h",
+    "CHIPLinuxStoragePaths.cpp",
+    "CHIPLinuxStoragePaths.h",
     "CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",

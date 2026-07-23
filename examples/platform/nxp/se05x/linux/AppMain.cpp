@@ -619,15 +619,13 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
 #ifdef CHIP_CONFIG_KVS_PATH
-    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+    // Configure the KVS data file path before InitChipStack() (which calls
+    // PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()) to avoid a double-init.
     {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+        const char * kvsPath =
+            (LinuxDeviceOptions::GetInstance().KVS == nullptr) ? CHIP_CONFIG_KVS_PATH : LinuxDeviceOptions::GetInstance().KVS;
+        DeviceLayer::GetStoragePaths().SetKVSDataFile(kvsPath);
     }
-    else
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
-    }
-    SuccessOrExit(err);
 #endif
 
 #if defined(ENABLE_CHIP_SHELL)

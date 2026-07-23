@@ -31,6 +31,10 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 
+#if (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN) && !CHIP_DISABLE_PLATFORM_KVS
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
+#endif
+
 #include "../clusters/JsonParser.h"
 
 namespace {
@@ -64,7 +68,16 @@ template <typename T, std::enable_if_t<HasInitWithString<T>::value, int> = 0>
 static void UseStorageDirectory(T & storageManagerImpl, const char * storageDirectory)
 {
     std::string platformKVS = std::string(storageDirectory) + "/chip_tool_kvs";
+#if (CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN) && !CHIP_DISABLE_PLATFORM_KVS
+    // Use the storage paths API so that PosixConfig::Init() (called during
+    // InitChipStack()) picks up the correct KVS data file path. Set both the
+    // base directory and the explicit KVS data file path.
+    auto & paths = chip::DeviceLayer::GetStoragePaths();
+    paths.SetBaseDir(storageDirectory);
+    paths.SetKVSDataFile(platformKVS);
+#else
     TEMPORARY_RETURN_IGNORED storageManagerImpl.Init(platformKVS.c_str());
+#endif
 }
 
 template <typename T, std::enable_if_t<!HasInitWithString<T>::value, int> = 0>

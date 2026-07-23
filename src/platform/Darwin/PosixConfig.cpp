@@ -30,6 +30,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/Darwin/PosixConfig.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 
 #include <platform/KeyValueStoreManager.h>
 
@@ -74,7 +75,11 @@ const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfi
 #if !CHIP_DISABLE_PLATFORM_KVS
 CHIP_ERROR PosixConfig::Init()
 {
-    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    // Use the KVS data file path resolved from the storage paths configuration
+    // (which may have been set by the application before InitChipStack()).
+    // Falls back to CHIP_CONFIG_KVS_PATH when no explicit path is configured.
+    std::string kvsDataPath = GetStoragePaths().GetKVSDataFilePath();
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(kvsDataPath.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
