@@ -393,6 +393,7 @@ CHIP_ERROR MdnsAvahi::RebuildClient()
 
     ChipLogError(DeviceLayer, "Avahi client failed; rebuilding it and cancelling outstanding lookups");
     ++mClientGeneration;
+    const uint64_t shutdownGeneration = mShutdownGeneration;
 
     // Detach the contexts first because their callbacks may start new DNS-SD operations.
     std::list<ResolveContext *> staleResolves;
@@ -444,12 +445,15 @@ CHIP_ERROR MdnsAvahi::RebuildClient()
     // failed rebuild has left mClient in a consistent state.
     for (auto * resolve : staleResolves)
     {
-        resolve->mCallback(resolve->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_FORCED_RESET);
+        if (mShutdownGeneration == shutdownGeneration)
+        {
+            resolve->mCallback(resolve->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_FORCED_RESET);
+        }
         chip::Platform::Delete(resolve);
     }
     for (auto * browse : staleBrowses)
     {
-        if (!browse->mStopped.load())
+        if (mShutdownGeneration == shutdownGeneration && !browse->mStopped.load())
         {
             browse->mCallback(browse->mContext, nullptr, 0, true, CHIP_ERROR_FORCED_RESET);
         }
@@ -755,6 +759,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
 
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
+    VerifyOrReturnError(browseContext != nullptr, CHIP_ERROR_NO_MEMORY);
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
 
     browseContext->mInstance    = this;
