@@ -82,7 +82,11 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SC_5_2(MatterBaseTest):
-    groupcast_settle_delay_seconds: float
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        # This value is a default of 3.0, but can change in the test body based upon certain test and device features
+        self.groupcast_settle_delay_seconds = 3.0
 
     async def wait_groupcast_to_unicast_settle_delay(self):
         logger.info(
