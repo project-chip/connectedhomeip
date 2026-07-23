@@ -963,12 +963,13 @@ TEST_F(TestAmbientContextSensingCluster, TestSensorFusionSupported)
     EXPECT_EQ(tester.ReadAttribute(Attributes::SensorFusionSupported::Id, out), CHIP_NO_ERROR);
     size_t size = 0;
     EXPECT_EQ(out.ComputeSize(&size), CHIP_NO_ERROR);
-    ASSERT_EQ(size, 3u);
+    ASSERT_EQ(size, std::size(sensorFusionSupportedArray));
 
     auto it = out.begin();
     auto i  = 0;
     while (it.Next())
     {
+        EXPECT_LT(static_cast<size_t>(i), std::size(sensorFusionSupportedArray));
         EXPECT_EQ(it.GetValue().namespaceID, sensorFusionSupportedArray[i].namespaceID);
         EXPECT_EQ(it.GetValue().tag, sensorFusionSupportedArray[i].tag);
         i++;

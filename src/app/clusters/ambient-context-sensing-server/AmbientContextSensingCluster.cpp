@@ -872,7 +872,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
     VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
 
     // Sanitize the input parameters
-    for (auto item : sensorFusionSupportedList)
+    for (const auto & item : sensorFusionSupportedList)
     {
         VerifyOrReturnError(IsSupportedType(item), CHIP_ERROR_INVALID_ARGUMENT);
     }
