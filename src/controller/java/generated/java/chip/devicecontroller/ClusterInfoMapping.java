@@ -34153,10 +34153,10 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("sdp",webRTCTransportProviderprovideOffersdpCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("originatingEndpointID",webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
@@ -34188,10 +34188,10 @@ public class ClusterInfoMapping {
            , (String)
              commandArguments.get("sdp")
 
-           , (Integer)
+           , (Optional<Integer>)
              commandArguments.get("streamUsage")
 
-           , (Integer)
+           , (Optional<Integer>)
              commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)

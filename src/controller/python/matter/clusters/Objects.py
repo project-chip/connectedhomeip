@@ -735,8 +735,8 @@ class Globals:
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
                         ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
@@ -747,8 +747,8 @@ class Globals:
             peerNodeID: 'uint' = 0
             peerEndpointID: 'uint' = 0
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
-            videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
-            audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
+            videoStreamID: 'typing.Union[None, Nullable, uint]' = None
+            audioStreamID: 'typing.Union[None, Nullable, uint]' = None
             metadataEnabled: 'bool' = False
             videoStreams: 'typing.Optional[typing.List[uint]]' = None
             audioStreams: 'typing.Optional[typing.List[uint]]' = None
@@ -55524,8 +55524,8 @@ class WebRTCTransportProvider(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=2, Type=Globals.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=2, Type=typing.Optional[Globals.Enums.StreamUsageEnum]),
+                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[Globals.Structs.ICEServerStruct]]),
@@ -55538,8 +55538,8 @@ class WebRTCTransportProvider(Cluster):
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
             sdp: str = ""
-            streamUsage: Globals.Enums.StreamUsageEnum = 0
-            originatingEndpointID: uint = 0
+            streamUsage: typing.Optional[Globals.Enums.StreamUsageEnum] = None
+            originatingEndpointID: typing.Optional[uint] = None
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[Globals.Structs.ICEServerStruct]] = None

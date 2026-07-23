@@ -68167,11 +68167,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Optional<Integer> streamUsage, Optional<Integer> originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams) {
       provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataEnabled, SFrameConfig, videoStreams, audioStreams, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Optional<Integer> streamUsage, Optional<Integer> originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Boolean> metadataEnabled, Optional<ChipStructs.WebRTCTransportProviderClusterSFrameStruct> SFrameConfig, Optional<ArrayList<Integer>> videoStreams, Optional<ArrayList<Integer>> audioStreams, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -68184,11 +68184,11 @@ public class ChipClusters {
       elements.add(new StructElement(sdpFieldID, sdptlvValue));
 
       final long streamUsageFieldID = 2L;
-      BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
+      BaseTLVType streamUsagetlvValue = streamUsage.<BaseTLVType>map((nonOptionalstreamUsage) -> new UIntType(nonOptionalstreamUsage)).orElse(new EmptyType());
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
       final long originatingEndpointIDFieldID = 3L;
-      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      BaseTLVType originatingEndpointIDtlvValue = originatingEndpointID.<BaseTLVType>map((nonOptionaloriginatingEndpointID) -> new UIntType(nonOptionaloriginatingEndpointID)).orElse(new EmptyType());
       elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
 
       final long videoStreamIDFieldID = 4L;
