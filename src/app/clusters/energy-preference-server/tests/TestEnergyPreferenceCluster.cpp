@@ -326,7 +326,8 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
     EnergyPreferenceCluster cluster(kTestEndpointId, bothFeatures);
 
     // currentEnergyBalance
-    for (CurrentEnergyBalance::TypeInfo::Type i = 0; i < static_cast<CurrentEnergyBalance::TypeInfo::Type>(testDelegate.GetNumEnergyBalances(kTestEndpointId)); ++i)
+    for (CurrentEnergyBalance::TypeInfo::Type i = 0;
+         i < static_cast<CurrentEnergyBalance::TypeInfo::Type>(testDelegate.GetNumEnergyBalances(kTestEndpointId)); ++i)
     {
         EXPECT_EQ(cluster.SetCurrentEnergyBalance(i), CHIP_NO_ERROR);
     }
@@ -339,7 +340,8 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // lowPowerModeSensitivity
-    for (CurrentLowPowerModeSensitivity::TypeInfo::Type i = 0; i < static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId));
+    for (CurrentLowPowerModeSensitivity::TypeInfo::Type i = 0; i <
+         static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId));
          ++i)
     {
         EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(i), CHIP_NO_ERROR);
