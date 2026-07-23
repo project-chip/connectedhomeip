@@ -920,6 +920,52 @@ TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
     EXPECT_EQ(keyset.policy, SecurityPolicy::kTrustFirst);
 }
 
+TEST_F(TestGroupDataProvider, TestKeySetInvalidKeyCount)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    EXPECT_TRUE(provider);
+
+    // Reset test
+    ResetProvider(provider);
+
+    // 1. Add a valid KeySet and map a group to it, so the group session iterator reaches the keyset.
+    EXPECT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->SetGroupKeyAt(kFabric1, 0, kGroup1Keyset1), CHIP_NO_ERROR);
+
+    // 2. Read the saved TLV from storage
+    auto keyName = DefaultStorageKeyAllocator::FabricKeyset(kFabric1, kKeysetId1);
+
+    uint8_t tlvBuffer[128] = {};
+    uint16_t tlvLength     = sizeof(tlvBuffer);
+    EXPECT_EQ(sDelegate.SyncGetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
+
+    // 3. Sanity check and patch the key count in-place, past the KeySet::kEpochKeysMax the
+    // operational_keys array can hold. We rely on the TLV encoding of KeySetData:
+    // - Outer structure start: 0x15
+    // - Policy field: Context Tag 1, value 0 (kTrustFirst) -> [0x24, 0x01, 0x00]
+    // - Key count field: Context Tag 2, value 1 -> [0x24, 0x02, 0x01]
+    ASSERT_GE(tlvLength, 7u);
+    ASSERT_EQ(tlvBuffer[0], 0x15); // Structure
+    ASSERT_EQ(tlvBuffer[4], 0x24); // Context Tag 1-byte value
+    ASSERT_EQ(tlvBuffer[5], 0x02); // Tag 2 (NumKeys)
+    ASSERT_EQ(tlvBuffer[6], 0x01); // Value (kKeySet1 uses a single key)
+
+    tlvBuffer[6] = 0xff;
+
+    // 4. Write it back to storage
+    EXPECT_EQ(sDelegate.SyncSetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
+
+    // 5. Loading the keyset must reject the out-of-range count rather than report it back.
+    KeySet keyset;
+    EXPECT_NE(provider->GetKeySet(kFabric1, kKeysetId1, keyset), CHIP_NO_ERROR);
+
+    // 6. The group session iterator must not read past operational_keys either.
+    auto it = provider->IterateGroupSessions(0);
+    ASSERT_TRUE(it);
+    EXPECT_EQ(it->Count(), 0u);
+    it->Release();
+}
+
 TEST_F(TestGroupDataProvider, TestKeySetInvalidPolicy)
 {
     GroupDataProvider * provider = GetGroupDataProvider();
