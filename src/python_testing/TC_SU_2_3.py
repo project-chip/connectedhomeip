@@ -167,7 +167,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_discriminator
         )
-        logger.info(f'Provider Commissioning response: {resp}')
+        logger.info("Provider Commissioning response: %s", resp)
 
         logger.info("Starting EventSubscription handlers")
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
@@ -184,13 +184,13 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         # Waiting for querying event
         querying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Quering event: {querying_event}")
+        logger.info("Quering event: %s", querying_event)
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kQuerying, querying_event.newState,
                              f"New state is {querying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kQuerying}")
 
         # Waiting for downloading event
         downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Downloading event: {downloading_event}")
+        logger.info("Downloading event: %s", downloading_event)
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kDownloading, downloading_event.newState,
                              f"New state is {downloading_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kDownloading}")
 
