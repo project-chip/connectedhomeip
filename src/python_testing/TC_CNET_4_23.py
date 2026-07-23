@@ -277,6 +277,9 @@ class TC_CNET_4_23(MatterBaseTest):
     def desc_TC_CNET_4_23(self):
         return "[TC-CNET-4.23] [Wi-Fi] Network Commissioning Success After Connection Failures [DUT-Server]"
 
+    def pics_TC_CNET_4_23(self):
+        return ['CNET.S.F00']
+
     @async_test_body
     async def test_TC_CNET_4_23(self):
 
