@@ -91,6 +91,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 static NSString * const sHighestObservedEventNumberKey = @"highestObservedEventNumber";
 
 static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the device may now be reachable";
+static NSString * const sOperationalAdvertisementReason = @"operational advertisement seen";
+static NSString * const sSubscriptionResetRetryReason = @"got subscription reset";
 
 // Not static, because these are public API.
 NSString * const MTRPreviousDataKey = @"previousData";
@@ -343,7 +345,27 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 //   Actively receiving priming report
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
-@property (nonatomic) BOOL doingCASEAttemptForDeviceMayBeReachable;
+// YES while a CASE attempt is in flight because we believe the node is now
+// reachable (SPI hint or operational mDNS advertisement).  Armed in
+// _setupSubscriptionWithReason: for every CASE-launching path; cleared once the
+// attempt resolves (established or failed) or on _resetSubscription.  While
+// armed it suppresses the stalled-CASE ReleaseSession branch in
+// _triggerResubscribeWithReason:, so a duplicate operational advertisement does
+// not tear down the in-flight attempt and surface a spurious CHIP_ERROR_CANCELLED.
+// _lock-protected.  (Renamed from doingCASEAttemptForDeviceMayBeReachable, which
+// armed only for the SPI-hint reason and so left the advertisement path exposed.)
+@property (nonatomic) BOOL doingCASEAttemptForNodeLikelyReachable;
+
+// ReadClient delivers a terminal subscription failure as OnError(err) followed
+// immediately by the parameterless OnDone() on the serialized Matter queue, but
+// OnDone is the callback that schedules the retry/backoff.  OnError stashes its
+// NSError here so OnDone can plumb it into _doHandleSubscriptionReset:underlyingError:
+// and preserve backoff on CHIP_ERROR_CANCELLED.  Relies on the documented
+// ReadClient OnError->OnDone ordering (see the OnDone block in
+// _setupSubscriptionWithReason: for the discussion).  Defensively cleared at
+// setup entry, after explicit-error resets, and in _resetSubscription so any
+// unconsumed stash cannot leak across subscription lifecycles.  _lock-protected.
+@property (nonatomic, nullable) NSError * pendingUnderlyingResubscribeError;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -526,7 +548,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
-        _doingCASEAttemptForDeviceMayBeReachable = NO;
+        _doingCASEAttemptForNodeLikelyReachable = NO;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -1152,7 +1174,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     MTR_LOG("%@ saw new operational advertisement", self);
 
-    [self _triggerResubscribeWithReason:@"operational advertisement seen"
+    [self _triggerResubscribeWithReason:sOperationalAdvertisementReason
                     nodeLikelyReachable:YES];
 }
 
@@ -1203,9 +1225,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             std::lock_guard lock(_lock);
             [self _clearSubscriptionPoolWork];
         }
-    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
+    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForNodeLikelyReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+        //
+        // doingCASEAttemptForNodeLikelyReachable gates the "state == Subscribing"
+        // arm: while a CASE attempt we launched on a reachability hint is still
+        // in flight, the guard is YES and we do NOT ReleaseSession it -- that is
+        // the duplicate-operational-advertisement self-cancel race this change
+        // fixes.  The guard is now armed for every CASE-launching reason (not
+        // just the SPI hint), so an operational advertisement arriving mid-CASE
+        // no longer tears down the live attempt.  A genuinely stalled attempt
+        // (guard already cleared, but state still Subscribing) still gets the
+        // release-and-fast-retry treatment.
 
         // Reset back off for framework resubscription
         os_unfair_lock_lock(&self->_lock);
@@ -1448,6 +1480,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     std::lock_guard lock(_lock);
+    // Stash the error for the paired OnDone callback (which is ^(void) and so
+    // has no error in scope) to consume, so it can preserve backoff on
+    // CHIP_ERROR_CANCELLED.  ReadClient pairs OnError immediately with OnDone on
+    // the serialized Matter queue, so a simple overwrite is sufficient.
+    _pendingUnderlyingResubscribeError = error;
     [self _doHandleSubscriptionError:error];
 }
 
@@ -1686,12 +1723,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _setupConnectivityMonitoring];
 }
 
-- (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
+- (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay underlyingError:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
 
     std::lock_guard lock(_lock);
-    [self _doHandleSubscriptionReset:retryDelay];
+    [self _doHandleSubscriptionReset:retryDelay underlyingError:error];
 }
 
 - (void)_setLastSubscriptionAttemptWait:(uint32_t)lastSubscriptionAttemptWait
@@ -1709,6 +1746,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
+    [self _doHandleSubscriptionReset:retryDelay underlyingError:nil];
+}
+
+- (void)_doHandleSubscriptionReset:(NSNumber * _Nullable)retryDelay underlyingError:(NSError * _Nullable)error
+{
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&_lock);
@@ -1718,6 +1760,23 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _clearSubscriptionPoolWork];
         return;
     }
+
+    // CHIP_ERROR_CANCELLED (MTRErrorCodeCancelled) indicates an
+    // internally-initiated cancellation -- e.g. a duplicate operational
+    // advertisement caused us to ReleaseSession the in-flight CASE attempt.
+    // That is internal noise, not a reachability failure, so we must not let it
+    // collapse our exponential backoff to the minimum; otherwise a flaky-but-
+    // still-advertising accessory oscillates 1-2-4-8-16-... indefinitely.
+    //
+    // Peer-cancel safety: a remote/peer-initiated abort does NOT surface as
+    // (MTRErrorDomain, MTRErrorCodeCancelled).  Peer aborts arrive as CHIP
+    // transport/IM status errors (CHIP_IM_STATUS_*, CHIP_ERROR_TIMEOUT,
+    // exchange/session errors), which map to other MTRError codes.
+    // MTRErrorCodeCancelled is produced only from CHIP_ERROR_CANCELLED, which in
+    // our usage is raised only by local ReleaseSession()/cancellation calls (see
+    // MTRError errorForCHIPErrorCode:), so the error code alone is a sound
+    // discriminator and we do not need a separate self-cancel flag.
+    BOOL underlyingErrorIsCancelled = [error.domain isEqualToString:MTRErrorDomain] && error.code == MTRErrorCodeCancelled;
 
     // If we are here, then either we failed to establish initial CASE, or we
     // failed to send the initial SubscribeRequest message, or our ReadClient
@@ -1745,8 +1804,25 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     self.reattemptingSubscription = YES;
 
     NSTimeInterval secondsToWait;
-    if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
-        _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS;
+    if (underlyingErrorIsCancelled) {
+        // Internal cancellation: preserve the existing backoff so a sequence of
+        // internal cancellations can't masquerade as transient reachability
+        // success and reset our pacing.  We do NOT double the backoff here (the
+        // attempt was internal noise, not a real failure), and we ignore any
+        // accompanying retryDelay since it is not server pacing guidance on this
+        // branch.  We do floor a sub-MIN_WAIT value up to MIN_WAIT so a storm of
+        // cancellations from the zero-backoff state still paces at >= 1s.
+        if (retryDelay != nil) {
+            MTR_LOG("%@ subscription reset: ignoring retryDelay %@ because error is CHIP_ERROR_CANCELLED (internal cancel)", self, retryDelay);
+        }
+        if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
+            [self _setLastSubscriptionAttemptWait:MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS];
+        }
+        secondsToWait = _lastSubscriptionAttemptWait;
+        MTR_LOG("%@ subscription reset due to internal CHIP_ERROR_CANCELLED; preserving backoff at %f seconds",
+            self, secondsToWait);
+    } else if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
+        [self _setLastSubscriptionAttemptWait:MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS];
         secondsToWait = _lastSubscriptionAttemptWait;
     } else if (retryDelay != nil) {
         // The device responded but is currently busy. Reset our backoff
@@ -1783,7 +1859,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
             std::lock_guard lock(self->_lock);
-            [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
+            [self _reattemptSubscriptionNowIfNeededWithReason:sSubscriptionResetRetryReason];
         }
             errorHandler:^(NSError * _Nonnull error) {
                 mtr_strongify(self);
@@ -2960,6 +3036,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [self _doHandleSubscriptionError:nil];
 
+    // Belt-and-braces: clear the in-flight CASE guard and any unconsumed
+    // OnError stash.  These are normally cleared by the CASE-completion / OnDone
+    // blocks in _setupSubscriptionWithReason, but a forced reset
+    // (invalidate/shutdown) can tear down the in-flight attempt before its
+    // completion runs; a latched guard would permanently suppress future
+    // advertisement-driven resubscribes.
+    _doingCASEAttemptForNodeLikelyReachable = NO;
+    _pendingUnderlyingResubscribeError = nil;
+
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
         if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionResetForDevice:)]) {
@@ -2975,6 +3060,225 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(self->_lock);
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
 }
+
+// Drive _handleSubscriptionReset: on the Matter queue with a controlled
+// starting backoff and optionally a synthetic (MTRErrorDomain,
+// MTRErrorCodeCancelled) underlying error.  Returns the resulting
+// _lastSubscriptionAttemptWait.  With injectCancelled=YES this pins that
+// internal cancellations preserve backoff; with NO, the normal doubling.
+- (uint32_t)unitTestInjectSubscriptionResetWithStartingBackoffSeconds:(uint32_t)startingBackoff
+                                                      injectCancelled:(BOOL)injectCancelled
+{
+    __block uint32_t result = 0;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    mtr_weakify(self);
+    [self._concreteController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        if (!self) {
+            dispatch_semaphore_signal(sem);
+            return;
+        }
+        {
+            std::lock_guard lock(self->_lock);
+            // Seed the backoff to a known value, and clear any in-flight
+            // reattempt state so _doHandleSubscriptionReset will proceed.
+            self->_lastSubscriptionAttemptWait = startingBackoff;
+            self->_reattemptingSubscription = NO;
+        }
+        NSError * underlyingError = nil;
+        if (injectCancelled) {
+            underlyingError = [NSError errorWithDomain:MTRErrorDomain
+                                                  code:MTRErrorCodeCancelled
+                                              userInfo:nil];
+        }
+        [self _handleSubscriptionReset:nil underlyingError:underlyingError];
+        {
+            std::lock_guard lock(self->_lock);
+            result = self->_lastSubscriptionAttemptWait;
+        }
+        dispatch_semaphore_signal(sem);
+    }
+        errorHandler:^(NSError * _Nonnull error) {
+            dispatch_semaphore_signal(sem);
+        }];
+    if (dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC)) != 0) {
+        MTR_LOG_ERROR("%@ unit-test SPI semaphore wait timed out after 30s", self);
+    }
+    return result;
+}
+
+// Deterministic pin for the OnError -> OnDone error hand-off.  Unlike
+// unitTestInjectSubscriptionResetWithStartingBackoffSeconds:injectCancelled:
+// (which calls _handleSubscriptionReset:underlyingError: directly), this drives
+// the real two-step path ReadClient uses: _handleSubscriptionError: stashes the
+// error in _pendingUnderlyingResubscribeError, then the OnDone consume logic
+// reads-and-clears the stash and feeds it into _doHandleSubscriptionReset:.  It
+// returns the resulting _lastSubscriptionAttemptWait so a test can assert the
+// CANCELLED error survives the ivar hand-off (pre-fix there was no hand-off and
+// backoff collapsed to MIN_WAIT).  Also verifies the stash is cleared by OnDone.
+- (uint32_t)unitTestInjectOnErrorThenOnDoneWithStartingBackoffSeconds:(uint32_t)startingBackoff
+                                                      injectCancelled:(BOOL)injectCancelled
+                                                 stashClearedByOnDone:(BOOL *)stashClearedByOnDone
+{
+    __block uint32_t result = 0;
+    __block BOOL cleared = NO;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    mtr_weakify(self);
+    [self._concreteController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        if (!self) {
+            dispatch_semaphore_signal(sem);
+            return;
+        }
+        {
+            std::lock_guard lock(self->_lock);
+            self->_lastSubscriptionAttemptWait = startingBackoff;
+            self->_reattemptingSubscription = NO;
+            self->_pendingUnderlyingResubscribeError = nil;
+        }
+
+        NSError * onErrorError = nil;
+        if (injectCancelled) {
+            onErrorError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeCancelled userInfo:nil];
+        } else {
+            // A non-cancelled terminal error (mirrors a real reachability failure).
+            onErrorError = [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT logContext:self];
+        }
+
+        // Step 1: OnError.  Stashes onErrorError into the ivar (and runs the
+        // error side-effects) exactly as the production OnError block does.
+        [self _handleSubscriptionError:onErrorError];
+
+        // Step 2: OnDone.  Replicate the production OnDone block's consume logic
+        // (read-and-clear the stash, then drive the reset) so the ivar hand-off
+        // is what carries the error -- not a directly-passed argument.
+        {
+            std::lock_guard lock(self->_lock);
+            NSError * underlyingError = self->_pendingUnderlyingResubscribeError;
+            self->_pendingUnderlyingResubscribeError = nil;
+            [self _doHandleSubscriptionReset:nil underlyingError:underlyingError];
+            result = self->_lastSubscriptionAttemptWait;
+            // Stash must be clear after OnDone so a later unrelated OnDone can't
+            // consume a stale CANCELLED and wrongly preserve backoff.
+            cleared = (self->_pendingUnderlyingResubscribeError == nil);
+        }
+        dispatch_semaphore_signal(sem);
+    }
+        errorHandler:^(NSError * _Nonnull error) {
+            dispatch_semaphore_signal(sem);
+        }];
+    if (dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC)) != 0) {
+        MTR_LOG_ERROR("%@ unit-test SPI semaphore wait timed out after 30s", self);
+    }
+    if (stashClearedByOnDone != NULL) {
+        *stashClearedByOnDone = cleared;
+    }
+    return result;
+}
+
+// Read the current in-flight CASE guard.  Used to verify it is armed for the
+// operational-advertisement path (not just the SPI-hint path).
+- (BOOL)unitTestDoingCASEAttemptForNodeLikelyReachable
+{
+    std::lock_guard lock(self->_lock);
+    return _doingCASEAttemptForNodeLikelyReachable;
+}
+
+// Read the in-flight CASE guard after first draining the Matter queue, so the
+// read is strictly ordered after the subscription-established / CASE-completion
+// blocks that clear the guard.  Those blocks run on the Matter queue, not the
+// device work queue, so draining the work queue alone (syncRunOnWorkQueue:)
+// races the clear.  An asyncDispatchToMatterQueue: enqueues behind the already-
+// scheduled established block, so reading the guard inside it observes the
+// post-clear value deterministically.
+- (BOOL)unitTestDoingCASEAttemptForNodeLikelyReachableSyncedOnMatterQueue
+{
+    __block BOOL guard = NO;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    mtr_weakify(self);
+    [self._concreteController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        if (self) {
+            std::lock_guard lock(self->_lock);
+            guard = self->_doingCASEAttemptForNodeLikelyReachable;
+        }
+        dispatch_semaphore_signal(sem);
+    }
+        errorHandler:^(NSError * _Nonnull error) {
+            dispatch_semaphore_signal(sem);
+        }];
+    if (dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC)) != 0) {
+        MTR_LOG_ERROR("%@ unit-test CASE-guard read semaphore wait timed out after 30s", self);
+    }
+    return guard;
+}
+
+// Read the current stored subscription backoff (_lastSubscriptionAttemptWait).
+- (uint32_t)unitTestLastSubscriptionAttemptWait
+{
+    std::lock_guard lock(self->_lock);
+    return _lastSubscriptionAttemptWait;
+}
+
+// Deterministic regression pin for "prong 1" of the fix: the in-flight CASE
+// guard must be armed for EVERY CASE-launching reason, not just the SPI-client
+// hint sDeviceMayBeReachableReason.  Tears down any existing subscription so the
+// device is back in a state where _setupSubscriptionWithReason: proceeds to the
+// guard-arming line, drives _setupSubscriptionWithReason: with the supplied
+// reason, and returns the value of _doingCASEAttemptForNodeLikelyReachable
+// captured synchronously right after the arming (before the asynchronous CASE
+// completion can clear it).
+//
+// Pre-fix this method armed the guard only when [reason hasPrefix:
+// sDeviceMayBeReachableReason], so calling it with the operational-advertisement
+// reason returned NO; post-fix it returns YES for any reason.  That difference
+// is what makes the corresponding test fail on the old code and pass on the new
+// code through the real arming path (no seeded internal state).
+- (BOOL)unitTestArmAndReadCASEGuardForSetupReason:(NSString *)reason
+{
+    __block BOOL guardAfterSetup = NO;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    mtr_weakify(self);
+    [self._concreteController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        if (!self) {
+            dispatch_semaphore_signal(sem);
+            return;
+        }
+        std::lock_guard lock(self->_lock);
+        // Tear down the established subscription synchronously so
+        // NeedToStartSubscriptionSetup is true again and
+        // _setupSubscriptionWithReason: will reach the guard-arming line.
+        // _resetSubscription sets the internal state to Unsubscribed under the
+        // lock we hold (via _doHandleSubscriptionError:nil) and clears the
+        // guard, giving us a clean NO baseline within this same critical
+        // section.  (We deliberately use the synchronous _resetSubscription
+        // rather than _resetSubscriptionWithReasonString:, which only schedules
+        // the reset on a later Matter-queue hop and would leave the state
+        // Established here.)
+        [self _resetSubscription];
+
+        // Drive the real setup path.  This arms the guard synchronously (under
+        // the lock we already hold) and then dispatches the CASE attempt
+        // asynchronously; the guard is not cleared until that async completion
+        // runs, so reading it here observes the armed value.
+        [self _setupSubscriptionWithReason:reason];
+        guardAfterSetup = self->_doingCASEAttemptForNodeLikelyReachable;
+
+        // Clear the guard we just armed so the dangling in-flight attempt we
+        // kicked off can't suppress later advertisement-driven resubscribes in
+        // the same test process.
+        self->_doingCASEAttemptForNodeLikelyReachable = NO;
+        dispatch_semaphore_signal(sem);
+    }
+        errorHandler:^(NSError * _Nonnull error) {
+            dispatch_semaphore_signal(sem);
+        }];
+    if (dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC)) != 0) {
+        MTR_LOG_ERROR("%@ unit-test SPI semaphore wait timed out after 30s", self);
+    }
+    return guardAfterSetup;
+}
 #endif
 
 // assume lock is held
@@ -2987,6 +3291,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // If we have a pending subscription reattempt, make sure it does not
     // actually happen, since we are trying to do a subscription now.
     self.reattemptingSubscription = NO;
+
+    // Clear any stale OnError stash from a previous subscription lifecycle that
+    // was never consumed by an OnDone, so it can't influence backoff on the
+    // next teardown.
+    _pendingUnderlyingResubscribeError = nil;
 
     if (![self _subscriptionsAllowed]) {
         MTR_LOG("%@ _setupSubscription: Subscriptions not allowed. Do not set up subscription (reason: %@)", self, reason);
@@ -3017,9 +3326,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
-    if ([reason hasPrefix:sDeviceMayBeReachableReason]) {
-        self.doingCASEAttemptForDeviceMayBeReachable = YES;
-    }
+    // Arm the in-flight CASE guard for every CASE-launching path, not just the
+    // SPI-hint reason (the old doingCASEAttemptForDeviceMayBeReachable was armed
+    // only when reason == sDeviceMayBeReachableReason).  While armed, the
+    // stalled-CASE ReleaseSession branch in _triggerResubscribeWithReason: is
+    // suppressed, so a duplicate operational advertisement arriving mid-CASE no
+    // longer tears down the in-flight attempt and surfaces CHIP_ERROR_CANCELLED.
+    // Cleared once the attempt resolves (established / failed) or on reset.
+    _doingCASEAttemptForNodeLikelyReachable = YES;
 
     __block bool markUnreachableAfterWait = true;
 #ifdef DEBUG
@@ -3059,16 +3373,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            mtr_strongify(self);
                            VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason directlyGetSessionForNode called back with nil MTRDevice"));
 
-                           self.doingCASEAttemptForDeviceMayBeReachable = NO;
-
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
+                               // CASE never established: clear the in-flight guard so future
+                               // advertisement-driven resubscribes are not suppressed.
+                               {
+                                   std::lock_guard lock(self->_lock);
+                                   self->_doingCASEAttemptForNodeLikelyReachable = NO;
+                               }
                                [self->_deviceController asyncDispatchToMatterQueue:^{
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
-                                   [self _handleSubscriptionError:error];
-                                   [self _handleSubscriptionReset:retryDelay];
+                                   // We have the explicit error in hand, so drive the error
+                                   // side-effects directly and plumb it into
+                                   // _handleSubscriptionReset:underlyingError:.  If a ReleaseSession
+                                   // cancelled the in-flight attempt, it surfaces here as
+                                   // CHIP_ERROR_CANCELLED and the reset preserves backoff rather
+                                   // than collapsing it to MIN_WAIT.
+                                   {
+                                       std::lock_guard lock(self->_lock);
+                                       [self _doHandleSubscriptionError:error];
+                                   }
+                                   [self _handleSubscriptionReset:retryDelay underlyingError:error];
                                } errorHandler:nil];
                                return;
                            }
@@ -3142,6 +3469,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    std::lock_guard lock(self->_lock);
                                    self.lastSubscriptionActiveTime = [NSDate now];
 
+                                   // Canonical clear of the in-flight CASE guard.  We clear here
+                                   // (on subscription established) rather than in the
+                                   // directlyGetSessionForNode success completion so the guard
+                                   // stays armed across the CASE-established/subscription-
+                                   // establishing window; otherwise a rapid mDNS advertisement
+                                   // could ReleaseSession the just-established session.
+                                   self->_doingCASEAttemptForNodeLikelyReachable = NO;
+
                                    // First synchronously change state
                                    if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
                                        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
@@ -3173,7 +3508,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                    // OnDone
                                    std::lock_guard lock(self->_lock);
-                                   [self _doHandleSubscriptionReset:nil];
+                                   // Consume the error stashed by the paired OnError, if any.
+                                   // ReadClient pairs OnError(err) immediately with OnDone()
+                                   // for terminal failures; OnDone has no error parameter, so
+                                   // without this hand-off CHIP_ERROR_CANCELLED arriving via
+                                   // OnError -> OnDone would collapse backoff to MIN_WAIT.
+                                   NSError * underlyingError = self->_pendingUnderlyingResubscribeError;
+                                   self->_pendingUnderlyingResubscribeError = nil;
+                                   [self _doHandleSubscriptionReset:nil underlyingError:underlyingError];
                                },
                                ^(void) {
                                    mtr_strongify(self);
@@ -3286,8 +3628,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            if (err != CHIP_NO_ERROR) {
                                NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
                                MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
-                               [self _handleSubscriptionError:error];
-                               [self _handleSubscriptionReset:nil];
+                               // CASE established but the subscribe request never landed: clear
+                               // the in-flight guard (mirroring the getSessionForNode error
+                               // branch) and plumb the explicit error into the reset.
+                               {
+                                   std::lock_guard lock(self->_lock);
+                                   self->_doingCASEAttemptForNodeLikelyReachable = NO;
+                                   [self _doHandleSubscriptionError:error];
+                               }
+                               [self _handleSubscriptionReset:nil underlyingError:error];
 
                                return;
                            }
@@ -5390,6 +5739,17 @@ uint32_t SubscriptionCallback::ComputeTimeTillNextSubscription()
     if (maxWaitTimeInMsec != 0) {
         minWaitTimeInMsec = (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
         waitTimeInMsec = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
+    }
+
+    // Floor the computed delay so a zero Fibonacci step (mResubscriptionNumRetries == 0,
+    // where GetFibonacciForIndex(0) == 0 leaves waitTimeInMsec == 0) can never produce a
+    // 0 ms re-arm. Without this floor a burst of resubscribe triggers can drive
+    // back-to-back SubscribeRequests on an already-established session. This mirrors the
+    // MIN_WAIT floor enforced in -_doHandleSubscriptionReset: and the equivalent floor in
+    // ReadClient::ComputeTimeTillNextSubscription.
+    constexpr uint32_t kMinResubscribeDelayMsec = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS * 1000;
+    if (waitTimeInMsec < kMinResubscribeDelayMsec) {
+        waitTimeInMsec = kMinResubscribeDelayMsec;
     }
 
     return waitTimeInMsec;
