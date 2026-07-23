@@ -53,6 +53,7 @@ class ClusterInteractionFragment : Fragment() {
             showMessage("getConnectedDevicePointer fail!")
             return@launch
           }
+        devicePtrInitialized = true
         showMessage("Retrieving endpoints")
         binding.endpointList.visibility = View.VISIBLE
       }
@@ -74,8 +75,15 @@ class ClusterInteractionFragment : Fragment() {
     return binding.root
   }
 
+  private var devicePtrInitialized = false
+
   override fun onDestroyView() {
     super.onDestroyView()
+    // Release the native device pointer to prevent a memory leak (issue #21539).
+    if (devicePtrInitialized) {
+      ChipClient.getDeviceController(requireContext()).releaseConnectedDevicePointer(devicePtr)
+      devicePtrInitialized = false
+    }
     _binding = null
   }
 
