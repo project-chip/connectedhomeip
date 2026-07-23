@@ -29,12 +29,12 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
-           lwip_platform == "nxp" || lwip_platform == "silabs" ||
-           lwip_platform == "qpg" || lwip_platform == "psoc6" ||
-           lwip_platform == "cyw30739" || lwip_platform == "bl602" ||
-           lwip_platform == "bl616" || lwip_platform == "bl702" ||
-           lwip_platform == "bl702l" || lwip_platform == "mt793x" ||
-           lwip_platform == "asr",
+           lwip_platform == "cc35xx" || lwip_platform == "nxp" ||
+           lwip_platform == "silabs" || lwip_platform == "qpg" ||
+           lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
+           lwip_platform == "bl602" || lwip_platform == "bl616" ||
+           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
+           lwip_platform == "mt793x" || lwip_platform == "asr",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -47,6 +47,8 @@ if (lwip_platform != "external") {
 if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "cc32xx") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (lwip_platform == "cc35xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "silabs") {
   import("//build_overrides/efr32_sdk.gni")
@@ -211,6 +213,12 @@ if (current_os == "zephyr") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
       sources += [ "standalone/pbuf_pool_assert.c" ]
+    } else if (lwip_platform == "cc35xx") {
+      public += [
+        "cc35xx/arch/sys_arch.h",
+        "cc35xx/lwippools.h",
+      ]
+      sources += [ "cc35xx/sys_arch.c" ]
     } else if (lwip_platform == "cyw30739") {
     } else if (lwip_platform == "mt793x") {
     } else {
@@ -225,6 +233,8 @@ if (current_os == "zephyr") {
     if (lwip_platform == "cc13xx_26xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "cc32xx") {
+      public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+    } else if (lwip_platform == "cc35xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "silabs") {
       public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
