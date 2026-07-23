@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "av-analysis-manager.h"
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
@@ -66,6 +67,7 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
+static constexpr uint8_t kMaxAnalysisStreams         = 8;   // Spec is upper limit of uint8
 
 // StreamIDs typically start from 0 and monotonically increase. Setting
 // Invalid value to a large and practically unused value.
@@ -95,6 +97,7 @@ public:
     chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
+    chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -318,6 +321,9 @@ public:
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
+    uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
+    std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
+
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();
     CameraError StopAudioPlaybackStream();
@@ -359,6 +365,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
+    chip::app::Clusters::AvAnalysis::AvAnalysisManager mAVAnalysisManager;
 
     DefaultMediaController mMediaController;
 
@@ -389,6 +396,7 @@ private:
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
+    uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
