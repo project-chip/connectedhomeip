@@ -547,6 +547,9 @@ class AndroidBuilder(Builder):
                 title="Building JNI " + self.identifier,
             )
 
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
+                self.stripSymbols()
+
             exampleName = self.app.ExampleName()
             if exampleName is None:
                 self.copyToSrcAndroid()
@@ -647,9 +650,6 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
-
-            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
-                self.stripSymbols()
 
     @lock_output_dir
     def build_outputs(self):
