@@ -21,7 +21,6 @@ import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -35,9 +34,9 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val metadataEnabled: Boolean,
   val videoStreams: Optional<List<UInt>>,
   val audioStreams: Optional<List<UInt>>,
-  val fabricIndex: UInt
+  val fabricIndex: UInt,
 ) {
-  override fun toString(): String  = buildString {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
@@ -170,7 +169,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
           Optional.empty()
         }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterWebRTCSessionStruct(
