@@ -347,6 +347,9 @@ exit:
 
 void MdnsAvahi::Shutdown()
 {
+    ++mClientGeneration;
+    ++mShutdownGeneration;
+
     TEMPORARY_RETURN_IGNORED StopPublish();
 
     // Release child objects before their client. Avahi would otherwise destroy the
@@ -389,6 +392,7 @@ CHIP_ERROR MdnsAvahi::RebuildClient()
     VerifyOrReturnError(mInitCallback != nullptr && mErrorCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogError(DeviceLayer, "Avahi client failed; rebuilding it and cancelling outstanding lookups");
+    ++mClientGeneration;
 
     // Detach the contexts first because their callbacks may start new DNS-SD operations.
     std::list<ResolveContext *> staleResolves;
@@ -860,15 +864,48 @@ void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBro
     // If we were already asked to stop, no need to send a callback - no one is listening.
     if (!context->mStopped.load())
     {
-        // The callback may start a lookup that rebuilds the Avahi client and deletes
-        // this context. Move everything needed by the callback to local storage first.
-        DnssdBrowseCallback callback = context->mCallback;
-        void * callbackContext       = context->mContext;
+        // The callback may rebuild or shut down the Avahi client. Detach this context
+        // so those operations cannot recursively notify or delete it.
+        MdnsAvahi * instance = context->mInstance;
+        instance->mAllocatedBrowses.remove(context);
+
+        DnssdBrowseCallback callback   = context->mCallback;
+        void * callbackContext         = context->mContext;
+        uint64_t clientGeneration      = instance->mClientGeneration;
+        uint64_t shutdownGeneration    = instance->mShutdownGeneration;
         std::vector<DnssdService> services;
         services.swap(context->mServices);
 
         // since this is continuous browse, finalBrowse will always be false.
         callback(callbackContext, services.data(), services.size(), false, CHIP_NO_ERROR);
+
+        if (instance->mShutdownGeneration != shutdownGeneration)
+        {
+            // Client destruction released the browser while this context was detached.
+            context->mBrowser = nullptr;
+            chip::Platform::Delete(context);
+        }
+        else if (instance->mClientGeneration != clientGeneration)
+        {
+            // A rebuild released the old browser. Complete this detached lookup
+            // sequentially rather than recursively from RebuildClient().
+            context->mBrowser = nullptr;
+            if (!context->mStopped.load())
+            {
+                callback(callbackContext, nullptr, 0, true, CHIP_ERROR_FORCED_RESET);
+            }
+            chip::Platform::Delete(context);
+        }
+        else if (context->mStopped.load())
+        {
+            avahi_service_browser_free(browser);
+            context->mBrowser = nullptr;
+            chip::Platform::Delete(context);
+        }
+        else
+        {
+            instance->mAllocatedBrowses.push_back(context);
+        }
     }
     else
     {

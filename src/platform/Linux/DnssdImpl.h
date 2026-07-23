@@ -22,6 +22,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
@@ -199,6 +200,11 @@ private:
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
+
+    // Incremented whenever the client lifecycle is invalidated. Shutdown has a
+    // separate generation so an active callback can distinguish it from rebuild.
+    std::atomic<uint64_t> mClientGeneration{ 0 };
+    std::atomic<uint64_t> mShutdownGeneration{ 0 };
 
     // Handling of allocated resolves
     size_t mResolveCount = 0;
