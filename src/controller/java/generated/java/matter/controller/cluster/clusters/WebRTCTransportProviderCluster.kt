@@ -41,19 +41,19 @@ import matter.tlv.TlvWriter
 
 class WebRTCTransportProviderCluster(
   private val controller: MatterController,
-  private val endpointId: UShort
+  private val endpointId: UShort,
 ) {
   class SolicitOfferResponse(
     val webRTCSessionID: UShort,
     val deferredOffer: Boolean,
     val videoStreamID: UShort?,
-    val audioStreamID: UShort?
+    val audioStreamID: UShort?,
   )
 
   class ProvideOfferResponse(
     val webRTCSessionID: UShort,
     val videoStreamID: UShort?,
-    val audioStreamID: UShort?
+    val audioStreamID: UShort?,
   )
 
   class CurrentSessionsAttribute(
@@ -174,7 +174,7 @@ class WebRTCTransportProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -254,7 +254,7 @@ class WebRTCTransportProviderCluster(
       webRTCSessionID_decoded,
       deferredOffer_decoded,
       videoStreamID_decoded,
-      audioStreamID_decoded
+      audioStreamID_decoded,
     )
   }
 
@@ -271,7 +271,7 @@ class WebRTCTransportProviderCluster(
     SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
     videoStreams: List<UShort>?,
     audioStreams: List<UShort>?,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ): ProvideOfferResponse {
     val commandId: UInt = 2u
 
@@ -345,7 +345,7 @@ class WebRTCTransportProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -415,14 +415,14 @@ class WebRTCTransportProviderCluster(
     return ProvideOfferResponse(
       webRTCSessionID_decoded,
       videoStreamID_decoded,
-      audioStreamID_decoded
+      audioStreamID_decoded,
     )
   }
 
   suspend fun provideAnswer(
     webRTCSessionID: UShort,
     sdp: String,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 4u
 
@@ -440,7 +440,7 @@ class WebRTCTransportProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -450,7 +450,7 @@ class WebRTCTransportProviderCluster(
   suspend fun provideICECandidates(
     webRTCSessionID: UShort,
     ICECandidates: List<WebRTCTransportProviderClusterICECandidateStruct>,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 5u
 
@@ -472,7 +472,7 @@ class WebRTCTransportProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -482,7 +482,7 @@ class WebRTCTransportProviderCluster(
   suspend fun endSession(
     webRTCSessionID: UShort,
     reason: UByte,
-    timedInvokeTimeout: Duration? = null
+    timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
 
@@ -500,7 +500,7 @@ class WebRTCTransportProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
+        timedRequest = timedInvokeTimeout,
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -547,7 +547,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeCurrentSessionsAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<CurrentSessionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
@@ -646,7 +646,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<GeneratedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65528u
     val attributePaths =
@@ -743,7 +743,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AcceptedCommandListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65529u
     val attributePaths =
@@ -840,7 +840,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<AttributeListAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65531u
     val attributePaths =
@@ -928,7 +928,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeFeatureMapAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UIntSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65532u
     val attributePaths =
@@ -1009,7 +1009,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun subscribeClusterRevisionAttribute(
     minInterval: Int,
-    maxInterval: Int
+    maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 65533u
     val attributePaths =

@@ -34,7 +34,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val metadataEnabled: Boolean,
   val videoStreams: Optional<List<UShort>>,
   val audioStreams: Optional<List<UShort>>,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
