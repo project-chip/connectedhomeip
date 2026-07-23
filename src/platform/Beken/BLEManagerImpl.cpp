@@ -473,7 +473,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 
     if (deviceName != NULL && deviceName[0] != 0)
     {
-        VerifyOrExit(strlen(deviceName) >= kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         mFlags.Set(Flags::kDeviceNameSet);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
