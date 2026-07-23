@@ -168,7 +168,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         await asyncio.sleep(1)
 
-        self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase and Wrap set to True")
+        self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase, Wrap set to True and LowestOff set to False")
         await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True,
                                      lowest_off=False)
 
@@ -253,8 +253,9 @@ class TC_FAN_3_5(MatterBaseTest):
 
         self.print_step("10c", "Read from the DUT the SpeedCurrent attribute and check its equal to 0")
         speed_current = await self.read_speed_current(endpoint=endpoint)
-        asserts.assert_equal(speed_current, 0,
-                             "SpeedCurrent did not wrap to 0 when LowestOff was omitted (expected spec default true)")
+        expected_speed = 0
+        asserts.assert_equal(speed_current, expected_speed,
+                             f"SpeedCurrent did not wrap to {expected_speed} when LowestOff was omitted (expected spec default true)")
 
 
 if __name__ == "__main__":
