@@ -81,9 +81,9 @@ public:
 
     uint16_t GetClusterRevision(EndpointId) override { return mClusterRevision; }
 
-    bool mLoginResult      = true;
-    bool mLogoutResult     = true;
-    bool mOAuthLoggedIn    = false;
+    bool mLoginResult         = true;
+    bool mLogoutResult        = true;
+    bool mOAuthLoggedIn       = false;
     uint16_t mClusterRevision = 3;
     CharSpan mSetupPin        = "1234"_span;
     CharSpan mUserCode        = "ABCD-EFGH"_span;
@@ -390,8 +390,7 @@ TEST_F(TestAccountLoginCluster, ReadClusterRevision)
     mDelegate.mClusterRevision = 3;
 
     uint16_t clusterRevision = 0;
-    EXPECT_EQ(ReadScalarAttributeViaAttrAccess(kTestEndpointId, Attributes::ClusterRevision::Id, clusterRevision),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(ReadScalarAttributeViaAttrAccess(kTestEndpointId, Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, 3);
 }
 
