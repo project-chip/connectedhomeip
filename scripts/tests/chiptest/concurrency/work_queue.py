@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import contextlib
 import queue
 import threading
 import time
@@ -160,31 +159,38 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
             TimeoutError: on timeout if `timeout` is not None.
             queue.Empty: if called with `timeout=0` and the queue is empty while the queue is neither cancelled nor closed.
         """
-        with self._cond:
-            if timeout != 0:
-                # First check without waiting, to avoid race conditions and unnecessary waiting. Allows to pass QueueCancelled and
-                # EndOfQueue exceptions to the consumer without waiting for the condition.
-                with contextlib.suppress(queue.Empty):
-                    return self.get(timeout=0)
+        # Level-triggered wait: re-check the real queue/cancel/close state on every poll and
+        # treat the condition notify() only as a wakeup hint. Because the queue may be backed by
+        # a multiprocessing.Manager with the producer and consumer in different processes, a
+        # notify() can be delivered while the consumer is not parked in wait() (between polls or
+        # during proxy round-trips) and be lost. Relying on the notify() edge alone would then
+        # block forever with an item already enqueued; polling the state bounds that to one
+        # interval. Polling also keeps the wait KeyboardInterrupt-catchable.
+        if timeout is not None and timeout < 0:
+            raise ValueError("'timeout' must be a non-negative number")
+        end = None if timeout is None else time.monotonic() + timeout
+        while True:
+            with self._cond:
+                if self._cancel_event.is_set():
+                    raise QueueCancelled
 
-                # We wait for the condition within the timeout (or infinitely when timeout=None).
-                if not wait_for_mp_managed(self._cond, timeout_sec=timeout):
-                    raise TimeoutError("Timeout when waiting for queue item")
+                try:
+                    # Use block=False since we've already synchronized via self._cond.
+                    return self._queue.get(block=False)
+                except queue.Empty:
+                    if self._end_of_queue.is_set():
+                        raise EndOfQueue
+                    # timeout=0 is a non-blocking poll: surface the empty queue to the caller.
+                    if timeout == 0:
+                        raise
 
-            # Check for cancel event.
-            if self._cancel_event.is_set():
-                raise QueueCancelled
-
-            # Check for the end of queue sentinel.
-            try:
-                # Check if there is a new queue element. Use block=False since we've already synchronized via self._cond.
-                return self._queue.get(block=False)
-            except queue.Empty:
-                # If there is no new queue element, check if the end of queue event is set. If not, re-raise the exception to
-                # indicate an empty queue, which should not normally happen.
-                if self._end_of_queue.is_set():
-                    raise EndOfQueue
-                raise
+                if end is None:
+                    self._cond.wait(0.1)
+                else:
+                    remaining = end - time.monotonic()
+                    if remaining <= 0:
+                        raise TimeoutError("Timeout when waiting for queue item")
+                    self._cond.wait(min(0.1, remaining))
 
     def cancel(self) -> None:
         """Set cancel event and notify all consumers."""
