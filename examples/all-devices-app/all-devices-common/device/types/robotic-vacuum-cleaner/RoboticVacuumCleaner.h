@@ -18,8 +18,11 @@
 #pragma once
 
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
 
 namespace chip::app {
 
@@ -33,10 +36,15 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::ServiceArea::ServiceAreaCluster & ServiceArea() { return mServiceAreaCluster.Cluster(); }
 
 private:
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
+
+    Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
+    Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
+    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
 };
 
 } // namespace chip::app

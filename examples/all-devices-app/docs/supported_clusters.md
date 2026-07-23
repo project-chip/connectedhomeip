@@ -166,7 +166,7 @@ To update or validate this list manually, follow these steps:
 | 120       | Relative Humidity Measurement                              | 1029 (0x0405) | Yes                | Yes                 |                                       |
 | 121       | Scenes                                                     | 5 (0x0005)    | No                 | No                  |                                       |
 | 122       | Scenes Management                                          | 98 (0x0062)   | Yes                | Yes                 |                                       |
-| 123       | Service Area                                               | 336 (0x0150)  | No                 | No                  |                                       |
+| 123       | Service Area                                               | 336 (0x0150)  | Yes                | Yes                 | Used by Robotic Vacuum Cleaner        |
 | 124       | Smoke CO Alarm                                             | 92 (0x005C)   | Yes                | Yes                 |                                       |
 | 125       | Software Diagnostics                                       | 52 (0x0034)   | Yes                | Yes                 |                                       |
 | 126       | Soil Measurement                                           | 1072 (0x0430) | Yes                | Yes                 |                                       |
