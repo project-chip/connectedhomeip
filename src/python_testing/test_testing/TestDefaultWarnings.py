@@ -63,6 +63,39 @@ class TestDefaultChecker(MatterBaseTest):
         run_check('OK name', set_override=True, expect_problem=False)
         asserts.assert_equal(self.skipped, 4, "Some override tests did not mark steps skipped")
 
+    def test_manufacturing_date_is_not_default_check(self):
+        def run_check(manufacturing_date: str, set_override: bool, expect_problem: bool):
+            self.test.user_params = {DefaultChecker.FLAG_MANUFACTURING_DATE: set_override}
+            self.test.problems = []
+            self.test.endpoints = {0: {Clusters.BasicInformation: {
+                Clusters.BasicInformation.Attributes.ManufacturingDate: manufacturing_date}}}
+            self.test.check_default_manufacturing_date()
+            if expect_problem:
+                asserts.assert_equal(len(self.test.problems), 1,
+                                     f"did not generate expected problem when testing with manufacturing date {manufacturing_date} (override = {set_override})")
+            else:
+                asserts.assert_equal(len(self.test.problems), 0,
+                                     f"Unexpected problem when testing with manufacturing date {manufacturing_date} (override = {set_override})")
+
+        # Attribute not present -> should be skipped, no problem
+        self.skipped = 0
+        self.test.problems = []
+        self.test.user_params = {}
+        self.test.endpoints = {0: {Clusters.BasicInformation: {}}}
+        self.test.check_default_manufacturing_date()
+        asserts.assert_equal(len(self.test.problems), 0,
+                             "Unexpected problem when ManufacturingDate attribute is not present")
+        asserts.assert_equal(self.skipped, 1, "Absent ManufacturingDate did not mark step skipped")
+
+        self.skipped = 0
+        run_check('20200101', set_override=False, expect_problem=True)
+        run_check('20200102', set_override=False, expect_problem=False)
+        run_check('20200102', set_override=True, expect_problem=False)
+        run_check('20200101', set_override=True, expect_problem=False)
+        run_check('20200101-test1', set_override=False, expect_problem=True)
+        run_check('20200102-test2', set_override=False, expect_problem=False)
+        asserts.assert_equal(self.skipped, 2, "Some override tests did not mark steps skipped")
+
     def test_vendor_name_is_not_default_check(self):
         def run_check(vendor_name: str, set_override: bool, expect_problem: bool):
             self.test.user_params = {DefaultChecker.FLAG_VENDOR_NAME: set_override}
