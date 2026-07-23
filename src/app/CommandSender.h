@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
@@ -356,6 +357,11 @@ public:
      *                  configuration option.
      *               2. Ensure you provide ExtendableCallback.
      */
+    void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+    {
+        mDelayReportData = aDelayReportData;
+    }
+
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
@@ -668,13 +674,14 @@ private:
     uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
-    State mState                = State::Idle;
-    bool mSuppressResponse      = false;
-    bool mTimedRequest          = false;
-    bool mBufferAllocated       = false;
-    bool mBatchCommandsEnabled  = false;
-    bool mUseExtendableCallback = false;
-    bool mAllowLargePayload     = false;
+    State mState                                                          = State::Idle;
+    bool mSuppressResponse                                                = false;
+    bool mTimedRequest                                                    = false;
+    bool mBufferAllocated                                                 = false;
+    bool mBatchCommandsEnabled                                            = false;
+    bool mUseExtendableCallback                                           = false;
+    bool mAllowLargePayload                                               = false;
+    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData = std::nullopt;
 };
 
 } // namespace app

@@ -84,6 +84,18 @@ bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandle
     return mTimerDelegate->IsTimerActive(this);
 }
 
+void SynchronizedReportSchedulerImpl::RescheduleAllReports()
+{
+    Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timeout timeout = Milliseconds32(0);
+    CHIP_ERROR err  = CalculateNextReportTimeout(timeout, nullptr, now);
+    LogErrorOnFailure(err);
+    if (err == CHIP_NO_ERROR)
+    {
+        LogErrorOnFailure(ScheduleReport(timeout, nullptr, now));
+    }
+}
+
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval(const Timestamp & now)
 {
     VerifyOrReturnError(mNodesPool.Allocated(), CHIP_ERROR_INVALID_LIST_LENGTH);

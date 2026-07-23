@@ -58,6 +58,9 @@ public:
     void TestReportTiming();
     void TestObserverCallbacks();
     void TestSynchronizedScheduler();
+    void TestReportDeferral();
+    void TestReportDeferralOnce();
+    void TestReportDeferralEndpointSpecific();
 
     /// @brief Mimicks the various operations that happen on a subscription transaction after a read handler was created so that
     /// readhandlers are in the expected state for further tests.
@@ -802,6 +805,177 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     EXPECT_FALSE(node2->CanBeSynced());
 
     syncScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferral)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Dirty read handler (min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    readHandler1->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    // Verify the scheduled timeout is initially minInterval (1s)
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+
+    // 1. Defer reports by 3 seconds. Since 3s > minInterval(1s) and 3s < maxInterval(5s), the scheduled timeout should become 3s.
+    sScheduler.DeferReports(System::Clock::Seconds32(3));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+
+    // 2. Defer reports by 10 seconds. Since 10s > maxInterval(5s), the scheduled timeout should be bounded to maxInterval (5s).
+    sScheduler.DeferReports(System::Clock::Seconds32(10));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(5));
+
+    // Clean up
+    sScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralOnce)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp to 0s
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Dirty read handler (min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    readHandler1->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    // Verify the scheduled timeout is initially minInterval (1s)
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+
+    // Defer reports by 3 seconds. Timeout should become 3s.
+    sScheduler.DeferReports(System::Clock::Seconds32(3));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+
+    // Fast-forward mock time to 3s (expiration of deferral)
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(3000));
+
+    // Trigger report transmission completed
+    sScheduler.OnSubscriptionReportSent(readHandler1);
+
+    // After transmission, the next report minInterval is 1s from now (i.e. at 4s).
+    // The previous deferral (which was at absolute time 3s) is now in the past (since current mock time is 3s and minInterval is
+    // 4s). Therefore, the schedule should reset back to minInterval (1s from now), and NOT be deferred any more!
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+
+    // Clean up
+    sScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralEndpointSpecific)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Subscription 1 (Endpoint 1, min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    // Add path targeting endpoint 1
+    AttributePathParams pathParams1(1, 1, 1);
+    SingleLinkedListNode<AttributePathParams> pathNode1{ pathParams1 };
+    readHandler1->mpAttributePathList = &pathNode1;
+    readHandler1->ForceDirtyState();
+
+    // Subscription 2 (Endpoint 2, min = 1s, max = 5s)
+    ReadHandler * readHandler2 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 1, 5));
+    // Add path targeting endpoint 2
+    AttributePathParams pathParams2(2, 1, 1);
+    SingleLinkedListNode<AttributePathParams> pathNode2{ pathParams2 };
+    readHandler2->mpAttributePathList = &pathNode2;
+    readHandler2->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+    EXPECT_EQ(getTimeout(readHandler2), System::Clock::Seconds32(1));
+
+    // Defer reports for Endpoint 1 by 3 seconds.
+    EndpointId targetedEndpoints[] = { 1 };
+    sScheduler.DeferReports(System::Clock::Seconds32(3), Span<const EndpointId>(targetedEndpoints));
+
+    // Subscription 1 (Endpoint 1) should be deferred to 3s.
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+    // Subscription 2 (Endpoint 2) should NOT be deferred (remains 1s).
+    EXPECT_EQ(getTimeout(readHandler2), System::Clock::Seconds32(1));
+
+    // Clean up
+    readHandler1->mpAttributePathList = nullptr;
+    readHandler2->mpAttributePathList = nullptr;
+    sScheduler.UnregisterAllHandlers();
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

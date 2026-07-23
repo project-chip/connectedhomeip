@@ -26,6 +26,17 @@ namespace reporting {
 using namespace System::Clock;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
+namespace {
+System::Clock::Timeout GetRemainingTimeout(const System::Clock::Timestamp & targetTimestamp, const System::Clock::Timestamp & now)
+{
+    if (targetTimestamp > now)
+    {
+        return std::chrono::duration_cast<System::Clock::Timeout>(targetTimestamp - now);
+    }
+    return System::Clock::Milliseconds32(0);
+}
+} // namespace
+
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
 void ReportSchedulerImpl::ReportTimerCallback()
@@ -53,6 +64,36 @@ void ReportSchedulerImpl::OnEnterActiveMode()
         return Loop::Continue;
     });
 #endif
+}
+
+void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints)
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
+        if (node->IsInterestedInEndpoints(targetedEndpoints))
+        {
+            System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
+            System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
+            node->SetDeferralEndTimestamp(now + effectiveDelay);
+        }
+        return Loop::Continue;
+    });
+    RescheduleAllReports();
+}
+
+void ReportSchedulerImpl::RescheduleAllReports()
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
+        Milliseconds32 newTimeout;
+        CHIP_ERROR err = this->CalculateNextReportTimeout(newTimeout, node, now);
+        LogErrorOnFailure(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            LogErrorOnFailure(this->ScheduleReport(newTimeout, node, now));
+        }
+        return Loop::Continue;
+    });
 }
 
 void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)

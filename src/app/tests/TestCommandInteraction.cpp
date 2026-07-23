@@ -436,9 +436,22 @@ public:
         return Status::Success;
     }
 
-    void ResetCounter() { onFinalCalledTimes = 0; }
+    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override
+    {
+        onDelayReportCalledTimes++;
+        mLastDelayReport = aDelay;
+    }
 
-    int onFinalCalledTimes = 0;
+    void ResetCounter()
+    {
+        onFinalCalledTimes       = 0;
+        onDelayReportCalledTimes = 0;
+        mLastDelayReport         = System::Clock::Timeout::zero();
+    }
+
+    int onFinalCalledTimes                  = 0;
+    int onDelayReportCalledTimes            = 0;
+    System::Clock::Timeout mLastDelayReport = System::Clock::Timeout::zero();
 } mockCommandHandlerDelegate;
 
 class TestCommandInteractionModel : public TestImCustomDataModel
@@ -531,6 +544,7 @@ public:
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse();
     void TestCommandHandler_ReleaseWithExchangeClosed();
     void TestCommandHandler_GetExchangeContextWhenAsync();
+    void TestCommandHandler_DelayReportData();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -2224,6 +2238,56 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContex
 
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
+{
+    isCommandDispatched = false;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::ConfigParameters configParameters;
+    configParameters.SetRemoteMaxPathsPerInvoke(1);
+    EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
+
+    InvokeRequestMessage::DelayReportData delayReportData;
+    delayReportData.delayMinMs          = 1000;
+    delayReportData.delayJitterWindowMs = 500;
+    commandSender.SetDelayReportData(delayReportData);
+
+    // Prepare a command
+    {
+        CommandPathParams commandPath = MakeTestCommandPath(kTestCommandIdWithData);
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.PrepareCommand(commandPath, prepareCommandParams));
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        app::CommandSender::FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(true);
+        EXPECT_EQ(CHIP_NO_ERROR, commandSender.FinishCommand(finishCommandParams));
+    }
+
+    BasicCommandPathRegistry<4> basicCommandPathRegistry;
+    MockCommandResponder mockCommandResponder;
+    CommandHandlerImpl::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
+    CommandHandlerImpl commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
+
+    System::PacketBufferHandle commandDatabuf;
+    EXPECT_EQ(commandSender.Finalize(commandDatabuf), CHIP_NO_ERROR);
+
+    mockCommandHandlerDelegate.ResetCounter();
+    commandDispatchedCount = 0;
+
+    Protocols::InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
+    uint64_t delayMs = static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
+    EXPECT_GE(delayMs, 1000u);
+    EXPECT_LE(delayMs, 1500u);
 }
 
 } // namespace app

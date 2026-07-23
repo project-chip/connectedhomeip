@@ -46,6 +46,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -229,6 +230,43 @@ public:
     const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const SingleLinkedListNode<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
     const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+
+    bool IsInterestedInEndpoints(Span<const EndpointId> targetedEndpoints) const
+    {
+        if (targetedEndpoints.empty())
+        {
+            return true;
+        }
+        for (auto * path = mpAttributePathList; path != nullptr; path = path->mpNext)
+        {
+            if (path->mValue.HasWildcardEndpointId())
+            {
+                return true;
+            }
+            for (auto endpointId : targetedEndpoints)
+            {
+                if (path->mValue.mEndpointId == endpointId)
+                {
+                    return true;
+                }
+            }
+        }
+        for (auto * path = mpEventPathList; path != nullptr; path = path->mpNext)
+        {
+            if (path->mValue.HasWildcardEndpointId())
+            {
+                return true;
+            }
+            for (auto endpointId : targetedEndpoints)
+            {
+                if (path->mValue.mEndpointId == endpointId)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * @brief Returns the reporting intervals that will used by the ReadHandler for the subscription being requested.
