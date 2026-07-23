@@ -3,14 +3,18 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/persistence/AttributePersistence.h>
 #include <clusters/EnergyPreference/Metadata.h>
+#include <clusters/EnergyPreference/Structs.h>
 
 namespace chip::app::Clusters {
 
 using namespace EnergyPreference;
 using namespace EnergyPreference::Attributes;
+using namespace EnergyPreference::Structs;
 
 CHIP_ERROR EnergyPreferenceCluster::Startup(ServerClusterContext & context)
 {
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
     AttributePersistence persistence(context.attributeStorage);
     uint8_t currentEnergyBalance = 0;
     uint8_t currentLowPowerModeSensitivity = 0;
@@ -18,8 +22,16 @@ CHIP_ERROR EnergyPreferenceCluster::Startup(ServerClusterContext & context)
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, currentEnergyBalance, currentEnergyBalance);
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id }, currentLowPowerModeSensitivity, currentLowPowerModeSensitivity);
 
-    SetCurrentEnergyBalance(currentEnergyBalance);
-    SetCurrentLowPowerModeSensitivity(currentLowPowerModeSensitivity);
+    if (mFeatures.Has(Feature::kEnergyBalance))
+    {
+        ReturnErrorOnFailure(SetCurrentEnergyBalance(currentEnergyBalance));
+    }
+
+    if (mFeatures.Has(Feature::kLowPowerModeSensitivity))
+    {
+        ReturnErrorOnFailure(SetCurrentLowPowerModeSensitivity(currentLowPowerModeSensitivity));
+    }
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus EnergyPreferenceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -97,8 +109,11 @@ CHIP_ERROR EnergyPreferenceCluster::SetCurrentEnergyBalance(uint8_t currentEnerg
 	if (SetAttributeValue(mCurrentEnergyBalance, currentEnergyBalance, CurrentEnergyBalance::Id))
     {
         sDelegate->OnCurrentEnergyBalanceChanged(GetEndpointId(), currentEnergyBalance);
-        AttributePersistence persistence(mContext->attributeStorage);
-        persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, currentEnergyBalance);
+        if (mContext != nullptr)
+        {
+            AttributePersistence persistence(mContext->attributeStorage);
+            ReturnErrorOnFailure(persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, currentEnergyBalance));
+        }
     }
 	return CHIP_NO_ERROR;
 }
@@ -119,8 +134,11 @@ CHIP_ERROR EnergyPreferenceCluster::SetCurrentLowPowerModeSensitivity(uint8_t cu
 	if (SetAttributeValue(mCurrentLowPowerModeSensitivity, currentLowPowerModeSensitivity, CurrentLowPowerModeSensitivity::Id))
     {
         sDelegate->OnCurrentLowPowerModeSensitivityChanged(GetEndpointId(), currentLowPowerModeSensitivity);
-        AttributePersistence persistence(mContext->attributeStorage);
-        persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id }, currentLowPowerModeSensitivity);
+        if (mContext != nullptr)
+        {
+            AttributePersistence persistence(mContext->attributeStorage);
+            ReturnErrorOnFailure(persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id }, currentLowPowerModeSensitivity));
+        }
     }
 	return CHIP_NO_ERROR;
 }

@@ -48,8 +48,8 @@ public:
     uint8_t GetCurrentEnergyBalance() const { return mCurrentEnergyBalance; }
     uint8_t GetCurrentLowPowerModeSensitivity() const { return mCurrentLowPowerModeSensitivity; }
 
-    static void SetDelegate(Delegate * aDelegate);
-    static Delegate * GetDelegate();
+    static void SetDelegate(EnergyPreference::Delegate * aDelegate);
+    static EnergyPreference::Delegate * GetDelegate();
 
 private:
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
@@ -62,7 +62,7 @@ private:
     uint8_t mCurrentEnergyBalance{};
     uint8_t mCurrentLowPowerModeSensitivity{};
 
-    inline static Delegate * sDelegate = nullptr;
+    inline static EnergyPreference::Delegate * sDelegate = nullptr;
 };
 
 } // namespace chip::app::Clusters

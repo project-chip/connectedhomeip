@@ -30,31 +30,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyPreference;
 using namespace chip::app::Clusters::EnergyPreference::Attributes;
-using namespace chip::Testing;
-
-/*
- *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
-#include <app/clusters/energy-preference-server/energy-preference-server.h>
-
-using namespace chip;
-using namespace chip::app::Clusters::EnergyPreference;
 using namespace chip::app::Clusters::EnergyPreference::Structs;
+using namespace chip::Testing;
 
 struct TestEnergyPreferenceDelegate : public Delegate
 {
@@ -322,8 +299,8 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
 
     // currentEnergyBalance
     // In bounds
-    size_t i = 0;
-    for (; i < testDelegate.GetNumEnergyBalances(); ++i)
+    uint8_t i = 0;
+    for (; i < testDelegate.GetNumEnergyBalances(kTestEndpointId); ++i)
     {
         CurrentEnergyBalance::TypeInfo::Type currentEnergyBalanceWrite = i;
         ASSERT_EQ(tester.WriteAttribute(CurrentEnergyBalance::Id, currentEnergyBalanceWrite), CHIP_NO_ERROR);
@@ -341,7 +318,7 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
     // lowPowerModeSensitivity
     // In bounds
     i = 0;
-    for (; i < testDelegate.GetNumLowPowerModeSensitivities(); ++i)
+    for (; i < testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId); ++i)
     {
         CurrentLowPowerModeSensitivity::TypeInfo::Type currentLowPowerModeSensitivityWrite = i;
         ASSERT_EQ(tester.WriteAttribute(CurrentLowPowerModeSensitivity::Id, currentLowPowerModeSensitivityWrite), CHIP_NO_ERROR);
@@ -352,8 +329,8 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
     }
 
     // Out of bounds
-    CurrentLowPowerModeSensitivity::TypeInfo::Type currentLowPowerModeSensitivityWrite = testDelegate.GetNumLowPowerModeSensitivities();
-    EXPECT_EQ(tester.WriteAttribute(CurrentLowPowerModeSensitivity::Id, currentLowPowerModeSensitivityWrite), Protocols::InteractionModel::Status::InvalidInState);
+    CurrentLowPowerModeSensitivity::TypeInfo::Type currentLowPowerModeSensitivityWrite = static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId));
+    EXPECT_EQ(tester.WriteAttribute(CurrentLowPowerModeSensitivity::Id, currentLowPowerModeSensitivityWrite), Protocols::InteractionModel::Status::ConstraintError);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -363,24 +340,24 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
     EnergyPreferenceCluster cluster(kTestEndpointId, bothFeatures);
 
     // currentEnergyBalance
-    for (size_t i = 0; i < testDelegate.GetNumCurrentEnergyBalances(); ++i)
+    for (CurrentEnergyBalance::TypeInfo::Type i = 0; i < testDelegate.GetNumEnergyBalances(kTestEndpointId); ++i)
     {
         EXPECT_EQ(cluster.SetCurrentEnergyBalance(i), CHIP_NO_ERROR);
     }
 
     CurrentEnergyBalance::TypeInfo::DecodableType currentEnergyBalance = cluster.GetCurrentEnergyBalance();
-    EXPECT_EQ(currentEnergyBalance, static_cast<uint8_t>(testDelegate.GetNumCurrentEnergyBalances() - 1));
-    EXPECT_EQ(cluster.SetCurrentEnergyBalance(testDelegate.GetNumCurrentEnergyBalances()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(currentEnergyBalance, static_cast<CurrentEnergyBalance::TypeInfo::Type>(testDelegate.GetNumEnergyBalances(kTestEndpointId) - 1));
+    EXPECT_EQ(cluster.SetCurrentEnergyBalance(static_cast<CurrentEnergyBalance::TypeInfo::Type>(testDelegate.GetNumEnergyBalances(kTestEndpointId))), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // lowPowerModeSensitivity
-    for (size_t i = 0; i < testDelegate.GetNumCurrentLowPowerModeSensitivities(); ++i)
+    for (CurrentLowPowerModeSensitivity::TypeInfo::Type i = 0; i < testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId); ++i)
     {
         EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(i), CHIP_NO_ERROR);
     }
 
     CurrentLowPowerModeSensitivity::TypeInfo::DecodableType currentLowPowerModeSensitivity = cluster.GetCurrentLowPowerModeSensitivity();
-    EXPECT_EQ(currentLowPowerModeSensitivity, static_cast<uint8_t>(testDelegate.GetNumCurrentLowPowerModeSensitivities() - 1));
-    EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(testDelegate.GetNumCurrentLowPowerModeSensitivities()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(currentLowPowerModeSensitivity, static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId) - 1));
+    EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId))), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 TEST_F(TestEnergyPreferenceCluster, TestPersistence)
