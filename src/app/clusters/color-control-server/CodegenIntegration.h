@@ -40,8 +40,9 @@ ColorControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
  * base `Convert*` no-ops are correct for single-feature devices, which never switch into a mode they do
  * not advertise, and `On*Changed` notifications are simply dropped).
  *
- * Call this from application init BEFORE the cluster is constructed: the delegate is bound once at
- * construction and is not repointable afterwards.
+ * May be called before or after the cluster is constructed: the delegate binding is repointable, so a
+ * registration that runs after Server::Init() still takes effect (it updates the live cluster via
+ * ColorControlCluster::SetDelegate).
  *
  * @param endpoint  Color Control server endpoint.
  * @param delegate  Application delegate, or `nullptr` to use the shared no-op default.

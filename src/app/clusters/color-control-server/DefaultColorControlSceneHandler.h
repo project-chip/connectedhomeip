@@ -44,8 +44,9 @@ namespace chip::app::Clusters {
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    // As per spec, 9 attributes are scenable in the color control cluster. If new scenable
-    // attributes are added, this value should be updated.
+    // Upper bound on scenable attributes: 10 distinct attribute IDs may be captured (CurrentHue and
+    // EnhancedCurrentHue are mutually exclusive, so at most 9 are saved for any one device). If new
+    // scenable attributes are added, this value should be updated.
     static constexpr uint8_t kColorControlScenableAttributesCount = 10;
 
     DefaultColorControlSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}

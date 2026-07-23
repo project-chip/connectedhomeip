@@ -1183,6 +1183,7 @@ Status ColorControlCluster::stepHue(StepModeEnum stepMode, uint16_t stepSize, ui
     }
 
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
 
     ApplyModeSwitch(isEnhanced ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
@@ -1261,6 +1262,7 @@ Status ColorControlCluster::stepSaturation(StepModeEnum stepMode, uint8_t stepSi
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
+    VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
 
     ApplyModeSwitch(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
@@ -1916,16 +1918,13 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
 }
 
 /**
- * @brief executes move to saturation command
+ * @brief Executes the MoveColor command: continuously moves CurrentX / CurrentY toward the CIE
+ *        boundary at the given signed rates (xy-units per second), running until StopMoveStep. A rate
+ *        of 0 leaves that axis stationary; both rates 0 stops any active XY movement.
  *
- * @param endpoint target endpoint where to execute move
- * @param colorX target X
- * @param colorY target Y
- * @param transitionTime transition time in 10th of seconds
- * @return Status::Success if successful,
- * @return Status::Success when successful,
- *         Status::UnsupportedEndpoint XY is not supported on the endpoint,
- *         Status::ConstraintError when a command parameter is outside its defined value range.
+ * @param rateX signed rate for CurrentX in xy-units per second
+ * @param rateY signed rate for CurrentY in xy-units per second
+ * @return Status::Success (gated by ShouldExecuteIfOff; the command has no out-of-range fields).
  */
 Status ColorControlCluster::moveColor(int16_t rateX, int16_t rateY, BitMask<OptionsBitmap> optionsMask,
                                       BitMask<OptionsBitmap> optionsOverride)

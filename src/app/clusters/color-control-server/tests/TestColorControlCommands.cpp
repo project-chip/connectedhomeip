@@ -141,6 +141,9 @@ TEST_F(TestColorControlCommands, StepSaturation)
     EXPECT_EQ(c.stepSaturation(StepModeEnum::kUp, 250, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), kMaxSat);
+
+    // A step size of 0 is rejected.
+    EXPECT_EQ(c.stepSaturation(StepModeEnum::kUp, 0, 10), Status::InvalidCommand);
 }
 
 // ---------------------------------------------------------------------------- Hue (basic + enhanced)
@@ -172,6 +175,8 @@ TEST_F(TestColorControlCommands, StepHue)
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x0A00 + (20 << 8))); // += 20 in the high byte
 
     EXPECT_EQ(c.stepHue(StepModeEnum::kUnknownEnumValue, 20, 10, false), Status::InvalidCommand);
+    // A step size of 0 is rejected.
+    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 0, 10, false), Status::InvalidCommand);
 }
 
 TEST_F(TestColorControlCommands, MoveHueRateThenStop)
