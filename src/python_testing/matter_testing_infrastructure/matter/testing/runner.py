@@ -777,7 +777,17 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if not populate_commissioning_args(args, config):
         sys.exit(1)
 
-    config.storage_path = pathlib.Path(TestingDefaults.STORAGE_PATH) if args.storage_path is None else args.storage_path
+    if args.chip_tool_common_storage_path or args.chip_tool_fabric_storage_path:
+        if not (args.chip_tool_common_storage_path and args.chip_tool_fabric_storage_path):
+            LOGGER.error("Error: One must specify both chip-tool common and chip-tool fabric storage paths")
+            sys.exit(1)
+        if args.storage_path is not None:
+            LOGGER.error("Error: Cannot specify both --storage-path and chip-tool storage paths")
+            sys.exit(1)
+        config.chip_tool_common_storage_path = pathlib.Path(args.chip_tool_common_storage_path)
+        config.chip_tool_fabric_storage_path = pathlib.Path(args.chip_tool_fabric_storage_path)
+    else:
+        config.storage_path = pathlib.Path(args.storage_path or TestingDefaults.STORAGE_PATH)
     config.logs_path = pathlib.Path(TestingDefaults.LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
@@ -958,6 +968,12 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
+    basic_group.add_argument(
+        "--chip-tool-common-storage-path", metavar="PATH", action="store", type=pathlib.Path,
+        help="path to chip-tool common persistent storage configuration file (INI format)")
+    basic_group.add_argument(
+        "--chip-tool-fabric-storage-path", metavar="PATH", action="store", type=pathlib.Path,
+        help="path to chip-tool fabric persistent storage configuration file (INI format)")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
