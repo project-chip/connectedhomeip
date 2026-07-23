@@ -177,6 +177,12 @@ private:
     void FreeResolveContext(size_t handle);
     void FreeResolveContext(const char * name);
 
+    // Completes a resolve: detaches the context and releases its resolver before invoking the
+    // terminal callback, so a re-entrant RebuildClient()/Shutdown() started from that callback
+    // cannot free the resolver twice or invoke the callback again. Deletes the context after.
+    void FinalizeResolve(ResolveContext * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                         CHIP_ERROR error);
+
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);
 

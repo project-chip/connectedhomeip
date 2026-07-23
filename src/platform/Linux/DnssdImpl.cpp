@@ -745,6 +745,14 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
                              chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                              intptr_t * browseIdentifier)
 {
+    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+
+    // Recover a failed client before allocating state so a rebuild failure needs no cleanup.
+    if (ClientHasFailed())
+    {
+        ReturnErrorOnFailure(RebuildClient());
+    }
+
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
@@ -761,17 +769,6 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     browseContext->mProtocol          = GetFullType(type, protocol);
     browseContext->mReceivedAllCached = false;
     browseContext->mStopped.store(false);
-
-    if (ClientHasFailed())
-    {
-        CHIP_ERROR error = RebuildClient();
-        if (error != CHIP_NO_ERROR)
-        {
-            chip::Platform::Delete(browseContext);
-            *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
-            return error;
-        }
-    }
 
     browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
@@ -1052,6 +1049,23 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
     }
 }
 
+void MdnsAvahi::FinalizeResolve(ResolveContext * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                CHIP_ERROR error)
+{
+    // A resolve is terminal, so detach the context and release its resolver before invoking the
+    // callback. The callback may start a new lookup that re-enters RebuildClient() or Shutdown();
+    // detaching keeps those from freeing this resolver a second time or invoking the callback again.
+    mAllocatedResolves.remove(context);
+    if (context->mResolver != nullptr)
+    {
+        avahi_service_resolver_free(context->mResolver);
+        context->mResolver = nullptr;
+    }
+
+    context->mCallback(context->mContext, result, addresses, error);
+    chip::Platform::Delete(context);
+}
+
 void MdnsAvahi::StopResolve(const char * name)
 {
     // Cancel and delete any pending resolves for this instance name.
@@ -1070,8 +1084,7 @@ void MdnsAvahi::StopResolve(const char * name)
 
     for (auto * context : contexts)
     {
-        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-        chip::Platform::Delete(context);
+        FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
     }
 }
 
@@ -1166,14 +1179,13 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
-                context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                sInstance.FreeResolveContext(handle);
+                sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
             }
             return;
         }
         ChipLogError(DeviceLayer, "Avahi resolve failed");
-        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-        break;
+        sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
+        return;
     case AVAHI_RESOLVER_FOUND:
         DnssdService result = {};
 
@@ -1250,16 +1262,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
+            sInstance.FinalizeResolve(context, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
         }
         else
         {
-            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), result_err);
+            sInstance.FinalizeResolve(context, nullptr, Span<Inet::IPAddress>(), result_err);
         }
-        break;
+        return;
     }
-
-    sInstance.FreeResolveContext(handle);
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
