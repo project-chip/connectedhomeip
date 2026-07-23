@@ -57,6 +57,7 @@ ModeSelectSceneValidator & GlobalValidator()
 ModeSelectCluster::ModeSelectCluster(EndpointId endpointId, Delegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, ModeSelect::Id }), DefaultSceneHandlerImpl(GlobalValidator()), mDelegate(delegate),
     mFeatureMap(config.featureMap), mOptionalAttributeSet(config.optionalAttributeSet),
+    mDescription(config.description), mStandardNamespace(config.standardNamespace),
     mOnOffValueForStartUp(config.onOffValueForStartUp), mDiagnosticDataProvider(config.diagnosticDataProvider),
     mStartUpMode(config.initialStartUpMode), mOnMode(config.initialOnMode)
 {}
@@ -203,6 +204,10 @@ DataModel::ActionReturnStatus ModeSelectCluster::ReadAttribute(const DataModel::
         return encoder.Encode(kRevision);
     case FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
+    case Description::Id:
+        return encoder.Encode(mDescription);
+    case StandardNamespace::Id:
+        return encoder.Encode(mStandardNamespace);
     case SupportedModes::Id:
         return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
             for (const auto & mode : mDelegate.GetSupportedModes())
@@ -268,8 +273,9 @@ CHIP_ERROR ModeSelectCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
-    // Description and StandardNamespace are fixed attributes served by ember from ZAP defaults.
     static constexpr DataModel::AttributeEntry kMandatory[] = {
+        Description::kMetadataEntry,
+        StandardNamespace::kMetadataEntry,
         SupportedModes::kMetadataEntry,
         CurrentMode::kMetadataEntry,
     };

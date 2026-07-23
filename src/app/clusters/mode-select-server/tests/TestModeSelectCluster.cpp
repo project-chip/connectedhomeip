@@ -77,11 +77,14 @@ struct TestModeSelectCluster : public ::testing::Test
         testContext.StorageDelegate().ClearStorage();
     }
 
-    ModeSelectCluster::Config MakeConfig(BitMask<Feature> featureMap = {}, bool onOffValueForStartUp = false)
+    ModeSelectCluster::Config MakeConfig(BitMask<Feature> featureMap = {}, bool onOffValueForStartUp = false,
+                                         chip::CharSpan description = "TestMode"_span)
     {
         return ModeSelectCluster::Config{
             .featureMap             = featureMap,
             .optionalAttributeSet   = optionalAttributeSet,
+            .description            = description,
+            .standardNamespace      = DataModel::NullNullable,
             .onOffValueForStartUp   = onOffValueForStartUp,
             .diagnosticDataProvider = diagnosticDataProvider,
         };
@@ -121,9 +124,10 @@ TEST_F(TestModeSelectCluster, AttributeListMandatoryOnly)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Description and StandardNamespace are served by ember from ZAP defaults, not by cluster code.
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
+                                            Description::kMetadataEntry,
+                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                         }));
@@ -138,6 +142,8 @@ TEST_F(TestModeSelectCluster, AttributeListWithStartUpMode)
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
+                                            Description::kMetadataEntry,
+                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                             StartUpMode::kMetadataEntry,
@@ -152,6 +158,8 @@ TEST_F(TestModeSelectCluster, AttributeListWithOnOffFeature)
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
+                                            Description::kMetadataEntry,
+                                            StandardNamespace::kMetadataEntry,
                                             SupportedModes::kMetadataEntry,
                                             CurrentMode::kMetadataEntry,
                                             OnMode::kMetadataEntry,
@@ -192,6 +200,28 @@ TEST_F(TestModeSelectCluster, ReadFeatureMap)
     uint32_t readFeatureMap = 0;
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, readFeatureMap), CHIP_NO_ERROR);
     EXPECT_EQ(readFeatureMap, featureMap.Raw());
+}
+
+TEST_F(TestModeSelectCluster, ReadDescription)
+{
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig({}, false, "Coffee"_span));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    chip::CharSpan description;
+    ASSERT_EQ(tester.ReadAttribute(Description::Id, description), CHIP_NO_ERROR);
+    EXPECT_TRUE(description.data_equal("Coffee"_span));
+}
+
+TEST_F(TestModeSelectCluster, ReadStandardNamespaceDefaultNull)
+{
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> standardNamespace;
+    ASSERT_EQ(tester.ReadAttribute(StandardNamespace::Id, standardNamespace), CHIP_NO_ERROR);
+    EXPECT_TRUE(standardNamespace.IsNull());
 }
 
 TEST_F(TestModeSelectCluster, ReadCurrentMode)

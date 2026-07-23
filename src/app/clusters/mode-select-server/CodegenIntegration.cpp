@@ -17,6 +17,7 @@
 
 #include "CodegenIntegration.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/mode-select-server/SupportedModesManager.h>
 
@@ -84,6 +85,7 @@ private:
 
 struct ModeSelectEntry
 {
+    char descriptionBuffer[64]; // persistent backing store for Description attribute
     SupportedModesManagerDelegate delegate;
     LazyRegisteredServerCluster<ModeSelectCluster> server;
 };
@@ -120,6 +122,21 @@ public:
         }
 #endif
 
+        // Read Description from Ember RAM storage (ZAP default = "Coffee" in all-clusters-app).
+        // descriptionBuffer is in gEntries (global) so the CharSpan remains valid for the cluster lifetime.
+        chip::MutableCharSpan descSpan(entry.descriptionBuffer, sizeof(entry.descriptionBuffer));
+        if (Attributes::Description::GetDefault(endpointId, descSpan) != Status::Success)
+        {
+            descSpan = chip::MutableCharSpan(entry.descriptionBuffer, 0);
+        }
+
+        // Read StandardNamespace from Ember RAM storage (ZAP default = null).
+        DataModel::Nullable<uint16_t> standardNamespace;
+        if (Attributes::StandardNamespace::GetDefault(endpointId, standardNamespace) != Status::Success)
+        {
+            standardNamespace.SetNull();
+        }
+
         // StartUpMode and OnMode are EXTERNAL_STORAGE (NVM) in code-driven clusters;
         // Ember raw reads do not work for them. Provide ZAP defaults directly:
         //   StartUpMode default = 0 (first mode, per all-clusters ZAP config)
@@ -132,6 +149,8 @@ public:
         ModeSelectCluster::Config config{
             .featureMap             = BitMask<Feature>(featureMap),
             .optionalAttributeSet   = optionalAttributeSet,
+            .description            = chip::CharSpan(entry.descriptionBuffer, descSpan.size()),
+            .standardNamespace      = standardNamespace,
             .onOffValueForStartUp   = onOffValueForStartUp,
             .initialStartUpMode     = initialStartUpMode,
             .initialOnMode          = initialOnMode,
