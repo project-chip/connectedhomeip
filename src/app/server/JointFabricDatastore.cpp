@@ -1308,7 +1308,8 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     }
     if (commandData.groupKeySetID.IsNull() == false)
     {
-        if (mGroupInformationEntries[index].groupKeySetID.Value() != commandData.groupKeySetID.Value())
+        if (mGroupInformationEntries[index].groupKeySetID.IsNull() ||
+            mGroupInformationEntries[index].groupKeySetID.Value() != commandData.groupKeySetID.Value())
         {
             // If the groupKeySetID is being updated, we need to ensure that the new key set exists
             ReturnErrorOnFailure(AddNodeKeySetEntry(commandData.groupID, commandData.groupKeySetID.Value()));
@@ -1325,7 +1326,8 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 
     if (commandData.groupCAT.IsNull() == false)
     {
-        if (mGroupInformationEntries[index].groupCAT.Value() != commandData.groupCAT.Value())
+        if (mGroupInformationEntries[index].groupCAT.IsNull() ||
+            mGroupInformationEntries[index].groupCAT.Value() != commandData.groupCAT.Value())
         {
             anyGroupCATFieldUpdated = true;
         }
@@ -1334,7 +1336,8 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     }
     if (commandData.groupCATVersion.IsNull() == false)
     {
-        if (mGroupInformationEntries[index].groupCATVersion.Value() != commandData.groupCATVersion.Value())
+        if (mGroupInformationEntries[index].groupCATVersion.IsNull() ||
+            mGroupInformationEntries[index].groupCATVersion.Value() != commandData.groupCATVersion.Value())
         {
             anyGroupCATFieldUpdated = true;
         }
