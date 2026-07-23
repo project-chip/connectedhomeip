@@ -68,6 +68,7 @@
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (BOOL)unitTestSuppressFirstThreadSubscribeDeferral:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;

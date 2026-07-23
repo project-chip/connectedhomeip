@@ -345,6 +345,30 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
 @property (nonatomic) BOOL doingCASEAttemptForDeviceMayBeReachable;
 
+// Set to YES while we are waiting to fire our very first subscribe attempt on
+// a Thread device for which we have no cached IP address.  The actual subscribe
+// fires when either (a) an operational mDNS advertisement arrives for this
+// device, or (b) a 1-second watchdog elapses, whichever comes first.  This
+// avoids racing the very first SubscribeRequest against threadradiod
+// [WED_START], which would otherwise produce a No-route-to-host failure and
+// burn 3-6 seconds of coldstart on a retry.
+@property (nonatomic) BOOL deferringFirstThreadSubscription;
+
+// Whether we have already gone through the first-Thread-subscribe deferral
+// path for this MTRDevice instance.  Used so we only defer once: subsequent
+// re-entries (e.g. the one nodeMayBeAdvertisingOperational triggers after
+// clearing the deferral) must not defer again.
+@property (nonatomic) BOOL hasDeferredFirstThreadSubscription;
+
+// Monotonically-increasing generation counter for the first-Thread-subscribe
+// deferral watchdog.  The 1-second watchdog is scheduled via dispatch_after,
+// which is uncancellable; a stale watchdog from a prior deferral cycle could
+// otherwise fire against a freshly re-armed deferral and prematurely collapse
+// the safety window.  Each arm captures the current generation, and every
+// path that clears the deferral flag increments this counter so a stale
+// watchdog observes a generation mismatch and exits without doing work.
+@property (nonatomic) uint64_t firstThreadSubscribeWatchdogGeneration;
+
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
 @property (nonatomic) uint32_t lastSubscriptionAttemptWait;
@@ -398,6 +422,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (BOOL)unitTestSuppressFirstThreadSubscribeDeferral:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 - (void)unitTestClusterDataPersisted:(MTRDevice *)device;
@@ -706,6 +731,70 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block
 {
     dispatch_sync(self.queue, block);
+}
+
+// Test helper: parse a textual IP address and stash it as the cached
+// "last subscription IP" so the first-Thread-subscribe deferral gate's
+// cached-IP short-circuit can be exercised in pure-ObjC tests without
+// pulling C++ headers into the test sources.  Pass nil to clear.
+- (void)unitTestSetLastSubscriptionIPAddressFromString:(NSString * _Nullable)addressString
+{
+    std::lock_guard lock(_lock);
+    if (addressString == nil) {
+        _lastSubscriptionIPAddress.reset();
+        return;
+    }
+    chip::Inet::IPAddress parsed;
+    if (chip::Inet::IPAddress::FromString(addressString.UTF8String, parsed)) {
+        _lastSubscriptionIPAddress = parsed;
+    } else {
+        _lastSubscriptionIPAddress.reset();
+    }
+}
+
+// Test helper: drive _ensureSubscriptionForExistingDelegates: with the lock
+// held so re-entry-during-deferral-window coverage can pin the no-op invariant
+// (latch & generation untouched) without tripping the method's
+// os_unfair_lock_assert_owner assertion when invoked from a test thread.
+- (void)unitTestReenterEnsureSubscriptionForExistingDelegatesUnderLock:(NSString *)reason
+{
+    std::lock_guard lock(_lock);
+    [self _ensureSubscriptionForExistingDelegates:reason];
+}
+
+// Test helper: report whether the cached "last subscription IP" is set.
+// The underlying property is std::optional<chip::Inet::IPAddress> and
+// therefore not KVC-bridgeable into pure-ObjC tests.
+- (BOOL)unitTestHasCachedLastSubscriptionIPAddress
+{
+    std::lock_guard lock(_lock);
+    return _lastSubscriptionIPAddress.has_value();
+}
+
+// Test helper: snapshot the three first-Thread-subscribe state flags under
+// _lock so tests observe a pair-atomic, race-free view of the deferral state
+// rather than reading each property via KVC under TSAN.  KVC-driven reads of
+// the underlying ivars are not synchronized with the daemon-side mutations
+// inside _ensureSubscriptionForExistingDelegates: and produce data-race
+// reports under ThreadSanitizer.
+- (MTRDeviceFirstThreadSubscribeFlags)unitTestSnapshotFirstThreadSubscribeFlags
+{
+    std::lock_guard lock(_lock);
+    MTRDeviceFirstThreadSubscribeFlags flags;
+    flags.deferring = _deferringFirstThreadSubscription;
+    flags.hasDeferred = _hasDeferredFirstThreadSubscription;
+    flags.hasCachedIP = _lastSubscriptionIPAddress.has_value();
+    return flags;
+}
+
+// Test helper: read the watchdog generation counter under _lock.  Tests must
+// use this accessor rather than KVC (-valueForKey:@"firstThreadSubscribeWatchdogGeneration")
+// because the underlying ivar is mutated under _lock from multiple queues and
+// an unsynchronized KVC read is a data race (flaky under ThreadSanitizer).
+- (uint64_t)unitTestFirstThreadSubscribeWatchdogGeneration
+{
+    std::lock_guard lock(_lock);
+    return _firstThreadSubscribeWatchdogGeneration;
 }
 #endif
 
@@ -1067,27 +1156,142 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         mtr_weakify(self);
         if ([self _deviceUsesThread]) {
             MTR_LOG(" => %@ - device is a thread device, scheduling in pool", self);
+
+            // If a first-Thread-subscribe deferral is already in flight, do
+            // nothing on re-entry.  The watchdog (or operational advertisement)
+            // that originally armed the gate is still on the hook to schedule
+            // the subscribe; coming back through here during the 1s window
+            // would otherwise either skip the gate (because
+            // hasDeferredFirstThreadSubscription is already YES, so
+            // shouldDeferForThreadColdstart evaluates to NO) and fall through
+            // to scheduleSubscriptionPoolWork(), bypassing the deferral.
+            if (_deferringFirstThreadSubscription) {
+                MTR_LOG("%@ - first Thread subscribe deferral still in flight; ignoring re-entry (%@)", self, reason);
+                return;
+            }
+
             NSString * description = [NSString stringWithFormat:@"MTRDevice setDelegate first subscription / controller resume (%p)", self];
-            [self _scheduleSubscriptionPoolWork:^{
+            void (^scheduleSubscriptionPoolWork)(void) = ^{
                 mtr_strongify(self);
-                VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates _scheduleSubscriptionPoolWork called back with nil MTRDevice"));
-
-                [self->_deviceController asyncDispatchToMatterQueue:^{
+                if (!self) {
+                    return;
+                }
+                // _scheduleSubscriptionPoolWork: requires _lock be held by the
+                // caller.  Most callers below already do this; the watchdog
+                // path takes the lock explicitly before invoking this block.
+                os_unfair_lock_assert_owner(&self->_lock);
+                [self _scheduleSubscriptionPoolWork:^{
                     mtr_strongify(self);
-                    VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue called back with nil MTRDevice"));
+                    VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates _scheduleSubscriptionPoolWork called back with nil MTRDevice"));
 
-                    std::lock_guard lock(self->_lock);
-                    [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
-                } errorHandler:^(NSError * _Nonnull error) {
-                    mtr_strongify(self);
-                    VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue errored with nil MTRDevice"));
+                    [self->_deviceController asyncDispatchToMatterQueue:^{
+                        mtr_strongify(self);
+                        VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
-                    // If controller is not running, clear work item from the subscription queue
-                    MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
-                    std::lock_guard lock(self->_lock);
-                    [self _clearSubscriptionPoolWork];
+                        std::lock_guard lock(self->_lock);
+                        [self _setupSubscriptionWithReason:[NSString stringWithFormat:@"%@ and scheduled subscription is happening", reason]];
+                    } errorHandler:^(NSError * _Nonnull error) {
+                        mtr_strongify(self);
+                        VerifyOrReturn(self, MTR_LOG_DEBUG("_ensureSubscriptionForExistingDelegates asyncDispatchToMatterQueue errored with nil MTRDevice"));
+
+                        // If controller is not running, clear work item from the subscription queue
+                        MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+                        std::lock_guard lock(self->_lock);
+                        [self _clearSubscriptionPoolWork];
+                    }];
+                } inNanoseconds:0 description:description];
+            };
+
+            // Coldstart gate: if this is our first subscription attempt for a
+            // Thread device and we have no cached IP address yet, the Thread
+            // interface is very likely still coming up.  Firing immediately
+            // would produce a No-route-to-host (errno 65) from the first
+            // SubscribeRequest before threadradiod's [WED_START] completes,
+            // and we'd burn 3-6s of coldstart on a wasted attempt.  Defer
+            // until either an operational advertisement arrives for this
+            // device (the strong signal that the interface is up) or a 1s
+            // watchdog elapses (the safety net), whichever comes first.
+            //
+            // Short-circuit the gate if we have evidence the device is
+            // already reachable: a recent report (within the last 60s) means
+            // the Thread interface is up and the device is talking to us, so
+            // there is no benefit to paying the 1s watchdog penalty (this is
+            // the warm-Thread cold-app-launch path).
+            NSDate * lastReportTime = [_mostRecentReportTimes lastObject];
+            BOOL hasRecentReport = (lastReportTime != nil
+                && -[lastReportTime timeIntervalSinceNow] < 60.0);
+            BOOL shouldDeferForThreadColdstart = (!_lastSubscriptionIPAddress.has_value()
+                && !hasRecentReport
+                && !_deferringFirstThreadSubscription
+                && !_hasDeferredFirstThreadSubscription);
+#ifdef DEBUG
+            // Tests that mock Thread (pretendThreadEnabled / unitTestPretendThreadEnabled:)
+            // are not exercising real coldstart behavior — the device is a real
+            // local fixture that is already reachable, and the 1s watchdog skews
+            // subscription-pool dequeue ordering.  Allow tests to opt out via
+            // unitTestSuppressFirstThreadSubscribeDeferral:; MTRDeviceTestDelegate
+            // returns the same value as pretendThreadEnabled so any test that
+            // already opted into the Thread mock automatically opts out of the
+            // coldstart deferral.  See PR #72268.
+            if (shouldDeferForThreadColdstart) {
+                __block BOOL suppressDeferral = NO;
+                [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                    if ([testDelegate respondsToSelector:@selector(unitTestSuppressFirstThreadSubscribeDeferral:)]) {
+                        suppressDeferral = [testDelegate unitTestSuppressFirstThreadSubscribeDeferral:self];
+                    }
                 }];
-            } inNanoseconds:0 description:description];
+                if (suppressDeferral) {
+                    shouldDeferForThreadColdstart = NO;
+                }
+            }
+#endif
+            if (shouldDeferForThreadColdstart) {
+                MTR_LOG("%@ - deferring first Thread subscribe up to 1s; waiting for operational advertisement", self);
+                _deferringFirstThreadSubscription = YES;
+                _hasDeferredFirstThreadSubscription = YES;
+
+                // Bump the generation so any stale watchdog from a prior arm
+                // (cleared and re-armed within the same MTRDevice lifetime —
+                // e.g. controllerSuspended -> controllerResumed) cannot fire
+                // against this fresh arm.  The new watchdog block captures
+                // armedGeneration and bails on mismatch.
+                uint64_t armedGeneration = ++_firstThreadSubscribeWatchdogGeneration;
+
+                static constexpr int64_t kFirstThreadSubscribeWatchdogNs = static_cast<int64_t>(NSEC_PER_SEC);
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kFirstThreadSubscribeWatchdogNs), self.queue, ^{
+                    mtr_strongify(self);
+                    if (!self) {
+                        return;
+                    }
+                    std::lock_guard lock(self->_lock);
+                    if (self->_firstThreadSubscribeWatchdogGeneration != armedGeneration) {
+                        // A subsequent arm/clear cycle bumped the generation;
+                        // this watchdog is stale and must not act.
+                        return;
+                    }
+                    if (!self->_deferringFirstThreadSubscription) {
+                        // Operational advertisement already triggered the subscribe.
+                        return;
+                    }
+                    self->_deferringFirstThreadSubscription = NO;
+                    // Defensive: invalidate / controllerSuspended could have
+                    // landed during the 1s window and torn down the
+                    // subscription path even though they also clear
+                    // deferringFirstThreadSubscription (so the early-return
+                    // above usually catches this).  Belt-and-suspenders: re-
+                    // check that subscriptions are still allowed before
+                    // scheduling the pool work.
+                    if (![self _subscriptionsAllowed]) {
+                        MTR_LOG("%@ - first Thread subscribe watchdog: subscriptions no longer allowed; aborting", self);
+                        return;
+                    }
+                    MTR_LOG("%@ - first Thread subscribe watchdog fired; proceeding without operational advertisement", self);
+                    scheduleSubscriptionPoolWork();
+                });
+                return;
+            }
+
+            scheduleSubscriptionPoolWork();
         } else {
             [_deviceController asyncDispatchToMatterQueue:^{
                 mtr_strongify(self);
@@ -1118,6 +1322,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
+
+    // Clear the first-Thread-subscribe deferral state under _lock so that any
+    // already-armed watchdog short-circuits at its early-return when it
+    // observes deferringFirstThreadSubscription == NO, and so a future
+    // re-attach starts from a clean slate.
+    _deferringFirstThreadSubscription = NO;
+    _hasDeferredFirstThreadSubscription = NO;
+    // Bump the generation so that any in-flight watchdog from before
+    // invalidate is unambiguously stale.  A fresh MTRDevice instance always
+    // starts at generation 0; this only matters within the lifetime of a
+    // single instance (invalidate followed by re-use is uncommon but legal).
+    ++_firstThreadSubscribeWatchdogGeneration;
 
     // Clear subscription pool work item if it's in progress, to avoid forever
     // taking up a slot in the controller's work queue.
@@ -1151,6 +1367,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     MTR_LOG("%@ saw new operational advertisement", self);
+
+    // If we were deferring our very first Thread subscribe waiting for exactly
+    // this signal, clear the deferral flag and trigger the subscribe via the
+    // normal path immediately rather than waiting for the 1s watchdog.
+    {
+        std::lock_guard lock(_lock);
+        if (_deferringFirstThreadSubscription) {
+            _deferringFirstThreadSubscription = NO;
+            // Bump the watchdog generation so any in-flight stale watchdog
+            // does not fire against a future re-arm of the deferral.
+            ++_firstThreadSubscribeWatchdogGeneration;
+            MTR_LOG("%@ - operational advertisement cleared first-Thread-subscribe deferral", self);
+            [self _ensureSubscriptionForExistingDelegates:@"operational advertisement seen"];
+            return;
+        }
+    }
 
     [self _triggerResubscribeWithReason:@"operational advertisement seen"
                     nodeLikelyReachable:YES];
@@ -5163,6 +5395,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     std::lock_guard lock(self->_lock);
     self.suspended = YES;
     [self _resetSubscriptionWithReasonString:@"Controller suspended"];
+
+    // Clear any pending first-Thread-subscribe deferral so an already-armed
+    // watchdog short-circuits at its early-return rather than scheduling a
+    // subscribe that _subscriptionsAllowed will refuse anyway.  The latch is
+    // also cleared so that a controllerResumed -> _ensureSubscriptionForExistingDelegates
+    // re-entry can re-arm the deferral path against a fresh resume.
+    _deferringFirstThreadSubscription = NO;
+    _hasDeferredFirstThreadSubscription = NO;
+    // Bump the generation so any in-flight watchdog from before suspend is
+    // unambiguously stale — this is the canonical re-arm path
+    // (suspend -> resume) where a stale watchdog could otherwise collapse
+    // the safety window of the freshly-armed deferral.
+    ++_firstThreadSubscribeWatchdogGeneration;
 
     // Ensure that any pre-existing resubscribe attempts we control don't try to
     // do anything.
