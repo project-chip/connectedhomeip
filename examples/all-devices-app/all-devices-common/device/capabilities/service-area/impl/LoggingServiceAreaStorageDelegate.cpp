@@ -240,8 +240,8 @@ bool LoggingServiceAreaStorageDelegate::AddSelectedAreaRaw(uint32_t aAreaId, uin
         return true;
     }
 
-    ChipLogError(Zcl, "AddSelectedAreaRaw %u - selected areas list is already at maximum size %u",
-                 static_cast<unsigned>(aAreaId), static_cast<unsigned>(kMaxNumSelectedAreas));
+    ChipLogError(Zcl, "AddSelectedAreaRaw %u - selected areas list is already at maximum size %u", static_cast<unsigned>(aAreaId),
+                 static_cast<unsigned>(kMaxNumSelectedAreas));
 
     return false;
 }
@@ -334,8 +334,7 @@ bool LoggingServiceAreaStorageDelegate::ModifyProgressElementRaw(uint32_t listIn
     if (modifiedProgressElement.areaID != mProgressList[listIndex].areaID)
     {
         ChipLogError(Zcl, "ModifyProgressElementRaw - areaID's do not match, new areaID %u, existing areaID %u",
-                     static_cast<unsigned>(modifiedProgressElement.areaID),
-                     static_cast<unsigned>(mProgressList[listIndex].areaID));
+                     static_cast<unsigned>(modifiedProgressElement.areaID), static_cast<unsigned>(mProgressList[listIndex].areaID));
         return false;
     }
 
