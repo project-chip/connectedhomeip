@@ -73,6 +73,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/closure-control-server/tests",
       "${chip_root}/src/app/clusters/closure-dimension-server/tests",
       "${chip_root}/src/app/clusters/commissioner-control-server/tests",
+      "${chip_root}/src/app/clusters/commissioning-proxy-server/tests",
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/content-launch-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
@@ -185,13 +186,15 @@ if (chip_build_tests) {
       ]
     }
 
-    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
-    # test build. Restrict them to specific platforms only
+    # These suites link ember mocks (codegen data-model provider), so they cannot
+    # run in a "unified" single-binary test build. Restrict them to specific
+    # platforms only.
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
         "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/commissioning-proxy-server/tests:tests-codegen-integration",
         "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",

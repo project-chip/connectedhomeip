@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,91 @@ namespace {
 
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
 static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+// Forwarder used by StartProxyScan / StopProxyScan to translate the
+// BlueZ-internal ChipDeviceScannerDelegate events into the public
+// BleScanResultCallback shape that the commissioning-proxy app expects.
+
+// Work item carried from the GLib scan thread onto the Matter event loop.
+struct ProxyScanWorkCtx
+{
+    BLEManagerImpl::BleScanResultCallback cb;
+    void * ctx;
+    uint8_t bdAddr[6]; // little-endian (reversed from BlueZ MSB-first)
+    uint16_t discriminator;
+    uint16_t vendorId;
+    uint16_t productId;
+};
+
+static void DispatchProxyScanResult(intptr_t arg)
+{
+    auto * r = reinterpret_cast<ProxyScanWorkCtx *>(arg);
+    r->cb(r->ctx, r->bdAddr, r->discriminator, r->vendorId, r->productId);
+    delete r;
+}
+
+class ProxyScanForwarder : public ChipDeviceScannerDelegate
+{
+public:
+    ProxyScanForwarder(BLEManagerImpl::BleScanResultCallback cb, void * ctx) : mCb(cb), mCtx(ctx) {}
+
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
+    {
+        const char * addrStr = bluez_device1_get_address(&device);
+        if (addrStr == nullptr)
+        {
+            return;
+        }
+        unsigned int b[6];
+        if (sscanf(addrStr, "%02x:%02x:%02x:%02x:%02x:%02x", &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]) != 6)
+        {
+            ChipLogDetail(DeviceLayer, "ProxyScanForwarder: malformed BD_ADDR '%s', skipping", addrStr);
+            return;
+        }
+        if (mCb == nullptr)
+        {
+            return;
+        }
+        // Schedule the callback onto the Matter event loop so the consumer can
+        // safely touch SystemLayer timers and the data model.  Dispatching via
+        // ScheduleWork avoids acquiring the CHIP stack lock from this GLib
+        // thread, which would deadlock when the Matter thread concurrently
+        // holds the lock inside StopScan()→GLibMatterContextInvokeSync().
+        //
+        // Byte order: BlueZ provides the address MSB-first ("AA:BB:…:FF").
+        // ScanResultStruct.Address SHALL be little-endian per spec, so reverse
+        // the bytes during the copy (index 0 = b[5] = LSB).
+        auto * work         = new ProxyScanWorkCtx{};
+        work->cb            = mCb;
+        work->ctx           = mCtx;
+        work->discriminator = info.GetDeviceDiscriminator();
+        work->vendorId      = info.GetVendorId();
+        work->productId     = info.GetProductId();
+        for (int i = 0; i < 6; ++i)
+        {
+            work->bdAddr[i] = static_cast<uint8_t>(b[5 - i]);
+        }
+        CHIP_ERROR schedErr = DeviceLayer::PlatformMgr().ScheduleWork(DispatchProxyScanResult, reinterpret_cast<intptr_t>(work));
+        if (schedErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ProxyScanForwarder: ScheduleWork failed: %" CHIP_ERROR_FORMAT, schedErr.Format());
+            delete work;
+        }
+    }
+    void OnScanComplete() override {}
+    void OnScanError(CHIP_ERROR) override {}
+
+private:
+    BLEManagerImpl::BleScanResultCallback mCb;
+    void * mCtx;
+};
+
+// Single in-flight proxy-scan forwarder.  Owned across StartProxyScan ->
+// StopProxyScan; destroyed and recreated each cycle so the scanner's
+// delegate pointer is never stale.
+static ProxyScanForwarder * sProxyScanForwarder = nullptr;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
@@ -106,6 +191,22 @@ void BLEManagerImpl::_Shutdown()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Spec: an already-commissioned Node SHALL NOT commence commissioning
+    // announcement using Bluetooth LE (DeviceDiscovery.adoc §"announcement of
+    // a Commissionable Node" — already-commissioned nodes use DNS-SD only).
+    // For the commissioning-proxy app, BLE has been switched to central role
+    // after the CP was used for a BLE proxy op (mIsCentral=true).  Refuse to
+    // arm peripheral-mode advertising — DNS-SD remains available for the
+    // OpenCommissioningWindow path.
+    if (val && mIsCentral)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "_SetAdvertisingEnabled(true) refused: BLE is in central role; "
+                        "DNS-SD advertising is used for OpenCommissioningWindow per spec");
+        return CHIP_NO_ERROR;
+    }
+#endif
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
@@ -540,7 +641,8 @@ void BLEManagerImpl::DriveBLEState()
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
+    // (Skip when in central role — see spec note in _SetAdvertisingEnabled above.)
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) && !mIsCentral)
     {
         // Start/re-start advertising if not already advertising, or if the advertising state of the
         // Bluez BLE layer needs to be refreshed.
@@ -753,6 +855,109 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     }
     return CHIP_NO_ERROR;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+CHIP_ERROR BLEManagerImpl::SwitchToCentralMode()
+{
+    if (mIsCentral)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Refuse if any BLE connection is still active (e.g. the commissioning
+    // session that brought the CP onto the fabric has not closed yet).  Caller
+    // can retry once the commissioner disconnects.
+    if (mEndpoint.GetNumConnections() > 0)
+    {
+        ChipLogProgress(DeviceLayer, "SwitchToCentralMode: BLE connection still active, deferring");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Refuse if an advertising start/stop D-Bus call is in-flight.  The async
+    // completion callback (kPlatformLinuxBLEPeripheralAdvStartComplete) runs
+    // unconditionally and re-arms kAdvertising=true after we clear it below,
+    // which would cause DriveBLEState to call Stop() on an already-Shutdown()
+    // BluezAdvertisement object and permanently disable BLE via DisableBLEService.
+    if (mFlags.Has(Flags::kControlOpInProgress))
+    {
+        ChipLogProgress(DeviceLayer, "SwitchToCentralMode: BLE control operation in progress, deferring");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Stop advertising and tear down advertising state so the radio is free for
+    // central scans / connects.  mBLEAdvertisement.Shutdown() also unregisters
+    // the BlueZ LEAdvertisement1 D-Bus object.
+    mBLEAdvertisement.Shutdown();
+    mFlags.Clear(Flags::kAdvertisingEnabled);
+    mFlags.Clear(Flags::kAdvertising);
+    mFlags.Clear(Flags::kAdvertisingConfigured);
+
+    // Lightweight role flip.  The peripheral GATT server objects stay registered
+    // (harmless — advertising is off so nothing will connect to them), but
+    // BluezConnection::Init and BluezEndpoint::HandleNewDevice subsequently see
+    // mIsCentral=true and take the central code path.  After this returns, the
+    // CP cannot be re-commissioned over BLE until the process restarts.
+    mIsCentral = true;
+    mEndpoint.SetCentralMode(true);
+
+    ChipLogProgress(DeviceLayer, "SwitchToCentralMode: BLE switched to central role for proxy operations");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * context)
+{
+    VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sProxyScanForwarder == nullptr, CHIP_ERROR_BUSY);
+    VerifyOrReturnError(!mDeviceScanner.IsScanning(), CHIP_ERROR_BUSY);
+    VerifyOrReturnError(mFlags.Has(Flags::kBluezAdapterAvailable), BLE_ERROR_ADAPTER_UNAVAILABLE);
+
+    sProxyScanForwarder = new ProxyScanForwarder(cb, context);
+    CHIP_ERROR err      = mDeviceScanner.Init(mAdapter.get(), sProxyScanForwarder);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete sProxyScanForwarder;
+        sProxyScanForwarder = nullptr;
+        return err;
+    }
+    err = mDeviceScanner.StartScan();
+    if (err != CHIP_NO_ERROR)
+    {
+        // Restore BLEManagerImpl as the scanner's delegate so the next internal
+        // scan (NewBleConnectionByDiscriminator) finds the expected callback target.
+        // If this re-Init fails the scanner still holds the soon-to-be-freed
+        // forwarder as its delegate, so abort rather than risk a use-after-free.
+        CHIP_ERROR restoreErr = mDeviceScanner.Init(mAdapter.get(), this);
+        VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "ProxyScan rollback: scanner Init failed: %" CHIP_ERROR_FORMAT,
+                           restoreErr.Format());
+        delete sProxyScanForwarder;
+        sProxyScanForwarder = nullptr;
+    }
+    return err;
+}
+
+CHIP_ERROR BLEManagerImpl::StopProxyScan()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mDeviceScanner.IsScanning())
+    {
+        err = mDeviceScanner.StopScan();
+    }
+    // Restore BLEManagerImpl as the scanner's delegate before deleting the
+    // forwarder, so any callback that fires after StopScan returns lands on a
+    // live object (BLEManagerImpl) rather than freed memory.  Skip the re-init
+    // if the adapter has been removed (mAdapter is null in that path and the
+    // scanner is already shut down by NotifyBLEAdapterRemoved).
+    if (mFlags.Has(Flags::kBluezAdapterAvailable))
+    {
+        CHIP_ERROR restoreErr = mDeviceScanner.Init(mAdapter.get(), this);
+        VerifyOrDieWithMsg(restoreErr == CHIP_NO_ERROR, DeviceLayer, "StopProxyScan: scanner Init failed: %" CHIP_ERROR_FORMAT,
+                           restoreErr.Format());
+    }
+    delete sProxyScanForwarder;
+    sProxyScanForwarder = nullptr;
+    return err;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 void BLEManagerImpl::NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress)
 {

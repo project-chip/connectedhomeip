@@ -106,6 +106,7 @@ The application supports the following device types (specified via the
 -   `water-freeze-detector`
 -   `water-leak-detector`
 -   `water-valve`
+-   `commissioning-proxy`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -116,7 +117,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|bridged-node|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve>
+  --device <aggregator|air-purifier|air-quality-sensor|bridged-node|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|robotic-vacuum-cleaner|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|water-freeze-detector|water-leak-detector|water-valve|commissioning-proxy>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -228,6 +229,38 @@ device types. When an endpoint is specified, it represents the starting number.
               │      └── Endpoint 7 (contact-sensor)
               └── ...
     ```
+
+## Commissioning Proxy cluster
+
+This example supports the Commissioning Proxy cluster as the
+`commissioning-proxy` device type, with the `MA-commissioning-by-proxy` device
+type. It is enabled by `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY` in
+`posix/include/CHIPProjectAppConfig.h` and lets the app act as a commissioning
+proxy over BLE.
+
+The BLE transport is included when `chip_config_network_layer_ble` is true (so
+it is disabled by the `-no-ble` build variants). `ProxyScanRequest` and the
+proxy connect/message/disconnect flow then operate over BLE.
+
+To build on Linux x86-64 run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
+```
+
+And to compile on Linux ARM run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl build"
+```
+
+To start the app as a proxy on endpoint 5:
+
+```
+$ ./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5
+```
+
+The cluster's attributes and commands can then be exercised on endpoint 5.
 
 ## Testing with chip-tool
 
