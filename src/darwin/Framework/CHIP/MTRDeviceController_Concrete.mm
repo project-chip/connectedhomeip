@@ -146,6 +146,19 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+
+    // Guards the read-currentCommissioning + StopPairing sequence in
+    // -stopCommissioningAtomically:forCommissioningID:.  Without this,
+    // the post-PASE watchdog fire path has a TOCTOU between checking
+    // `currentCommissioning != self` (the "replaced" gate) and the
+    // subsequent StopPairing call: a concurrent
+    // setupCommissioningSessionWithPayload: on another thread can swap
+    // currentCommissioning between the two reads and the watchdog
+    // either dispatches a spurious CHIP_ERROR_TIMEOUT to a now-detached
+    // delegate or fails to release a still-current C++ commissioning
+    // slot.  This lock makes the check-and-act sequence atomic w.r.t.
+    // any other writer of currentCommissioning that also acquires it.
+    os_unfair_lock _currentCommissioningLock;
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -205,6 +218,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         _currentCommissioning = nil;
         _commissioningQueue = dispatch_queue_create("org.csa-iot.matter.framework.commissioning.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _deviceConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
+        _currentCommissioningLock = OS_UNFAIR_LOCK_INIT;
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -861,18 +875,87 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     MTR_LOG("%@ Setting up commissioning session for device ID 0x%016llX with setup payload %@", self, newNodeID.unsignedLongLongValue, payload);
 
+    // Compute the pairing code first so we can compare against any stale
+    // post-PASE commissioning before we touch metrics state.
+    NSString * earlyPairingCode = [payload qrCodeString:nil];
+    if (earlyPairingCode == nil) {
+        earlyPairingCode = [payload manualEntryCode];
+    }
+
+    // If we have a stale internally-created commissioning still parked at the
+    // post-PASE waiting state for a *different* setup payload, treat the new
+    // setupCommissioningSessionWithPayload: call as an implicit cancel of the
+    // previous one.  Otherwise the new call would fail with CHIP_ERROR_BUSY
+    // (0xDB) because the controller still considers the prior commissioning
+    // in flight, and the user would be stuck until a process restart.
+    //
+    // IMPORTANT: do this BEFORE resetting/beginning kMetricDeviceCommissioning
+    // for the new attempt.  -_cancelCommissioning routes through the bridge,
+    // which calls MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, ...) -- if
+    // we had already begun the new attempt's metric, the synthetic CANCELLED
+    // from the stale operation would close out the new attempt's metric,
+    // leaving it without a matching begin/end and skewing telemetry.  Also
+    // bail out early on cancel failure here, before any new-attempt metric
+    // state is touched, so we never leave kMetricDeviceCommissioning open
+    // across a returned-NO failure.
+    auto * staleCommissioning = self.currentCommissioning;
+    if (staleCommissioning && staleCommissioning.isInternallyCreated
+        && staleCommissioning.isWaitingAfterPASEEstablished
+        && earlyPairingCode != nil
+        && ![staleCommissioning.setupPayload isEqualToString:earlyPairingCode]) {
+        MTR_LOG("%@ implicitly cancelling stale post-PASE commissioning %@ before starting a new one with a different payload", self, staleCommissioning);
+
+        // Synchronously tear down the stale operation's post-PASE watchdog
+        // BEFORE we begin the new attempt's metrics.  The setter on
+        // isWaitingAfterPASEEstablished:NO bounces the teardown onto
+        // _delegateQueue via dispatch_async, which leaves a race window: a
+        // watchdog timer block already on _delegateQueue could still fire
+        // AFTER we have called MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning)
+        // for the new attempt.  That fire would route through
+        // -_dispatchCommissioningError -> MATTER_LOG_METRIC_END, ending
+        // the NEW attempt's metric span and corrupting telemetry -- exactly
+        // the bug this PR exists to prevent.  -_syncCancelPostPASEWatchdog
+        // guarantees no further timer block can run.
+        [staleCommissioning _syncCancelPostPASEWatchdog];
+
+        // Use the atomic stop variant so the "are we still the current
+        // commissioning?" gate check and the StopPairing call happen under
+        // a single controller lock.  This closes the TOCTOU window between
+        // reading self.currentCommissioning above and the StopPairing call
+        // inside -_cancelCommissioning -- a concurrent setter on another
+        // thread could otherwise swap the slot out from under us.
+        MTRStopCommissioningOutcome outcome = [self stopCommissioningAtomically:staleCommissioning
+                                                             forCommissioningID:staleCommissioning.commissioningID];
+        switch (outcome) {
+        case MTRStopCommissioningOutcomeReplaced:
+        case MTRStopCommissioningOutcomeStopped:
+            // Replaced: another path already cleared the stale slot for us
+            // (e.g. -_commissioningDone: ran while we were preparing).  We
+            // can proceed with the new attempt either way.
+            // Stopped: the atomic stop succeeded; the stale slot is cleared
+            // synchronously under _currentCommissioningLock.  Proceed.
+            break;
+        case MTRStopCommissioningOutcomeFailedStillCurrent:
+            // StopPairing failed at the CHIP layer; surface the error rather
+            // than silently starting a new commissioning that is about to
+            // hit the very CHIP_ERROR_BUSY we just failed to clear.  No
+            // new-attempt metrics have been begun yet, so there is nothing
+            // to MATTER_LOG_METRIC_END here.
+            MTR_LOG_ERROR("%@ failed to implicitly cancel stale commissioning %@", self, staleCommissioning);
+            if (error) {
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_BUSY];
+            }
+            return NO;
+        }
+    }
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
     emitMetricForSetupPayload(payload);
 
-    // Try to get a QR code if possible (because it has a better
-    // discriminator, etc), then fall back to manual code if that fails.
-    NSString * pairingCode = [payload qrCodeString:nil];
-    if (pairingCode == nil) {
-        pairingCode = [payload manualEntryCode];
-    }
+    NSString * pairingCode = earlyPairingCode;
     if (pairingCode == nil) {
         CHIP_ERROR errorCode = CHIP_ERROR_INVALID_ARGUMENT;
         MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, errorCode);
@@ -1355,6 +1438,42 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return [self _cancelCommissioning:currentCommissioning forNodeID:commissioningID error:nil];
+}
+
+- (MTRStopCommissioningOutcome)stopCommissioningAtomically:(MTRCommissioningOperation *)commissioning
+                                        forCommissioningID:(NSNumber *)commissioningID
+{
+    // Hold _currentCommissioningLock across BOTH the "are we still the
+    // current commissioning?" gate check AND the StopPairing call so a
+    // concurrent setter of currentCommissioning cannot swap the slot out
+    // from under us between the two operations.  This eliminates the
+    // TOCTOU window the watchdog fire path used to have when it did the
+    // check and the stop as two independent reads of currentCommissioning.
+    //
+    // The lock-order concern here is whether StopPairing (via
+    // syncRunOnWorkQueue on the Matter queue) can call back into a path
+    // that re-acquires _currentCommissioningLock and deadlocks.  In
+    // practice it cannot: the only callbacks that mutate currentCommissioning
+    // (commissioningDone: -> _commissioningDone:) are delivered via
+    // dispatch_async on _commissioningQueue, so they cannot re-enter
+    // synchronously under this lock; they will simply queue behind us
+    // and acquire the lock after we have returned.
+    os_unfair_lock_lock(&_currentCommissioningLock);
+    if (self.currentCommissioning != commissioning) {
+        os_unfair_lock_unlock(&_currentCommissioningLock);
+        MTR_LOG("%@ stopCommissioningAtomically: commissioning %@ was already replaced; no-op", self, commissioning);
+        return MTRStopCommissioningOutcomeReplaced;
+    }
+
+    NSError * stopError = nil;
+    BOOL ok = [self _cancelCommissioning:commissioning forNodeID:commissioningID error:&stopError];
+    os_unfair_lock_unlock(&_currentCommissioningLock);
+
+    if (!ok) {
+        MTR_LOG_ERROR("%@ stopCommissioningAtomically: StopPairing failed for commissioning %@: %@", self, commissioning, stopError);
+        return MTRStopCommissioningOutcomeFailedStillCurrent;
+    }
+    return MTRStopCommissioningOutcomeStopped;
 }
 
 - (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
