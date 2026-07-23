@@ -62,7 +62,8 @@ run_test_with_crash_handling() {
         # Raw core dumps are created instantly in /mnt/chip/dump/
         # No need to wait - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then
-            echo "Raw core dump created: /mnt/chip/dump/core.$TEST_NAME.*"
+            echo "Core dump was created while running test '$TEST_NAME'."
+            echo "Look for files matching: /mnt/chip/dump/core.*"
         fi
     else
         echo "DONE: SUCCESS"
