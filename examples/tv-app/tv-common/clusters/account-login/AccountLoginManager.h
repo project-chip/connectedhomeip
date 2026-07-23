@@ -25,8 +25,9 @@
 using chip::CharSpan;
 using chip::app::CommandResponseHelper;
 using chip::Platform::CopyString;
-using AccountLoginDelegate = chip::app::Clusters::AccountLogin::Delegate;
-using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using AccountLoginDelegate     = chip::app::Clusters::AccountLogin::Delegate;
+using GetSetupPINResponse      = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using GetDeviceAuthURIResponse = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Type;
 
 class AccountLoginManager : public AccountLoginDelegate
 {
@@ -46,13 +47,17 @@ public:
         CopyString(setupPin, setupPinSize, mSetupPin);
     };
 
+    void HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper) override;
+    bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };
+
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     static const size_t kSetupPinSize = 12;
     char mSetupPin[kSetupPinSize];
+    bool mOAuthLoggedIn = false;
 
 private:
     // TODO: set this based upon meta data from app
-    static constexpr uint16_t kClusterRevision = 2;
+    static constexpr uint16_t kClusterRevision = 3;
 };

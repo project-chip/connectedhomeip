@@ -4714,12 +4714,14 @@ endpoint 3 {
   }
 
   server cluster AccountLogin {
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute OAuthLoggedIn;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 3;
 
     handle command GetSetupPIN;
     handle command Login;
     handle command Logout;
+    handle command GetDeviceAuthURI;
   }
 
   server cluster ContentControl {

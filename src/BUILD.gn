@@ -190,6 +190,7 @@ if (chip_build_tests) {
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
+        "${chip_root}/src/app/clusters/account-login-server/tests",
         "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
