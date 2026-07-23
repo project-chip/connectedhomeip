@@ -199,7 +199,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         self.write_to_app_pipe(command, self.fifo_in)
         response_data = self.read_from_app_pipe(self.fifo_out)
 
-        logger.info(f"Out of band command response: {response_data}")
+        logger.info("Out of band command response: %s", response_data)
 
         # Verify that the DUT obtains the User Consent from the user prior to transfer of software update image
         user_consent_needed = response_data['Payload']['UserConsentNeeded']
