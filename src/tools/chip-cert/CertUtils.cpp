@@ -1000,9 +1000,13 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     }
 
     // Sign the new certificate.
-    if (!X509_sign(newCert, caKey, certConfig.GetSignatureAlgorithmDER()))
+    // ML-DSA keys use a built-in hash; pass nullptr as the digest algorithm.
     {
-        ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        const EVP_MD * md = IsMLDSAKey(caKey) ? nullptr : certConfig.GetSignatureAlgorithmDER();
+        if (!X509_sign(newCert, caKey, md))
+        {
+            ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        }
     }
 
     // Injuct error into signature value.
@@ -1043,13 +1047,39 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
     // otherwise use compact identity format for Network (Client) Identities.
     bool useCompactIdentityFormat = (!certConfig.IsErrorTestCaseEnabled() && certType == CertType::kNetworkIdentity);
 
-    uint8_t * p = subjectPubkey;
-    VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(newKey), &p) == chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES,
-                        CHIP_ERROR_INVALID_ARGUMENT);
+    bool isMLDSAKey         = IsMLDSAKey(newKey);
+    size_t subjectPubkeyLen = 0;
+    size_t issuerPubkeyLen  = 0;
 
-    p = issuerPubkey;
-    VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(caKey), &p) == chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES,
-                        CHIP_ERROR_INVALID_ARGUMENT);
+    // For ML-DSA keys, use EVP_PKEY_get_raw_public_key; for EC keys, use i2o_ECPublicKey.
+    std::unique_ptr<uint8_t[]> subjectPubkeyBuf;
+    std::unique_ptr<uint8_t[]> issuerPubkeyBuf;
+
+    if (isMLDSAKey)
+    {
+        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(newKey, nullptr, &subjectPubkeyLen) == 1, CHIP_ERROR_INTERNAL);
+        subjectPubkeyBuf.reset(new uint8_t[subjectPubkeyLen]);
+        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(newKey, subjectPubkeyBuf.get(), &subjectPubkeyLen) == 1,
+                            CHIP_ERROR_INTERNAL);
+
+        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(caKey, nullptr, &issuerPubkeyLen) == 1, CHIP_ERROR_INTERNAL);
+        issuerPubkeyBuf.reset(new uint8_t[issuerPubkeyLen]);
+        VerifyOrReturnError(EVP_PKEY_get_raw_public_key(caKey, issuerPubkeyBuf.get(), &issuerPubkeyLen) == 1, CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        subjectPubkeyLen = chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+        uint8_t * p      = subjectPubkey;
+        VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(newKey), &p) ==
+                                static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        issuerPubkeyLen = chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+        p               = issuerPubkey;
+        VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(caKey), &p) ==
+                                static_cast<int>(chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     writer.Init(chipCert);
 
@@ -1132,20 +1162,44 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
         }
 
         // public key algorithm
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(kOID_PubKeyAlgo_ECPublicKey)));
+        if (isMLDSAKey)
+        {
+            OID pubKeyAlgoOID = kOID_PubKeyAlgo_ML_DSA_65; // default
+            if (IsMLDSA44Key(newKey))
+                pubKeyAlgoOID = kOID_PubKeyAlgo_ML_DSA_44;
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(pubKeyAlgoOID)));
+            // ML-DSA does not use an elliptic curve identifier
+        }
+        else
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(kOID_PubKeyAlgo_ECPublicKey)));
 
-        // public key curve Id
-        uint8_t ecCurveEnum = certConfig.IsSigCurveWrong() ? 0x02 : GetOIDEnum(kOID_EllipticCurve_prime256v1);
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurveIdentifier), ecCurveEnum));
+            // public key curve Id
+            uint8_t ecCurveEnum = certConfig.IsSigCurveWrong() ? 0x02 : GetOIDEnum(kOID_EllipticCurve_prime256v1);
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurveIdentifier), ecCurveEnum));
+        }
     }
 
     // public key
-    if (certConfig.IsPublicKeyError())
     {
-        subjectPubkey[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+        const uint8_t * pubkeyData = isMLDSAKey ? subjectPubkeyBuf.get() : subjectPubkey;
+        size_t pubkeyLen           = isMLDSAKey ? subjectPubkeyLen : chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+
+        if (certConfig.IsPublicKeyError())
+        {
+            // For error injection, we need a mutable copy
+            if (isMLDSAKey)
+            {
+                subjectPubkeyBuf.get()[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+            }
+            else
+            {
+                subjectPubkey[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+            }
+        }
+        ReturnErrorOnFailure(
+            writer.PutBytes(ContextTag(kTag_EllipticCurvePublicKey), pubkeyData, static_cast<uint32_t>(pubkeyLen)));
     }
-    ReturnErrorOnFailure(
-        writer.PutBytes(ContextTag(kTag_EllipticCurvePublicKey), subjectPubkey, chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES));
 
     // extensions
     if (!useCompactIdentityFormat)
@@ -1245,7 +1299,9 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
             // subject key identifier
             if (certConfig.IsExtensionSKIDPresent())
             {
-                ReturnErrorOnFailure(Crypto::Hash_SHA1(subjectPubkey, sizeof(subjectPubkey), keyid));
+                const uint8_t * skData = isMLDSAKey ? subjectPubkeyBuf.get() : subjectPubkey;
+                size_t skLen           = isMLDSAKey ? subjectPubkeyLen : sizeof(subjectPubkey);
+                ReturnErrorOnFailure(Crypto::Hash_SHA1(skData, skLen, keyid));
                 size_t keyIdLen = certConfig.IsExtensionSKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
                 ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SubjectKeyIdentifier), ByteSpan(keyid, keyIdLen)));
             }
@@ -1253,7 +1309,9 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
             // authority key identifier
             if (certConfig.IsExtensionAKIDPresent())
             {
-                ReturnErrorOnFailure(Crypto::Hash_SHA1(issuerPubkey, sizeof(issuerPubkey), keyid));
+                const uint8_t * akData = isMLDSAKey ? issuerPubkeyBuf.get() : issuerPubkey;
+                size_t akLen           = isMLDSAKey ? issuerPubkeyLen : sizeof(issuerPubkey);
+                ReturnErrorOnFailure(Crypto::Hash_SHA1(akData, akLen, keyid));
                 size_t keyIdLen = certConfig.IsExtensionAKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
                 ReturnErrorOnFailure(writer.Put(ContextTag(kTag_AuthorityKeyIdentifier), ByteSpan(keyid, keyIdLen)));
             }
@@ -1523,9 +1581,13 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Sign the new certificate.
-    if (!X509_sign(newCert, caKey, certConfig.GetSignatureAlgorithmDER()))
+    // ML-DSA keys use a built-in hash; pass nullptr as the digest algorithm.
     {
-        ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        const EVP_MD * md = IsMLDSAKey(caKey) ? nullptr : certConfig.GetSignatureAlgorithmDER();
+        if (!X509_sign(newCert, caKey, md))
+        {
+            ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        }
     }
 
 exit:

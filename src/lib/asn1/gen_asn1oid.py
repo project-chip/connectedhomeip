@@ -94,10 +94,23 @@ oids = [
     ("PubKeyAlgo",     "ECPublicKey",             1,       [
      iso(1), member_body(2), us(840), ansi_X9_62(10045), keyType(2), 1]),
 
+    # ML-DSA (FIPS 204) Public Key Algorithms
+    # OIDs from NIST CSOR: 2.16.840.1.101.3.4.3.x
+    ("PubKeyAlgo",     "ML_DSA_44",               2,       [
+     joint_iso_ccitt(2), 16, us(840), 1, 101, 3, 4, 3, 17]),
+    ("PubKeyAlgo",     "ML_DSA_65",               3,       [
+     joint_iso_ccitt(2), 16, us(840), 1, 101, 3, 4, 3, 18]),
+
     # Signature Algorithms
     # RFC 3279
     ("SigAlgo",        "ECDSAWithSHA256",         1,       [
      iso(1), member_body(2), us(840), ansi_X9_62(10045), signatures(4), 3, 2]),
+
+    # ML-DSA (FIPS 204) Signature Algorithms (pure ML-DSA, same OIDs as PubKeyAlgo)
+    ("SigAlgo",        "ML_DSA_44",               2,       [
+     joint_iso_ccitt(2), 16, us(840), 1, 101, 3, 4, 3, 17]),
+    ("SigAlgo",        "ML_DSA_65",               3,       [
+     joint_iso_ccitt(2), 16, us(840), 1, 101, 3, 4, 3, 18]),
 
     # X.509 Distinguished Name Attribute Types
     #   WARNING -- Assign no values higher than 127.

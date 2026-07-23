@@ -52,6 +52,14 @@ paa_cert_file="$dest_dir/Chip-Development-PAA-Cert"
 "$chip_cert_tool" convert-key "$paa_key_file".pem "$paa_key_file".der --x509-der
 "$chip_cert_tool" convert-cert "$paa_cert_file".pem "$paa_cert_file".der --x509-der
 
+# Generate ML-DSA-44 (post-quantum) PAA certificate
+paa_pqc_key_file="$dest_dir/Chip-Development-PAA-ML-DSA-44-Key"
+paa_pqc_cert_file="$dest_dir/Chip-Development-PAA-ML-DSA-44-Cert"
+
+"$chip_cert_tool" gen-att-cert --type a --subject-cn "Matter Development PAA ML-DSA-44" --key-type ml-dsa-44 --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --out-key "$paa_pqc_key_file".pem --out "$paa_pqc_cert_file".pem
+
+"$chip_cert_tool" convert-key "$paa_pqc_key_file".pem "$paa_pqc_key_file".der --x509-der
+
 # Example of how Vendor (FFF1) PAI Certificates can be generate:
 #
 # vid=FFF1
