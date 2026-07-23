@@ -33,6 +33,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Step 0: TH reads FeatureMap attribute on DUT. feature bit is set."
+      PICS: GRPKEY.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
+    - label: Is GCAST feature set?
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: (FeatureMapValue & 0x02)
+              - name: "Value2"
+                value: 0x02
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsGCASTFeatureSet
+
+    - label:
+          "Step 0b: If GCAST feature is set, TH writes the GroupcastAdoption
+          attribute on GroupKeyManagement cluster on DUT with one entry for TH's
+          fabric with GroupcastAdopted set to false."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0004
+      runIf: IsGCASTFeatureSet
+      command: "writeAttribute"
+      attribute: "GroupcastAdoption"
+      arguments:
+          value: [{ FabricIndex: 1, GroupcastAdopted: false }]
+
     - label:
           "Step 1: TH reads GroupKeyMap attribute from DUT using a
           fabric-filtered read."
@@ -83,6 +115,16 @@ tests:
               maxValue: 65535
 
     - label:
+          "Step 5 GCAST check: If GCAST feature is set, verify that
+          MaxGroupsPerFabric is 0."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0002
+      runIf: IsGCASTFeatureSet
+      command: "readAttribute"
+      attribute: "MaxGroupsPerFabric"
+      response:
+          value: 0
+
+    - label:
           "Step 6: TH reads MaxGroupKeysPerFabric attribute from
           GroupKeyManagement cluster on DUT using a fabric-filtered read."
       command: "readAttribute"
@@ -94,3 +136,62 @@ tests:
               type: int16u
               minValue: 1
               maxValue: 65535
+
+    - label:
+          "Step 7: If GCAST is NOT set, skip remaining steps. Otherwise, TH
+          reads GroupcastAdoption attribute from GroupKeyManagement cluster on
+          DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0004
+      runIf: IsGCASTFeatureSet
+      command: "readAttribute"
+      attribute: "GroupcastAdoption"
+      fabricFiltered: true
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 8: TH writes the GroupcastAdoption attribute on
+          GroupKeyManagement cluster on DUT with one entry for TH's fabric with
+          GroupcastAdopted set to true."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0004
+      runIf: IsGCASTFeatureSet
+      command: "writeAttribute"
+      attribute: "GroupcastAdoption"
+      arguments:
+          value: [{ FabricIndex: 1, GroupcastAdopted: true }]
+
+    - label:
+          "Step 9: TH reads GroupKeyMap attribute from GroupKeyManagement
+          cluster on DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0000
+      runIf: IsGCASTFeatureSet
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: true
+      response:
+          value: []
+
+    - label:
+          "Step 10: TH writes to the GroupKeyMap attribute on GroupKeyManagement
+          cluster on DUT with one entry as follows: List item 1:, GroupId:
+          0x0103, GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0000
+      runIf: IsGCASTFeatureSet
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+      response:
+          error: INVALID_IN_STATE
+
+    - label:
+          "Step 11: TH writes the GroupcastAdoption attribute on
+          GroupKeyManagement cluster on DUT with one entry for TH's fabric with
+          GroupcastAdopted set to false."
+      PICS: GRPKEY.S.F01 && GRPKEY.S.A0004
+      runIf: IsGCASTFeatureSet
+      command: "writeAttribute"
+      attribute: "GroupcastAdoption"
+      arguments:
+          value: [{ FabricIndex: 1, GroupcastAdopted: false }]
