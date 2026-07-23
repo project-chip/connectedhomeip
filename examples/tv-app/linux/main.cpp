@@ -49,7 +49,11 @@ constexpr EndpointId kMediaFileManagementEndpointId = 1;
 // The Media File Management cluster is code-driven, so the application owns the
 // delegate and the cluster registration lifecycle (unlike the legacy Ember
 // clusters wired up via SetDefaultDelegate in ZCLCallbacks.cpp).
-MediaFileManagement::MediaFileManagementManager gMediaFileManagementManager;
+//
+// Both are constructed in ApplicationInit() (not as eagerly-constructed globals)
+// because the manager's constructor performs filesystem I/O and logging, which
+// must not run during static initialization before the SDK is ready.
+std::optional<MediaFileManagement::MediaFileManagementManager> gMediaFileManagementManager;
 std::optional<MediaFileManagement::MediaFileManagementServer> gMediaFileManagementServer;
 
 } // namespace
@@ -59,12 +63,14 @@ void ApplicationInit()
     ChipLogProgress(Zcl, "TV Linux App: ApplicationInit()");
 
     // Register the code-driven Media File Management cluster on endpoint 1.
-    gMediaFileManagementServer.emplace(kMediaFileManagementEndpointId, gMediaFileManagementManager);
+    gMediaFileManagementManager.emplace();
+    gMediaFileManagementServer.emplace(kMediaFileManagementEndpointId, *gMediaFileManagementManager);
     CHIP_ERROR err = gMediaFileManagementServer->Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "TV Linux App: MediaFileManagement init failed: %" CHIP_ERROR_FORMAT, err.Format());
         gMediaFileManagementServer.reset();
+        gMediaFileManagementManager.reset();
     }
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
@@ -101,10 +107,11 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
+    // Unregister the cluster from the data model provider. Shutdown() mirrors
+    // Init(); the optionals are left intact and torn down at process exit.
     if (gMediaFileManagementServer.has_value())
     {
         gMediaFileManagementServer->Shutdown();
-        gMediaFileManagementServer.reset();
     }
 }
 

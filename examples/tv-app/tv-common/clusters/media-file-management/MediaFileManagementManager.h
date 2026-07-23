@@ -91,9 +91,6 @@ private:
     void LoadIndex();
     void SaveIndex();
 
-    // Find an entry by fileID; returns nullptr if not present.
-    FileEntry * FindEntry(uint64_t fileID);
-
     std::string mStorageDir;
     std::vector<FileEntry> mFiles;
     uint64_t mNextFileID = 1;

@@ -51,6 +51,12 @@ constexpr char kFieldSep = '\t';
 
 std::string Sanitize(const CharSpan & span)
 {
+    // An empty CharSpan may carry a null data pointer; constructing a
+    // std::string from (nullptr, 0) is undefined behavior.
+    if (span.empty())
+    {
+        return "";
+    }
     std::string out(span.data(), span.size());
     for (char & c : out)
     {
@@ -155,18 +161,6 @@ void MediaFileManagementManager::SaveIndex()
         out << entry.fileID << kFieldSep << entry.size << kFieldSep << entry.mimeType << kFieldSep << entry.imageUri << kFieldSep
             << entry.name << '\n';
     }
-}
-
-MediaFileManagementManager::FileEntry * MediaFileManagementManager::FindEntry(uint64_t fileID)
-{
-    for (FileEntry & entry : mFiles)
-    {
-        if (entry.fileID == fileID)
-        {
-            return &entry;
-        }
-    }
-    return nullptr;
 }
 
 uint64_t MediaFileManagementManager::GetTotalStorage()
