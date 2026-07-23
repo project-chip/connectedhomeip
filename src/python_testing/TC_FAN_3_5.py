@@ -36,7 +36,6 @@
 
 import asyncio
 import logging
-from typing import Optional
 
 from mobly import asserts
 
@@ -74,8 +73,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
     async def send_step_command(self, endpoint,
                                 direction: Clusters.Objects.FanControl.Enums.StepDirectionEnum,
-                                wrap: Optional[bool] = None,
-                                lowest_off: Optional[bool] = None,
+                                wrap: bool | None = None,
+                                lowest_off: bool | None = None,
                                 expected_status: Status = Status.Success):
         # Passing None for optional fields omits them so the DUT applies cluster defaults (Wrap false, LowestOff true).
         step_kwargs = {"direction": direction}
