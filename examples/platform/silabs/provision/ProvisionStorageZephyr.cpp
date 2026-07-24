@@ -129,8 +129,8 @@ CHIP_ERROR Storage::GetVendorId(uint16_t & value)
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
-        value = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
-        err   = CHIP_NO_ERROR;
+        stored = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+        err    = CHIP_NO_ERROR;
     }
 #endif
     ReturnErrorOnFailure(err);
@@ -146,7 +146,7 @@ CHIP_ERROR Storage::SetVendorName(const char * value, size_t len)
 CHIP_ERROR Storage::GetVendorName(char * value, size_t max)
 {
     size_t name_len = 0;
-    VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_VendorName, value, max, name_len);
 #if defined(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME)
@@ -189,7 +189,7 @@ CHIP_ERROR Storage::SetProductName(const char * value, size_t len)
 CHIP_ERROR Storage::GetProductName(char * value, size_t max)
 {
     size_t size = 0;
-    VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductName, value, max, size);
 #if defined(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME)
@@ -265,7 +265,7 @@ CHIP_ERROR Storage::SetHardwareVersionString(const char * value, size_t len)
 CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 {
     size_t size = 0;
-    VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size);
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
