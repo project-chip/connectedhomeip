@@ -22,7 +22,12 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+#include <platform/ESP32/multi_ota/AppImageProcessor.h>
+#include <platform/ESP32/multi_ota/MultiImageOTAProcessorImpl.h>
+#else
 #include <platform/ESP32/OTAImageProcessorImpl.h>
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 #include <system/SystemEvent.h>
 
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -31,11 +36,15 @@
 #include <lib/shell/commands/Help.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && !defined(CONFIG_ENABLE_MULTI_IMAGE_OTA)
 #include "esp_check.h"
 #include "esp_rcp_ota.h"
 #include "esp_rcp_update.h"
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
+
+#if defined(CONFIG_ENABLE_MULTI_IMAGE_OTA) && defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#include "OTARcpImageProcessor.h"
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA && CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
 
 using namespace chip::DeviceLayer;
 using namespace chip;
@@ -51,11 +60,21 @@ DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+MultiImageOTAProcessorImpl gImageProcessor;
+AppImageProcessor gAppImageProcessor;
+ImageProcessorEntry gAppImageEntry{ kAppImageProcessorTag, &gAppImageProcessor };
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+OTARcpImageProcessor gRcpImageProcessor;
+ImageProcessorEntry gRcpImageEntry{ kRcpImageProcessorTag, &gRcpImageProcessor };
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
+#else
 OTAImageProcessorImpl gImageProcessor;
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 chip::Optional<bool> gRequestorCanConsent;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && !defined(CONFIG_ENABLE_MULTI_IMAGE_OTA)
 class OTARcpProcessorImpl : public OTAImageProcessorImpl::OTARcpProcessorDelegate
 {
 public:
@@ -123,11 +142,11 @@ esp_err_t OTARcpProcessorImpl::OnOtaRcpAbort()
 }
 
 OTARcpProcessorImpl gOtaRcpDelegate;
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
 
 // WARNING: This is just an example for using key for decrypting the encrypted OTA image
 // Please do not use it as is for production use cases
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
 extern const char sOTADecryptionKeyStart[] asm("_binary_esp_image_encryption_key_pem_start");
 extern const char sOTADecryptionKeyEnd[] asm("_binary_esp_image_encryption_key_pem_end");
 
@@ -145,19 +164,31 @@ void OTAHelpers::InitOTARequestor()
 {
     if (!GetRequestorInstance())
     {
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+        // Register the application-firmware sub-processor before the requestor is initialised.
+        // The app image is registered first so it is applied last (it triggers the reboot).
+        LogErrorOnFailure(gImageProcessor.RegisterProcessor(gAppImageEntry));
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+        LogErrorOnFailure(gImageProcessor.RegisterProcessor(gRcpImageEntry));
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
         TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
                                                      GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
         gImageProcessor.SetOTADownloader(&gDownloader);
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && !defined(CONFIG_ENABLE_MULTI_IMAGE_OTA)
         gImageProcessor.SetOtaRcpDelegate(&gOtaRcpDelegate);
-#endif
+#endif // CONFIG_AUTO_UPDATE_RCP && CONFIG_OPENTHREAD_BORDER_ROUTER && !CONFIG_ENABLE_MULTI_IMAGE_OTA
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+        LogErrorOnFailure(gAppImageProcessor.InitEncryptedOTA(sOTADecryptionKey));
+#else
         gImageProcessor.InitEncryptedOTA(sOTADecryptionKey);
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
         if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
@@ -167,6 +198,13 @@ void OTAHelpers::InitOTARequestor()
         }
     }
 }
+
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+CHIP_ERROR OTAHelpers::RegisterSubImageProcessor(chip::ImageProcessorEntry & entry)
+{
+    return gImageProcessor.RegisterProcessor(entry);
+}
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 
 namespace chip {
 namespace Shell {

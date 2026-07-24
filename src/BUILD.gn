@@ -262,6 +262,11 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
+    # The ESP32 multi-image OTA header parser is platform independent and host testable.
+    if (chip_device_platform == "esp32") {
+      tests += [ "${chip_root}/src/platform/ESP32/multi_ota/tests" ]
+    }
+
     if (chip_config_network_layer_ble) {
       tests += [ "${chip_root}/src/ble/tests" ]
     }
