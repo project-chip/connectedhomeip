@@ -57,12 +57,11 @@ template("siwx917_sdk") {
       "${chip_root}",
       "${root_gen_dir}/include",
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/config",
-      "${efr32_sdk_root}/cmsis_common/platform/common/inc",
+      "${efr32_sdk_root}/platform_core/platform/common/inc",
       "${efr32_sdk_root}/platform_core/platform/service/mem_pool/inc/",
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform_core/platform/service/device_init/inc",
-      "${efr32_sdk_root}/platform_common/platform/common/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/dmadrv/inc",
       "${efr32_sdk_root}/platform_core/platform/driver/gpio/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/gpiointerrupt/inc",
@@ -129,8 +128,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/sli_queue_manager/inc",
 
       # nvm3
-      "${efr32_sdk_root}/platform_common/platform/common/inc",
-      "${efr32_sdk_root}/platform_core/platform/common/inc",
       "${efr32_sdk_root}/platform_core/platform/emlib/inc",
       "${efr32_sdk_root}/platform_core/platform/service/system/inc",
       "${efr32_sdk_root}/cmsis/RTOS2/Include",
@@ -209,7 +206,7 @@ template("siwx917_sdk") {
       _include_dirs += [
         "${efr32_sdk_root}/segger/systemview/SEGGER",
         "${efr32_sdk_root}/segger/systemview/init/",
-        "${efr32_sdk_root}/segger/systemview/profiles/freertos_v10/",
+        "${efr32_sdk_root}/segger/systemview/profiles/freertos_v11/",
       ]
 
       defines += [
@@ -452,11 +449,12 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/config/",
           "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/config/preset",
           "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/inc",
-          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/inc",
-          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sli_crypto/inc",
-          "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/inc",
-          "${efr32_sdk_root}/security_mbedtls_source/include",
-          "${efr32_sdk_root}/security_mbedtls_source/library",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/inc",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_crypto/inc",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_psec_common/inc",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_psec_osal/inc",
+          "${_mbedtls_root}/include",
+          "${_mbedtls_root}/library",
         ]
       }
 
@@ -539,13 +537,13 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/x509write_csr.c",
 
           # Simplicity SDK
-          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/config/src/sl_psa_crypto.c",
-          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/config/src/sli_psa_crypto.c",
+          "${_mbedtls_root}/include/psa/crypto_compat.h",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
+          "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
           "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
-          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
-          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
-          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
-          "${efr32_sdk_root}/security_mbedtls_source/include/psa/crypto_compat.h",
 
           # WISECONNECT 3 SDK
           "${sl_si91x_psa_crypto_path}/aead/src/sl_si91x_psa_aead.c",
@@ -855,7 +853,7 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/segger/systemview/Config/SEGGER_RTT_Conf.h",
         "${efr32_sdk_root}/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
         "${efr32_sdk_root}/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
-        "${efr32_sdk_root}/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",
+        "${efr32_sdk_root}/segger/systemview/profiles/freertos_v11/SEGGER_SYSVIEW_FreeRTOS.c",
       ]
     }
 
