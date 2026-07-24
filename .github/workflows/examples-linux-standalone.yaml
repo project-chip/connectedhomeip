@@ -60,6 +60,7 @@ jobs:
                 strip out/linux-x64-chip-cert/chip-cert
                 strip out/linux-x64-chip-tool/chip-tool
             - name: Upload tools as artifact
+              if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
               uses: actions/upload-artifact@v7
               with:
                 name: chip-tools-linux-x64

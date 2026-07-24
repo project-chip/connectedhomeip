@@ -60,6 +60,7 @@ jobs:
                 scripts/run_in_build_env.sh "llvm-strip out/linux-arm64-chip-cert-clang/chip-cert"
                 scripts/run_in_build_env.sh "llvm-strip out/linux-arm64-chip-tool-clang/chip-tool"
             - name: Upload tools as artifact
+              if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
               uses: actions/upload-artifact@v7
               with:
                 name: chip-tools-linux-arm64
