@@ -196,7 +196,7 @@ void VerifyCommand::PrintDeviceInformation()
     }
     else
     {
-        printf("Invalid cert: %d\n", mAttestationResult);
+        printf("Invalid cert: %u\n", static_cast<uint16_t>(mAttestationResult));
     }
 }
 
