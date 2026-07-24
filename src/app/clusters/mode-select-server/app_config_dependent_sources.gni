@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "ModeSelectCluster.cpp",
-  "SupportedModesManager.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "supported-modes-manager.h",
 ]

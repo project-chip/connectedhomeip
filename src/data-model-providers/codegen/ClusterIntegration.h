@@ -16,11 +16,13 @@
  */
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 #include <app/util/generic-callbacks.h>
 
 #include <cstdint>
+#include <lib/support/Span.h>
 
 namespace chip::app {
 
@@ -145,6 +147,21 @@ public:
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for the provided endpoint id or nullptr if
     /// not found.
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
+
+    /// Read a ZCL short-string attribute from Ember RAM into `buffer` (max `maxLength` chars, no NUL needed).
+    /// Returns a CharSpan into buffer on success, or an empty span on read failure.
+    static CharSpan ReadStringAttribute(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, char * buffer,
+                                        size_t maxLength);
+
+    /// Read a nullable uint16 attribute from Ember RAM.
+    /// Returns null Nullable on read failure or when the stored value is the null sentinel (0xFFFF).
+    static DataModel::Nullable<uint16_t> ReadNullableUint16Attribute(EndpointId endpointId, ClusterId clusterId,
+                                                                     AttributeId attributeId);
+
+    /// Read a nullable uint8 attribute from Ember RAM.
+    /// Returns null Nullable on read failure or when the stored value is the null sentinel (0xFF).
+    static DataModel::Nullable<uint8_t> ReadNullableUint8Attribute(EndpointId endpointId, ClusterId clusterId,
+                                                                   AttributeId attributeId);
 };
 
 } // namespace chip::app

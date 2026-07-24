@@ -57,6 +57,8 @@ public:
     Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                             const ModeOptionStructType ** dataPtr) const override;
 
+    chip::CharSpan getDescription(EndpointId endpointId) const override;
+
     ~StaticSupportedModesManager(){};
 
     StaticSupportedModesManager() {}

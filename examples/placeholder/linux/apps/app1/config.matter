@@ -9365,13 +9365,13 @@ endpoint 0 {
     ram      attribute description;
     callback attribute standardNamespace;
     callback attribute supportedModes;
-    ram      attribute currentMode;
-    ram      attribute startUpMode;
+    callback attribute currentMode;
+    callback attribute startUpMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }

@@ -18,10 +18,13 @@
 
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
+#include <algorithm>
+#include <cstring>
 #include <limits>
 
 namespace chip::app {
@@ -182,6 +185,69 @@ ServerClusterInterface * CodegenClusterIntegration::FindClusterOnEndpoint(const 
 #endif
 
     return interface;
+}
+
+CharSpan CodegenClusterIntegration::ReadStringAttribute(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                                        char * buffer, size_t maxLength)
+{
+    // ZCL short string: first byte is length, followed by chars (no NUL terminator)
+    uint8_t zclBuf[256]; // max ZCL short string size
+    uint16_t readLen = static_cast<uint16_t>(std::min(maxLength + 1, sizeof(zclBuf)));
+    if (emberAfReadAttribute(endpointId, clusterId, attributeId, zclBuf, readLen) != Protocols::InteractionModel::Status::Success)
+    {
+        return CharSpan();
+    }
+    uint8_t len = emberAfStringLength(zclBuf);
+    if (len > maxLength)
+    {
+        len = static_cast<uint8_t>(maxLength);
+    }
+    memcpy(buffer, &zclBuf[1], len);
+    return CharSpan(buffer, len);
+}
+
+DataModel::Nullable<uint16_t> CodegenClusterIntegration::ReadNullableUint16Attribute(EndpointId endpointId, ClusterId clusterId,
+                                                                                     AttributeId attributeId)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    if (emberAfReadAttribute(endpointId, clusterId, attributeId, Traits::ToAttributeStoreRepresentation(storageValue),
+                             sizeof(storageValue)) != Protocols::InteractionModel::Status::Success)
+    {
+        return DataModel::NullNullable;
+    }
+    DataModel::Nullable<uint16_t> result;
+    if (Traits::IsNullValue(storageValue))
+    {
+        result.SetNull();
+    }
+    else
+    {
+        result.SetNonNull(Traits::StorageToWorking(storageValue));
+    }
+    return result;
+}
+
+DataModel::Nullable<uint8_t> CodegenClusterIntegration::ReadNullableUint8Attribute(EndpointId endpointId, ClusterId clusterId,
+                                                                                   AttributeId attributeId)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    if (emberAfReadAttribute(endpointId, clusterId, attributeId, Traits::ToAttributeStoreRepresentation(storageValue),
+                             sizeof(storageValue)) != Protocols::InteractionModel::Status::Success)
+    {
+        return DataModel::NullNullable;
+    }
+    DataModel::Nullable<uint8_t> result;
+    if (Traits::IsNullValue(storageValue))
+    {
+        result.SetNull();
+    }
+    else
+    {
+        result.SetNonNull(Traits::StorageToWorking(storageValue));
+    }
+    return result;
 }
 
 } // namespace chip::app
