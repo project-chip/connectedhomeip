@@ -130,11 +130,20 @@ public:
                         new core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>(GetEndpoint()));
         RegisterCommand(chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Id,
                         new core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type>(GetEndpoint()));
+        RegisterCommand(
+            chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id,
+            new core::Command<chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id,
+                        new core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type>(GetEndpoint()));
 
         RegisterAttribute(
             chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id,
             new core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
                 GetEndpoint()));
+        RegisterAttribute(chip::app::Clusters::ContentLauncher::Attributes::Movable::Id,
+                          new core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(chip::app::Clusters::ContentLauncher::Attributes::Presets::Id,
+                          new core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Presets::TypeInfo>(GetEndpoint()));
     }
 };
 }; // namespace content_launcher
@@ -291,9 +300,53 @@ public:
         RegisterAttribute(
             chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id,
             new core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(
+            chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id,
+            new core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(
+            chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id,
+            new core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::TypeInfo>(GetEndpoint()));
     }
 };
 }; // namespace media_playback
+
+namespace media_file_management {
+class MediaFileManagementCluster : public core::BaseCluster
+{
+public:
+    MediaFileManagementCluster(memory::Weak<core::Endpoint> endpoint) : core::BaseCluster(endpoint) {}
+
+    void SetUp()
+    {
+        ChipLogProgress(AppServer, "Setting up MediaFileManagementCluster on EndpointId: %d", GetEndpoint().lock()->GetId());
+
+        RegisterCommand(chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id,
+                        new core::Command<chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id,
+                        new core::Command<chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Type>(GetEndpoint()));
+        RegisterCommand(
+            chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id,
+            new core::Command<chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id,
+                        new core::Command<chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type>(GetEndpoint()));
+        RegisterCommand(chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id,
+                        new core::Command<chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type>(GetEndpoint()));
+
+        RegisterAttribute(
+            chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id,
+            new core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(
+            chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::Id,
+            new core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(
+            chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::Id,
+            new core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::TypeInfo>(GetEndpoint()));
+        RegisterAttribute(
+            chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::Id,
+            new core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::TypeInfo>(GetEndpoint()));
+    }
+};
+}; // namespace media_file_management
 
 namespace on_off {
 class OnOffCluster : public core::BaseCluster
