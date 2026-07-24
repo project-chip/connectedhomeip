@@ -99,8 +99,8 @@ private:
     Delegate & mDelegate;
     const BitMask<ModeSelect::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
-    chip::CharSpan mDescription;
-    DataModel::Nullable<uint16_t> mStandardNamespace;
+    const chip::CharSpan mDescription;
+    const DataModel::Nullable<uint16_t> mStandardNamespace;
     const bool mOnOffValueForStartUp;
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 
