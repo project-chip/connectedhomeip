@@ -171,12 +171,9 @@ class TC_HSTAT_2_1(MatterBaseTest):
             match mode:
                 case ModeEnum.kHumidifier:
                     humidifierModeSupported = True
-                    # log.info("Humidifier feature supported value is %s", humidifierFeatureSupported)
                     asserts.assert_true(humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
                 case ModeEnum.kDehumidifier:
                     dehumidifierModeSupported = True
-                    # log.info("Dehumidifier feature supported value is %s", dehumidifierFeatureSupported)
-                    # log.info("From the bitmap: %s", bool(feature_map & features.kDehumidifier))
                     asserts.assert_true(dehumidifierFeatureSupported, "Dehumidifier mode was supported while the feature was not")
                 case ModeEnum.kAuto:
                     autoModeSupported = True
