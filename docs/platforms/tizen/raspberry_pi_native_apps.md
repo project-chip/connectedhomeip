@@ -112,11 +112,13 @@ sdb shell rm -rf /opt/matter/
 
 ## Profiling Memory Leaks with AddressSanitizer
 
-To profile memory leaks in the application, use AddressSanitizer (ASan) during cross-compilation.
+To profile memory leaks in the application, use AddressSanitizer (ASan) during
+cross-compilation.
 
 ### Step 1: Build with ASan Enabled
 
-Compile the application with the ASan target inside the `crosscompile` Docker container:
+Compile the application with the ASan target inside the `crosscompile` Docker
+container:
 
 ```bash
 docker compose run --rm crosscompile bash
@@ -125,7 +127,8 @@ source scripts/activate.sh
 exit
 ```
 
-The ASan-enabled binary will be in `out/linux-arm64-light-no-thread-no-ble-asan-clang/`.
+The ASan-enabled binary will be in
+`out/linux-arm64-light-no-thread-no-ble-asan-clang/`.
 
 ### Step 2: Deploy the ASan Binary
 
@@ -142,7 +145,8 @@ sdb shell chmod +x /opt/matter/chip-lighting-app
 
 ### Step 3: Run with ASan Verbosity
 
-Run the application on the Raspberry Pi with the `ASAN_OPTIONS` environment variable to get verbose output:
+Run the application on the Raspberry Pi with the `ASAN_OPTIONS` environment
+variable to get verbose output:
 
 ```bash
 sdb shell ASAN_OPTIONS='verbosity=1' /opt/matter/chip-lighting-app --wifi true --discriminator 1234 --passcode 11223344
@@ -150,7 +154,9 @@ sdb shell ASAN_OPTIONS='verbosity=1' /opt/matter/chip-lighting-app --wifi true -
 
 ### Step 4: Introduce a Memory Leak (for Testing)
 
-Since the application code typically does not contain memory leaks, you can introduce one for testing purposes. Add the following code to `examples/lighting-app/linux/main.cpp`:
+Since the application code typically does not contain memory leaks, you can
+introduce one for testing purposes. Add the following code to
+`examples/lighting-app/linux/main.cpp`:
 
 ```cpp
 int main(int argc, char * argv[])
@@ -168,7 +174,9 @@ int main(int argc, char * argv[])
     // ... rest of main
 ```
 
-:::{note} The Fibonacci calculation ensures the allocated memory is actually used, preventing compiler warnings about unused variables that could cause build failures. :::
+:::{note} The Fibonacci calculation ensures the allocated memory is actually
+used, preventing compiler warnings about unused variables that could cause build
+failures. :::
 
 ### Step 5: Recompile and Run with the Memory Leak
 
@@ -211,7 +219,8 @@ SUMMARY: AddressSanitizer: 2000 byte(s) leaked in 1 allocation(s).
 
 ### Step 6: Map Leak Output to Code Paths
 
-Convert the hexadecimal addresses from the ASan report to source code locations using `llvm-symbolizer` on the cross-compile machine:
+Convert the hexadecimal addresses from the ASan report to source code locations
+using `llvm-symbolizer` on the cross-compile machine:
 
 ```bash
 llvm-symbolizer --obj=out/linux-arm64-light-no-thread-no-ble-asan-clang/chip-lighting-app 0x30a86c 0x31d13c 0x230b2c
@@ -230,6 +239,12 @@ _start
 ??:0:0
 ```
 
-This output shows the exact file and line number where the memory leak occurred (e.g., `main.cpp:129`). The first address (`0x30a86c`) points to the `operator new[]` call, the second address (`0x31d13c`) points to the `main` function where the allocation occurs, and the third address (`0x230b2c`) points to the `_start` entry point.
+This output shows the exact file and line number where the memory leak occurred
+(e.g., `main.cpp:129`). The first address (`0x30a86c`) points to the
+`operator new[]` call, the second address (`0x31d13c`) points to the `main`
+function where the allocation occurs, and the third address (`0x230b2c`) points
+to the `_start` entry point.
 
-:::{note} The `llvm-symbolizer` command must be run on the machine where the cross-compilation was performed, as it requires access to the build artifacts and debug symbols. :::
+:::{note} The `llvm-symbolizer` command must be run on the machine where the
+cross-compilation was performed, as it requires access to the build artifacts
+and debug symbols. :::
