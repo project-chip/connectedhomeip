@@ -229,9 +229,7 @@ if (current_os == "zephyr") {
     } else if (lwip_platform == "silabs") {
       public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
-      sources += [
-        "${lwip_platform}/lwipopts-siwx.h",
-      ]
+      sources += [ "${lwip_platform}/lwipopts-siwx.h" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "cyw30739") {

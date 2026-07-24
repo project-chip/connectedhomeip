@@ -20,7 +20,6 @@ import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 declare_args() {
-
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -59,7 +58,6 @@ config("wifi-platform-config") {
            "ssid can't be null if psk is provided")
     defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
-
 
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
