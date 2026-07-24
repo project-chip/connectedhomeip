@@ -566,10 +566,6 @@ config MBEDTLS_PKCS1_V15
 
 if CHIP_CRYPTO_IMPL_PSA
 
-config PSA_CRYPTO_SW_ONLY
-	bool
-	default y if BOARD_SIWX917_RB4338A
-	default n
 config PSA_WANT_ALG_SPAKE2P_MATTER
 	bool
 	default y
