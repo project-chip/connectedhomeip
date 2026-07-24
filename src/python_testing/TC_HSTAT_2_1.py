@@ -38,6 +38,7 @@
 
 
 import logging
+import inspect
 
 from mobly import asserts
 
@@ -113,17 +114,18 @@ class TC_HSTAT_2_1(MatterBaseTest):
         cluster = Clusters.Humidistat
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
-        mistBitmap = cluster.Bitmaps.Mist
+        mistBitmap = cluster.Bitmaps.MistTypeBitmap
         supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
         SetSettings = Clusters.Humidistat.Commands.SetSettings
-
-        feature_map = await self.read_setting(attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attributes.FeatureMap)
+        log.info("Feature map value: %s", feature_map)
         humidifierFeatureSupported = bool(feature_map & features.kHumidifier)
         dehumidifierFeatureSupported = bool(feature_map & features.kDehumidifier)
         continuousFeatureSupported = bool(feature_map & features.kContinuous)
         sensorFeatureSupported = bool(feature_map & features.kSensor)
         autoFeatureSupported = bool(feature_map & features.kAuto)
-        fanOnlyFeatureSupported = bool(feature_map & features.kFan)
+        fanOnlyFeatureSupported = bool(feature_map & features.kFanOnly)
         optimalFeatureSupported = bool(feature_map & features.kOptimal)
         warmFeatureSupported = bool(feature_map & features.kWarmMist)
         coldFeatureSupported = bool(feature_map & features.kColdMist)
@@ -139,15 +141,11 @@ class TC_HSTAT_2_1(MatterBaseTest):
         log.info("DUT supports the Cold feature: %s", coldFeatureSupported)
         log.info("DUT supports the CondPump feature: %s", condPumpFeatureSupported)
 
-        # some convenience definions
-        modeHumidifier = cluster.Enums.ModeEnum.kHumidifier
-        modeDehumidifier = cluster.Enums.ModeEnum.kDeumidifier
-        modeAuto = cluster.Enums.ModeEnum.kAuto
-        modeFanOnly = cluster.Enums.ModeEnum.kFanOnly
         stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
         stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
         stateFan = cluster.Enums.SystemStateEnum.kFan
         stateIdle = cluster.Enums.SystemStateEnum.kIdle
+        ModeEnum = cluster.Enums.ModeEnum
 
         self.step(2)
         # TH reads from the DUT the FeatureMap attribute. Already read above and implicitly checked.
@@ -171,29 +169,32 @@ class TC_HSTAT_2_1(MatterBaseTest):
         for mode in SupportedModes:
             #   - Each list item is supported by the FeatureMap.
             match mode:
-                case modeHumidifier:
+                case ModeEnum.kHumidifier:
                     humidifierModeSupported = True
+                    # log.info("Humidifier feature supported value is %s", humidifierFeatureSupported)
                     asserts.assert_true(humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
-                case modeDehumidifier:
+                case ModeEnum.kDehumidifier:
                     dehumidifierModeSupported = True
+                    # log.info("Dehumidifier feature supported value is %s", dehumidifierFeatureSupported)
+                    # log.info("From the bitmap: %s", bool(feature_map & features.kDehumidifier))
                     asserts.assert_true(dehumidifierFeatureSupported, "Dehumidifier mode was supported while the feature was not")
-                case modeAuto:
+                case ModeEnum.kAuto:
                     autoModeSupported = True
                     asserts.assert_true(autoFeatureSupported, "Auto mode was supported while the feature was not")
-                case modeFanOnly:
+                case ModeEnum.kFanOnly:
                     fanOnlyModeSupported = True
                     asserts.assert_true(fanOnlyFeatureSupported, "FanOnly mode was supported while the feature was not")
                 case _:
                     asserts.fail("Unknown mode value encountered in SupportModes")
             asserts.assert_greater_equal(mode, 0, "SupportedModes entry is out of range")
             asserts.assert_less_equal(mode, 3, "SupportedModes entry is out of range")
-            asserts.assert_equal(humidifierModeSupported, humidifierFeatureSupported,
-                                 "Humidifier mode was supported while the feature was not")
-            asserts.assert_equal(dehumidifierModeSupported, dehumidifierFeatureSupported,
-                                 "Dehumidifier mode was supported while the feature was not")
-            asserts.assert_equal(autoModeSupported, autoFeatureSupported, "Auto mode was supported while the feature was not")
-            asserts.assert_equal(fanOnlyModeSupported, fanOnlyFeatureSupported,
-                                 "FanOnly mode was supported while the feature was not")
+        asserts.assert_equal(humidifierModeSupported, humidifierFeatureSupported,
+                                "Humidifier mode was supported while the feature was not")
+        asserts.assert_equal(dehumidifierModeSupported, dehumidifierFeatureSupported,
+                             "Dehumidifier mode was supported while the feature was not")
+        asserts.assert_equal(autoModeSupported, autoFeatureSupported, "Auto mode was supported while the feature was not")
+        asserts.assert_equal(fanOnlyModeSupported, fanOnlyFeatureSupported,
+                             "FanOnly mode was supported while the feature was not")
 
         self.step(4)
         # TH reads from the DUT the Mode attribute.
@@ -296,191 +297,6 @@ class TC_HSTAT_2_1(MatterBaseTest):
         if condPumpFeatureSupported:
             dut_CondRunCount = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.CondRunCount)
             asserts.assert_greater_equal(dut_CondRunCount, 0, "CondRunCount attribute out of range")
-
-        # move everything below this line
-
-        self.step(next(step))  # Set Mode to Off
-        await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeOff))
-
-        self.step(next(step))  # Read Mode, should be Off
-        dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
-        asserts.assert_equal(dut_Mode, modeOff, "Mode attribute is not Off")
-
-        self.step(next(step))  # Read SystemState, should be Off
-        dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-        asserts.assert_equal(dut_SystemState, stateOff, "SystemState attribute is not Off")
-
-        self.step(next(step))  # Set Mode to Humidifier
-        if humidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeHumidifier))
-
-        self.step(next(step))  # Read Mode, should be Humidifier
-        if humidifierFeatureSupported:
-            dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
-            asserts.assert_equal(dut_Mode, modeHumidifier, "Mode attribute is not Humidifier")
-
-        self.step(next(step))  # Read SystemState, should be Idle or Humidifying
-        if humidifierFeatureSupported:
-            dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.true(dut_SystemState in [stateIdle, stateHumidifying], "SystemState attribute is not Idle or Humidifying")
-
-        self.step(next(step))  # Set Mode to Dehumidifier
-        if dehumidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeDehumidifier))
-
-        self.step(next(step))  # Read Mode, should be Dehmidifier
-        if dehumidifierFeatureSupported:
-            dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
-            asserts.assert_equal(dut_Mode, modeDehumidifier, "Mode attribute is not Dehumidifier")
-
-        self.step(next(step))  # Read SystemState, should be Idle or Dehumidifying
-        if humidifierFeatureSupported:
-            dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.true(dut_SystemState in [stateIdle, stateDehumidifying], "SystemState attribute is not Idle or Dehumidifying")
-
-        self.step(next(step))  # Set Mode to Auto
-        if autoFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeAuto))
-
-        self.step(next(step))  # Read Mode, should be Auto
-        if autoFeatureSupported:
-            dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
-            asserts.assert_equal(dut_Mode, modeAuto, "Mode attribute is not Auto")
-
-        self.step(next(step))  # Read SystemState, should be Idle, Humidifying, or Dehumidifying
-        if autoFeatureSupported:
-            dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_true(dut_SystemState in [stateIdle, stateHumidifying, stateDehumidifying],
-                                "SystemState attribute is not Idle, Humidifying, or Dehumifying")
-
-        self.step(next(step))  # Set Mode to FanOnly
-        if fanOnlyFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeFanOnly))
-
-        self.step(next(step))  # Read Mode, should be FanOnly
-        if fanOnlyFeatureSupported:
-            dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
-            asserts.assert_equal(dut_Mode, modeFanOnly, "Mode attribute is not FanOnly")
-
-        self.step(next(step))  # Read SystemState, should be Fan
-        if fanOnlyFeatureSupported:
-            dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_equal(dut_SystemState, stateFan, "SystemState attribute is not Fan")
-
-        self.step(next(step))  # Set Mode to Humidifier or Dehumidifier
-        if humidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeHumidifier))
-        else:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeDehumidifier))
-
-        self.step(next(step))  # Set MinSetpoint to UserSetpoint
-        if sensorFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(userSetpoint=dut_MinSetpoint))
-
-        self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint
-        if sensorFeatureSupported:
-            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
-            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute not equal to MinSetpoint attribute")
-
-        self.step(next(step))  # Set MaxSetpoint to UserSetpoint
-        if sensorFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(userSetpoint=dut_MaxSetpoint))
-
-        self.step(next(step))  # Read UserSetpoint, confirm it is MaxSetpoint
-        if sensorFeatureSupported:
-            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
-            asserts.assert_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute not equal to MaxSetpoint attribute")
-
-        testUserValue = dut_MinSetpoint + dut_Step
-
-        self.step(next(step))  # Set test value to UserSetpoint
-        if sensorFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(userSetpoint=testUserValue))
-
-        self.step(next(step))  # Read UserSetpoint, confirm it is test value
-        if sensorFeatureSupported:
-            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
-            asserts.assert_equal(dut_UserSetpoint, testUserValue, "UserSetpoint attribute not as expected")
-
-        self.step(next(step))  # Read Continuous attribute
-        if continuousFeatureSupported:
-            dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
-
-        testContinuousValue = not dut_Continuous
-
-        self.step(next(step))  # Set opposite value to Continuous
-        if continuousFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(continuous=testContinuousValue))
-
-        self.step(next(step))  # Read Continuous attribute and check value
-        if continuousFeatureSupported:
-            dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
-            asserts.assert_equal(dut_Continuous, testContinuousValue, "Continuous attribute not as expected")
-
-        self.step(next(step))  # Set Continuous to False
-        if continuousFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(continuous=False))
-
-        self.step(next(step))  # Read Sleep attribute
-        if attributes.Sleep.attribute_id in supported_attributes:
-            dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
-
-        testSleepValue = not dut_Sleep
-
-        self.step(next(step))  # Set opposite value to Sleep
-        if attributes.Sleep.attribute_id in supported_attributes:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(sleep=testSleepValue))
-
-        self.step(next(step))  # Read Sleep attribute and check value
-        if attributes.Sleep.attribute_id in supported_attributes:
-            dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
-            asserts.assert_equal(dut_Sleep, testSleepValue, "Sleep attribute not as expected")
-
-        self.step(next(step))  # Set Sleep to False
-        if attributes.Sleep.attribute_id in supported_attributes:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(sleep=False))
-
-        self.step(next(step))  # Read Optimal attribute
-        if optimalFeatureSupported:
-            dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
-
-        testOptimalValue = not dut_Optimal
-
-        self.step(next(step))  # Set opposite value to Optimal
-        if optimalFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(optimal=testOptimalValue))
-
-        self.step(next(step))  # Read Optimal attribute and check value
-        if optimalFeatureSupported:
-            dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
-            asserts.assert_equal(dut_Optimal, testOptimalValue, "Optimal attribute not as expected")
-
-        self.step(next(step))  # Set Optimal to False
-        if optimalFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(optimal=False))
-
-        self.step(next(step))  # Set Mode to Humidifier
-        if humidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeHumidifier))
-
-        self.step(next(step))  # Set Warm to MistType
-        if humidifierFeatureSupported and warmFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mistType=mistBitmap.kWarmMist))
-
-        self.step(next(step))  # Check that MistType attribute is Warm
-        if humidifierFeatureSupported and warmFeatureSupported:
-            dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
-            asserts.assert_true(bool(dut_MistType & mistBitmap.kWarmMist), "MistType not Warm")
-
-        self.step(next(step))  # Set Cold to MistType
-        if humidifierFeatureSupported and coldFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mistType=mistBitmap.kColdMist))
-
-        self.step(next(step))  # Check that MistType attribute is Cold
-        if humidifierFeatureSupported and coldFeatureSupported:
-            dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
-            asserts.assert_true(bool(dut_MistType & mistBitmap.kColdMist), "MistType not Cold")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
