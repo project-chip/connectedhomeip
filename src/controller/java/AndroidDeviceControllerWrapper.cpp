@@ -430,6 +430,32 @@ void AndroidDeviceControllerWrapper::Shutdown()
     mIsInitialized = false;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    mThreadCredentialsNeededListenerObject = env->NewGlobalRef(listener);
+    jclass listenerClass = env->GetObjectClass(listener);
+
+    mThreadCredentialsNeededListener = env->GetMethodID(listenerClass, "onThreadCredentialsNeeded", "(I)V");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SetWifiCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    mWifiCredentialsNeededListenerObject = env->NewGlobalRef(listener);
+    jclass listenerClass = env->GetObjectClass(listener);
+
+    mWifiCredentialsNeededListener = env->GetMethodID(listenerClass, "onWifiCredentialsNeeded", "(I)V");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
                                                                    jobject networkCredentials)
 {
@@ -1139,6 +1165,42 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jlong>(err.AsInteger()),
                         icdDeviceInfoObj);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointId endpoint)
+{
+    if (mWifiCredentialsNeededListener != nullptr)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jint value = (jint) endpoint;
+
+        env->CallVoidMethod(mWifiCredentialsNeededListenerObject, mWifiCredentialsNeededListener, value);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(Controller, "Error! No Listener for WifiCredentialsNeeded !");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::EndpointId endpoint)
+{
+    if (mThreadCredentialsNeededListener != nullptr)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jint value = (jint) endpoint;
+
+        env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, value);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(Controller, "Error! No Listener for ThreadCredentialsNeeded !");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
