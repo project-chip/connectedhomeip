@@ -1037,6 +1037,10 @@ namespace StandardNamespace {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // enum16
 } // namespace StandardNamespace
 
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
+} // namespace FeatureMap
+
 } // namespace Attributes
 } // namespace ModeSelect
 

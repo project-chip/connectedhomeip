@@ -632,7 +632,6 @@
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Mode Select": [
             "ClusterRevision",
-            "FeatureMap",
             "SupportedModes",
             "CurrentMode",
             "StartUpMode",
