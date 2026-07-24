@@ -549,6 +549,36 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
     EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
+{
+    IdentificationDeclaration id;
+
+    // Add far more target app infos than the fixed array can hold. AddTargetAppInfo must
+    // reject the extras instead of writing past the end of mTargetAppInfos.
+    uint8_t accepted = 0;
+    for (uint16_t i = 0; i < 64; i++)
+    {
+        TargetAppInfo appInfo;
+        appInfo.vendorId  = static_cast<uint16_t>(i + 1);
+        appInfo.productId = static_cast<uint16_t>(i + 100);
+        if (id.AddTargetAppInfo(appInfo))
+        {
+            accepted++;
+        }
+    }
+
+    // The count must be capped and every stored entry must be retrievable.
+    EXPECT_EQ(id.GetNumTargetAppInfos(), accepted);
+    EXPECT_LT(id.GetNumTargetAppInfos(), 64);
+    for (uint8_t i = 0; i < id.GetNumTargetAppInfos(); i++)
+    {
+        TargetAppInfo appInfo;
+        EXPECT_TRUE(id.GetTargetAppInfo(i, appInfo));
+        EXPECT_EQ(appInfo.vendorId, static_cast<uint16_t>(i + 1));
+        EXPECT_EQ(appInfo.productId, static_cast<uint16_t>(i + 100));
+    }
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;

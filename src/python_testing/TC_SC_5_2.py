@@ -64,6 +64,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -72,7 +73,7 @@ from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcas
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import _has_feature, async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -81,6 +82,18 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SC_5_2(MatterBaseTest):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        # This value is a default of 3.0, but can change in the test body based upon certain test and device features
+        self.groupcast_settle_delay_seconds = 3.0
+
+    async def wait_groupcast_to_unicast_settle_delay(self):
+        logger.info(
+            "Waiting before doing unicast action for %.1f seconds after the multicast action.",
+            self.groupcast_settle_delay_seconds
+        )
+        await asyncio.sleep(self.groupcast_settle_delay_seconds)
 
     def desc_TC_SC_5_2(self) -> str:
         return "26.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT"
@@ -125,12 +138,12 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("16c", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0102 -> KeySetId 0x01a4. Note: Removes GroupId 0x0101."),
             TestStep("16d", "TH sends the same group command destined for Group 0x0101 (encrypted using KeySet 0x01a4)."),
             TestStep("16e", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
-            TestStep("16f", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4. Note: Removes GroupId 0x0102."),
+            TestStep("16f", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4, GroupId 0x0102 -> KeySetId 0x01a4. Note: No entries are removed."),
             TestStep("16g", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
-            TestStep("16h", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
-            TestStep("16i", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4, GroupId 0x0102 -> KeySetId 0x01a4. Note: No entries are removed."),
+            TestStep("16h", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: 0x0102, AccessAllowed: null, GroupcastTestResult: Success)."),
+            TestStep("16i", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4. Note: Removes GroupId 0x0102."),
             TestStep("16j", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
-            TestStep("16k", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: 0x0102, AccessAllowed: null, GroupcastTestResult: Success)."),
+            TestStep("16k", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
             TestStep("16l", "TH sends Groupcast cluster's GroupcastTesting command on EP0 with TestOperation field set to DisableTesting."),
             TestStep("17a", "TH removes GroupKeySetID 0x01a3 by sending a KeySetRemove command to the GroupKeyManagement cluster."),
             TestStep("17b", "TH removes GroupKeySetID 0x01a4 by sending a KeySetRemove command to the GroupKeyManagement cluster."),
@@ -154,6 +167,32 @@ class TC_SC_5_2(MatterBaseTest):
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
+
+        raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
+        if raw_delay is not None:
+            self.groupcast_settle_delay_seconds = float(raw_delay)
+            logger.info("Explicit PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided (%.1f s)",
+                        self.groupcast_settle_delay_seconds)
+        elif self.is_pics_sdk_ci_only:
+            self.groupcast_settle_delay_seconds = 1.0
+            logger.info("CI detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 1 second")
+        else:
+            is_thread_device = any(
+                _has_feature(
+                    self.stored_global_wildcard,
+                    ep,
+                    Clusters.NetworkCommissioning,
+                    Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface,
+                )
+                for ep in self.stored_global_wildcard.attributes
+            )
+            if is_thread_device:
+                self.groupcast_settle_delay_seconds = 5.0
+                logger.info("Thread device detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 5 seconds")
+            else:
+                self.groupcast_settle_delay_seconds = 3.0
+                logger.info("non-Thread device detected, no PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS argument provided, defaulting to 3 seconds")
+
         logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
             logger.info("Running test against endpoint %s groups cluster", endpoint)
@@ -298,6 +337,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 6a: AddGroup 0x0201 as group command via GroupID 0x0101
             self.step("6a")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0201))
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 6b: ViewGroup 0x0201 to confirm success
             self.step("6b")
@@ -317,6 +357,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 7b: AddGroup 0x0202 as group command via GroupID 0x0101
             self.step("7b")
             dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0202))
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 7c: ViewGroup 0x0202 to confirm rejection
             self.step("7c")
@@ -335,6 +376,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 8b: AddGroup 0x0203 as group command via GroupID 0x0102
             self.step("8b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0203))
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 8c: ViewGroup 0x0203 to confirm rejection
             self.step("8c")
@@ -354,6 +396,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 9b: AddGroup 0x0204 as group command via GroupID 0x0102
             self.step("9b")
             dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0204))
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 9c: ViewGroup 0x0204 to confirm rejection
             self.step("9c")
@@ -363,6 +406,7 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 10a: RemoveGroup 0x0101 as group command via GroupID 0x0300
             self.step("10a")
             dev_ctrl.SendGroupCommand(groupId0300, Clusters.Groups.Commands.RemoveGroup(groupId0101))
+            await self.wait_groupcast_to_unicast_settle_delay()
 
             # Step 10b: ViewGroup 0x0101 to confirm removal
             self.step("10b")
@@ -434,6 +478,8 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 16b: Validate the DUT received the group command via the GroupcastTesting event.
             self.step("16b")
+            # This is the first groupcast testing event generated from a step in this test. This means it will be the first
+            # groupcast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
             event_data = event_sub.wait_for_event_report(
                 Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupId0101, "Incorrect group ID in GroupcastTesting event")
@@ -457,8 +503,15 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 16e: Validate the DUT rejected the group command via the GroupcastTesting event.
             self.step("16e")
-            event_data = event_sub.wait_for_event_report(
-                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
+            # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
+            # the DUT and controller.
+            event_data = event_sub.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
             asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
                                 f"Expected GroupID to be null, got {event_data.groupID}")
             asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
@@ -467,33 +520,8 @@ class TC_SC_5_2(MatterBaseTest):
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
                                  "GroupcastTesting event should report FailedAuth")
 
-            # Step 16f: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
+            # Step 16f: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
             self.step("16f")
-            mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
-            ]
-            result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
-            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
-
-            # Step 16g: Send the operate-only command as a group command to GroupID 0x0102.
-            self.step("16g")
-            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
-
-            # Step 16h: Validate the DUT rejected the group command via the GroupcastTesting event.
-            self.step("16h")
-            event_data = event_sub.wait_for_event_report(
-                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
-            asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
-                                f"Expected GroupID to be null, got {event_data.groupID}")
-            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
-                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                                 "GroupcastTesting event should report FailedAuth")
-
-            # Step 16i: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
-            self.step("16i")
             mapping = [
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
@@ -502,20 +530,53 @@ class TC_SC_5_2(MatterBaseTest):
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
-            # Step 16j: Send the operate-only command as a group command to GroupID 0x0102.
-            self.step("16j")
+            # Step 16g: Send the operate-only command as a group command to GroupID 0x0102.
+            self.step("16g")
             dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
 
-            # Step 16k: Validate the DUT received the group command via the GroupcastTesting event.
-            self.step("16k")
-            event_data = event_sub.wait_for_event_report(
-                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            # Step 16h: Validate the DUT received the group command via the GroupcastTesting event.
+            self.step("16h")
+            event_data = event_sub.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                timeout_sec=30
+            )
             asserts.assert_equal(event_data.groupID, groupId0102, "Incorrect group ID in GroupcastTesting event")
             asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
                                 f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
             asserts.assert_equal(event_data.groupcastTestResult,
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
+
+            # Step 16i: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
+            self.step("16i")
+            mapping = [
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+            ]
+            result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
+            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
+
+            # Step 16j: Send the operate-only command as a group command to GroupID 0x0102.
+            self.step("16j")
+            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
+
+            # Step 16k: Validate the DUT rejected the group command via the GroupcastTesting event.
+            self.step("16k")
+            event_data = event_sub.wait_for_event_report_with_duplication(
+                Clusters.Groupcast.Events.GroupcastTesting,
+                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                timeout_sec=30
+            )
+            asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
+                                f"Expected GroupID to be null, got {event_data.groupID}")
+            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+            asserts.assert_equal(event_data.groupcastTestResult,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                 "GroupcastTesting event should report FailedAuth")
 
             # Step 16l: Disable GroupcastTesting to restore normal operation.
             self.step("16l")
@@ -540,6 +601,13 @@ class TC_SC_5_2(MatterBaseTest):
                 targets=NullValue),
         ]
         await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
+
+        # Controller cleanup at end
+        for group_id in [groupId0101, groupId0102, groupId0300, groupId0201]:
+            dev_ctrl.RemoveGroupInfo(group_id)
+        for keyset_id in [keySetId01a3, keySetId01a4]:
+            dev_ctrl.RemoveKeySet(keyset_id)
+        dev_ctrl.RemoveGroupKeys()
 
 
 if __name__ == "__main__":

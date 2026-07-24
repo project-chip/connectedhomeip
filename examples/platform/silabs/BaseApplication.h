@@ -42,13 +42,13 @@
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "demo-ui.h"
 #include "lcd.h"
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 /**********************************************************
  * Defines
@@ -61,6 +61,7 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class BaseApplicationDelegate : public AppDelegate, public chip::FabricTable::Delegate
 {
@@ -131,7 +132,7 @@ public:
      */
     static void PostEvent(const AppEvent * event);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     /**
      * @brief Return LCD object
      */
@@ -158,7 +159,7 @@ public:
      * @param screen The screen to be displayed
      */
     static void PostUpdateDisplayEvent(SilabsLCD::Screen_e screen);
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     /**
      * @brief Function called to start the LED light timer
