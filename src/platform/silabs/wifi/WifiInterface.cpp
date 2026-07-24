@@ -140,7 +140,6 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
 
     MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 
-
     TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
