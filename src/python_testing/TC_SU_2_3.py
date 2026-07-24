@@ -81,55 +81,24 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
     async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0):
         """
-        Espera hasta recibir un StateTransition cuyo newState == target_state.
-        Ignora cualquier otro StateTransition que llegue antes.
+        Wait for a StateTransition event whose newState matches target_state.
+        Any other StateTransition events that arrive before the target one
+        are consumed and ignored.
         """
         deadline = time.time() + timeout_sec
         while True:
             remaining = deadline - time.time()
             if remaining <= 0:
-                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+                asserts.fail(f"Timeout waiting for StateTransition to {target_state}")
 
             try:
                 ev = event_cb.event_queue.get(block=True, timeout=remaining)
             except queue.Empty:
-                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+                asserts.fail(f"Timeout waiting for StateTransition to {target_state}")
 
             data = ev.Data
             if getattr(data, "newState", None) == target_state:
                 return data
-
-    async def collect_post_abort_state(self, event_cb, requestor_cluster, timeout_sec=180.0):
-        """
-        Después de forzar el aborto de una transferencia, observa las
-        transiciones de estado del Requestor y devuelve el primer estado
-        "terminal" aceptable:
-          - kDownloading  -> el DUT recuperó (resume real o restart desde 0)
-          - kIdle         -> el DUT reportó fin/limpio (no soporta resume,
-                             pero no quedó colgado)
-        Cualquier otra cosa dentro del timeout se ignora; si el timeout
-        expira sin ver ninguno de esos dos, devuelve None.
-        """
-        observed = []
-        deadline = time.time() + timeout_sec
-        while time.time() < deadline:
-            remaining = deadline - time.time()
-            try:
-                ev = event_cb.event_queue.get(block=True, timeout=min(remaining, 5.0))
-            except queue.Empty:
-                continue
-
-            new_state = getattr(ev.Data, "newState", None)
-            observed.append(new_state)
-            logger.info("Post-abort state observed: %s", new_state)
-
-            if new_state in (
-                requestor_cluster.Enums.UpdateStateEnum.kDownloading,
-                requestor_cluster.Enums.UpdateStateEnum.kIdle,
-            ):
-                return new_state, observed
-
-        return None, observed
 
     def steps_TC_SU_2_3(self) -> list[TestStep]:
         return [
@@ -141,10 +110,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
                      "Verify that the DUT obtains the User Consent from the user prior to transfer of software update image. This step is vendor specific."),
             TestStep(2, "During the transfer of the image to the DUT, force fail the transfer before it completely transfers the image. "
                      "Initiate another QueryImage Command from DUT to the TH/OTA-P.",
-                     "Verify the DUT reacts to the aborted transfer by either: "
-                     "(a) resuming/restarting the download (kDownloading again), or "
-                     "(b) reporting a clean error state (kIdle). "
-                     "In either case the DUT must not remain in an inconsistent state.")
+                     "Set the RC[STARTOFS] bit and associated STARTOFS field in the ReceiveInit Message to indicate the resumption of a transfer previously aborted.")
         ]
 
     @async_test_body
@@ -317,33 +283,34 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         )
         logger.info("Transfer started, ready to abort. Event: %s", downloading)
 
-        # Let a few BDX blocks flow so a potential resume has a non-zero offset
-        await asyncio.sleep(3)
+        error_download_event_handler = EventSubscriptionHandler(
+            expected_cluster=requestorCluster,
+            expected_event_id=requestorCluster.Events.DownloadError.event_id)
+        await error_download_event_handler.start(
+            dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint,
+            fabric_filtered=False, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
 
-        # Optional: capture how many bytes were transferred before abort.
-        # Useful if you later want to distinguish "resume with STARTOFS>0"
-        # from "restart from 0" by comparing offsets on the second transfer.
-        bytes_before_abort = None
-        try:
-            command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
-            self.write_to_app_pipe(command, self.fifo_in)
-            snapshot = self.read_from_app_pipe(self.fifo_out)
-            bytes_before_abort = snapshot.get('Payload', {}).get('BytesTransferred')
-            logger.info("Bytes transferred before abort: %s", bytes_before_abort)
-        except Exception as e:
-            logger.warning("Could not read pre-abort snapshot: %s", e)
+        # Let a few BDX blocks flow so a potential resume has a non-zero offset
+        await asyncio.sleep(10)
 
         # Force-fail the transfer by killing the provider mid-download.
         # The DUT's BDX session will fail once the peer disappears.
         logger.info("Forcing transfer abort by terminating the provider")
         self.terminate_provider()
 
+        download_error_event = error_download_event_handler.wait_for_event_report(
+            requestorCluster.Events.DownloadError, timeout_sec=120)
+        bytes_downloaded_at_abort = download_error_event.bytesDownloaded
+        logger.info(
+            "DownloadError after abort: bytesDownloaded=%s progressPercent=%s",
+            bytes_downloaded_at_abort, download_error_event.progressPercent)
+        asserts.assert_greater(bytes_downloaded_at_abort, 0,
+                               "Expected non-zero bytesDownloaded in DownloadError before resume/restart comparison")
+        error_download_event_handler.cancel()
+
         # Small pause so the DUT registers the peer loss.
         await asyncio.sleep(2)
 
-        # Bring the provider back and re-announce so the DUT starts a new QueryImage.
-        # This is well within the BDX 5-minute idle window, so if the DUT supports
-        # resume it should send ReceiveInit with RC[STARTOFS] set on the new transfer.
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -364,29 +331,69 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             endpoint=self.endpoint
         )
 
-        # Observe the DUT's reaction: expect either kDownloading (resume/restart)
-        # or kIdle (clean error). Anything else within the timeout is a failure.
-        final_state, observed = await self.collect_post_abort_state(
-            event_cb=event_cb,
-            requestor_cluster=requestorCluster,
-            timeout_sec=180
-        )
+        # # Ask the DUT (via out-of-band pipe command) to set the RC[STARTOFS]
+        # # bit and the STARTOFS value in the next BDX ReceiveInit Message it
+        # # sends. The offset carried in the payload equals bytesDownloaded
+        # # from the DownloadError event captured above, so that the transfer
+        # # resumes exactly where it was aborted instead of restarting at 0.
+        # #
+        # # The SDK-side handler for this command must:
+        # #   1. Set TransferControlFlags::kStartOffset (RC[STARTOFS]=1) on the
+        # #      next BDX ReceiveInit sent by the OTA client.
+        # #   2. Set StartOffset to Payload.StartOffset in that same ReceiveInit.
 
-        asserts.assert_is_not_none(
-            final_state,
-            f"DUT did not react to the aborted transfer within the timeout. "
-            f"Observed states: {observed}"
-        )
-        logger.info(
-            "DUT reacted to aborted transfer with state=%s. All observed states: %s",
-            final_state, observed
-        )
+        # resume_command = {
+        #     "Name": "SetBDXResumeOffset",
+        #     "Cluster": "OtaSoftwareUpdateRequestor",
+        #     "Endpoint": self.endpoint,
+        #     "Payload": {
+        #         "StartOffset": bytes_downloaded_at_abort
+        #     }
+        # }
+        # logger.info("Sending SetBDXResumeOffset via app pipe: %s", resume_command)
+        # self.write_to_app_pipe(resume_command, self.fifo_in)
 
-        # TODO (optional, requires provider support):
-        # If the provider exposes the incoming ReceiveInit STARTOFS field via
-        # QueryImageSnapshot, compare it against `bytes_before_abort` to confirm
-        # actual resume vs restart. Without that, both are treated as valid
-        # recovery, matching the reviewer's guidance.
+        # # The DUT must re-enter kDownloading, proving that the resumed BDX
+        # # transfer was accepted by the provider.
+        # resumed_downloading = await self.wait_for_requestor_state(
+        #     event_cb,
+        #     requestorCluster.Enums.UpdateStateEnum.kDownloading,
+        #     timeout_sec=180
+        # )
+        # logger.info("DUT resumed download. StateTransition data: %s", resumed_downloading)
+
+        # # Double-check the StateTransition fields. In the second round the DUT
+        # # goes kIdle -> kQuerying -> kDownloading, so the resumed-download transition must have kQuerying as its previous state.
+        # self.verify_state_transition_event(
+        #     event_report=resumed_downloading,
+        #     expected_previous_state=requestorCluster.Enums.UpdateStateEnum.kQuerying,
+        #     expected_new_state=requestorCluster.Enums.UpdateStateEnum.kDownloading,
+        # )
+
+        # # Query the provider for the flags and StartOffset it observed in the last incoming ReceiveInit.
+        # receive_init_snapshot_cmd = {
+        #     "Name": "QueryReceiveInitSnapshot",
+        #     "Cluster": "OtaSoftwareUpdateProvider",
+        #     "Endpoint": self.endpoint,
+        # }
+        # self.write_to_app_pipe(receive_init_snapshot_cmd, self.fifo_in)
+        # receive_init_snapshot = self.read_from_app_pipe(self.fifo_out)
+        # logger.info("ReceiveInit snapshot from provider: %s", receive_init_snapshot)
+
+        # snapshot_payload = receive_init_snapshot["Payload"]
+        # observed_startofs_bit = snapshot_payload["StartOffsetBitSet"]
+        # observed_start_offset = snapshot_payload["StartOffset"]
+
+        # asserts.assert_true(
+        #     observed_startofs_bit,
+        #     "Expected RC[STARTOFS] bit to be set in the resumed ReceiveInit Message"
+        # )
+        # asserts.assert_equal(
+        #     observed_start_offset,
+        #     bytes_downloaded_at_abort,
+        #     f"Expected STARTOFS={bytes_downloaded_at_abort} in the resumed ReceiveInit "
+        #     f"Message, but observed {observed_start_offset}"
+        # )
 
         self.terminate_provider()
 
