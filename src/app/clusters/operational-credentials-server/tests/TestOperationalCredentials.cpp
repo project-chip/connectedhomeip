@@ -109,11 +109,6 @@ TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)
         .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
         .dnssdServer                = app::DnssdServer::Instance(),
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
-        .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformMgr(),
-        .eventManagement            = EventManagement::GetInstance(),
     };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
