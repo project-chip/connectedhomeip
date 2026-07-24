@@ -165,6 +165,10 @@ void chip::Zephyr::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.operationalKeystore = chip::Zephyr::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -177,13 +181,10 @@ void chip::Zephyr::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 #if CONFIG_OPERATIONAL_KEYSTORE
+    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
     chip::Zephyr::App::OperationalKeystore::Init(persistentStorage);
 #endif
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(persistentStorage);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     GetAppTask().PostInitMatterServerInstance();
     ChipLogDetail(DeviceLayer, "finishing init");
