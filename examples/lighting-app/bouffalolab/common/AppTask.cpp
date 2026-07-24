@@ -283,7 +283,8 @@ void AppTask::LightingUpdate(app_event_t status)
 
                 // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param +
                 // Status shape) so we do not depend on the internal cluster type.
-                if (Protocols::InteractionModel::Status::Success != Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
+                if (Protocols::InteractionModel::Status::Success !=
+                    Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
                 {
                     break;
                 }

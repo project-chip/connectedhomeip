@@ -273,8 +273,8 @@ Status Get(EndpointId endpoint, ColorModeEnum * value)
     // equivalent, so clamp it down to CurrentHueAndCurrentSaturation (§3.2.7.10 / §3.2.7.11).
     EnhancedColorModeEnum enhanced = cluster->GetEnhancedColorMode();
     *value                         = (enhanced == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
-                        ? ColorModeEnum::kCurrentHueAndCurrentSaturation
-                        : static_cast<ColorModeEnum>(enhanced);
+                                ? ColorModeEnum::kCurrentHueAndCurrentSaturation
+                                : static_cast<ColorModeEnum>(enhanced);
     return Status::Success;
 }
 } // namespace ColorMode

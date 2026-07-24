@@ -297,15 +297,18 @@ CHIP_ERROR AppTask::InitLight()
 
     // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param + Status
     // shape) so we do not depend on the internal cluster type.
-    if (Clusters::ColorControl::Attributes::CurrentX::Get(LIGHT_ENDPOINT, &currentx) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(LIGHT_ENDPOINT, &currentx) ==
+        Protocols::InteractionModel::Status::Success)
     {
         sCurrentX = currentx;
     }
-    if (Clusters::ColorControl::Attributes::CurrentY::Get(LIGHT_ENDPOINT, &currenty) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(LIGHT_ENDPOINT, &currenty) ==
+        Protocols::InteractionModel::Status::Success)
     {
         sCurrentY = currenty;
     }
-    if (Clusters::ColorControl::Attributes::CurrentHue::Get(LIGHT_ENDPOINT, &currenthue) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(LIGHT_ENDPOINT, &currenthue) ==
+        Protocols::InteractionModel::Status::Success)
     {
         sCurrentHue = currenthue;
     }
