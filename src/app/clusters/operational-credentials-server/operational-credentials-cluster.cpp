@@ -271,18 +271,11 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
     });
 }
 
-<<<<<<< HEAD:src/app/clusters/operational-credentials-server/operational-credentials-cluster.cpp
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                               TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                               FailSafeContext & failSafeContext,
-                                                              Credentials::DeviceAttestationCredentialsProvider * dacProvider)
-=======
-std::optional<DataModel::ActionReturnStatus>
-HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
-                 FabricTable & fabricTable, FailSafeContext & failSafeContext,
-                 Credentials::DeviceAttestationCredentialsProvider & dacProvider,
-                 const ByteSpan (&vendorReserved)[OperationalCredentialsCluster::kMaxCSRVendorReservedFields])
->>>>>>> ca48b666e4 (Add support to input vendor_reserved fields in NOCSR elements (#72811)):src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp
+                                                              Credentials::DeviceAttestationCredentialsProvider * dacProvider,
+                                                              const ByteSpan (&vendorReserved)[OperationalCredentialsCluster::kMaxCSRVendorReservedFields])
 {
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     Commands::CSRRequest::DecodableType commandData;
@@ -1215,12 +1208,8 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::CertificateChainRequest::Id:
         return HandleCertificateChainRequest(handler, request.path, input_arguments, GetDACProvider());
     case OperationalCredentials::Commands::CSRRequest::Id:
-<<<<<<< HEAD:src/app/clusters/operational-credentials-server/operational-credentials-cluster.cpp
-        return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
-=======
-        return HandleCSRRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
-                                mOpCredsContext.failSafeContext, mOpCredsContext.dacProvider, mCsrVendorReserved);
->>>>>>> ca48b666e4 (Add support to input vendor_reserved fields in NOCSR elements (#72811)):src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp
+        return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider(),
+                                mCsrVendorReserved);
     case OperationalCredentials::Commands::AddNOC::Id: {
         bool reportChange = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus =

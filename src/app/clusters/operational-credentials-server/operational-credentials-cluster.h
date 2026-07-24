@@ -93,7 +93,7 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
-<<<<<<< HEAD:src/app/clusters/operational-credentials-server/operational-credentials-cluster.h
+    ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields] = {};
 
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
@@ -101,9 +101,6 @@ private:
     SessionManager & GetSessionManager();
     DnssdServer & GetDNSSDServer();
     CommissioningWindowManager & GetCommissioningWindowManager();
-=======
-    ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields] = {};
->>>>>>> ca48b666e4 (Add support to input vendor_reserved fields in NOCSR elements (#72811)):src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.h
 };
 
 } // namespace Clusters
