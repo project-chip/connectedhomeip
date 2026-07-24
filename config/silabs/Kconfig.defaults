@@ -105,6 +105,14 @@ endif
 config SILABS_SISDK_RAIL_MULTIPROTOCOL
 	default y if !CHIP_WIFI
 
+# Currently the CHIPArgParser uses the standard getopt() API. Building with
+# Zephyr's shim getopt (which uses Zephyr's sys_getopt) does not work for this.
+# So let's disable it, and use directly the C library standard getopt.
+choice POSIX_AEP_CHOICE
+	default POSIX_AEP_CHOICE_NONE if CHIP_LIB_SHELL
+
+endchoice
+
 if SHELL
 
 config SHELL_STACK_SIZE
