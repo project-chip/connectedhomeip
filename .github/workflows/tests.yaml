@@ -948,6 +948,84 @@ jobs:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
 
+<<<<<<< HEAD
+=======
+      runs-on: ubuntu-latest
+      concurrency:
+          group: ${{ github.event_name == 'pull_request' && format('gh-pages-report-{0}', github.run_id) || 'gh-pages-deploy' }}
+          cancel-in-progress: false
+      permissions:
+          contents: write
+          checks: write
+
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v7
+
+          # The gh-pages Allure history is handled several times over on this
+          # runner (checkout, history copy, deploy clone), so free up disk first.
+          - name: Maximize runner disk
+            uses: ./.github/actions/maximize-runner-disk
+
+          - name: Download all JUnit XML results
+            uses: actions/download-artifact@v8
+            with:
+                pattern: junit-results-*
+                path: junit-results
+                merge-multiple: true
+
+          - name: Publish test results to GitHub Actions
+            uses: mikepenz/action-junit-report@v6
+            with:
+                report_paths: junit-results/**/*.xml
+                detailed_summary: true
+                require_tests: false
+                annotate_only: true
+
+          - name: Checkout gh-pages for Allure history
+            uses: actions/checkout@v7
+            with:
+                ref: gh-pages
+                path: gh-pages
+
+          - name: Generate Allure Report
+            uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
+            with:
+                allure_results: junit-results
+                allure_report: allure-report
+                gh_pages: gh-pages
+                allure_history: allure-history
+                subfolder: allure-report/ci_tests
+                keep_reports: 200
+                # This is the name that will show up in the Dashboard Overview
+                report_name: "CI Tests"
+
+          - name: Upload Allure Report
+            uses: actions/upload-artifact@v7
+            with:
+                name: allure-report-ci-repl
+                path: allure-report
+                retention-days: 30
+                if-no-files-found: warn
+
+          - name: Deploy to GitHub Pages
+            if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+            uses: peaceiris/actions-gh-pages@v4
+            with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: allure-history/allure-report/ci_tests
+                destination_dir: allure-report/ci_tests
+                # keep_files: false prunes reports beyond keep_reports from the
+                # branch; scoped to destination_dir, so other subfolders are kept.
+                keep_files: false
+
+          - name: Notify Slack on Failure
+            if: failure()
+            uses: ./.github/actions/notify-slack-failure
+            with:
+              slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+              job-name: "Deploy to GitHub Pages"
+>>>>>>> 71bfbfa618 ([CI] Fix Allure report generation (missing xargs in action base image) (#73225))
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
 
