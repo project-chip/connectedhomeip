@@ -60,11 +60,13 @@ const ZephyrConfig::Key kConfigKey_SetupPayload          = CONFIG_KEY(NAMESPACE_
 
 constexpr psa_key_id_t kDacPsaKeyId = 2;
 
-static constexpr ZephyrConfig::Key kProvisionRequestKey = CONFIG_KEY("sl-fct/provision-req");
-static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY("sl-fct/provision-ver");
+static constexpr ZephyrConfig::Key kProvisionRequestKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-req");
+static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-ver");
 
 constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
 constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
+
+constexpr size_t kDateStringLength = 8; // YYYYMMDD
 
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
 {
@@ -108,11 +110,13 @@ CHIP_ERROR Storage::Commit()
 
 CHIP_ERROR Storage::SetSerialNumber(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_SerialNum, value, len);
 }
 
 CHIP_ERROR Storage::GetSerialNumber(char * value, size_t max)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     size_t size = 0;
     return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_SerialNum, value, max, size);
 }
@@ -126,6 +130,7 @@ CHIP_ERROR Storage::GetVendorId(uint16_t & value)
 {
     uint32_t stored = 0;
     CHIP_ERROR err  = ZephyrConfig::ReadConfigValue(kConfigKey_VendorId, stored);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -140,17 +145,19 @@ CHIP_ERROR Storage::GetVendorId(uint16_t & value)
 
 CHIP_ERROR Storage::SetVendorName(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_VendorName, value, len);
 }
 
 CHIP_ERROR Storage::GetVendorName(char * value, size_t max)
 {
-    size_t name_len = 0;
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t name_len = 0;
 
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_VendorName, value, max, name_len);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err && strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME) > 0)
     {
         VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME);
@@ -169,6 +176,7 @@ CHIP_ERROR Storage::GetProductId(uint16_t & value)
 {
     uint32_t stored = 0;
     CHIP_ERROR err  = ZephyrConfig::ReadConfigValue(kConfigKey_ProductId, stored);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -183,17 +191,19 @@ CHIP_ERROR Storage::GetProductId(uint16_t & value)
 
 CHIP_ERROR Storage::SetProductName(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductName, value, len);
 }
 
 CHIP_ERROR Storage::GetProductName(char * value, size_t max)
 {
-    size_t size = 0;
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size = 0;
 
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductName, value, max, size);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err && strlen(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME) > 0)
     {
         VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME);
@@ -205,33 +215,39 @@ CHIP_ERROR Storage::GetProductName(char * value, size_t max)
 
 CHIP_ERROR Storage::SetProductLabel(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductLabel, value, len);
 }
 
 CHIP_ERROR Storage::GetProductLabel(char * value, size_t max)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     size_t size = 0;
     return ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductLabel, value, max, size);
 }
 
 CHIP_ERROR Storage::SetProductURL(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_ProductUrl, value, len);
 }
 
 CHIP_ERROR Storage::GetProductURL(char * value, size_t max)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     size_t size = 0;
     return ZephyrConfig::ReadConfigValueStr(kConfigKey_ProductUrl, value, max, size);
 }
 
 CHIP_ERROR Storage::SetPartNumber(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_PartNumber, value, len);
 }
 
 CHIP_ERROR Storage::GetPartNumber(char * value, size_t max)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     size_t size = 0;
     return ZephyrConfig::ReadConfigValueStr(kConfigKey_PartNumber, value, max, size);
 }
@@ -245,6 +261,7 @@ CHIP_ERROR Storage::GetHardwareVersion(uint16_t & value)
 {
     uint32_t stored = 0;
     CHIP_ERROR err  = ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_HardwareVersion, stored);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION) && CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -259,16 +276,18 @@ CHIP_ERROR Storage::GetHardwareVersion(uint16_t & value)
 
 CHIP_ERROR Storage::SetHardwareVersionString(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kConfigKey_HardwareVersionString, value, len);
 }
 
 CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 {
-    size_t size = 0;
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t size    = 0;
     CHIP_ERROR err = ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err && strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING) > 0)
     {
         VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
@@ -280,21 +299,25 @@ CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 
 CHIP_ERROR Storage::SetManufacturingDate(const char * value, size_t len)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_ManufacturingDate, value, len);
 }
 
 CHIP_ERROR Storage::GetManufacturingDate(uint8_t * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_ManufacturingDate, reinterpret_cast<char *>(value), max, size);
 }
 
 CHIP_ERROR Storage::SetPersistentUniqueId(const uint8_t * value, size_t size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueBin(ZephyrConfig::kConfigKey_UniqueId, value, size);
 }
 
 CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueBin(ZephyrConfig::kConfigKey_UniqueId, value, max, size);
 }
 
@@ -311,6 +334,7 @@ CHIP_ERROR Storage::GetSetupDiscriminator(uint16_t & value)
 {
     uint32_t stored = 0;
     CHIP_ERROR err  = ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_SetupDiscriminator, stored);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -332,6 +356,7 @@ CHIP_ERROR Storage::SetSpake2pIterationCount(uint32_t value)
 CHIP_ERROR Storage::GetSpake2pIterationCount(uint32_t & value)
 {
     CHIP_ERROR err = ZephyrConfig::ReadConfigValue(ZephyrConfig::kConfigKey_Spake2pIterationCount, value);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -356,21 +381,25 @@ CHIP_ERROR Storage::GetSetupPasscode(uint32_t & value)
 
 CHIP_ERROR Storage::SetSpake2pSalt(const char * value, size_t size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_Spake2pSalt, value, size);
 }
 
 CHIP_ERROR Storage::GetSpake2pSalt(char * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_Spake2pSalt, value, max, size);
 }
 
 CHIP_ERROR Storage::SetSpake2pVerifier(const char * value, size_t size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(ZephyrConfig::kConfigKey_Spake2pVerifier, value, size);
 }
 
 CHIP_ERROR Storage::GetSpake2pVerifier(char * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueStr(ZephyrConfig::kConfigKey_Spake2pVerifier, value, max, size);
 }
 
@@ -467,21 +496,25 @@ CHIP_ERROR Storage::GetCredentialsBaseAddress(uint32_t & addr)
 
 CHIP_ERROR Storage::SetProvisionVersion(const char * value, size_t size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueStr(kProvisionVersionKey, value, size);
 }
 
 CHIP_ERROR Storage::GetProvisionVersion(char * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueStr(kProvisionVersionKey, value, max, size);
 }
 
 CHIP_ERROR Storage::SetSetupPayload(const uint8_t * value, size_t size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::WriteConfigValueBin(kConfigKey_SetupPayload, value, size);
 }
 
 CHIP_ERROR Storage::GetSetupPayload(uint8_t * value, size_t max, size_t & size)
 {
+    VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return ZephyrConfig::ReadConfigValueBin(kConfigKey_SetupPayload, value, max, size);
 }
 
@@ -607,7 +640,6 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value, size_t size)
 
 CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    constexpr size_t kDateStringLength         = 8; // YYYYMMDD
     char date[kManufacturingDateLengthMax + 1] = { 0 };
     size_t dateLen                             = 0;
 
@@ -637,7 +669,6 @@ CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8
 
 CHIP_ERROR Storage::GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
 {
-    constexpr size_t kDateStringLength         = 8; // YYYYMMDD
     char date[kManufacturingDateLengthMax + 1] = { 0 };
     size_t dateLen                             = 0;
 
@@ -660,6 +691,7 @@ CHIP_ERROR Storage::GetRotatingDeviceIdUniqueId(MutableByteSpan & value)
     size_t size = 0;
 
     CHIP_ERROR err = GetPersistentUniqueId(value.data(), value.size(), size);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -681,8 +713,9 @@ CHIP_ERROR Storage::GetSpake2pSalt(MutableByteSpan & value)
     size_t sizeB64                             = 0;
 
     CHIP_ERROR err = GetSpake2pSalt(saltB64, sizeof(saltB64), sizeB64);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err && strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT) > 0)
     {
         sizeB64 = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
         VerifyOrReturnError(sizeB64 <= sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -710,8 +743,9 @@ CHIP_ERROR Storage::GetSpake2pVerifier(MutableByteSpan & outValue, size_t & outS
     size_t sizeB64                                     = 0;
 
     CHIP_ERROR err = GetSpake2pVerifier(verifierB64, sizeof(verifierB64), sizeB64);
+    // If value not found in storage, use the compile-time default if available. Otherwise, propagate error unchanged.
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
-    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err && strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER) > 0)
     {
         sizeB64 = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
         VerifyOrReturnError(sizeB64 <= sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
