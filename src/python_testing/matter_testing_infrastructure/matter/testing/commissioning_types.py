@@ -60,13 +60,13 @@ class CustomCommissioningParameters:
         passcode (Optional[int]): With ``discriminator``, for manual code synthesis.
     """
 
-    commissioningParameters: Optional[Any] = None
-    randomDiscriminator: Optional[int] = None
-    setup_code: Optional[str] = None
-    discriminator: Optional[int] = None
-    passcode: Optional[int] = None
+    commissioningParameters: Any | None = None
+    randomDiscriminator: int | None = None
+    setup_code: str | None = None
+    discriminator: int | None = None
+    passcode: int | None = None
 
-    def resolve_setup_code(self, dev_ctrl: Any) -> Optional[str]:
+    def resolve_setup_code(self, dev_ctrl: Any) -> str | None:
         """Return a setup string for PASE, or None if credentials are incomplete."""
         if self.setup_code:
             return self.setup_code

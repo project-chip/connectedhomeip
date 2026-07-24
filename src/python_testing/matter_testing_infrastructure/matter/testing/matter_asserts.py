@@ -378,8 +378,8 @@ async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    commissioning_params: Optional[CustomCommissioningParameters] = None,
-    discovery_timeout_sec: Optional[float] = None,
+    commissioning_params: CustomCommissioningParameters | None = None,
+    discovery_timeout_sec: float | None = None,
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -396,12 +396,12 @@ async def assert_factory_fresh(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
-        commissioning_params: Optional :class:`CustomCommissioningParameters`. When the device
+        commissioning_params: class:`CustomCommissioningParameters`. When the device
             is not operational on this fabric via DNS-SD, a session is established with
             :func:`matter.testing.commissioning.establish_pase_or_case_session` before reading
             fabric count. When DNS-SD already shows the device operational, no extra session
             setup is performed.
-        discovery_timeout_sec: Optional DNS-SD timeout (seconds) passed to operational discovery
+        discovery_timeout_sec: DNS-SD timeout (seconds) passed to operational discovery
             and :func:`matter.testing.commissioning.get_commissioned_fabric_count`; defaults to
             the infrastructure default when omitted.
 
@@ -454,8 +454,8 @@ async def assert_fabric_count(
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    commissioning_params: Optional[CustomCommissioningParameters] = None,
-    discovery_timeout_sec: Optional[float] = None,
+    commissioning_params: CustomCommissioningParameters | None = None,
+    discovery_timeout_sec: float | None = None,
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -474,12 +474,12 @@ async def assert_fabric_count(
         node_id: Node ID of the device to check
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
-        commissioning_params: Optional :class:`CustomCommissioningParameters`. When the device
+        commissioning_params: class:`CustomCommissioningParameters`. When the device
             is not operational on this fabric via DNS-SD, a session is established with
             :func:`matter.testing.commissioning.establish_pase_or_case_session` before reading
             fabric count. When DNS-SD already shows the device operational, no extra session
             setup is performed.
-        discovery_timeout_sec: Optional DNS-SD timeout (seconds); same as
+        discovery_timeout_sec: DNS-SD timeout (seconds); same as
             :func:`assert_factory_fresh`.
 
     Raises:

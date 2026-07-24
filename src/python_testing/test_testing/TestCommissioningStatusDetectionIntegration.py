@@ -60,7 +60,7 @@ from python_path import PythonPath
 
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import _is_device_operational_via_dnssd, get_commissioned_fabric_count, is_commissioned
+from matter.testing.commissioning import get_commissioned_fabric_count, is_commissioned, is_device_operational_on_fabric_dnssd
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -145,7 +145,7 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         self.start_th_server()
 
         LOGGER.info("Checking DNS-SD for factory-fresh device")
-        is_operational = await _is_device_operational_via_dnssd(
+        is_operational = await is_device_operational_on_fabric_dnssd(
             self.default_controller,
             self.th_server_local_nodeid
         )
@@ -194,7 +194,7 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
 
         LOGGER.info("Checking DNS-SD for commissioned device")
 
-        is_operational = await _is_device_operational_via_dnssd(
+        is_operational = await is_device_operational_on_fabric_dnssd(
             self.default_controller,
             self.th_server_local_nodeid
         )

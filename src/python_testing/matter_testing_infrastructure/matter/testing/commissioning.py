@@ -553,7 +553,7 @@ async def establish_pase_or_case_session(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID for the session
-        commissioning_params: Optional :class:`CustomCommissioningParameters` with setup or
+        commissioning_params: :class:`CustomCommissioningParameters` with setup or
             commissioning-window data for ``FindOrEstablishPASESession``. If omitted or
             :meth:`CustomCommissioningParameters.resolve_setup_code` returns None, only CASE
             is attempted.
