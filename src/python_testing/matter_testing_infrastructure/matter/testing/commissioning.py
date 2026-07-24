@@ -22,9 +22,10 @@ This module contains classes and functions designed to handle the commissioning 
 import asyncio
 import contextlib
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -41,7 +42,7 @@ LOGGER.setLevel(logging.INFO)
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 
-def _successful_task_in_done_set(done: set[asyncio.Task]) -> Optional[asyncio.Task]:
+def _successful_task_in_done_set(done: set[asyncio.Task]) -> asyncio.Task | None:
     """
     Return a task from *done* that finished without raising, if any.
 
@@ -537,7 +538,7 @@ async def _is_device_commissionable_via_dnssd(
 async def establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    commissioning_params: Optional[CustomCommissioningParameters] = None
+    commissioning_params: CustomCommissioningParameters | None = None
 ) -> EstablishedSessionKind:
     """
     Establish a session to the device by trying PASE and CASE in parallel.
