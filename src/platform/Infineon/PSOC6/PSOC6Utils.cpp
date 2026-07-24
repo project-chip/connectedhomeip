@@ -729,21 +729,24 @@ CHIP_ERROR PSOC6Utils::ping_init(void)
     CHIP_ERROR err               = CHIP_NO_ERROR;
     struct netif * net_interface = NULL;
     net_interface                = (netif *) cy_network_get_nw_interface(CY_NETWORK_WIFI_STA_INTERFACE, 0);
-    ping_target                  = &net_interface->gw;
+    if (net_interface)
+    {
+        ping_target                  = &net_interface->gw;
 
-    /* Ping to Gateway address */
-    if (ping_target)
-    {
+        /* Ping to Gateway address */
+        if (ping_target)
+        {
 #if PING_USE_SOCKETS
-        ping_socket();
+            ping_socket();
 #else
-        ping_raw();
+            ping_raw();
 #endif
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "ping_thread failed: Invalid IP address for Ping");
-        err = CHIP_ERROR_INTERNAL;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "ping_thread failed: Invalid IP address for Ping");
+            err = CHIP_ERROR_INTERNAL;
+        }
     }
     return err;
 }
