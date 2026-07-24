@@ -1349,9 +1349,8 @@
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* StartUpMode */                                                                    \
         { ZAP_EMPTY_DEFAULT(), 0x00000005, 1, ZAP_TYPE(INT8U),                                                                     \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(READABLE) |                     \
-              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* OnMode */                                                                         \
-        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
-          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */                                  \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) },                                                       /* OnMode */                   \
+        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) }, /* FeatureMap */               \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */                             \
                                                                                                                                    \
@@ -4095,7 +4094,7 @@
       .clusterId = 0x00000050, \
       .attributes = ZAP_ATTRIBUTE_INDEX(335), \
       .attributeCount = 9, \
-      .clusterSize = 68, \
+      .clusterSize = 72, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayModeSelectServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 129 ), \
