@@ -191,8 +191,7 @@ void InvokeContentLauncherPlayPreset(matter::casting::memory::Strong<matter::cas
     matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> * playPresetCommand =
         static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> *>(
             contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id));
-    VerifyOrReturn(playPresetCommand != nullptr,
-                   ChipLogError(AppServer, "PlayPreset command not found on ContentLauncherCluster"));
+    VerifyOrReturn(playPresetCommand != nullptr, ChipLogError(AppServer, "PlayPreset command not found on ContentLauncherCluster"));
 
     // create the PlayPreset request
     chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type request;
@@ -226,8 +225,8 @@ void ReadContentLauncherMovable(matter::casting::memory::Strong<matter::casting:
     // call Read on movableAttribute while passing in success/failure callbacks
     movableAttribute->Read(
         nullptr,
-        [](void * context, chip::Optional<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType>
-                               before,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType> before,
            chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType after) {
             ChipLogProgress(AppServer, "Read Movable value: %d", static_cast<int>(after));
         },
@@ -267,8 +266,8 @@ void InvokeMediaFileManagementAddFile(matter::casting::memory::Strong<matter::ca
             }
             else
             {
-                ChipLogProgress(AppServer, "AddFile Success with status: %d, fileID: %" PRIu64,
-                                static_cast<int>(response.status), response.fileID.Value());
+                ChipLogProgress(AppServer, "AddFile Success with status: %d, fileID: %" PRIu64, static_cast<int>(response.status),
+                                response.fileID.Value());
             }
         },
         [](void * context, CHIP_ERROR error) {

@@ -3386,7 +3386,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ContentAppObserver
 
-
 namespace MediaFileManagement {
 namespace Attributes {
 
