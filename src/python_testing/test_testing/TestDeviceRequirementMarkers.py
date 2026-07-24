@@ -33,7 +33,7 @@ from pathlib import Path
 
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import (CertificationUnitTestNoDevice, MatterBaseTest, MatterTestCommissionedDevice,
-                                            MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement)
+                                           MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement)
 
 _MARKERS = (
     MatterTestCommissionedDevice,
