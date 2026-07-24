@@ -119,10 +119,20 @@ class TC_DA_1_1(MatterBaseTest):
         if not setupPayloadInfo:
             asserts.fail(f"Setup payload info is required for commissioning, found '{setupPayloadInfo}'")
 
-        # Build setup parameters for commissioning
+        # Vendor ID and Product ID are set to 0x0000, the pair the spec prescribes for
+        # commissioner-generated onboarding payloads not bound to a product identity.
+        vendor_id = 0
+        product_id = 0
+
+        # Build setup parameters for commissioning.
+        # - With no VID/PID claim in the QR, PASE discovery matches the DUT on long
+        #   discriminator and passcode alone instead of rejecting DUTs whose advertised
+        #   VID/PID differ from fabricated values.
         setup_params = SetupParameters(
             discriminator=setupPayloadInfo[0].filter_value,
-            passcode=setupPayloadInfo[0].passcode
+            passcode=setupPayloadInfo[0].passcode,
+            vendor_id=vendor_id,
+            product_id=product_id
         )
 
         # Setup
