@@ -30,34 +30,6 @@
 #include <optional>
 #include <thread>
 
-enum class VerifyMode
-{
-    None,
-    Code,
-    CodePaseOnly,
-    Ble,
-    SoftAP,
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF,
-#endif
-    AlreadyDiscovered,
-    AlreadyDiscoveredByIndex,
-    AlreadyDiscoveredByIndexWithCode,
-    OnNetwork,
-    Nfc,
-#if CHIP_SUPPORT_THREAD_MESHCOP
-    ThreadMeshcop,
-#endif
-};
-
-enum class VerifyNetworkType
-{
-    None,
-    WiFi,
-    Thread,
-    WiFiOrThread,
-};
-
 class VerifyCommand : public CHIPCommand,
                       public chip::Controller::DevicePairingDelegate,
                       public chip::Controller::DeviceDiscoveryDelegate,
