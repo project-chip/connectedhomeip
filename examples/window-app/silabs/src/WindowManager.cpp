@@ -602,7 +602,10 @@ CHIP_ERROR WindowManager::Init()
     LEDWidget::InitGpio();
     mActionLED.Init(APP_ACTION_LED);
     AppTask::GetAppTask().LinkAppLed(&mActionLED);
-
+#ifdef DISPLAY_ENABLED
+    // Binds SilabsLCD for LcdPainter::Paint; runs once after GetLCD().Init() in BaseInit().
+    static LcdPainter sLcdRegistration(AppTask::GetAppTask().GetLCD());
+#endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;
@@ -691,7 +694,7 @@ void WindowManager::UpdateLCD()
 
         if (!tilt.IsNull() && !lift.IsNull())
         {
-            LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, lift.Value(), tilt.Value(), mIcon);
+            LcdPainter::Paint(type, lift.Value(), tilt.Value(), mIcon);
         }
     }
 }
