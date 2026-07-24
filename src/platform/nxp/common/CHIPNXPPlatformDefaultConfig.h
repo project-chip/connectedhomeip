@@ -288,8 +288,3 @@
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 #endif // CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
 #endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-
-#ifndef NXP_USE_MML
-/* Do not use Memory Manager Light for dynamic memory allocation by default. */
-#define NXP_USE_MML 0
-#endif // NXP_USE_MML

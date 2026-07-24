@@ -490,6 +490,16 @@
 - (MCMediaPlaybackClusterAvailableTextTracksAttribute * _Nullable)availableTextTracksAttribute;
 
 /**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterAvailableCommandsAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterAvailableCommandsAttribute * _Nullable)availableCommandsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCMediaPlaybackClusterContentInfoAttribute if supported, nil otherwise.
+ */
+- (MCMediaPlaybackClusterContentInfoAttribute * _Nullable)contentInfoAttribute;
+
+/**
  * @brief Returns non-nil pointer to MCMediaPlaybackClusterGeneratedCommandListAttribute if supported, nil otherwise.
  */
 - (MCMediaPlaybackClusterGeneratedCommandListAttribute * _Nullable)generatedCommandListAttribute;
@@ -570,6 +580,16 @@
  */
 - (MCContentLauncherClusterLaunchURLCommand * _Nullable)launchURLCommand;
 
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterContentReplicationRequestCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterContentReplicationRequestCommand * _Nullable)contentReplicationRequestCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPlayPresetCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPlayPresetCommand * _Nullable)playPresetCommand;
+
 // ContentLauncher cluster attributes:
 
 /**
@@ -581,6 +601,16 @@
  * @brief Returns non-nil pointer to MCContentLauncherClusterSupportedStreamingProtocolsAttribute if supported, nil otherwise.
  */
 - (MCContentLauncherClusterSupportedStreamingProtocolsAttribute * _Nullable)supportedStreamingProtocolsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterMovableAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterMovableAttribute * _Nullable)movableAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPresetsAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPresetsAttribute * _Nullable)presetsAttribute;
 
 /**
  * @brief Returns non-nil pointer to MCContentLauncherClusterGeneratedCommandListAttribute if supported, nil otherwise.

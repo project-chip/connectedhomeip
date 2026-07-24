@@ -14,6 +14,11 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
@@ -311,4 +316,40 @@ source_set("commissioner-main") {
   }
 
   public_configs = [ ":app-main-config" ]
+}
+
+config("pw_rpc_config") {
+  include_dirs = [ "${chip_root}/examples/common" ]
+}
+
+if (chip_enable_pw_rpc) {
+  # This target compiles the generic Pigweed RPC server initialization and socket/HDLC communication code.
+  # It does not compile service registrations or carry final executable link dependencies.
+  # The application target must add Rpc.cpp, specific service dependencies, and service-specific defines.
+  source_set("pw_rpc") {
+    sources = [ "system_rpc_server.cc" ]
+
+    public_deps = [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sync:mutex",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+      "${chip_root}/src/platform",
+    ]
+
+    public_configs = [
+      ":app-main-config",
+      ":pw_rpc_config",
+    ]
+  }
 }

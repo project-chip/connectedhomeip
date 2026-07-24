@@ -156,7 +156,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     auto countdown_time = delegate->GetCountdownTime();
 
-    if (countdown_time.IsNull() || countdown_time.Value() > 0)
+    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
@@ -167,7 +167,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             delegate->mPausedTime++;
         }
     }
-    else
+    else if (!countdown_time.IsNull() && countdown_time.Value() <= 0)
     {
         OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         delegate->HandleStopStateCallback(noError);
@@ -305,7 +305,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
     return ret;
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
                                                             MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -326,6 +326,20 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
         to_underlying(OperationalState::OperationalStateEnum::kStopped)));
 
     ChipLogProgress(Zcl, "Registered global delegate and instance for operational state on endpoint %d.", endpointId);
+}
+
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
+                                                            MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOperationalStateTableSize)
+    {
+        return;
+    }
+
+    gOperationalStateInstanceTable[epIndex]->Shutdown();
+    gOperationalStateInstanceTable[epIndex].reset();
+    gOperationalStateDelegateTable[epIndex].reset();
 }
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

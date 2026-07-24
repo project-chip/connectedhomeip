@@ -143,7 +143,7 @@ brew install sdl2
 
 Complete the following steps:
 
-1. Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+1. Using `rpi-imager`, install the Ubuntu _24.04_ 64-bit _server_ OS for arm64
    architectures on a micro SD card.
 1. Boot the SD card.
 1. Log in with the default user account "ubuntu" and password "ubuntu"
@@ -160,9 +160,10 @@ Complete the following steps:
 #### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
-controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
-the features required by the Matter application by default. To enable these
-features, you need to enable experimental Bluetooth support in BlueZ.
+controller. The BlueZ version that comes with Ubuntu 22.04 and 24.04 does not
+support all the features required by the Matter application by default. To
+enable these features, you need to enable experimental Bluetooth support in
+BlueZ.
 
 Also disable the battery plugin from BlueZ, because iOS devices advertises a
 battery service via BLE, which requires pairing if accessed. BlueZ includes a

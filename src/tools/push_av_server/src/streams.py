@@ -5,7 +5,6 @@ Stream management service for handling media streams and sessions.
 import contextlib
 import json
 import logging
-from typing import Optional
 
 from models import Stream, SupportedIngestInterface, UploadError, ValidUpload
 from utils import WorkingDirectory
@@ -54,7 +53,7 @@ class StreamService:
         log.info("Stream created: id=%s, interface=%s", stream_id, interface)
         return stream
 
-    def get_stream(self, stream_id: int) -> Optional[Stream]:
+    def get_stream(self, stream_id: int) -> Stream | None:
         """Get a stream by ID."""
         return self.streams.get(str(stream_id))
 
@@ -88,7 +87,7 @@ class StreamService:
         self.streams[str(stream.id)] = stream
         self._save_stream(stream)
 
-    def add_error_upload(self, stream: Stream, session_id: Optional[int], file_path: str, reasons: list[str]):
+    def add_error_upload(self, stream: Stream, session_id: int | None, file_path: str, reasons: list[str]):
         """Add a file to error_uploads if it doesn't already exist."""
         if not self._is_file_in_error_uploads(stream, file_path):
             # Check if file exists in valid_uploads and remove it
@@ -96,7 +95,7 @@ class StreamService:
                 stream.valid_uploads = [valid for valid in stream.valid_uploads if valid.file_path != file_path]
             stream.error_uploads.append(UploadError(session_id=session_id, file_path=file_path, reasons=reasons))
 
-    def add_valid_upload(self, stream: Stream, session_id: Optional[int], file_path: str):
+    def add_valid_upload(self, stream: Stream, session_id: int | None, file_path: str):
         """Add a file to valid_uploads if it doesn't already exist and isn't in error_uploads."""
         if not self._is_file_in_valid_uploads(stream, file_path) and not self._is_file_in_error_uploads(stream, file_path):
             stream.valid_uploads.append(ValidUpload(session_id=session_id, file_path=file_path))

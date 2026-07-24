@@ -169,13 +169,17 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 }
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
-    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
-                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
+    std::vector<app::DataModel::AttributeEntry> expectedAttributes = {
+        DataModel::AttributeEntry(GroupKeyManagement::Attributes::GroupKeyMap::Id,
+                                  BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                                             DataModel::AttributeQualityFlags::kChangesOmitted),
+                                  Access::Privilege::kView, Access::Privilege::kManage),
+        GroupKeyManagement::Attributes::GroupTable::kMetadataEntry,
+        GroupKeyManagement::Attributes::MaxGroupsPerFabric::kMetadataEntry,
+        GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::kMetadataEntry,
+    };
 
-    // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    // TODO: Fix the assert below including the optional attribute.
-    // The assert is disabled because an optional attribute, GroupcastAdoption, was added to the cluster.
-    // ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, std::move(mandatoryAttributes)));
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, expectedAttributes));
 }
 
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs

@@ -92,6 +92,10 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/DeviceCallbacks.cpp
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp

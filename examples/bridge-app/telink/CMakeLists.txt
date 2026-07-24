@@ -50,6 +50,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c
                ${CHIP_ROOT}/examples/bridge-app/bridge-common/src/bridged-actions-stub.cpp)
 
 chip_configure_data_model(app

@@ -66,8 +66,8 @@ constexpr CommandId kInternalOffTransition = 0xFFFFFFFF; // Sentinel value to id
 
 } // namespace
 
-LevelControlCluster::LevelControlCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
+LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & config) :
+    DefaultServerCluster({ endpoint, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
     mOnLevel(DataModel::Nullable<uint8_t>()),
     mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),

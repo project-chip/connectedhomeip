@@ -15,9 +15,9 @@
 import logging
 import os
 import xml.etree.ElementTree
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import MutableMapping, Optional, Union
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -67,7 +67,7 @@ class ClusterActionEnum(Enum):
 @dataclass
 class ServerClusterRequirement:
     action: ClusterActionEnum
-    id: Union[str, int]
+    id: str | int
 
 
 def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
@@ -203,7 +203,7 @@ class LintRulesContext:
     def Deny(self, what: ClusterAttributeDeny):
         self._required_attributes_rule.Deny(what)
 
-    def FindClusterCode(self, name: str) -> Optional[tuple[str, int]]:
+    def FindClusterCode(self, name: str) -> tuple[str, int] | None:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
@@ -315,7 +315,7 @@ class LintRulesTransformer(Transformer):
     def instruction(self, instruction):
         return Discard
 
-    def all_endpoint_rule(self, rules: list[Union[AttributeRequirement, ClusterAttributeDeny]]):
+    def all_endpoint_rule(self, rules: list[AttributeRequirement | ClusterAttributeDeny]):
         for rule in rules:
             if type(rule) is AttributeRequirement:
                 self.context.RequireAttribute(rule)

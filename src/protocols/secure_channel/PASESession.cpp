@@ -547,6 +547,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     // Initiator's random value
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
     VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 

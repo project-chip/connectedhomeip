@@ -57,10 +57,15 @@ template("chip_fuzz_target") {
       if (oss_fuzz) {
         fuzz_configs += [ "//build/config/compiler:oss_fuzz" ]
       } else {
-        fuzz_configs += [
-          "//build/config/compiler:libfuzzer_fuzzing",
-          "//build/config/compiler:sanitize_address",
-        ]
+        fuzz_configs += [ "//build/config/compiler:libfuzzer_fuzzing" ]
+
+        # ASan is the default sanitizer for local libFuzzer builds. MSAN (is_msan) is
+        # mutually exclusive with ASan and is applied globally via sanitize_default
+        # (which pulls in the instrumented-sysroot libc++), so only add ASan here when
+        # not building MSAN.
+        if (!is_msan) {
+          fuzz_configs += [ "//build/config/compiler:sanitize_address" ]
+        }
       }
 
       if (defined(public_configs)) {

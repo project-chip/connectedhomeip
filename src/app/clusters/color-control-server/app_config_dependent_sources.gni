@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "color-control-server.cpp",
-  "color-control-server.h",
+  "codegen/color-control-server.cpp",
+  "codegen/color-control-server.h",
 ]

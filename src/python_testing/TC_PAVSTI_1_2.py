@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/pavsti_1_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
@@ -32,6 +32,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/pavsti_1_2_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -46,6 +47,7 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -54,7 +56,7 @@ log = logging.getLogger(__name__)
 
 class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     def desc_TC_PAVSTI_1_2(self) -> str:
-        return "[TC-PAVSTI-1.2] Verify transmission with trigger type as Continuous and ensure privacy settings are checked if supported."
+        return "[TC-PAVSTI-1.2] Verify CMAF Interface-2 DASH-based ingestion with continuous trigger type and privacy settings validation."
 
     def pics_TC_PAVSTI_1_2(self):
         return ["PAVST.S"]
@@ -113,53 +115,93 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
             TestStep(
                 5,
-                "TH sends the AllocatePushTransport command with valid parameters and TriggerType = Continuous",
-                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID.",
+                "TH sends the AllocatePushTransport command with valid parameters including TriggerType = Continuous, StreamUsage = Recording and CMAFInterface = Interface2DASH for the CMAF container options.",
+                "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions. Store ConnectionID as aConnectionID.",
             ),
             TestStep(
                 6,
-                "TH writes SoftRecordingPrivacyModeEnabled as True",
-                "DUT responds with SUCCESS status code.",
+                "TH establishes a subscription to all events from the Push AV Stream Transport Cluster.",
+                "Subscription must be successfully established.",
             ),
             TestStep(
                 7,
-                "TH writes SoftLiveStreamPrivacyModeEnabled as True",
-                "DUT responds with SUCCESS status code.",
+                "If the DUT supports HardPrivacyModeOn attribute, enable HardPrivacyModeOn by following manufacturer-provided instructions.",
+                "HardPrivacyModeOn in DUT is must be set to True.",
             ),
             TestStep(
                 8,
-                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active",
+                "If the DUT supports HardPrivacyModeOn attribute, TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
                 "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
                 9,
-                "TH writes SoftRecordingPrivacyModeEnabled as False",
-                "DUT responds with SUCCESS status code.",
+                "If the DUT supports HardPrivacyModeOn attribute, disable HardPrivacyModeOn by following manufacturer-provided instructions.",
+                "HardPrivacyModeOn in DUT is set to False.",
             ),
             TestStep(
                 10,
-                "TH writes SoftLiveStreamPrivacyModeEnabled as False",
+                "TH writes SoftRecordingPrivacyModeEnabled as True in the Camera AV Stream Management Cluster.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 11,
                 "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
-                "DUT responds with SUCCESS status code.",
+                "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
                 12,
-                "View the video stream in TH UI",
-                "Verify the transmitted video stream is of CMAF Format.",
+                "TH writes SoftRecordingPrivacyModeEnabled as False in the Camera AV Stream Management Cluster.",
+                "DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 13,
-                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
+                "TH sends ModifyPushTransport command with ConnectionID = aConnectionID and updated TransportOptions with StreamUsage = LiveView.",
                 "DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 14,
-                "View the video stream in TH UI",
-                "Verify the transmission of video stream has stopped.",
+                "TH writes SoftLivestreamPrivacyModeEnabled as True in the Camera AV Stream Management Cluster.",
+                "DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                15,
+                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
+                "DUT responds with INVALID_IN_STATE status code.",
+            ),
+            TestStep(
+                16,
+                "TH writes SoftLivestreamPrivacyModeEnabled as False in the Camera AV Stream Management Cluster.",
+                "DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                17,
+                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Active.",
+                "DUT responds with SUCCESS status code and begins CMAF transmission.",
+            ),
+            TestStep(
+                18,
+                "TH verifies that a PushTransportBegin event was received.",
+                "TH validates that connectionID = aConnectionID.",
+            ),
+            TestStep(
+                19,
+                "TH displays the video playback prompt. The prompt must list all uploaded content and identify any non-conforming uploads.",
+                "Live CMAF content must play and the upload sequence must conform to Matter and CMAF Interface-2 DASH specification.",
+            ),
+            TestStep(
+                20,
+                "TH sends the SetTransportStatus command with ConnectionID = aConnectionID and TransportStatus = Inactive.",
+                "DUT responds with SUCCESS status code and stops transmission.",
+            ),
+            TestStep(
+                21,
+                "TH verifies that a PushTransportEnd event was received.",
+                "TH validates that connectionID = aConnectionID.",
+            ),
+            TestStep(
+                22,
+                "TH displays the video playback prompt again. The prompt must list all uploaded content and identify any non-conforming uploads.",
+                "CMAF content must play successfully from uploaded files. DUT shall not upload any new files. All extended paths must conform to the Matter-defined format specified in step 19.",
             ),
         ]
 
@@ -250,24 +292,27 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         audioStreamId = allocatedAudioStream.audioStreamID
 
         self.step(5)
-        trackName = "media"
-        self.server.update_track_name(uploadStreamId, trackName)
+        videoStreamName = "video"
+        audioStreamName = "audio"
+        self.server.update_expected_track_names(uploadStreamId, [videoStreamName, audioStreamName])
+        # TODO: The testing framework currently treats sessionGroup and trackName as mandatory. Remove once fixed.
+        transportOptions = {
+            "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
+            "videoStreams": [{"videoStreamID": videoStreamId, "videoStreamName": videoStreamName}],
+            "audioStreams": [{"audioStreamID": audioStreamId, "audioStreamName": audioStreamName}],
+            "TLSEndpointID": self.tlsEndpointId,
+            "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
+            "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
+            "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
+            "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
+            "containerOptions": {
+                "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
+                "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": "media"},
+            },
+        }
         allocatePushTransportResponse = await self.send_single_cmd(
             cmd=pushavCluster.Commands.AllocatePushTransport(
-                transportOptions={
-                    "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
-                    "videoStreamID": videoStreamId,
-                    "audioStreamID": audioStreamId,
-                    "TLSEndpointID": self.tlsEndpointId,
-                    "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
-                    "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
-                    "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                    "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                    "containerOptions": {
-                        "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
-                    },
-                }
+                transportOptions=transportOptions
             ),
             endpoint=endpoint,
         )
@@ -277,32 +322,31 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         aConnectionID = (
             allocatePushTransportResponse.transportConfiguration.connectionID
         )
-        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
-            self.step(6)
-            aFeatureMap = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avsmCluster, attribute=avsmAttr.FeatureMap
-            )
-            privacySupport = (aFeatureMap & avsmCluster.Bitmaps.Feature.kPrivacy) > 0
-            asserts.assert_true(privacySupport, "Privacy Feature is not supported.")
 
-            result = await self.write_single_attribute(
-                avsmAttr.SoftRecordingPrivacyModeEnabled(True), endpoint_id=endpoint
-            )
-            asserts.assert_equal(
-                result,
-                Status.Success,
-                "Error when trying to write SoftRecordingPrivacyModeEnabled",
-            )
+        self.step(6)
+        event_callback = EventSubscriptionHandler(expected_cluster=pushavCluster)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint())
 
+        if await self.attribute_guard(endpoint=endpoint, attribute=avsmAttr.HardPrivacyModeOn):
             self.step(7)
-            result = await self.write_single_attribute(
-                avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
+            # For CI: Use app pipe to simulate physical privacy switch being turned on
+            # For manual testing: User should physically turn on the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
+            else:
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Please turn ON the physical privacy switch on the device, then press Enter to continue..."
+                )
+
+            # Verify the attribute reflects the privacy switch state
+            hard_privacy_mode = await self.read_single_attribute_check_success(
+                endpoint=endpoint,
+                cluster=Clusters.CameraAvStreamManagement,
+                attribute=Clusters.CameraAvStreamManagement.Attributes.HardPrivacyModeOn
             )
-            asserts.assert_equal(
-                result,
-                Status.Success,
-                "Error when trying to write SoftLivestreamPrivacyModeEnabled",
-            )
+            asserts.assert_true(hard_privacy_mode, "HardPrivacyModeOn should be True when privacy switch is on")
 
             self.step(8)
             try:
@@ -313,16 +357,59 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     endpoint=endpoint,
                 )
                 asserts.fail(
-                    "Unexpected success when expecting INVALID_IN_STATE due to SoftPrivacy mode set to True"
+                    "Unexpected success when expecting INVALID_IN_STATE due to HardPrivacyModeOn set to True"
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status,
                     Status.InvalidInState,
-                    "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to True",
+                    "Unexpected error returned when expecting INVALID_IN_STATE due to HardPrivacyModeOn set to True",
                 )
 
             self.step(9)
+            # For CI: Use app pipe to simulate physical privacy switch being turned off
+            # For manual testing: User should physically turn off the privacy switch
+            if self.is_pics_sdk_ci_only:
+                self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
+            else:
+                user_response = self.wait_for_user_input(
+                    prompt_msg="Please turn OFF the physical privacy switch on the device, then press Enter to continue..."
+                )
+        else:
+            self.skip_step(7)
+            self.skip_step(8)
+            self.skip_step(9)
+
+        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
+            self.step(10)
+            result = await self.write_single_attribute(
+                avsmAttr.SoftRecordingPrivacyModeEnabled(True), endpoint_id=endpoint
+            )
+            asserts.assert_equal(
+                result,
+                Status.Success,
+                "Error when trying to write SoftRecordingPrivacyModeEnabled",
+            )
+
+            self.step(11)
+            try:
+                await self.send_single_cmd(
+                    cmd=pushavCluster.Commands.SetTransportStatus(
+                        connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive
+                    ),
+                    endpoint=endpoint,
+                )
+                asserts.fail(
+                    "Unexpected success when expecting INVALID_IN_STATE due to SoftRecordingPrivacyModeEnabled being set to True"
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected error returned when expecting INVALID_IN_STATE due to SoftRecordingPrivacyModeEnabled being set to True",
+                )
+
+            self.step(12)
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -332,7 +419,45 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 "Error when trying to write SoftRecordingPrivacyModeEnabled",
             )
 
-            self.step(10)
+            self.step(13)
+            transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
+            await self.send_single_cmd(
+                cmd=pushavCluster.Commands.ModifyPushTransport(
+                    connectionID=aConnectionID,
+                    transportOptions=transportOptions
+                ),
+                endpoint=endpoint,
+            )
+
+            self.step(14)
+            result = await self.write_single_attribute(
+                avsmAttr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint
+            )
+            asserts.assert_equal(
+                result,
+                Status.Success,
+                "Error when trying to write SoftLivestreamPrivacyModeEnabled",
+            )
+
+            self.step(15)
+            try:
+                await self.send_single_cmd(
+                    cmd=pushavCluster.Commands.SetTransportStatus(
+                        connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive
+                    ),
+                    endpoint=endpoint,
+                )
+                asserts.fail(
+                    "Unexpected success when expecting INVALID_IN_STATE due to SoftLivestreamPrivacyModeEnabled being set to True"
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected error returned when expecting INVALID_IN_STATE due to SoftLivestreamPrivacyModeEnabled being set to True",
+                )
+
+            self.step(16)
             result = await self.write_single_attribute(
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
@@ -342,30 +467,49 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 "Error when trying to write SoftLivestreamPrivacyModeEnabled",
             )
         else:
-            self.skip_step(6)
-            self.skip_step(7)
-            self.skip_step(8)
-            self.skip_step(9)
             self.skip_step(10)
+            self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
+            self.skip_step(14)
+            self.skip_step(15)
+            self.skip_step(16)
+            transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
+            await self.send_single_cmd(
+                cmd=pushavCluster.Commands.ModifyPushTransport(
+                    connectionID=aConnectionID,
+                    transportOptions=transportOptions
+                ),
+                endpoint=endpoint,
+            )
 
-        self.step(11)
+        self.step(17)
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.SetTransportStatus(
                 connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kActive),
             endpoint=endpoint,
         )
 
-        self.step(12)
+        self.step(18)
+        # Verify event received
+        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
+        log.info("Event data %s", event_data)
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+
+        self.step(19)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
             skipped = self.user_verify_push_av_stream(
-                prompt_msg="Verify the video stream is being transmitted by playing the live video and viewing the uploaded contents."
+                prompt_msg=(
+                    "Verify the video stream is being transmitted by playing the live video and\nviewing the uploaded contents.\n"
+                    "Verify that there are no non-conforming uploads."
+                )
             )
 
             if skipped:
                 # For when running in CLI
-                prompt = ("\nVerify the video segments are being received by the server by viewing the logs with [PUSH_AV_SERVER] tag.\n"
-                          "The uploaded content must be accepted by the server without any errors.\n"
-                          "Enter 'y' to confirm.")
+                prompt = ("\nVerify the video segments are being received by the server by viewing the logs with [PUSH_AV_SERVER] tag."
+                          "\nThe uploaded content must be accepted by the server without any errors."
+                          "\nEnter 'y' to confirm.")
                 user_response = self.wait_for_user_input(
                     prompt_msg=prompt,
                     prompt_msg_placeholder="y",
@@ -373,26 +517,38 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 )
                 asserts.assert_equal(user_response.lower(), "y")
 
-        self.step(13)
+        self.step(20)
         await self.send_single_cmd(
             cmd=pushavCluster.Commands.SetTransportStatus(
                 connectionID=aConnectionID, transportStatus=pushavCluster.Enums.TransportStatusEnum.kInactive),
             endpoint=endpoint,
         )
 
-        self.step(14)
+        self.step(21)
+        # Verify event received
+        event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
+        log.info("Event data %s", event_data)
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+
+        self.step(22)
         if not self.check_pics("PICS_SDK_CI_ONLY"):
-            prompt = ("Verify the video stream uploaded can be played. Verify that DUT has stopped uploading by viewing the uploaded content and ensure no new files are received.\n"
-                      "Click on the 'Refresh Streams' button to view the latest uploaded contents"
-                      "The uploaded segment's extended path must conform to the Matter's extended path format")
+            prompt = ("Verify the uploaded CMAF content by:\n"
+                      "1. Playing back the video and audio from uploaded files\n"
+                      "2. Verifying DUT has stopped uploading (no new files appearing)\n"
+                      "3. Clicking the 'Refresh Streams' button to see the latest uploads\n\n"
+                      "- Both 'video' and 'audio' track content must play correctly\n"
+                      "- All uploaded files must conform to Matter specification\n"
+                      "- If any uploads are marked as non-conforming, review the reasons listed\n"
+                      "- No new segments should be uploaded.")
             skipped = self.user_verify_push_av_stream(
                 prompt_msg=prompt
             )
             if skipped:
                 # For when running in CLI
-                prompt = ("\nVerify that DUT has stopped transmitting content by viewing the server logs with [PUSH_AV_SERVER] tag."
-                          "No new segments should be received."
-                          "Enter 'y' to confirm.")
+                prompt = ("\nVerify that DUT has stopped transmitting:"
+                          "\nCheck server logs with [PUSH_AV_SERVER] tag - no new uploads"
+                          "\nEnsure no new segment files are being added"
+                          "\nEnter 'y' to confirm transmission has stopped.")
                 user_response = self.wait_for_user_input(
                     prompt_msg=prompt,
                     prompt_msg_placeholder="y",

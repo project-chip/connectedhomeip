@@ -59,15 +59,14 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
 )
 
-# TODO Implement OTA support
 if(CONFIG_CHIP_OTA_REQUESTOR)
-    # target_sources(app PRIVATE
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
-    # )
-    # target_include_directories(app PRIVATE
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/include/
-    # )
+    target_sources(app PRIVATE
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
+    )
+    target_include_directories(app PRIVATE
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/include/
+    )
 endif()
 
 if(CONFIG_CHIP_WIFI)
@@ -93,3 +92,5 @@ if(CONFIG_CHIP_LIB_SHELL)
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
     )
 endif()
+
+include(${CHIP_ROOT}/config/silabs/app/zephyr-post-build.cmake)

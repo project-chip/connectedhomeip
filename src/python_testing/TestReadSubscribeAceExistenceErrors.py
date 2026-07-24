@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import copy
-from typing import Union
 
 from mobly import asserts  # type: ignore
 
@@ -87,7 +86,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.write_acl(self.TH1, self.dut_acl_original)
 
     @staticmethod
-    def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
+    def verify_attribute_exists(res: Clusters.Attribute.SubscriptionTransaction | dict,
                                 cluster:  type[Clusters.ClusterObjects.Cluster],
                                 attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
                                 ep: int = ROOT_NODE_ENDPOINT_ID):

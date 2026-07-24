@@ -49,6 +49,7 @@ target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
@@ -65,8 +66,11 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app

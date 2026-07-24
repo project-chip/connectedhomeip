@@ -15,27 +15,11 @@
  *    limitations under the License.
  */
 #include "DeviceFactoryPlatformOverride.h"
-#include "Esp32BleRssiRangingAdapter.h"
-
-#include <device-factory/DeviceFactory.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
-{
-    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
-    {
-        static Esp32BleRssiRangingAdapter sBleAdapter;
-        VerifyOrDie(sBleAdapter.Init(storageDelegate) == CHIP_NO_ERROR);
-        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
-            return std::make_unique<ProximityRangerDevice>(timerDelegate,
-                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
-        });
-    }
-}
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate) {}
 
 } // namespace app
 } // namespace chip

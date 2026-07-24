@@ -89,7 +89,7 @@ class SetupPayloadInfo:
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
     passcode: int = 0
-    setup_code: Optional[str] = None
+    setup_code: str | None = None
 
 
 @dataclass
@@ -120,15 +120,15 @@ class CommissioningInfo:
         tc_user_response_to_simulate (Optional[int]):
             The user response to simulate for the Terms and Conditions, if applicable.
     """
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    commissioning_method: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
-    wifi_passphrase: Optional[str] = None
-    wifi_ssid: Optional[str] = None
-    tc_version_to_simulate: Optional[int] = None
-    tc_user_response_to_simulate: Optional[int] = None
-    thread_ba_host: Optional[str] = None
-    thread_ba_port: Optional[int] = None
+    commissionee_ip_address_just_for_testing: str | None = None
+    commissioning_method: str | None = None
+    thread_operational_dataset: bytes | None = None
+    wifi_passphrase: str | None = None
+    wifi_ssid: str | None = None
+    tc_version_to_simulate: int | None = None
+    tc_user_response_to_simulate: int | None = None
+    thread_ba_host: str | None = None
+    thread_ba_port: int | None = None
 
 
 class PairingStatus:
@@ -139,7 +139,7 @@ class PairingStatus:
     is set to true to indicate that the commissioning process has succeeded.
     """
 
-    def __init__(self, exception: Optional[Exception] = None):
+    def __init__(self, exception: Exception | None = None):
         self.exception = exception
 
     def __bool__(self):
@@ -203,10 +203,24 @@ class Commission:
                 self.info.passcode
             )
 
-        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
-            setupCode=setup_code,
-            nodeId=self.node_id
-        )
+        if self.commissioning_info.commissioning_method == "thread-meshcop":
+            thread_ba_host = self.commissioning_info.thread_ba_host
+            thread_ba_port = self.commissioning_info.thread_ba_port
+
+            if thread_ba_host is None or thread_ba_port is None:
+                raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
+
+            commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+                setupCode=setup_code,
+                nodeId=self.node_id,
+                threadMeshCoPConfig=(thread_ba_host, thread_ba_port),
+            )
+        else:
+            commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+                setupCode=setup_code,
+                nodeId=self.node_id
+            )
+
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session")
 

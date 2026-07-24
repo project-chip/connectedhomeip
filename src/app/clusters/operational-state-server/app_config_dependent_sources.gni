@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# These files depend on ZAP-generated headers / Ember APIs, or are backward-compat
+# shims; they must be compiled as part of the application, not the core library.
+# The core cluster sources are pulled in via src/app/clusters/BUILD.gn.
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "OperationalStateDelegate.h",
-  "operational-state-cluster-objects.h",
   "operational-state-server.h",
 ]
