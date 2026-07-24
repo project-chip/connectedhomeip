@@ -113,9 +113,9 @@ class TC_HSTAT_2_1(MatterBaseTest):
         cluster = Clusters.Humidistat
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
-        mistBitmap = cluster.Bitmaps.MistTypeBitmap
+        # mistBitmap = cluster.Bitmaps.MistTypeBitmap
         supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        SetSettings = Clusters.Humidistat.Commands.SetSettings
+        # SetSettings = Clusters.Humidistat.Commands.SetSettings
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.FeatureMap)
         log.info("Feature map value: %s", feature_map)
@@ -140,10 +140,10 @@ class TC_HSTAT_2_1(MatterBaseTest):
         log.info("DUT supports the Cold feature: %s", coldFeatureSupported)
         log.info("DUT supports the CondPump feature: %s", condPumpFeatureSupported)
 
-        stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
-        stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
-        stateFan = cluster.Enums.SystemStateEnum.kFan
-        stateIdle = cluster.Enums.SystemStateEnum.kIdle
+        # stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
+        # stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
+        # stateFan = cluster.Enums.SystemStateEnum.kFan
+        # stateIdle = cluster.Enums.SystemStateEnum.kIdle
         ModeEnum = cluster.Enums.ModeEnum
 
         self.step(2)
