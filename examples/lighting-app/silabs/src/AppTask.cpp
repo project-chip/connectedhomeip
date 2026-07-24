@@ -297,24 +297,24 @@ CHIP_ERROR AppTask::InitLight()
 
     // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param + Status
     // shape) so we do not depend on the internal cluster type.
-    if (ColorControlServer::Instance().GetCurrentX(LIGHT_ENDPOINT, currentx) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentX::Get(LIGHT_ENDPOINT, &currentx) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentX = currentx;
     }
-    if (ColorControlServer::Instance().GetCurrentY(LIGHT_ENDPOINT, currenty) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentY::Get(LIGHT_ENDPOINT, &currenty) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentY = currenty;
     }
-    if (ColorControlServer::Instance().GetCurrentHue(LIGHT_ENDPOINT, currenthue) == Protocols::InteractionModel::Status::Success)
+    if (Clusters::ColorControl::Attributes::CurrentHue::Get(LIGHT_ENDPOINT, &currenthue) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentHue = currenthue;
     }
-    if (ColorControlServer::Instance().GetCurrentSaturation(LIGHT_ENDPOINT, currentsaturation) ==
+    if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(LIGHT_ENDPOINT, &currentsaturation) ==
         Protocols::InteractionModel::Status::Success)
     {
         sCurrentSaturation = currentsaturation;
     }
-    if (ColorControlServer::Instance().GetColorTemperatureMireds(LIGHT_ENDPOINT, currentctmireds) ==
+    if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(LIGHT_ENDPOINT, &currentctmireds) ==
         Protocols::InteractionModel::Status::Success)
     {
         sCurrentCTMireds = currentctmireds;

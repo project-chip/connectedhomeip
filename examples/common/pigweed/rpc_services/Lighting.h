@@ -107,8 +107,8 @@ public:
             // we do not depend on the internal cluster type.
             uint8_t hue        = 0;
             uint8_t saturation = 0;
-            RETURN_STATUS_IF_NOT_OK(ColorControlServer::Instance().GetCurrentHue(kEndpoint, hue));
-            RETURN_STATUS_IF_NOT_OK(ColorControlServer::Instance().GetCurrentSaturation(kEndpoint, saturation));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentHue::Get(kEndpoint, &hue));
+            RETURN_STATUS_IF_NOT_OK(app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(kEndpoint, &saturation));
             response.color.hue        = hue;
             response.color.saturation = saturation;
             response.has_color        = true;

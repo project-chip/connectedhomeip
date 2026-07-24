@@ -275,6 +275,8 @@
             "RemainingTime",
             "CurrentX",
             "CurrentY",
+            "DriftCompensation",
+            "CompensationText",
             "ColorTemperatureMireds",
             "ColorMode",
             "Options",

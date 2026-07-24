@@ -52,6 +52,49 @@ void SetDefaultDelegate(EndpointId endpoint, ColorControlDelegate * delegate);
 /** Returns the delegate registered with `SetDefaultDelegate` for `endpoint`, or `nullptr` if none/invalid. */
 ColorControlDelegate * GetDelegate(EndpointId endpoint);
 
+/**
+ * Live Color Control attribute read access for the code-driven server cluster.
+ *
+ * These re-provide the pre-migration generated-accessor shape (`Attributes::<Name>::Get(endpoint, T *)`)
+ * so application code (examples, platform glue) keeps reading color state through the same fully-qualified
+ * names it used before the cluster became code-driven, without depending on the internal
+ * ColorControlCluster type. Each resolves the per-endpoint cluster via FindClusterOnEndpoint and writes its
+ * live value, or returns Status::UnsupportedEndpoint (leaving `value` untouched) when no Color Control
+ * server is registered on the endpoint.
+ *
+ * For startup values stored in the ZAP/ember attribute store, use the generated `GetDefault` functions in
+ * `app-common/zap-generated/attributes/Accessors.h`.
+ */
+namespace Attributes {
+
+namespace CurrentHue {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
+} // namespace CurrentHue
+
+namespace CurrentSaturation {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
+} // namespace CurrentSaturation
+
+namespace CurrentX {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
+} // namespace CurrentX
+
+namespace CurrentY {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
+} // namespace CurrentY
+
+namespace ColorTemperatureMireds {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
+} // namespace ColorTemperatureMireds
+
+// ColorMode is derived from the cluster's EnhancedColorMode; the enhanced-hue variant is clamped down to
+// the legacy CurrentHueAndCurrentSaturation value so callers see a legal ColorMode.
+namespace ColorMode {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, ColorModeEnum * value);
+} // namespace ColorMode
+
+} // namespace Attributes
+
 } // namespace chip::app::Clusters::ColorControl
 
 /**
@@ -79,23 +122,6 @@ public:
     static ColorControlServer & Instance();
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
-
-    // Legacy attribute read accessors.
-    //
-    // These deliberately preserve the pre-migration generated-accessor signature
-    // (endpoint + out-param + Status) instead of returning the ColorControlCluster instance:
-    // application code (examples, platform glue) keeps reading color state without depending on the
-    // internal code-driven cluster type. Each resolves the per-endpoint cluster via
-    // ColorControl::FindClusterOnEndpoint and returns its live value, or Status::UnsupportedEndpoint
-    // (leaving `value` untouched) when no Color Control server is registered on the endpoint.
-    Status GetCurrentHue(chip::EndpointId endpoint, uint8_t & value);
-    Status GetCurrentSaturation(chip::EndpointId endpoint, uint8_t & value);
-    Status GetCurrentX(chip::EndpointId endpoint, uint16_t & value);
-    Status GetCurrentY(chip::EndpointId endpoint, uint16_t & value);
-    Status GetColorTemperatureMireds(chip::EndpointId endpoint, uint16_t & value);
-    // ColorMode is derived from the cluster's EnhancedColorMode; the enhanced-hue variant is clamped
-    // down to the legacy CurrentHueAndCurrentSaturation value here so callers see a legal ColorMode.
-    Status GetColorMode(chip::EndpointId endpoint, ColorModeEnum & value);
 
     Status stopAllColorTransitions(chip::EndpointId endpoint);
     Status stopMoveStepCommand(chip::EndpointId endpoint,

@@ -99,7 +99,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         {
             hue = *value;
             /* Read Current Saturation value when Attribute change callback for HUE Attribute */
-            ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
+            CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
@@ -108,7 +108,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
              */
             saturation = *value;
             /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
-            ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
+            CurrentHue::Get(endpointId, &hue);
         }
         /* Set RGB Color on Cluster Indication LED */
         sClusterLED.SetColor(hue, saturation);

@@ -172,12 +172,12 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
         if (attributeId == CurrentHue::Id)
         {
             hue = *value;
-            ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
+            CurrentSaturation::Get(endpointId, &saturation);
         }
         else
         {
             saturation = *value;
-            ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
+            CurrentHue::Get(endpointId, &hue);
         }
         statusLED1.SetColor(hue, saturation);
     }

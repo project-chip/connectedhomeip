@@ -224,14 +224,14 @@ void DBusInterface::InitColor()
         auto value = Clusters::ColorControl::ColorModeEnum::kCurrentHueAndCurrentSaturation;
         // ColorControl is code-driven; read via the legacy ColorControlServer facade so we do not depend
         // on the internal cluster type.
-        auto status = ColorControlServer::Instance().GetColorMode(mEndpointId, value);
+        auto status = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", to_underlying(status)));
         light_app_color_control_set_color_mode(mIfaceColorControl, to_underlying(value));
     }
     {
         uint16_t value = 0;
-        auto status    = ColorControlServer::Instance().GetColorTemperatureMireds(mEndpointId, value);
+        auto status    = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(mEndpointId, &value);
         VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
                        ChipLogError(NotSpecified, "Error getting ColorTemperatureMireds: 0x%x", to_underlying(status)));
         light_app_color_control_set_color_temperature_mireds(mIfaceColorControl, value);

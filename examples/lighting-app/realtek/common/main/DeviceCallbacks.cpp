@@ -291,7 +291,7 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
             xy.x = *reinterpret_cast<uint16_t *>(value);
             // get Y from the code-driven cluster via the legacy ColorControlServer facade (keeps the
             // pre-migration accessor shape so we do not depend on the internal cluster type)
-            Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentY(endpointId, xy.y);
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpointId, &xy.y);
             VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
                          ChipLogError(Zcl, "Failed to read CurrentY value"));
         }
@@ -299,7 +299,7 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
         {
             xy.y = *reinterpret_cast<uint16_t *>(value);
             // get X from the code-driven cluster via the legacy ColorControlServer facade
-            Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentX(endpointId, xy.x);
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpointId, &xy.x);
             VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
                          ChipLogError(Zcl, "Failed to read CurrentX value"));
         }
@@ -323,7 +323,7 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
         {
             hsv.h = *value;
             // get saturation from the code-driven cluster via the legacy ColorControlServer facade
-            Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentSaturation(endpointId, hsv.s);
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpointId, &hsv.s);
             VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
                          ChipLogError(Zcl, "Failed to read CurrentSaturation value"));
         }
@@ -331,7 +331,7 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
         {
             hsv.s = *value;
             // get hue from the code-driven cluster via the legacy ColorControlServer facade
-            Protocols::InteractionModel::Status status = ColorControlServer::Instance().GetCurrentHue(endpointId, hsv.h);
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpointId, &hsv.h);
             VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
                          ChipLogError(Zcl, "Failed to read CurrentHue value"));
         }

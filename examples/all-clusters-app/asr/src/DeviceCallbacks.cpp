@@ -232,12 +232,12 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
+        CurrentSaturation::Get(endpointId, &saturation);
     }
     if (attributeId == CurrentSaturation::Id)
     {
         saturation = *value;
-        ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
+        CurrentHue::Get(endpointId, &hue);
     }
 
     ChipLogProgress(Zcl, "New hue: %d, New saturation: %d ", hue, saturation);

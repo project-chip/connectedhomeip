@@ -213,12 +213,12 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
+        CurrentSaturation::Get(endpointId, &saturation);
     }
     if (attributeId == CurrentSaturation::Id)
     {
         saturation = *value;
-        ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
+        CurrentHue::Get(endpointId, &hue);
     }
 
     ASR_LOG("New hue: %d, New saturation: %d\n", hue, saturation);
