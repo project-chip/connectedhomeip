@@ -268,7 +268,8 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 
 # See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	select WIFI
+	default y
+	depends on WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
 	imply NET_PKT_TIMESTAMP
@@ -277,6 +278,10 @@ config CHIP_WIFI
 	imply NET_IPV6_NBR_CACHE
 	imply NET_STATISTICS_IPV6
 	imply NET_STATISTICS_USER_API
+
+config CHIP_ENABLE_WIFI_STATION
+	depends on CHIP_WIFI
+	default y
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
