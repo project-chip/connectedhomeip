@@ -34,18 +34,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from mobly import asserts
-import matter.clusters as Clusters
-from matter.interaction_model import Status
+import logging
+
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from itertools import count
 
-import logging
 log = logging.getLogger(__name__)
 
 # Auto-generated from test specification: [TC-HSTAT-2.4] Optional functionality with DUT as Server
+
+
 class TC_HSTAT_2_4(MatterBaseTest):
 
     def pics_TC_HSTAT_2_4(self) -> list[str]:
@@ -59,27 +58,40 @@ class TC_HSTAT_2_4(MatterBaseTest):
     def steps_TC_HSTAT_2_4(self):
         return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", ""),
-            TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(3, "TH sends command SetSettings with the Mode field set to Humidifier or Dehumidifier", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(4, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(5, "Individually subscribe to the attributes Continuous if supported, Sleep if supported, and Optimal if supported.", "This will receive updates when these attributes change value."),
-            TestStep(5, "TH sends command SetSettings with the Continuous field set to True.", "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(3, "TH sends command SetSettings with the Mode field set to Humidifier or Dehumidifier",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(4, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(5, "Individually subscribe to the attributes Continuous if supported, Sleep if supported, and Optimal if supported.",
+                     "This will receive updates when these attributes change value."),
+            TestStep(5, "TH sends command SetSettings with the Continuous field set to True.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(6, "TH reads from the DUT the Continuous attribute.", "Verify that the DUT response contains a value of True"),
-            TestStep(7, "TH writes to the DUT the Continuous attribute with False.", "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False."),
-            TestStep(8, "TH sends command SetSettings with the Sleep field set to True.", "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(7, "TH writes to the DUT the Continuous attribute with False.",
+                     "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False."),
+            TestStep(8, "TH sends command SetSettings with the Sleep field set to True.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(9, "TH reads from the DUT the Sleep attribute.", "Verify that the DUT response contains a value of True"),
-            TestStep(10, "TH writes to the DUT the Sleep attribute with False.", "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False."),
-            TestStep(11, "TH sends command SetSettings with the Optimal field set to True.", "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(10, "TH writes to the DUT the Sleep attribute with False.",
+                     "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False."),
+            TestStep(11, "TH sends command SetSettings with the Optimal field set to True.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(12, "TH reads from the DUT the Optimal attribute.", "Verify that the DUT response contains a value of True"),
-            TestStep(13, "TH writes to the DUT the Optimal attribute with False.", "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False."),
+            TestStep(13, "TH writes to the DUT the Optimal attribute with False.",
+                     "Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False."),
             TestStep(14, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowContinuous event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep(15, "TH sends command SetSettings with the Continuous field set to True", "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
+            TestStep(15, "TH sends command SetSettings with the Continuous field set to True",
+                     "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
             TestStep(16, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowContinuous event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep(17, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowSleep event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep(18, "TH sends command SetSettings with the Sleep field set to True", "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
+            TestStep(18, "TH sends command SetSettings with the Sleep field set to True",
+                     "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
             TestStep(19, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowSleep event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
             TestStep(20, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowOptimal event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep(21, "TH sends command SetSettings with the Optimal field set to True", "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
+            TestStep(21, "TH sends command SetSettings with the Optimal field set to True",
+                     "Verify DUT responds w/ status INVALID_IN_STATE(0xcb)"),
             TestStep(22, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowOptimal event.", "Verify DUT responds w/ status SUCCESS(0x00)."),
         ]
 
@@ -87,7 +99,7 @@ class TC_HSTAT_2_4(MatterBaseTest):
     async def test_TC_HSTAT_2_4(self):
         self.step(1)
         # Commission DUT to TH (can be skipped if done in a preceding test).
-        # 
+        #
 
         self.step(2)
         # TH sends command On to the On/Off cluster on the same endpoint as this cluster.
