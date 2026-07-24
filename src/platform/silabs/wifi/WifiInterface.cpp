@@ -135,9 +135,6 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
 
-    // TODO : Remove workaround when sl_wfx_startup_ind_t is unified
-    //        Issue is same structure name but different contents
-
     MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 
     TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
