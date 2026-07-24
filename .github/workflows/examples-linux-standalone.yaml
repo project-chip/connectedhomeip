@@ -48,12 +48,25 @@ jobs:
               with:
                 platform: linux
 
-            - name: Build Standalone cert tool
+            - name: Build standalone tools
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
-                        build" && rm -rf out
+                        --target linux-x64-chip-tool \
+                        build"
+            - name: Strip executables
+              run: |
+                strip out/linux-x64-chip-cert/chip-cert
+                strip out/linux-x64-chip-tool/chip-tool
+            - name: Upload tools as artifact
+              uses: actions/upload-artifact@v7
+              with:
+                name: chip-tools-linux-x64
+                path: |
+                  out/linux-x64-chip-cert/chip-cert
+                  out/linux-x64-chip-tool/chip-tool
+
             - name: Build minmdns example with platform dns
               run: |
                   ./scripts/run_in_build_env.sh \
