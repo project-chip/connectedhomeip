@@ -58,8 +58,7 @@ typedef struct wfx_wifi_scan_ext
 
 #ifdef SL_MATTER_SIWX_WIFI_ENABLE
 /*
- * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
- * We took it from the SDK (for WF200)
+ * Station/SoftAP interface selector for GetMacAddress (legacy WFX naming).
  */
 typedef enum
 {

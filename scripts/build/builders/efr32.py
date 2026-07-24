@@ -199,7 +199,6 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_wf200: bool = False,
                  enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
@@ -256,12 +255,10 @@ class Efr32Builder(GnBuilder):
                 # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                if enable_wf200:
-                    self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
-                elif enable_917_ncp:
+                if enable_917_ncp:
                     self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
                 else:
-                    raise Exception('Wifi usage: ...-wifi-[wf200|siwx917]-...')
+                    raise Exception('Wifi usage: ...-wifi-[siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
