@@ -30,6 +30,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -294,27 +295,26 @@ CHIP_ERROR AppTask::InitLight()
         sCurrentLevel = brightness.Value();
     }
 
-    if (Clusters::ColorControl::Attributes::CurrentX::Get(LIGHT_ENDPOINT, &currentx) ==
-        Protocols::InteractionModel::Status::Success)
+    // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param + Status
+    // shape) so we do not depend on the internal cluster type.
+    if (ColorControlServer::Instance().GetCurrentX(LIGHT_ENDPOINT, currentx) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentX = currentx;
     }
-    if (Clusters::ColorControl::Attributes::CurrentY::Get(LIGHT_ENDPOINT, &currenty) ==
-        Protocols::InteractionModel::Status::Success)
+    if (ColorControlServer::Instance().GetCurrentY(LIGHT_ENDPOINT, currenty) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentY = currenty;
     }
-    if (Clusters::ColorControl::Attributes::CurrentHue::Get(LIGHT_ENDPOINT, &currenthue) ==
-        Protocols::InteractionModel::Status::Success)
+    if (ColorControlServer::Instance().GetCurrentHue(LIGHT_ENDPOINT, currenthue) == Protocols::InteractionModel::Status::Success)
     {
         sCurrentHue = currenthue;
     }
-    if (Clusters::ColorControl::Attributes::CurrentSaturation::Get(LIGHT_ENDPOINT, &currentsaturation) ==
+    if (ColorControlServer::Instance().GetCurrentSaturation(LIGHT_ENDPOINT, currentsaturation) ==
         Protocols::InteractionModel::Status::Success)
     {
         sCurrentSaturation = currentsaturation;
     }
-    if (Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(LIGHT_ENDPOINT, &currentctmireds) ==
+    if (ColorControlServer::Instance().GetColorTemperatureMireds(LIGHT_ENDPOINT, currentctmireds) ==
         Protocols::InteractionModel::Status::Success)
     {
         sCurrentCTMireds = currentctmireds;

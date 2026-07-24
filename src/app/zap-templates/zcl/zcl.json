@@ -269,6 +269,27 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "Color Control": [
+            "CurrentHue",
+            "CurrentSaturation",
+            "RemainingTime",
+            "CurrentX",
+            "CurrentY",
+            "ColorTemperatureMireds",
+            "ColorMode",
+            "Options",
+            "NumberOfPrimaries",
+            "EnhancedCurrentHue",
+            "EnhancedColorMode",
+            "ColorLoopActive",
+            "ColorLoopDirection",
+            "ColorLoopTime",
+            "ColorLoopStartEnhancedHue",
+            "ColorLoopStoredEnhancedHue",
+            "ColorCapabilities",
+            "StartUpColorTemperatureMireds",
+            "ClusterRevision"
+        ],
         "Commissioning Proxy": [
             "Transport",
             "ScanMaxTime",

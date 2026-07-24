@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/color-control-server/color-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 static const char TAG[] = "light-app-callbacks";
@@ -107,12 +108,12 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
     if (attributeId == CurrentHue::Id)
     {
         hue = *value;
-        CurrentSaturation::Get(endpointId, &saturation);
+        ColorControlServer::Instance().GetCurrentSaturation(endpointId, saturation);
     }
     else
     {
         saturation = *value;
-        CurrentHue::Get(endpointId, &hue);
+        ColorControlServer::Instance().GetCurrentHue(endpointId, hue);
     }
     AppLED.SetColor(hue, saturation);
 

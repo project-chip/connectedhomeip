@@ -238,6 +238,10 @@ void MatterFanControlClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterFanControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterColorControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterColorControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

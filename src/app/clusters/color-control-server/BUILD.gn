@@ -11,5 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("color-control-server") {
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+# Ember-free core cluster + the cross-cluster coupling HEADERS (ember-free interfaces with
+# compile-guarded no-op stubs). The coupling .cpp implementations call CodegenDataModelProvider /
+# ScenesServer Instance()s, so they are codegen-layer code and live in app_config_dependent_sources
+# (linked in at app level), NOT here.
+source_set("color-control-server") {
+  sources = [
+    "ColorControlCluster.cpp",
+    "ColorControlCluster.h",
+    "ColorControlColorState.h",
+    "ColorControlDelegate.h",
+    "ColorControlSceneInvalidator.h",
+    "LevelControlCoupling.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/cluster-building-blocks",
+    "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/ColorControl",
+  ]
 }

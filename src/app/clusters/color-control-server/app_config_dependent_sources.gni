@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "codegen/color-control-server.cpp",
-  "codegen/color-control-server.h",
+  # Codegen integration: reads ZAP FeatureMap / fixed defaults and registers the code-driven
+  # ColorControlCluster per endpoint. Defines Matter{Init,Shutdown}Callback for this cluster.
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
+
+  # Ember-free cross-cluster coupling implementations. They call CodegenDataModelProvider /
+  # ScenesServer Instance()s, so they build with the app codegen model (here), not the core BUILD.gn.
+  "DefaultColorControlSceneHandler.h",
+  "LevelControlCoupling.cpp",
+  "SceneIntegration.cpp",
+  "SceneIntegration.h",
 ]

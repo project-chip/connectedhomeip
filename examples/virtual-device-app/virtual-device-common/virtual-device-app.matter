@@ -4137,22 +4137,22 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue default = 0x00;
-    ram      attribute currentSaturation default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
-    ram      attribute currentX default = 0x616B;
-    ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
-    ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorCapabilities default = 0x0000;
+    callback attribute currentHue;
+    callback attribute currentSaturation;
+    callback attribute remainingTime;
+    callback attribute currentX;
+    callback attribute currentY;
+    callback attribute colorTemperatureMireds;
+    callback attribute colorMode;
+    callback attribute options;
+    callback attribute numberOfPrimaries;
+    callback attribute enhancedColorMode;
+    callback attribute colorCapabilities;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0009;
+    callback attribute clusterRevision;
 
     handle command MoveToHue;
     handle command MoveToSaturation;

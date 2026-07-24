@@ -8464,17 +8464,17 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    persist  attribute currentHue default = 0x00;
-    persist  attribute currentSaturation default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
-    persist  attribute currentX default = 0x616B;
-    persist  attribute currentY default = 0x607D;
+    callback attribute currentHue;
+    callback attribute currentSaturation;
+    callback attribute remainingTime;
+    callback attribute currentX;
+    callback attribute currentY;
     ram      attribute driftCompensation;
     ram      attribute compensationText;
-    persist  attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
+    callback attribute colorTemperatureMireds;
+    callback attribute colorMode;
+    callback attribute options;
+    callback attribute numberOfPrimaries;
     ram      attribute primary1X;
     ram      attribute primary1Y;
     ram      attribute primary1Intensity;
@@ -8504,20 +8504,20 @@ endpoint 1 {
     ram      attribute colorPointBX;
     ram      attribute colorPointBY;
     ram      attribute colorPointBIntensity;
-    persist  attribute enhancedCurrentHue default = 0x0000;
-    persist  attribute enhancedColorMode default = 0x01;
-    persist  attribute colorLoopActive default = 0x00;
-    persist  attribute colorLoopDirection default = 0x00;
-    persist  attribute colorLoopTime default = 0x0019;
-    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
-    ram      attribute colorCapabilities default = 0x1F;
+    callback attribute enhancedCurrentHue;
+    callback attribute enhancedColorMode;
+    callback attribute colorLoopActive;
+    callback attribute colorLoopDirection;
+    callback attribute colorLoopTime;
+    callback attribute colorLoopStartEnhancedHue;
+    callback attribute colorLoopStoredEnhancedHue;
+    callback attribute colorCapabilities;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
-    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
+    callback attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 0x0009;
+    callback attribute clusterRevision;
 
     handle command MoveToHue;
     handle command MoveHue;

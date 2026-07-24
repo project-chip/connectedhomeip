@@ -47,7 +47,7 @@
 #endif                                                // MATTER_DM_PLUGIN_ON_OFF
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#include <app/clusters/color-control-server/color-control-server.h> //nogncheck
+#include <app/clusters/color-control-server/LevelControlCoupling.h> //nogncheck
 #endif                                                              // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 #include <assert.h>
@@ -343,7 +343,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
     {
         if (options.Has(OptionsBitmap::kCoupleColorTempToLevel))
         {
-            emberAfPluginLevelControlCoupledColorTempChangeCallback(endpoint);
+            ColorControl::NotifyLevelControlCurrentLevelChanged(endpoint);
         }
     }
 }

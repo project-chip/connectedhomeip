@@ -16,6 +16,12 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/codegen/color-control-server.cpp"
-    "${CLUSTER_DIR}/codegen/color-control-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    # Ember-free cross-cluster coupling implementations. They call CodegenDataModelProvider /
+    # ScenesServer Instance()s, so they build with the app codegen model (here), not the core BUILD.gn.
+    "${CLUSTER_DIR}/DefaultColorControlSceneHandler.h"
+    "${CLUSTER_DIR}/LevelControlCoupling.cpp"
+    "${CLUSTER_DIR}/SceneIntegration.cpp"
+    "${CLUSTER_DIR}/SceneIntegration.h"
 )
