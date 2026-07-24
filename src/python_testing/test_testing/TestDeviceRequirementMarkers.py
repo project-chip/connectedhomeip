@@ -104,14 +104,25 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
 
 
 def _load_module(rel_path: str):
-    """Import a test module by file path, returning the loaded module object."""
+    """Import a test module by file path, returning the loaded module object.
+
+    Raises ImportError if the spec can't be created or the module fails to execute; the
+    caller uses that to fall back to a source (AST) check. On failure the partially
+    initialized module is removed from sys.modules so it can't leak into later imports.
+    """
     abs_path = _PY_TESTING / rel_path
     name = abs_path.stem
     spec = importlib.util.spec_from_file_location(name, abs_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot create import spec for {abs_path}")
     module = importlib.util.module_from_spec(spec)
     # Register before exec so intra-module dataclass/self references resolve.
     sys.modules[name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
     return module
 
 
@@ -127,6 +138,12 @@ def _concrete_test_classes(module):
 
 _MARKER_NAMES = {m.__name__ for m in _MARKERS}
 
+# Optional third-party dependencies that some reclassified modules import at load time
+# (absent in minimal local environments, present in CI). When one of these is missing we
+# verify the marker from source instead of importing; ANY other import failure is a real
+# problem (missing required dep, bad import, typo) and must fail the test.
+_OPTIONAL_IMPORT_DEPS = frozenset({"ndef", "graphviz"})
+
 
 def _marker_bases_from_source(rel_path: str) -> dict[str, set[str]]:
     """Fallback used when a module can't be imported (e.g. an optional dependency such as
@@ -134,11 +151,19 @@ def _marker_bases_from_source(rel_path: str) -> dict[str, set[str]]:
     marker base, the set of marker names in its base list. Detects both "which marker"
     and "more than one marker" without executing the module.
     """
+    def _base_name(base) -> str | None:
+        # Handle both `class X(Marker)` (ast.Name) and `class X(module.Marker)` (ast.Attribute).
+        if isinstance(base, ast.Name):
+            return base.id
+        if isinstance(base, ast.Attribute):
+            return base.attr
+        return None
+
     tree = ast.parse((_PY_TESTING / rel_path).read_text())
     result: dict[str, set[str]] = {}
     for node in tree.body:
         if isinstance(node, ast.ClassDef):
-            base_names = {b.id for b in node.bases if isinstance(b, ast.Name)}
+            base_names = {name for name in (_base_name(b) for b in node.bases) if name}
             markers = base_names & _MARKER_NAMES
             if markers:
                 result[node.name] = markers
@@ -201,7 +226,10 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
                     try:
                         module = _load_module(rel_path)
                     except ImportError as e:
-                        # Optional dependency missing (e.g. ndeflib for NFC tests): verify from source.
+                        # Only fall back for a known-optional missing dependency; re-raise any
+                        # other import failure so it fails the test rather than being masked.
+                        if e.name not in _OPTIONAL_IMPORT_DEPS:
+                            raise
                         source_fallback.append(f"{rel_path} ({e.name})")
                         declared = _marker_bases_from_source(rel_path)
                         self.assertTrue(declared, f"{rel_path}: no class declares a device-requirement marker")
