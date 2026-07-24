@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ how DUT processes commands.
 '''
 
 
-class TestBatchInvoke(MatterBaseTest):
+class TestBatchInvoke(MatterTestCommissionedDevice):
     requires_dut = False
 
     @async_test_body

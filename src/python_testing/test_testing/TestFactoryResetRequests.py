@@ -41,13 +41,13 @@ import logging
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TestFactoryResetRequests(MatterBaseTest):
+class TestFactoryResetRequests(MatterTestCommissioner):
     requires_dut = False
 
     def desc_TestFactoryResetRequests(self) -> str:

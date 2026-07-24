@@ -497,12 +497,20 @@ class TestCleanupConfig:
 class MatterBaseTest(base_test.BaseTestClass):
     """Base class for Matter Python tests.
 
-    Wildcard subscription (see setup_test):
+    This base is device-requirement neutral: it does not itself imply a commissioned,
+    uncommissioned, commissioner, or no-device test. Concrete tests should instead derive
+    from one of the device-requirement markers (MatterTestCommissionedDevice,
+    MatterTestUncommissionedDevice, MatterTestCommissioner, CertificationUnitTestNoDevice),
+    or from BasicCompositionTests for the intentional dual-state case. Those markers are
+    declarative only and do not change runtime behavior.
+
+    Wildcard subscription (see setup_test), a SEPARATE concern from device classification:
 
     * Set class attribute requires_dut = False for tests that do not interact with a
       real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
       will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is True.
+      device that isn't there.  Default is True. This flag is independent of the
+      device-requirement marker; do not derive one from the other.
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
     * When a wildcard subscription is active, read_single_attribute_check_success compares
@@ -3316,6 +3324,80 @@ class MatterBaseTest(base_test.BaseTestClass):
             if time.time() - start_time > timeout_sec:
                 asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
             await asyncio.sleep(0.1)
+
+
+# ---------------------------------------------------------------------------
+# Device-requirement marker base classes
+#
+# These declare, per test class, what device state a test needs so tooling (the
+# Test Harness, CI selection, structural checks) can reason about it statically.
+# They are pure markers: each is an empty subclass of MatterBaseTest that adds NO
+# runtime behavior. Update a test's inheritance to the marker that matches its
+# device requirement; method resolution order is unchanged because the markers
+# override nothing.
+#
+# IMPORTANT: device classification is INDEPENDENT of the background wildcard
+# subscription. Whether the subscription runs is controlled solely by
+# requires_dut / disable_wildcard_subscription / --no-wildcard-subscription (see
+# MatterBaseTest.setup_test). These markers deliberately set no subscription
+# attribute, and a test's device-requirement marker must never be used to derive
+# subscription behavior. The two concerns are orthogonal.
+# ---------------------------------------------------------------------------
+
+
+class MatterTestCommissionedDevice(MatterBaseTest):
+    """Marker: the test requires a DUT already commissioned before test execution.
+
+    Classification follows the DUT-under-test's required starting state, not incidental
+    commissioning actions. A test that opens a commissioning window and commissions a
+    *second* fabric, or commissions a helper/peer device, while its own DUT is already
+    commissioned is still MatterTestCommissionedDevice."""
+
+
+class MatterTestUncommissionedDevice(MatterBaseTest):
+    """Marker: the test requires an uncommissioned / commissionable DUT (not yet on a fabric).
+
+    Used for tests whose DUT-under-test must arrive uncommissioned and that do not perform
+    protocol commissioning of it (e.g. out-of-box discovery / advertising checks). Tests
+    that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner."""
+
+
+class MatterTestCommissioner(MatterBaseTest):
+    """Marker: the DUT-under-test is NOT already commissioned when the test starts, and the
+    test drives commissioning of it itself -- e.g. it calls commission_devices() /
+    CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
+    session to it.
+
+    This is keyed on the primary DUT's starting state, NOT on whether the test happens to
+    exercise commissioner APIs: a test that merely commissions a second fabric or a helper
+    device against an already-commissioned DUT is MatterTestCommissionedDevice, not this."""
+
+
+class CertificationUnitTestNoDevice(MatterBaseTest):
+    """Marker: a parser / validation / framework unit test that never communicates with a DUT."""
+
+
+_DEVICE_REQUIREMENT_MARKERS: tuple[type, ...] = (
+    MatterTestCommissionedDevice,
+    MatterTestUncommissionedDevice,
+    MatterTestCommissioner,
+    CertificationUnitTestNoDevice,
+)
+
+
+def device_requirement(test_class: type) -> type | None:
+    """Return the device-requirement marker 'test_class' declares, or None if it declares none.
+
+    Raises ValueError if the class inherits from more than one marker: a test cannot
+    require two different device states at once.
+    """
+    markers = [m for m in _DEVICE_REQUIREMENT_MARKERS if issubclass(test_class, m)]
+    if len(markers) > 1:
+        raise ValueError(
+            f"{test_class.__name__} declares conflicting device-requirement markers: "
+            f"{', '.join(m.__name__ for m in markers)}"
+        )
+    return markers[0] if markers else None
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

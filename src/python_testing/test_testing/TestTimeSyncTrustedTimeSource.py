@@ -22,7 +22,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
@@ -37,7 +37,7 @@ kConfigureTrustedTimeSource = 19
 # NOTE: all of these tests require a specific app setup. Please see TestTimeSyncTrustedTimeSourceRunner.py
 
 
-class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
+class TestTestTimeSyncTrustedTimeSource(MatterTestCommissionedDevice):
     requires_dut = False
 
     # This test needs to be run against an app that has previously been commissioned, has been reset

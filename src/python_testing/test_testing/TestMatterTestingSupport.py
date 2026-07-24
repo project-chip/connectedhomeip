@@ -25,7 +25,7 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.clusters.Types import Nullable, NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import parse_pics, parse_pics_xml
 from matter.testing.runner import convert_args_to_matter_config, default_matter_test_main, matter_test_args_parser
 from matter.testing.taglist_and_topology_test import (TagProblem, build_tree_for_graph, create_device_type_list_for_root,
@@ -106,7 +106,7 @@ def run_all_match_tests_for_type(test_type):
     test_type_matching_for_type(test_type=test_type, test_nullable=True, test_optional=True)
 
 
-class TestMatterTestingSupport(MatterBaseTest):
+class TestMatterTestingSupport(CertificationUnitTestNoDevice):
     requires_dut = False
 
     @async_test_body

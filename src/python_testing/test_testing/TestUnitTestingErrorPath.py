@@ -41,7 +41,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ log = logging.getLogger(__name__)
 """
 
 
-class TestUnitTestingErrorPath(MatterBaseTest):
+class TestUnitTestingErrorPath(MatterTestCommissionedDevice):
     requires_dut = False
 
     @async_test_body

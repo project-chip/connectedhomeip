@@ -24,7 +24,7 @@ from mobly import asserts
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
 from matter.testing.conformance import ConformanceAssessmentData
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
@@ -175,7 +175,7 @@ def create_cluster_with_o_and_xxx_choice(more: bool):
     return cluster_template.render(feature_string=FEATURE_FOR_O_AND_XXX, attribute_string='\n'.join(xml_str), command_string='')
 
 
-class TestConformanceSupport(MatterBaseTest):
+class TestConformanceSupport(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def setup_class(self):

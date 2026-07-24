@@ -22,11 +22,11 @@ from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType,
                                                  is_standard_cluster_id, is_standard_command_id, is_standard_device_type_id,
                                                  is_valid_attribute_id, is_valid_cluster_id, is_valid_command_id,
                                                  is_valid_device_type_id)
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestIdChecks(MatterBaseTest):
+class TestIdChecks(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def test_device_type_ids(self):

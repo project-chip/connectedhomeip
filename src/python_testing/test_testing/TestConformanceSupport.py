@@ -24,7 +24,7 @@ from matter.testing.conformance import (EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, Choice,
                                         ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated,
                                         disallowed, mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
                                         provisional, zigbee)
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
@@ -35,7 +35,7 @@ def basic_test(xml: str, cls: Callable) -> None:
     asserts.assert_true(isinstance(xml_callable, cls), "Unexpected class parsed from basic conformance")
 
 
-class TestConformanceSupport(MatterBaseTest):
+class TestConformanceSupport(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def setup_class(self):
