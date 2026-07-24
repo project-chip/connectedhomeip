@@ -365,7 +365,8 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@v1.14
+              # findutils fix; no tag past v1.14 yet (simple-elf#78)
+              uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459
               with:
                   allure_results: junit-results
                   allure_report: allure-report
