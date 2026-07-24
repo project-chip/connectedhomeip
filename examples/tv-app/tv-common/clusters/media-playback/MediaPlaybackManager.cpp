@@ -19,6 +19,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <clusters/MediaPlayback/Metadata.h>
 #include <lib/support/Span.h>
 
 #include <string>
@@ -95,6 +96,29 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
         }
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode(Commands::Play::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Pause::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Stop::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Next::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Previous::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Rewind::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::FastForward::Id));
+        ReturnErrorOnFailure(encoder.Encode(Commands::Seek::Id));
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aEncoder)
+{
+    Structs::ContentInfoStruct::Type contentInfo;
+    contentInfo.contentType = MediaType::kTVShow;
+    contentInfo.title       = chip::MakeOptional(chip::app::DataModel::MakeNullable("Example Show"_span));
+    return aEncoder.Encode(contentInfo);
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
@@ -320,7 +344,7 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kEndpointFeatureMap;
     }
@@ -332,9 +356,9 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::MediaPlayback::kRevision;
     }
 
     uint16_t clusterRevision = 0;

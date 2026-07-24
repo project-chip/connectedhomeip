@@ -19,12 +19,17 @@
 #include "AppMain.h"
 #include "AppTv.h"
 
+#include "media-file-management/MediaFileManagementManager.h"
+
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/app-platform/ContentAppPlatform.h>
+#include <app/clusters/media-file-management-server/CodegenIntegration.h>
 #include <app/util/endpoint-config-api.h>
+
+#include <optional>
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "AppTvShellCommands.h"
@@ -36,9 +41,37 @@ using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
 
+namespace {
+
+// Endpoint that hosts the Media File Management cluster in tv-app.zap.
+constexpr EndpointId kMediaFileManagementEndpointId = 1;
+
+// The Media File Management cluster is code-driven, so the application owns the
+// delegate and the cluster registration lifecycle (unlike the legacy Ember
+// clusters wired up via SetDefaultDelegate in ZCLCallbacks.cpp).
+//
+// Both are constructed in ApplicationInit() (not as eagerly-constructed globals)
+// because the manager's constructor performs filesystem I/O and logging, which
+// must not run during static initialization before the SDK is ready.
+std::optional<MediaFileManagement::MediaFileManagementManager> gMediaFileManagementManager;
+std::optional<MediaFileManagement::MediaFileManagementServer> gMediaFileManagementServer;
+
+} // namespace
+
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationInit()");
+
+    // Register the code-driven Media File Management cluster on endpoint 1.
+    gMediaFileManagementManager.emplace();
+    gMediaFileManagementServer.emplace(kMediaFileManagementEndpointId, *gMediaFileManagementManager);
+    CHIP_ERROR err = gMediaFileManagementServer->Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "TV Linux App: MediaFileManagement init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        gMediaFileManagementServer.reset();
+        gMediaFileManagementManager.reset();
+    }
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
@@ -72,7 +105,15 @@ void ApplicationInit()
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    // Unregister the cluster from the data model provider. Shutdown() mirrors
+    // Init(); the optionals are left intact and torn down at process exit.
+    if (gMediaFileManagementServer.has_value())
+    {
+        gMediaFileManagementServer->Shutdown();
+    }
+}
 
 int main(int argc, char * argv[])
 {

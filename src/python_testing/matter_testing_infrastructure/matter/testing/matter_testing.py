@@ -64,8 +64,11 @@ from matter.testing.commissioning import (CommissioningInfo, CustomCommissioning
                                           commission_devices, get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
+                                           resolve_harness_value)
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
@@ -97,6 +100,26 @@ def clear_queue(report_queue: queue.Queue):
             report_queue.get(block=False)
         except queue.Empty:
             break
+
+
+def compute_mrp_retransmission_timeout_sec(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, node_id: int) -> float:
+    """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+    session_params = dev_ctrl.GetRemoteSessionParameters(node_id)
+    # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
+    # idle=500ms, active=300ms.
+    negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else None
+    negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else None
+    if negotiated_idle_interval_ms is None:
+        negotiated_idle_interval_ms = 500
+    if negotiated_active_interval_ms is None:
+        negotiated_active_interval_ms = 300
+
+    # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+    base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+    # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+    backoff_sum = 1 + 1.6 + 2.56 + 4.096
+    return base_interval_ms * backoff_sum * 1.375 / 1000.0
 
 
 def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
@@ -1408,6 +1431,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._teardown_ran = False
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
+        self._validate_test_parameters()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
         # in teardown_class. Skip when the DUT is not known to be available: unit tests
         # never commission a device so _dut_confirmed_available stays False, and
@@ -1518,6 +1542,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing failure information.
         """
         self.failed = True
+        if not self.is_commissioning:
+            test_method = getattr(self, self.current_test_info.name, None)
+            param_dump = format_declared_parameters_for_failure(
+                test_method, self.user_params, self.matter_test_config
+            )
+            if param_dump:
+                LOGGER.error(param_dump)
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
 
@@ -1708,6 +1739,68 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Parameter Getters
     #
+
+    def pixit(self, name: str, default: Any = None) -> Any:
+        """Get a declared PIXIT value by name.
+
+        Retrieves the value from user_params. If not found, optional PIXITs may
+        fall back to the default specified in the @pixit decorator; required
+        PIXITs do not use decorator defaults (setup validation must supply them).
+        Otherwise falls back to the ``default`` argument of this method.
+
+        Args:
+            name: The PIXIT parameter name (as declared in @pixit).
+            default: Fallback default if no value is found and no decorator default exists.
+
+        Returns:
+            The PIXIT value, or the default.
+        """
+        value = self.user_params.get(name)
+        if value is not None:
+            return value
+
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method:
+            for pixit_def in get_pixit_definitions(test_method):
+                if pixit_def.name == name:
+                    if (not pixit_def.required
+                            and pixit_def.default is not _PIXIT_NO_DEFAULT):
+                        return pixit_def.default
+                    return default
+        return default
+
+    def harness_param(self, name: str) -> Any:
+        """Return a declared harness parameter value from ``matter_test_config``.
+
+        Returns the direct config value when available. For ``discriminator`` /
+        ``passcode`` satisfied only via ``--qr-code`` or ``--manual-code``, returns
+        ``None`` because the decoded value is not on ``MatterTestConfig``.
+
+        Args:
+            name: Logical name declared with ``@harness_params`` (registry key).
+
+        Raises:
+            ValueError: If ``name`` is not a registered harness parameter.
+        """
+        return resolve_harness_value(name, self.matter_test_config)
+
+    def _validate_test_parameters(self):
+        """Validate declared PIXITs and harness parameters before each test.
+
+        Called from setup_test(). Fails with a combined message if any required
+        PIXIT or harness parameter is missing.
+        """
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method is None:
+            return
+
+        error_msg = format_missing_test_parameters(
+            test_name, test_method, self.user_params, self.matter_test_config
+        )
+        if error_msg:
+            asserts.fail(error_msg)
 
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""

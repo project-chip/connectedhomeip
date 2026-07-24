@@ -140,6 +140,26 @@ tests:
               - name: "Status"
                 value: 0
 
+    - label: "Read attribute Movable"
+      command: "readAttribute"
+      attribute: "Movable"
+      response:
+          value: true
+
+    - label: "Read attribute Presets"
+      command: "readAttribute"
+      attribute: "Presets"
+
+    - label: "Content Replication Request Command"
+      command: "ContentReplicationRequest"
+
+    - label: "Play Preset Command"
+      command: "PlayPreset"
+      arguments:
+          values:
+              - name: "PresetID"
+                value: 1
+
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.
 CI:
