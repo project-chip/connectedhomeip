@@ -640,31 +640,45 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value, size_t size)
 
 CHIP_ERROR Storage::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
+    constexpr uint8_t kLegacyDateLength        = 10; // YYYY-MM-DD
     char date[kManufacturingDateLengthMax + 1] = { 0 };
-    size_t dateLen                             = 0;
+    char temp[kManufacturingDateLengthMax + 1] = { 0 };
+    size_t date_len                            = 0;
+    char * parse_end                           = nullptr;
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
 
-    ReturnErrorOnFailure(GetManufacturingDate(reinterpret_cast<uint8_t *>(date), sizeof(date), dateLen));
-    VerifyOrReturnError(dateLen >= kDateStringLength, CHIP_ERROR_INVALID_ARGUMENT);
-
-    char temp[5] = { 0 };
-    char * parseEnd;
-
+    ReturnErrorOnFailure(GetManufacturingDate((uint8_t *) date, sizeof(date), date_len));
+    // Convert legacy date format to new date format
+    if ((kLegacyDateLength == date_len) && ('-' == date[4]) && ('-' == date[7]))
+    {
+        date_len = kDateStringLength;
+        snprintf(temp, sizeof(temp), "%.4s%.2s%.2s", date, date + 5, date + 8);
+        memcpy(date, temp, date_len);
+        ReturnErrorOnFailure(SetManufacturingDate(date, date_len));
+    }
+    VerifyOrExit(date_len >= kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // Year
     memcpy(temp, date, 4); // yyyy
     temp[4] = 0;
-    year    = static_cast<uint16_t>(strtoul(temp, &parseEnd, 10));
-    VerifyOrReturnError(parseEnd == temp + 4, CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(temp, date + 4, 2); // mm
+    year    = static_cast<uint16_t>(strtoul(temp, &parse_end, 10));
+    VerifyOrExit(parse_end == (temp + 4), err = CHIP_ERROR_INVALID_ARGUMENT);
+    // Month
+    memcpy(temp, &date[4], 2); // mm
     temp[2] = 0;
-    month   = static_cast<uint8_t>(strtoul(temp, &parseEnd, 10));
-    VerifyOrReturnError(parseEnd == temp + 2, CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(temp, date + 6, 2); // dd
+    month   = static_cast<uint8_t>(strtoul(temp, &parse_end, 10));
+    VerifyOrExit(parse_end == (temp + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
+    // Day
+    memcpy(temp, &date[6], 2); // dd
     temp[2] = 0;
-    day     = static_cast<uint8_t>(strtoul(temp, &parseEnd, 10));
-    VerifyOrReturnError(parseEnd == temp + 2, CHIP_ERROR_INVALID_ARGUMENT);
+    day     = static_cast<uint8_t>(strtoul(temp, &parse_end, 10));
+    VerifyOrExit(parse_end == (temp + 2), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    return CHIP_NO_ERROR;
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        printf("Invalid manufacturing date: %s", date);
+    }
+    return err;
 }
 
 CHIP_ERROR Storage::GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
