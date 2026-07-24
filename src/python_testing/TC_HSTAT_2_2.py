@@ -43,9 +43,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 
 log = logging.getLogger(__name__)
 
@@ -63,22 +63,36 @@ class TC_HSTAT_2_2(MatterBaseTest):
         return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModesMode attribute.", "Store the value as SupportedModes."),
-            TestStep(3, "TH sends command Off to the On/Off cluster on the same endpoint as this cluster.", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(4, "TH reads from the DUT the SystemState attribute.", "Verify that the DUT response contains a value of Idle"),
+            TestStep(3, "TH sends command Off to the On/Off cluster on the same endpoint as this cluster.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(4, "TH reads from the DUT the SystemState attribute.",
+                     "Verify that the DUT response contains a value of Idle"),
             TestStep(5, "TH reads from the DUT the MistType attribute.", "Verify that the DUT response contains the NULL value."),
-            TestStep(6, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(7, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(8, "Individually subscribe to the Mode and SystemState attributes", "This will receive updates when these attributes change value."),
-            TestStep(9, "Iteratively write the value of the Mode attribute with the values in SupportedModes except for one.", "For each update, the DUT shall return a SUCCESS status code."),
+            TestStep(6, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(7, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(8, "Individually subscribe to the Mode and SystemState attributes",
+                     "This will receive updates when these attributes change value."),
+            TestStep(9, "Iteratively write the value of the Mode attribute with the values in SupportedModes except for one.",
+                     "For each update, the DUT shall return a SUCCESS status code."),
             TestStep(10, "Send the SetSettings command with the Mode field set to the remaining value from SupportedModes", "Verify DUT responds w/ status SUCCESS(0x00) After all updates have been performed, verify: The order of the values of the Mode attribute reports matches the order of the SupportedModes list. The order of the values of the SystemState attribute reports matches the order of the SupportedModes list. Where the value in the SupportedModes list is Humidifier, the value in associated report SHALL be Humidifying or Idle. Where the value in the SupportedModes list is Dehumidifier, the value in associated report SHALL be Dehumidifying or Idle. Where the value in the SupportedModes list is FanOnly, the value in associated report SHALL be Fan. Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the Mode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying."),
-            TestStep(11, "TH sends command SetSettings with the Mode field set to Humidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-            TestStep(12, "TH sends command SetSettings with the Mode field set to Dehumidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-            TestStep(13, "TH sends command SetSettings with the Mode field set to FanOnly", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-            TestStep(14, "TH sends command SetSettings with the Mode field set to Auto", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-            TestStep(15, "TH sends command SetSettings with the Continuous field set to True", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(16, "TH sends command SetSettings with the Sleep field set to True", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(17, "TH sends command SetSettings with the Optimal field set to True", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(18, "TH sends command SetSettings with the MistType field set to Cold", "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(11, "TH sends command SetSettings with the Mode field set to Humidifier",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(12, "TH sends command SetSettings with the Mode field set to Dehumidifier",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(13, "TH sends command SetSettings with the Mode field set to FanOnly",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(14, "TH sends command SetSettings with the Mode field set to Auto",
+                     "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+            TestStep(15, "TH sends command SetSettings with the Continuous field set to True",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(16, "TH sends command SetSettings with the Sleep field set to True",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(17, "TH sends command SetSettings with the Optimal field set to True",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep(18, "TH sends command SetSettings with the MistType field set to Cold",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):

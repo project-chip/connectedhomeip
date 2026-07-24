@@ -37,15 +37,15 @@
 # === END CI TEST ARGUMENTS ===
 
 
+import logging
+
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -78,19 +78,19 @@ class TC_HSTAT_2_1(MatterBaseTest):
             TestStep(9, "TH reads from the DUT the UserSetpoint attribute.",
                         "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive such that (SetpointValue - MinSetpointValue) % StepValue == 0. Store the value as SetpointValue."),
             TestStep(10, "TH reads from the DUT the TargetSetpoint attribute.",
-                        "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
+                     "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
             TestStep(11, "TH reads from the DUT the MistType attribute.",
-                        "Verify that the DUT response contains a value with at most the 2 least significant bits set."),
+                     "Verify that the DUT response contains a value with at most the 2 least significant bits set."),
             TestStep(12, "TH reads from the DUT the Continuous attribute.",
-                        "Verify that the DUT response contains a Boolean."),
+                     "Verify that the DUT response contains a Boolean."),
             TestStep(13, "TH reads from the DUT the Sleep attribute.",
-                        "Verify that the DUT response contains a Boolean."),
+                     "Verify that the DUT response contains a Boolean."),
             TestStep(14, "TH reads from the DUT the Optimal attribute.",
-                        "Verify that the DUT response contains a Boolean."),
+                     "Verify that the DUT response contains a Boolean."),
             TestStep(15, "TH reads from the DUT the CondPumpEnabled attribute.",
-                        "Verify that the DUT response contains a Boolean."),
+                     "Verify that the DUT response contains a Boolean."),
             TestStep(16, "TH reads from the DUT the CondRunCount attribute.",
-                        "Verify that the DUT response contains an unsigned integer value."),
+                     "Verify that the DUT response contains an unsigned integer value."),
         ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
@@ -185,7 +185,6 @@ class TC_HSTAT_2_1(MatterBaseTest):
                     asserts.assert_true(fanOnlyFeatureSupported, "FanOnly mode was supported while the feature was not")
             asserts.assert_greater_equal(mode, 0, "SupportedModes entry is out of range")
             asserts.assert_less_equal(mode, 3, "SupportedModes entry is out of range")
-        
 
         self.step(4)
         # TH reads from the DUT the Mode attribute.
@@ -315,7 +314,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         if humidifierFeatureSupported:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
             asserts.true(dut_SystemState in [stateIdle, stateHumidifying], "SystemState attribute is not Idle or Humidifying")
-    
+
         self.step(next(step))  # Set Mode to Dehumidifier
         if dehumidifierFeatureSupported:
             await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=SetSettings(mode=modeDehumidifier))
@@ -472,6 +471,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         if humidifierFeatureSupported and coldFeatureSupported:
             dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
             asserts.assert_true(bool(dut_MistType & mistBitmap.kColdMist), "MistType not Cold")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
