@@ -410,7 +410,7 @@ CHIP_ERROR Storage::GetSpake2pVerifier(char * value, size_t max, size_t & size)
 CHIP_ERROR Storage::SetFirmwareInformation(const ByteSpan & value)
 {
     (void) value;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR Storage::GetFirmwareInformation(MutableByteSpan & value)
