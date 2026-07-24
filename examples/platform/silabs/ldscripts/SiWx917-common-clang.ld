@@ -79,6 +79,24 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)			
 	} > rom 
 	__exidx_end = .;
+	/* startup_si91x.c Copy_Table / Zero_Table */
+	.copy.table :
+	{
+		. = ALIGN(4);
+		__copy_table_start__ = .;
+		LONG (LOADADDR(.data))
+		LONG (__data_start__)
+		LONG ((__data_end__ - __data_start__) / 4)
+		__copy_table_end__ = .;
+	} > rom
+
+	.zero.table :
+	{
+		. = ALIGN(4);
+		__zero_table_start__ = .;
+		__zero_table_end__ = .;
+	} > rom
+
 	__etext = .;
 	
 
@@ -173,6 +191,7 @@ SECTIONS
 	.stack (NOLOAD):
 	{
 		__StackLimit = .;
+		PROVIDE(__stack_limit = __StackLimit);
 		KEEP(*(.stack*))
 		. = ALIGN(4);
 		__StackTop = .;

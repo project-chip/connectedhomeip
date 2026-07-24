@@ -42,7 +42,7 @@ import matter.testing.matchers as matchers
 
 # isort: off
 
-from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
+from matter import ChipDeviceCtrl, discovery  # Needed before matter.FabricAdmin
 import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 import matter.CertificateAuthority
 
@@ -60,12 +60,15 @@ from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
-from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                          get_setup_payload_info_config)
+from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_device,
+                                          commission_devices, get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
+                                           resolve_harness_value)
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
@@ -97,6 +100,26 @@ def clear_queue(report_queue: queue.Queue):
             report_queue.get(block=False)
         except queue.Empty:
             break
+
+
+def compute_mrp_retransmission_timeout_sec(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, node_id: int) -> float:
+    """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+    session_params = dev_ctrl.GetRemoteSessionParameters(node_id)
+    # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
+    # idle=500ms, active=300ms.
+    negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else None
+    negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else None
+    if negotiated_idle_interval_ms is None:
+        negotiated_idle_interval_ms = 500
+    if negotiated_active_interval_ms is None:
+        negotiated_active_interval_ms = 300
+
+    # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+    base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+    # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+    backoff_sum = 1 + 1.6 + 2.56 + 4.096
+    return base_interval_ms * backoff_sum * 1.375 / 1000.0
 
 
 def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
@@ -1408,6 +1431,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._teardown_ran = False
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
+        self._validate_test_parameters()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
         # in teardown_class. Skip when the DUT is not known to be available: unit tests
         # never commission a device so _dut_confirmed_available stays False, and
@@ -1518,6 +1542,13 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing failure information.
         """
         self.failed = True
+        if not self.is_commissioning:
+            test_method = getattr(self, self.current_test_info.name, None)
+            param_dump = format_declared_parameters_for_failure(
+                test_method, self.user_params, self.matter_test_config
+            )
+            if param_dump:
+                LOGGER.error(param_dump)
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
 
@@ -1708,6 +1739,68 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Parameter Getters
     #
+
+    def pixit(self, name: str, default: Any = None) -> Any:
+        """Get a declared PIXIT value by name.
+
+        Retrieves the value from user_params. If not found, optional PIXITs may
+        fall back to the default specified in the @pixit decorator; required
+        PIXITs do not use decorator defaults (setup validation must supply them).
+        Otherwise falls back to the ``default`` argument of this method.
+
+        Args:
+            name: The PIXIT parameter name (as declared in @pixit).
+            default: Fallback default if no value is found and no decorator default exists.
+
+        Returns:
+            The PIXIT value, or the default.
+        """
+        value = self.user_params.get(name)
+        if value is not None:
+            return value
+
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method:
+            for pixit_def in get_pixit_definitions(test_method):
+                if pixit_def.name == name:
+                    if (not pixit_def.required
+                            and pixit_def.default is not _PIXIT_NO_DEFAULT):
+                        return pixit_def.default
+                    return default
+        return default
+
+    def harness_param(self, name: str) -> Any:
+        """Return a declared harness parameter value from ``matter_test_config``.
+
+        Returns the direct config value when available. For ``discriminator`` /
+        ``passcode`` satisfied only via ``--qr-code`` or ``--manual-code``, returns
+        ``None`` because the decoded value is not on ``MatterTestConfig``.
+
+        Args:
+            name: Logical name declared with ``@harness_params`` (registry key).
+
+        Raises:
+            ValueError: If ``name`` is not a registered harness parameter.
+        """
+        return resolve_harness_value(name, self.matter_test_config)
+
+    def _validate_test_parameters(self):
+        """Validate declared PIXITs and harness parameters before each test.
+
+        Called from setup_test(). Fails with a combined message if any required
+        PIXIT or harness parameter is missing.
+        """
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method is None:
+            return
+
+        error_msg = format_missing_test_parameters(
+            test_name, test_method, self.user_params, self.matter_test_config
+        )
+        if error_msg:
+            asserts.fail(error_msg)
 
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
@@ -2152,6 +2245,76 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
 
         result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        if result:
+            self._dut_confirmed_available = True
+        return result
+
+    async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
+        """Commission a single DUT devices over NTL.
+        The discovery_cap_bitmask is patched to keep only the NTL bit ON.
+
+        Uses the default controller to commission a device over NTL based on setup payload
+        and commissioning configuration.
+
+        Returns:
+            True if commissioning succeeded, False otherwise.
+        """
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
+
+        LOGGER.info(
+            "commission_ntl_device. Payload fields: passcode=%s discriminator=%s short_discriminator=%s vendor_id=%s product_id=%s discovery_cap_bitmask=%s commissioning_flow=%s",
+            setup_payload.setup_passcode,
+            setup_payload.long_discriminator,
+            setup_payload.short_discriminator,
+            setup_payload.vendor_id,
+            setup_payload.product_id,
+            format(setup_payload.rendezvous_information, '03b'),
+            setup_payload.commissioning_flow,
+        )
+
+        # Ensure exactly one DUT node id is configured
+        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
+        LOGGER.info("Configured DUT node ids: %s", dut_node_ids)
+        asserts.assert_equal(len(dut_node_ids), 1, "Expected exactly one DUT node id in matter_test_config.dut_node_ids")
+        dut_node_id = dut_node_ids[0]
+
+        # Retrieve the long_discriminator
+        long_discriminator = setup_payload.long_discriminator
+        asserts.assert_is_not_none(long_discriminator, "Expected setup payload to contain a long discriminator")
+        long_discriminator = typing.cast(int, long_discriminator)
+
+        # Create a new SetupPayload where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
+        ntl_onboarding_data = SetupPayload().GenerateQrCode(
+            passcode=setup_payload.setup_passcode,
+            vendorId=setup_payload.vendor_id,
+            productId=setup_payload.product_id,
+            discriminator=long_discriminator,
+            customFlow=setup_payload.commissioning_flow,
+            capabilities=0b10000,
+            version=setup_payload.version
+        )
+
+        # Create SetupPayloadInfo from Onboarding data
+        ntl_setup_payload_info = SetupPayloadInfo()
+        ntl_setup_payload_info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+        ntl_setup_payload_info.filter_value = long_discriminator
+        ntl_setup_payload_info.passcode = setup_payload.setup_passcode
+        ntl_setup_payload_info.setup_code = ntl_onboarding_data
+
+        commissioning_info: CommissioningInfo = CommissioningInfo(
+            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+            commissioning_method=self.matter_test_config.commissioning_method,
+            thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
+            wifi_passphrase=self.matter_test_config.wifi_passphrase,
+            wifi_ssid=self.matter_test_config.wifi_ssid,
+            tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
+            tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            thread_ba_host=self.matter_test_config.thread_ba_host,
+            thread_ba_port=self.matter_test_config.thread_ba_port,
+        )
+
+        pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
+        result = bool(pairing_status)
         if result:
             self._dut_confirmed_available = True
         return result

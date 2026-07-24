@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,4 +15,6 @@
  *    limitations under the License.
  */
 #pragma once
+
+//  This file is kept only for backwards compatibility
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
