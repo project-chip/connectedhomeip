@@ -93,7 +93,6 @@ static_library("chip-tool-utils") {
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
-    "commands/verify/VerifyCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
@@ -101,6 +100,7 @@ static_library("chip-tool-utils") {
     "commands/session-management/CloseSessionCommand.cpp",
     "commands/session-management/CloseSessionCommand.h",
     "commands/storage/StorageManagementCommand.cpp",
+    "commands/verify/VerifyCommand.cpp",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
