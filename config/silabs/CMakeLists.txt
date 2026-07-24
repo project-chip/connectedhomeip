@@ -103,7 +103,6 @@ matter_add_gn_arg_string("chip_crypto"                           ${CONFIG_CHIP_C
 
 if (CONFIG_CHIP_FACTORY_DATA)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
-    matter_add_gn_arg_bool("chip_enable_factory_data"                           TRUE)
 elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
 endif()
