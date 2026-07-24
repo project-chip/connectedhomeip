@@ -49,7 +49,7 @@ from matter.clusters import ClusterObjects
 from matter.clusters.Attribute import AttributePath
 from matter.testing import global_attribute_ids
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_ID = 0xFFF1FC21
@@ -57,7 +57,7 @@ TEST_HIDDEN_MANUFACTURER_SPECIFIC_ENDPOINT = 1
 TEST_HIDDEN_MANUFACTURER_SPECIFIC_ATTRIBUTE_ID = 0x0000  # TestAttribute
 
 
-class TC_ManufacturerSpecificCluster(MatterBaseTest):
+class TC_ManufacturerSpecificCluster(MatterTestCommissionedDevice):
     """
     Integration test for manufacturer-specific cluster handling.
 

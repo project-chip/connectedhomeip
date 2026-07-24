@@ -21,7 +21,7 @@ from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters,
                                          build_xml_global_data_types)
@@ -30,7 +30,7 @@ from matter.tlv import uint
 LOGGER = logging.getLogger(__name__)
 
 
-class TestSpecParsingDataType(MatterBaseTest):
+class TestSpecParsingDataType(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def setup_class(self):

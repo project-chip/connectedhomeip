@@ -35,7 +35,7 @@ from matter.clusters import Attribute
 from matter.testing.decorators import (async_test_body, has_attribute, has_cluster, has_feature, run_if_endpoint_matches,
                                        run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import MockTestRunner
 
 
@@ -98,7 +98,7 @@ class DecoratorTestRunnerHooks:
         pass
 
 
-class TestDecorators(MatterBaseTest):
+class TestDecorators(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def test_checkers(self):

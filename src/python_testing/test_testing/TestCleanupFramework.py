@@ -102,13 +102,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import _has_attribute, _has_cluster, async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TestCleanupFramework(MatterBaseTest):
+class TestCleanupFramework(MatterTestCommissionedDevice):
 
     def desc_TestCleanupFramework(self) -> str:
         return "[TestCleanupFramework] Validates the MatterBaseTest cleanup framework"

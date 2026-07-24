@@ -19,13 +19,13 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import generate_device_element_pics_from_device_wildcard
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 
 
-class TestPicsHelpers(MatterBaseTest):
+class TestPicsHelpers(CertificationUnitTestNoDevice):
     requires_dut = False
 
     def test_pics_generation(self):

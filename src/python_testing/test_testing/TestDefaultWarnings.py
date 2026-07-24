@@ -21,11 +21,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.testing.default_checker as DefaultChecker
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestDefaultChecker(MatterBaseTest):
+class TestDefaultChecker(CertificationUnitTestNoDevice):
     ''' This is a unit-style test of the defaults test. It runs the individual test functions against mocks.'''
     requires_dut = False
 

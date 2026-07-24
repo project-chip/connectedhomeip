@@ -43,11 +43,11 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestWriteReadOnlyAttributes(MatterBaseTest):
+class TestWriteReadOnlyAttributes(MatterTestCommissionedDevice):
     requires_dut = False
 
     @async_test_body
