@@ -99,6 +99,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 #else
     {
         mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+        VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
         // Copy the public key from the CSR
         result =

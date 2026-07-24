@@ -16,6 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/mode-select-server.cpp"
+    "${CLUSTER_DIR}/ModeSelectCluster.cpp"
+    "${CLUSTER_DIR}/SupportedModesManager.h"
     "${CLUSTER_DIR}/supported-modes-manager.h"
 )

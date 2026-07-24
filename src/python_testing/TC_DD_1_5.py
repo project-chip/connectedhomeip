@@ -32,6 +32,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_1_5(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_1_5(self) -> str:
         return "[TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT - Commissionee]"
 

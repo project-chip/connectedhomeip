@@ -8926,6 +8926,28 @@ public class ClusterReadMapping {
           readMessagesActiveMessageIDsCommandParams
         );
         result.put("readActiveMessageIDsAttribute", readMessagesActiveMessageIDsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMessagesSupportedLanguageCodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMessagesSupportedLanguageCodesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MessagesCluster) cluster).readSupportedLanguageCodesAttribute(
+              (ChipClusters.MessagesCluster.SupportedLanguageCodesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMessagesClusterSupportedLanguageCodesAttributeCallback(),
+          readMessagesSupportedLanguageCodesCommandParams
+        );
+        result.put("readSupportedLanguageCodesAttribute", readMessagesSupportedLanguageCodesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMessagesSupportedMimeTypesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMessagesSupportedMimeTypesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MessagesCluster) cluster).readSupportedMimeTypesAttribute(
+              (ChipClusters.MessagesCluster.SupportedMimeTypesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMessagesClusterSupportedMimeTypesAttributeCallback(),
+          readMessagesSupportedMimeTypesCommandParams
+        );
+        result.put("readSupportedMimeTypesAttribute", readMessagesSupportedMimeTypesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readMessagesGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readMessagesGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18184,6 +18206,17 @@ public class ClusterReadMapping {
           readMediaPlaybackAvailableTextTracksCommandParams
         );
         result.put("readAvailableTextTracksAttribute", readMediaPlaybackAvailableTextTracksAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaPlaybackAvailableCommandsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaPlaybackAvailableCommandsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaPlaybackCluster) cluster).readAvailableCommandsAttribute(
+              (ChipClusters.MediaPlaybackCluster.AvailableCommandsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaPlaybackClusterAvailableCommandsAttributeCallback(),
+          readMediaPlaybackAvailableCommandsCommandParams
+        );
+        result.put("readAvailableCommandsAttribute", readMediaPlaybackAvailableCommandsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readMediaPlaybackGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readMediaPlaybackGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18464,6 +18497,28 @@ public class ClusterReadMapping {
           readContentLauncherSupportedStreamingProtocolsCommandParams
         );
         result.put("readSupportedStreamingProtocolsAttribute", readContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentLauncherMovableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentLauncherMovableAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentLauncherCluster) cluster).readMovableAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readContentLauncherMovableCommandParams
+        );
+        result.put("readMovableAttribute", readContentLauncherMovableAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentLauncherPresetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentLauncherPresetsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentLauncherCluster) cluster).readPresetsAttribute(
+              (ChipClusters.ContentLauncherCluster.PresetsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedContentLauncherClusterPresetsAttributeCallback(),
+          readContentLauncherPresetsCommandParams
+        );
+        result.put("readPresetsAttribute", readContentLauncherPresetsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readContentLauncherGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readContentLauncherGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18810,7 +18865,18 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readAccountLoginInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginOAuthLoggedInCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccountLoginOAuthLoggedInAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccountLoginCluster) cluster).readOAuthLoggedInAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAccountLoginOAuthLoggedInCommandParams
+        );
+        result.put("readOAuthLoggedInAttribute", readAccountLoginOAuthLoggedInAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccountLoginGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.AccountLoginCluster) cluster).readGeneratedCommandListAttribute(
