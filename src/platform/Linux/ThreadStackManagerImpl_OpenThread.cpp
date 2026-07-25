@@ -27,7 +27,15 @@
 
 #include "ThreadStackManagerImpl_OpenThread.h"
 
+// CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP (defined in CHIPDevicePlatformConfig.h,
+// pulled in by CHIPDeviceConfig.h) selects the posix otSysMainloop* event API over
+// the simulation platform's otSysUpdateEvents/otSysProcessEvents.
+#include <platform/CHIPDeviceConfig.h>
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+#include <openthread/openthread-system.h>
+#else
 #include <openthread-select.h>
+#endif
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -70,7 +78,26 @@ void ThreadStackManagerImpl::PrepareEvents(int & maxfd, fd_set & readfds, fd_set
     struct timeval timeoutOpenThread = timeout;
 
     otTaskletsProcess(OTInstance());
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    // The POSIX platform bundles the fd sets, max fd and timeout into a single
+    // otSysMainloopContext. otSysMainloopUpdate only *adds* descriptors and
+    // shortens the timeout, so seed the context with CHIP's aggregates and copy
+    // the merged results back into timeoutOpenThread for the shared min below.
+    otSysMainloopContext mainloop{};
+    mainloop.mMaxFd      = maxfd;
+    mainloop.mReadFdSet  = readfds;
+    mainloop.mWriteFdSet = writefds;
+    mainloop.mErrorFdSet = exceptfds;
+    mainloop.mTimeout    = timeoutOpenThread;
+    otSysMainloopUpdate(OTInstance(), &mainloop);
+    maxfd             = mainloop.mMaxFd;
+    readfds           = mainloop.mReadFdSet;
+    writefds          = mainloop.mWriteFdSet;
+    exceptfds         = mainloop.mErrorFdSet;
+    timeoutOpenThread = mainloop.mTimeout;
+#else
     otSysUpdateEvents(OTInstance(), &maxfd, &readfds, &writefds, &exceptfds, &timeoutOpenThread);
+#endif
 
     if (timeoutOpenThread.tv_sec < timeout.tv_sec ||
         (timeoutOpenThread.tv_sec == timeout.tv_sec && timeoutOpenThread.tv_usec < timeout.tv_usec))
@@ -81,7 +108,17 @@ void ThreadStackManagerImpl::PrepareEvents(int & maxfd, fd_set & readfds, fd_set
 
 void ThreadStackManagerImpl::ProcessEvents(const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds)
 {
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    // mMaxFd is unused on the process path (otSysMainloopProcess dispatches by
+    // FD_ISSET, never iterating up to mMaxFd), so only the fd sets are seeded.
+    otSysMainloopContext mainloop{};
+    mainloop.mReadFdSet  = readfds;
+    mainloop.mWriteFdSet = writefds;
+    mainloop.mErrorFdSet = exceptfds;
+    otSysMainloopProcess(OTInstance(), &mainloop);
+#else
     otSysProcessEvents(OTInstance(), &readfds, &writefds, &exceptfds);
+#endif
 }
 
 void ThreadStackManagerImpl::_LockThreadStack()

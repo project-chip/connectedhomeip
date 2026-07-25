@@ -1095,6 +1095,19 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+ *
+ * Drive the OpenThread stack from the POSIX platform's otSysMainloop* event API
+ * instead of the simulation platform's otSysUpdateEvents/otSysProcessEvents, and use
+ * the otSysInit(otPlatformConfig*) signature. Set by the Linux POSIX RCP build; see
+ * src/platform/Linux/openthread_posix_rcp.gni.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+#define CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
  *
  * Indicate if the matter device thread stack is implemented using the ot-br-posix dbus API
