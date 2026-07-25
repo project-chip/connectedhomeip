@@ -75,6 +75,10 @@ enum
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
     kDeviceOption_ThreadNodeId,
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    kDeviceOption_ThreadRadioUrl,
+    kDeviceOption_ThreadDataPath,
+#endif
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -179,6 +183,10 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    { "thread-radio-url", kArgumentRequired, kDeviceOption_ThreadRadioUrl },
+    { "thread-data-path", kArgumentRequired, kDeviceOption_ThreadDataPath },
+#endif
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif
@@ -296,6 +304,14 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --thread-node-id <node id>\n"
     "       Enable Thread Simulation with the specified node id.\n"
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    "  --thread-radio-url <url>\n"
+    "       Drive a real 802.15.4 RCP over spinel via OpenThread's POSIX platform\n"
+    "       (e.g. spinel+hdlc+uart:///dev/ttyACM0). No otbr/ot-daemon required.\n"
+    "  --thread-data-path <dir>\n"
+    "       OpenThread settings directory for this instance, isolating its state\n"
+    "       when running multiple RCP device instances. Defaults to the platform path.\n"
+#endif
 #else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
@@ -580,6 +596,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
         break;
+#if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
+    case kDeviceOption_ThreadRadioUrl:
+        LinuxDeviceOptions::GetInstance().mThreadRadioUrl = aValue;
+        break;
+    case kDeviceOption_ThreadDataPath:
+        LinuxDeviceOptions::GetInstance().mThreadDataPath = aValue;
+        break;
+#endif
 #else
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;

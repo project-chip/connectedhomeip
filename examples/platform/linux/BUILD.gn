@@ -297,7 +297,7 @@ source_set("app-main") {
     # Must match src/platform/Linux/BUILD.gn: link exactly one OT platform, or
     # the simulation and posix radios' otPlatRadio* symbols collide.
     if (chip_openthread_linux_use_posix_rcp) {
-      deps += [ "${chip_root}/third_party/openthread/platforms/posix" ]
+      deps += [ "${chip_root}/src/platform/Linux/openthread_posix_rcp" ]
 
       # AppMain must build the posix otSysInit(otPlatformConfig*) call (not the
       # simulation otSysInit(argc, argv)); shares the CHIP glue's select macro.
