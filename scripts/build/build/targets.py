@@ -239,6 +239,9 @@ def BuildHostTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier("openthread-endpoint", openthread_endpoint=True)
+    # POSIX-RCP variant: lighting-app driving a real 802.15.4 RCP over spinel via
+    # OpenThread's POSIX platform. Scoped to a single lighting-app target.
+    target.AppendModifier("thread-rcp", use_thread_posix_rcp=True).OnlyIfRe('-light-thread-rcp$')
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
