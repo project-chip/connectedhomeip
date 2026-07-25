@@ -562,6 +562,9 @@ class AndroidBuilder(Builder):
                 title="Building JNI " + self.identifier,
             )
 
+            if (self.profile != AndroidProfile.DEBUG) or self.optimize_size:
+                self.stripSymbols()
+
             exampleName = self.app.ExampleName()
             if exampleName is None:
                 self.copyToSrcAndroid()
@@ -662,9 +665,6 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
-
-            if (self.profile != AndroidProfile.DEBUG) or self.optimize_size:
-                self.stripSymbols()
 
     def build_outputs(self):
         if self.board.IsIde():
