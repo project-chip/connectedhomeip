@@ -3389,7 +3389,7 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
 
 class MatterTestCommissioner(MatterBaseTest):
-    """Marker: the DUT-under-test is NOT already commissioned when the test starts, and the
+    """Marker: the DUT is NOT already commissioned when the test starts, and the
     test drives commissioning of it itself -- e.g. it calls commission_devices() /
     CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
     session to it.
