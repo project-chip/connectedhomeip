@@ -474,6 +474,7 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
+                 use_thread_posix_rcp=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
@@ -691,6 +692,36 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+
+        if use_thread_posix_rcp:
+            # Drive a real 802.15.4 RCP over spinel via OpenThread's POSIX platform
+            # (no otbr / ot-daemon) instead of the UDP simulation radio. The core lib
+            # and posix platform lib must share the POSIX core config header, selected
+            # here via openthread_project_core_config_file (repo-relative path).
+            self.extra_gn_options.append('chip_openthread_linux_use_posix_rcp=true')
+            self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+            self.extra_gn_options.append('chip_mdns="platform"')
+            self.extra_gn_options.append('openthread_enable_core_config_args=true')
+            # Feature set a Matter Thread device needs (mirrors all-clusters-app);
+            # SRP client is what makes the device discoverable, and it requires
+            # ECDSA. joiner pulls in the seeker API that CHIP's OT glue references.
+            self.extra_gn_options.append('openthread_config_ecdsa_enable=true')
+            self.extra_gn_options.append('openthread_config_ip6_slaac_enable=true')
+            self.extra_gn_options.append('openthread_config_srp_client_enable=true')
+            self.extra_gn_options.append('openthread_config_joiner_enable=true')
+            self.extra_gn_options.append('openthread_config_tcp_enable=false')
+            # //third_party/connectedhomeip is the chip_root symlink present in each
+            # example root; gn's ${chip_root} is not in scope for command-line --args.
+            self.extra_gn_options.append(
+                'openthread_project_core_config_file=rebase_path('
+                '"//third_party/connectedhomeip/third_party/openthread/repo/'
+                'src/posix/platform/openthread-core-posix-config.h")')
+            # Project config header (enables MESHCOP steering-data API referenced by
+            # CHIP's OT glue). Value must include the quotes for OPENTHREAD_CONFIG_FILE.
+            self.extra_gn_options.append(
+                'openthread_config_file="\\""+rebase_path('
+                '"//third_party/connectedhomeip/third_party/openthread/'
+                'openthread-config.h")+"\\""')
 
         if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:
