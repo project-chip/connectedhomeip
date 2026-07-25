@@ -1291,15 +1291,15 @@ jobs:
       permissions:
           contents: write
           checks: write
+      env:
+          # Allure is only deployed to gh-pages post-merge; on PRs / merge_group
+          # the deploy no-ops, so building it (and cloning the gh-pages history)
+          # is wasted work. Gate the publish-only steps below on this.
+          PUBLISH_ALLURE_HISTORY: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
 
       steps:
           - name: Checkout
             uses: actions/checkout@v7
-
-          # The gh-pages Allure history is handled several times over on this
-          # runner (checkout, history copy, deploy clone), so free up disk first.
-          - name: Maximize runner disk
-            uses: ./.github/actions/maximize-runner-disk
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1316,14 +1316,22 @@ jobs:
                 require_tests: false
                 annotate_only: true
 
+          # The gh-pages Allure history is handled several times over on this
+          # runner (checkout, history copy, deploy clone), so free up disk first.
+          - name: Maximize runner disk
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
+            uses: ./.github/actions/maximize-runner-disk
+
           - name: Checkout gh-pages for Allure history
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
             uses: actions/checkout@v7
             with:
                 ref: gh-pages
                 path: gh-pages
 
           - name: Generate Allure Report
-            uses: simple-elf/allure-report-action@v1.14
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
+            uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
             with:
                 allure_results: junit-results
                 allure_report: allure-report
@@ -1335,6 +1343,7 @@ jobs:
                 report_name: "CI Tests"
 
           - name: Upload Allure Report
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
             uses: actions/upload-artifact@v7
             with:
                 name: allure-report-ci-repl
@@ -1343,7 +1352,7 @@ jobs:
                 if-no-files-found: warn
 
           - name: Deploy to GitHub Pages
-            if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
             uses: peaceiris/actions-gh-pages@v4
             with:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
