@@ -1744,5 +1744,26 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriter)
     EXPECT_EQ(memcmp(yayBuffer->Start(), kPayload, sizeof kPayload), 0);
 }
 
+TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
+{
+    static const char kPayload[] = "Hello, world!";
+
+    // A failed allocation reaches the writer as a null handle. Construction must leave the
+    // writer null instead of dereferencing it, so that callers can test IsNull() as documented.
+    PacketBufferWriter sized(PacketBufferHandle(), sizeof(kPayload));
+    EXPECT_TRUE(sized.IsNull());
+    EXPECT_EQ(sized.Size(), static_cast<size_t>(0));
+
+    PacketBufferHandle empty;
+    PacketBufferWriter unsized(std::move(empty));
+    EXPECT_TRUE(unsized.IsNull());
+    EXPECT_EQ(unsized.Size(), static_cast<size_t>(0));
+
+    // Writing to a null writer must be inert, and Finalize() must yield a null handle.
+    sized.Put(kPayload);
+    EXPECT_FALSE(sized.Fit());
+    EXPECT_TRUE(sized.Finalize().IsNull());
+}
+
 } // namespace System
 } // namespace chip
