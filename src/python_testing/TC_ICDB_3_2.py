@@ -68,8 +68,8 @@ from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperatio
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

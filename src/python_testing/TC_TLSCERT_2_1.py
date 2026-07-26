@@ -38,8 +38,8 @@ from TC_TLSCERT_Base import TC_TLSCERT_Base
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_1(MatterTestCommissionedDevice, TC_TLSCERT_Base):

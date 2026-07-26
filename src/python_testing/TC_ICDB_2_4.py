@@ -50,8 +50,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.matter_testing import MatterTestCommissioner
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

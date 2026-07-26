@@ -50,8 +50,8 @@ from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFAdministratorSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.matter_testing import MatterTestCommissioner
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 

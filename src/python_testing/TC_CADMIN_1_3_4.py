@@ -56,9 +56,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
-from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 

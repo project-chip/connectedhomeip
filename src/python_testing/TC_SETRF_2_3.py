@@ -47,8 +47,8 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityTariff
 
