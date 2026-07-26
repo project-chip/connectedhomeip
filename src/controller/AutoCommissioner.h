@@ -165,7 +165,7 @@ private:
     static constexpr size_t kMaxSupportedTimeZones = 2;
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type mTimeZoneBuf[kMaxSupportedTimeZones];
     static constexpr size_t kMaxTimeZoneNameLen = 64;
-    char mTimeZoneNames[kMaxTimeZoneNameLen][kMaxSupportedTimeZones];
+    char mTimeZoneNames[kMaxSupportedTimeZones][kMaxTimeZoneNameLen];
 
     // DSTOffsetStructs are similarly not trivially destructible. They don't have a defined size, but we're
     // going to do static allocation of the buffers anyway until we replace chip::Optional with std::optional.
