@@ -265,6 +265,14 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         { // get STM_Header
             uint8_t STMHeader[STM_HEADER_SIZE];
 
+            if (imageProcessor->mBlock.size() < sizeof(STMHeader))
+            {
+                ChipLogError(SoftwareUpdate, "Block of %u bytes is too small to hold the STM header (%u bytes)",
+                             static_cast<unsigned>(imageProcessor->mBlock.size()), static_cast<unsigned>(sizeof(STMHeader)));
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_DECODE_FAILED);
+                return;
+            }
+
             memcpy(STMHeader, reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()), sizeof(STMHeader));
 
             // retrieve the cpu1/2 size with STM header
