@@ -29,7 +29,8 @@ from mobly import asserts
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep, has_feature, run_if_endpoint_matches
+from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -986,7 +987,7 @@ async def verify_operational_network(test, ssid):
         pass
 
 
-class TC_CNET_4_11(MatterBaseTest):
+class TC_CNET_4_11(MatterTestCommissionedDevice):
 
     @classmethod
     def setup_class(cls):

@@ -75,13 +75,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import _has_feature, async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SC_5_2(MatterBaseTest):
+class TC_SC_5_2(MatterTestCommissionedDevice):
     def __init__(self, *args):
         super().__init__(*args)
 

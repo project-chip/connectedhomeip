@@ -48,11 +48,12 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_4_1(SoftwareUpdateBaseTest):
+class TC_SU_4_1(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     """[TC-SU-4.1] Verifying Cluster Attributes on OTA-R(DUT)"""
 
     # Reference variable for the OTA Software Update Requestor cluster.

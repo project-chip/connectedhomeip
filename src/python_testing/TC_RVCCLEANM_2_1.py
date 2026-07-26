@@ -46,7 +46,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ log = logging.getLogger(__name__)
 # --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
 
 
-class TC_RVCCLEANM_2_1(MatterBaseTest):
+class TC_RVCCLEANM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)

@@ -71,6 +71,7 @@ from matter.interaction_model import InteractionModelError
 from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissioner
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ commands = cluster.Commands
 ClientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
-class TC_ICDB_2_3(ICDBaseTest):
+class TC_ICDB_2_3(MatterTestCommissioner, ICDBaseTest):
 
     @async_test_body
     async def setup_class(self):

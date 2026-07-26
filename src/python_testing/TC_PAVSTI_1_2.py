@@ -48,13 +48,13 @@ from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
+class TC_PAVSTI_1_2(MatterTestCommissionedDevice, AVSMTestBase, PAVSTIUtils):
     def desc_TC_PAVSTI_1_2(self) -> str:
         return "[TC-PAVSTI-1.2] Verify CMAF Interface-2 DASH-based ingestion with continuous trigger type and privacy settings validation."
 

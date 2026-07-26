@@ -51,11 +51,12 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
+class TC_SETRF_2_2(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_2."""
 
     def desc_TC_SETRF_2_2(self) -> str:

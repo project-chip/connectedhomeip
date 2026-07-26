@@ -91,7 +91,7 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import EventReadResult
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -116,7 +116,7 @@ def bump_substep(step: str) -> str:
     return step_prefix + next_end_char
 
 
-class TC_SwitchTests(MatterBaseTest):
+class TC_SwitchTests(MatterTestCommissionedDevice):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._default_pressed_position = self.user_params.get("default_pressed_position", 1)

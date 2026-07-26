@@ -44,7 +44,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import CommissioningInfo, SetupParameters, commission_device
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
@@ -61,7 +61,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/deviceatt
 '''
 
 
-class TC_DA_1_1(MatterBaseTest):
+class TC_DA_1_1(MatterTestCommissionedDevice):
 
     def desc_TC_DA_1_1(self) -> str:
         return "The NOC SHALL be wiped on Factory Reset [DUT - Commissionee]"

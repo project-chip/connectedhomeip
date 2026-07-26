@@ -44,7 +44,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ def error_enum_to_text(error_enum):
         return f'{Clusters.OperationalState.Enums.ErrorStateEnum(error_enum).name[1:]}(0x{error_enum:02x})'
 
 
-class TC_RVCOPSTATE_2_4(MatterBaseTest):
+class TC_RVCOPSTATE_2_4(MatterTestCommissionedDevice):
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = None

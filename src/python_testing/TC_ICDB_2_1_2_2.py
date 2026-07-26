@@ -51,6 +51,7 @@ import matter.clusters as Clusters
 from matter.testing.commissioning import CommissioningInfo, commission_device, get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissioner
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ commands = cluster.Commands
 ClientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
-class TC_ICDB_2_1_2_2(ICDBaseTest):
+class TC_ICDB_2_1_2_2(MatterTestCommissioner, ICDBaseTest):
 
     # DUT can take more than one cycle to detect a dropped subscriber and resume check-ins, default_timeout
     # is raised to accommodate that (can be overridden by a --timeout on the command line)

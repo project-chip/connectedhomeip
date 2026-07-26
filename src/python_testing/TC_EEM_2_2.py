@@ -45,11 +45,11 @@ from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EEM_2_2(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def desc_TC_EEM_2_2(self) -> str:
         """Returns a description of this test"""

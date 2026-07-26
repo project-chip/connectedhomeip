@@ -36,19 +36,20 @@ import random
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_15(MatterBaseTest):
+class TC_CADMIN_1_15(MatterTestCommissionedDevice, CADMINBaseTest):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Clusters.AdministratorCommissioning.Enums.StatusCode | None = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
             return await th.OpenCommissioningWindow(

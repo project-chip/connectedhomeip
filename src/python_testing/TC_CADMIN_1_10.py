@@ -44,11 +44,12 @@ import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_10(CADMINBaseTest):
+class TC_CADMIN_1_10(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_10(self) -> list[TestStep]:
         return [

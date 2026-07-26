@@ -46,7 +46,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ log = logging.getLogger(__name__)
 # For running in CI, it is expected that OK=0 and FAIL=2
 
 
-class TC_RVCRUNM_2_1(MatterBaseTest):
+class TC_RVCRUNM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)

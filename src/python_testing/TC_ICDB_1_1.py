@@ -53,6 +53,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
 
-class TC_ICDB_1_1(ICDBaseTest):
+class TC_ICDB_1_1(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_1_1(self) -> str:
         return "[TC-ICDB-1.1] ICD Check-In Protocol - Register client - idle mode duration [DUT as Server]"

@@ -44,7 +44,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 
@@ -56,7 +56,7 @@ class RvcStatusEnum(enum.IntEnum):
     InvalidInMode = 0x3
 
 
-class TC_RVCCLEANM_2_2(MatterBaseTest):
+class TC_RVCCLEANM_2_2(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
