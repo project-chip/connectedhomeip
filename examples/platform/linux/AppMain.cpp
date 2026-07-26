@@ -762,9 +762,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_THREAD_OT_POSIX_MAINLOOP
         // POSIX platform (real RCP over spinel): otSysInit takes an otPlatformConfig
         // carrying the radio URL, not the simulation platform's (argc, argv).
-        // --thread-node-id has no meaning against a real RCP, so require the URL
-        // rather than passing a null one down into the radio driver.
-        VerifyOrExit(LinuxDeviceOptions::GetInstance().mThreadRadioUrl != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
         otPlatformConfig platformConfig{};
         platformConfig.mCoprocessorUrls.mUrls[0] = LinuxDeviceOptions::GetInstance().mThreadRadioUrl;
         platformConfig.mCoprocessorUrls.mNum     = 1;
