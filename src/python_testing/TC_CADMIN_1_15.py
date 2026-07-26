@@ -36,7 +36,6 @@ import random
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
-from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
