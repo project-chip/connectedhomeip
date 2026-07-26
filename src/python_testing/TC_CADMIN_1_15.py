@@ -49,7 +49,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_15(MatterTestCommissionedDevice, CADMINBaseTest):
+class TC_CADMIN_1_15(MatterTestCommissionedDevice):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Clusters.AdministratorCommissioning.Enums.StatusCode | None = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
             return await th.OpenCommissioningWindow(
