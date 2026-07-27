@@ -184,6 +184,9 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static CHIP_ERROR ClearConfigValue(const char * keyString);
     static bool ConfigValueExists(Key key);
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
+    static CHIP_ERROR FactoryResetEraseSettings(void);
+#endif
     static CHIP_ERROR FactoryResetConfig(void);
     static bool ValidConfigKey(Key key);
 
