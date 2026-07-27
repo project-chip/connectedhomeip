@@ -92,7 +92,16 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
     }
 
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertActiveDataset() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR RevertActiveDataset() override
+    {
+        // SetActiveDataset is only accepted when no dataset is configured, so
+        // reverting it means returning to the unconfigured state.
+        mActiveDataset.Clear();
+        mAttributeChangeCallback->ReportAttributeChanged(
+            app::Clusters::ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        return CHIP_NO_ERROR;
+    }
 
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override
     {
