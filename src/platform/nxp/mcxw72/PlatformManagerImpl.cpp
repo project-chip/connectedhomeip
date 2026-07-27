@@ -108,7 +108,7 @@ void PlatformManagerImpl::HardwareInit(void)
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
-status_t crypto_init_status = kStatus_Success;
+    status_t crypto_init_status = kStatus_Success;
 #if CHIP_CRYPTO_PSA
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
     config_mbedtls_threading_alt();
@@ -119,7 +119,7 @@ status_t crypto_init_status = kStatus_Success;
 #endif /* CHIP_CRYPTO_PSA */
 
     VerifyOrDieWithMsg(crypto_init_status == kStatus_Success, DeviceLayer,
-        "A2 Board Detected: secure subsystem is not supported for A2 boards. Aborting...");
+                       "A2 Board Detected: secure subsystem is not supported for A2 boards. Aborting...");
     BOARD_InitAppConsole();
 }
 
@@ -268,7 +268,8 @@ void PlatformManagerImpl::_Shutdown()
 #if CONFIG_NXP_USE_LOW_POWER
 CHIP_ERROR PlatformManagerImpl::EnableOTAStorage(void)
 {
-    switch (otaStorageState) {
+    switch (otaStorageState)
+    {
     case OTAStorageEnabled:
         // OTA storage is already enabled. Do nothing
         break;

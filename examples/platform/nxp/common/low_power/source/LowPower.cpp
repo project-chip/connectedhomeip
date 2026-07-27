@@ -24,9 +24,9 @@ extern "C" {
 #include "fwk_platform_extflash.h"
 }
 
+#include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
 #include <platform/nxp/common/PlatformManagerImpl.h>
-#include <lib/support/CodeUtils.h>
 
 #define APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED CHIP_APPLICATION_ERROR(0x01)
 
