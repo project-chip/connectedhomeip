@@ -75,7 +75,7 @@ class XmlRpcServerProcess(WrappedProcess[ProcessConfig, XmlRpcFuncCall, XmlRpcFu
 
     def _call(self, name: str, *args: Any) -> bool:
         log.debug("Call: %s%r", name, args)
-        self._work_queue.put(XmlRpcFuncCall(name, args))
+        self.work_queue.put(XmlRpcFuncCall(name, args))
 
         # Get the result from the response queue. If there was an exception, propagate it to the RPC server process, so that it can
         # be handled by it, and in turn propagated back to the caller of the RPC function.
@@ -227,7 +227,7 @@ class XmlRpcServerProcessManager(threading.Thread):
 
                 while True:
                     try:
-                        server._rsp_queue.put(self._proc_work(server._work_queue.get()))
+                        server._rsp_queue.put(self._proc_work(server.work_queue.get()))
                     except QueueCancelled:
                         log.debug("Stopping on a cancel event")
                         break

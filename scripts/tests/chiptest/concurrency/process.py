@@ -76,7 +76,7 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
         # to initialize some shared resources in the constructor.
 
         self._config = config
-        self._work_queue = work_queue
+        self.work_queue = work_queue
         self._rsp_queue = rsp_queue
         self.state = ProcessState(mp_manager, config)
 
@@ -148,12 +148,15 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
         return False
 
     @with_annotated_exception
-    def stop(self) -> None:
+    def stop(self, *, cancel_queue: bool = False) -> None:
         """
         Stop the subprocess with escalating termination signals.
 
         The method waits for a graceful exit first (typically triggered when the work queue is cancelled by its owner). If still
         alive, it escalates to SIGINT, then SIGTERM, then SIGKILL.
+
+        Work queue cancellation is optional, as the caller may have already cancelled it. If `cancel_queue` is True, the work queue
+        is cancelled before attempting to stop the process.
         """
         if self._stopped:
             log.debug("Process %s is already stopped", self.name)
@@ -166,7 +169,10 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
                 log.debug("Process %s hasn't been started yet or has been already stopped", self.name)
                 return
 
-            # Wait for the external work queue to be cancelled by its owner, which should signal the process to gracefully stop.
+            # Wait for the external work queue to be cancelled by its owner or if cancel_queue is True. It should signal the process
+            # to gracefully stop.
+            if cancel_queue:
+                self.work_queue.cancel()
             if self.has_stopped(self._config.stop_timeout_sec):
                 return
 
@@ -263,4 +269,4 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
         Default behavior waits for cancellation. Override to consume `self._work_queue` and publish activity by toggling
         `state.phase` between `READY` and `WORKING` as appropriate.
         """
-        self._work_queue.wait_for_cancelled()
+        self.work_queue.wait_for_cancelled()

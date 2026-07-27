@@ -65,7 +65,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
     def _proc_work(self) -> None:
         """Main loop of the worker process."""
         while True:
-            work = self._work_queue.get()
+            work = self.work_queue.get()
 
             with (self.state.working_context(),
                   self._config.log_config.fmt_context(task=work.test.name, level=self._config.log_config.level_tests),
