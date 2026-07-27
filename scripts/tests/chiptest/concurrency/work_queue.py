@@ -37,7 +37,7 @@ class WaitableFor(Protocol, Generic[P]):
 
 
 def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable[P, bool] | None = None,
-                        timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
+                        timeout_sec: float | None = None, polling_interval_sec: float = 1.0) -> bool:
     """
     Wait for a resource managed by multiprocessing.Manager.
 
