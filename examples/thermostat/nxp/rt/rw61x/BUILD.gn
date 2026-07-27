@@ -107,6 +107,7 @@ rt_sdk("sdk") {
 
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+
     # CONFIG_CHIP_CRYPTO_PSA=1 is required to propagate the PSA crypto backend
     # selection to the Matter port layer. It is consumed by NXP Matter port files
     # (e.g. src/platform/nxp) to conditionally compile PSA-based crypto paths.
@@ -129,14 +130,14 @@ rt_executable("thermostat") {
 
   if (chip_enable_thread) {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+
     # CONFIG_CHIP_OPENTHREAD_FTD is propagated here so that it is visible to
     # mbedtls/config/nxp_matter_mbedtls_config.h, which gates OpenThread FTD
     # specific mbedTLS configuration on this macro.
     defines += [ "CONFIG_CHIP_OPENTHREAD_FTD" ]
   }
 
-  if (chip_enable_wifi)
-  {
+  if (chip_enable_wifi) {
     # CONFIG_CHIP_WIFI is propagated here so that it is visible to
     # mbedtls/config/nxp_matter_mbedtls_config.h, which gates Wi-Fi specific
     # mbedTLS configuration on this macro.
