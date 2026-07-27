@@ -29,10 +29,11 @@ from typing import Any
 
 import chiptest
 import click
+from chiptest.concurrency.config import WorkerConfig
 from chiptest.concurrency.context import SYNC_MANAGER_PATH, mp_wrapped_spawn_context
-from chiptest.concurrency.process import ProcessPhase
+from chiptest.concurrency.state import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
-from chiptest.concurrency.worker import GenericWorkerProcess, WorkerConfig, WorkerJob
+from chiptest.concurrency.worker import GenericWorkerProcess, WorkerJob
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus

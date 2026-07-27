@@ -29,6 +29,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, TypeAlias
 
+from chiptest.concurrency.config import WorkerConfig
 from chiptest.concurrency.context import TerminableThread
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue
 

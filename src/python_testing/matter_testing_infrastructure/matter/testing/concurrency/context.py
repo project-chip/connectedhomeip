@@ -13,15 +13,51 @@
 # limitations under the License.
 
 import contextlib
+import functools
 import logging
+import multiprocessing
+import multiprocessing.process
 import subprocess
 import threading
 from abc import abstractmethod
 from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Generic, Self, TypeVar
+from typing import Any, Concatenate, Generic, ParamSpec, Protocol, Self, TypeVar, runtime_checkable
 
 log = logging.getLogger(__name__)
+
+
+class WithName(Protocol):
+    @property
+    def name(self) -> str: ...
+
+
+@runtime_checkable
+class HasProcessProperty(Protocol):
+    _proc: multiprocessing.process.BaseProcess
+
+
+S = TypeVar("S", bound="WithName")
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def with_annotated_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+    """Decorator to enrich exceptions from thread and process methods with their names for easier debugging."""
+
+    @functools.wraps(fn)
+    def wrapper(self: S, *args: P.args, **kwargs: P.kwargs) -> R:
+        try:
+            return fn(self, *args, **kwargs)
+        except BaseException as e:
+            kind = ("thread" if isinstance(self, threading.Thread) else
+                    "process" if isinstance(self, (multiprocessing.Process, HasProcessProperty)) else
+                    self.__class__.__name__)
+
+            e.add_note(f"Exception in {kind} {self.name}")
+            raise
+
+    return wrapper
 
 
 InternalResourceT = TypeVar("InternalResourceT")

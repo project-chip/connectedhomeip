@@ -29,8 +29,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from chiptest.concurrency.context import StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context
-from chiptest.concurrency.process import ProcessConfig, WrappedProcess, with_annotated_exception
+from chiptest.concurrency.config import ProcessConfig
+from chiptest.concurrency.context import (StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context,
+                                          with_annotated_exception)
+from chiptest.concurrency.process import WrappedProcess
 from chiptest.concurrency.work_queue import CancellableQueue, QueueCancelled
 from chiptest.log_config import LogConfig
 
