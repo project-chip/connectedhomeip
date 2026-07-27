@@ -27,7 +27,7 @@ namespace chip::app::Clusters {
 class EnergyPreferenceCluster : public DefaultServerCluster
 {
     // from spec 9.7.5.2 about the `Balance` struct type
-    inline static size_t kMaxBalanceStructLabelLength = 64;
+    constexpr static size_t kMaxBalanceStructLabelLength = 64;
 
 public:
     EnergyPreferenceCluster(EndpointId endpointId, BitFlags<EnergyPreference::Feature> features) :
