@@ -117,8 +117,7 @@ public:
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
 
-    CHIP_ERROR SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList) override;
-    SemanticTagType * GetSensorFusionSupportedBuf() override { return mSensorFusionSupportedBuf; };
+    SemanticTagType * GetSensorFusionSupportedBuf(size_t size ) override;
 
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
@@ -142,7 +141,7 @@ private:
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
-TestACSDelegate::TestACSDelegate() : mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{} {}
+TestACSDelegate::TestACSDelegate() : mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mSensorFusionSupportedBuf{} {}
 
 SemanticTagType * TestACSDelegate::GetAmbientContextTypeSupportedBuf(size_t size)
 {
@@ -185,18 +184,10 @@ CHIP_ERROR TestACSDelegate::SetPredictedActivity(const Span<PredictedActivityTyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestACSDelegate::SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList)
+SemanticTagType * TestACSDelegate::GetSensorFusionSupportedBuf(size_t size)
 {
-    VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupportedForTest, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (size_t i = 0; i < sensorFusionSupportedList.size(); i++)
-    {
-        const auto & src = sensorFusionSupportedList[i];
-        auto & dst       = mSensorFusionSupportedBuf[i];
-        dst              = src;
-    }
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(size <= kMaxSensorFusionSupportedForTest, nullptr);
+    return mSensorFusionSupportedBuf;
 }
 
 AmbientContextSensed * TestACSDelegate::AllocDetection()

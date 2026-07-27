@@ -74,6 +74,7 @@ void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
     mAmbientContextTypeSupportedList = {};
     mAmbientContextTypeList.Clear();
     mAmbientContextTypeListSize = 0;
+    mSensorFusionSupportedList = {};
     mHoldTimeDelegate.CancelTimer(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -438,13 +439,17 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const Span<Predict
 CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
     const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
 {
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupported, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrDie(mACSDelegate != nullptr);
 
     ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
-    ReturnErrorOnFailure(mACSDelegate->SetSensorFusionSupported(sensorFusionSupportedList));
-    mSensorFusionSupportedList =
-        Span<AmbientContextSensing::SemanticTagType>(mACSDelegate->GetSensorFusionSupportedBuf(), sensorFusionSupportedList.size());
+    // Obtain delegate-owned buffer and copy
+    const size_t fusionListSize = sensorFusionSupportedList.size();
+    auto * buf = mACSDelegate->GetSensorFusionSupportedBuf(fusionListSize);
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    std::copy(sensorFusionSupportedList.begin(), sensorFusionSupportedList.end(), buf);
+    mSensorFusionSupportedList = Span<SemanticTagType>(buf, fusionListSize);
     NotifyAttributeChanged(Attributes::SensorFusionSupported::Id);
     return CHIP_NO_ERROR;
 }
@@ -882,6 +887,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
 
 CHIP_ERROR AmbientContextSensingCluster::ReadSensorFusionSupported(AttributeValueEncoder & encoder)
 {
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDie(mACSDelegate != nullptr);
     VerifyOrReturnValue(!mSensorFusionSupportedList.empty(), encoder.EncodeEmptyList());
 

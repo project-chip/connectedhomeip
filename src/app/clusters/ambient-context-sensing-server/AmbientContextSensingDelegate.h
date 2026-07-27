@@ -88,11 +88,10 @@ public:
     // Return the stored PredictedActivity
     virtual PredictActivity * GetPredictedActivityBuf() = 0;
 
-    // Save the SensorFusionSupported attribute passed from the caller
-    virtual CHIP_ERROR SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList) = 0;
-
     // Return the stored sensorFusionSupported buffer
-    virtual SemanticTagType * GetSensorFusionSupportedBuf() = 0;
+    // Returns nullptr if the requested size exceeds the implementation capacity.
+    // Only called when Feature::kSensorFusion is set in the cluster feature map.
+    virtual SemanticTagType * GetSensorFusionSupportedBuf(size_t size) = 0;
 
     // Get the pointer of the structure from the delegate module
     virtual AmbientContextSensed * AllocDetection() = 0;

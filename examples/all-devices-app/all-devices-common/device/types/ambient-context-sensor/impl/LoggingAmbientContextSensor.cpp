@@ -31,7 +31,7 @@ LoggingAmbientContextSensor::LoggingAmbientContextSensor(TimerDelegate & timerDe
                                                .holdTimeDefault = 10,
                                            }),
                          timerDelegate, *this),
-    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}
+    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mSensorFusionSupportedBuf{}
 {}
 
 CHIP_ERROR LoggingAmbientContextSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -86,18 +86,10 @@ CHIP_ERROR LoggingAmbientContextSensor::SetPredictedActivity(const Span<Predicte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LoggingAmbientContextSensor::SetSensorFusionSupported(const Span<SemanticTagType> & sensorFusionSupportedList)
+SemanticTagType * LoggingAmbientContextSensor::GetSensorFusionSupportedBuf(size_t size)
 {
-    VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupportedForLog, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (size_t i = 0; i < sensorFusionSupportedList.size(); i++)
-    {
-        const auto & src = sensorFusionSupportedList[i];
-        auto & dst       = mSensorFusionSupportedBuf[i];
-        dst              = src;
-    }
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(size <= kMaxSensorFusionSupportedForLog, nullptr);
+    return mSensorFusionSupportedBuf;
 }
 
 AmbientContextSensed * LoggingAmbientContextSensor::AllocDetection()
