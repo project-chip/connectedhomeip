@@ -117,7 +117,7 @@ public:
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     PredictActivity * GetPredictedActivityBuf() override { return mPredictActivityBuf; };
 
-    SemanticTagType * GetSensorFusionSupportedBuf(size_t size ) override;
+    SemanticTagType * GetSensorFusionSupportedBuf(size_t size) override;
 
     AmbientContextSensed * AllocDetection() override;
     CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;

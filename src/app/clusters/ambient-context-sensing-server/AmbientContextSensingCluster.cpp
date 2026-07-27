@@ -74,7 +74,7 @@ void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
     mAmbientContextTypeSupportedList = {};
     mAmbientContextTypeList.Clear();
     mAmbientContextTypeListSize = 0;
-    mSensorFusionSupportedList = {};
+    mSensorFusionSupportedList  = {};
     mHoldTimeDelegate.CancelTimer(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -446,7 +446,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
     ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
     // Obtain delegate-owned buffer and copy
     const size_t fusionListSize = sensorFusionSupportedList.size();
-    auto * buf = mACSDelegate->GetSensorFusionSupportedBuf(fusionListSize);
+    auto * buf                  = mACSDelegate->GetSensorFusionSupportedBuf(fusionListSize);
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INCORRECT_STATE);
     std::copy(sensorFusionSupportedList.begin(), sensorFusionSupportedList.end(), buf);
     mSensorFusionSupportedList = Span<SemanticTagType>(buf, fusionListSize);
