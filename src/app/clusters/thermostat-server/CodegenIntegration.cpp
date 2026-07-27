@@ -92,26 +92,9 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].Destroy(); }
 };
 
-ThermostatCluster * ClusterForEndpoint(EndpointId endpointId)
-{
-    ThermostatCluster * cluster = nullptr;
-    for (size_t i = 0; i < kThermostatEndpointCount; i++)
-    {
-        if (gClusters[i].IsConstructed())
-        {
-            if (gClusters[i].Cluster().Endpoint() == endpointId)
-            {
-                cluster = &gClusters[i].Cluster();
-                break;
-            }
-        }
-    }
-    return cluster;
-}
-
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    ThermostatCluster * cluster = ClusterForEndpoint(endpoint);
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
@@ -119,6 +102,22 @@ Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Dele
     }
     cluster->SetDelegate(delegate);
     return Protocols::InteractionModel::Status::Success;
+}
+
+ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * thermostat = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = Thermostat::Id,
+            .fixedClusterInstanceCount = kThermostatFixedClusterCount,
+            .maxClusterInstanceCount   = kThermostatEndpointCount,
+        },
+        integrationDelegate);
+
+    return static_cast<ThermostatCluster *>(thermostat);
 }
 
 } // namespace Thermostat

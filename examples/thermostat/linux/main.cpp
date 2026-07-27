@@ -88,7 +88,7 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
 void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
     ChipLogError(Zcl, "emberAfThermostatClusterServerInitCallback!");
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
