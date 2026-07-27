@@ -643,9 +643,7 @@ class IDMBaseTest(BasicCompositionTests):
                   result_status, test_value)
         return False
 
-    # ========================================================================
     # Command Constraint Testing (TC-IDM-9.1 step 1)
-    # ========================================================================
 
     def discover_constrained_command_fields(self) -> list[CommandFieldInfo]:
         """Discover all accepted-command fields with spec constraints on the DUT.
@@ -852,7 +850,7 @@ class IDMBaseTest(BasicCompositionTests):
             if valid_value is not None:
                 base_kwargs[sibling_label] = valid_value
 
-        timed_request_timeout_ms = 1000 if info.command_class.must_use_timed_invoke else None
+        timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
         all_enforced = True
         for description, bad_value in violations:
             command = info.command_class(**base_kwargs, **{target_label: bad_value})
