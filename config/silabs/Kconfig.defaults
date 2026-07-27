@@ -1,6 +1,5 @@
 
 config BT_HOST_CRYPTO
-	bool
 	default n
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
