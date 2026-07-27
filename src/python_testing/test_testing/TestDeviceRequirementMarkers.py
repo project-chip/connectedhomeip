@@ -227,6 +227,10 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         """Every module reclassified in this PR exposes a concrete test class carrying exactly
         the expected marker (and only one).
 
+        Importing each module here intentionally doubles as a load smoke-test: a broken import
+        in a reclassified module (typo, bad base change, missing required dep) is re-raised and
+        fails this test rather than being masked.
+
         Modules import cleanly -> checked at runtime via device_requirement(). Modules whose
         optional dependencies are absent in this environment fall back to a source (AST) check
         of the declared base; such modules are reported, never silently skipped.
