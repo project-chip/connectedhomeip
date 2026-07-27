@@ -36,9 +36,9 @@ function(zephyr_get_compile_flags VAR LANG)
     zephyr_get_compile_options_for_lang_as_string(${LANG} FLAGS)
 
     if("${LANG}" STREQUAL "CXX" AND CMAKE_CXX_COMPILER_TARGET)
-        list(APPEND FLAGS --target=${CMAKE_CXX_COMPILER_TARGET})
+        string(APPEND FLAGS " --target=${CMAKE_CXX_COMPILER_TARGET}")
     elseif(CMAKE_C_COMPILER_TARGET)
-        list(APPEND FLAGS --target=${CMAKE_C_COMPILER_TARGET})
+        string(APPEND FLAGS " --target=${CMAKE_C_COMPILER_TARGET}")
     endif()
 
     set(${VAR} ${INCLUDES} ${SYSTEM_INCLUDES} ${DEFINES} ${FLAGS} ${${VAR}} PARENT_SCOPE)
