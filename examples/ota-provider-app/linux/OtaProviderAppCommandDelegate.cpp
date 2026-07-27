@@ -59,6 +59,14 @@ static std::string ToString(const Json::Value & v)
     return Json::writeString(w, v);
 }
 
+Json::Value OtaProviderAppCommandHandler::BuildBDXResumeOffsetResponse(uint16_t endpoint)
+{
+    Json::Value payload(Json::objectValue);
+    payload["StartOffsetBitSet"] = GetOtaProviderExample().GetStartOffsetBitSet();
+    payload["StartOffset"] = GetOtaProviderExample().GetStartOffset();
+    return payload;
+}
+
 Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -152,6 +160,21 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         out["Cluster"]  = cluster;
         out["Endpoint"] = endpoint;
         out["Payload"]  = self->BuildApplyUpdateRequestSnapshot(endpoint);
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
+        return;
+    }
+
+    if (name == "GetBDXOffset")
+    {
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "BDXResumeOffsetResponse";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+        out["Payload"] = self->BuildBDXResumeOffsetResponse(endpoint);
 
         if (delegate && delegate->GetPipes())
         {

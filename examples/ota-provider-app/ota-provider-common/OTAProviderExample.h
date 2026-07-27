@@ -119,6 +119,8 @@ public:
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
+    bool GetStartOffsetBitSet() const { return mBdxOtaSender.GetLastReceiveInitStartOffsetBitSet(); }
+    uint32_t GetStartOffset() const { return mBdxOtaSender.GetLastReceiveInitStartOffset(); }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 

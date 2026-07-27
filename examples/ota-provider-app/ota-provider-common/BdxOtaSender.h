@@ -35,6 +35,9 @@ public:
 
     void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
 
+    bool GetLastReceiveInitStartOffsetBitSet() const { return mLastReceiveInitStartOffsetBitSet; }
+    uint32_t GetLastReceiveInitStartOffset() const { return mLastReceiveInitStartOffset; }
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
@@ -45,6 +48,8 @@ private:
     char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
     std::unordered_map<std::string, std::string> mFileDesignatorMap;
     uint32_t mNumBytesSent = 0;
+    bool     mLastReceiveInitStartOffsetBitSet = false;
+    uint32_t mLastReceiveInitStartOffset       = 0;
 
     bool mInitialized = false;
 
