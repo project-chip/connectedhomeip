@@ -1060,7 +1060,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to set ThreadCredentialsNeeded Listener. : %" CHIP_ERROR_FORMAT, err.Format());
-        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
     }
 }
 
