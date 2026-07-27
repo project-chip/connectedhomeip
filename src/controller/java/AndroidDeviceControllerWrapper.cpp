@@ -1219,6 +1219,18 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     if (mWifiCredentialsNeededListenerObject == nullptr || mWifiCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for WiFiCredentialsNeeded");
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+        jint value = (jint) endpoint;
+
+        env->CallVoidMethod(mWifiCredentialsNeededListenerObject, mWifiCredentialsNeededListener, value);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(Controller, "Error! No Listener for WifiCredentialsNeeded !");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
@@ -1238,6 +1250,18 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     if (mThreadCredentialsNeededListenerObject == nullptr || mThreadCredentialsNeededListener == nullptr)
     {
         ChipLogError(Controller, "No listener registered for ThreadCredentialsNeeded");
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+        jint value = (jint) endpoint;
+
+        env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, value);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(Controller, "Error! No Listener for ThreadCredentialsNeeded !");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

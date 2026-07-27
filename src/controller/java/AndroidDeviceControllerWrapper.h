@@ -256,8 +256,8 @@ private:
     jbyte * operationalDataset         = nullptr;
 
     // Java object containing the ThreadCredentialsNeeded Listener
-    jobject mThreadCredentialsNeededListenerObject;
-    jmethodID mThreadCredentialsNeededListener = nullptr;
+    jobject mThreadCredentialsNeededListenerObject = nullptr;
+    jmethodID mThreadCredentialsNeededListener     = nullptr;
 
     // Java object containing the WifiCredentialsNeeded Listener
     jobject mWifiCredentialsNeededListenerObject;
