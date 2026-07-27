@@ -146,15 +146,20 @@ class TerminableThread(TerminableResource, threading.Thread):
                  terminate_debug_logging: bool = True) -> None:
         threading.Thread.__init__(self, group, target, name, args, kwargs, daemon=daemon)
         super().__init__(name, terminate_debug_logging)
+        self.exception: BaseException | None = None
 
     def resource_start(self) -> None:
         self.start()
 
-    def resource_thread_join(self) -> bool:
+    def resource_thread_join(self, *, raise_on_error: bool = True) -> bool:
         """Join the thread and return whether it has been successfully joined (i.e. is not alive anymore)."""
         if self.ident is not None:
             log.debug("Joining thread %s", self.name)
             self.join(timeout=self.RESOURCE_TIMEOUT_TERMINATE_S)
+
+        if raise_on_error and self.exception is not None:
+            raise self.exception
+
         return not self.is_alive()
 
     def resource_terminate(self) -> None:
