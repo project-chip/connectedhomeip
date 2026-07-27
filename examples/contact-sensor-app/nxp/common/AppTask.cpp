@@ -31,6 +31,7 @@
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
+
 #ifndef APP_DEVICE_TYPE_ENDPOINT
 #define APP_DEVICE_TYPE_ENDPOINT 1
 #endif
