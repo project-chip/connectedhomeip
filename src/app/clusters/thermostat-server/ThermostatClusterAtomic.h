@@ -50,7 +50,7 @@ public:
         virtual Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId)  = 0;
 
         virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
-        virtual bool HasAttribute(chip::AttributeId attributeId) = 0;
+        virtual bool HasAttribute(chip::AttributeId attributeId)                                                     = 0;
     };
 
     /**
@@ -140,8 +140,9 @@ private:
     /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
     /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
     /// @return Status::Success if the request is valid, an error status if it is not
-    Protocols::InteractionModel::Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                                Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+    Protocols::InteractionModel::Status BuildAttributeStatuses(
+        const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+        Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 };
 
 } // namespace Thermostat

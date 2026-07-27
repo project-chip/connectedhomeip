@@ -48,7 +48,6 @@ class ThermostatCluster : public DefaultServerCluster, chip::FabricTable::Delega
 {
 
 public:
-
     struct OptionalAttributes
     {
         bool AbsMinHeatSetpointLimit = false;
@@ -78,7 +77,8 @@ public:
         OptionalAttributes() = default;
     };
 
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes);
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
+                      const OptionalAttributes & optionalAttributes);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;

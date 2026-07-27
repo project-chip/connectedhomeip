@@ -47,8 +47,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
+ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
+                                     const OptionalAttributes & optionalAttributes) :
+    DefaultServerCluster({ endpointId, Thermostat::Id }),
+    mFeatures(features), mOptionalAttributes(optionalAttributes)
 {
     auto hasHeating = mFeatures.Has(Feature::kHeating);
     auto hasCooling = mFeatures.Has(Feature::kCooling);

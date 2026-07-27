@@ -115,7 +115,6 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
 }
 
-
 } // anonymous namespace
 
 bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
@@ -439,15 +438,15 @@ void AtomicWriteSession::OnAtomicWriteTimeout()
     ResetAtomicWrite();
 }
 
-
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
 /// @param endpoint The associated endpoint for the AtomicRequest invocation
 /// @param attributeRequests The list of requested attributes
 /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
 /// @return Status::Success if the request is valid, an error status if it is not
-Status AtomicWriteSession::BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                              Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+Status AtomicWriteSession::BuildAttributeStatuses(
+    const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
 
     size_t attributeStatusCount = 0;
@@ -498,7 +497,7 @@ Status AtomicWriteSession::BuildAttributeStatuses(const EndpointId endpoint, con
             // This is definitely an attribute we know about.
             continue;
         }
-        
+
         if (IsSupportedGlobalAttributeNotInMetadata(attributeStatus.attributeID))
         {
             continue;
