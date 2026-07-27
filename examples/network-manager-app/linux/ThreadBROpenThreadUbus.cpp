@@ -76,9 +76,11 @@ bool OpenThreadUbusBorderRouterDelegate::GetInterfaceEnabled()
 
 CHIP_ERROR OpenThreadUbusBorderRouterDelegate::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
-    VerifyOrReturnError(type == DatasetType::kActive, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(!mActiveDataset.IsEmpty(), CHIP_ERROR_NOT_FOUND);
-    dataset = mActiveDataset;
+    VerifyOrReturnError(type == DatasetType::kActive || type == DatasetType::kPending, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const Thread::OperationalDataset & source = (type == DatasetType::kPending) ? mPendingDataset : mActiveDataset;
+    VerifyOrReturnError(!source.IsEmpty(), CHIP_ERROR_NOT_FOUND);
+    dataset = source;
     return CHIP_NO_ERROR;
 }
 
@@ -116,12 +118,67 @@ exit:
     callback->OnActivateDatasetComplete(sequenceNum, err);
 }
 
+CHIP_ERROR OpenThreadUbusBorderRouterDelegate::InvokeWithDataset(const char * method, const Thread::OperationalDataset & dataset)
+{
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+    BlobMsgBuf buf;
+
+    VerifyOrReturnError(mOtbr.Resolved(), CHIP_ERROR_NOT_CONNECTED);
+
+    buf.Add("dataset", dataset.AsByteSpan());
+    ChipLogDetail(AppServer, "%s invoking on %d", method, mOtbr.ObjectID());
+    VerifyOrReturnError(!ubus_invoke(&mUbusManager.Context(), mOtbr.ObjectID(), method, buf.head,
+                                     ([](ubus_request * req, int type, blob_attr * msg) {
+                                         ErrorField otError;
+                                         VerifyOrReturn(BlobMsgParse(msg, otError) && otError.value_or(0) == 0);
+                                         *static_cast<CHIP_ERROR *>(req->priv) = CHIP_NO_ERROR;
+                                     }),
+                                     &err, kInvokeTimeout),
+                        CHIP_ERROR_INTERNAL);
+
+    return err;
+}
+
+CHIP_ERROR OpenThreadUbusBorderRouterDelegate::SetPendingDataset(const Thread::OperationalDataset & pendingDataset)
+{
+    // otbr schedules the migration; the switch happens when the dataset's delay
+    // timer expires, and the pending_dataset_changed notification reports it.
+    return InvokeWithDataset("set_pending", pendingDataset);
+}
+
+CHIP_ERROR OpenThreadUbusBorderRouterDelegate::RevertActiveDataset()
+{
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+
+    // SetActiveDataset is only accepted when no dataset is configured, so
+    // reverting means returning to the unprovisioned state rather than
+    // restoring a previous dataset.
+    VerifyOrReturnError(mOtbr.Resolved(), CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrReturnError(!ubus_invoke(&mUbusManager.Context(), mOtbr.ObjectID(), "deprovision", nullptr,
+                                     ([](ubus_request * req, int type, blob_attr * msg) {
+                                         ErrorField otError;
+                                         VerifyOrReturn(BlobMsgParse(msg, otError) && otError.value_or(0) == 0);
+                                         *static_cast<CHIP_ERROR *>(req->priv) = CHIP_NO_ERROR;
+                                     }),
+                                     &err, kInvokeTimeout),
+                        CHIP_ERROR_INTERNAL);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mActiveDataset.Clear();
+        mAttributeChangeCallback->ReportAttributeChanged(ActiveDatasetTimestamp::Id);
+    }
+
+    return err;
+}
+
 void OpenThreadUbusBorderRouterDelegate::OnDataReceived(blob_attr * msg, bool notification)
 {
     BlobMsgField<ByteSpan, CHIP_CTST("BorderAgentId")> borderAgentID;
     BlobMsgField<ByteSpan, CHIP_CTST("ActiveDataset")> activeDataset;
+    BlobMsgField<ByteSpan, CHIP_CTST("PendingDataset")> pendingDataset;
     BlobMsgField<bool, CHIP_CTST("Attached")> attached;
-    BlobMsgParse(msg, borderAgentID, attached, activeDataset);
+    BlobMsgParse(msg, borderAgentID, attached, activeDataset, pendingDataset);
 
     if (!mBorderAgentIDValid && borderAgentID.has_value() && borderAgentID->size() == sizeof(mBorderAgentID))
     {
@@ -142,6 +199,36 @@ void OpenThreadUbusBorderRouterDelegate::OnDataReceived(blob_attr * msg, bool no
             {
                 mAttributeChangeCallback->ReportAttributeChanged(ActiveDatasetTimestamp::Id);
             }
+        }
+    }
+
+    if (pendingDataset.has_value())
+    {
+        bool updated = false;
+        // An empty payload means a scheduled migration has completed, so the
+        // dataset is cleared rather than left reporting a stale timestamp.
+        // Only an actual change is reported; a snapshot repeating the known
+        // dataset must not wake subscribers.
+        if (pendingDataset->empty())
+        {
+            if (!mPendingDataset.IsEmpty())
+            {
+                mPendingDataset.Clear();
+                updated = true;
+            }
+        }
+        else if (!mPendingDataset.AsByteSpan().data_equal(pendingDataset.value()))
+        {
+            Thread::OperationalDatasetView dataset;
+            if (dataset.Init(pendingDataset.value()) == CHIP_NO_ERROR)
+            {
+                mPendingDataset = dataset;
+                updated         = true;
+            }
+        }
+        if (notification && updated)
+        {
+            mAttributeChangeCallback->ReportAttributeChanged(PendingDatasetTimestamp::Id);
         }
     }
 
