@@ -7166,13 +7166,13 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    callback attribute colorMode;
-    callback attribute options;
-    callback attribute numberOfPrimaries;
-    callback attribute enhancedColorMode;
-    callback attribute colorCapabilities;
+    ram      attribute colorMode default = 0x01;
+    ram      attribute options default = 0x00;
+    ram      attribute numberOfPrimaries default = 0;
+    ram      attribute enhancedColorMode default = 0x01;
+    ram      attribute colorCapabilities default = 0x1F;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    ram      attribute clusterRevision default = 0x0009;
   }
 
   server cluster BallastConfiguration {
