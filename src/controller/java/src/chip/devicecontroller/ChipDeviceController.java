@@ -81,8 +81,8 @@ public class ChipDeviceController {
     setThreadCredentialsNeededListener(deviceControllerPtr, listener);
   }
 
-  public void setWifiCredentialsNeededListener(WifiCredentialsNeededListener listener) {
-    setWifiCredentialsNeededListener(deviceControllerPtr, listener);
+  public void setWiFiCredentialsNeededListener(WiFiCredentialsNeededListener listener) {
+    setWiFiCredentialsNeededListener(deviceControllerPtr, listener);
   }
 
   /**
@@ -1835,8 +1835,8 @@ public class ChipDeviceController {
   private native void setThreadCredentialsNeededListener(
       long deviceControllerPtr, ThreadCredentialsNeededListener listener);
 
-  private native void setWifiCredentialsNeededListener(
-      long deviceControllerPtr, WifiCredentialsNeededListener listener);
+  private native void setWiFiCredentialsNeededListener(
+      long deviceControllerPtr, WiFiCredentialsNeededListener listener);
 
   static {
     System.loadLibrary("CHIPController");
@@ -1907,8 +1907,8 @@ public class ChipDeviceController {
   }
 
   /** Interface to listen for WifiCredentialsNeeded events. */
-  public interface WifiCredentialsNeededListener {
-    void onWifiCredentialsNeeded(int endpoint);
+  public interface WiFiCredentialsNeededListener {
+    void onWiFiCredentialsNeeded(int endpoint);
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */

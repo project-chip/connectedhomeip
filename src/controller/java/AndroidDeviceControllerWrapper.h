@@ -216,7 +216,7 @@ public:
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
     CHIP_ERROR SetThreadCredentialsNeededListener(jobject listener);
-    CHIP_ERROR SetWifiCredentialsNeededListener(jobject listener);
+    CHIP_ERROR SetWiFiCredentialsNeededListener(jobject listener);
 
     void StartDnssd();
 
@@ -260,8 +260,8 @@ private:
     jmethodID mThreadCredentialsNeededListener     = nullptr;
 
     // Java object containing the WifiCredentialsNeeded Listener
-    jobject mWifiCredentialsNeededListenerObject = nullptr;
-    jmethodID mWifiCredentialsNeededListener     = nullptr;
+    jobject mWiFiCredentialsNeededListenerObject = nullptr;
+    jmethodID mWiFiCredentialsNeededListener     = nullptr;
 
     std::vector<uint8_t> mNocCertificate;
     std::vector<uint8_t> mIcacCertificate;
