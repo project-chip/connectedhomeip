@@ -84,8 +84,10 @@ class TC_COMPRO_2_3(COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        # Step 7 sleeps 40 s; step 12 waits up to cache_timeout (≤120 s) + 10 s;
-        # steps 9/14 poll up to 40 s each; step 22 sleeps 20 s.
+        # Step 7 sleeps 40 s; step 12 waits up to cache_timeout + 10 s (the value
+        # the DUT reports for CacheTimeout — the spec mandates no fixed default,
+        # but implementations typically use ~120 s); steps 9/14 poll up to 40 s
+        # each; step 22 sleeps 20 s.
         # Worst-case sequential total ≈ 270 s; 360 s gives comfortable headroom.
         return 360
 

@@ -353,6 +353,7 @@ import sys
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.discovery as discovery
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest
 
@@ -876,6 +877,94 @@ class COMPROBaseTest(MatterBaseTest):
                 "then press Enter to continue."
             )
             self.wait_for_user_input(prompt)
+
+    # ------------------------------------------------------------------
+    # PASE-first commissioning lifecycle (TC-COMPRO-2.6 / 2.9)
+    #
+    # These tests verify that the three fabric-scoped (O F) commands
+    # (ProxyConnectRequest, ProxyDisconnectRequest, ProxyMessageRequest) are
+    # rejected with UNSUPPORTED_ACCESS when they are not executed via a CASE
+    # session.  The cluster spec states this rule explicitly for each of those
+    # commands.  The natural way to exercise it is against an *uncommissioned*
+    # DUT, before any fabric exists: the DUT is discovered, a PASE session is
+    # established to it, the reject-tests run over that PASE, and the DUT is then
+    # commissioned so the remaining CASE steps can run.
+    #
+    # Run these tests with --in-test-commissioning-method (NOT
+    # --commissioning-method); the latter makes the harness auto-commission the
+    # DUT before the test body runs, which defeats the PASE-first premise.  The
+    # DUT MUST start factory-reset / uncommissioned on every run, so these two
+    # tests do not call commission_if_needed().
+    # ------------------------------------------------------------------
+
+    async def establish_pase_to_dut(self, node_id: int | None = None) -> int:
+        """Establish an on-network (UDP) PASE session to the uncommissioned DUT.
+
+        Returns the node id the PASE was established to (defaults to the DUT's own
+        node id).  The session is deliberately established over IP/UDP and to the
+        DUT node id so it can be REUSED for commissioning (see
+        commission_dut_in_test): AutoCommissioner derives mNeedsNetworkSetup from
+        the PASE transport type (BLE/WiFiPAF ⇒ needs network setup, UDP ⇒ not —
+        src/controller/AutoCommissioner.cpp).  The proxy advertises commissionable
+        over BLE, WiFiPAF and DNS-SD simultaneously, so the multi-transport
+        SetUpCodePairer (FindOrEstablishPASESession) races onto BLE/WiFiPAF and
+        would force WiFi provisioning during commissioning; establishing the PASE
+        directly over IP avoids that race entirely.
+
+        The DUT IP may be supplied via the ``dut_ip`` param (deterministic; the
+        rig runner passes it).  Otherwise the DUT is discovered on-network and its
+        first routable address is used.
+        """
+        if node_id is None:
+            node_id = self.dut_node_id
+        params = getattr(self, 'user_params', {}) or {}
+        setup_info = self.get_setup_payload_info()[0]
+        dut_ip = params.get('dut_ip')
+        # Default CHIP commissioning port when an explicit dut_ip is supplied.
+        port = int(params.get('dut_port', 5540))
+        if not dut_ip:
+            nodes = await self.default_controller.DiscoverCommissionableNodes(
+                filterType=discovery.FilterType.LONG_DISCRIMINATOR,
+                filter=setup_info.filter_value, stopOnFirst=True, timeoutSecond=15)
+            node = nodes[0] if isinstance(nodes, list) else nodes
+            asserts.assert_is_not_none(node, "DUT not discoverable on-network for PASE")
+            addrs = node.addresses or []
+            # Prefer a routable (non-link-local) address: EstablishPASESessionIP
+            # needs an interface scope for link-local, which discovery omits.
+            routable = [a for a in addrs if not a.lower().startswith(("fe80", "169.254"))]
+            asserts.assert_true(bool(routable or addrs),
+                                f"DUT discovered but exposed no usable address: {addrs}")
+            dut_ip = (routable or addrs)[0]
+            port = node.port or 0
+        await self.default_controller.EstablishPASESessionIP(
+            ipaddr=dut_ip, setupPinCode=setup_info.passcode, nodeId=node_id, port=port)
+        return node_id
+
+    async def commission_dut_in_test(self) -> None:
+        """Commission the DUT mid-test by REUSING the on-network PASE.
+
+        Runs the commissioning state machine over the PASE session opened by
+        establish_pase_to_dut() (do NOT expire it — the DUT supports a single PASE
+        at a time, and re-discovering it after a PASE has been torn down races with
+        the DUT dropping its commissionable advertisement, which times out mDNS).
+        Because that PASE is over UDP, AutoCommissioner keeps mNeedsNetworkSetup
+        false and skips WiFi/Thread provisioning — the proxy is reached over its
+        existing IP network, not provisioned onto WiFi (which would also clash with
+        its WiFiPAF radio use).  A BLE/WiFiPAF PASE would instead force
+        RequestWiFiCredentials and fail with "Not Implemented".
+        """
+        method = self.matter_test_config.in_test_commissioning_method
+        asserts.assert_is_not_none(
+            method,
+            "TC-COMPRO PASE-first tests require --in-test-commissioning-method "
+            "(e.g. 'on-network'); do not pass --commissioning-method, which would "
+            "auto-commission the DUT before the test body runs.")
+        asserts.assert_equal(
+            method, "on-network",
+            f"commission_dut_in_test supports only on-network commissioning, got '{method}'")
+        # Commission() runs commissioning over the existing (reused) PASE session
+        # for this node id.  Raises ChipStackError (→ test failure) on failure.
+        await self.default_controller.Commission(self.dut_node_id)
 
     # ------------------------------------------------------------------
     # Bitmap validation helpers

@@ -45,9 +45,10 @@ by the DUT.  Steps 4–9 iterate once per transport bit in valid_transports
 
   Steps 1–3:  Commission DUT; read Transport and WiFiBand attributes.
   Steps 4–9:  For each transport bit in valid_transports:
-                Make ED commissionable; send ProxyConnectRequest; tunnel PASE +
-                commissioning via ProxyMessageRequest/Response until ED is on the
-                fabric; send ProxyMessageRequest(ResponseTimeout=0); send
+                Make ED commissionable; send ProxyConnectRequest; send
+                ProxyMessageRequest(ResponseTimeout=0, Message=null) and verify an
+                immediate ProxyMessageResponse; tunnel PASE + commissioning via
+                ProxyMessageRequest/Response until ED is on the fabric; send
                 ProxyDisconnectRequest with invalid and valid SessionIds.
   Step 10:    ProxyConnectRequest with Timeout=1 (ED not commissionable) — DUT
               MUST return TIMEOUT after the timeout fires.
@@ -144,10 +145,10 @@ CONNECT_TIMEOUT_S = 120
 # ED_NODE_ID + iteration_index to avoid fabric storage collisions.
 ED_NODE_ID = 0x1001
 
-# Minimal placeholder message (8 zero bytes) for the ResponseTimeout=0 and
-# non-existent-session negative tests.  This is NOT a well-formed Matter frame;
-# it is sufficient only because the DUT either does not wait for a reply
-# (ResponseTimeout=0) or rejects the request (NOT_FOUND) before parsing it.
+# Minimal placeholder message (8 zero bytes) for the non-existent-session
+# negative test (step 13).  This is NOT a well-formed Matter frame; it is
+# sufficient only because the DUT rejects the request (NOT_FOUND) before parsing
+# it.  (Step 6's ResponseTimeout=0 test uses a null Message, not this.)
 _MINIMAL_MATTER_MSG = bytes(8)
 
 
@@ -181,15 +182,16 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                      "ProxyConnectRequest with that transport bit set",
                      "DUT returns ProxyConnectResponse with SUCCESS and a SessionID "
                      "≤ 0xFFFE (max 65534); save as current_session_id"),
-            TestStep(6, "For each transport bit in valid_transports: TH acts as Commissioner "
+            TestStep(6, "For each transport bit in valid_transports: TH sends "
+                     "ProxyMessageRequest(SessionID=current_session_id, ResponseTimeout=0, "
+                     "Message=null)",
+                     "DUT returns ProxyMessageResponse immediately (without waiting for a "
+                     "Commissionee reply) with SessionID=current_session_id; Message may be "
+                     "null or a queued message"),
+            TestStep(7, "For each transport bit in valid_transports: TH acts as Commissioner "
                      "and performs full commissioning flow by tunneling PASE and commissioning "
                      "traffic through the DUT",
                      "Commissioning procedure completes; ED is commissioned onto the fabric"),
-            TestStep(7, "For each transport bit in valid_transports: TH sends "
-                     "ProxyMessageRequest(SessionID=current_session_id, ResponseTimeout=0, "
-                     "Message=<valid frame>)",
-                     "DUT returns ProxyMessageResponse immediately with "
-                     "SessionID=current_session_id; Message may be null"),
             TestStep(8, "For each transport bit in valid_transports: TH sends "
                      "ProxyDisconnectRequest(SessionID=<non-existent>)",
                      "DUT returns NOT_FOUND"),
@@ -358,7 +360,33 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 "≤ 0xFFFE (ProxyConnectResponse SessionID constraint is max 65534)")
             logger.info("[%s] ProxyConnectResponse: sessionID=%d", transport_label, current_session_id)
 
-            # -- Step 6 work: CommissionViaProxy --
+            # -- Step 6 work: ProxyMessageRequest(ResponseTimeout=0, Message=null) --
+            # Sent before commissioning so it does not perturb the tunneled flow.
+            # Per spec: ResponseTimeout=0 means no response is expected and the
+            # proxy responds immediately with success; Message=null means the proxy
+            # SHALL NOT forward anything to the Commissionee (it returns a queued
+            # message or null).  The two combined verify the immediate-success
+            # behaviour without sending any frame to the ED.
+            msg_response = await self.default_controller.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=self.cp_endpoint,
+                payload=cp.Commands.ProxyMessageRequest(
+                    sessionID=current_session_id,
+                    responseTimeout=0,
+                    message=NullValue,
+                ),
+                interactionTimeoutMs=5000,
+            )
+            asserts.assert_equal(
+                msg_response.sessionID, current_session_id,
+                f"[{transport_label}] ProxyMessageResponse sessionID must match request sessionID")
+            logger.info("[%s] ProxyMessageResponse received immediately (ResponseTimeout=0, "
+                        "Message=null): sessionID=%d message=%s",
+                        transport_label, msg_response.sessionID,
+                        "null" if msg_response.message is NullValue
+                        else f"{len(msg_response.message)} bytes")
+
+            # -- Step 7 work: CommissionViaProxy --
             if wifi_ssid:
                 self.default_controller.SetWiFiCredentials(wifi_ssid, wifi_password)
 
@@ -375,26 +403,6 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             )
             logger.info("[%s] ED commissioned successfully via proxy (nodeId=0x%04x)",
                         transport_label, ed_node_id)
-
-            # -- Step 7 work: ProxyMessageRequest(ResponseTimeout=0) --
-            msg_response = await self.default_controller.SendCommand(
-                nodeId=self.dut_node_id,
-                endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyMessageRequest(
-                    sessionID=current_session_id,
-                    responseTimeout=0,
-                    message=_MINIMAL_MATTER_MSG,
-                ),
-                interactionTimeoutMs=5000,
-            )
-            asserts.assert_equal(
-                msg_response.sessionID, current_session_id,
-                f"[{transport_label}] ProxyMessageResponse sessionID must match request sessionID")
-            logger.info("[%s] ProxyMessageResponse received immediately (ResponseTimeout=0): "
-                        "sessionID=%d message=%s",
-                        transport_label, msg_response.sessionID,
-                        "null" if msg_response.message is NullValue
-                        else f"{len(msg_response.message)} bytes")
 
             # -- Step 8 work: ProxyDisconnect invalid SessionID → NOT_FOUND --
             non_existent_session_id = 0xFFFE
