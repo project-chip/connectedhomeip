@@ -173,8 +173,8 @@ public:
             mSetupDiscriminator == other.mSetupDiscriminator && //
             mMRPConfig == other.mMRPConfig
 #if CONFIG_NETWORK_LAYER_BLE
-            && mBleLayer == other.mBleLayer &&                  //
-            mConnectionObject == other.mConnectionObject &&     //
+            && mBleLayer == other.mBleLayer &&              //
+            mConnectionObject == other.mConnectionObject && //
             mDiscoveredObject == other.mDiscoveredObject
 #endif // CONFIG_NETWORK_LAYER_BLE
             ;

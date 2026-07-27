@@ -282,8 +282,7 @@ TEST_F(TestSetUpCodePairer, NotifyDiscovered_CoalescesAcrossCallbacks)
     EXPECT_EQ(Access().GetDiscoveredParametersCount(), 1u);
 
     // Different address -> new entry.
-    Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(ParseIP("2001:db8::2"), MakeInterfaceId(1)),
-                                                  kDiscriminatorA);
+    Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(ParseIP("2001:db8::2"), MakeInterfaceId(1)), kDiscriminatorA);
     EXPECT_EQ(Access().GetDiscoveredParametersCount(), 2u);
 }
 
