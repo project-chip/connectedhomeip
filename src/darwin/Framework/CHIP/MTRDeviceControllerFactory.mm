@@ -211,7 +211,7 @@ MTR_DIRECT_MEMBERS
 
     // Start the work queue and leave it running. There is no performance
     // cost to having an idle dispatch queue, and it simplifies our logic.
-    DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
@@ -779,7 +779,7 @@ MTR_DIRECT_MEMBERS
             MTR_LOG_ERROR("Can't pre-warm, Matter controller factory is not running");
         } else {
             MTR_LOG("Pre-warming commissioning session");
-            self->_controllerFactory->EnsureAndRetainSystemState();
+            TEMPORARY_RETURN_IGNORED self->_controllerFactory->EnsureAndRetainSystemState();
             err = DeviceLayer::PlatformMgrImpl().StartBleScan(&self->_preWarmingDelegate, DeviceLayer::BleScanMode::kPreWarm);
             if (err != CHIP_NO_ERROR) {
                 MTR_LOG_ERROR("Pre-warming failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -934,7 +934,7 @@ MTR_DIRECT_MEMBERS
             // Clear out out group keys for this fabric index, in case fabric
             // indices get reused later.  If a new controller is started on the
             // same fabric it will be handed the IPK at that point.
-            self->_groupDataProvider.RemoveGroupKeys(fabricIndex);
+            TEMPORARY_RETURN_IGNORED self->_groupDataProvider.RemoveGroupKeys(fabricIndex);
         }
 
         // If there are no other controllers left, we can shut down some things.
@@ -1133,8 +1133,6 @@ MTR_DIRECT_MEMBERS
     for (MTRDeviceController_Concrete * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
-            ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
-                controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
             [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
@@ -1202,6 +1200,10 @@ MTR_DIRECT_MEMBERS
                           additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    MTR_LOG("%@ setting MRP params: idle %@ active %@ threshold %@ additional retransmit delay %@",
+        self, idleRetransmitMs, activeRetransmitMs, activeThresholdMs, additionalRetransmitDelayMs);
+
     dispatch_async(_chipWorkQueue, ^{
         bool resetAdvertising;
         if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {

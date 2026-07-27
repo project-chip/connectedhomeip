@@ -137,3 +137,9 @@ tests:
           [1653180214397] [48426:1919098] CHIP: [TOO]       Revision: 1
           [1653180214397] [48426:1919098] CHIP: [TOO]      }
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

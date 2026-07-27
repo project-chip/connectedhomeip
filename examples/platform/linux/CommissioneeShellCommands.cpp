@@ -47,7 +47,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 
     streamer_printf(sout, "done\r\n");
 
@@ -66,8 +66,8 @@ static CHIP_ERROR PrintAllCommands()
                     "  udccommissionerpasscode <address> <port> [CommissionerPasscodeReady] [PairingHint] [PairingInst] Send UDC "
                     "commissioner passcode message to address. Usage: udccommissionerpasscode ::1 5543 t 5 HelloWorld\r\n");
     streamer_printf(sout,
-                    "  testudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst] Send UDC "
-                    "message to address. Usage: cast testudc ::1 5543 t t 5 HelloWorld\r\n");
+                    "  testudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst] [PinLength] "
+                    "Send UDC message to address. Usage: cast testudc ::1 5543 t t 5 HelloWorld 8\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // TODO: Figure out whether setdiscoverytimeout is a reasonable thing to do
     // at all, and if so what semantics it should have.  Presumably it should
@@ -157,7 +157,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
 
-        // sendudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst]
+        // testudc <address> <port> [NoPasscode] [CdUponPasscodeDialog] [vid] [PairingHint] [PairingInst] [PinLength]
         // ex. sendudc <address> <port> t t 111 5 'hello world'
 
         Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
@@ -184,6 +184,11 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         if (argc > 7)
         {
             id.SetPairingInst(argv[7]);
+        }
+        if (argc > 8)
+        {
+            uint8_t pinLength = (uint8_t) strtol(argv[8], &eptr, 10);
+            id.SetPasscodeLength(pinLength);
         }
         return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
                                                                           id);
@@ -236,8 +241,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "startbcm") == 0)
     {
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-        return CHIP_NO_ERROR;
+        return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }

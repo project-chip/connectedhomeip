@@ -49,12 +49,14 @@ source_set("mock_codegen_data_model") {
   public_deps = codegen_data_model_PUBLIC_DEPS
 
   sources += [
-    "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
     "${chip_root}/src/app/util/ember-io-storage.cpp",
     "CodegenEmberMocks.cpp",
   ]
 
   public_configs = [ ":mock_include" ]
   public_deps += [ ":mock_ember" ]
-  deps = [ "${chip_root}/src/app/util/persistence:persistence" ]
+  deps = [
+    "${chip_root}/src/app:required-privileges",
+    "${chip_root}/src/app/persistence:default",
+  ]
 }

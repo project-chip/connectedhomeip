@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2022-2024, 2026 Project CHIP Authors
+ *    Copyright 2023, 2024, 2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ extern "C" {
 #define SHA256_OUTPUT_SIZE 32
 #define HASH_ID 0xCE47BA5E
 #define HASH_LEN 4
-#define CBC_INITIAL_VECTOR_SIZE 16
 
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
@@ -56,20 +55,18 @@ extern uint32_t __FACTORY_DATA_SIZE[];
 namespace chip {
 namespace DeviceLayer {
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                                 uint32_t * contentAddr)
 {
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
 
-    while (index < factoryDataSize)
+    /* index will be incremented later, we have to be sure we have enough space for a new TLV entry */
+    while (index + sizeof(type) + sizeof(currentLen) < factoryDataSize)
     {
         /* Read the type */
         memcpy((uint8_t *) &type, factoryDataAddress + index, sizeof(type));
@@ -116,61 +113,19 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     return err;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
-{
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    Crypto::P256PublicKey dacPublicKey;
-    uint16_t certificateSize = 0;
-    uint32_t certificateAddr;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, certificateSize, &certificateAddr));
-    MutableByteSpan dacCertSpan((uint8_t *) certificateAddr, certificateSize);
-
-    /* Extract Public Key of DAC certificate from itself */
-    ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
-
-    /* Get private key of DAC certificate from reserved section */
-    uint16_t keySize = 0;
-    uint32_t keyAddr;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
-    MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
-
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
-
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
-
-    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-}
-
-CHIP_ERROR FactoryDataProviderImpl::LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
     uint16_t len;
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t currentBlock[BLOCK_SIZE_16_BYTES];
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     size_t outputHashSize = sizeof(calculatedHash);
     uint16_t i;
     CHIP_ERROR res;
+
+    VerifyOrReturnError(pAESKeySize == aes_128, CHIP_ERROR_INVALID_ARGUMENT);
 
     /* Init mflash */
     status = mflash_drv_init();
@@ -243,26 +198,18 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t * keyAes128)
+CHIP_ERROR FactoryDataProviderImpl::SetKeyType(KeyType type)
 {
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (keyAes128 != nullptr)
+    if (type == kHwKey)
     {
-        pAesKey = keyAes128;
-        error   = CHIP_NO_ERROR;
+        // by default if hw key is selected, kDCP_OTPMKKeyLow is choosen
+        selectedKey = kDCP_OTPMKKeyLow;
     }
-    return error;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetKeySelected(KeySelect key)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (key <= kDCP_OCOTPKeyHigh)
+    else
     {
-        selectedKey = key;
-        error       = CHIP_NO_ERROR;
+        selectedKey = kDCP_UseSoftKey;
     }
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void FactoryDataProviderImpl::SetDCP_OTPKeySelect(void)
@@ -288,28 +235,6 @@ void FactoryDataProviderImpl::SetDCP_OTPKeySelect(void)
     default:
         break;
     }
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (ivSize == CBC_INITIAL_VECTOR_SIZE)
-    {
-        cbcInitialVector = iv;
-        error            = CHIP_NO_ERROR;
-    }
-    return error;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (mode <= encrypt_cbc)
-    {
-        encryptMode = mode;
-        error       = CHIP_NO_ERROR;
-    }
-    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * desBuff, uint8_t * sourceAddr, uint16_t sizeToRead)
@@ -376,6 +301,14 @@ CHIP_ERROR FactoryDataProviderImpl::Hash256(const uint8_t * input, size_t inputS
 
     return CHIP_NO_ERROR;
 }
+
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

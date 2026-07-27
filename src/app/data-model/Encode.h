@@ -20,6 +20,7 @@
 
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
@@ -66,15 +67,29 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
     return writer.Put(tag, x);
 }
 
+// Reusable macro for dealing with unknown enum values that we can use in
+// attribute value encoding.
+#if CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+#define CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(value)                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        /* Nothing to do */                                                                                                        \
+    } while (0)
+#else
+#define CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(value)                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (value == std::remove_reference_t<decltype(value)>::kUnknownEnumValue)                                                  \
+        {                                                                                                                          \
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);                                                                         \
+        }                                                                                                                          \
+    } while (0)
+#endif // CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value && detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
-#if !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
-    if (x == X::kUnknownEnumValue)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-#endif // !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+    CHIP_DM_ENCODING_MAYBE_FAIL_UNKNOWN_ENUM_VALUE(x);
 
     return writer.Put(tag, x);
 }
@@ -251,6 +266,31 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 #endif // !defined(__clang__)
     return EncodeForRead(writer, tag, accessingFabricIndex, x.Value());
 #pragma GCC diagnostic pop
+}
+
+// Should this be declared in a separate header?
+struct FabricAwareTLVWriter
+{
+    FabricAwareTLVWriter(TLV::TLVWriter & writer, FabricIndex accessingFabricIndex) :
+        mTLVWriter(writer), mAccessingFabricIndex(accessingFabricIndex)
+    {}
+
+    operator TLV::TLVWriter &() { return mTLVWriter; }
+
+    TLV::TLVWriter & mTLVWriter;
+    const FabricIndex mAccessingFabricIndex;
+};
+
+/**
+ * @brief
+ *
+ * Encodes a response command payload. This is a templated function to allow
+ * specializations to be created as needed to customize the behavior.
+ */
+template <typename PayloadType>
+CHIP_ERROR EncodeResponseCommandPayload(FabricAwareTLVWriter & writer, TLV::Tag tag, const PayloadType & payload)
+{
+    return payload.Encode(writer, tag);
 }
 
 } // namespace DataModel

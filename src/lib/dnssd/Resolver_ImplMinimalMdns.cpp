@@ -23,6 +23,7 @@
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -30,11 +31,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
-
-// MDNS servers will receive all broadcast packets over the network.
-// Disable 'invalid packet' messages because the are expected and common
-// These logs are useful for debug only
-#undef MINMDNS_RESOLVER_OVERLY_VERBOSE
 
 namespace chip {
 namespace Dnssd {
@@ -109,7 +105,7 @@ void PacketParser::OnHeader(ConstHeaderRef & header)
 {
     mIsResponse = header.GetFlags().IsResponse();
 
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     if (header.GetFlags().IsTruncated())
     {
         // MinMdns does not cache data, so receiving piecewise data does not work
@@ -219,9 +215,11 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             // Receiving records that we do not need to parse is normal:
             // MinMDNS may receive all DNSSD packets on the network, only
             // interested in a subset that is matter-specific
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-            ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
-#endif
+            if (err != CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME)
+            {
+                ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogByteSpan(Discovery, data.GetData().AsByteSpan());
+            }
         }
 
         // Done finding an inactive resolver and attempting to use it.
@@ -509,7 +507,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 
     AdvancePendingResolverStates();
 
-    ScheduleRetries();
+    TEMPORARY_RETURN_IGNORED ScheduleRetries();
 }
 
 CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
@@ -785,7 +783,7 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
 {
-    reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
+    TEMPORARY_RETURN_IGNORED reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
 }
 
 MinMdnsResolver gResolver;

@@ -24,6 +24,7 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/secure_channel/CheckinMessage.h>
 #include <transport/SessionManager.h>
 
@@ -345,7 +346,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithRemovedKey)
     EXPECT_EQ(checkInCounter, counter);
 
     // Use a removed key in the storage for encoding
-    manager.RemoveKey(clientInfo), CHIP_NO_ERROR;
+    manager.RemoveKey(clientInfo);
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
                   clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),
               CHIP_NO_ERROR);
@@ -385,7 +386,7 @@ TEST_F(TestDefaultICDClientStorage, TestProcessCheckInPayloadWithEmptyIcdStorage
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     EXPECT_EQ(manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter), CHIP_NO_ERROR);
     EXPECT_EQ(checkInCounter, counter);
-    manager.DeleteAllEntries(fabricId);
+    EXPECT_SUCCESS(manager.DeleteAllEntries(fabricId));
 
     EXPECT_EQ(chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(
                   clientInfo.aes_key_handle, clientInfo.hmac_key_handle, counter, ByteSpan(), output),

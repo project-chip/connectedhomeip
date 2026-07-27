@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
 
 #include "DiagnosticLogsProviderDelegateImpl.h"
 
-#include <src/app/server/Server.h>
-#include <src/lib/support/SafeInt.h>
+#include <app/server/Server.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
@@ -71,7 +71,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnError(diagData, CHIP_ERROR_NO_MEMORY);
 
     err = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), diagData, diagSize);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, err, free(diagData));
 
     MutableByteSpan * mutableSpan = reinterpret_cast<MutableByteSpan *>(calloc(1, sizeof(MutableByteSpan)));
     VerifyOrReturnValue(mutableSpan, CHIP_ERROR_NO_MEMORY, free(diagData));

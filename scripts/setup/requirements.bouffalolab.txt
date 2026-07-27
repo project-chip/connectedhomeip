@@ -5,3 +5,5 @@ qrcode==7.4.2
 bitarray==2.6.0
 python_stdnum==1.18
 pycryptodome>=3.20.0
+toml>=0.10.2
+construct>=2.10.70

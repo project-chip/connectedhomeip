@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ArlEncoder.h"
+#include <app/clusters/access-control-server/ArlEncoder.h>
 
 using namespace chip;
 using namespace chip::app;

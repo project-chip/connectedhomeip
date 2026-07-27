@@ -1,0 +1,49 @@
+{{> header}}
+// This file is generated from clusters-shared-Structs.h.zapt
+
+#pragma once
+
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
+#include <lib/support/BitMask.h>
+
+#include <clusters/shared/Enums.h>
+
+#include <cstdint>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+// Structs shared across multiple clusters.
+namespace detail {
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct  cluster="" header=true}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
+// Global structs.
+namespace Globals {
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_no_clusters}}
+{{> cluster_objects_struct header=true}}
+
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace Globals
+} // namespace Clusters
+} // namespace app
+} // namespace chip

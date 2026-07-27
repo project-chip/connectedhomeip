@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
 #include <crypto/CHIPCryptoPAL.h>
@@ -38,7 +37,18 @@
 
 #include <lwip/tcpip.h>
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
+              "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+
+#else
 #include "els_pkc_mbedtls.h"
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -49,9 +59,23 @@
 #include "ot_platform_common.h"
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#include "crypto/S50/S50KeyAllocator.h"
+#include "psa/crypto.h"
+#include <crypto/PSAKeyAllocator.h>
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+#endif
+
 extern "C" void BOARD_InitHardware(void);
 extern "C" void otPlatSetResetFunction(void (*fp)(void));
 extern "C" void initiateResetInIdle(void);
+
+extern "C" {
+#include "osa.h"
+}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -76,13 +100,6 @@ extern "C" void vApplicationMallocFailedHook(void)
     ChipLogError(DeviceLayer, "Malloc Failure");
 }
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" void vApplicationIdleHook(void)
-{
-    chip::DeviceLayer::PlatformManagerImpl::IdleHook();
-}
-#endif
-
 extern "C" void __wrap_exit(int __status)
 {
     ChipLogError(DeviceLayer, "======> error exit function !!!");
@@ -94,7 +111,8 @@ extern "C" void __wrap_exit(int __status)
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" int wlan_event_callback(enum wlan_event_reason reason, void * data)
 {
-    return 0;
+    /* Could be called by wifi driver for specific event scenarios like when the driver hangs */
+    return chip::DeviceLayer::ConnectivityMgrImpl()._WlanEventCallback(reason, data);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
@@ -114,8 +132,16 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
+#if CONFIG_CHIP_CRYPTO_PSA
+    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    config_mbedtls_threading_alt();
+#endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+    status = psa_crypto_init();
+#else
     status = CRYPTO_InitHardware();
-
+#endif /* CHIP_CRYPTO_PSA */
     if (status != 0)
     {
         chipRes = CHIP_ERROR_INTERNAL;
@@ -161,7 +187,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&GetDiagnosticDataProviderImpl());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     /* Initialize LwIP via Wi-Fi layer. */
@@ -171,21 +197,41 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    err = WiFiInterfaceInit();
+    /*
+     * Wait Wifi to init.
+     * Initializing the 15.4 controller too early, before the wifi fw is finished initializing,
+     * can lead to a blockage in IMU communication between CPU1 and CPU2.
+     */
+    vTaskDelay(1500 / portTICK_PERIOD_MS); // TODO: Replace with a proper synchronization mechanism
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected "
+                        "with the board and start again!");
+        chipDie();
+    }
+    ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
+
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+
+#endif
+
     /*
      * Initialize controllers here before initializing BLE/OT/WIFI,
-     * this will load the firmware in CPU1/CPU2 depending on the
-     * connectivity used
+     * this will load the firmware in CPU2 depending on the
+     * connectivity used. CPU1 is loaded when the WiFiInterfaceInit is called
      */
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ZIGBEE
     controllerMask |= conn802_15_4_c;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ZIGBEE */
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     controllerMask |= connBle_c;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE */
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    controllerMask |= connWlan_c;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
     PLATFORM_InitControllers(controllerMask);
 
@@ -207,7 +253,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatRandomInit();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
@@ -216,22 +261,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
-    err = WiFiInterfaceInit();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer,
-                        "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected "
-                        "with the board and start again!");
-        chipDie();
-    }
-    ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
-
+#if CONFIG_CHIP_ETHERNET
     /* Initialize platform services */
     err = ServiceInit();
     SuccessOrExit(err);
-
-#endif
+#endif // CONFIG_CHIP_ETHERNET
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -335,7 +369,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -358,5 +393,5 @@ void PlatformManagerImpl::_Shutdown()
 
 extern "C" void mt_wipe(void)
 {
-    chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
 }

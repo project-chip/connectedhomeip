@@ -25,6 +25,9 @@ declare_args() {
   # communicated to OperationalSessionSetup API consumers.
   chip_enable_busy_handling_for_operational_session_setup = true
 
+  # Flag that sets path to zap-generated app-common directory
+  chip_app_zap_dir = chip_root + "/zzz_generated/app-common"
+
   # Controls whether the device commissioning process requires the user to
   # acknowledge terms and conditions during commissioning.
   chip_terms_and_conditions_required = false
@@ -35,4 +38,29 @@ declare_args() {
   chip_data_model_extra_logging =
       current_os == "linux" || current_os == "ios" || current_os == "mac" ||
       current_os == "android"
+
+  # Enable shutdown callbacks in CodegenDataModelProvider::Shutdown() so that
+  # Server::Shutdown() → Server::Init() cycles re-initialize clusters correctly.
+  # Disabled by default on embedded platforms to avoid pulling in per-cluster
+  # shutdown callbacks (~7-8K flash on some lighting apps).
+  chip_enable_server_restart_support =
+      current_os == "linux" || current_os == "ios" || current_os == "mac" ||
+      current_os == "android"
+
+  # Flag that controls whether the camera server is enabled
+  matter_enable_camera_server = false
+
+  # Disable matter groupcast by default, this should be enabled on an
+  # application/platform specific layer
+  chip_config_enable_groupcast = false
+
+  # Optional path to a directory containing well-known override source
+  # files for the data model. When set to a non-empty path, the build
+  # system looks for files like cluster-objects-override.cpp,
+  # Accessors-override.cpp, cluster-servers-override.gni,
+  # CHIPAttributeTLVValueDecoder-override.cpp, and
+  # CHIPEventTLVValueDecoder-override.cpp inside this directory and
+  # compiles them instead of the full zap-generated sources.
+  # When empty (default), the full generated sources are used.
+  chip_data_model_overrides_dir = ""
 }

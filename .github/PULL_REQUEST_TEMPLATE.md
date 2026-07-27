@@ -1,18 +1,34 @@
-> !!!!!!!!!! Please delete the instructions below and replace with PR
-> description
->
-> If you have an issue number, please use a syntax of `Fixes #12345` and a brief
-> change description
->
-> If you do not have an issue number, please have a good description of the
-> problem and the fix. Help the reviewer understand what to expect.
->
-> Complete/append to the `### Testing` section below, to describe how testing
-> was done. See
-> <https://github.com/project-chip/connectedhomeip/blob/master/CONTRIBUTING.md#pull-requests>
->
-> Make sure you delete these instructions (to prove you have read them).
->
-> !!!!!!!!!! Instructions end
+### Summary
 
-#### Testing
+<!--
+    Briefly describe what changed and why. For bug fixes, include the root cause
+    and your chosen solution. Link to relevant documents, test plans, or prior
+    issues.
+
+    See [Pull Request Guidelines](https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html).
+
+    Please replace this HTML comment with the actual PR summary.
+-->
+
+### Related issues
+
+<!--
+    Link to related GitHub issues. Use `Fixes #12345` to auto-close on merge,
+    or `#12345` to reference without closing.
+
+    Please replace this HTML comment with the actual related issues.
+-->
+
+### Testing
+
+<!--
+    Describe how you tested this change.
+
+    Examples:
+        - Added unit tests
+        - Verified by YAML test: TC_ABC.yaml
+        - Added Python test: TC_DEF.py
+        - Manually tested (describe steps)
+
+    Please replace this HTML comment with the actual testing details.
+-->

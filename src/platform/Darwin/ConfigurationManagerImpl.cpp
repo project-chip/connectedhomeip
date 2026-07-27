@@ -26,6 +26,7 @@
 #include <platform/Darwin/ConfigurationManagerImpl.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Global.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
@@ -138,10 +139,13 @@ exit:
 }
 #endif // TARGET_OS_OSX
 
+namespace {
+AtomicGlobal<ConfigurationManagerImpl> gInstance;
+}
+
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
-    static ConfigurationManagerImpl sInstance;
-    return sInstance;
+    return gInstance.get();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
@@ -196,6 +200,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location));
     }
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ConfigurationVersion))
+    {
+        ReturnErrorOnFailure(StoreConfigurationVersion(1));
+    }
+
     return CHIP_NO_ERROR;
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
@@ -244,6 +253,32 @@ CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else  // CHIP_DISABLE_PLATFORM_KVS
     return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetCommissionableDeviceName(char * buf, size_t bufSize)
+{
+    if (mConfigValueProvider != nullptr)
+    {
+        size_t outLen  = 0;
+        CHIP_ERROR err = mConfigValueProvider(PosixConfig::kConfigKey_DeviceName.Namespace, PosixConfig::kConfigKey_DeviceName.Name,
+                                              buf, bufSize, outLen);
+        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        {
+            return err;
+        }
+    }
+
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    size_t outLen  = 0;
+    CHIP_ERROR err = ReadConfigValueStr(PosixConfig::kConfigKey_DeviceName, buf, bufSize, outLen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        return GenericConfigurationManagerImpl<PosixConfig>::GetCommissionableDeviceName(buf, bufSize);
+    }
+    return err;
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
@@ -336,6 +371,24 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return ReadConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    return WriteConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 

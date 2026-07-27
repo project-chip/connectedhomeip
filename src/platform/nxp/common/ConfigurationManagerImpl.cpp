@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -33,18 +33,20 @@
 
 #include "fsl_device_registers.h"
 
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-#include "fsl_power.h"
-#endif
+#include <platform/nxp/common/BootReason.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataProvider.h"
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" {
 #include "wlan.h"
 }
+#endif
+#if CONFIG_CHIP_ETHERNET
+#include "fsl_enet.h"
+#include "fsl_silicon_id.h"
 #endif
 
 namespace chip {
@@ -58,47 +60,21 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason()
 {
-    /*
-    With current implementation kBrownOutReset couldn't be catched
-    */
     BootReasonType bootReason = BootReasonType::kUnspecified;
 
-    if (rebootCause == 0)
-    {
-        bootReason = BootReasonType::kPowerOnReboot;
-    }
-
-    else if (rebootCause == kPOWER_ResetCauseWdt)
-    {
-        /* Reboot can be due to hardware or software watchdog */
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-    }
-    else if (rebootCause == kPOWER_ResetCauseSysResetReq)
-    {
-        /*
-        kConfigKey_SoftwareUpdateCompleted not supported for now
-        if (NXPConfig::ConfigValueExists(NXPConfig::kConfigKey_SoftwareUpdateCompleted))
-        {
-            bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        }
-        else
-        {
-            bootReason = BootReasonType::kSoftwareReset;
-        }
-        */
-        bootReason = BootReasonType::kSoftwareReset;
-    }
+    ReturnErrorOnFailure(NXP::ReadAndDetermineBootReason(bootReason));
 
     return StoreBootReason(to_underlying(bootReason));
 }
-#endif
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
-    /* Empty implementation*/
+#if CONFIG_CHIP_NXP_PLATFORM_MCXW72
+    ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, true), DeviceLayer,
+                               "Failed to store OTA completion flag");
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -106,11 +82,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    uint8_t rebootCause = POWER_GetResetCause();
-    POWER_ClearResetCause(rebootCause);
-#endif
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
@@ -136,15 +107,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    SuccessOrExit(err = DetermineBootReason(rebootCause));
-#else
-    if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
-    {
-        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
-        SuccessOrExit(err);
-    }
-#endif
+    err = DetermineBootReason();
+    SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
 
@@ -168,6 +132,15 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
+
+#if CONFIG_CHIP_ETHERNET
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
+{
+    ENET_GetMacAddr(ENET, buf.data());
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
@@ -202,7 +175,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
@@ -308,14 +281,16 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = NXPConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
     ThreadStackMgr().ErasePersistentInfo();
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
+#endif
 
     /* Schedule a reset in the next idle call */
     PlatformMgrImpl().ScheduleResetInIdle();

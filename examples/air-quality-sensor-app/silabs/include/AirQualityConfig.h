@@ -8,6 +8,16 @@
 // Users should modify these #define statements to customize thresholds for their application.
 // These thresholds are used to categorize air quality into various levels.
 
+#ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
+#ifdef SLI_SI91X_MCU_INTERFACE
+
+// The I2C instance used should be the same as the one installed by I2C component.
+// <i> Default: SL_I2C2
+#define I2C_INSTANCE_USED SL_I2C2
+
+#endif // SLI_SI91X_MCU_INTERFACE
+#endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
+
 // <o MIN_THRESHOLD> Minimum Threshold Value
 // <i> Default: 0
 #define MIN_THRESHOLD 0
@@ -35,6 +45,10 @@
 // <o EXTREMELY_POOR_THRESHOLD> Extremely Poor Threshold Value
 // <i> Default: 300
 #define EXTREMELY_POOR_THRESHOLD 300
+
+// <o SENSOR_TIMER_PERIOD_MS> Sensor sampling period in milliseconds
+// <i> Default: 30000 (30 seconds)
+#define SENSOR_TIMER_PERIOD_MS 30000
 
 // <<< end of configuration section >>>
 

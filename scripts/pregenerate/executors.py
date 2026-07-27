@@ -17,22 +17,24 @@ import os
 import shlex
 import subprocess
 
+log = logging.getLogger(__name__)
+
 
 class ShellRunner:
     def run(self, cmd, cwd=None):
-        logging.debug(f"Executing {cmd}")
+        log.debug("Executing: %s", shlex.join(cmd))
         subprocess.check_call(cmd, cwd=cwd)
 
-    def ensure_directory_exists(self, dir):
-        os.makedirs(dir, exist_ok=True)
+    def ensure_directory_exists(self, path):
+        os.makedirs(path, exist_ok=True)
 
 
 class DryRunner:
     def run(self, cmd, cwd=None):
         if cwd:
-            logging.info(f"DRY-RUN: {shlex.join(cmd)} in {cwd}")
+            log.info("DRY-RUN in '%s': %s", cwd, shlex.join(cmd))
         else:
-            logging.info(f"DRY-RUN: {shlex.join(cmd)}")
+            log.info("DRY-RUN: %s", shlex.join(cmd))
 
-    def ensure_directory_exists(self, dir):
-        logging.info(f"DRY-RUN: mkdir {dir}")
+    def ensure_directory_exists(self, path):
+        log.info("DRY-RUN: mkdir '%s'", path)

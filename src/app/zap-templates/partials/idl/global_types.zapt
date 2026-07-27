@@ -2,7 +2,7 @@
 {{#if has_no_clusters}}
 enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
   {{#zcl_enum_items}}
-  k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
+  k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}} {{~>idl_label_clarification}};
   {{/zcl_enum_items}}
 }
 
@@ -15,7 +15,7 @@ enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
 {{else}}
 bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
   {{#zcl_bitmap_items}}
-  k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
+  k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}} {{~>idl_label_clarification}};
   {{/zcl_bitmap_items}}
 }
 

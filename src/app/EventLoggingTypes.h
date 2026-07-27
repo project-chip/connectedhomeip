@@ -18,7 +18,9 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
+#include <app/ConcreteEventPath.h>
 #include <app/EventPathParams.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -100,7 +102,7 @@ struct Timestamp
         kSystem = 0,
         kEpoch
     };
-    Timestamp() {}
+    constexpr Timestamp() = default;
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp Epoch(System::Clock::Timestamp aValue)
@@ -127,10 +129,20 @@ struct Timestamp
 class EventOptions
 {
 public:
-    EventOptions() : mPriority(PriorityLevel::Invalid) {}
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid) {}
+    EventOptions() = default;
+
+    template <typename EVENT_TYPE>
+    EventOptions(EndpointId endpointId, const EVENT_TYPE & eventData) :
+        mPath(endpointId, eventData.GetClusterId(), eventData.GetEventId()), mPriority(eventData.GetPriorityLevel())
+    {
+        constexpr bool isFabricScoped = DataModel::IsFabricScoped<EVENT_TYPE>::value;
+        if constexpr (isFabricScoped)
+        {
+            mFabricIndex = eventData.GetFabricIndex();
+        }
+    }
+
     ConcreteEventPath mPath;
-    Timestamp mTimestamp;
     PriorityLevel mPriority = PriorityLevel::Invalid;
     // kUndefinedFabricIndex 0 means not fabric associated at all
     FabricIndex mFabricIndex = kUndefinedFabricIndex;

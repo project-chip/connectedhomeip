@@ -30,6 +30,19 @@ Draft
 			<status>O</status>
 			<support>true</support>
 		</picsItem>
+		<!-- This also isn't part of basic info, but I added a descriptor for checking some MCORE PICS -->
+		<picsItem>
+			<itemNumber>DESC.S</itemNumber>
+			<feature>Does the device implement the descriptor as a server?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
+		<picsItem>
+			<itemNumber>DESC.S.A0000</itemNumber>
+			<feature>Does the device implement the device type list attribute?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
 	</usage>
 	<!--PIXIT-->
 	<pixit>
@@ -195,6 +208,27 @@ Draft
 			<picsItem>
 				<itemNumber>BINFO.S.A0014</itemNumber>
 				<feature>Does the DUT(server) support the ProductAppearance attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">O</status>
+				<support>false</support>
+			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0015</itemNumber>
+				<feature>Does the DUT(server) support the SpecificationVersion attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">M</status>
+				<support>true</support>
+			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0016</itemNumber>
+				<feature>Does the DUT(server) support the MaxPathsPerInvoke attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">M</status>
+				<support>false</support>
+			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0017</itemNumber>
+				<feature>Does the DUT(server) support the DeviceLocation attribute?</feature>
 				<reference>9.2.1. Attributes - index.html[pdf]</reference>
 				<status cond="BINFO.S">O</status>
 				<support>false</support>

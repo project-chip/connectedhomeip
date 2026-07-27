@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
@@ -34,7 +35,7 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         {
             uint16_t identifyTime;
             if (Protocols::InteractionModel::Status::Success ==
-                Identify::Attributes::IdentifyTime::Get(attributePath.mEndpointId, &identifyTime))
+                Identify::Attributes::IdentifyTime::GetDefault(attributePath.mEndpointId, &identifyTime))
             {
                 ChipLogProgress(Zcl, "IdentifyTime %u", identifyTime);
                 return;

@@ -162,7 +162,7 @@ void TestCreateReleaseStruct()
     {
         S(std::set<S *> & set) : mSet(set) { mSet.insert(this); }
         ~S() { mSet.erase(this); }
-        std::set<S *> & mSet;
+        std::set<S *> & mSet; // NOLINT(clang-analyzer-webkit.NoUncountedMemberChecker)
     };
     std::set<S *> objs1;
 
@@ -489,7 +489,7 @@ void TestPoolInterface()
     struct TestObject
     {
         TestObject(uint32_t * set, size_t id) : mSet(set), mId(id) { *mSet |= (1 << mId); }
-        ~TestObject() { *mSet &= ~(1 << mId); }
+        ~TestObject() { *mSet &= static_cast<uint32_t>(~(1 << mId)); }
         uint32_t * mSet;
         size_t mId;
     };
@@ -498,7 +498,7 @@ void TestPoolInterface()
     struct PoolHolder
     {
         PoolHolder(TestObjectPoolType & testObjectPool) : mTestObjectPoolInterface(testObjectPool) {}
-        TestObjectPoolType & mTestObjectPoolInterface;
+        TestObjectPoolType & mTestObjectPoolInterface; // NOLINT(clang-analyzer-webkit.NoUncountedMemberChecker)
     };
 
     constexpr size_t kSize = 10;
@@ -543,6 +543,49 @@ TEST_F(TestPool, TestPoolInterfaceStatic)
 TEST_F(TestPool, TestPoolInterfaceDynamic)
 {
     TestPoolInterface<ObjectPoolMem::kHeap>();
+}
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+template <typename T, size_t N, ObjectPoolMem P>
+void TestPoolAutoRelease()
+{
+    using PoolType = ObjectPool<uint32_t, N, P>;
+    PoolType pool;
+
+    EXPECT_EQ(pool.Allocated(), 0u);
+
+    {
+        PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
+        ASSERT_NE(obj, nullptr);
+        ASSERT_FALSE(obj.IsNull());
+        EXPECT_EQ(GetNumObjectsInUse(pool), 1u);
+        EXPECT_EQ(pool.Allocated(), 1u);
+    }
+
+    EXPECT_EQ(GetNumObjectsInUse(pool), 0u);
+    EXPECT_EQ(pool.Allocated(), 0u);
+
+    PoolAutoRelease<uint32_t, PoolType> obj(pool, pool.CreateObject());
+    ASSERT_NE(obj, nullptr);
+    ASSERT_FALSE(obj.IsNull());
+    obj.Release();
+    ASSERT_EQ(obj, nullptr);
+    ASSERT_TRUE(obj.IsNull());
+
+    // Assert additional release is a no-op
+    obj.Release();
+}
+
+TEST_F(TestPool, TestPoolAutoReleaseStatic)
+{
+    constexpr const size_t kSize = 100;
+    TestPoolAutoRelease<uint32_t, kSize, ObjectPoolMem::kInline>();
+}
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+TEST_F(TestPool, TestPoolAutoReleaseDynamic)
+{
+    TestPoolAutoRelease<uint32_t, 100, ObjectPoolMem::kHeap>();
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 

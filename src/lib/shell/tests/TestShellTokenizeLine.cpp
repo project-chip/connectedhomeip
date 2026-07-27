@@ -101,7 +101,7 @@ static const struct test_shell_vector test_vector_shell_tokenizer[] = {
 
 TEST(TestShellTokenizeLine, TestShell_Tokenizer)
 {
-    int numOfTestVectors = ArraySize(test_vector_shell_tokenizer);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(test_vector_shell_tokenizer);
     int numOfTestsRan    = 0;
     const struct test_shell_vector * test_params;
 

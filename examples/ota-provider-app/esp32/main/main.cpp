@@ -20,7 +20,6 @@
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
@@ -28,9 +27,10 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <OTAProviderCommands.h>
-#include <app/clusters/ota-provider/ota-provider.h>
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
 #include <shell_extension/launch.h>
@@ -173,12 +173,13 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        char otaImagePath[kMaxImagePathlen];
-        memset(otaImagePath, 0, sizeof(otaImagePath));
-        snprintf(otaImagePath, sizeof(otaImagePath), "%s", fileDesignator);
-        ESP_LOGI(TAG, "File designator: %s", otaImagePath);
-
-        otaImageFile = fopen(otaImagePath, "r");
+        ESP_LOGI(TAG, "File designator: %s", fileDesignator);
+        const char * filePath = otaProvider.GetFilePathForDesignator(fileDesignator);
+        if (filePath == nullptr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        otaImageFile = fopen(filePath, "r");
         if (otaImageFile == NULL)
 
         {
@@ -209,7 +210,8 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         isEof = false;
         return CHIP_ERROR_READ_FAILED;
     }
-    ESP_LOGI(TAG, "Read %u bytes from %s", size, otaFilename);
+    ESP_LOGI(TAG, "OTA Transfer: %" PRIu32 "/%" PRIu32 " bytes (%.1f%%)", (uint32_t) (offset + size), otaImageLen,
+             (float) (offset + size) * 100 / otaImageLen);
     return CHIP_NO_ERROR;
 }
 
@@ -281,5 +283,5 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }

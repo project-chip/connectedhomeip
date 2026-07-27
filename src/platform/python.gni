@@ -15,9 +15,6 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Build controller (set to false for a device)
-  chip_controller = true
-
   # Pass the directory to the BUILD.gn that pulls in the generated data-model files, e.g. ///examples/lighting-app/lighting-common
   chip_data_model = ""
 }

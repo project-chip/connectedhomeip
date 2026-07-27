@@ -24,6 +24,8 @@ import tarfile
 import coloredlogs
 import github
 
+log = logging.getLogger(__name__)
+
 
 class BundleBuilder:
 
@@ -32,13 +34,13 @@ class BundleBuilder:
         self.outputPrefix = outputPrefix
         self.workingDirectory = workingDirectory
 
-        logging.info('Creating bundle "%s":', self.outputName)
+        log.info("Creating bundle '%s':", self.outputName)
 
-        self.output = tarfile.open(self.outputName, 'w:xz')
+        self.output = tarfile.open(self.outputName, "w:xz")  # noqa: SIM115
 
     def appendFile(self, name):
         """Appends the specified file in the working directory to the bundle."""
-        logging.info('   Appending %s to the bundle', name)
+        log.info("   Appending '%s' to the bundle", name)
 
         current_directory = os.path.realpath(os.curdir)
         try:
@@ -49,7 +51,7 @@ class BundleBuilder:
 
     def close(self):
         """Closes the bundle and returns the file name of the bundle."""
-        logging.info('   Bundle creation complete.')
+        log.info("   Bundle creation complete.")
         self.output.close()
         return self.outputName
 
@@ -90,14 +92,14 @@ def main():
     coloredlogs.install()
 
     if not args.github_api_token:
-        logging.error(
-            'Required arguments missing: github api token is required')
+        log.error(
+            "Required arguments missing: github api token is required")
         return
 
     bundle = BundleBuilder(args.bundle_name, args.bundle_name,
                            args.working_directory)
 
-    with open(args.bundle_files, 'rt') as bundleInputs:
+    with open(args.bundle_files) as bundleInputs:
         for fileName in bundleInputs.readlines():
             bundle.appendFile(fileName.strip())
 
@@ -106,14 +108,14 @@ def main():
     api = github.Github(args.github_api_token)
     repo = api.get_repo(args.github_repository)
 
-    logging.info('Connected to github repository')
+    log.info("Connected to github repository")
 
     release = repo.get_release(args.release_tag)
-    logging.info('Release "%s" found.' % args.release_tag)
+    log.info("Release '%s' found.", args.release_tag)
 
-    logging.info('Uploading %s', assetPath)
+    log.info("Uploading '%s'", assetPath)
     release.upload_asset(assetPath)
-    logging.info('Asset upload complete')
+    log.info("Asset upload complete")
 
 
 if __name__ == '__main__':

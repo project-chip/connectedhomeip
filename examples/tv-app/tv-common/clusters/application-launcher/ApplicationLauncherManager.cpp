@@ -45,7 +45,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
@@ -58,7 +58,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
@@ -71,5 +71,5 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }

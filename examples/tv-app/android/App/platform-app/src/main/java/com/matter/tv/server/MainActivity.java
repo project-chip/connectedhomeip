@@ -20,22 +20,21 @@ public class MainActivity extends AppCompatActivity {
   private BottomNavigationView.OnNavigationItemSelectedListener navListener =
       item -> {
         Fragment selectedFragment = null;
-        switch (item.getItemId()) {
-          case R.id.content_app:
-            selectedFragment = ContentAppFragment.newInstance();
-            break;
-          case R.id.qr_code:
-            selectedFragment = QrCodeFragment.newInstance();
-            break;
-          case R.id.terminal:
-            selectedFragment = TerminalFragment.newInstance();
-            break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.content_app) {
+          selectedFragment = ContentAppFragment.newInstance();
+        } else if (itemId == R.id.qr_code) {
+          selectedFragment = QrCodeFragment.newInstance();
+        } else if (itemId == R.id.terminal) {
+          selectedFragment = TerminalFragment.newInstance();
         }
 
-        getSupportFragmentManager()
-            .beginTransaction()
-            .replace(R.id.fragment_container_view, selectedFragment)
-            .commit();
+        if (selectedFragment != null) {
+          getSupportFragmentManager()
+              .beginTransaction()
+              .replace(R.id.fragment_container_view, selectedFragment)
+              .commit();
+        }
         return true;
       };
 

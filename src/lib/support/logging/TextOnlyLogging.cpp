@@ -104,53 +104,11 @@ namespace {
 std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
 
 /*
- * Array of strings containing the names for each of the chip log modules.
- *
- * NOTE: The names must be in the order defined in the LogModule enumeration.
+ * Array of strings containing the short names for each of the chip log modules.
  */
 static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
-    "-",   // None
-    "IN",  // Inet
-    "BLE", // BLE
-    "ML",  // MessageLayer
-    "SM",  // SecurityManager
-    "EM",  // ExchangeManager
-    "TLV", // TLV
-    "ASN", // ASN1
-    "CR",  // Crypto
-    "CTL", // Controller
-    "AL",  // Alarm
-    "SC",  // SecureChannel
-    "BDX", // BulkDataTransfer
-    "DMG", // DataManagement
-    "DC",  // DeviceControl
-    "DD",  // DeviceDescription
-    "ECH", // Echo
-    "FP",  // FabricProvisioning
-    "NP",  // NetworkProvisioning
-    "SD",  // ServiceDirectory
-    "SP",  // ServiceProvisioning
-    "SWU", // SoftwareUpdate
-    "FS",  // FailSafe
-    "TS",  // TimeService
-    "HB",  // Heartbeat
-    "CSL", // chipSystemLayer
-    "EVL", // Event Logging
-    "SPT", // Support
-    "TOO", // chipTool
-    "ZCL", // Zcl
-    "SH",  // Shell
-    "DL",  // DeviceLayer
-    "SPL", // SetupPayload
-    "SVR", // AppServer
-    "DIS", // Discovery
-    "IM",  // InteractionModel
-    "TST", // Test
-    "OSS", // OperationalSessionSetup
-    "ATM", // Automation
-    "CSM", // CASESessionManager
-    "ICD", // ICD
-    "FS",  // FabricSync
+#define _CHIP_LOGMODULE_NAME_INIT(MOD, NAME, ...) NAME,
+    CHIP_LOGMODULES_ENUMERATE(_CHIP_LOGMODULE_NAME_INIT)
 };
 
 } // namespace

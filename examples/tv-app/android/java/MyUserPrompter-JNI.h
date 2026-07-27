@@ -28,11 +28,11 @@ public:
     JNIMyUserPrompter(jobject prompter);
     void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName, uint16_t pairingHint,
-                                     const char * pairingInstruction) override;
+                                     const char * pairingInstruction, uint8_t passcodeLength) override;
     void HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     bool DisplaysPasscodeAndQRCode() override;
     void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName, uint32_t passcode,
-                                        uint16_t pairingHint, const char * pairingInstruction) override;
+                                        uint8_t passcodeLength, uint16_t pairingHint, const char * pairingInstruction) override;
     void PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override;
     void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override;

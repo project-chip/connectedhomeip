@@ -30,7 +30,7 @@ struct AttributePathParams
 {
     AttributePathParams() = default;
 
-    explicit AttributePathParams(EndpointId aEndpointId) :
+    constexpr explicit AttributePathParams(EndpointId aEndpointId) :
         AttributePathParams(aEndpointId, kInvalidClusterId, kInvalidAttributeId, kInvalidListIndex)
     {}
 
@@ -38,19 +38,19 @@ struct AttributePathParams
     // TODO: (Issue #10596) Need to ensure that we do not encode the NodeId over the wire
     // if it is either not 'set', or is set to a value that matches accessing fabric
     // on which the interaction is undertaken.
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
         AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         AttributePathParams(aEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
+    constexpr AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
         AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
         mClusterId(aClusterId), mAttributeId(aAttributeId), mEndpointId(aEndpointId), mListIndex(aListIndex)
     {}
 

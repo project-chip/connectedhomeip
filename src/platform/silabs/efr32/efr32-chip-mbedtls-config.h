@@ -32,8 +32,8 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif // CHIP_HAVE_CONFIG_H
 
-// DIC Specific Configurations
-#ifdef DIC_ENABLE
+// MATTER AWS Specific Configurations
+#ifdef SL_MATTER_ENABLE_AWS
 #define MBEDTLS_PKCS1_V15
 #define MBEDTLS_RSA_NO_CRT
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
@@ -65,7 +65,7 @@
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_ENTROPY_C
 
-#endif // DIC_ENABLE
+#endif // SL_MATTER_ENABLE_AWS
 
 // Configurations necessary for ot coap cert libs
 #if SL_USE_COAP_CONFIG
@@ -81,10 +81,12 @@
 #define MBEDTLS_CIPHER_MODE_CBC
 #define MBEDTLS_CCM_C
 #define MBEDTLS_ECJPAKE_C
+#define MBEDTLS_X509_CRT_PARSE_C
 #define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
 #define MBEDTLS_PK_HAVE_CURVE_SECP256R1
 #define MBEDTLS_PK_HAVE_JPAKE
-#define PSA_WANT_ALG_SOME_PAKE
+#define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+#define MBEDTLS_SSL_HANDSHAKE_WITH_CERT_ENABLED
 #endif // SL_USE_COAP_CONFIG
 
 #if SL_MATTER_PROVISION_FLASH
@@ -93,6 +95,8 @@
 #define MBEDTLS_ECDSA_DETERMINISTIC
 #endif // SL_MATTER_PROVISION_FLASH
 
+// If defining snprintf we are also responsible for including its declaration
+#include <stdio.h>
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
 #define MBEDTLS_AES_ROM_TABLES

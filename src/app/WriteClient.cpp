@@ -34,6 +34,7 @@ namespace app {
 void WriteClient::Close()
 {
     MoveToState(State::AwaitingDestruction);
+    mExchangeCtx.Release();
 
     if (mpCallback)
     {
@@ -54,7 +55,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     ReturnErrorOnFailure(writeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeResponse.PrettyPrint();
 #endif
 
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
@@ -171,8 +172,11 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks.
-    VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
+    // Per the Matter specification a chunked Write Request cannot be part of a Timed Write Interaction, and it cannot
+    // suppress the response: intermediate WriteResponses are required to pace the chunks, so SuppressResponse must be
+    // false when the request is chunked.
+    VerifyOrReturnError(!((mTimedWriteTimeoutMs.HasValue() || mSuppressResponse) && !mChunks.IsNull()),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -201,7 +205,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -247,7 +251,8 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
+CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                               TestListEncodingOverride testListEncodingOverride)
 {
     ReturnErrorOnFailure(EnsureMessage());
 
@@ -256,23 +261,67 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
     {
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
+        uint16_t encodedItemCount      = 0;
         ConcreteDataAttributePath path = attributePath;
 
-        dataReader.Init(data);
-        dataReader.OpenContainer(valueReader);
+        // By convention, and as tested against all cluster servers, clients have historically encoded an empty list as a
+        // ReplaceAll, (i.e. the entire attribute contents are cleared before appending the new list’s items). However, this
+        // behavior can be problematic, especially for the ACL attribute; sending an empty ReplaceAll list can cause clients to be
+        // locked out. This is because the empty list first deletes all existing ACL entries, and if the new (malformed) ACL is
+        // rejected, the server is left without valid (or with incomplete) ACLs.
+        // SOLUTION: we treat ACL as an exception and avoid encoding an empty ReplaceAll list. Instead, we pack as many ACL entries
+        // as possible into the ReplaceAll list, and send  any remaining entries in subsequent chunks are part of the AppendItem
+        // list operation.
+        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
+        // enforce all clusters to support it in testing and in certification.
+        bool encodeEmptyListAsReplaceAll = (path.mClusterId != Clusters::AccessControl::Id) ||
+            (testListEncodingOverride == TestListEncodingOverride::kForceLegacyEncoding);
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
-
-        if (err == CHIP_NO_ERROR)
+        if (encodeEmptyListAsReplaceAll)
         {
-            path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-            while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        }
+        else
+        {
+
+            dataReader.Init(data);
+            TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
+            bool chunkingNeeded = false;
+
+            // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
+            // WriteRequestMessage chunk.
+            ReturnErrorOnFailure(
+                TryPutPreencodedAttributeWritePayloadIntoList(path, valueReader, chunkingNeeded, encodedItemCount));
+
+            // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
+            // and we can exit early.
+            VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
+
+            // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
+            // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
+            ReturnErrorOnFailure(StartNewMessage());
+        }
+        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+
+        // We will restart iterating on ValueReader, only appending the items we need to append.
+        dataReader.Init(data);
+        TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
+
+        CHIP_ERROR err            = CHIP_NO_ERROR;
+        uint16_t currentItemCount = 0;
+
+        while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+        {
+            currentItemCount++;
+
+            if (currentItemCount <= encodedItemCount)
             {
-                ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
+                // Element already encoded via `TryPutPreencodedAttributeWritePayloadIntoList`
+                continue;
             }
+
+            ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
         }
 
         if (err == CHIP_END_OF_TLV)
@@ -281,8 +330,96 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
+
     // We are writing a non-list attribute, or we are writing a single element of a list.
     return PutSinglePreencodedAttributeWritePayload(attributePath, data);
+}
+
+CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
+{
+    TLV::TLVWriter backupWriter;
+    mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+
+    CHIP_ERROR err = TryToStartList(attributePath);
+    if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        // If it failed with no memory, then we create a new chunk for it.
+        mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+        ReturnErrorOnFailure(StartNewMessage());
+        ReturnErrorOnFailure(TryToStartList(attributePath));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::TryToStartList(const ConcreteDataAttributePath & attributePath)
+{
+
+    // TODO (#38414) : Move reservation/unreservtion of Buffer for TLV Writing to AttributeDataIB Builder instead of WriteClient
+    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListAttributeIB));
+
+    ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
+
+    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
+
+    VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::EnsureListEnded()
+{
+    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Undo the reservation made in EnsureListStarted() to free up space for the EndOfContainer TLV Elements
+    // (for both the List and AttributeDataIB).
+    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListAttributeIB));
+    ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
+
+    return FinishAttributeIB();
+}
+
+CHIP_ERROR
+WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const ConcreteDataAttributePath & attributePath,
+                                                           TLV::TLVReader & valueReader, bool & outChunkingNeeded,
+                                                           ListIndex & outEncodedItemCount)
+{
+
+    ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+    AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
+    TLV::TLVWriter backupWriter;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    outEncodedItemCount = 0;
+
+    while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+    {
+        // Try to put all the list items into the list we just started, until we either run out of items
+        // or run out of space.
+        // Make sure that if we run out of space we don't leave a partially-encoded list item around.
+        attributeDataIB.Checkpoint(backupWriter);
+        err = attributeDataIB.GetWriter()->CopyElement(TLV::AnonymousTag(), valueReader);
+
+        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            // Rollback through the attributeDataIB, which also resets the Builder's error state.
+            // This returns the object to the state it was in before attempting to copy the element.
+            attributeDataIB.Rollback(backupWriter);
+            outChunkingNeeded = true;
+            err               = CHIP_NO_ERROR;
+            break;
+        }
+        ReturnErrorOnFailure(err);
+        outEncodedItemCount++;
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+
+    return EnsureListEnded();
 }
 
 const char * WriteClient::GetStateStr() const
@@ -339,7 +476,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     if (timeout == System::Clock::kZero)
     {
-        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -369,7 +506,7 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session->IsGroupSession())
+        if (session->IsGroupSession() || (mSuppressResponse && mState != State::AwaitingTimedStatus))
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");
@@ -393,16 +530,20 @@ CHIP_ERROR WriteClient::SendWriteRequest()
     System::PacketBufferHandle data = mChunks.PopHead();
 
     bool isGroupWrite = mExchangeCtx->IsGroupExchangeContext();
-    if (!mChunks.IsNull() && isGroupWrite)
+    if (!mChunks.IsNull() && (isGroupWrite || mSuppressResponse))
     {
-        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()), and this is a group
-        // exchange context.
+        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()) and either this is a
+        // group exchange context or the response is suppressed; a chunked write requires intermediate WriteResponses.
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (mSuppressResponse)
+    {
+        return mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone);
     }
 
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
-
     MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }
@@ -412,10 +553,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse &&
-        // We had sent the last chunk of data, and received all responses
-        mChunks.IsNull())
+    if (mState == State::AwaitingResponse)
     {
+        // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
+        //       SendWriteRequest() call below will move back to an AwaitingResponse state
         MoveToState(State::ResponseReceived);
     }
 
@@ -482,7 +623,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::AwaitingResponse)

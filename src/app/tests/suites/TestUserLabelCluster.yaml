@@ -68,13 +68,7 @@ tests:
       command: "writeAttribute"
       attribute: "LabelList"
       arguments:
-          value:
-              [
-                  { Label: "room", Value: "bedroom 2" },
-                  { Label: "orientation", Value: "North" },
-                  { Label: "floor", Value: "5" },
-                  { Label: "direction", Value: "up" },
-              ]
+          value: [{ Label: "direction", Value: "up" }]
 
     - label: "Reboot target device"
       cluster: "SystemCommands"
@@ -92,10 +86,4 @@ tests:
       command: "readAttribute"
       attribute: "LabelList"
       response:
-          value:
-              [
-                  { Label: "room", Value: "bedroom 2" },
-                  { Label: "orientation", Value: "North" },
-                  { Label: "floor", Value: "5" },
-                  { Label: "direction", Value: "up" },
-              ]
+          value: [{ Label: "direction", Value: "up" }]

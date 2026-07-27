@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -35,36 +36,21 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import logging
+
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing import matter_asserts
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class TC_DGSW_2_1(MatterBaseTest):
-
-    @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint32_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_str_value(value):
-        return isinstance(value, str) and len(value) > 0
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64."""
-        asserts.assert_true(self.is_valid_uint64_value(value), f"{field_name} field should be a uint64 type")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32."""
-        asserts.assert_true(self.is_valid_uint32_value(value), f"{field_name} field should be a uint32 type")
-
-    def assert_valid_str(self, value, field_name):
-        """Asserts that the value is a non-empty string."""
-        asserts.assert_true(self.is_valid_str_value(value), f"{field_name} field should be a non-empty string")
 
     async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
@@ -78,69 +64,117 @@ class TC_DGSW_2_1(MatterBaseTest):
         return ["DGSW.S"]
 
     def steps_TC_DGSW_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the ThreadMetrics attribute"),
-            TestStep(3, "Read the CurrentHeapFree attribute"),
-            TestStep(4, "Read the CurrentHeapUsed attribute"),
-            TestStep(5, "Read the CurrentHeapHighWatermark attribute"),
+            TestStep(2, "Read the ThreadMetrics attribute",
+                     "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"
+                     "ThreadMetrics Struct. The Id field of the list is mandatory and shall match with Node assigned ID unique-per-thread."
+                     "Name field shall be set to vendor specific strings. StackFreeCurrent field shall indicate the current amount of stack memory, in bytes, not being utilized by the respective thread."
+                     "StackFreeMinimum field shall indicate the minimum amount of available stack memory in bytes. "
+                     "This value can be reset by a node reboot. StackSize field shall indicate the amount of memory allocated for use by the respective thread."
+                     "Verify that StackSize is greater than 0."
+                     "Verify that StackFreeCurrent is less than StackSize."
+                     "Verify that StackFreeMinimum is less than or equal to StackFreeCurrent."),
+            TestStep(3, "Read the CurrentHeapFree attribute",
+                     "The value will indicate the current amount of unutilized heap memory in bytes."
+                     "Verify that CurrentHeapFree is a valid value (>= 0)."),
+            TestStep(4, "Read the CurrentHeapUsed attribute",
+                     "The value will indicate the current amount of used heap memory in bytes."
+                     "Verify that CurrentHeapUsed is a valid value (>= 0)."),
+            TestStep(5, "Read the CurrentHeapHighWatermark attribute",
+                     "The value will indicate the maximum amount of heap memory being used in bytes. This value can be reset by a node reboot."
+                     "Verify that CurrentHeapHighWatermark is greater than or equal to CurrentHeapUsed."),
         ]
-        return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_1(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
 
         # STEP 1: Commission DUT (already done)
         self.step(1)
 
         attributes = Clusters.SoftwareDiagnostics.Attributes
-        attribute_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         # STEP 2: TH reads from the DUT the ThreadMetrics attribute
         self.step(2)
-        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
+        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics)
+        if attr_condition:
             thread_metrics_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
 
             # Validate each element in the thread_metrics_list
             for metric in thread_metrics_list:
+                stackSize = None
                 # The Id field is mandatory
-                self.assert_valid_uint64(metric.id, "Id")
+                matter_asserts.assert_valid_uint64(metric.id, "Id")
+                logger.info("Thread Metric ID: %s", metric.id)
 
                 # Validate the optional Name field
                 if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
-
-                # Validate the optional StackFreeCurrent field
-                if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
-
-                # Validate the optional StackFreeMinimum field
-                if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+                    matter_asserts.assert_is_string(metric.name, "Name")
+                    logger.info("Thread Metric Name: %s", metric.name)
 
                 # Validate the optional StackSize field
                 if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
+                    stackSize = metric.stackSize
+                    matter_asserts.assert_valid_uint32(stackSize, "StackSize")
+                    # Verify that StackSize is greater than 0.
+                    asserts.assert_greater(stackSize, 0, "StackSize is not greater than 0.")
+                else:
+                    logger.warning("Thread Metric StackSize is None for ID: %s", metric.id)
+
+                # Validate the optional StackFreeCurrent field
+                if metric.stackFreeCurrent is not None:
+                    matter_asserts.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
+                    # Verify that StackFreeCurrent is less than stackSize.
+                    if stackSize is not None:
+                        asserts.assert_less(metric.stackFreeCurrent, stackSize,
+                                            "StackFreeCurrent is not less than StackSize.")
+                else:
+                    logger.warning("Thread Metric StackFreeCurrent is None for ID: %s", metric.id)
+
+                # Validate the optional StackFreeMinimum field
+                if metric.stackFreeMinimum is not None:
+                    matter_asserts.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
+                    # Verify that StackFreeMinimum is less than or equal to StackFreeCurrent.
+                    if metric.stackFreeCurrent is not None:
+                        asserts.assert_less_equal(metric.stackFreeMinimum, metric.stackFreeCurrent,
+                                                  "StackFreeMinimum is not less than or equal to StackFreeCurrent.")
+                else:
+                    logger.warning("Thread Metric StackFreeMinimum is None for ID: %s", metric.id)
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
-        if self.pics_guard(attributes.CurrentHeapFree.attribute_id in attribute_list):
+        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
+        if attr_condition:
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            self.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
+            logger.info("CurrentHeapFree: %s", current_heap_free_attr)
+            matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
+            # Verify that CurrentHeapFree is greater than or equal to 0.
+            asserts.assert_greater_equal(current_heap_free_attr, 0, "CurrentHeapFree is not greater than or equal to 0.")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
-        if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
+
+        current_heap_used_attr = 0
+        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
+        if attr_condition:
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            self.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
+            logger.info("CurrentHeapUsed: %s", current_heap_used_attr)
+            matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
+            # Verify that CurrentHeapUsed is greater than or equal to 0.
+            asserts.assert_greater_equal(current_heap_used_attr, 0, "CurrentHeapUsed is not greater than or equal to 0.")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
-        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
+        attr_condition = await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        if attr_condition:
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
+            logger.info("CurrentHeapHighWatermark: %s", current_heap_high_watermark_attr)
+            matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
+            # Verify that CurrentHeapHighWatermark is greater than or equal to CurrentHeapUsed.
+            asserts.assert_greater_equal(current_heap_high_watermark_attr, current_heap_used_attr,
+                                         "CurrentHeapHighWatermark is not greater than or equal to CurrentHeapUsed.")
 
 
 if __name__ == "__main__":

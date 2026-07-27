@@ -35,7 +35,11 @@
 
 #include <sys/time.h>
 
+#include <lib/core/CHIPConfig.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPointImpl.h>
+#endif
 #include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayerImpl.h>
@@ -50,7 +54,9 @@
 
 extern chip::System::LayerImpl gSystemLayer;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 extern chip::Inet::TCPEndPointManagerImpl gTCP;
+#endif
 extern chip::Inet::UDPEndPointManagerImpl gUDP;
 
 extern bool gDone;

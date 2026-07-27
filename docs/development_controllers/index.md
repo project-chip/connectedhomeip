@@ -5,9 +5,9 @@
 :maxdepth: 1
 :hidden:
 
-chip-repl/index
 chip-tool/index
+matter-repl/index
 ```
 
--   [chip-tool](./chip-tool)
--   [chip-repl](./chip-repl)
+-   [chip-tool](./chip-tool/index.md)
+-   [matter-repl](./matter-repl/index.md)

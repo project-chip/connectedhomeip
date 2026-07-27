@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -28,38 +30,35 @@ class InfineonApp(Enum):
     def ExampleName(self):
         if self == InfineonApp.LOCK:
             return 'lock-app'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'lighting-app'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
             return 'chip-psoc6-lock-example'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'chip-psoc6-lighting-example'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'chip-psoc6-clusters-example'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-psoc6-clusters-minimal-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == InfineonApp.LOCK:
             return 'lock_app.flashbundle.txt'
-        elif self == InfineonApp.ALL_CLUSTERS:
+        if self == InfineonApp.ALL_CLUSTERS:
             return 'clusters_app.flashbundle.txt'
-        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+        if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'clusters_minimal_app.flashbundle.txt'
-        elif self == InfineonApp.LIGHT:
+        if self == InfineonApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'infineon/psoc6')
@@ -71,21 +70,21 @@ class InfineonBoard(Enum):
     def GnArgName(self):
         if self == InfineonBoard.PSOC6BOARD:
             return 'CY8CKIT-062S2-43012'
+        raise Exception('Unknown board type: %r' % self)
 
 
 class InfineonBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.PSOC6BOARD,
                  enable_ota_requestor: bool = False,
                  update_image: bool = False,
                  enable_trustm: bool = False):
-        super(InfineonBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.extra_gn_options = ['psoc6_board="%s"' % board.GnArgName()]
@@ -100,8 +99,11 @@ class InfineonBuilder(GnBuilder):
             self.extra_gn_options.append('chip_crypto=\"mbedtls\"')
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ['out']
         if self.options.enable_link_map_file:
@@ -110,6 +112,7 @@ class InfineonBuilder(GnBuilder):
             name = f"{self.app.AppNamePrefix()}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def bundle_outputs(self):
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):

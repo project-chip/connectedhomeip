@@ -28,8 +28,10 @@
 class ModelCommand : public CHIPCommand
 {
 public:
-    ModelCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig, bool supportsMultipleEndpoints = false) :
-        CHIPCommand(commandName, credsIssuerConfig), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    ModelCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig, bool supportsMultipleEndpoints = false,
+                 const char * helpText = nullptr) :
+        CHIPCommand(commandName, credsIssuerConfig, helpText),
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mSupportsMultipleEndpoints(supportsMultipleEndpoints)
     {}
 

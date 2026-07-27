@@ -46,15 +46,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController ()
+@interface MTRDeviceController () <MTRDeviceControllerDelegate>
 
 @property (nonatomic, readonly) NSMapTable<NSNumber *, MTRDevice *> * nodeIDToDeviceMap;
 @property (readonly, assign) os_unfair_lock_t deviceMapLock;
 
-@property (readwrite, nonatomic) NSUUID * uniqueIdentifier;
-// (moved here so subclasses can initialize differently)
-
-- (instancetype)initForSubclasses:(BOOL)startSuspended;
+- (instancetype)initForSubclasses:(BOOL)startSuspended uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -116,6 +113,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData;
 - (void)removeDevice:(MTRDevice *)device;
 
+/**
+ * Called by MTRDevice object when their dealloc is called, so the controller can notify interested delegate that active devices have changed
+ */
+- (void)deviceDeallocated;
+
 @end
 
 /**
@@ -145,5 +147,6 @@ static NSString * const kDeviceControllerErrorCSRValidation = @"Extracting publi
 static NSString * const kDeviceControllerErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kDeviceControllerErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kDeviceControllerErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
+static NSString * const kDeviceControllerErrorUpdateNetworkCredentials = @"Failure while trying to update network credentials during commissioning";
 
 NS_ASSUME_NONNULL_END

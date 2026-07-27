@@ -28,7 +28,7 @@
 #include "esp_idf_version.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_spi_flash.h"
@@ -89,7 +89,7 @@ CHIP_ERROR AppTask::Init()
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    statusLED1.Init(STATUS_LED_GPIO_NUM);
+    statusLED1.Init(static_cast<gpio_num_t>(CONFIG_STATUS_LED_GPIO_NUM));
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
     // "LED"s on devices with screens.
     statusLED2.Init(GPIO_NUM_MAX);

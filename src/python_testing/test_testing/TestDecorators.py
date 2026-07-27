@@ -26,14 +26,17 @@
 # You will get step_* calls as appropriate in between the test_start and test_stop calls if the test is not skipped.
 
 import sys
-from typing import Optional
+from pathlib import Path
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.matter_testing import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute, has_cluster, has_feature,
-                                         run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
 from mobly import asserts
-from MockTestRunner import MockTestRunner
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.testing.decorators import (async_test_body, has_attribute, has_cluster, has_feature, run_if_endpoint_matches,
+                                       run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import MockTestRunner
 
 
 def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadResponse:
@@ -90,12 +93,14 @@ class DecoratorTestRunnerHooks:
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         pass
 
 
 class TestDecorators(MatterBaseTest):
+    requires_dut = False
+
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)
@@ -216,7 +221,8 @@ class TestDecorators(MatterBaseTest):
 def main():
     failures = []
     hooks = DecoratorTestRunnerHooks()
-    test_runner = MockTestRunner('TestDecorators.py', 'TestDecorators', 'test_checkers')
+    test_runner = MockTestRunner(Path(__file__).parent / 'TestDecorators.py',
+                                 'TestDecorators', 'test_checkers')
     read_resp = get_clusters([0, 1])
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:

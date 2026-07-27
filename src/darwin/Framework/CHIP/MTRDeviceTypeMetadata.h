@@ -23,18 +23,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-enum class MTRDeviceTypeClass
-{
+enum class MTRDeviceTypeClass {
     Utility,
     Simple,
     Node, // Might not be a real class, but we have it for Root Node for now.
 };
 
-struct MTRDeviceTypeData
-{
+struct MTRDeviceTypeData {
     chip::DeviceTypeId id;
     MTRDeviceTypeClass deviceClass;
-    const char * name;
+    NSString * name;
 };
 
 // Returns null for unknown device types.

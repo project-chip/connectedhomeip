@@ -1,0 +1,24 @@
+#pragma once
+
+{%- for cluster in clusters | sort(attribute='name') %}
+void Matter{{ cluster.name }}PluginServerInitCallback();
+{%- endfor %}
+
+{%- for cluster in clusters | sort(attribute='name') %}
+void Matter{{ cluster.name }}PluginServerShutdownCallback();
+{%- endfor %}
+
+#define MATTER_PLUGINS_INIT \
+{%- for cluster in clusters | sort(attribute='name') %}
+    Matter{{ cluster.name }}PluginServerInitCallback();{{ " \\" if not loop.last else ""}}
+{%- else %}
+    (void)0; /* No server side clusters */
+{%- endfor %}
+
+#define MATTER_PLUGINS_SHUTDOWN \
+{%- for cluster in clusters | sort(attribute='name') %}
+    Matter{{ cluster.name }}PluginServerShutdownCallback();{{ " \\" if not loop.last else ""}}
+{%- else %}
+    (void)0; /* No server side clusters */
+{%- endfor %}
+

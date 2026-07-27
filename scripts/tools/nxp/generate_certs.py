@@ -16,9 +16,11 @@
 #
 
 import argparse
-import logging as log
+import logging
 import os
 import subprocess
+
+log = logging.getLogger(__name__)
 
 MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/nxp")]
 
@@ -101,8 +103,8 @@ def gen_test_certs(chip_cert_exe: str,
     else:
         PAA_PATH = paa_cert_path
         PAA_KEY_PATH = paa_key_path
-        log.info("Using PAA certificate: " + PAA_PATH)
-        log.info("using PAA key: " + PAA_KEY_PATH)
+        log.info("Using PAA certificate: '%s'", PAA_PATH)
+        log.info("using PAA key: '%s'", PAA_KEY_PATH)
 
     log.info("Generating PAI certificate...")
     cmd = [
@@ -138,7 +140,7 @@ def gen_test_certs(chip_cert_exe: str,
     log.info("Converting to .der files...")
     for cert_k, cert_v in new_certificates.items():
         action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
-        log.info(cert_v + ".der")
+        log.info("%s.der", cert_v)
         cmd = [
             chip_cert_exe,
             action_type,
@@ -191,7 +193,7 @@ def main():
                         help=("The lifetime for the new certificate, in whole days. Default to 7305 days."))
     args = parser.parse_args()
 
-    log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
+    logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
     gen_test_certs(args.chip_cert_path,
                    args.output,

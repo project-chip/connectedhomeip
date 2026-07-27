@@ -1,0 +1,62 @@
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/ {
+	chosen {
+		zephyr,entropy = &rng0;
+		zephyr,flash = &flash0;
+		zephyr,flash-controller = &flashctrl0;
+		zephyr,shell-uart = &ulpuart;
+		zephyr,console = &ulpuart;
+		zephyr,code-partition = &code_partition;
+	};
+};
+
+&ulpuart {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&ulpuart_default>;
+	pinctrl-names = "default";
+};
+
+
+
+&sram0 {
+    status = "okay";
+    reg = <0x00000400 DT_SIZE_K(319)>;
+};
+
+&flash0 {
+        partitions {
+                factory_partition: partition@1e3000 {
+                        reg = <0x003e5000 DT_SIZE_K(4)>;
+                };
+
+                settings_partition: partition@1e4000 {
+                        reg = <0x003e6000 DT_SIZE_K(32)>;
+                };
+        };
+};
+
+&code_partition {
+       reg = <0x202000 DT_SIZE_K(1932)>;
+};
+
+
+&storage_partition {
+        reg = <0x00406200 DT_SIZE_K(92)>;
+};

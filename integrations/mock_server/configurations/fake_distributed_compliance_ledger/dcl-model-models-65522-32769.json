@@ -1,0 +1,42 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/dcl/model/models/65522/32769",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "model": {
+                        "vid": 65522,
+                        "pid": 32769,
+                        "deviceTypeId": 259,
+                        "productName": "TEST_PRODUCT",
+                        "productLabel": "Terms and Conditions App",
+                        "partNumber": "",
+                        "commissioningCustomFlow": 2,
+                        "commissioningCustomFlowUrl": "",
+                        "commissioningModeInitialStepsHint": 0,
+                        "commissioningModeInitialStepsInstruction": "",
+                        "commissioningModeSecondaryStepsHint": 0,
+                        "commissioningModeSecondaryStepsInstruction": "",
+                        "creator": "chip project",
+                        "lsfRevision": 0,
+                        "lsfUrl": "",
+                        "productUrl": "https://github.com/project-chip/connectedhomeip/tree/master/examples/terms-and-conditions-app",
+                        "supportUrl": "https://github.com/project-chip/connectedhomeip/",
+                        "userManualUrl": "",
+                        "enhancedSetupFlowOptions": 1,
+                        "enhancedSetupFlowTCUrl": "https://raw.githubusercontent.com/project-chip/connectedhomeip/refs/heads/master/integrations/mock_server/configurations/static/tc-65522-32769-v1.json",
+                        "enhancedSetupFlowTCRevision": 1,
+                        "enhancedSetupFlowTCDigest": "y2jloeWQPmNxSOoHRlPxxssuiFM8gqq8Fm8rHDPaOqk=",
+                        "enhancedSetupFlowTCFileSize": 532,
+                        "enhancedSetupFlowMaintenanceUrl": ""
+                    }
+                }
+            }
+        }
+    ]
+}

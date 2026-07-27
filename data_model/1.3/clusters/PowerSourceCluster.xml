@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="2">
   <revisionHistory>
@@ -552,58 +554,64 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Status" type="PowerSourceStatusEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="Order" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="Description" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="60"/>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="WiredAssessedInputVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0004" name="WiredAssessedInputFrequency" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0005" name="WiredCurrentType" type="WiredCurrentTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="WIRED"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="WiredAssessedCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0007" name="WiredNominalVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0008" name="WiredMaximumCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
@@ -620,26 +628,33 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x000C" name="BatPercentRemaining" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="between" from="0" to="200"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="200"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
@@ -649,7 +664,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BAT"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="BatReplacementNeeded" type="bool">
       <access read="true" readPrivilege="view"/>
@@ -659,7 +676,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0010" name="BatReplaceability" type="BatReplaceabilityEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="BAT"/>
       </mandatoryConform>
@@ -676,51 +693,63 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
-      <constraint type="maxCount" value="8"/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="BatReplacementDescription" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
-      <constraint type="maxLength" value="60"/>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
     </attribute>
     <attribute id="0x0014" name="BatCommonDesignation" type="BatCommonDesignationEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0015" name="BatANSIDesignation" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="maxLength" value="20"/>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0016" name="BatIECDesignation" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="maxLength" value="20"/>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0017" name="BatApprovedChemistry" type="BatApprovedChemistryEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <feature name="REPLC"/>
       </optionalConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0018" name="BatCapacity" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform>
         <orTerm>
           <feature name="REPLC"/>
@@ -730,7 +759,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0019" name="BatQuantity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="REPLC"/>
       </mandatoryConform>
@@ -740,11 +769,13 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="RECHG"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
@@ -757,7 +788,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001D" name="BatChargingCurrent" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
@@ -768,7 +799,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="RECHG"/>
       </optionalConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
     </attribute>
     <attribute id="0x001F" name="EndpointList" type="list">
       <entry type="endpoint-no"/>
@@ -785,12 +818,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="WiredFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="WiredFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </event>
     <event id="0x01" name="BatFaultChange" priority="info">
@@ -801,12 +838,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="BatFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="BatFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="8"/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="BatChargeFaultChange" priority="info">
@@ -817,12 +858,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list" default="empty">
         <entry type="BatChargeFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="16"/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list" default="empty">
         <entry type="BatChargeFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="16"/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
       </field>
     </event>
   </events>

@@ -37,7 +37,7 @@ static_library("nuttx") {
   }
 
   if (chip_build_example_providers) {
-    public_deps += [ "${chip_root}/examples/providers:device_info_provider" ]
+    public_deps += [ "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is" ]
   }
 
   if (chip_example_lighting) {

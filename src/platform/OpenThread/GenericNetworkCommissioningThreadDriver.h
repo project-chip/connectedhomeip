@@ -87,6 +87,8 @@ public:
         connectNetworkTimeout     = connectTimeoutSec;
     }
 
+    void ClearNetwork() { mStagingNetwork.Clear(); }
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
     CHIP_ERROR Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback) override;
@@ -125,10 +127,12 @@ private:
     static void OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg);
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
+    bool BackupExists();
     void CheckInterfaceEnabled();
 
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mStagingNetwork = {};
+    bool mRevertOnServerReady                  = false;
 };
 
 } // namespace NetworkCommissioning

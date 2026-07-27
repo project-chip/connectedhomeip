@@ -19,15 +19,9 @@
 
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST "${ALL_CLUSTERS_COMMON_DIR}/include"
-                           "${ENERGY_MANAGEMENT_COMMON_DIR}/common/include"
-                           "${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include"
-                           "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include"
-                           "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include"
-                           "${ENERGY_MANAGEMENT_COMMON_DIR}/water-heater/include"
                            "${CMAKE_CURRENT_LIST_DIR}/include"
                            "${CHIP_ROOT}/examples/providers"
                            "${CHIP_ROOT}/examples/platform/esp32"
@@ -37,11 +31,6 @@ set(SRC_DIRS_LIST     "${CMAKE_CURRENT_LIST_DIR}"
                       "${APP_COMMON_GEN_DIR}/attributes"
                       "${APP_COMMON_GEN_DIR}"
                       "${ALL_CLUSTERS_COMMON_DIR}/src"
-                      "${ENERGY_MANAGEMENT_COMMON_DIR}/common/src"
-                      "${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src"
-                      "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src"
-                      "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src"
-                      "${ENERGY_MANAGEMENT_COMMON_DIR}/water-heater/src"
                       "${CHIP_ROOT}/examples/providers"
                       "${CHIP_ROOT}/examples/platform/esp32/ota"
                       "${CHIP_ROOT}/examples/platform/esp32/common"
@@ -85,7 +74,6 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"

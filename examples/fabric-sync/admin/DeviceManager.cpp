@@ -20,12 +20,11 @@
 #include <LinuxCommissionableDataProvider.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
-#include <bridge/include/FabricBridge.h>
+#include <bridge/FabricBridge.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
 #include <cstdio>
-#include <string>
 
 using namespace chip;
 

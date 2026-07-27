@@ -23,12 +23,17 @@
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
+namespace {
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+}
 namespace matter {
 namespace casting {
 namespace core {
@@ -111,6 +116,10 @@ CHIP_ERROR CastingApp::Start()
     ChipLogProgress(Discovery, "CastingApp::Start()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -146,11 +155,11 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    chip::BindingManager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
     // Set FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
 
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
@@ -161,8 +170,11 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
     // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(CommissionerDeclarationHandler::GetInstance());
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
@@ -176,7 +188,11 @@ CHIP_ERROR CastingApp::Stop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(nullptr);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     // Shutdown the Matter server
@@ -196,6 +212,7 @@ CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
 
 CHIP_ERROR CastingApp::ClearCache()
 {
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     return support::CastingStore::GetInstance()->DeleteAll();
 }
 

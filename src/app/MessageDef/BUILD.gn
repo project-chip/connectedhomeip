@@ -116,6 +116,7 @@ source_set("MessageDef") {
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",

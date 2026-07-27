@@ -78,7 +78,7 @@ extern "C" void vApplicationIdleHook(void)
 extern "C" void vApplicationDaemonTaskStartupHook()
 {
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     /* Create the Main task. */
     xTaskCreate(main_task, "Main task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, NULL);
@@ -149,7 +149,7 @@ int main(void)
     vTaskStartScheduler();
 
     chip::Platform::MemoryShutdown();
-    PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask();
     PlatformMgr().Shutdown();
 
     // Should never get here.

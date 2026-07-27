@@ -26,8 +26,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-class ConfigurationManager;
-
 namespace {
 
 /** Singleton pointer to the ConfigurationManager implementation.

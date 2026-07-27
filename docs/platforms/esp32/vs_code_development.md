@@ -18,7 +18,9 @@ Follow
 [these](https://github.com/project-chip/connectedhomeip/edit/master/docs/VSCODE_DEVELOPMENT.md)
 steps to set up Visual Studio Code for Matter development.
 
-### Linux <a name="linux">
+(linux)=
+
+### Linux
 
 For Espressif esp32 devices:
 
@@ -39,7 +41,7 @@ For Espressif esp32 devices:
 1. Source esp-idf : `source /opt/espressif/esp-idf/export.sh`
 
 1. Activate matter :
-   `cd /workspaces/connectedhomeip && source scripts/bootstrap.sh && source scripts/activate.sh`
+   `cd /workspaces/connectedhomeip && source scripts/bootstrap.sh -p all,esp32 && source scripts/activate.sh`
 
 1. Confirm that the device is accessible : `ls -l /dev/ttyUSB*`
 
@@ -68,4 +70,4 @@ For Espressif esp32 devices:
 
 1. Open connectedhomeip within WSL on Visual Studio Code.
 
-1. Perform step 2 onwards from [Linux](#linux) guide.
+1. Perform step 2 onwards from {ref}`linux` guide.

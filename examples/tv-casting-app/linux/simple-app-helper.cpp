@@ -28,14 +28,13 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
-const uint16_t kDesiredEndpointVendorId = 65521;
-// EndpointId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection using the
-// Commissioner-Generated passcode commissioning flow
-const uint8_t kDesiredEndpointId = 1;
+const uint16_t kDesiredEndpointVendorId    = 65521; // 0xFFF1
+const uint16_t kDesiredEndpointVendorIdTwo = 65522; // 0xFFF2
 // Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
 bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
@@ -101,8 +100,8 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
     launchURLCommand->Invoke(
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
-            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
-                            response.data.Value().data());
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
+                            chip::NullTerminated(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
@@ -179,6 +178,131 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
             ChipLogError(AppServer, "CurrentState Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
         },
         kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
+}
+
+void InvokeContentLauncherPlayPreset(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the playPresetCommand from the contentLauncherCluster
+    matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> * playPresetCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> *>(
+            contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id));
+    VerifyOrReturn(playPresetCommand != nullptr, ChipLogError(AppServer, "PlayPreset command not found on ContentLauncherCluster"));
+
+    // create the PlayPreset request
+    chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type request;
+    request.presetID = kPlayPresetId;
+
+    // call Invoke on playPresetCommand while passing in success/failure callbacks. PlayPreset has no response payload.
+    playPresetCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "PlayPreset Success");
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "PlayPreset Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void ReadContentLauncherMovable(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the movableAttribute from the contentLauncherCluster
+    matter::casting::core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo> * movableAttribute =
+        static_cast<matter::casting::core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo> *>(
+            contentLauncherCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Movable::Id));
+    VerifyOrReturn(movableAttribute != nullptr, ChipLogError(AppServer, "Movable attribute not found on ContentLauncherCluster"));
+
+    // call Read on movableAttribute while passing in success/failure callbacks
+    movableAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType after) {
+            ChipLogProgress(AppServer, "Read Movable value: %d", static_cast<int>(after));
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "Movable Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+
+void InvokeMediaFileManagementAddFile(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the addFileCommand from the mediaFileManagementCluster
+    matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type> * addFileCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type> *>(
+            mediaFileManagementCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id));
+    VerifyOrReturn(addFileCommand != nullptr, ChipLogError(AppServer, "AddFile command not found on MediaFileManagementCluster"));
+
+    // create the AddFile request
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type request;
+    request.name     = chip::CharSpan::fromCharString(kMediaFileName);
+    request.size     = kMediaFileSize;
+    request.mimeType = chip::CharSpan::fromCharString(kMediaFileMimeType);
+    request.imageUri = chip::CharSpan::fromCharString(kMediaFileImageUri);
+
+    // call Invoke on addFileCommand while passing in success/failure callbacks
+    addFileCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type::ResponseType & response) {
+            if (response.fileID.IsNull())
+            {
+                ChipLogProgress(AppServer, "AddFile Success with status: %d (no fileID)", static_cast<int>(response.status));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "AddFile Success with status: %d, fileID: %" PRIu64, static_cast<int>(response.status),
+                                response.fileID.Value());
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "AddFile Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void ReadMediaFileManagementTotalStorage(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the totalStorageAttribute from the mediaFileManagementCluster
+    matter::casting::core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> *
+        totalStorageAttribute = static_cast<
+            matter::casting::core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> *>(
+            mediaFileManagementCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id));
+    VerifyOrReturn(totalStorageAttribute != nullptr,
+                   ChipLogError(AppServer, "TotalStorage attribute not found on MediaFileManagementCluster"));
+
+    // call Read on totalStorageAttribute while passing in success/failure callbacks
+    totalStorageAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableArgType after) {
+            ChipLogProgress(AppServer, "Read TotalStorage value: %" PRIu64, after);
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "TotalStorage Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
 }
 
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
@@ -265,46 +389,25 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler()");
 
     // For a connection failure, called back with an error and nullptr.
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            AppServer,
-            "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
-            targetCastingPlayer->GetId(), err.Format()));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(AppServer,
+                                "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s, Vendor "
+                                "ID: %d) with err %" CHIP_ERROR_FORMAT,
+                                targetCastingPlayer->GetId(), targetCastingPlayer->GetVendorId(), err.Format()));
 
-    if (gCommissionerGeneratedPasscodeFlowRunning)
-    {
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s) using "
-                        "Commissioner-Generated passcode",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint ID for demo interactions: 1");
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s)",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint Vendor ID for demo interactions: %d",
-                        kDesiredEndpointVendorId);
-    }
-
-    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints available for demo interactions");
+    ChipLogProgress(AppServer,
+                    "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s, Vendor ID: %d)",
+                    castingPlayer->GetId(), targetCastingPlayer->GetVendorId());
+    ChipLogProgress(
+        AppServer,
+        "simple-app-helper.cpp::ConnectionHandler(): Demo interactions, getting endpoints matching Endpoint Vendor ID: %d",
+        kDesiredEndpointVendorId);
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     LogEndpointsDetails(endpoints);
 
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
     auto it = std::find_if(endpoints.begin(), endpoints.end(),
                            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
-                               if (gCommissionerGeneratedPasscodeFlowRunning)
-                               {
-                                   // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with
-                                   // the Endpoint with ID 1. For this flow, we commissioned with the Target Content Application
-                                   // with Vendor ID 1111. Since this target content application does not report its Endpoint's
-                                   // Vendor IDs, we find the desired endpoint based on the Endpoint ID. See
-                                   // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                                   return endpoint->GetId() == kDesiredEndpointId;
-                               }
                                return endpoint->GetVendorId() == kDesiredEndpointVendorId;
                            });
     if (it != endpoints.end())
@@ -328,6 +431,18 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
         // demonstrate subscribing to an attribute
         ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling SubscribeToMediaPlaybackCurrentState()");
         SubscribeToMediaPlaybackCurrentState(endpoints[index]);
+
+        // demonstrate the new ContentLauncher features (PlayPreset command, Movable attribute)
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeContentLauncherPlayPreset()");
+        InvokeContentLauncherPlayPreset(endpoints[index]);
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadContentLauncherMovable()");
+        ReadContentLauncherMovable(endpoints[index]);
+
+        // demonstrate the MediaFileManagement cluster (AddFile command, TotalStorage attribute)
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementAddFile()");
+        InvokeMediaFileManagementAddFile(endpoints[index]);
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadMediaFileManagementTotalStorage()");
+        ReadMediaFileManagementTotalStorage(endpoints[index]);
     }
     else
     {
@@ -405,6 +520,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
+        // For demonstration purposes add another TargetApp Vendor ID to interact with after commissioning. If the
+        // target content app's allowedVendorList contains the casting client's Vendor ID, then the client will receive
+        // the corresponding bindings and endpoints.
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfoTwo;
+        targetAppInfoTwo.vendorId = kDesiredEndpointVendorIdTwo;
 
         if (argc == 3)
         {
@@ -419,14 +539,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                     "CommandHandler() request %lu commissioner-generated-passcode. Attempting the "
                                     "Commissioner-Generated Passcode commissioning flow",
                                     index);
-                    idOptions.mCommissionerPasscode = true;
-
-                    // For the example Commissioner-Generated passcode commissioning flow, override the default Target Content
-                    // Application Vendor ID, which is configured on the tv-app. This Target Content Application Vendor ID (1111),
-                    // does not implement the AccountLogin cluster, which would otherwise auto commission using the
-                    // Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message. See
-                    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                    targetAppInfo.vendorId                    = 1111;
+                    idOptions.mCommissionerPasscode           = true;
                     gCommissionerGeneratedPasscodeFlowRunning = true;
                 }
                 else
@@ -444,6 +557,22 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         {
             ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
         }
+        result = CHIP_NO_ERROR;
+        result = idOptions.addTargetAppInfo(targetAppInfoTwo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfoTwo: %" CHIP_ERROR_FORMAT,
+                         result.Format());
+        }
+
+        if (!gCommissionerGeneratedPasscodeFlowRunning)
+        {
+            uint32_t defaultTestPasscode = 0;
+            chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+            VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+            ChipLogProgress(AppServer, "CommandHandler() request, tv-casting-app Commissionee Passcode: %u",
+                            static_cast<unsigned>(defaultTestPasscode));
+        }
 
         matter::casting::core::ConnectionCallbacks connectionCallbacks;
         connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
@@ -455,7 +584,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)
@@ -550,7 +679,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     {
         char * eptr;
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
-        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -572,7 +701,8 @@ CHIP_ERROR PrintAllCommands()
                     "[index] using the Commissionee-Generated passcode commissioning flow. Usage: cast request 0\r\n");
     streamer_printf(sout,
                     "  request <index> commissioner-generated-passcode  Request connecting to discovered Casting Player with "
-                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 cgp\r\n");
+                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 "
+                    "commissioner-generated-passcode\r\n");
     streamer_printf(sout,
                     "  setcommissionerpasscode <passcode>               Set the commissioning session's passcode to the "
                     "Commissioner-Generated passcode. Used for the the Commissioner-Generated passcode commissioning flow. Usage: "
@@ -587,10 +717,10 @@ CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(AppServer,
-                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        "PrintBindings() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));

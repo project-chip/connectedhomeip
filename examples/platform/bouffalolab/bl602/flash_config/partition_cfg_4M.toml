@@ -41,7 +41,7 @@ type = 4
 name = "PSM"
 device = 0
 address0 = 0x3C3000
-size0 = 0x8000
+size0 = 0x10000
 address1 = 0
 size1 = 0
 # compressed image must set len,normal image can left it to 0

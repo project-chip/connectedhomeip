@@ -87,18 +87,28 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket;
+        size_t bufferSizeToAllocate = kMaxSecureSduLengthBytes;
         if (mAllowLargePayload)
         {
-            commandPacket = System::PacketBufferHandle::New(kMaxLargeSecureSduLengthBytes);
+            bufferSizeToAllocate = kMaxLargeSecureSduLengthBytes;
         }
-        else
-        {
-            commandPacket = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-        }
+        commandPacket = System::PacketBufferHandle::New(bufferSizeToAllocate);
+
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to bufferSizeToAllocate for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > bufferSizeToAllocate)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - bufferSizeToAllocate);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeRequestBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
@@ -125,7 +135,8 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
     mExchangeCtx.Grab(exchange);
     VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    mExchangeCtx->SetResponseTimeout(
+        timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime, true /*isFirstMessageOnExchange*/)));
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
@@ -134,7 +145,12 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
         return CHIP_NO_ERROR;
     }
 
-    return SendInvokeRequest();
+    CHIP_ERROR err = SendInvokeRequest();
+    if (err == CHIP_NO_ERROR && mSuppressResponse)
+    {
+        Close();
+    }
+    return err;
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -163,6 +179,13 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
             mTimedRequest, mTimedInvokeTimeoutMs.HasValue());
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    if (mTimedRequest && mSuppressResponse)
+    {
+        ChipLogError(DataManagement, "TimedRequest cannot be sent with SuppressResponse");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return SendCommandRequestInternal(session, timeout);
 }
 
@@ -190,8 +213,17 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
+    SendFlags sendFlags;
+    sendFlags.Set(SendMessageFlags::kExpectResponse, !mSuppressResponse);
+
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
+
+    if (mSuppressResponse)
+    {
+        // No response, so we can immediately terminate
+        return CHIP_NO_ERROR;
+    }
+
     MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;
@@ -239,7 +271,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         SuccessOrExit(err);
         if (moreChunkedMessages)
         {
-            StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
             MoveToState(State::AwaitingResponse);
             return CHIP_NO_ERROR;
         }
@@ -265,7 +297,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
     }
 
     if (mState != State::AwaitingResponse)
@@ -294,7 +326,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeResponseMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeResponseMessage.PrettyPrint();
 #endif
 
     ReturnErrorOnFailure(invokeResponseMessage.GetSuppressResponse(&suppressResponse));
@@ -337,6 +369,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
+    // TimedInvoke requires a StatusResponse. So it is wrong to send a TimedInvoke with SuppressResponse.
+    // If the invoke is not TimedRequest and users set SuppressResponse, a timer would NOT be triggered and
+    // OnResponseTimeout would never be called. So we can safely report error without checking mSuppressResponse here.
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 
@@ -392,7 +427,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
 
             StatusIB::Parser status;
-            commandStatus.GetErrorStatus(&status);
+            TEMPORARY_RETURN_IGNORED commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
             ReturnErrorOnFailure(GetRef(commandStatus, commandRef, commandRefRequired));
         }
@@ -405,7 +440,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
-            commandData.GetFields(&commandDataReader);
+            TEMPORARY_RETURN_IGNORED commandData.GetFields(&commandDataReader);
             ReturnErrorOnFailure(GetRef(commandData, commandRef, commandRefRequired));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
@@ -594,7 +629,7 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
 
     if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
     {
-        mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
+        TEMPORARY_RETURN_IGNORED mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
     }
 
     if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())

@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -28,14 +30,13 @@ class Cyw30739App(Enum):
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
             return "lighting-app"
-        elif self == Cyw30739App.LIGHT_SWITCH:
+        if self == Cyw30739App.LIGHT_SWITCH:
             return "light-switch-app"
-        elif self == Cyw30739App.LOCK:
+        if self == Cyw30739App.LOCK:
             return "lock-app"
-        elif self == Cyw30739App.THERMOSTAT:
+        if self == Cyw30739App.THERMOSTAT:
             return "thermostat"
-        else:
-            raise Exception("Unknown app type: %r" % self)
+        raise Exception("Unknown app type: %r" % self)
 
     def AppNamePrefix(self):
         return self.ExampleName().replace("-", "_")
@@ -54,29 +55,28 @@ class Cyw30739Board(Enum):
     def GnArgName(self):
         if self == Cyw30739Board.CYW30739B2_P5_EVK_01:
             return "CYW30739B2-P5-EVK-01"
-        elif self == Cyw30739Board.CYW30739B2_P5_EVK_02:
+        if self == Cyw30739Board.CYW30739B2_P5_EVK_02:
             return "CYW30739B2-P5-EVK-02"
-        elif self == Cyw30739Board.CYW30739B2_P5_EVK_03:
+        if self == Cyw30739Board.CYW30739B2_P5_EVK_03:
             return "CYW30739B2-P5-EVK-03"
-        elif self == Cyw30739Board.CYW930739M2EVB_01:
+        if self == Cyw30739Board.CYW930739M2EVB_01:
             return "CYW930739M2EVB-01"
-        elif self == Cyw30739Board.CYW930739M2EVB_02:
+        if self == Cyw30739Board.CYW930739M2EVB_02:
             return "CYW930739M2EVB-02"
-        else:
-            raise Exception("Unknown board #: %r" % self)
+        raise Exception("Unknown board #: %r" % self)
 
 
 class Cyw30739Builder(GnBuilder):
     def __init__(
         self,
-        root,
-        runner,
+        root: str,
+        runner: Runner,
+        output_dir_lock: OutDirLock,
         app: Cyw30739App = Cyw30739App.LIGHT,
         board: Cyw30739Board = Cyw30739Board.CYW30739B2_P5_EVK_01,
         release: bool = False,
     ):
-        super(Cyw30739Builder, self).__init__(
-            root=app.BuildRoot(root), runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.board = board
         self.release = release
@@ -95,13 +95,12 @@ class Cyw30739Builder(GnBuilder):
         self._output_dir = value
 
     def GnBuildArgs(self):
-        args = []
-
+        args = super().GnBuildArgs()
         if self.release:
             args.append('is_debug=false')
-
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["elf"]
         if self.options.enable_link_map_file:

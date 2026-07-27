@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 #include <bluetooth.h>
@@ -73,6 +74,19 @@ struct BLEScanConfig
 
     // Optional argument to be passed to callback functions provided by the BLE scan/connect requestor
     void * mAppState = nullptr;
+};
+
+class BLEConnection
+{
+public:
+    explicit BLEConnection(const char * addr) : peerAddr(addr) {}
+    ~BLEConnection() = default;
+
+    std::string peerAddr;
+    unsigned int mtu = 0;
+    // These are handle copies managed by BLEManagerImpl.
+    bt_gatt_h gattCharC1Handle = nullptr;
+    bt_gatt_h gattCharC2Handle = nullptr;
 };
 
 /**
@@ -188,8 +202,9 @@ private:
     static void HandleScanTimeout(chip::System::Layer *, void * appState);
 
     // ==== Connection.
-    void AddConnectionData(const char * remoteAddr);
-    void RemoveConnectionData(const char * remoteAddr);
+    BLEConnection * GetConnection(const char * remoteAddr);
+    void AddConnection(const char * remoteAddr);
+    void RemoveConnection(const char * remoteAddr);
 
     void HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleC2CharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -221,16 +236,18 @@ private:
     CHIP_ERROR StopBLEAdvertising();
     void CleanScanConfig();
 
-    CHIPoBLEServiceMode mServiceMode;
+    CHIPoBLEServiceMode mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     BitFlags<Flags> mFlags;
-    bool mIsCentral          = false;
-    void * mGattCharC1Handle = nullptr;
-    void * mGattCharC2Handle = nullptr;
-    uint32_t mAdapterId;
+
+    uint32_t mAdapterId = 0;
+    bool mIsCentral     = false;
+
     bt_advertiser_h mAdvertiser = nullptr;
     bool mAdvReqInProgress      = false;
-    /* Connection Hash Table Map */
-    GHashTable * mConnectionMap = nullptr;
+
+    bt_gatt_h mGattCharC1Handle = nullptr;
+    bt_gatt_h mGattCharC2Handle = nullptr;
+    std::unordered_map<std::string, BLEConnection *> mConnectionMap;
 
     ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;

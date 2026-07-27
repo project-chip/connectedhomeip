@@ -55,10 +55,8 @@ class JavaBuildTest(unittest.TestCase):
 
         for target in (JavaBuildTest.targets_to_check +
                        JavaBuildTest.prebuilt_targets_to_check):
-            with open(expected_dir + '/' + target + '_expected.json',
-                      'r') as expected_config, open(
-                          configs_dir + '/' + target + '.json',
-                          'r') as actual_config:
+            with (open(expected_dir + '/' + target + '_expected.json') as expected_config,
+                  open(configs_dir + '/' + target + '.json') as actual_config):
                 expected_json = json.load(expected_config)['deps_info']
                 actual_json = json.load(actual_config)['deps_info']
 

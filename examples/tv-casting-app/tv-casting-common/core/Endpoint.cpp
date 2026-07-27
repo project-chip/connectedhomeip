@@ -28,7 +28,8 @@ void Endpoint::RegisterClusters(std::vector<chip::ClusterId> clusters)
 {
     for (chip::ClusterId clusterId : clusters)
     {
-        ChipLogProgress(AppServer, "Endpoint::RegisterClusters() Registering clusterId %d for endpointId %d", clusterId, GetId());
+        ChipLogProgress(AppServer, "Endpoint::RegisterClusters() Registering clusterId %d for endpointId %d, vendorId: %d",
+                        clusterId, GetId(), GetVendorId());
         switch (clusterId)
         {
         case chip::app::Clusters::ApplicationBasic::Id:
@@ -57,6 +58,10 @@ void Endpoint::RegisterClusters(std::vector<chip::ClusterId> clusters)
 
         case chip::app::Clusters::MediaPlayback::Id:
             RegisterCluster<clusters::media_playback::MediaPlaybackCluster>(clusterId);
+            break;
+
+        case chip::app::Clusters::MediaFileManagement::Id:
+            RegisterCluster<clusters::media_file_management::MediaFileManagementCluster>(clusterId);
             break;
 
         case chip::app::Clusters::TargetNavigator::Id:

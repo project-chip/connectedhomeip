@@ -24,37 +24,15 @@
 
 #include <lib/support/CodeUtils.h>
 
-/**
- * @brief Flag to configure if the app button is enabled.
- *
- * Enabled by default.
- */
-#ifndef CONFIG_APP_BUTTON_ENABLED
-#define CONFIG_APP_BUTTON_ENABLED 1
-#endif
-
-/**
- * @brief Flag to configure if the BLE button is enabled.
- *
- * Enabled by default.
- */
-#ifndef CONFIG_BLE_BUTTON_ENABLED
-#define CONFIG_BLE_BUTTON_ENABLED 1
-#endif
-
 CHIP_ERROR chip::NXP::App::RegisterButtons(void)
 {
     ReturnErrorOnFailure(ButtonMgr().Init());
 
-#if CONFIG_BLE_BUTTON_ENABLED
     static chip::NXP::App::ButtonBle sBleButton;
     ReturnErrorOnFailure(ButtonMgr().RegisterButton(sBleButton));
-#endif
 
-#if CONFIG_APP_BUTTON_ENABLED
     static chip::NXP::App::ButtonApp sAppButton;
     ReturnErrorOnFailure(ButtonMgr().RegisterButton(sAppButton));
-#endif
 
     return CHIP_NO_ERROR;
 }

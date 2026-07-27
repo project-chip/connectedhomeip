@@ -15,24 +15,22 @@
  *    limitations under the License.
  */
 
-// SL MATTER WI-FI INTERFACE
-
-#include "silabs_utils.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/WifiInterface.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
-#define CONVERT_SEC_TO_MS(TimeInS) (TimeInS * 1000)
+// TODO: We shouldn't need to have access to a global variable in the interface here
+extern WfxRsi_t wfx_rsi;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -43,29 +41,32 @@ namespace {
 constexpr uint8_t kWlanMinRetryIntervalsInSec = 1;
 constexpr uint8_t kWlanMaxRetryIntervalsInSec = 60;
 uint8_t retryInterval                         = kWlanMinRetryIntervalsInSec;
-osTimerId_t sRetryTimer;
 
-/*
- * Notifications to the upper-layer
- * All done in the context of the RSI/WiFi task (rsi_if.c)
+/**
+ * @brief Retry timer callback that triggers a reconnection attempt
+ *
+ * TODO: The structure of the retry needs to be redone
+ *
+ * @param arg
  */
 void RetryConnectionTimerHandler(void * arg)
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    if (wfx_connect_to_ap() != SL_STATUS_OK)
+    if (chip::DeviceLayer::Silabs::WifiInterface::GetInstance().ConnectToAccessPoint() != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+        ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed.");
     }
 }
 
 } // namespace
 
-/* Updated functions */
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
 
-void NotifyIPv6Change(bool gotIPv6Addr)
+void WifiInterface::NotifyIPv6Change(bool gotIPv6Addr)
 {
+    mHasNotifiedIPv6 = gotIPv6Addr;
+
     sl_wfx_generic_message_t eventData = {};
     eventData.header.id                = gotIPv6Addr ? to_underlying(WifiEvent::kGotIPv6) : to_underlying(WifiEvent::kLostIP);
     eventData.header.length            = sizeof(eventData.header);
@@ -73,8 +74,11 @@ void NotifyIPv6Change(bool gotIPv6Addr)
     HandleWFXSystemEvent(&eventData);
 }
 
-void NotifyIPv4Change(bool gotIPv4Addr)
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+void WifiInterface::NotifyIPv4Change(bool gotIPv4Addr)
 {
+    mHasNotifiedIPv4 = gotIPv4Addr;
+
     sl_wfx_generic_message_t eventData;
 
     memset(&eventData, 0, sizeof(eventData));
@@ -82,8 +86,9 @@ void NotifyIPv4Change(bool gotIPv4Addr)
     eventData.header.length = sizeof(eventData.header);
     HandleWFXSystemEvent(&eventData);
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
 
-void NotifyDisconnection(WifiDisconnectionReasons reason)
+void WifiInterface::NotifyDisconnection(WifiDisconnectionReasons reason)
 {
     sl_wfx_disconnect_ind_t evt = {};
     evt.header.id               = to_underlying(WifiEvent::kDisconnect);
@@ -93,81 +98,94 @@ void NotifyDisconnection(WifiDisconnectionReasons reason)
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-void NotifyConnection(const MacAddress & ap)
+void WifiInterface::NotifyConnection(const MacAddress & ap)
 {
     sl_wfx_connect_ind_t evt = {};
     evt.header.id            = to_underlying(WifiEvent::kConnect);
     evt.header.length        = sizeof evt;
-#ifdef RS911X_WIFI
+#ifdef SL_MATTER_SIWX_WIFI_ENABLE
     evt.body.channel = wfx_rsi.ap_chan;
 #endif
     std::copy(ap.begin(), ap.end(), evt.body.mac);
+    // Resetting the retry connection state machine for a successful connection
+    // NOTE: This is required in case an access point gets disconnected after a successful connection.
+    ResetConnectionRetryInterval();
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-/* Function to update */
-
-/***********************************************************************************
- * @fn  sl_matter_wifi_task_started(void)
- * @brief
- *       Wifi device started notification
- * @param[in]: None
- * @return None
- *************************************************************************************/
-void sl_matter_wifi_task_started(void)
+void WifiInterface::ResetIPNotificationStates()
 {
-    sl_wfx_startup_ind_t evt = {};
+    mHasNotifiedIPv6 = false;
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+    mHasNotifiedIPv4 = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+}
 
+void WifiInterface::NotifyWifiTaskInitialized(void)
+{
+    sl_wfx_startup_ind_t evt = { { 0 } };
+
+    // TODO: We should move this to the init function and not the notification function
     // Creating a timer which will be used to retry connection with AP
-    sRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
-    VerifyOrReturn(sRetryTimer != NULL);
+    mRetryTimer = osTimerNew(RetryConnectionTimerHandler, osTimerOnce, NULL, NULL);
+    VerifyOrReturn(mRetryTimer != NULL);
 
     evt.header.id     = to_underlying(WifiEvent::kStartUp);
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
 
-    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
+    // TODO : Remove workaround when sl_wfx_startup_ind_t is unified
     //        Issue is same structure name but different contents
 #if WF200_WIFI
-    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWiFiMacAddressLength);
 #else
-    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 #endif // WF200_WIFI
 
-    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
+    TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
 
-/**************************************************************************************
- * @fn  void wfx_retry_connection(uint16_t retryAttempt)
- * @brief
- *      During commissioning, we retry to join the network MAX_JOIN_RETRIES_COUNT times.
- *      If DUT is disconnected from the AP or device is power cycled, then retry connection
- *      with AP continously after a certain time interval.
- * @param[in]  retryAttempt
- * @return None
- *************************************************************************************/
-void wfx_retry_connection(uint16_t retryAttempt)
+// TODO: The retry stategy needs to be re-worked
+void WifiInterface::ScheduleConnectionAttempt()
 {
     if (retryInterval > kWlanMaxRetryIntervalsInSec)
     {
         retryInterval = kWlanMaxRetryIntervalsInSec;
     }
-    if (osTimerStart(sRetryTimer, pdMS_TO_TICKS(CONVERT_SEC_TO_MS(retryInterval))) != osOK)
+
+    if (osTimerStart(mRetryTimer, pdMS_TO_TICKS(retryInterval * 1000)) != osOK)
     {
         ChipLogProgress(DeviceLayer, "Failed to start retry timer");
         // Sending the join command if retry timer failed to start
-        if (wfx_connect_to_ap() != SL_STATUS_OK)
+        if (ConnectToAccessPoint() != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wfx_connect_to_ap() failed.");
+            ChipLogError(DeviceLayer, "ConnectToAccessPoint() failed.");
         }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        //  Remove High performance request before giving up due to a timer start error to save battery life
+        TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         return;
     }
-#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI91X_MCU_INTERFACE
-    ChipLogProgress(DeviceLayer, "wfx_retry_connection : Next attempt after %d Seconds", retryInterval);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);
     retryInterval += retryInterval;
 }
+
+void WifiInterface::ResetConnectionRetryInterval()
+{
+    ChipLogDetail(DeviceLayer, "ResetConnectionRetryInterval: Resetting state to default");
+    retryInterval = kWlanMinRetryIntervalsInSec;
+}
+
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip

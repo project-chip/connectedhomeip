@@ -87,6 +87,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INVALID_DATA_LIST,
     CHIP_ERROR_TIMEOUT,
     CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR,
+    CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME,
     CHIP_ERROR_INVALID_PASE_PARAMETER,
     CHIP_ERROR_INVALID_USE_OF_SESSION_KEY,
     CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY,
@@ -207,6 +208,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStr)
         // ErrorStr with static char array.
         CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
@@ -222,6 +226,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorage)
         ErrorStrStorage storage;
         CheckCoreErrorStrHelper(ErrorStr(err, /*withSourceLocation=*/true, storage), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 void CheckCoreErrorStrWithoutSourceLocationHelper(const char * errStr, CHIP_ERROR err)
@@ -258,6 +265,9 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
         // ErrorStr with static char array.
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }
 
 TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
@@ -273,4 +283,7 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrStorageWithoutSourceLocation)
         ErrorStrStorage storage;
         CheckCoreErrorStrWithoutSourceLocationHelper(ErrorStr(err, /*withSourceLocation=*/false, storage), err);
     }
+
+    // Deregister the layer error formatter
+    DeregisterCHIPLayerErrorFormatter();
 }

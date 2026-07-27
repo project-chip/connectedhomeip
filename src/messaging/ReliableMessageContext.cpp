@@ -25,7 +25,6 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/Defer.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>

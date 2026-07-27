@@ -257,7 +257,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
     constexpr size_t bssIdSize = 6;
     VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    error = matter_wifi_get_ap_bssid(BssId.data());
+    error = matter_wifi_sta_get_ap_bssid(BssId.data());
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
 
     if (err != CHIP_NO_ERROR)
@@ -274,82 +274,93 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    // Support 802.11a/n Wi-Fi in AmebaD chipset
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/25542
-    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    int32_t error;
+    uint8_t wifi_version = 0;
+
+    error = matter_wifi_sta_get_wifi_version(&wifi_version);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kUnknownEnumValue;
+    }
+    else
+    {
+        if (wifi_version & MATTER_WIFI_VERSION_11AH)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kAh;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11AX)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kAx;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11AC)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kAc;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11N)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11G)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kG;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11B)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kB;
+        }
+        else if (wifi_version & MATTER_WIFI_VERSION_11A)
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kA;
+        }
+        else
+        {
+            wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kUnknownEnumValue;
+        }
+    }
+
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
     CHIP_ERROR err;
     int32_t error;
+    uint32_t wifi_security = 0;
 
-    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-
-    unsigned int _auth_type;
-    unsigned short security = 0;
-    rtw_wifi_setting_t setting;
-
-    error = matter_wifi_get_security_type(WLAN0_IDX, &security, &setting.key_idx, setting.password);
+    error = matter_wifi_sta_get_security_type(&wifi_security);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
     if (err != CHIP_NO_ERROR)
     {
         securityType = SecurityTypeEnum::kUnspecified;
     }
-#ifdef CONFIG_PLATFORM_8721D
     else
     {
-        switch (security)
+        if (wifi_security & WPA3_SECURITY)
         {
-        case IW_ENCODE_ALG_NONE:
-            securityType = SecurityTypeEnum::kNone;
-            break;
-        case IW_ENCODE_ALG_WEP:
-            securityType = SecurityTypeEnum::kWep;
-            break;
-        case IW_ENCODE_ALG_TKIP:
-            securityType = SecurityTypeEnum::kWpa;
-            break;
-        case IW_ENCODE_ALG_CCMP:
+            securityType = SecurityTypeEnum::kWpa3;
+        }
+        else if (wifi_security & WPA2_SECURITY)
+        {
             securityType = SecurityTypeEnum::kWpa2;
-            break;
-        default:
-            securityType = SecurityTypeEnum::kUnspecified;
-            break;
         }
-    }
-#else
-    else
-    {
-        switch (security)
+        else if (wifi_security & WPA_SECURITY)
         {
-        case IW_ENCODE_ALG_NONE:
-            securityType = SecurityTypeEnum::kNone;
-            break;
-        case IW_ENCODE_ALG_WEP:
+            securityType = SecurityTypeEnum::kWpa;
+        }
+        else if (wifi_security & WEP_ENABLED)
+        {
             securityType = SecurityTypeEnum::kWep;
-            break;
-        case IW_ENCODE_ALG_TKIP:
-            if (_auth_type == WPA_SECURITY)
-                securityType = SecurityTypeEnum::kWpa;
-            else if (_auth_type == WPA2_SECURITY)
-                securityType = SecurityTypeEnum::kWpa2;
-            break;
-        case IW_ENCODE_ALG_CCMP:
-            if (_auth_type == WPA_SECURITY)
-                securityType = SecurityTypeEnum::kWpa;
-            else if (_auth_type == WPA2_SECURITY)
-                securityType = SecurityTypeEnum::kWpa2;
-            else if (_auth_type == WPA3_SECURITY)
-                securityType = SecurityTypeEnum::kWpa3;
-            break;
-        default:
-            securityType = SecurityTypeEnum::kUnspecified;
-            break;
+        }
+        else
+        {
+            securityType = SecurityTypeEnum::kNone;
         }
     }
-#endif
 
     return err;
 }
@@ -358,14 +369,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     CHIP_ERROR err;
     int32_t error;
-    unsigned char channel;
+    uint8_t channel = 0;
 
-    error = matter_wifi_get_wifi_channel_number(WLAN0_IDX, &channel);
+    error = matter_wifi_sta_get_channel_number(&channel);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
     if (err != CHIP_NO_ERROR)
+    {
         channelNumber = 0;
+    }
     else
-        channelNumber = (uint16_t) channel;
+    {
+        channelNumber = static_cast<uint16_t>(channel);
+    }
 
     return err;
 }
@@ -374,14 +390,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
     CHIP_ERROR err;
     int32_t error;
+    int tempRssi = 0;
 
-    error = matter_wifi_get_rssi((int *) &rssi);
+    error = matter_wifi_sta_get_rssi(&tempRssi);
     err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
 
     if (err != CHIP_NO_ERROR)
     {
-        // set rssi to 0 upon error
         rssi = 0;
+    }
+    else
+    {
+        rssi = static_cast<int8_t>(tempRssi);
     }
 
     return err;

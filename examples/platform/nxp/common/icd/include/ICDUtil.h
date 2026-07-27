@@ -18,6 +18,9 @@
 #pragma once
 
 #include <app/ReadHandler.h>
+#if CONFIG_NXP_USE_POWER_DOWN
+#include <app/icd/server/ICDStateObserver.h>
+#endif // CONFIG_NXP_USE_POWER_DOWN
 
 namespace chip {
 namespace NXP {
@@ -34,6 +37,35 @@ inline ICDUtil & GetICDUtil()
 {
     return ICDUtil::sICDUtil;
 }
+
+#if CONFIG_NXP_USE_POWER_DOWN
+class NxpICDObserver : public chip::app::ICDStateObserver
+{
+    enum LowPowerState : uint8_t
+    {
+        DeepSleep,
+        PowerDown
+    };
+
+    LowPowerState mLPState = DeepSleep;
+
+    ~NxpICDObserver();
+
+    void OnEnterIdleMode() override;
+    void OnEnterActiveMode() override;
+    void OnTransitionToIdle() override;
+    void OnICDModeChange() override;
+
+    friend NxpICDObserver & GetAppICDObserver();
+    static NxpICDObserver sICDObserver;
+};
+
+inline NxpICDObserver & GetAppICDObserver()
+{
+    return NxpICDObserver::sICDObserver;
+}
+#endif // CONFIG_NXP_USE_POWER_DOWN
+
 } // namespace App
 } // namespace NXP
 } // namespace chip

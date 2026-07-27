@@ -4,9 +4,13 @@
 #pragma once
 
 /**** Cluster endpoint counts ****/
-{{#all_user_clusters}}
-#define MATTER_DM_{{as_delimited_macro define}}_{{as_delimited_macro side}}_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id side}})
-{{/all_user_clusters}}
+{{#zcl_clusters}}
+#define MATTER_DM_{{as_delimited_macro define}}_SERVER_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id "server"}})
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+#define MATTER_DM_{{as_delimited_macro define}}_CLIENT_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id "client"}})
+{{/zcl_clusters}}
 
 /**** Cluster Plugins ****/
 {{#all_user_clusters}}
@@ -63,3 +67,14 @@
 {{/if}}
 
 {{/all_user_clusters}}
+
+/**** Cluster Commands Flag ****/
+{{#all_user_clusters_with_incoming_commands}}
+  {{#if (isServer clusterSide)}}
+    //  {{asUpperCamelCase clusterName}} Cluster Commands  
+    {{#all_incoming_commands_for_cluster clusterName clusterSide}}
+#define {{as_delimited_macro clusterName}}_ENABLE_{{as_delimited_macro commandName}}_CMD 1
+    {{/all_incoming_commands_for_cluster}}
+
+  {{/if}}
+{{/all_user_clusters_with_incoming_commands}}

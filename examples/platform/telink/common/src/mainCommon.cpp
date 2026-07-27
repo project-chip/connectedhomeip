@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2024 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,19 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
 #include <zephyr/kernel.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 
 #ifdef CONFIG_USB_DEVICE_STACK
 #include <zephyr/usb/usb_device.h>
@@ -36,15 +43,36 @@
 #include "Rpc.h"
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+K_SEM_DEFINE(gThreadPrescanDoneSem, 0, 1);
+
+class InitScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+{
+public:
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks) override
+    {
+        k_sem_give(&gThreadPrescanDoneSem);
+    }
+};
+#endif
+
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::TelinkWiFiDriver::Instance()));
 #endif
+
+#if CHIP_ENABLE_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif
+#endif // CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
@@ -56,7 +84,7 @@ static k_timer FactoryResetUsualBootTimer;
 static void FactoryResetUsualBoot(struct k_timer * dummy)
 {
     (void) dummy;
-    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LogErrorOnFailure(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey));
     LOG_INF("Schedule factory counter deleted");
 }
 
@@ -164,8 +192,24 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
+
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+    LogErrorOnFailure(sThreadNetworkDriver.Init());
+#endif
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        static InitScanCallback sInitScanCallback;
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInitScanCallback));
+        k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
+    }
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiCommissioningInstance.Init();
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+    LogErrorOnFailure(sWiFiCommissioningInstance.Init());
+#endif
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;
@@ -174,6 +218,6 @@ int main(void)
     err = GetAppTask().StartApp();
 
 exit:
-    LOG_ERR("Exit err %" CHIP_ERROR_FORMAT, err.Format());
+    LOG_ERR("Exit err %d", err.Format());
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

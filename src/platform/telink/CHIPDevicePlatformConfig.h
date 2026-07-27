@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -120,6 +120,10 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif
 
+#if defined(CONFIG_SOC_RISCV_TELINK_TLX) || defined(CONFIG_SOC_RISCV_TELINK_B9X)
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
+#endif
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Zephyr platforms.
@@ -145,6 +149,8 @@
 #if !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 /// Use mallinfo() to obtain the heap usage statistics exposed by SoftwareDiagnostics cluster attributes.
 #define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 1
+#else
+#define CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO 0
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 
@@ -247,6 +253,12 @@
 #ifdef CONFIG_CHIP_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #endif // CONFIG_CHIP_EXTENDED_DISCOVERY
+
+#ifdef CONFIG_CHIP_BLE_EXT_ADVERTISING
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING 1
+#endif // CONFIG_CHIP_BLE_EXT_ADVERTISING
+
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (CONFIG_CHIP_BLE_ADVERTISING_DURATION * 60)
 
 #ifndef CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
 #ifdef CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL

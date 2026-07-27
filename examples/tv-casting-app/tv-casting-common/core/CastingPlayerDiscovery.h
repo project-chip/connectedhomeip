@@ -108,6 +108,7 @@ public:
     static CastingPlayerDiscovery * GetInstance();
     ~CastingPlayerDiscovery()
     {
+        ChipLogError(AppServer, "CastingPlayerDiscovery destructor() called");
         mCastingPlayers.clear();
         mCastingPlayersInternal.clear();
     }

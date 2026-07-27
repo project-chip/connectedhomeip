@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -956,6 +956,27 @@ static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_266 = 
                                                                                   .tcId      = 37,
                                                                                   .result    = CHIP_ERROR_INTERNAL };
 
+static const uint8_t chiptest_dac9e1195a0d_key_267[]                          = { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+                                                                                  0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f };
+static const uint8_t chiptest_dac9e1195a0d_nonce_268[]                        = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+                                                                                  0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+static const uint8_t chiptest_dac9e1195a0d_tag_269[]                          = { 0x32, 0xd6, 0xf8, 0x24, 0x3a, 0x26, 0xd0, 0xbd,
+                                                                                  0x98, 0xd0, 0x1b, 0x0f, 0x44, 0x8e, 0x77, 0x73 };
+static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_270 = { .pt        = nullptr,
+                                                                                  .pt_len    = 0,
+                                                                                  .aad       = nullptr,
+                                                                                  .aad_len   = 0,
+                                                                                  .key       = chiptest_dac9e1195a0d_key_267,
+                                                                                  .key_len   = 16,
+                                                                                  .nonce     = chiptest_dac9e1195a0d_nonce_268,
+                                                                                  .nonce_len = 13,
+                                                                                  .ct        = nullptr,
+                                                                                  .ct_len    = 0,
+                                                                                  .tag       = chiptest_dac9e1195a0d_tag_269,
+                                                                                  .tag_len   = 16,
+                                                                                  .tcId      = 38,
+                                                                                  .result    = CHIP_NO_ERROR };
+
 static const uint8_t test_vector_2ef53070ae20_key[] = {
     0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
 };
@@ -1401,6 +1422,217 @@ static const struct ccm_128_test_vector aesccm128_matter_ac063659d220_test_vecto
     .result    = CHIP_NO_ERROR,
 };
 
+static const uint8_t test_vector_6d369ac02025_key[] = {
+    0x08, 0xb0, 0xda, 0x25, 0x5d, 0x20, 0x83, 0x80, 0x8a, 0x1b, 0x4d, 0x36, 0x70, 0x90, 0xba, 0xcc,
+};
+
+static const uint8_t test_vector_6d369ac02025_nonce[] = {
+    0x77, 0x78, 0x28, 0xb1, 0x36, 0x79, 0xa9, 0xe2, 0xca, 0x89, 0x56, 0x82, 0x33,
+};
+
+static const uint8_t test_vector_6d369ac02025_in[] = {};
+
+static const uint8_t test_vector_6d369ac02025_ad[] = {
+    0xc5,
+};
+
+static const uint8_t test_vector_6d369ac02025_ct[] = {};
+
+static const uint8_t test_vector_6d369ac02025_tag[] = {
+    0x0a, 0x93, 0xec, 0x4a, 0x8f, 0xf3, 0x39, 0x64, 0xf5, 0x80, 0x05, 0x86, 0x8a, 0x86, 0x88, 0x56,
+};
+// Matter-Compliant AES-CCM Test Vector (Plaintext/Ciphertext Length = 0)
+static const struct ccm_128_test_vector aesccm128_matter_6d369ac02025_test_vector_11 = {
+    .pt        = test_vector_6d369ac02025_in,
+    .pt_len    = 0,
+    .aad       = test_vector_6d369ac02025_ad,
+    .aad_len   = 1,
+    .key       = test_vector_6d369ac02025_key,
+    .key_len   = 16,
+    .nonce     = test_vector_6d369ac02025_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_6d369ac02025_ct,
+    .ct_len    = 0,
+    .tag       = test_vector_6d369ac02025_tag,
+    .tag_len   = 16,
+    .tcId      = 11,
+    .result    = CHIP_NO_ERROR,
+};
+
+static const uint8_t test_vector_zh910q69h920_key[] = {
+    0x08, 0xb0, 0xda, 0x25, 0x5d, 0x20, 0x83, 0x80, 0x8a, 0x1b, 0x4d, 0x36, 0x70, 0x90, 0xba, 0xcc,
+};
+
+static const uint8_t test_vector_zh910q69h920_nonce[] = {
+    0x77, 0x78, 0x28, 0xb1, 0x36, 0x79, 0xa9, 0xe2, 0xca, 0x89, 0x56, 0x82, 0x33,
+};
+
+static const uint8_t test_vector_zh910q69h920_in[] = {
+    0x3a, 0x7f, 0x9b, 0x1d, 0x2e, 0x4c, 0x6a, 0x8f, 0x0b, 0x5d, 0x1c, 0x3e, 0x7a, 0x6d, 0x9f, 0x20,
+};
+
+static const uint8_t test_vector_zh910q69h920_ad[] = {
+    0xc5,
+};
+
+static const uint8_t test_vector_zh910q69h920_ct[] = {
+    0xc9, 0xd2, 0xfc, 0x97, 0x93, 0xb6, 0xf7, 0x3a, 0x90, 0xd3, 0x26, 0x81, 0x6f, 0x52, 0xc1, 0x6a,
+};
+
+static const uint8_t test_vector_zh910q69h920_tag[] = {
+    0xe4, 0xe2, 0x45, 0x67, 0x10, 0x6d, 0x61, 0xbf, 0x50, 0x40, 0xb2, 0x6f, 0xba, 0xa6, 0x8a, 0x58,
+};
+
+// Matter-Compliant AES-CCM Test Vector -- Plaintext/Ciphertext Length = 16 (1 CCM Block)
+static const struct ccm_128_test_vector aesccm128_matter_zh910q69h920_test_vector_12 = {
+    .pt        = test_vector_zh910q69h920_in,
+    .pt_len    = 16,
+    .aad       = test_vector_zh910q69h920_ad,
+    .aad_len   = 1,
+    .key       = test_vector_zh910q69h920_key,
+    .key_len   = 16,
+    .nonce     = test_vector_zh910q69h920_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_zh910q69h920_ct,
+    .ct_len    = 16,
+    .tag       = test_vector_zh910q69h920_tag,
+    .tag_len   = 16,
+    .tcId      = 12,
+    .result    = CHIP_NO_ERROR,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_key[] = {
+    0x08, 0xb0, 0xda, 0x25, 0x5d, 0x20, 0x83, 0x80, 0x8a, 0x1b, 0x4d, 0x36, 0x70, 0x90, 0xba, 0xcc,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_nonce[] = {
+    0x77, 0x78, 0x28, 0xb1, 0x36, 0x79, 0xa9, 0xe2, 0xca, 0x89, 0x56, 0x82, 0x33,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_in[] = {
+    0xe4, 0x1a, 0x9f, 0x3c, 0x6d, 0x2b, 0x81, 0x74, 0x5c, 0x0e, 0x3f, 0x1d,
+    0x89, 0xab, 0x5d, 0x26, 0xf3, 0xc7, 0xe8, 0x90, 0xbd, 0x12, 0xa4, 0x5b,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_ad[] = {
+    0xc5,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_ct[] = {
+    0x17, 0xb7, 0xf8, 0xb6, 0xd0, 0xd1, 0x1c, 0xc1, 0xc7, 0x80, 0x05, 0xa2,
+    0x9c, 0x94, 0x03, 0x6c, 0xa9, 0xf3, 0x76, 0xfb, 0x1b, 0x04, 0x10, 0x05,
+};
+
+static const uint8_t test_vector_61fs1fzo9124_tag[] = {
+    0xd0, 0x35, 0x0a, 0x3c, 0x8d, 0xb3, 0xcd, 0x85, 0x12, 0xf4, 0x5f, 0x35, 0x43, 0x2c, 0xb7, 0x0d,
+};
+
+// Matter-Compliant AES-CCM Test Vector -- Plaintext/Ciphertext Length = 24 (between 1 and 2 CCM blocks)
+static const struct ccm_128_test_vector aesccm128_matter_61fs1fzo9124_test_vector_13 = {
+    .pt        = test_vector_61fs1fzo9124_in,
+    .pt_len    = 24,
+    .aad       = test_vector_61fs1fzo9124_ad,
+    .aad_len   = 1,
+    .key       = test_vector_61fs1fzo9124_key,
+    .key_len   = 16,
+    .nonce     = test_vector_61fs1fzo9124_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_61fs1fzo9124_ct,
+    .ct_len    = 24,
+    .tag       = test_vector_61fs1fzo9124_tag,
+    .tag_len   = 16,
+    .tcId      = 13,
+    .result    = CHIP_NO_ERROR,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_key[] = {
+    0x08, 0xb0, 0xda, 0x25, 0x5d, 0x20, 0x83, 0x80, 0x8a, 0x1b, 0x4d, 0x36, 0x70, 0x90, 0xba, 0xcc,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_nonce[] = {
+    0x77, 0x78, 0x28, 0xb1, 0x36, 0x79, 0xa9, 0xe2, 0xca, 0x89, 0x56, 0x82, 0x33,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_in[] = {
+    0xd8, 0x4f, 0x9a, 0x2c, 0x3b, 0x71, 0xe5, 0x6f, 0x08, 0xa1, 0xd3, 0xc9, 0xbe, 0x42, 0x7a, 0x9f,
+    0x14, 0xc2, 0x6e, 0x8d, 0x9b, 0x70, 0x3f, 0xa1, 0xe3, 0x6b, 0x8c, 0x9d, 0x24, 0xf0, 0xa7, 0xbd,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_ad[] = {
+    0xc5,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_ct[] = {
+    0x2b, 0xe2, 0xfd, 0xa6, 0x86, 0x8b, 0x78, 0xda, 0x93, 0x2f, 0xe9, 0x76, 0xab, 0x7d, 0x24, 0xd5,
+    0x4e, 0xf6, 0xf0, 0xe6, 0x3d, 0x66, 0x8b, 0xff, 0x9d, 0xbb, 0x22, 0x19, 0xcb, 0xbe, 0x0e, 0x38,
+};
+
+static const uint8_t test_vector_k3p9z7q1xv2m_tag[] = {
+    0x13, 0x7a, 0xc1, 0xc8, 0x85, 0x85, 0x9b, 0x96, 0x95, 0xd7, 0xe8, 0x07, 0x19, 0x4e, 0x86, 0xaf,
+};
+
+// Matter-Compliant AES-CCM Test Vector -- Plaintext/Ciphertext Length = 32 Bytes ( 2 CCM Blocks )
+static const struct ccm_128_test_vector aesccm128_matter_k3p9z7q1xv2m_test_vector_14 = {
+    .pt        = test_vector_k3p9z7q1xv2m_in,
+    .pt_len    = 32,
+    .aad       = test_vector_k3p9z7q1xv2m_ad,
+    .aad_len   = 1,
+    .key       = test_vector_k3p9z7q1xv2m_key,
+    .key_len   = 16,
+    .nonce     = test_vector_k3p9z7q1xv2m_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_k3p9z7q1xv2m_ct,
+    .ct_len    = 32,
+    .tag       = test_vector_k3p9z7q1xv2m_tag,
+    .tag_len   = 16,
+    .tcId      = 14,
+    .result    = CHIP_NO_ERROR,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_key[] = {
+    0x08, 0xb0, 0xda, 0x25, 0x5d, 0x20, 0x83, 0x80, 0x8a, 0x1b, 0x4d, 0x36, 0x70, 0x90, 0xba, 0xcc,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_nonce[] = {
+    0x77, 0x78, 0x28, 0xb1, 0x36, 0x79, 0xa9, 0xe2, 0xca, 0x89, 0x56, 0x82, 0x33,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_in[] = {
+    0xe9, 0xb4, 0x7f, 0xc2, 0x38, 0xd5, 0xa9, 0x1c, 0x04, 0xbf, 0x7e, 0x6d, 0x83, 0x92, 0xfa, 0x47, 0xb0, 0xae, 0x16, 0xc2,
+    0xd9, 0xf8, 0x4c, 0x71, 0xad, 0x35, 0x07, 0xb2, 0xe1, 0xf6, 0x90, 0x3a, 0xa4, 0xd1, 0xcf, 0x82, 0x1a, 0x9b, 0x4c, 0x1d,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_ad[] = {
+    0xc5,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_ct[] = {
+    0x1a, 0x19, 0x18, 0x48, 0x85, 0x2f, 0x34, 0xa9, 0x9f, 0x31, 0x44, 0xd2, 0x96, 0xad, 0xa4, 0x0d, 0xea, 0x9a, 0x88, 0xa9,
+    0x7f, 0xee, 0xf8, 0x2f, 0xd3, 0xe5, 0xa9, 0x36, 0x0e, 0xb8, 0x39, 0xbf, 0x98, 0xc0, 0x89, 0x90, 0xb6, 0x8d, 0x17, 0xda,
+};
+
+static const uint8_t test_vector_v9m3x2q7b1zn_tag[] = {
+    0xd4, 0xa8, 0xdc, 0xb3, 0x62, 0xad, 0xc0, 0xb1, 0x1d, 0x4b, 0x6a, 0x6f, 0x11, 0x7c, 0x49, 0xdb,
+};
+
+// Matter-Compliant AES-CCM Test Vector -- Plaintext/Ciphertext Length = 40 Bytes ( > 2 CCM Blocks )
+static const struct ccm_128_test_vector aesccm128_matter_v9m3x2q7b1zn_test_vector_15 = {
+    .pt        = test_vector_v9m3x2q7b1zn_in,
+    .pt_len    = 40,
+    .aad       = test_vector_v9m3x2q7b1zn_ad,
+    .aad_len   = 1,
+    .key       = test_vector_v9m3x2q7b1zn_key,
+    .key_len   = 16,
+    .nonce     = test_vector_v9m3x2q7b1zn_nonce,
+    .nonce_len = 13,
+    .ct        = test_vector_v9m3x2q7b1zn_ct,
+    .ct_len    = 40,
+    .tag       = test_vector_v9m3x2q7b1zn_tag,
+    .tag_len   = 16,
+    .tcId      = 15,
+    .result    = CHIP_NO_ERROR,
+};
+
 static const struct ccm_128_test_vector * ccm_128_test_vectors[] = {
 // All test cases in the ifdef do NOT follow the crypto primitive constraints for
 // Matter: they use different tag length and nonce length than the mandatory primitives.
@@ -1425,11 +1657,14 @@ static const struct ccm_128_test_vector * ccm_128_test_vectors[] = {
     &chiptest_dac9e1195a0d_test_vector_217,        &chiptest_dac9e1195a0d_test_vector_224,
     &chiptest_dac9e1195a0d_test_vector_231,        &chiptest_dac9e1195a0d_test_vector_238,
     &chiptest_dac9e1195a0d_test_vector_245,        &chiptest_dac9e1195a0d_test_vector_252,
+    &chiptest_dac9e1195a0d_test_vector_270,
 #endif // !CHIP_CRYPTO_BORINGSSL
     &aesccm128_matter_2ef53070ae20_test_vector_0,  &aesccm128_matter_91c8d337cf46_test_vector_1,
     &aesccm128_matter_37fc295e3601_test_vector_2,  &aesccm128_matter_8bab3993e4d1_test_vector_3,
     &aesccm128_matter_76dbd8e42344_test_vector_4,  &aesccm128_matter_ea145e3af464_test_vector_5,
     &aesccm128_matter_08f3cd0b35d1_test_vector_6,  &aesccm128_matter_70d7d4a1f8ea_test_vector_7,
     &aesccm128_matter_56f7e4096627_test_vector_8,  &aesccm128_matter_02112b4a46d8_test_vector_9,
-    &aesccm128_matter_ac063659d220_test_vector_10,
+    &aesccm128_matter_ac063659d220_test_vector_10, &aesccm128_matter_6d369ac02025_test_vector_11,
+    &aesccm128_matter_zh910q69h920_test_vector_12, &aesccm128_matter_61fs1fzo9124_test_vector_13,
+    &aesccm128_matter_k3p9z7q1xv2m_test_vector_14, &aesccm128_matter_v9m3x2q7b1zn_test_vector_15
 };

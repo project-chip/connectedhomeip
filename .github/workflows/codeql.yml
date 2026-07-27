@@ -23,7 +23,7 @@ on:
 
 jobs:
   analyze:
-    uses: project-chip/connectedhomeip/.github/workflows/build.yaml@master
+    uses: ./.github/workflows/build.yaml
     with:
       run-codeql: true
   

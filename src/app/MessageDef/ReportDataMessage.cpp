@@ -82,7 +82,7 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                attributeReportIBs.Init(reader);
+                TEMPORARY_RETURN_IGNORED attributeReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
                 ReturnErrorOnFailure(attributeReportIBs.PrettyPrint());
@@ -94,7 +94,7 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                eventReportIBs.Init(reader);
+                TEMPORARY_RETURN_IGNORED eventReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
                 ReturnErrorOnFailure(eventReportIBs.PrettyPrint());
@@ -135,7 +135,14 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
 
 CHIP_ERROR ReportDataMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {
-    return GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apSuppressResponse);
+    CHIP_ERROR err = GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apSuppressResponse);
+    if (CHIP_END_OF_TLV == err)
+    {
+        // If SuppressResponse is not present, treat it as false.
+        *apSuppressResponse = false;
+        return CHIP_NO_ERROR;
+    }
+    return err;
 }
 
 CHIP_ERROR ReportDataMessage::Parser::GetSubscriptionId(SubscriptionId * const apSubscriptionId) const

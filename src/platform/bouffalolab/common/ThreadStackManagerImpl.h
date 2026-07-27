@@ -29,6 +29,11 @@ extern "C" otInstance * otrGetInstance();
 
 namespace chip {
 namespace DeviceLayer {
+namespace Internal {
+
+CHIP_ERROR InitThreadPlatform();
+
+} // namespace Internal
 
 class ThreadStackManager;
 class ThreadStackManagerImpl;
@@ -65,6 +70,7 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
+    void FactoryResetThreadStack(void);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.

@@ -71,13 +71,25 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   }
 
   @Override
-  public void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName) {
+  public void promptForCommissionPinCode(
+      int vendorId,
+      int productId,
+      int passcodeLength,
+      String commissioneeName,
+      int pairingHint,
+      String pairingInstruction) {
     Log.d(
         TAG,
         "Received prompt for PIN code vendor id:"
             + vendorId
             + " productId:"
             + productId
+            + " passcode length:"
+            + passcodeLength
+            + " pairing hint:"
+            + pairingHint
+            + " pairing instruction:"
+            + pairingInstruction
             + ". Commissionee: "
             + commissioneeName);
     android.os.Message obtained = android.os.Message.obtain();
@@ -106,6 +118,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
       int productId,
       String commissioneeName,
       long passcode,
+      int passcodeLength,
       int pairingHint,
       String pairingInstruction) {
     Log.d(
@@ -116,12 +129,24 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + vendorId
             + " productId:"
             + productId
+            + " passcode length:"
+            + passcodeLength
+            + " pairing hint:"
+            + pairingHint
+            + " pairing instruction:"
+            + pairingInstruction
             + ". Commissionee: "
             + commissioneeName);
     Bundle bundle = new Bundle();
     PromptCommissionerPasscode promptCommissionerPasscode =
         new PromptCommissionerPasscode(
-            vendorId, productId, commissioneeName, passcode, pairingHint, pairingInstruction);
+            vendorId,
+            productId,
+            commissioneeName,
+            passcode,
+            passcodeLength,
+            pairingHint,
+            pairingInstruction);
     bundle.putParcelable(MsgHandler.KEY_PROMPT_COMMISSIONER_PASSCODE, promptCommissionerPasscode);
     android.os.Message obtained = android.os.Message.obtain();
     obtained.what = MsgHandler.MSG_CommissionerPasscode;

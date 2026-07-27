@@ -130,6 +130,16 @@
 #endif // BLE_READ_REQUEST_CONTEXT
 
 /**
+ *  @def BLE_USES_DEVICE_EVENTS
+ *
+ * @brief Whether the platform uses / supports BLE-related device events.
+ * @see chip::DeviceLayer::ChipDeviceEvent
+ */
+#ifndef BLE_USES_DEVICE_EVENTS
+#define BLE_USES_DEVICE_EVENTS 1
+#endif
+
+/**
  *  @def BLE_MAX_RECEIVE_WINDOW_SIZE
  *
  *  @brief

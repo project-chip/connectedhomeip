@@ -15,8 +15,11 @@
  *    limitations under the License.
  */
 #include "EmberReadWriteOverride.h"
+#include "app/data-model-provider/AttributeChangeListener.h"
+#include "app/data-model-provider/Provider.h"
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -36,7 +39,9 @@ Status gEmberStatusCode = Status::InvalidAction;
 } // namespace
 
 namespace chip {
-namespace Test {
+namespace Testing {
+
+app::DataModel::Provider * TestNotifiedProvider::gProvider = nullptr;
 
 void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
 {
@@ -73,7 +78,7 @@ ByteSpan GetEmberBuffer()
     return ByteSpan(gEmberIoBuffer, gEmberIoBufferFill);
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
 
 /// TODO: this SHOULD be part of attribute-storage mocks and allow proper I/O control
@@ -93,6 +98,11 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
         size_t len = std::min<size_t>(sizeof(gEmberIoBuffer), readLength);
         memcpy(gEmberIoBuffer, buffer, len);
         gEmberIoBufferFill = len;
+        if (auto provider = chip::Testing::TestNotifiedProvider::Provider(); provider != nullptr)
+        {
+            provider->NotifyAttributeChanged({ attRecord->endpoint, attRecord->clusterId, attRecord->attributeId },
+                                             chip::app::DataModel::AttributeChangeType::kReportable);
+        }
     }
     else
     {
@@ -122,9 +132,16 @@ Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path,
     memcpy(gEmberIoBuffer, input.dataPtr, len);
     gEmberIoBufferFill = len;
 
-    if (input.changeListener != nullptr)
+    // Increase cluster data version
+    auto * version = emberAfDataVersionStorage(chip::app::ConcreteClusterPath(path.mEndpointId, path.mClusterId));
+    if (version != nullptr)
     {
-        input.changeListener->MarkDirty(chip::app::AttributePathParams(path.mEndpointId, path.mClusterId, path.mAttributeId));
+        (*(version))++;
+    }
+
+    if (auto provider = chip::Testing::TestNotifiedProvider::Provider(); provider != nullptr)
+    {
+        provider->NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
     }
 
     return Status::Success;

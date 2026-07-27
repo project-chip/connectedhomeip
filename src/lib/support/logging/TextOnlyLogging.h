@@ -36,10 +36,10 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <lib/support/Assertions.h>
 #include <lib/support/Compiler.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
-#include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
@@ -97,6 +97,27 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #else // CHIP_ERROR_LOGGING
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif // CHIP_ERROR_LOGGING
+
+/**
+ * @def ChipLogFailure(err, MOD, MSG, ...)
+ *
+ * @brief
+ *   Log a chip message with a formatted ChipError for the specified module in the 'Error'
+ *   category.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ChipLogFailure(errCode, Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  ERROR_CODE  A CHIP_ERROR to log.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define ChipLogFailure(ERROR_CODE, MOD, MSG, ...)                                                                                  \
+    ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, ERROR_CODE.Format());
 
 #if CHIP_PROGRESS_LOGGING
 /**
@@ -230,9 +251,10 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  *  }
  *  @endcode
  *
- *  @param[in]  aValue    64-bit value that will be split in 32-bit MSB/LSB part
+ *  @param[in]  aValue    unsigned 64-bit value that will be split in 32-bit MSB/LSB part
  */
-#define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
+#define ChipLogValueX64(aValue)                                                                                                    \
+    static_cast<uint32_t>(static_cast<uint64_t>(aValue) >> 32), static_cast<uint32_t>(static_cast<uint64_t>(aValue))
 
 /*
  *  @brief

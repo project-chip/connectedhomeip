@@ -40,9 +40,9 @@
 
 #include <transport/raw/PeerAddress.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #error "When using OpenThread Endpoints, one should also use GenericThreadStackManagerImpl_OpenThread"
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 namespace chip {
 namespace DeviceLayer {
@@ -202,8 +202,8 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                         }
                         else if (lwipErr != ERR_OK)
                         {
-                            ChipLogProgress(DeviceLayer, "netif_add_ip6_address) failed: %s",
-                                            ErrorStr(chip::System::MapErrorLwIP(lwipErr)));
+                            ChipLogProgress(DeviceLayer, "netif_add_ip6_address) failed: %" CHIP_ERROR_FORMAT,
+                                            chip::System::MapErrorLwIP(lwipErr).Format());
                         }
                     }
 
@@ -290,13 +290,16 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struc
 {
     err_t lwipErr = ERR_OK;
     otError otErr;
-    otMessage * pktMsg                  = NULL;
-    const otMessageSettings msgSettings = { true, OT_MESSAGE_PRIORITY_NORMAL };
+    otMessage * pktMsg            = NULL;
+    otMessageSettings msgSettings = {};
     uint16_t remainingLen;
 
     // Lock the OpenThread stack.
     // Note that at this point the LwIP core lock is also held.
     ThreadStackMgrImpl().LockThreadStack();
+
+    msgSettings.mLinkSecurityEnabled = otThreadGetDeviceRole(ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_DISABLED;
+    msgSettings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
 
     // Allocate an OpenThread message
     pktMsg = otIp6NewMessage(ThreadStackMgrImpl().OTInstance(), &msgSettings);

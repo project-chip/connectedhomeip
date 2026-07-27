@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/DecodableList.h>
+#include <clusters/OtaSoftwareUpdateProvider/Commands.h>
 #include <lib/core/Optional.h>
 
 namespace chip {

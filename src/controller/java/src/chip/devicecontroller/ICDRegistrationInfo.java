@@ -50,7 +50,18 @@ public class ICDRegistrationInfo {
     return monitoredSubject;
   }
 
-  /** Returns the 16 bytes ICD symmetric key. */
+  /**
+   * Gets the ICD symmetric key.
+   *
+   * <p>Typically returns a 16-byte key. However:
+   *
+   * <ul>
+   *   <li>If deferred ICD configuration is supported, this may return an empty array as a sentinel
+   *       value.
+   *   <li>If no symmetric key was explicitly set in the builder, this may return {@code null},
+   *       indicating that a 16-byte key will be randomly generated in native code.
+   * </ul>
+   */
   public byte[] getSymmetricKey() {
     return symmetricKey;
   }
@@ -61,6 +72,15 @@ public class ICDRegistrationInfo {
 
   public static Builder newBuilder() {
     return new Builder();
+  }
+
+  /**
+   * Creates an ICDRegistrationInfo instance with an empty symmetric key. This configuration enables
+   * the kBeforeComplete feature but intentionally omits the key to defer the configuration and
+   * trigger the OnICDRegistrationInfoRequired callback during commissioning.
+   */
+  public static ICDRegistrationInfo createForDeferredConfiguration() {
+    return newBuilder().setSymmetricKey(new byte[0]).build();
   }
 
   /** Builder for {@link ICDRegistrationInfo}. */
@@ -89,7 +109,9 @@ public class ICDRegistrationInfo {
     }
 
     /**
-     * The 16 bytes ICD symmetric key, If not set this value, this value will be randomly generated.
+     * Sets the ICD symmetric key. Typically, this is a 16-byte key. If not set, a 16-byte key will
+     * be randomly generated. Note that an empty array is a valid sentinel value for deferred ICD
+     * configuration.
      */
     public Builder setSymmetricKey(byte[] symmetricKey) {
       this.symmetricKey = symmetricKey;

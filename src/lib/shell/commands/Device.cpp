@@ -37,7 +37,7 @@ void RegisterDeviceCommands()
         { &FactoryResetHandler, "factoryreset", "Performs device factory reset" },
     };
 
-    static constexpr Command deviceComand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "device",
+    static constexpr Command deviceComand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "device",
                                               "Device management commands" };
 
     Engine::Root().RegisterCommands(&deviceComand, 1);

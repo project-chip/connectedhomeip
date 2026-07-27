@@ -87,7 +87,7 @@ def GetOptions():
 
     # Definition file in GYP is newline separated, in GN they are shell formatted.
     # shlex can parse both of these.
-    with open(cmdline_options.definitions, 'r') as def_file:
+    with open(cmdline_options.definitions) as def_file:
         defs = shlex.split(def_file.read())
     defines_index = defs.index('--defines')
 

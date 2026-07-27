@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimeUtils.h>
+#include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/CheckInCounter.h>
 #include <system/SystemClock.h>
@@ -31,11 +34,11 @@ namespace app {
 class ICDManager;
 } // namespace app
 
-namespace Test {
+namespace Testing {
 // Forward declaration of ICDConfigurationDataTestAccess tests to allow it to be friend with the ICDConfigurationData.
 // Used in unit tests
 class ICDConfigurationDataTestAccess;
-} // namespace Test
+} // namespace Testing
 
 /**
  * @brief ICDConfigurationData manages and stores ICD related configurations for the ICDManager.
@@ -57,6 +60,7 @@ public:
 
     static ICDConfigurationData & GetInstance() { return instance; };
 
+    // This represents the ICDManagement Cluster's fixed value mIdleModeDuration Attribute
     System::Clock::Seconds32 GetIdleModeDuration() { return mIdleModeDuration; }
 
     System::Clock::Milliseconds32 GetActiveModeDuration() { return mActiveModeDuration; }
@@ -77,6 +81,8 @@ public:
 
     System::Clock::Seconds32 GetMaximumCheckInBackoff() { return mMaximumCheckInBackOff; }
 
+    BitFlags<app::Clusters::IcdManagement::Feature> GetFeatureMap() { return mFeatureMap; }
+
     /**
      * The returned value will depend on the devices operating mode.
      * If ICDMode == SIT && the configured slow poll interval is superior to the maximum threshold (15s), the function will return
@@ -88,11 +94,49 @@ public:
      */
     System::Clock::Milliseconds32 GetSlowPollingInterval();
 
+    /**
+     * @brief Indicates if the device should apply the ShortIdleModeDuration instead of the normal IdleModeDuration.
+     *
+     * Uses ShortIdle only when:
+     *  - ShortIdleModeDuration < IdleModeDuration
+     *  - Long Idle Time feature is supported
+     *  - Device currently operates in SIT mode
+     *
+     * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+     *
+     * @return true if ShortIdleModeDuration shall be used, false otherwise.
+     */
+    bool ShouldUseShortIdle();
+
+    /**
+     * @brief Returns the appropriate Idle duration based on current operating conditions.
+     *
+     * If ShouldUseShortIdle() is true, returns ShortIdleModeDuration; otherwise returns IdleModeDuration.
+     *
+     * @return Effective IdleMode duration in seconds.
+     */
+    System::Clock::Seconds32 GetModeBasedIdleModeDuration();
+
     ICDMode GetICDMode() { return mICDMode; }
 
 private:
     // Singleton Object
-    ICDConfigurationData() = default;
+    ICDConfigurationData()
+    {
+        // Initialize feature map
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_UAT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kUserActiveModeTrigger);
+#endif // CHIP_CONFIG_ENABLE_ICD_UAT
+#if CHIP_CONFIG_ENABLE_ICD_LIT
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+        mFeatureMap.Set(app::Clusters::IcdManagement::Feature::kDynamicSitLitSupport);
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
+    }
     static ICDConfigurationData instance;
 
     // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
@@ -101,11 +145,36 @@ private:
     // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
 
-    friend class chip::Test::ICDConfigurationDataTestAccess;
+    friend class chip::Testing::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
-    void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
+
+    /**
+     * @brief Sets the slow polling interval for the ICD.
+     *
+     * If LIT support is not enabled, the interval cannot be set higher than the SIT polling threshold.
+     * If LIT support is enabled, any value is accepted.
+     *
+     * @param[in] slowPollInterval The slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval);
+
+    /**
+     * @brief Sets the SIT Idle polling interval.
+     *
+     * This function sets the slow/idle polling interval, which is used when the configured
+     * slow polling interval exceeds the allowed threshold for SIT mode. The provided value must
+     * be less than, or equal to the SIT polling threshold (kSITPollingThreshold).
+     *
+     * This SIT Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
+     * when operating as LIT, but use a faster SlowPollingInterval when the device must operate in SIT mode
+     *
+     * @param[in] pollingInterval The SIT slow polling interval in milliseconds.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
+     */
+    CHIP_ERROR SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
@@ -116,6 +185,9 @@ private:
      * @param[in] activeModeDuration new ActiveModeDuration value
      * @param[in] idleModeDuration new IdleModeDuration value
      *                                The precision of the IdleModeDuration must be seconds.
+     * Note: mIdleModeDuration is expressed in seconds. The idleModeDuration parameter is in milliseconds for backward compatibility
+     * reasons. The conversion to seconds is done inside the function.
+     *
      * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_ms is smaller than activeModeDuration_ms
      *                                                is returned if idleModeDuration_ms is greater than 64800000 ms
      *                                                is returned if idleModeDuration_ms is smaller than 1000 ms
@@ -124,6 +196,36 @@ private:
      */
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
                                 Optional<System::Clock::Milliseconds32> idleModeDuration);
+
+    /**
+     * @brief Change the ActiveModeDuration, IdleModeDuration and/or ShortIdleModeDuration values.
+     *
+     * At least one of the three parameters must be provided. Omitted parameters keep their current stored values.
+     *
+     * Constraints:
+     *  - activeModeDuration (ms) must be <= resulting idleModeDuration (s)
+     *  - idleModeDuration (s) must be within [kMinIdleModeDuration, kMaxIdleModeDuration]
+     *  - shortIdleModeDuration (s) must be <= resulting idleModeDuration (s)
+     *
+     * NOTE: to keep previous behavior, If shortIdleModeDuration is not provided, mShortIdleModeDuration can be clamped to resulting
+     * idleModeDuration if the later becomes lesser than the previous mShortIdleModeDuration.
+     *
+     * @param[in] activeModeDuration      New ActiveModeDuration in milliseconds (optional).
+     * @param[in] idleModeDuration        New IdleModeDuration in seconds (optional).
+     * @param[in] shortIdleModeDuration   New ShortIdleModeDuration in seconds (optional, must not exceed IdleModeDuration).
+     *
+     * @return CHIP_NO_ERROR on success.
+     * @return CHIP_ERROR_INVALID_ARGUMENT when:
+     *         - no parameter is provided
+     *         - activeModeDuration > resulting idleModeDuration
+     *         - idleModeDuration is greater than 64800 s or is smaller than 1 s
+     *         - shortIdleModeDuration > resulting idleModeDuration
+     */
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
+                                std::optional<System::Clock::Seconds32> idleModeDuration,
+                                std::optional<System::Clock::Seconds32> shortIdleModeDuration);
+
+    void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
     static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
     static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);
@@ -136,6 +238,11 @@ private:
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration.count(),
                   "Spec requires the IdleModeDuration to be equal or greater to 1s.");
     System::Clock::Seconds32 mIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC);
+
+    // Shorter idleModeDuration when a LIT capable device operates in SIT mode.
+    System::Clock::Seconds32 mShortIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC);
+    static_assert((CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC <= CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
+                  "mShortIdleModeDuration must be lesser or equal than mIdleModeDuration.");
 
     static_assert(System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <=
                       System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
@@ -166,8 +273,18 @@ private:
     static_assert((CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL <= kSitIcdSlowPollMaximum),
                   "LIT support is required for slow polling intervals superior to 15 seconds");
 #endif
-    System::Clock::Milliseconds32 mSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    // The Polling interval used in Idle mode
+    System::Clock::Milliseconds32 mLITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    // The Polling interval used in Active mode
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL <= kSitIcdSlowPollMaximum),
+                  "The SIT polling intervals must not exceed 15 seconds");
+    // The Polling interval used in Idle mode when a LIT capable device operates in SIT mode and that is mLITPollingInterval is
+    // greater than mSITPollingInterval
+    System::Clock::Milliseconds32 mSITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL;
+
+    BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
 
     ICDMode mICDMode = ICDMode::SIT;
 };

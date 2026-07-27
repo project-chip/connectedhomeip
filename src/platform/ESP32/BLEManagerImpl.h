@@ -24,11 +24,12 @@
  */
 
 #pragma once
+#include <sdkconfig.h>
 #include <string>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#include "sdkconfig.h"
+#ifdef CONFIG_BT_NIMBLE_ENABLED
+#include <vector>
+#endif
 
 #include <lib/core/Optional.h>
 
@@ -117,6 +118,7 @@ struct BLEScanConfig
 };
 
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 /**
  * Concrete implementation of the BLEManager singleton object for the ESP32 platform.
  */
@@ -124,12 +126,10 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
                              private Ble::BlePlatformDelegate,
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-                             private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate,
-                             private ChipDeviceScannerDelegate
-#else
-                             private Ble::BleApplicationDelegate
+                             private ChipDeviceScannerDelegate,
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+                             private Ble::BleApplicationDelegate
 {
 public:
     BLEManagerImpl() {}
@@ -142,6 +142,9 @@ public:
 
     CHIP_ERROR ConfigureScanResponseData(ByteSpan data);
     void ClearScanResponseData(void);
+#ifdef CONFIG_BT_NIMBLE_ENABLED
+    CHIP_ERROR ConfigureExtraServices(std::vector<struct ble_gatt_svc_def> & extGattSvcs, bool afterMatterSvc);
+#endif
 
 private:
     chip::Optional<chip::ByteSpan> mScanResponse;
@@ -194,8 +197,7 @@ private:
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
 #ifdef CONFIG_BT_NIMBLE_ENABLED
-    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
-                                 const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    virtual void OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
 #elif defined(CONFIG_BT_BLUEDROID_ENABLED)
     virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
@@ -227,6 +229,7 @@ private:
         kUseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
         kExtAdvertisingEnabled    = 0x1000, /**< The application has enabled Extended BLE announcement. */
+        kBleDeinitAndMemReleased  = 0x2000, /**< The ble is deinitialized and memory is reclaimed. */
     };
 
     enum
@@ -239,6 +242,12 @@ private:
     BLEAdvConfig mBLEAdvConfig;
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #ifdef CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_EXT_ADV
+    static constexpr size_t kMaxMatterAdvDataLen = 31;
+    static constexpr uint8_t kMatterAdvInstance  = 0;
+    uint8_t mMatterAdvData[kMaxMatterAdvDataLen];
+    uint16_t mMatterAdvDataLen = 0;
+#endif
     uint16_t mSubscribedConIds[kMaxConnections];
 #endif // CONFIG_BT_NIMBLE_ENABLED
 
@@ -277,6 +286,7 @@ private:
     esp_gatt_if_t mAppIf;
 #elif defined(CONFIG_BT_NIMBLE_ENABLED)
     uint16_t mNumGAPCons;
+    std::vector<struct ble_gatt_svc_def> mGattSvcs;
 #endif // CONFIG_BT_BLUEDROID_ENABLED
     uint16_t mServiceAttrHandle;
     uint16_t mRXCharAttrHandle;
@@ -346,7 +356,7 @@ private:
     static void bleprph_host_task(void * param);
     static void bleprph_on_sync(void);
     static void bleprph_on_reset(int);
-    static const struct ble_gatt_svc_def CHIPoBLEGATTAttrs[];
+    static const struct ble_gatt_svc_def CHIPoBLEGATTSvc;
     static int ble_svr_gap_event(struct ble_gap_event * event, void * arg);
 
     static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
@@ -422,5 +432,3 @@ inline bool BLEManagerImpl::_IsAdvertising(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

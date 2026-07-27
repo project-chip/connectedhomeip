@@ -30,7 +30,9 @@
 #include <string.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <arpa/inet.h>
@@ -39,9 +41,23 @@
 namespace chip {
 namespace Inet {
 
+// Normalize a string to lowercase per RFC 5952 (canonical IPv6 text form).
+// ip6addr_ntoa_r and otIp6AddressToString output uppercase, which is
+// non-canonical.
+static void NormalizeIp6ToLower(char * str)
+{
+    for (char * p = str; *p != '\0'; ++p)
+    {
+        if (*p >= 'A' && *p <= 'F')
+        {
+            *p = static_cast<char>(*p + ('a' - 'A'));
+        }
+    }
+}
+
 char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -53,6 +69,8 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
     {
         ip6_addr_t ip6_addr = ToIPv6();
         ip6addr_ntoa_r(&ip6_addr, buf, (int) bufSize);
+        // Normalize to lowercase per RFC 5952 (canonical IPv6 text form).
+        NormalizeIp6ToLower(buf);
     }
 #elif CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // socklen_t is sometimes signed, sometimes not, so the only safe way to do
@@ -76,12 +94,42 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
         // This cast is safe because |s| points into |buf| which is not const.
         buf = const_cast<char *>(s);
     }
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     otIp6Address addr = ToIPv6();
     otIp6AddressToString(&addr, buf, static_cast<uint16_t>(bufSize));
+    // Normalize to lowercase per RFC 5952 (canonical IPv6 text form).
+    NormalizeIp6ToLower(buf);
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     return buf;
+}
+
+char * IPAddress::ToString(char * buf, uint32_t bufSize, const Inet::InterfaceId & interfaceId) const
+{
+    if (IsIPv6LinkLocal() && interfaceId.IsPresent())
+    {
+        char ipStr[IPAddress::kMaxStringLength];
+        if (ToString(ipStr, sizeof(ipStr)) == nullptr)
+        {
+            return nullptr;
+        }
+
+        // Normalize to lowercase per RFC 5952 (canonical IPv6 text form).
+        NormalizeIp6ToLower(ipStr);
+
+        StringBuilderBase builder(buf, bufSize);
+        builder.Add(ipStr);
+
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
+        if (interfaceId.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR)
+        {
+            builder.Add("%").Add(ifName);
+        }
+
+        return builder.Fit() ? buf : nullptr;
+    }
+
+    return ToString(buf, bufSize);
 }
 
 bool IPAddress::FromString(const char * str, IPAddress & output)
@@ -89,7 +137,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
 #if INET_CONFIG_ENABLE_IPV4
     if (strchr(str, ':') == nullptr)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ip4_addr_t ipv4Addr;
         if (!ip4addr_aton(str, &ipv4Addr))
             return false;
@@ -103,7 +151,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
     else
 #endif // INET_CONFIG_ENABLE_IPV4
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ip6_addr_t ipv6Addr;
         if (!ip6addr_aton(str, &ipv6Addr))
             return false;
@@ -111,7 +159,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         struct in6_addr ipv6Addr;
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         otIp6Address ipv6Addr;
         if (OT_ERROR_NONE != otIp6AddressFromString(str, &ipv6Addr))
             return false;

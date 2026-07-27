@@ -77,7 +77,7 @@ int ShellTask::Start(void)
 
     // Start App task.
     sShellTaskHandle =
-        xTaskCreateStatic(ShellTask::Main, "SHELL_TASK", ArraySize(shellStack), nullptr, 1, shellStack, &shellTaskStruct);
+        xTaskCreateStatic(ShellTask::Main, "SHELL_TASK", MATTER_ARRAY_SIZE(shellStack), nullptr, 1, shellStack, &shellTaskStruct);
     if (sShellTaskHandle == nullptr)
     {
         return 1;

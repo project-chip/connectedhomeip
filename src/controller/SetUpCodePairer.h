@@ -30,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -39,25 +40,55 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_BLE
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <nfc/NFC.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+#include <controller/ThreadMeshcopCommissionProxy.h>
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+
 #include <controller/DeviceDiscoveryDelegate.h>
 
 #include <deque>
+#include <optional>
+#include <vector>
 
 namespace chip {
+
+namespace Testing {
+
+class SetUpCodePairerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 class DeviceCommissioner;
 
+/**
+ * A class that represents a discovered device.  This includes both the inputs to discovery (via the
+ * RendezvousParameters super-class), and the outputs from discovery (the PeerAddress in
+ * RendezvousParameters but also some of our members like mHostName, mInterfaceId,
+ * mLongDiscriminator).
+ */
 class SetUpCodePairerParameters : public RendezvousParameters
 {
 public:
     SetUpCodePairerParameters() = default;
-    SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, size_t index);
+    SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, std::optional<uint16_t> longDiscriminator, size_t index);
 #if CONFIG_NETWORK_LAYER_BLE
-    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected = true);
+    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> longDiscriminator, bool connected = true);
 #endif // CONFIG_NETWORK_LAYER_BLE
     char mHostName[Dnssd::kHostNameMaxLength + 1] = {};
     Inet::InterfaceId mInterfaceId;
+
+    // The long discriminator of the device that was actually discovered, if this is known.  This
+    // differs from the mSetupDiscriminator member of RendezvousParameters in that the latter may be
+    // a short discriminator from a numeric setup code (which may match multiple devices), while
+    // this member, if set, is always a long discriminator that was actually advertised by the
+    // device represented by our PeerAddress.
+    std::optional<uint16_t> mLongDiscriminator = std::nullopt;
 };
 
 enum class SetupCodePairerBehaviour : uint8_t
@@ -74,10 +105,21 @@ enum class DiscoveryType : uint8_t
 };
 
 class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    ,
+                                   public Nfc::NFCReaderTransportDelegate
+#endif
 {
+    friend class chip::Testing::SetUpCodePairerTestAccess;
+
 public:
+    struct ThreadMeshcopCommissionParameters
+    {
+        Transport::PeerAddress mBorderAgentAddress;
+        uint8_t mPSKcBuffer[Thread::kSizePSKc];
+    };
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
-    ~SetUpCodePairer();
+    virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
                           SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,
@@ -93,6 +135,15 @@ public:
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    void SetThreadMeshcopCommissionParamsAndProxy(ThreadMeshcopCommissionParameters & meshcopCommissionParams,
+                                                  ThreadMeshcopCommissionProxy * proxy)
+    {
+        mThreadMeshcopCommissionProxy = proxy;
+        mThreadMeshcopCommissionParams.SetValue(meshcopCommissionParams);
+    }
+#endif
+
     // Stop ongoing discovery / pairing of the specified node, or of
     // whichever node we're pairing if kUndefinedNodeId is passed.
     bool StopPairing(NodeId remoteId = kUndefinedNodeId);
@@ -100,22 +151,35 @@ public:
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                           const std::optional<SetupPayload> & setupPayload) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
-    CHIP_ERROR Connect(SetupPayload & paload);
-    CHIP_ERROR StartDiscoverOverBle(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverBle();
-    CHIP_ERROR StartDiscoverOverIP(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverIP();
-    CHIP_ERROR StartDiscoverOverSoftAP(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverSoftAP();
-    CHIP_ERROR StartDiscoverOverWiFiPAF(SetupPayload & payload);
-    CHIP_ERROR StopConnectOverWiFiPAF();
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    // Nfc::NFCReaderTransportDelegate implementation
+    void OnTagDiscovered(const chip::Nfc::NFCTag::Identifier & identifer) override;
+    void OnTagDiscoveryFailed(CHIP_ERROR error) override;
+#endif
+
+    CHIP_ERROR Connect();
+    CHIP_ERROR StartDiscoveryOverBLE();
+    CHIP_ERROR StopDiscoveryOverBLE();
+    CHIP_ERROR StartDiscoveryOverDNSSD();
+    CHIP_ERROR StopDiscoveryOverDNSSD();
+    CHIP_ERROR StartDiscoveryOverWiFiPAF();
+    CHIP_ERROR StopDiscoveryOverWiFiPAF();
+    CHIP_ERROR StartDiscoveryOverNFC();
+    CHIP_ERROR StopDiscoveryOverNFC();
+    CHIP_ERROR StartDiscoveryOverThreadMeshcop();
+    CHIP_ERROR StopDiscoveryOverThreadMeshcop();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
+
+    // Stop attempts to discover more things to connect to, but keep trying to
+    // connect to the ones we have already discovered.
+    void StopAllDiscoveryAttempts();
 
     // Reset our mWaitingForDiscovery/mDiscoveredParameters state to indicate no
     // pending work.
@@ -146,26 +210,40 @@ private:
     // RendezvousParameters in the future.
     bool DiscoveryInProgress() const;
 
+    // If there is nothing left to try (no PASE in progress, no queued discovered
+    // parameters, no discovery in progress), notify the commissioner that pairing
+    // has failed.  err is used as the failure error only if no PASE attempt has
+    // produced an error yet.
+    void StopPairingIfTransportsExhausted(CHIP_ERROR err);
+
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes
     {
         kBLETransport = 0,
         kIPTransport,
-        kSoftAPTransport,
         kWiFiPAFTransport,
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+        kNFCTransport,
+#endif
+#if CHIP_SUPPORT_THREAD_MESHCOP
+        kThreadMeshcopTransport,
+#endif
         kTransportTypeCount,
     };
 
-    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData);
+    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData,
+                                              std::optional<uint16_t> matchedLongDiscriminator);
 
     static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
-    void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj);
+    void OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> matchedLongDiscriminator);
     void OnBLEDiscoveryError(CHIP_ERROR err);
     /////////// BLEConnectionDelegate Callbacks /////////
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnDiscoveredDeviceWithDiscriminatorOverBleSuccess(void * appState, uint16_t matchedLongDiscriminator,
+                                                                  BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -178,20 +256,21 @@ private:
     bool NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const;
     static bool IdIsPresent(uint16_t vendorOrProductID);
 
-    Dnssd::DiscoveryFilter mCurrentFilter;
-    // The vendor id and product id from the SetupPayload.  They may be 0, which
-    // indicates "not available" (e.g. because the SetupPayload came from a
-    // short manual code).  In that case we should not filter on those values.
+    bool ShouldDiscoverUsing(RendezvousInformationFlag commissioningChannel) const;
+
+    // kNotAvailable represents unavailable vendor/product ID values in setup payloads.
     static constexpr uint16_t kNotAvailable = 0;
-    uint16_t mPayloadVendorID               = kNotAvailable;
-    uint16_t mPayloadProductID              = kNotAvailable;
 
     DeviceCommissioner * mCommissioner       = nullptr;
     System::Layer * mSystemLayer             = nullptr;
     chip::NodeId mRemoteId                   = kUndefinedNodeId;
-    uint32_t mSetUpPINCode                   = 0;
     SetupCodePairerBehaviour mConnectionType = SetupCodePairerBehaviour::kCommission;
     DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
+    std::vector<SetupPayload> mSetupPayloads;
+
+    // The payload we are using for our current PASE connection attempt.  Only
+    // set while we are attempting PASE.
+    std::optional<SetupPayload> mCurrentPASEPayload;
 
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on
@@ -209,7 +288,7 @@ private:
 
     // Current thing we are trying to connect to over UDP. If a PASE connection fails with
     // a CHIP_ERROR_TIMEOUT, the discovered parameters will be used to ask the
-    // mdns daemon to invalidate the
+    // mdns daemon to invalidate its caches.
     Optional<SetUpCodePairerParameters> mCurrentPASEParameters;
 
     // mWaitingForPASE is true if we have called either
@@ -219,6 +298,11 @@ private:
 
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
+    ThreadMeshcopCommissionProxy * mThreadMeshcopCommissionProxy = nullptr;
+#endif
 };
 
 } // namespace Controller

@@ -32,8 +32,11 @@
  */
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
-class OTAMultiImageProcessorImpl : public OTAImageProcessorInterface
+class OTAMultiImageProcessorImpl : public chip::OTAImageProcessorInterface
 {
 public:
     using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
@@ -58,7 +61,7 @@ public:
     CHIP_ERROR ProcessPayload(ByteSpan & block);
     CHIP_ERROR ProcessFinalize();
     CHIP_ERROR SelectProcessor(ByteSpan & block);
-    CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+    CHIP_ERROR RegisterProcessor(OTAProcessorTag tag, OTATlvProcessor * processor);
 
     static void FetchNextData(uint32_t context);
     static OTAMultiImageProcessorImpl & GetDefaultInstance();
@@ -93,7 +96,10 @@ private:
     OTAImageHeaderParser mHeaderParser;
     OTATlvProcessor * mCurrentProcessor = nullptr;
     OTADataAccumulator mAccumulator;
-    std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
+    std::map<OTAProcessorTag, OTATlvProcessor *> mProcessorMap;
 };
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

@@ -36,7 +36,7 @@ uint32_t SizeOfStatusIB(const StatusIB & aStatus)
     // 1 byte: end of container.
     uint32_t size = 5;
 
-    if (aStatus.mClusterStatus.HasValue())
+    if (aStatus.mClusterStatus.has_value())
     {
         // 1 byte: control byte for uint8 value.
         // 1 byte: context-specific tag for uint8 value.
@@ -225,6 +225,12 @@ CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::UpdateEventCache(const Even
     }
 
     return CHIP_NO_ERROR;
+}
+
+template <bool CanEnableDataCaching>
+void ClusterStateCacheT<CanEnableDataCaching>::NotifySubscriptionStillActive(const ReadClient & aReadClient)
+{
+    mCallback.NotifySubscriptionStillActive(aReadClient);
 }
 
 template <bool CanEnableDataCaching>
@@ -426,7 +432,7 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnAttributeData(const ConcreteDat
         dataSnapshot.Init(*apData);
     }
 
-    UpdateCache(aPath, apData, aStatus);
+    TEMPORARY_RETURN_IGNORED UpdateCache(aPath, apData, aStatus);
 
     //
     // Forward the call through.
@@ -458,7 +464,7 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnEventData(const EventHeader & a
         dataSnapshot.Init(*apData);
     }
 
-    UpdateEventCache(aEventHeader, apData, apStatus);
+    TEMPORARY_RETURN_IGNORED UpdateEventCache(aEventHeader, apData, apStatus);
     mCallback.OnEventData(aEventHeader, apData ? &dataSnapshot : nullptr, apStatus);
 }
 

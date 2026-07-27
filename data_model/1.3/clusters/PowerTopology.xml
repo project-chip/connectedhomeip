@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009C" name="Power Topology Cluster" revision="1">
   <revisionHistory>
@@ -83,20 +85,24 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="AvailableEndpoints" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="SET"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="20"/>
+      <constraint>
+        <maxCount value="20"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ActiveEndpoints" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="DYPF"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="20"/>
+      <constraint>
+        <maxCount value="20"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

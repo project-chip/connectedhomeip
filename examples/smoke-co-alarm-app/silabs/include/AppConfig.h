@@ -21,9 +21,9 @@
 
 // ---- Smoke CO Alarm Example App Config ----
 
-#define APP_TASK_NAME "Alm"
+#define APP_TASK_NAME "Smoke"
 
-#define BLE_DEV_NAME "SiLabs-Alarm"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

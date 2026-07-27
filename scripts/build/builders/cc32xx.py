@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -26,18 +28,16 @@ class cc32xxApp(Enum):
     def ExampleName(self):
         if self == cc32xxApp.LOCK:
             return 'lock-app'
-        elif self == cc32xxApp.AIR_PURIFIER:
+        if self == cc32xxApp.AIR_PURIFIER:
             return 'air-purifier-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == cc32xxApp.LOCK:
             return 'chip-CC3235SF_LAUNCHXL-lock-example'
-        elif self == cc32xxApp.AIR_PURIFIER:
+        if self == cc32xxApp.AIR_PURIFIER:
             return 'chip-CC3235SF_LAUNCHXL-air-purifier-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'cc32xx')
@@ -46,22 +46,27 @@ class cc32xxApp(Enum):
 class cc32xxBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: cc32xxApp = cc32xxApp.LOCK):
-        super(cc32xxBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
 
     def GnBuildArgs(self):
-        args = [
-            'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
-        ]
+        try:
+            sysconfig_root = os.environ['TI_SYSCONFIG_ROOT_CC32XX']
+        except KeyError:
+            raise Exception(
+                'TI_SYSCONFIG_ROOT_CC32XX environment variable must be set for CC32XX builds. Please point it to the TI SysConfig installation directory.'
+            )
 
+        args = super().GnBuildArgs()
+        args.append(f'ti_sysconfig_root="{sysconfig_root}"')
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         if (self.app == cc32xxApp.LOCK):
             extensions = ["out", "bin"]

@@ -76,12 +76,11 @@ enum class MsgType : uint8_t
 };
 
 // Placeholder value for the ProtocolCode field when the GeneralCode is Success or Continue.
-inline constexpr uint16_t kProtocolCodeSuccess         = 0x0000;
-inline constexpr uint16_t kProtocolCodeNoSharedRoot    = 0x0001;
-inline constexpr uint16_t kProtocolCodeInvalidParam    = 0x0002;
-inline constexpr uint16_t kProtocolCodeCloseSession    = 0x0003;
-inline constexpr uint16_t kProtocolCodeBusy            = 0x0004;
-inline constexpr uint16_t kProtocolCodeSessionNotFound = 0x0005;
+inline constexpr uint16_t kProtocolCodeSuccess      = 0x0000;
+inline constexpr uint16_t kProtocolCodeNoSharedRoot = 0x0001;
+inline constexpr uint16_t kProtocolCodeInvalidParam = 0x0002;
+inline constexpr uint16_t kProtocolCodeCloseSession = 0x0003;
+inline constexpr uint16_t kProtocolCodeBusy         = 0x0004;
 
 // Placeholder value for the ProtocolCode field when there is no additional protocol-specific code to provide more information.
 inline constexpr uint16_t kProtocolCodeGeneralFailure = 0xFFFF;

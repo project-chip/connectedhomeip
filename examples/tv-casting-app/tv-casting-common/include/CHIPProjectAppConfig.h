@@ -47,6 +47,23 @@
 
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+ *
+ * 0xFFF1 (65521): Test Vendor #1 is reserved for test and development by device manufacturers or hobbyists. A Vendor Identifier
+ * (Vendor ID or VID) is a 16-bit number that uniquely identifies a particular product manufacturer, vendor, or group thereof.
+ * For production, replace with the Vendor ID allocated for you by the Connectivity Standards Alliance.
+ */
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
+ *
+ * 0x8001 (32769): A Product Identifier (Product ID or PID) is a 16-bit number that uniquely identifies a product of a vendor.
+ * The Product ID is assigned by the vendor and SHALL be unique for each product within a Vendor ID.
+ */
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
+
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test TV casting app"
@@ -66,11 +83,32 @@
  * For casting, we need to allow for more binding table entries because the Casting App can connect to many Matter Casting Players,
  * each with many Content Apps. Each Casting Player will set 1 binding per endpoint on it. A Casting Player will have 1 endpoint for
  * every Matter Content App installed on it + 1 endpoint representing the Casting Player + 1 endpoint representing a speaker.
+ * We define CHIP_CONFIG_MAX_FABRICS to 16 by default, so the maximum binding table is 64.
  */
-#define MATTER_BINDING_TABLE_SIZE 64
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
-// Enable some test-only interaction model APIs.
+// CONFIG_BUILD_FOR_HOST_UNIT_TEST gates *data members* in core types such as
+// CASESession (mStopHandshakeAtState) and, transitively, the layout of the
+// Server singleton (which embeds CASESession via CASEServer/CASESessionManager
+// ahead of its FabricTable). This header is the global project-config include
+// (chip_project_config_include in args.gni), so it is seen by EVERY translation
+// unit in the tv-casting-app build, both the app sources and the core src/*
+// library. It MUST therefore resolve to a single value across the whole link.
+//
+// It is also a functional switch: the non-size-optimized build pulls in the
+// legacy chip-tool InteractionModel.cpp, whose SendCommand/SendSubscribeRequest
+// paths call the test-only CommandSender/ReadClient hooks that are compiled only
+// when this is 1. So it must be 1, matching chip-tool's own CHIPProjectAppConfig.h
+// (which shares that code).
+//
+// Set it here in the shared project-config header ONLY. Do NOT add a per-target
+// `-DCONFIG_BUILD_FOR_HOST_UNIT_TEST=...` override in any BUILD.gn: that reaches
+// only some TUs while the rest pick up the value below, and the resulting ODR
+// mismatch changes the offset of Server::mFabrics between TUs, crashing at
+// startup in FabricTable::AddFabricDelegate (garbage mDelegateListRoot).
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#endif
 
 #define CHIP_ENABLE_ROTATING_DEVICE_ID 1
 
@@ -90,8 +128,17 @@
 // delay (in sec) before which we assume undiscovered cached players may be in STR mode
 #define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
 
+// Enable automatic port retry to handle port conflicts
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 1
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+
+#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
+// Increase memory pools for better attribute reading performance
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500 // Default is 15
+
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first
-#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <CHIPProjectConfig.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN

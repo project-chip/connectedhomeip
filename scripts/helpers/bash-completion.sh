@@ -16,6 +16,98 @@
 # limitations under the License.
 #
 
+_chip_build_example() {
+
+    local cur prev words cword split
+    _init_completion -s || return
+
+    # The command names supported by the script.
+    local commands="build gen targets"
+
+    local i
+    local command command_comp_cword
+    # Get the first non-option argument taking into account the options with their arguments.
+    for ((i = 1; i <= COMP_CWORD; i++)); do
+        case "${COMP_WORDS[i]}" in
+            --log-level | --target | --build-profile | --repo | --out-prefix | --ninja-jobs | --pregen-dir | --dry-run-output | --pw-command-launcher)
+                ((i == COMP_CWORD)) && break
+                ((i == COMP_CWORD - 1)) && [[ "${COMP_WORDS[i + 1]}" = "=" ]] && break
+                [[ "${COMP_WORDS[i + 1]}" = "=" ]] && ((i++))
+                [[ "${COMP_WORDS[i + 1]}" ]] && ((i++))
+                continue
+                ;;
+            -* | =)
+                continue
+                ;;
+        esac
+        command="${COMP_WORDS[i]}"
+        command_comp_cword=$i
+        break
+    done
+
+    # Compete the global options if the command is not specified yet.
+    if [[ -z "$command" ]]; then
+        case "$prev" in
+            --target)
+                readarray -t COMPREPLY < <(compgen -W "$("$1" targets --format=completion "$cur")" -- "$cur")
+                compopt -o nospace
+                return
+                ;;
+            --log-level | --build-profile)
+                # Parse values from the "[foo|bar|baz]" part of the help text for the given option.
+                readarray -t COMPREPLY < <(compgen -W "$("$1" --help | awk -F'[][]' -v o="$prev" 'index($1, o) { gsub(/[|]/, " "); print $2 }')" -- "$cur")
+                return
+                ;;
+            --repo | --out-prefix | --pregen-dir)
+                _filedir -d
+                return
+                ;;
+            --dry-run-output)
+                _filedir
+                return
+                ;;
+        esac
+        case "$cur" in
+            -*)
+                readarray -t COMPREPLY < <(compgen -W "$(_parse_help "$1")" -- "$cur")
+                return
+                ;;
+        esac
+    fi
+
+    # Complete the command name.
+    if [[ "$command_comp_cword" -eq "$COMP_CWORD" ]]; then
+        readarray -t COMPREPLY < <(compgen -W "$commands" -- "$cur")
+        return
+    fi
+
+    # Check if the command is valid.
+    [[ "$commands" =~ $command ]] || return
+
+    # Command-specific completion.
+    case "$prev" in
+        --format)
+            readarray -t COMPREPLY < <(compgen -W "summary expanded json" -- "$cur")
+            return
+            ;;
+        --copy-artifacts-to | --create-archives)
+            _filedir -d
+            return
+            ;;
+    esac
+    case "$cur" in
+        -*)
+            readarray -t COMPREPLY < <(compgen -W "$("$1" "$command" --help | _parse_help -)" -- "$cur")
+            ;;
+    esac
+
+}
+
+# Get the list of commands from the output of the chip-cert tool.
+_chip_cert_get_commands() {
+    "$@" --help 2>&1 | awk '/ -- / && $1 !~ /^-/ { print $1 }'
+}
+
 # Get the list of commands from the output of the chip-tool,
 # where each command is prefixed with the ' | * ' string.
 _chip_tool_get_commands() {
@@ -34,7 +126,7 @@ _chip_app() {
     _init_completion -s || return
 
     case "$prev" in
-        --ble-device)
+        --ble-controller)
             readarray -t words < <(ls -I '*:*' /sys/class/bluetooth)
             # Get the list of Bluetooth devices without the 'hci' prefix.
             readarray -t COMPREPLY < <(compgen -W "${words[*]#hci}" -- "$cur")
@@ -75,6 +167,61 @@ _chip_app() {
     case "$cur" in
         -*)
             readarray -t COMPREPLY < <(compgen -W "$(_parse_help "$1")" -- "$cur")
+            ;;
+    esac
+
+}
+
+_chip_cert() {
+
+    local cur prev words cword split
+    _init_completion -s || return
+
+    local i command
+    # Get the first non-option argument.
+    for ((i = 1; i < COMP_CWORD; i++)); do
+        if [[ "${COMP_WORDS[i]}" != -* ]] && [[ -n "${COMP_WORDS[i]}" ]]; then
+            command="${COMP_WORDS[i]}"
+            break
+        fi
+    done
+
+    if [[ -z "$command" ]]; then
+        words=$(_chip_cert_get_commands "$1")
+        readarray -t COMPREPLY < <(compgen -W "$words" -- "$cur")
+        return
+    fi
+
+    case "$command" in
+        gen-cert)
+            case "$prev" in
+                -t | --type)
+                    readarray -t COMPREPLY < <(compgen -W "r c n f p v" -- "$cur")
+                    return
+                    ;;
+                -F | --out-format)
+                    readarray -t COMPREPLY < <(compgen -W "x509-pem x509-der x509-hex chip chip-b64 chip-hex" -- "$cur")
+                    return
+                    ;;
+            esac
+            ;;
+        gen-att-cert)
+            case "$prev" in
+                -t | --type)
+                    readarray -t COMPREPLY < <(compgen -W "a i d" -- "$cur")
+                    return
+                    ;;
+            esac
+            ;;
+    esac
+
+    case "$cur" in
+        -*)
+            words=$("$1" "$command" --help | _parse_help -)
+            readarray -t COMPREPLY < <(compgen -W "$words" -- "$cur")
+            ;;
+        *)
+            _filedir
             ;;
     esac
 
@@ -124,11 +271,15 @@ _chip_tool() {
 
 }
 
+complete -F _chip_build_example scripts/build/build_examples.py
+complete -F _chip_build_example build_examples.py
+
 complete -F _chip_app chip-air-purifier-app
 complete -F _chip_app chip-all-clusters-app
 complete -F _chip_app chip-bridge-app
 complete -F _chip_app chip-dishwasher-app
-complete -F _chip_app chip-energy-management-app
+complete -F _chip_app chip-energy-gateway-app
+complete -F _chip_app chip-evse-app
 complete -F _chip_app chip-lighting-app
 complete -F _chip_app chip-lock-app
 complete -F _chip_app chip-log-source-app
@@ -139,5 +290,7 @@ complete -F _chip_app chip-refrigerator-app
 complete -F _chip_app chip-rvc-app
 complete -F _chip_app chip-tv-app
 complete -F _chip_app chip-tv-casting-app
+complete -F _chip_app matter-water-heater-app
 
+complete -F _chip_cert chip-cert
 complete -F _chip_tool chip-tool

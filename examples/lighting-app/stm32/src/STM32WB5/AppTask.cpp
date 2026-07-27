@@ -37,18 +37,20 @@
 /*Matter includes*/
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 #if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif
@@ -90,6 +92,11 @@ static uint8_t NvmTimerCpt       = 0;
 static uint8_t NvmButtonStateCpt = 0;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CHIP_ENABLE_OPENTHREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_ENABLE_OPENTHREAD
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -135,6 +142,7 @@ CHIP_ERROR AppTask::Init()
 
     ThreadStackMgr().InitThreadStack();
     ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    sThreadNetworkDriver.Init();
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 

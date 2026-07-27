@@ -20,13 +20,11 @@ source_set("ember_extra_files") {
     # This IS TERRIBLE, however we want to pretend AAI exists for global
     # items and we need a shared IO storage to reduce overhead between
     # data-model access and ember-compatibility (we share the same buffer)
-    "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
     "${chip_root}/src/app/util/ember-io-storage.cpp",
     "EmberInvokeOverride.cpp",
     "EmberInvokeOverride.h",
     "EmberReadWriteOverride.cpp",
     "EmberReadWriteOverride.h",
-    "InteractionModelTemporaryOverrides.cpp",
   ]
 
   public_deps = [
@@ -44,6 +42,7 @@ source_set("mock_model") {
   # this ties in the codegen model to an actual ember implementation
   public_deps += [
     ":ember_extra_files",
+    "${chip_root}/src/app:required-privileges",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
@@ -62,5 +61,6 @@ chip_test_suite("tests") {
   public_deps = [
     ":mock_model",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
+    "${chip_root}/src/app/server-cluster/testing",
   ]
 }

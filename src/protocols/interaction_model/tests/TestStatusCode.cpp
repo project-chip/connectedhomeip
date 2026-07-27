@@ -43,23 +43,22 @@ TEST(TestStatusCode, TestClusterStatusCode)
     {
         ClusterStatusCode status_code_success{ Status::Success };
         EXPECT_EQ(status_code_success.GetStatus(), Status::Success);
-        EXPECT_FALSE(status_code_success.HasClusterSpecificCode());
-        EXPECT_EQ(status_code_success.GetClusterSpecificCode(), chip::NullOptional);
+        EXPECT_EQ(status_code_success.GetClusterSpecificCode(), std::nullopt);
         EXPECT_TRUE(status_code_success.IsSuccess());
 
         ClusterStatusCode status_code_failure{ Status::Failure };
         EXPECT_EQ(status_code_failure.GetStatus(), Status::Failure);
-        EXPECT_FALSE(status_code_failure.HasClusterSpecificCode());
+        EXPECT_FALSE(status_code_failure.GetClusterSpecificCode().has_value());
         EXPECT_FALSE(status_code_failure.IsSuccess());
 
         ClusterStatusCode status_code_unsupported_ep{ Status::UnsupportedEndpoint };
         EXPECT_EQ(status_code_unsupported_ep.GetStatus(), Status::UnsupportedEndpoint);
-        EXPECT_FALSE(status_code_unsupported_ep.HasClusterSpecificCode());
+        EXPECT_FALSE(status_code_unsupported_ep.GetClusterSpecificCode().has_value());
         EXPECT_FALSE(status_code_unsupported_ep.IsSuccess());
 
         ClusterStatusCode status_code_invalid_in_state{ Status::InvalidInState };
         EXPECT_EQ(status_code_invalid_in_state.GetStatus(), Status::InvalidInState);
-        EXPECT_FALSE(status_code_invalid_in_state.HasClusterSpecificCode());
+        EXPECT_FALSE(status_code_invalid_in_state.GetClusterSpecificCode().has_value());
         EXPECT_FALSE(status_code_invalid_in_state.IsSuccess());
     }
 
@@ -73,13 +72,11 @@ TEST(TestStatusCode, TestClusterStatusCode)
     {
         ClusterStatusCode status_code_success = ClusterStatusCode::ClusterSpecificSuccess(RobotoClusterStatus::kSauceSuccess);
         EXPECT_EQ(status_code_success.GetStatus(), Status::Success);
-        EXPECT_TRUE(status_code_success.HasClusterSpecificCode());
         EXPECT_EQ(status_code_success.GetClusterSpecificCode(), static_cast<uint8_t>(RobotoClusterStatus::kSauceSuccess));
         EXPECT_TRUE(status_code_success.IsSuccess());
 
         ClusterStatusCode status_code_failure = ClusterStatusCode::ClusterSpecificFailure(RobotoClusterStatus::kSandwichError);
         EXPECT_EQ(status_code_failure.GetStatus(), Status::Failure);
-        EXPECT_TRUE(status_code_failure.HasClusterSpecificCode());
         EXPECT_EQ(status_code_failure.GetClusterSpecificCode(), static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
         EXPECT_FALSE(status_code_failure.IsSuccess());
     }
@@ -90,9 +87,6 @@ TEST(TestStatusCode, TestClusterStatusCode)
         ClusterStatusCode status_code_failure2(status_code_failure1);
 
         EXPECT_EQ(status_code_failure1, status_code_failure2);
-        EXPECT_TRUE(status_code_failure1.HasClusterSpecificCode());
-        EXPECT_TRUE(status_code_failure2.HasClusterSpecificCode());
-
         EXPECT_EQ(status_code_failure1.GetClusterSpecificCode(), static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
         EXPECT_EQ(status_code_failure2.GetClusterSpecificCode(), static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
 

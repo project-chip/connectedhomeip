@@ -84,7 +84,7 @@ enum class IntrusiveMode
 class IntrusiveListNodePrivateBase
 {
 public:
-    IntrusiveListNodePrivateBase() : mPrev(nullptr), mNext(nullptr) {}
+    constexpr IntrusiveListNodePrivateBase() : mPrev(nullptr), mNext(nullptr) {}
     ~IntrusiveListNodePrivateBase() { VerifyOrDie(!IsInList()); }
 
     // Note: The copy construct/assignment is not provided because the list node state is not copyable.
@@ -98,7 +98,7 @@ public:
 
 private:
     friend class IntrusiveListBase;
-    IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase * prev, IntrusiveListNodePrivateBase * next) :
+    constexpr IntrusiveListNodePrivateBase(IntrusiveListNodePrivateBase * prev, IntrusiveListNodePrivateBase * next) :
         mPrev(prev), mNext(next)
     {}
 
@@ -284,7 +284,7 @@ protected:
     //   ^                                           |
     //    \------------------------------------------/
     //
-    IntrusiveListBase() : mNode(&mNode, &mNode) {}
+    constexpr IntrusiveListBase() : mNode(&mNode, &mNode) {}
     ~IntrusiveListBase()
     {
         VerifyOrDie(Empty());
@@ -399,7 +399,7 @@ template <typename T, IntrusiveMode Mode = IntrusiveMode::Strict, typename Hook 
 class IntrusiveList : public IntrusiveListBase
 {
 public:
-    IntrusiveList() : IntrusiveListBase() {}
+    constexpr IntrusiveList() : IntrusiveListBase() {}
 
     IntrusiveList(IntrusiveList &&)             = default;
     IntrusiveList & operator=(IntrusiveList &&) = default;

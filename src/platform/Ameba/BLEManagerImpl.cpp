@@ -164,7 +164,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     InitSubscribed();
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     return err;
@@ -221,7 +221,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled, 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return;
@@ -377,7 +377,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         mFlags.Set(Flags::kAdvertisingEnabled, val);
         mFlags.Set(Flags::kFastAdvertisingEnabled, val);
         mFlags.Set(Flags::kRestartAdvertising, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -397,7 +397,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer()
     {
         mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
         mFlags.Set(Flags::kRestartAdvertising, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -415,7 +415,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -538,12 +538,12 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 #endif
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Close connection failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Close connection failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     mFlags.Set(Flags::kRestartAdvertising);
     mFlags.Clear(Flags::kAdvertisingConfigured);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -626,7 +626,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -761,7 +761,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -892,7 +892,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_connect_cb(uint8_t conn_id)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
@@ -909,7 +909,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_disconnect_cb(uint8_t conn_id, uint
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
@@ -1073,12 +1073,12 @@ CHIP_ERROR BLEManagerImpl::ble_svr_gap_msg_event(void * param, T_IO_MSG * p_gap_
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
     // Schedule DriveBLEState() to run.
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -1166,7 +1166,7 @@ CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(void * param, T_SERVER_ID service
             break;
         }
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -1177,13 +1177,13 @@ int BLEManagerImpl::ble_callback_dispatcher(void * param, void * p_cb_data, int 
     switch (callback_type)
     {
     case CB_PROFILE_CALLBACK:
-        blemgr->gatt_svr_chr_access(param, type, (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->gatt_svr_chr_access(param, type, (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
         break;
     case CB_GAP_CALLBACK:
-        blemgr->ble_svr_gap_event(param, type, p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->ble_svr_gap_event(param, type, p_cb_data);
         break;
     case CB_GAP_MSG_CALLBACK:
-        blemgr->ble_svr_gap_msg_event(param, (T_IO_MSG *) p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->ble_svr_gap_msg_event(param, (T_IO_MSG *) p_cb_data);
         break;
     default:
         break;

@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "RefrigeratorUI.h"
 #endif
 
@@ -84,11 +84,11 @@ private:
     static AppTask sAppTask;
 
     /**
-     * @brief AppTask initialisation function
+     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
      * @return CHIP_ERROR
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR AppInit() override;
 
     /**
      * @brief PB0 Button event processing function

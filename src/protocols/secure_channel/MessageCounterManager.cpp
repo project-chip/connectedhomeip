@@ -55,7 +55,8 @@ void MessageCounterManager::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
+        TEMPORARY_RETURN_IGNORED mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(
+            Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
         mExchangeMgr->CloseAllContextsForDelegate(this);
         mExchangeMgr = nullptr;
     }

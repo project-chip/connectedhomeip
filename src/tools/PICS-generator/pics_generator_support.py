@@ -24,6 +24,8 @@ cluster_to_pics_dict = {
     "OTA Software Update Requestor": "OTA Software Update",
     "On/Off": "On-Off",
     "GroupKeyManagement": "Group Communication",
+    "Group Key Management": "Group Communication",
+    "Wake On LAN": "Media Cluster",
     "Wake on LAN": "Media Cluster",
     "Low Power": "Media Cluster",
     "Keypad Input": "Media Cluster",
@@ -44,12 +46,17 @@ cluster_to_pics_dict = {
     "Thermostat": "Thermostat Cluster",
     "Boolean State": "Boolean State Cluster",
     "AccessControl": "Access Control Cluster",
+    "Energy EVSE": "Energy EVSE Cluster",
 }
 
 
 def pics_xml_file_list_loader(pics_xml_path: str, log_loaded_pics_files: bool) -> list:
 
-    pics_xml_file_list = os.listdir(pics_xml_path)
+    # Sort so template selection is deterministic. os.listdir order is
+    # filesystem-dependent, so without this the prefix match below could pick
+    # different templates on different machines when names share a prefix
+    # (e.g. "Access Control Cluster ..." vs "Access Control Enforcement ...").
+    pics_xml_file_list = sorted(os.listdir(pics_xml_path))
 
     if log_loaded_pics_files:
         if not pics_xml_path.endswith('/'):

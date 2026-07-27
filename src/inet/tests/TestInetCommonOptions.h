@@ -59,7 +59,7 @@ public:
     std::vector<chip::Inet::IPAddress> LocalIPv4Addr;
     std::vector<chip::Inet::IPAddress> LocalIPv6Addr;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     std::vector<chip::Inet::IPAddress> IPv4GatewayAddr;
     std::vector<chip::Inet::IPAddress> IPv6GatewayAddr;
     chip::Inet::IPAddress DNSServerAddr;
@@ -67,7 +67,7 @@ public:
     uint8_t LwIPDebugFlags;
     uint32_t EventDelay;
     bool TapUseSystemConfig;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     NetworkOptions();
 
@@ -76,6 +76,7 @@ public:
 
 extern NetworkOptions gNetworkOptions;
 
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 /**
  * Handler for options that control fault injection testing behavior.
  */
@@ -93,3 +94,4 @@ public:
 };
 
 extern FaultInjectionOptions gFaultInjectionOptions;
+#endif // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION

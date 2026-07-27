@@ -1,0 +1,4 @@
+#include "darwin-framework-tool.xcconfig"
+
+// Include override file last, if it exists
+#include? "darwin-framework-tool.Release.override.xcconfig"

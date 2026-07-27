@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #include <zephyr/drivers/flash.h>
 #include <zephyr/storage/flash_map.h>
@@ -36,47 +36,33 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     CHIP_ERROR Init(void);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
-
-    CHIP_ERROR SetAes128Key(const uint8_t * keyAes128);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
 
-private:
-    struct Header
-    {
-        uint32_t hashId;
-        uint32_t size;
-        uint8_t hash[4];
-    };
+    void UpdateKeyAttributes(psa_key_attributes_t & attrs) override;
 
+private:
     struct FactoryData
     {
         struct Header header;
-        uint8_t factoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition) - sizeof(struct Header)];
+        uint8_t factoryDataBuffer[PARTITION_SIZE(factory_partition) - sizeof(struct Header)];
     };
 
     FactoryData mFactoryData;
-    const uint8_t * pAes128Key = nullptr;
-    EncryptionMode encryptMode = encrypt_ecb;
+    const struct device * mFlashDevice = nullptr;
 
     CHIP_ERROR ReadEncryptedData(uint8_t * dest, uint8_t * source);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
+
+#if defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX)
+    CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t KeyAddr);
+    CHIP_ERROR ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & addr);
+    CHIP_ERROR ELS_ConvertDacKey();
+#endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) */
 };
 
-inline FactoryDataProvider & FactoryDataPrvd()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
-
-inline FactoryDataProviderImpl & FactoryDataPrvdImpl()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
+FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

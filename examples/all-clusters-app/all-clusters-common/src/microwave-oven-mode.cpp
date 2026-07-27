@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ void ExampleMicrowaveOvenModeDelegate::HandleChangeToMode(uint8_t NewMode,
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -51,7 +51,7 @@ CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeLabelByIndex(uint8_t modeInd
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -61,7 +61,7 @@ CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeValueByIndex(uint8_t modeInd
 
 CHIP_ERROR ExampleMicrowaveOvenModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -96,11 +96,19 @@ void MicrowaveOvenMode::Shutdown()
     }
 }
 
-void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
-    gMicrowaveOvenModeInstance =
-        new ModeBase::Instance(gMicrowaveOvenModeDelegate, endpointId, MicrowaveOvenMode::Id, chip::to_underlying(Feature::kOnOff));
-    gMicrowaveOvenModeInstance->Init();
+    gMicrowaveOvenModeInstance = new ModeBase::Instance(gMicrowaveOvenModeDelegate, endpointId, MicrowaveOvenMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gMicrowaveOvenModeInstance->Init();
+}
+
+void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    if (gMicrowaveOvenModeInstance)
+    {
+        gMicrowaveOvenModeInstance->Shutdown();
+    }
+    MicrowaveOvenMode::Shutdown();
 }
