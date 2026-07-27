@@ -134,15 +134,26 @@ struct Header
 /**
  * Incremental DNS message writer with RDLENGTH backpatching.
  *
- * The writer operates on a caller-provided buffer and tracks whether all writes
- * fit. Records are written with StartRecord()/FinishRecord() or via the typed
- * helpers. Header section counts are typically patched at the end via
- * PatchHeaderCounts().
+ * The writer operates on a caller-owned buffer (mBuffer), provided at construction time,
+ * and tracks whether all writes fit.
+ * Records are written with StartRecord()/FinishRecord() or via the typed helpers.
+ * Header section counts are typically patched at the end via PatchHeaderCounts().
  */
 class DnsWriter
 {
 public:
+    /**
+     * @brief Construct a writer to build a DNS message into a caller-owned buffer.
+     * @param buffer  The buffer to write to. This must be valid for the lifetime of the writer as it is used by each methods.
+     * @param size    The size of the buffer.
+     */
     DnsWriter(uint8_t * buffer, size_t size) : mBuffer(buffer), mSize(size) {}
+
+    // Write helper functions. Advance the cursor(mOffset) for the written field in the buffer.
+    // The helpers return CHIP_ERROR_BUFFER_TOO_SMALL if the field to be written does not fit in the buffer.
+    CHIP_ERROR PutU16(uint16_t value);
+    CHIP_ERROR PutU32(uint32_t value);
+    CHIP_ERROR PutBytes(const uint8_t * data, size_t len);
 
     /**
      * @brief Write the fixed 12-byte DNS header.
@@ -161,6 +172,10 @@ public:
      *
      * Useful when the final counts are only known after all records are
      * emitted. On failure the writer is marked not-Ok.
+     * @param qdcount  Question / zone entry count.
+     * @param ancount  Answer / prerequisite count.
+     * @param nscount  Authority / update count.
+     * @param arcount  Additional record count.
      * @return CHIP_NO_ERROR, or CHIP_ERROR_BUFFER_TOO_SMALL
      */
     CHIP_ERROR PatchHeaderCounts(uint16_t qdcount, uint16_t ancount, uint16_t nscount, uint16_t arcount);
@@ -173,10 +188,6 @@ public:
      *         63 octets, or a name longer than 255 octets.
      */
     CHIP_ERROR PutName(const char * name);
-
-    CHIP_ERROR PutU16(uint16_t value);
-    CHIP_ERROR PutU32(uint32_t value);
-    CHIP_ERROR PutBytes(const uint8_t * data, size_t len);
 
     // Write a question / zone entry: NAME, TYPE, CLASS.
     CHIP_ERROR PutQuestion(const char * name, RecordType type, RecordClass recordClass);
@@ -197,6 +208,7 @@ public:
     CHIP_ERROR FinishRecord();
 
     // Typed record helpers (each is a full StartRecord()/rdata/FinishRecord()).
+    // They all return CHIP_ERROR_BUFFER_TOO_SMALL if the remaining buffer size is less than the field to be written.
     CHIP_ERROR PutSrv(const char * name, RecordClass recordClass, uint32_t ttl, uint16_t priority, uint16_t weight, uint16_t port,
                       const char * target);
     CHIP_ERROR PutTxt(const char * name, RecordClass recordClass, uint32_t ttl, const TextEntry * entries, size_t count);
@@ -227,8 +239,8 @@ private:
 /**
  * @brief Sequential DNS message reader supporting name decompression.
  *
- * The reader maintains a cursor (Offset()) into a caller-owned buffer and
- * advances it as fields are consumed. Every accessor is bounds-checked against
+ * The reader maintains a cursor (Offset()) into a caller-owned buffer, provided at construction time,
+ * and advances it as fields are consumed. Every accessor is bounds-checked against
  * the buffer size and returns CHIP_ERROR_BUFFER_TOO_SMALL on truncation, so a
  * malformed or partial message can never read out of bounds.
  *
@@ -253,10 +265,23 @@ public:
         size_t rdataOffset;
     };
 
+    /**
+     * @brief Construct a reader to parse a DNS message from provided buffer.
+     * @param buffer  The buffer to read from. This must be valid for the lifetime of the reader as it is used by each methods.
+     * @param size    The size of the buffer.
+     */
     DnsReader(const uint8_t * buffer, size_t size) : mBuffer(buffer), mSize(size) {}
+
+    // Read helper functions. Advance the cursor(mOffset) past the read field pointing to the next data in mBuffer.
+    // The helpers return CHIP_ERROR_BUFFER_TOO_SMALL if the remaining buffer size is less than the field to be read.
+    CHIP_ERROR ReadU16(uint16_t & value);
+    CHIP_ERROR ReadU32(uint32_t & value);
+    CHIP_ERROR ReadBytes(uint8_t * out, size_t len);
 
     /**
      * @brief Read the fixed 12-byte header and advance the cursor past it.
+     * @param out  Destination for the header.
+     * @return CHIP_NO_ERROR, or CHIP_ERROR_BUFFER_TOO_SMALL the buffer was to small to contain an expected header.
      */
     CHIP_ERROR ReadHeader(Header & out);
 
@@ -272,19 +297,24 @@ public:
      */
     CHIP_ERROR ReadName(char * out, size_t outSize);
 
-    // Read helper functions. Advance the cursor past the field.
-    CHIP_ERROR ReadU16(uint16_t & value);
-    CHIP_ERROR ReadU32(uint32_t & value);
-    CHIP_ERROR ReadBytes(uint8_t * out, size_t len);
-
+    /**
+     * @brief Skip the question section of the message.
+     * @return CHIP_NO_ERROR, or CHIP_ERROR_BUFFER_TOO_SMALL the buffer was to small to contain an expected question section.
+     */
     CHIP_ERROR SkipQuestion();
 
+    /**
+     * @brief Read the header of a record and advance the cursor past it.
+     * @param out  Destination for the record header.
+     * @return CHIP_NO_ERROR, or CHIP_ERROR_BUFFER_TOO_SMALL the buffer was to small to contain an expected record header.
+     */
     CHIP_ERROR ReadRecordHeader(RecordHeader & out);
 
     // Advance past the RDATA of a record just read with ReadRecordHeader().
     CHIP_ERROR SkipRecordData(const RecordHeader & header);
 
     // Typed RDATA parsers. The current offset must be at the record's RDATA.
+    // The parsers all return CHIP_ERROR_BUFFER_TOO_SMALL if the remaining buffer size is less than the field to be read.
     CHIP_ERROR ReadSrv(uint16_t & priority, uint16_t & weight, uint16_t & port, char * target, size_t targetSize);
     CHIP_ERROR ReadAaaa(Inet::IPAddress & address);
     CHIP_ERROR ReadPtr(char * target, size_t targetSize);

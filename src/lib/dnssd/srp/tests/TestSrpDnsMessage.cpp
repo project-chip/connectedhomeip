@@ -29,6 +29,84 @@ using namespace chip::Dnssd::Srp;
 
 namespace {
 
+TEST(TestSrpDnsMessage, WriterAndReaderHelpersRoundTrip)
+{
+    const uint8_t payload[] = { 0xDE, 0xAD, 0xBE, 0xEF };
+
+    uint8_t buffer[16];
+    DnsWriter writer(buffer, sizeof(buffer));
+    ASSERT_EQ(writer.PutU16(0xABCD), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.PutU32(0x10203040), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.PutBytes(payload, sizeof(payload)), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.PutBytes(nullptr, 0), CHIP_NO_ERROR); // zero-length is a no-op
+    EXPECT_EQ(writer.Length(), 10u);
+    EXPECT_TRUE(writer.Ok());
+
+    // Network byte order on the wire.
+    EXPECT_EQ(buffer[0], 0xAB);
+    EXPECT_EQ(buffer[1], 0xCD);
+    EXPECT_EQ(buffer[2], 0x10);
+    EXPECT_EQ(buffer[3], 0x20);
+    EXPECT_EQ(buffer[4], 0x30);
+    EXPECT_EQ(buffer[5], 0x40);
+
+    DnsReader reader(buffer, writer.Length());
+    uint16_t u16                 = 0;
+    uint32_t u32                 = 0;
+    uint8_t out[sizeof(payload)] = {};
+    ASSERT_EQ(reader.ReadU16(u16), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.ReadU32(u32), CHIP_NO_ERROR);
+    ASSERT_EQ(reader.ReadBytes(out, sizeof(out)), CHIP_NO_ERROR);
+    EXPECT_EQ(u16, 0xABCD);
+    EXPECT_EQ(u32, 0x10203040u);
+    EXPECT_EQ(memcmp(out, payload, sizeof(payload)), 0);
+    EXPECT_EQ(reader.Offset(), writer.Length());
+}
+
+TEST(TestSrpDnsMessage, WriterAndReaderHelpersBufferTooSmall)
+{
+    // Writer helpers.
+    {
+        uint8_t buffer[1];
+        DnsWriter writer(buffer, sizeof(buffer));
+        EXPECT_EQ(writer.PutU16(1), CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_FALSE(writer.Ok());
+    }
+    {
+        uint8_t buffer[3];
+        DnsWriter writer(buffer, sizeof(buffer));
+        EXPECT_EQ(writer.PutU32(1), CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_FALSE(writer.Ok());
+    }
+    {
+        uint8_t buffer[2];
+        const uint8_t payload[] = { 1, 2, 3 };
+        DnsWriter writer(buffer, sizeof(buffer));
+        EXPECT_EQ(writer.PutBytes(payload, sizeof(payload)), CHIP_ERROR_BUFFER_TOO_SMALL);
+        EXPECT_FALSE(writer.Ok());
+    }
+
+    // Reader helpers.
+    {
+        uint8_t buffer[1] = { 0xAB };
+        DnsReader reader(buffer, sizeof(buffer));
+        uint16_t value = 0;
+        EXPECT_EQ(reader.ReadU16(value), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+    {
+        uint8_t buffer[3] = { 0x10, 0x20, 0x30 };
+        DnsReader reader(buffer, sizeof(buffer));
+        uint32_t value = 0;
+        EXPECT_EQ(reader.ReadU32(value), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+    {
+        uint8_t buffer[2] = { 0xDE, 0xAD };
+        DnsReader reader(buffer, sizeof(buffer));
+        uint8_t out[3] = {};
+        EXPECT_EQ(reader.ReadBytes(out, sizeof(out)), CHIP_ERROR_BUFFER_TOO_SMALL);
+    }
+}
+
 TEST(TestSrpDnsMessage, HeaderRoundTrip)
 {
     uint8_t buffer[64];
