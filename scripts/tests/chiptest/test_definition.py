@@ -610,7 +610,9 @@ class TestDefinition:
                     test_cmd,
                     name='TEST', dependencies=[apps_register],
                     timeout_seconds=config.test_timeout_seconds)
-
+        except KeyboardInterrupt:
+            log.warning("Interrupting %s per user request", self.name)
+            raise
         except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
