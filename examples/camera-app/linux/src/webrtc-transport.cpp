@@ -209,10 +209,10 @@ void WebrtcTransport::Start()
                                   [this](bool connected) { this->OnConnectionStateChanged(connected); },
                                   [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); },
                                   [this](bool gatheringComplete) {
-                                    if (mOnGatheringState)
-                                    {
-                                        mOnGatheringState(gatheringComplete, mRequestArgs.sessionId);
-                                    }
+                                      if (mOnGatheringState)
+                                      {
+                                          mOnGatheringState(gatheringComplete, mRequestArgs.sessionId);
+                                      }
                                   });
 }
 
@@ -228,10 +228,10 @@ void WebrtcTransport::Stop()
     mLocalAudioTrack = nullptr;
 }
 
-void WebrtcTransport::OnGatheringStateChanged(bool gatheringComplete) 
+void WebrtcTransport::OnGatheringStateChanged(bool gatheringComplete)
 {
     ChipLogProgress(Camera, "OnGatheringStateChanged for sessionId %u, complete %d", mRequestArgs.sessionId,
-                                static_cast<int>(gatheringComplete));
+                    static_cast<int>(gatheringComplete));
     if (gatheringComplete && mOnGatheringState)
     {
         mOnGatheringState(gatheringComplete, mRequestArgs.sessionId);

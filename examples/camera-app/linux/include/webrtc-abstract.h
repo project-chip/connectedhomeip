@@ -82,7 +82,7 @@ public:
 
     virtual void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
                               OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack,
-                              OnGatheringStateCallback onGatheringstate)              = 0;
+                              OnGatheringStateCallback onGatheringstate)                                         = 0;
     virtual void Close()                                                                                         = 0;
     virtual void CreateOffer()                                                                                   = 0;
     virtual void CreateAnswer()                                                                                  = 0;
