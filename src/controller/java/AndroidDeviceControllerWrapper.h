@@ -260,8 +260,8 @@ private:
     jmethodID mThreadCredentialsNeededListener     = nullptr;
 
     // Java object containing the WifiCredentialsNeeded Listener
-    jobject mWifiCredentialsNeededListenerObject;
-    jmethodID mWifiCredentialsNeededListener = nullptr;
+    jobject mWifiCredentialsNeededListenerObject = nullptr;
+    jmethodID mWifiCredentialsNeededListener     = nullptr;
 
     std::vector<uint8_t> mNocCertificate;
     std::vector<uint8_t> mIcacCertificate;

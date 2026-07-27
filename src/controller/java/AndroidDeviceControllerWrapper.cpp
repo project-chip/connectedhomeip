@@ -448,11 +448,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jo
         return CHIP_NO_ERROR;
     }
 
-    jclass listenerClass = env->GetObjectClass(listener);
-    VerifyOrReturnError(listenerClass != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-    jmethodID method = env->GetMethodID(listenerClass, "onThreadCredentialsNeeded", "(I)V");
-    VerifyOrReturnError(method != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onThreadCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     jobject globalRef = env->NewGlobalRef(listener);
     VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
@@ -484,11 +482,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetWifiCredentialsNeededListener(jobj
         return CHIP_NO_ERROR;
     }
 
-    jclass listenerClass = env->GetObjectClass(listener);
-    VerifyOrReturnError(listenerClass != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-    jmethodID method = env->GetMethodID(listenerClass, "onWifiCredentialsNeeded", "(I)V");
-    VerifyOrReturnError(method != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onWifiCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     jobject globalRef = env->NewGlobalRef(listener);
     VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
