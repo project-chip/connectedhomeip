@@ -39,13 +39,18 @@ public:
     void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                           ActivateDatasetCallback * callback) override;
 
-    bool GetPanChangeSupported() override { return false; }
+    // otbr implements MGMT_PENDING_SET via its set_pending method, so a running
+    // network can be migrated rather than only formed.
+    bool GetPanChangeSupported() override { return true; }
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertActiveDataset() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR SetPendingDataset(const chip::Thread::OperationalDataset &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR RevertActiveDataset() override;
+    CHIP_ERROR SetPendingDataset(const chip::Thread::OperationalDataset & pendingDataset) override;
 
 private:
     void OnDataReceived(blob_attr * msg, bool notification);
+
+    // Invokes an otbr method that takes a hex encoded dataset argument.
+    CHIP_ERROR InvokeWithDataset(const char * method, const Thread::OperationalDataset & dataset);
 
     AttributeChangeCallback * mAttributeChangeCallback;
 
@@ -56,6 +61,7 @@ private:
     uint8_t mBorderAgentID[app::Clusters::ThreadBorderRouterManagement::kBorderAgentIdLength];
 
     Thread::OperationalDataset mActiveDataset;
+    Thread::OperationalDataset mPendingDataset;
     ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
     uint32_t mActivateDatasetSequence;
 };
