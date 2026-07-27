@@ -42,6 +42,9 @@ def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable
 
     Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
     as the manager process explicitly ignores SIGINT.
+
+    TODO: Revisit this implementation so that we don't use busy waiting. It is possibly an issue with Python standard library, and
+    how it handles signals in a multi-process environment.
     """
     if predicate is not None:
         if not isinstance(waitable, WaitableFor):
