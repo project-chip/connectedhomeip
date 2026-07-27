@@ -335,7 +335,7 @@ private:
     const StaticConfig * mStaticConfig = nullptr; // app-owned fixed descriptors; null == none supported
     OnOffCluster * mOnOff              = nullptr; // injected On/Off cluster for ShouldExecuteIfOff; null == no coupling
     chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate = nullptr; // scene-invalidation hook; null == none
-    bool mIgnoreHueCommandsWhileColorLooping = false;                               // §3.2.11 manufacturer choice; see Config
+    bool mIgnoreHueCommandsWhileColorLooping                             = false;   // §3.2.11 manufacturer choice; see Config
 
     bool LoopIsDriving() const;
     // §3.2.11: true when a hue-changing command should be dropped because a color loop is active and the

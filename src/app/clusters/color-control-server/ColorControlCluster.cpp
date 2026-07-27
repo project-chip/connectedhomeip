@@ -17,7 +17,7 @@
 
 #include "ColorControlCluster.h"
 #include <algorithm>
-#include <app/clusters/on-off-server/OnOffCluster.h> // injected On/Off cluster (GetOnOff) for ShouldExecuteIfOff
+#include <app/clusters/on-off-server/OnOffCluster.h>                // injected On/Off cluster (GetOnOff) for ShouldExecuteIfOff
 #include <app/clusters/scenes-server/AttributeValuePairValidator.h> // scene validator base (this cluster is its own handler)
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -132,9 +132,9 @@ void AddAttributeValuePair(AttributeValuePair * pairs, AttributeId id, Type valu
 
 ColorControlCluster::ColorControlCluster(EndpointId endpoint, const Config & config) :
     DefaultServerCluster({ endpoint, ColorControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalColorControlValidator()),
-    mDelegate(&config.mDelegate), mFeatures(config.mFeatures),
-    mColorValue(config.mColorValue), mColorLoop(config.mColorLoop), mCT(config.ctConfig), mStaticConfig(config.sc),
-    mOnOff(config.onOff), mScenesIntegrationDelegate(config.scenesIntegrationDelegate),
+    mDelegate(&config.mDelegate), mFeatures(config.mFeatures), mColorValue(config.mColorValue), mColorLoop(config.mColorLoop),
+    mCT(config.ctConfig), mStaticConfig(config.sc), mOnOff(config.onOff),
+    mScenesIntegrationDelegate(config.scenesIntegrationDelegate),
     mIgnoreHueCommandsWhileColorLooping(config.ignoreHueCommandsWhileColorLooping)
 {
     // ColorCapabilities mirrors the FeatureMap 1:1 (the two bitmaps share bit positions 0x1..0x10).
@@ -749,7 +749,8 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
     const uint64_t elapsed = now - tx.startTimeMs;
     // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
     // guard for a same-instant elapsed==0 tick).
-    const float t   = (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
+    const float t =
+        (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
     const bool done = (t >= 1.f);
 
     // Saturation is linear (not circular) and 8-bit. Exact target on the last tick avoids drift.
@@ -786,7 +787,8 @@ bool ColorControlCluster::TickCT(CTTransition & tx, uint64_t now)
     const uint64_t elapsed = now - tx.startTimeMs;
     // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
     // guard for a same-instant elapsed==0 tick).
-    const float t   = (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
+    const float t =
+        (tx.durationMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationMs), 0.f, 1.f);
     const bool done = (t >= 1.f);
 
     // Color temperature is linear, 16-bit mireds. Exact target on the last tick avoids drift.
@@ -867,8 +869,10 @@ bool ColorControlCluster::TickXY(XYTransition & tx, uint64_t now)
 
     // transitionTime 0 is an immediate move: land on the target this tick (this is also the 0/0 -> NaN
     // guard for a same-instant elapsed==0 tick).
-    const float tX   = (tx.durationXMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationXMs), 0.f, 1.f);
-    const float tY   = (tx.durationYMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationYMs), 0.f, 1.f);
+    const float tX =
+        (tx.durationXMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationXMs), 0.f, 1.f);
+    const float tY =
+        (tx.durationYMs == 0) ? 1.f : std::clamp(static_cast<float>(elapsed) / static_cast<float>(tx.durationYMs), 0.f, 1.f);
     const bool doneX = (tX >= 1.f);
     const bool doneY = (tY >= 1.f);
     const bool done  = doneX && doneY; // XY is done only when BOTH axes arrive
@@ -1154,8 +1158,8 @@ void ColorControlCluster::startColorLoop(bool startFromStartHue)
     }
 
     mColorLoop.active            = 1;
-    mColorLoopEngaged            = true; // (re)engage the green light — ColorLoopSet is the only way back on
-    mColorLoop.storedEnhancedHue = ehs.enhancedHue;                                      // remember where to return on stop
+    mColorLoopEngaged            = true;            // (re)engage the green light — ColorLoopSet is the only way back on
+    mColorLoop.storedEnhancedHue = ehs.enhancedHue; // remember where to return on stop
     ehs.enhancedHue = startFromStartHue ? mColorLoop.startEnhancedHue : ehs.enhancedHue; // per ColorLoopSet startHue action
 
     // Stamp the wall-clock anchor TickColorLoop interpolates from. Stamped once here and never again
@@ -1342,8 +1346,8 @@ void ColorControlCluster::StartEnhancedHueAndSatTransition(const ColorControl::C
 }
 
 CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorModeEnum ColorMode,
-                                                 const ColorControl::ColorValue & target,
-                                                 const ColorControl::ColorLoopState & loop, uint32_t timeMs)
+                                                 const ColorControl::ColorValue & target, const ColorControl::ColorLoopState & loop,
+                                                 uint32_t timeMs)
 {
     if (loop.active == 1)
     {
