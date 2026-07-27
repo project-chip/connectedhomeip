@@ -106,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     rngMutexHandle = osMutexNew(nullptr);
-    VerifyOrExit((&rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit((rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 

@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,17 +17,34 @@
 
 #pragma once
 
-#include "media-file-management-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-storage.h>
+#include <protocols/interaction_model/Constants.h>
+
+#include "Setpoint.h"
+#include "SetpointAttributes.h"
+#include "Temperature.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace MediaFileManagement {
+namespace Thermostat {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+class Setpoints;
 
-} // namespace MediaFileManagement
+struct SetpointRange
+{
+    AbsoluteSetpoint heating;
+    AbsoluteSetpoint cooling;
+
+    SetpointRange(AbsoluteSetpoint heat, AbsoluteSetpoint cool) : heating(heat), cooling(cool) {}
+
+    SetpointRange(const SetpointRange & spr) : heating(spr.heating), cooling(spr.cooling) {}
+
+    SetpointRange & operator=(const SetpointRange & other) = default;
+};
+
+} // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
