@@ -13,6 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from __future__ import annotations
+
 import logging
 import os
 import shlex
@@ -30,8 +32,10 @@ from pathlib import Path
 
 from python_path import PythonPath
 
-from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
+
+if typing.TYPE_CHECKING:
+    from .accessories import AppsRegister
 
 CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
