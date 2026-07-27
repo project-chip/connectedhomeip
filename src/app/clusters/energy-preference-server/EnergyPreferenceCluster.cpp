@@ -1,4 +1,21 @@
-#include "EnergyPreferenceCluster.h"
+/**
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+ #include "EnergyPreferenceCluster.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -147,7 +164,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePa
         do
         {
             Percent step;
-            char buffer[64];
+            char buffer[kMaxBalanceStructLabelLength];
             Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
             if ((err = sDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
             {
@@ -199,7 +216,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const Concrete
         do
         {
             Percent step;
-            char buffer[64];
+            char buffer[kMaxBalanceStructLabelLength];
             Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
             if ((err = sDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
             {

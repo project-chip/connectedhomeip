@@ -1,4 +1,4 @@
-/*
+/**
  *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
 #include "energy-preference-delegate.h"
@@ -25,6 +26,9 @@ namespace chip::app::Clusters {
 
 class EnergyPreferenceCluster : public DefaultServerCluster
 {
+    // from spec 9.7.5.2 about the `Balance` struct type
+    inline static size_t kMaxBalanceStructLabelLength = 64;
+
 public:
     EnergyPreferenceCluster(EndpointId endpointId, BitFlags<EnergyPreference::Feature> features) :
         DefaultServerCluster({ endpointId, EnergyPreference::Id }), mFeatures(features)
