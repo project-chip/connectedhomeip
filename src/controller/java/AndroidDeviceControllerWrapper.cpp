@@ -433,7 +433,8 @@ void AndroidDeviceControllerWrapper::Shutdown()
 CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jobject listener)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
     mThreadCredentialsNeededListenerObject = env->NewGlobalRef(listener);
     jclass listenerClass = env->GetObjectClass(listener);
@@ -446,7 +447,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jo
 CHIP_ERROR AndroidDeviceControllerWrapper::SetWifiCredentialsNeededListener(jobject listener)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
     mWifiCredentialsNeededListenerObject = env->NewGlobalRef(listener);
     jclass listenerClass = env->GetObjectClass(listener);
@@ -1172,6 +1174,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
     if (mWifiCredentialsNeededListener != nullptr)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Controller, "Could not get JNIEnv for current thread"));
         jint value = (jint) endpoint;
 
         env->CallVoidMethod(mWifiCredentialsNeededListenerObject, mWifiCredentialsNeededListener, value);
@@ -1190,6 +1194,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
     if (mThreadCredentialsNeededListener != nullptr)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Controller, "Could not get JNIEnv for current thread"));
         jint value = (jint) endpoint;
 
         env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, value);
