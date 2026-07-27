@@ -492,6 +492,8 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('virtual-device-app',
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
+        TargetPart('all-devices-app',
+                   app=AndroidApp.ALL_DEVICES_APP),
     ])
 
     # Modifiers
