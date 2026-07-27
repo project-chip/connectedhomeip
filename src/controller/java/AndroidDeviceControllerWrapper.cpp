@@ -1176,7 +1176,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointI
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
                             ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-        jint value   = (jint) endpoint;
+        jint value = (jint) endpoint;
 
         env->CallVoidMethod(mWifiCredentialsNeededListenerObject, mWifiCredentialsNeededListener, value);
 
@@ -1196,7 +1196,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::Endpoin
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
                             ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-        jint value   = (jint) endpoint;
+        jint value = (jint) endpoint;
 
         env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, value);
 
