@@ -195,7 +195,7 @@ class ProcessGroupState:
     def wait_for(self, predicate: Callable[[Iterable[ProcessState]], bool], timeout: float | None = None):
         """Wait for the given state predicate to become True, with an optional timeout."""
         with self._state_changed:
-            return self._state_changed.wait_for(lambda: predicate(self._states), timeout)
+            return wait_for_mp_managed(self._state_changed, lambda: predicate(self._states), timeout)
 
     def collect_exceptions(self) -> Literal[True]:
         """Collect exceptions from all registered exception holders.
