@@ -1906,7 +1906,7 @@ public class ChipDeviceController {
     void onThreadCredentialsNeeded(int endpoint);
   }
 
-  /** Interface to listen for WifiCredentialsNeeded events. */
+  /** Interface to listen for WiFiCredentialsNeeded events. */
   public interface WiFiCredentialsNeededListener {
     void onWiFiCredentialsNeeded(int endpoint);
   }
