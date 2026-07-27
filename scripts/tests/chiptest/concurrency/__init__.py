@@ -13,3 +13,9 @@
 # limitations under the License.
 
 """Module with tools needed for concurrent execution of tests."""
+
+from chiptest.concurrency.manager import install_proxy_resync
+
+# Installed on import, before any proxy can be used: a process can only hold a manager proxy if it has imported something from this
+# package, and no proxy call happens during spawn unpickling.
+install_proxy_resync()
