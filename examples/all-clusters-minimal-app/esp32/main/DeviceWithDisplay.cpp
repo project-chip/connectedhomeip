@@ -24,12 +24,10 @@
 // TODO: Ideally we should not depend on the codegen integration
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
-#include <app/clusters/window-covering-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -177,30 +175,13 @@ public:
             {
                 // update the current hue here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Hue changed to : %d", n * 360 / 254);
-                // ColorControl is code-driven and has no direct hue setter; drive the color through the
-                // legacy ColorControlServer facade command. ExecuteIfOff preserves the previous
-                // direct-write behavior (value applies even while the light is off); saturation is kept by
-                // reading its current value.
-                using OptBits = app::Clusters::ColorControl::OptionsBitmap;
-                BitMask<OptBits> executeIfOff(OptBits::kExecuteIfOff);
-                uint8_t saturation = 0;
-                chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::Get(1, &saturation);
-                ColorControlServer::Instance().moveToHueAndSaturationCommand(1, static_cast<uint16_t>(n), saturation,
-                                                                             /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                             /*isEnhanced=*/false);
+                app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, n);
             }
             else if (name == "Current Saturation")
             {
                 // update the current saturation here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
-                // See "Current Hue" above: drive saturation through the facade command, keeping hue.
-                using OptBits = app::Clusters::ColorControl::OptionsBitmap;
-                BitMask<OptBits> executeIfOff(OptBits::kExecuteIfOff);
-                uint8_t hue = 0;
-                chip::app::Clusters::ColorControl::Attributes::CurrentHue::Get(1, &hue);
-                ColorControlServer::Instance().moveToHueAndSaturationCommand(1, hue, static_cast<uint8_t>(n),
-                                                                             /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                             /*isEnhanced=*/false);
+                app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
             }
             else if (name == "Illuminance")
             {
@@ -241,32 +222,19 @@ public:
             {
                 // update the current lift here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Current position lift percent 100ths changed to : %d", n * 100);
-                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
-                {
-                    wc->SetCurrentPositionLiftPercent100ths(
-                        app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
-                }
+                app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
             }
             else if (name == "Current Tilt")
             {
                 // update the current tilt here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Current position tilt percent 100ths changed to : %d", n * 100);
-                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
-                {
-                    wc->SetCurrentPositionTiltPercent100ths(
-                        app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
-                }
+                app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
             }
             else if (name == "Opr Status")
             {
                 // update the operational status here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Operational status changed to : %d", n);
-                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
-                {
-                    chip::BitMask<app::Clusters::WindowCovering::OperationalStatus> opStatus;
-                    opStatus.SetRaw(static_cast<uint8_t>(n));
-                    wc->SetOperationalStatus(opStatus);
-                }
+                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(n));
             }
             else if (name == "Bat remaining")
             {
@@ -642,39 +610,19 @@ void SetupPretendDevices()
     AddEndpoint("2");
     AddCluster("Color Control");
     AddAttribute("Current Hue", "200");
+    app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
     AddAttribute("Current Saturation\n", "150");
-    // Seed the initial color through the code-driven cluster (no direct attribute setters). ExecuteIfOff
-    // so the value applies even though the light starts off. Requires the Color Control cluster to be
-    // registered on the endpoint; a no-op otherwise.
-    {
-        using OptBits = app::Clusters::ColorControl::OptionsBitmap;
-        BitMask<OptBits> executeIfOff(OptBits::kExecuteIfOff);
-        ColorControlServer::Instance().moveToHueAndSaturationCommand(1, /*hue=*/200, /*saturation=*/150,
-                                                                     /*transitionTime=*/0, executeIfOff, executeIfOff,
-                                                                     /*isEnhanced=*/false);
-    }
+    app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
 
     AddDevice("Window Covering");
     AddEndpoint("1");
     AddCluster("Window Covering");
     AddAttribute("Current Lift", "5");
-    auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1);
-    if (wc != nullptr)
-    {
-        wc->SetCurrentPositionLiftPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
-    }
+    app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
     AddAttribute("Current Tilt", "5");
-    if (wc != nullptr)
-    {
-        wc->SetCurrentPositionTiltPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
-    }
+    app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
     AddAttribute("Opr Status", "0");
-    if (wc != nullptr)
-    {
-        chip::BitMask<app::Clusters::WindowCovering::OperationalStatus> opStatus;
-        opStatus.SetRaw(0);
-        wc->SetOperationalStatus(opStatus);
-    }
+    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(0));
 
     AddDevice("Battery");
     AddEndpoint("1");

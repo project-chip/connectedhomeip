@@ -17,7 +17,6 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 
 #include <app/server/Dnssd.h>
@@ -48,9 +47,7 @@
 #include <LEDWidget.h>
 #include <plat.h>
 
-#include "AppTask.h"
-
-#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#if CHIP_DEVICE_LAYER_TARGET_BL616
 #ifdef BOOT_PIN_RESET
 #include <bflb_gpio.h>
 #endif
@@ -61,6 +58,9 @@ extern "C" {
 #include <hosal_gpio.h>
 }
 #endif
+
+#include "AppTask.h"
+#include "mboard.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -105,7 +105,7 @@ void StartAppTask(void)
 }
 
 #if CONFIG_ENABLE_CHIP_SHELL
-#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#if CHIP_DEVICE_LAYER_TARGET_BL616
 void AppTask::StartAppShellTask()
 {
     Engine::Root().Init();
@@ -161,11 +161,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 #else
     uint32_t resetCnt = 0;
     Internal::BflbConfig::ReadConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
-    resetCnt++;
     Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
     GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
-    ChipLogProgress(NotSpecified, "AppTaskMain %llu, resetCnt %u", (unsigned long long) GetAppTask().mButtonPressedTime,
-                    (unsigned int) resetCnt);
+    ChipLogProgress(NotSpecified, "AppTaskMain %lld, resetCnt %ld", GetAppTask().mButtonPressedTime, resetCnt);
 #endif
 
     GetAppTask().sTimer =
@@ -281,8 +279,6 @@ void AppTask::LightingUpdate(app_event_t status)
                     break;
                 }
 
-                // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param +
-                // Status shape) so we do not depend on the internal cluster type.
                 if (Protocols::InteractionModel::Status::Success !=
                     Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
                 {
@@ -468,7 +464,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 }
 
 #ifdef BOOT_PIN_RESET
-#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#if CHIP_DEVICE_LAYER_TARGET_BL616
 static struct bflb_device_s * app_task_gpio_var = NULL;
 static void app_task_gpio_isr(int irq, void * arg)
 {
@@ -488,7 +484,7 @@ void AppTask::ButtonInit(void)
 {
     GetAppTask().mButtonPressedTime = 0;
 
-#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#if CHIP_DEVICE_LAYER_TARGET_BL616
     app_task_gpio_var = bflb_device_get_by_name("gpio");
 
     bflb_gpio_init(app_task_gpio_var, BOOT_PIN_RESET, GPIO_INPUT);
@@ -505,7 +501,7 @@ void AppTask::ButtonInit(void)
 
 bool AppTask::ButtonPressed(void)
 {
-#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#if CHIP_DEVICE_LAYER_TARGET_BL616
     return bflb_gpio_read(app_task_gpio_var, BOOT_PIN_RESET);
 #else
     uint8_t val = 1;

@@ -30,7 +30,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -143,7 +142,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 
     sLightOn = false;
     sLightLED.Set(false);
-#if SL_MATTER_DISPLAY_ENABLED
+#ifdef DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(false);
 #endif
 }
@@ -189,7 +188,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     DisarmOffWithEffectTimer();
 
-#if SL_MATTER_DISPLAY_ENABLED
+#ifdef DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
 
@@ -251,9 +250,9 @@ CHIP_ERROR AppTask::AppInit()
     sLightLED.Set(sLightOn);
 
 // Update the LCD with the stored value. Show QR Code if not provisioned
-#if SL_MATTER_DISPLAY_ENABLED
+#ifdef DISPLAY_ENABLED
     GetLCD().WriteDemoUI(sLightOn);
-#if SL_MATTER_QR_CODE_ENABLED
+#ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -262,7 +261,7 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // QR_CODE_ENABLED
 #endif
 
     return err;
@@ -295,8 +294,6 @@ CHIP_ERROR AppTask::InitLight()
         sCurrentLevel = brightness.Value();
     }
 
-    // ColorControl is code-driven; read via the legacy ColorControlServer facade (out-param + Status
-    // shape) so we do not depend on the internal cluster type.
     if (Clusters::ColorControl::Attributes::CurrentX::Get(LIGHT_ENDPOINT, &currentx) ==
         Protocols::InteractionModel::Status::Success)
     {
@@ -341,7 +338,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
-    CHIP_ERROR err = AppInstance().Init();
+    CHIP_ERROR err = GetAppTask().Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("AppTask.Init() failed");
@@ -349,7 +346,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    AppInstance().StartStatusLEDTimer();
+    GetAppTask().StartStatusLEDTimer();
 #endif
 
     SILABS_LOG("App Task started");
@@ -359,7 +356,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, nullptr, osWaitForever);
         while (eventReceived == osOK)
         {
-            AppInstance().DispatchEvent(&event);
+            GetAppTask().DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, nullptr, 0);
         }
     }
@@ -462,7 +459,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 
             sLightOn = lightOn;
             sLightLED.Set(sLightOn);
-#if SL_MATTER_DISPLAY_ENABLED
+#ifdef DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
         }

@@ -20,6 +20,8 @@
 #include "ColorControlColorState.h"
 #include "ColorControlDelegate.h"
 #include <app/CommandHandler.h>
+#include <app/clusters/scenes-server/SceneHandlerImpl.h> // scenes::DefaultSceneHandlerImpl (the cluster is its own scene handler)
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h> // scenes::ScenesIntegrationDelegate (scene invalidation hook)
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -127,11 +129,9 @@ struct State
 // (inline) GetOnOff() from the .cpp, so the full On/Off header is not needed here.
 class OnOffCluster;
 
-// Forward-declared for the optional Scene Management coupling (injected, ember-free). See
-// ColorControlSceneInvalidator.h.
-class ColorControlSceneInvalidator;
-
-class ColorControlCluster : public DefaultServerCluster
+// ColorControlCluster is its own scene handler (mirrors LevelControlCluster): the owning application
+// registers this cluster with the endpoint's scene table (table->RegisterHandler(&cluster)).
+class ColorControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
     static constexpr uint32_t kTickMs = 100; // the tick fires every 100 ms
@@ -146,8 +146,9 @@ public:
         OnOffCluster * onOff = nullptr;
 
         // Optional Scene Management coupling: injected so a color change can mark stored scenes stale
-        // without the core depending on the Scenes cluster / ScenesServer. Null == no scene coupling.
-        ColorControlSceneInvalidator * sceneInvalidator = nullptr;
+        // without the core depending on the Scenes cluster. Null == no scene coupling. Same shared delegate
+        // OnOff/LevelControl use; the app wires it to the endpoint's ScenesManagementCluster.
+        chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate = nullptr;
 
         ColorControl::ColorValue mColorValue;    // variant: XYColor | HueSatColor | EnhancedHueSatColor | CTColor
         ColorControl::ColorLoopState mColorLoop; // mode-independent; see below
@@ -155,6 +156,11 @@ public:
         CTConfig ctConfig;
         ColorControlDelegate & mDelegate;
         BitMask<ColorControl::Feature> mFeatures{};
+
+        // §3.2.11: while a color loop is active, a manufacturer MAY choose to ignore incoming commands that
+        // change hue (MoveHue/MoveToHue/StepHue/MoveToHueAndSaturation). false (default) = honor them; true =
+        // ignore them while ColorLoopActive == 1. Stop-semantic commands are never affected either way.
+        bool ignoreHueCommandsWhileColorLooping = false;
     };
 
     // Per MIGRATION.md: endpoint is explicit and forwarded to the base ConcreteClusterPath (which is where
@@ -167,7 +173,8 @@ public:
     ~ColorControlCluster() override;
 
     // Arm the one-shot 100ms tick timer (no-op if already armed). OnTick re-arms itself while active.
-    void ArmTick();
+    // Returns the StartTimer error so callers that must not silently drop a transition can propagate it.
+    CHIP_ERROR ArmTick();
     // ── t=100ms, 200ms, … · SystemLayer fires OnTick every 100ms ────────────────
     void OnTick();
     // TickHue: t from wall clock, exact target on the last tick, then store + fan-out.
@@ -188,14 +195,30 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR HandleApplyScene(ColorControl::EnhancedColorModeEnum ColorMode, const ColorControl::ColorValue & target,
-                                const ColorControl::ColorLoopState & loop, uint16_t timeMs);
+                                const ColorControl::ColorLoopState & loop, uint32_t timeMs);
     bool HasFeature(ColorControl::Feature feature) const { return mFeatures.Has(feature); }
 
-    // §3.2.8.x Coupling color temperature to Level Control. Called (via the Level Control coupling glue)
-    // whenever the Level Control cluster's CurrentLevel changes and its CoupleColorTempToLevel option is
-    // set. `currentLevel` is Level Control's live value; the mapping is one-way (level → color temp) and
-    // only takes effect while the active mode is color temperature. No cross-cluster coupling lives in the
-    // core: the caller supplies the level, keeping this cluster free of any Level Control dependency.
+    // ---- Scene handler (scenes::DefaultSceneHandlerImpl) overrides ----
+    // Upper bound on scenable attributes: 10 distinct attribute IDs may be captured (CurrentHue and
+    // EnhancedCurrentHue are mutually exclusive, so at most 9 are saved for any one device).
+    static constexpr uint8_t kColorControlScenableAttributesCount = 10;
+    bool SupportsCluster(EndpointId endpoint, ClusterId clusterId) override;
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId clusterId, MutableByteSpan & serializedBytes) override;
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId clusterId, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override;
+    // §3.2.7.1.1: at AddScene, verify the EFS being defined carries the attributes its declared
+    // EnhancedColorMode requires (a presence check across the whole EFS — the per-pair validator cannot
+    // see the mode and its companions together). Then delegates the actual serialize to the base handler.
+    CHIP_ERROR SerializeAdd(EndpointId endpoint,
+                            const ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
+                            MutableByteSpan & serializedBytes) override;
+
+    // §3.2.8.x Coupling color temperature to Level Control. The application calls this directly whenever the
+    // Level Control cluster's CurrentLevel changes and its CoupleColorTempToLevel option is set (it holds a
+    // reference to this cluster — no registry lookup). `currentLevel` is Level Control's live value; the
+    // mapping is one-way (level → color temp) and only takes effect while the active mode is color
+    // temperature. No cross-cluster coupling lives in the core: the caller supplies the level, keeping this
+    // cluster free of any Level Control dependency.
     void CoupleColorTempToLevel(uint8_t currentLevel);
 
     // ---- Live-state accessors (used by the scene handler to serialize a scene) ----
@@ -289,6 +312,13 @@ private:
     // XY/CT owns the output. LoopIsDriving() decides whether TickColorLoop reads these each tick.
     uint16_t mColorLoopStartHue    = 0; // EnhancedCurrentHue at the moment the loop started
     uint64_t mColorLoopStartTimeMs = 0; // SystemClock() reading at the moment the loop started
+    // Runtime (NON-persistent) "green light" for the loop, distinct from the ColorLoopActive attribute.
+    // Latched off in OnTick once a command's hue transition owns the hue axis: the loop then stays dormant
+    // (ColorLoopActive stays 1) and does NOT resume when that transition ends — only ColorLoopSet
+    // (startColorLoop) re-engages it. This is the one bit (active, mTransition, mode) can't carry: a loop
+    // running normally and a loop parked after a finite move both sit at active==1 / monostate / enhanced-HS.
+    // Defaults true so a loop active at construction / reboot drives; dormancy is transient, not persisted.
+    bool mColorLoopEngaged = true;
 
     // ---- Cluster state (initialized from Config in the constructor) ----
     // Pointer (not a reference) so it can be repointed after construction: applications register their
@@ -304,16 +334,25 @@ private:
     CTConfig mCT;                                 // color-temperature limits + startup
     const StaticConfig * mStaticConfig = nullptr; // app-owned fixed descriptors; null == none supported
     OnOffCluster * mOnOff              = nullptr; // injected On/Off cluster for ShouldExecuteIfOff; null == no coupling
-    ColorControlSceneInvalidator * mSceneInvalidator = nullptr; // injected scene-invalidation hook; null == no coupling
+    chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate = nullptr; // scene-invalidation hook; null == none
+    bool mIgnoreHueCommandsWhileColorLooping = false;                               // §3.2.11 manufacturer choice; see Config
 
     bool LoopIsDriving() const;
+    // §3.2.11: true when a hue-changing command should be dropped because a color loop is active and the
+    // manufacturer opted to ignore such commands. Saturation-only and stop-semantic commands never consult it.
+    bool ShouldIgnoreHueCommandNow() const;
 
     // Scene-restore transition helpers: populate mTransition + arm the tick from a saved ColorValue.
     // They do NOT switch mode — the caller runs ApplyModeSwitch first so mColorValue already matches.
-    CHIP_ERROR StartXYTransition(const ColorControl::ColorValue & target, uint16_t timeMs);
-    CHIP_ERROR StartColorTemperatureTransition(const ColorControl::ColorValue & target, uint16_t timeMs);
-    CHIP_ERROR StartHueAndSatTransition(const ColorControl::ColorValue & target, uint16_t timeMs);
-    CHIP_ERROR StartEnhancedHueAndSatTransition(const ColorControl::ColorValue & target, uint16_t timeMs);
+    // Pure builders: they only populate mTransition and RemainingTime. Arming the tick is the one fallible
+    // step and is left to the caller (a command, or HandleApplyScene) so that a failed timer arm can be
+    // surfaced rather than swallowed here.
+    void StartXYTransition(const ColorControl::ColorValue & target, uint32_t timeMs);
+    void StartColorTemperatureTransition(const ColorControl::ColorValue & target, uint32_t timeMs);
+    // `moveHue` gates only the hue axis (saturation always moves): a command passes the manufacturer's
+    // ignore-while-looping choice; the scene-restore path passes true so it always restores both axes.
+    void StartHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue);
+    void StartEnhancedHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue);
     void ApplyModeSwitch(ColorControl::EnhancedColorModeEnum target);
 
     // ---- Color-loop lifecycle ----

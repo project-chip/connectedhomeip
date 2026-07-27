@@ -27,7 +27,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 static const char TAG[] = "light-app-callbacks";

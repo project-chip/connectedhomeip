@@ -27,6 +27,7 @@
 #include <clusters/ColorControl/Attributes.h>
 #include <clusters/ColorControl/Commands.h>
 #include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
 
@@ -47,8 +48,20 @@ constexpr uint16_t kMaxCieXy = 0xFEFF;
 
 struct TestColorControlCommands : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    // The command handlers arm the 100 ms tick via DeviceLayer::SystemLayer().StartTimer(), which fails
+    // with CHIP_ERROR_INCORRECT_STATE unless the SystemLayer is initialized — so a fresh command would
+    // return Status::Failure. InitChipStack() brings the layer up; its work queue starts suspended, so the
+    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::PlatformMgr().Shutdown();
+        Platform::MemoryShutdown();
+    }
 
     ColorControlDelegate delegate;
     System::Clock::Internal::RAIIMockClock clock;
@@ -125,8 +138,8 @@ TEST_F(TestColorControlCommands, MoveSaturation)
     Complete(c);
     EXPECT_EQ(c.Saturation(), 0); // moves to the min bound
 
-    // rate 0 on a non-stop move is invalid; Stop is accepted.
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 0), Status::ConstraintError);
+    // rate 0 on a non-stop move is invalid (InvalidCommand, matching MoveColorTemperature); Stop is accepted.
+    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 0), Status::InvalidCommand);
     EXPECT_EQ(c.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
 }
 
@@ -530,11 +543,13 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
     EXPECT_EQ(c.EnhancedHue(), 63079u);
 }
 
-// A color loop owns the hue axis and nothing but Deactivate stops it: an ordinary hue command issued while
-// it runs is a no-op and the loop keeps advancing.
-TEST_F(TestColorControlCommands, ColorLoopKeepsRunningThroughHueCommand)
+// Default (§3.2.11, ignoreHueCommandsWhileColorLooping == false): a hue-changing command issued while a loop
+// runs is HONORED. It takes over the hue axis, which latches the loop dormant — ColorLoopActive stays 1 but
+// the loop stops driving and does NOT resume when the command's transition ends (only ColorLoopSet re-engages
+// it). This is the "a color loop cannot keep running once someone moves the hue axis" behavior.
+TEST_F(TestColorControlCommands, HueCommandParksRunningColorLoop)
 {
-    ColorControlCluster c(kEp, LoopConfig());
+    ColorControlCluster c(kEp, LoopConfig()); // ignoreHueCommandsWhileColorLooping defaults to false
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
@@ -542,7 +557,35 @@ TEST_F(TestColorControlCommands, ColorLoopKeepsRunningThroughHueCommand)
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
-    // moveToHue must not disturb the loop (§3.2.8.1): returns Success but changes nothing.
+    // moveToHue is honored: it drives the hue axis to its own target over 1 s and parks the loop.
+    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.ColorLoopActive(), 1); // still "active" as an attribute — parked, not deactivated
+
+    Tick(c, 1000);
+    EXPECT_EQ(c.EnhancedHue(), 0x8000); // followed the command's target, not the loop
+
+    // The loop stays parked: further ticks do NOT resume the autonomous hue advance.
+    Tick(c, 2000);
+    EXPECT_EQ(c.EnhancedHue(), 0x8000);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+}
+
+// §3.2.11 manufacturer opt-in (ignoreHueCommandsWhileColorLooping == true): a hue-changing command issued
+// while a loop runs is dropped (returns Success, no effect) and the loop keeps advancing undisturbed.
+TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
+{
+    ColorControlCluster::Config config        = LoopConfig();
+    config.ignoreHueCommandsWhileColorLooping = true;
+    ColorControlCluster c(kEp, config);
+
+    const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
+                           .Set(UpdateFlagsBitmap::kUpdateDirection)
+                           .Set(UpdateFlagsBitmap::kUpdateAction);
+    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+                             BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+              Status::Success);
+
+    // moveToHue must not disturb the loop: returns Success but changes nothing.
     EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 

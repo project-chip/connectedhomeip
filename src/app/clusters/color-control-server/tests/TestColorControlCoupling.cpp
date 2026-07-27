@@ -25,6 +25,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
 
@@ -41,8 +42,19 @@ constexpr EndpointId kTestEndpointId = 1;
 
 struct TestColorControlCoupling : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    // Command handlers arm the tick via DeviceLayer::SystemLayer().StartTimer(); InitChipStack() brings the
+    // layer up so a fresh command doesn't return Status::Failure. The work queue starts suspended, so the
+    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::PlatformMgr().Shutdown();
+        Platform::MemoryShutdown();
+    }
 
     TimerDelegateMock mockTimer;
     ColorControlDelegate delegate;
@@ -107,6 +119,47 @@ TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecute
     ColorControlCluster cluster(kTestEndpointId, config);
 
     EXPECT_TRUE(cluster.ShouldExecuteIfOff(BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()));
+}
+
+// Level -> color-temp coupling (ZCL 5.2.2.1.1). The application calls CoupleColorTempToLevel directly
+// with Level Control's live CurrentLevel (no registry, no glue): max level maps to the coupling-min
+// mireds end, min level to the physical max, honoring the one-way mapping while in color-temperature mode.
+TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kColorTemperature);
+    config.mColorValue                              = CTColor{ .mireds = 250 };
+    config.ctConfig.colorTempPhysicalMinMireds      = 100;
+    config.ctConfig.colorTempPhysicalMaxMireds      = 400;
+    config.ctConfig.coupleColorTempToLevelMinMireds = 150;
+    ColorControlCluster cluster(kTestEndpointId, config);
+
+    // Max level (0xFE) -> CoupleColorTempToLevelMinMireds.
+    cluster.CoupleColorTempToLevel(254);
+    Complete(cluster);
+    EXPECT_EQ(cluster.ColorTempMireds(), 150u);
+
+    // Min level (0x01) -> physical max mireds.
+    cluster.CoupleColorTempToLevel(1);
+    Complete(cluster);
+    EXPECT_EQ(cluster.ColorTempMireds(), 400u);
+}
+
+// The coupling is one-way and mode-gated: while not in color-temperature mode, CoupleColorTempToLevel is
+// a no-op (it must never switch the active mode).
+TEST_F(TestColorControlCoupling, CoupleColorTempToLevelIsNoOpOutsideColorTempMode)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kXy);
+    config.mColorValue = XYColor{ .x = 100, .y = 200 };
+    ColorControlCluster cluster(kTestEndpointId, config);
+
+    cluster.CoupleColorTempToLevel(254);
+    Complete(cluster);
+
+    // Still in XY mode, unchanged.
+    EXPECT_EQ(cluster.CurrentX(), 100u);
+    EXPECT_EQ(cluster.CurrentY(), 200u);
 }
 
 } // namespace

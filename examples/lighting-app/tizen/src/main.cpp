@@ -120,11 +120,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-// Note: the legacy emberAfColorControlClusterInitCallback has been removed. Color Control is now a
-// code-driven cluster and is no longer in ClustersWithInitFunctions, so the generated
-// emberAfClusterInitCallback dispatcher never invoked this override. Its former actions are obsolete:
-// ColorMode is derived from the cluster's state (no direct setter), and StartUpColorTemperatureMireds is a
-// nullable attribute that already defaults to null and is persisted/restored by the cluster's own Startup().
+void emberAfColorControlClusterInitCallback(EndpointId endpoint)
+{
+    // Set the color mode to color temperature.
+    Clusters::ColorControl::Attributes::ColorMode::Set(endpoint, Clusters::ColorControl::ColorModeEnum::kColorTemperatureMireds);
+    // Preserve the state of the color temperature attribute across reboots.
+    Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::SetNull(endpoint);
+}
 
 void ApplicationInit()
 {

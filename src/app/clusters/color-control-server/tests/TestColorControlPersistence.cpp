@@ -28,6 +28,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/ColorControl/Attributes.h>
 #include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
 
@@ -44,8 +45,19 @@ constexpr EndpointId kEp = 1;
 
 struct TestColorControlPersistence : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    // Command handlers arm the tick via DeviceLayer::SystemLayer().StartTimer(); InitChipStack() brings the
+    // layer up so a fresh command doesn't return Status::Failure. The work queue starts suspended, so the
+    // armed timer never fires on a background thread and cannot race the manual OnTick() calls below.
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::PlatformMgr().Shutdown();
+        Platform::MemoryShutdown();
+    }
 
     ColorControlDelegate delegate;
     System::Clock::Internal::RAIIMockClock clock;

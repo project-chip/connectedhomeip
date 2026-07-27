@@ -18425,8 +18425,7 @@ namespace Attributes {
 
 namespace DriftCompensation {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::ColorControl::DriftCompensationEnum * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
     Traits::StorageType temp;
@@ -18442,11 +18441,39 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
     return status;
 }
 
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value,
+                                        MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensationEnum value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ColorControl::DriftCompensationEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
 } // namespace DriftCompensation
 
 namespace CompensationText {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[254 + 1];
     Protocols::InteractionModel::Status status =
@@ -18464,11 +18491,36 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Mutabl
     return status;
 }
 
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
+{
+
+    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[254 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value)
+{
+
+    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[254 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
 } // namespace CompensationText
 
 namespace Primary1X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18482,13 +18534,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1X
 
 namespace Primary1Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18502,13 +18581,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1Y
 
 namespace Primary1Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18525,13 +18631,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary1Intensity
 
 namespace Primary2X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18545,13 +18718,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2X
 
 namespace Primary2Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18565,13 +18765,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2Y
 
 namespace Primary2Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18588,13 +18815,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary2Intensity
 
 namespace Primary3X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18608,13 +18902,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3X
 
 namespace Primary3Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18628,13 +18949,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3Y
 
 namespace Primary3Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18651,13 +18999,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary3Intensity
 
 namespace Primary4X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18671,13 +19086,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4X
 
 namespace Primary4Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18691,13 +19133,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4Y
 
 namespace Primary4Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18714,13 +19183,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary4Intensity
 
 namespace Primary5X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18734,13 +19270,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5X
 
 namespace Primary5Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18754,13 +19317,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5Y
 
 namespace Primary5Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18777,13 +19367,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary5Intensity
 
 namespace Primary6X {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18797,13 +19454,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6X
 
 namespace Primary6Y {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18817,13 +19501,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6Y
 
 namespace Primary6Intensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18840,13 +19551,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary6Intensity
 
 namespace WhitePointX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18860,13 +19638,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WhitePointX
 
 namespace WhitePointY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18880,13 +19685,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WhitePointY
 
 namespace ColorPointRX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18900,13 +19732,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointRX
 
 namespace ColorPointRY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18920,13 +19779,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointRY
 
 namespace ColorPointRIntensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -18943,13 +19829,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ColorPointRIntensity
 
 namespace ColorPointGX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18963,13 +19916,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointGX
 
 namespace ColorPointGY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -18983,13 +19963,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointGY
 
 namespace ColorPointGIntensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -19006,13 +20013,80 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
         value.SetNonNull() = Traits::StorageToWorking(temp);
     }
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ColorPointGIntensity
 
 namespace ColorPointBX {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19026,13 +20100,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointBX
 
 namespace ColorPointBY {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19048,11 +20149,38 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     return status;
 }
 
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
 } // namespace ColorPointBY
 
 namespace ColorPointBIntensity {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
@@ -19071,11 +20199,78 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::N
     return status;
 }
 
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
+                                        MarkAttributeDirty markDirty)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint, markDirty);
+    }
+
+    return Set(endpoint, value.Value(), markDirty);
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
 } // namespace ColorPointBIntensity
 
 namespace ColorTempPhysicalMinMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19089,13 +20284,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorTempPhysicalMinMireds
 
 namespace ColorTempPhysicalMaxMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19109,13 +20331,40 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorTempPhysicalMaxMireds
 
 namespace CoupleColorTempToLevelMinMireds {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
@@ -19131,11 +20380,38 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
     return status;
 }
 
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
 } // namespace CoupleColorTempToLevelMinMireds
 
 namespace FeatureMap {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
@@ -19149,6 +20425,33 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
     }
     *value = Traits::StorageToWorking(temp);
     return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ColorControl::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap

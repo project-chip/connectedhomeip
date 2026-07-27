@@ -709,7 +709,10 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1882,7 +1885,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
-/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -2081,7 +2084,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 4;
+  revision 3;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2120,6 +2123,7 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
+    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2513,7 +2517,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2845,7 +2849,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_colortemperaturelight = 268, version 5;
+  device type ma_colortemperaturelight = 268, version 4;
 
 
   server cluster Identify {
@@ -2938,32 +2942,32 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    callback attribute currentHue;
-    callback attribute currentSaturation;
-    callback attribute remainingTime;
-    callback attribute currentX;
-    callback attribute currentY;
-    callback attribute colorTemperatureMireds;
-    callback attribute colorMode;
-    callback attribute options;
-    callback attribute numberOfPrimaries;
-    callback attribute enhancedCurrentHue;
-    callback attribute enhancedColorMode;
-    callback attribute colorLoopActive;
-    callback attribute colorLoopDirection;
-    callback attribute colorLoopTime;
-    callback attribute colorLoopStartEnhancedHue;
-    callback attribute colorLoopStoredEnhancedHue;
-    callback attribute colorCapabilities;
+    persist  attribute currentHue default = 0x00;
+    persist  attribute currentSaturation default = 0x00;
+    ram      attribute remainingTime default = 0x0000;
+    persist  attribute currentX default = 0x616B;
+    persist  attribute currentY default = 0x607D;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    persist  attribute colorMode default = 0x01;
+    ram      attribute options default = 0x00;
+    ram      attribute numberOfPrimaries;
+    persist  attribute enhancedCurrentHue default = 0x0000;
+    persist  attribute enhancedColorMode default = 0x01;
+    persist  attribute colorLoopActive default = 0x00;
+    persist  attribute colorLoopDirection default = 0x00;
+    persist  attribute colorLoopTime default = 0x0019;
+    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
+    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
+    ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    callback attribute startUpColorTemperatureMireds;
+    persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x1F;
-    callback attribute clusterRevision;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;

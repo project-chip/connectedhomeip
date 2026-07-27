@@ -27,7 +27,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
@@ -97,7 +96,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         if (attributeId == ColorControl::Attributes::CurrentHue::Id)
         {
             hue = *value;
-            /* Read Current Saturation via the legacy ColorControlServer facade (code-driven cluster) */
+            /* Read Current Saturation value when Attribute change callback for HUE Attribute */
             ColorControl::Attributes::CurrentSaturation::Get(endpointId, &saturation);
         }
         else
@@ -106,7 +105,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
              * set the color on Cluster LED using both Saturation and Hue.
              */
             saturation = *value;
-            /* Read Current Hue via the legacy ColorControlServer facade (code-driven cluster) */
+            /* Read Current Hue value when Attribute change callback for SATURATION Attribute */
             ColorControl::Attributes::CurrentHue::Get(endpointId, &hue);
         }
         /* Set RGB Color on Cluster Indication LED */

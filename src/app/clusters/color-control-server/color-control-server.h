@@ -16,9 +16,6 @@
  */
 #pragma once
 
-// Backward-compat shim. The legacy Ember `ColorControlServer` singleton has been replaced by the
-// code-driven `ColorControlCluster`. Application code that included this header now gets the codegen
-// integration surface (per-endpoint cluster lookup + delegate registration). Callers that used
-// `ColorControlServer::Instance().<command>(endpoint, ...)` should switch to
-// `ColorControl::FindClusterOnEndpoint(endpoint)-><command>(...)`.
-#include "CodegenIntegration.h" // nogncheck
+// This header is for backwards compatibility only with codegen cluster
+// implementations. We just include the codegen version
+#include "codegen/color-control-server.h" // nogncheck

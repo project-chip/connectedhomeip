@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
-#include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/level-control/level-control.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 
@@ -103,8 +102,7 @@ void Light::UpdateState()
     LevelControl::Attributes::MaxLevel::Get(mEndpointId, &mMaxLevel);
     LevelControl::Attributes::RemainingTime::Get(mEndpointId, &mLevelRemainingTime10sOfSec);
 
-    // Color control. ColorControl is code-driven; read via the legacy ColorControlServer facade
-    // (out-param + Status shape) so we do not depend on the internal cluster type.
+    // Color control
     ColorControl::Attributes::ColorMode::Get(mEndpointId, &mColorMode);
 
     ColorControl::Attributes::CurrentHue::Get(mEndpointId, &mColorHue);

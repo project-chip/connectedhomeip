@@ -952,7 +952,10 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -1086,7 +1089,7 @@ cluster AccessControl = 31 {
   fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
-/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose logical grouping and actions. */
+/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 cluster Actions = 37 {
   revision 1;
 
@@ -2840,7 +2843,7 @@ cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -3187,7 +3190,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 4;
+  revision 3;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -3226,6 +3229,7 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
+    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -7396,7 +7400,7 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 3;
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -7417,13 +7421,6 @@ cluster MediaPlayback = 1286 {
     kEnhancedAudioIntelligibility = 15;
     kEmergency = 16;
     kKaraoke = 17;
-  }
-
-  enum MediaType : enum8 {
-    kGeneric = 0;
-    kTVShow = 1;
-    kMusic = 2;
-    kPodcast = 3;
   }
 
   enum PlaybackStateEnum : enum8 {
@@ -7452,25 +7449,12 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable CharacteristicEnum characteristics[] = 1;
-    optional nullable long_char_string<256> displayName = 2;
+    optional nullable char_string displayName = 1;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
     nullable TrackAttributesStruct trackAttributes = 1;
-  }
-
-  struct ContentInfoStruct {
-    MediaType contentType = 0;
-    optional nullable long_char_string<256> title = 1;
-    optional nullable char_string<64> show = 2;
-    optional nullable char_string<64> season = 3;
-    optional nullable char_string<64> episode = 4;
-    optional nullable char_string<64> provider = 5;
-    optional nullable char_string<64> artist = 6;
-    optional nullable char_string<64> album = 7;
-    optional nullable char_string<64> track = 8;
   }
 
   struct PlaybackPositionStruct {
@@ -7480,13 +7464,13 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    epoch_us startTime = 1;
-    int64u duration = 2;
+    EPOCH_US startTime = 1;
+    INT64U duration = 2;
     PlaybackPositionStruct sampledPosition = 3;
     single playbackSpeed = 4;
-    int64u seekRangeEnd = 5;
-    int64u seekRangeStart = 6;
-    optional long_octet_string data = 7;
+    INT64U seekRangeEnd = 5;
+    INT64U seekRangeStart = 6;
+    optional OCTET_STRING data = 7;
     boolean audioAdvanceUnmuted = 8;
   }
 
@@ -7501,8 +7485,6 @@ cluster MediaPlayback = 1286 {
   readonly attribute optional nullable TrackStruct availableAudioTracks[] = 8;
   readonly attribute optional nullable TrackStruct activeTextTrack = 9;
   readonly attribute optional nullable TrackStruct availableTextTracks[] = 10;
-  provisional readonly attribute nullable int32u availableCommands[] = 11;
-  provisional readonly attribute nullable ContentInfoStruct contentInfo = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7535,47 +7517,47 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    char_string<32> trackID = 0;
-    int8u audioOutputIndex = 1;
+    CHAR_STRING trackID = 0;
+    INT8U audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    char_string<32> trackID = 0;
+    CHAR_STRING trackID = 0;
   }
 
-  /** This command is used to start playback of the media. */
+  /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
-  /** This command is used to pause playback of the media. */
+  /** Upon receipt, this SHALL pause media. */
   command Pause(): PlaybackResponse = 1;
-  /** This command is used to stop playback of the media. */
+  /** Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched. */
   command Stop(): PlaybackResponse = 2;
-  /** This command is used to start playback of the media from the beginning. */
+  /** Upon receipt, this SHALL Start Over with the current media playback item. */
   command StartOver(): PlaybackResponse = 3;
-  /** This command is used to go back to the previous media playback item. */
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item. */
   command Previous(): PlaybackResponse = 4;
-  /** This command is used to go to the next media playback item. */
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item. */
   command Next(): PlaybackResponse = 5;
-  /** This command is used to rewind the media. */
+  /** Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command Rewind(RewindRequest): PlaybackResponse = 6;
-  /** This command is used to fast forward the media. */
+  /** Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command FastForward(FastForwardRequest): PlaybackResponse = 7;
-  /** This command is used to skip forward in the media. */
+  /** Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows: */
   command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
-  /** This command is used to skip backward in the media. */
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
-  /** This command is used to seek to a specific position in the media. */
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command Seek(SeekRequest): PlaybackResponse = 11;
-  /** This command is used to activate a specific Audio Track for the media being played. */
+  /** Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT. */
   command ActivateAudioTrack(ActivateAudioTrackRequest): DefaultSuccess = 12;
-  /** This command is used to activate a specific Text Track for the media being played. */
+  /** Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT. */
   command ActivateTextTrack(ActivateTextTrackRequest): DefaultSuccess = 13;
-  /** This command is used to deactivate a specific Text Track for the media being played. */
+  /** If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it. */
   command DeactivateTextTrack(): DefaultSuccess = 14;
 }
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 3;
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -7596,13 +7578,6 @@ cluster MediaPlayback = 1286 {
     kEnhancedAudioIntelligibility = 15;
     kEmergency = 16;
     kKaraoke = 17;
-  }
-
-  enum MediaType : enum8 {
-    kGeneric = 0;
-    kTVShow = 1;
-    kMusic = 2;
-    kPodcast = 3;
   }
 
   enum PlaybackStateEnum : enum8 {
@@ -7631,25 +7606,12 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable CharacteristicEnum characteristics[] = 1;
-    optional nullable long_char_string<256> displayName = 2;
+    optional nullable char_string displayName = 1;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
     nullable TrackAttributesStruct trackAttributes = 1;
-  }
-
-  struct ContentInfoStruct {
-    MediaType contentType = 0;
-    optional nullable long_char_string<256> title = 1;
-    optional nullable char_string<64> show = 2;
-    optional nullable char_string<64> season = 3;
-    optional nullable char_string<64> episode = 4;
-    optional nullable char_string<64> provider = 5;
-    optional nullable char_string<64> artist = 6;
-    optional nullable char_string<64> album = 7;
-    optional nullable char_string<64> track = 8;
   }
 
   struct PlaybackPositionStruct {
@@ -7659,13 +7621,13 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    epoch_us startTime = 1;
-    int64u duration = 2;
+    EPOCH_US startTime = 1;
+    INT64U duration = 2;
     PlaybackPositionStruct sampledPosition = 3;
     single playbackSpeed = 4;
-    int64u seekRangeEnd = 5;
-    int64u seekRangeStart = 6;
-    optional long_octet_string data = 7;
+    INT64U seekRangeEnd = 5;
+    INT64U seekRangeStart = 6;
+    optional OCTET_STRING data = 7;
     boolean audioAdvanceUnmuted = 8;
   }
 
@@ -7680,8 +7642,6 @@ cluster MediaPlayback = 1286 {
   readonly attribute optional nullable TrackStruct availableAudioTracks[] = 8;
   readonly attribute optional nullable TrackStruct activeTextTrack = 9;
   readonly attribute optional nullable TrackStruct availableTextTracks[] = 10;
-  provisional readonly attribute nullable int32u availableCommands[] = 11;
-  provisional readonly attribute nullable ContentInfoStruct contentInfo = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7714,41 +7674,41 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    char_string<32> trackID = 0;
-    int8u audioOutputIndex = 1;
+    CHAR_STRING trackID = 0;
+    INT8U audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    char_string<32> trackID = 0;
+    CHAR_STRING trackID = 0;
   }
 
-  /** This command is used to start playback of the media. */
+  /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
-  /** This command is used to pause playback of the media. */
+  /** Upon receipt, this SHALL pause media. */
   command Pause(): PlaybackResponse = 1;
-  /** This command is used to stop playback of the media. */
+  /** Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched. */
   command Stop(): PlaybackResponse = 2;
-  /** This command is used to start playback of the media from the beginning. */
+  /** Upon receipt, this SHALL Start Over with the current media playback item. */
   command StartOver(): PlaybackResponse = 3;
-  /** This command is used to go back to the previous media playback item. */
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item. */
   command Previous(): PlaybackResponse = 4;
-  /** This command is used to go to the next media playback item. */
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item. */
   command Next(): PlaybackResponse = 5;
-  /** This command is used to rewind the media. */
+  /** Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command Rewind(RewindRequest): PlaybackResponse = 6;
-  /** This command is used to fast forward the media. */
+  /** Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command FastForward(FastForwardRequest): PlaybackResponse = 7;
-  /** This command is used to skip forward in the media. */
+  /** Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows: */
   command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
-  /** This command is used to skip backward in the media. */
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
-  /** This command is used to seek to a specific position in the media. */
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command Seek(SeekRequest): PlaybackResponse = 11;
-  /** This command is used to activate a specific Audio Track for the media being played. */
+  /** Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT. */
   command ActivateAudioTrack(ActivateAudioTrackRequest): DefaultSuccess = 12;
-  /** This command is used to activate a specific Text Track for the media being played. */
+  /** Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT. */
   command ActivateTextTrack(ActivateTextTrackRequest): DefaultSuccess = 13;
-  /** This command is used to deactivate a specific Text Track for the media being played. */
+  /** If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it. */
   command DeactivateTextTrack(): DefaultSuccess = 14;
 }
 
@@ -8128,7 +8088,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 3;
+  revision 1;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -8176,24 +8136,12 @@ cluster ContentLauncher = 1290 {
     kAny = 16;
   }
 
-  enum QueueTypeEnum : enum8 {
-    kReplace = 0;
-    kNext = 1;
-    kLast = 2;
-  }
-
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
     kTextTrackNotAvailable = 3;
     kAudioTrackNotAvailable = 4;
-    kInvalidData = 5;
-    kAccountMismatch = 6;
-    kContentAppNotAvailable = 7;
-    kReplicationNotAllowed = 8;
-    kReplicationNotSupported = 9;
-    kPresetNotFound = 10;
   }
 
   bitmap Feature : bitmap32 {
@@ -8202,9 +8150,6 @@ cluster ContentLauncher = 1290 {
     kAdvancedSeek = 0x4;
     kTextTracks = 0x8;
     kAudioTracks = 0x10;
-    kContentReplication = 0x20;
-    kContentQueueing = 0x40;
-    kPresets = 0x80;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -8216,27 +8161,6 @@ cluster ContentLauncher = 1290 {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
-  }
-
-  struct ContentAppInfo {
-    int16u contentAppVendorID = 0;
-    int16u contentAppProductID = 1;
-    long_char_string<1024> data = 2;
-  }
-
-  struct LaunchUrlInfo {
-    long_char_string<8192> url = 0;
-    optional nullable long_char_string<1024> data = 1;
-    optional nullable long_char_string<256> contentType = 2;
-    optional nullable char_string contentHeaders[] = 3;
-    optional nullable int32u offsetMillisecs = 4;
-    optional nullable QueueTypeEnum queueType = 5;
-    optional nullable long_char_string<8192> nextUrl = 6;
-  }
-
-  struct ReplicationInfo {
-    optional nullable LaunchUrlInfo launchUrlInfo = 0;
-    optional nullable ContentAppInfo contentAppInfo = 1;
   }
 
   struct TrackPreferenceStruct {
@@ -8252,13 +8176,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    long_char_string<256> name = 0;
-    long_char_string<8192> value = 1;
+    char_string<256> name = 0;
+    char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    long_char_string<1024> value = 1;
+    char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -8267,13 +8191,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional long_char_string<8192> imageURL = 0;
+    optional char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    long_char_string<256> providerName = 0;
+    char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -8281,19 +8205,8 @@ cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
-  struct ContentPresetStruct {
-    int8u presetID = 0;
-    char_string<48> presetName = 1;
-  }
-
-  provisional info event ContentReplication = 0 {
-    StatusEnum status = 0;
-  }
-
   readonly attribute optional char_string acceptHeader[] = 0;
   readonly attribute optional SupportedProtocolsBitmap supportedStreamingProtocols = 1;
-  provisional readonly attribute optional boolean movable = 2;
-  provisional readonly attribute optional ContentPresetStruct presets[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8306,20 +8219,12 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 2;
     optional PlaybackPreferencesStruct playbackPreferences = 3;
     optional boolean useCurrentContext = 4;
-    optional nullable int16u contentAppVendorID = 5;
-    optional nullable int16u contentAppProductID = 6;
   }
 
   request struct LaunchURLRequest {
-    long_char_string<8192> contentURL = 0;
-    optional long_char_string<256> displayString = 1;
+    char_string contentURL = 0;
+    optional char_string displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
-    optional PlaybackPreferencesStruct playbackPreferences = 3;
-    optional nullable long_char_string<256> contentType = 4;
-    optional nullable char_string contentHeaders[] = 5;
-    optional nullable int32u offsetMillisecs = 6;
-    optional nullable QueueTypeEnum queueType = 7;
-    optional nullable long_char_string<8192> nextUrl = 8;
   }
 
   response struct LauncherResponse = 2 {
@@ -8327,28 +8232,15 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 1;
   }
 
-  response struct ContentReplicationResponse = 4 {
-    StatusEnum status = 0;
-    optional nullable ReplicationInfo replicationInfo = 1;
-  }
-
-  request struct PlayPresetRequest {
-    int8u presetID = 0;
-  }
-
   /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
-  /** Upon receipt, this SHALL request replication information for the currently playing content. */
-  command ContentReplicationRequest(): ContentReplicationResponse = 3;
-  /** This command will play the preset passed in. */
-  command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 3;
+  revision 1;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -8396,24 +8288,12 @@ cluster ContentLauncher = 1290 {
     kAny = 16;
   }
 
-  enum QueueTypeEnum : enum8 {
-    kReplace = 0;
-    kNext = 1;
-    kLast = 2;
-  }
-
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
     kTextTrackNotAvailable = 3;
     kAudioTrackNotAvailable = 4;
-    kInvalidData = 5;
-    kAccountMismatch = 6;
-    kContentAppNotAvailable = 7;
-    kReplicationNotAllowed = 8;
-    kReplicationNotSupported = 9;
-    kPresetNotFound = 10;
   }
 
   bitmap Feature : bitmap32 {
@@ -8422,9 +8302,6 @@ cluster ContentLauncher = 1290 {
     kAdvancedSeek = 0x4;
     kTextTracks = 0x8;
     kAudioTracks = 0x10;
-    kContentReplication = 0x20;
-    kContentQueueing = 0x40;
-    kPresets = 0x80;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -8436,27 +8313,6 @@ cluster ContentLauncher = 1290 {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
-  }
-
-  struct ContentAppInfo {
-    int16u contentAppVendorID = 0;
-    int16u contentAppProductID = 1;
-    long_char_string<1024> data = 2;
-  }
-
-  struct LaunchUrlInfo {
-    long_char_string<8192> url = 0;
-    optional nullable long_char_string<1024> data = 1;
-    optional nullable long_char_string<256> contentType = 2;
-    optional nullable char_string contentHeaders[] = 3;
-    optional nullable int32u offsetMillisecs = 4;
-    optional nullable QueueTypeEnum queueType = 5;
-    optional nullable long_char_string<8192> nextUrl = 6;
-  }
-
-  struct ReplicationInfo {
-    optional nullable LaunchUrlInfo launchUrlInfo = 0;
-    optional nullable ContentAppInfo contentAppInfo = 1;
   }
 
   struct TrackPreferenceStruct {
@@ -8472,13 +8328,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    long_char_string<256> name = 0;
-    long_char_string<8192> value = 1;
+    char_string<256> name = 0;
+    char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    long_char_string<1024> value = 1;
+    char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -8487,13 +8343,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional long_char_string<8192> imageURL = 0;
+    optional char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    long_char_string<256> providerName = 0;
+    char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -8501,19 +8357,8 @@ cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
-  struct ContentPresetStruct {
-    int8u presetID = 0;
-    char_string<48> presetName = 1;
-  }
-
-  provisional info event ContentReplication = 0 {
-    StatusEnum status = 0;
-  }
-
   readonly attribute optional char_string acceptHeader[] = 0;
   readonly attribute optional SupportedProtocolsBitmap supportedStreamingProtocols = 1;
-  provisional readonly attribute optional boolean movable = 2;
-  provisional readonly attribute optional ContentPresetStruct presets[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8526,20 +8371,12 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 2;
     optional PlaybackPreferencesStruct playbackPreferences = 3;
     optional boolean useCurrentContext = 4;
-    optional nullable int16u contentAppVendorID = 5;
-    optional nullable int16u contentAppProductID = 6;
   }
 
   request struct LaunchURLRequest {
-    long_char_string<8192> contentURL = 0;
-    optional long_char_string<256> displayString = 1;
+    char_string contentURL = 0;
+    optional char_string displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
-    optional PlaybackPreferencesStruct playbackPreferences = 3;
-    optional nullable long_char_string<256> contentType = 4;
-    optional nullable char_string contentHeaders[] = 5;
-    optional nullable int32u offsetMillisecs = 6;
-    optional nullable QueueTypeEnum queueType = 7;
-    optional nullable long_char_string<8192> nextUrl = 8;
   }
 
   response struct LauncherResponse = 2 {
@@ -8547,26 +8384,13 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 1;
   }
 
-  response struct ContentReplicationResponse = 4 {
-    StatusEnum status = 0;
-    optional nullable ReplicationInfo replicationInfo = 1;
-  }
-
-  request struct PlayPresetRequest {
-    int8u presetID = 0;
-  }
-
   /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
-  /** Upon receipt, this SHALL request replication information for the currently playing content. */
-  command ContentReplicationRequest(): ContentReplicationResponse = 3;
-  /** This command will play the preset passed in. */
-  command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
-/** This cluster provides an interface for controlling the Output on a Video Player device such as a TV. */
+/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -8586,7 +8410,7 @@ cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string<32> name = 2;
+    char_string name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -8603,7 +8427,7 @@ cluster AudioOutput = 1291 {
 
   request struct RenameOutputRequest {
     int8u index = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
@@ -8612,7 +8436,7 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for controlling the Output on a Video Player device such as a TV. */
+/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 cluster AudioOutput = 1291 {
   revision 1;
 
@@ -8632,7 +8456,7 @@ cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string<32> name = 2;
+    char_string name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -8649,7 +8473,7 @@ cluster AudioOutput = 1291 {
 
   request struct RenameOutputRequest {
     int8u index = 0;
-    char_string<32> name = 1;
+    char_string name = 1;
   }
 
   /** Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List. */
@@ -8658,7 +8482,7 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for launching applications on a Video Player device such as a TV. */
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
   revision 2;
 
@@ -8719,7 +8543,7 @@ cluster ApplicationLauncher = 1292 {
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
-/** This cluster provides an interface for launching applications on a Video Player device such as a TV. */
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
   revision 2;
 
@@ -8780,7 +8604,7 @@ cluster ApplicationLauncher = 1292 {
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
-/** This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). */
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
   revision 1;
 
@@ -8811,7 +8635,7 @@ cluster ApplicationBasic = 1293 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). */
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
   revision 1;
 
@@ -8844,18 +8668,13 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 3;
-
-  bitmap Feature : bitmap32 {
-    kOAuth = 0x1;
-  }
+  revision 2;
 
   fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
     fabric_idx fabricIndex = 254;
   }
 
-  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8880,38 +8699,23 @@ cluster AccountLogin = 1294 {
     optional node_id node = 0;
   }
 
-  response struct GetDeviceAuthURIResponse = 5 {
-    char_string<16> userCode = 0;
-    long_char_string<256> verificationURI = 1;
-    optional long_char_string<512> verificationURIComplete = 2;
-    int16u expiresIn = 3;
-    int8u interval = 4;
-  }
-
   /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
-  /** This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App. */
-  fabric timed command access(invoke: administer) GetDeviceAuthURI(): GetDeviceAuthURIResponse = 4;
 }
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 3;
-
-  bitmap Feature : bitmap32 {
-    kOAuth = 0x1;
-  }
+  revision 2;
 
   fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
     fabric_idx fabricIndex = 254;
   }
 
-  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8936,26 +8740,16 @@ cluster AccountLogin = 1294 {
     optional node_id node = 0;
   }
 
-  response struct GetDeviceAuthURIResponse = 5 {
-    char_string<16> userCode = 0;
-    long_char_string<256> verificationURI = 1;
-    optional long_char_string<512> verificationURIComplete = 2;
-    int16u expiresIn = 3;
-    int8u interval = 4;
-  }
-
   /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
-  /** This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App. */
-  fabric timed command access(invoke: administer) GetDeviceAuthURI(): GetDeviceAuthURIResponse = 4;
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
 
   binding cluster GeneralCommissioning;
@@ -9435,7 +9229,7 @@ endpoint 0 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
-    callback attribute operationalStatus;
+    ram      attribute operationalStatus default = 0x00;
     ram      attribute targetPositionLiftPercent100ths default = 500;
     ram      attribute targetPositionTiltPercent100ths default = 500;
     ram      attribute endProductType default = 0x00;
@@ -9446,7 +9240,7 @@ endpoint 0 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
-    callback attribute safetyStatus;
+    ram      attribute safetyStatus default = 0x00;
     ram      attribute featureMap default = 0x17;
     callback attribute clusterRevision;
 
@@ -9725,7 +9519,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 4;
+  device type ma_dimmablelight = 257, version 3;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -9849,17 +9643,17 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    callback attribute currentHue;
-    callback attribute currentSaturation;
-    callback attribute remainingTime;
-    callback attribute currentX;
-    callback attribute currentY;
+    ram      attribute currentHue default = 0x00;
+    ram      attribute currentSaturation default = 0x00;
+    ram      attribute remainingTime default = 0x00;
+    ram      attribute currentX default = 0x616B;
+    ram      attribute currentY default = 0x607D;
     ram      attribute driftCompensation;
     ram      attribute compensationText;
-    callback attribute colorTemperatureMireds;
-    callback attribute colorMode;
-    callback attribute options;
-    callback attribute numberOfPrimaries;
+    ram      attribute colorTemperatureMireds default = 0x00FA;
+    ram      attribute colorMode default = 1;
+    ram      attribute options default = 0x00;
+    ram      attribute numberOfPrimaries;
     ram      attribute primary1X;
     ram      attribute primary1Y;
     ram      attribute primary1Intensity;
@@ -9889,20 +9683,20 @@ endpoint 1 {
     ram      attribute colorPointBX;
     ram      attribute colorPointBY;
     ram      attribute colorPointBIntensity;
-    callback attribute enhancedCurrentHue;
-    callback attribute enhancedColorMode;
-    callback attribute colorLoopActive;
-    callback attribute colorLoopDirection;
-    callback attribute colorLoopTime;
-    callback attribute colorLoopStartEnhancedHue;
-    callback attribute colorLoopStoredEnhancedHue;
-    callback attribute colorCapabilities;
+    ram      attribute enhancedCurrentHue default = 0x00;
+    ram      attribute enhancedColorMode default = 0x01;
+    ram      attribute colorLoopActive default = 0x00;
+    ram      attribute colorLoopDirection default = 0x00;
+    ram      attribute colorLoopTime default = 0x0019;
+    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
+    ram      attribute colorLoopStoredEnhancedHue default = 0x00;
+    ram      attribute colorCapabilities default = 0x00;
     ram      attribute colorTempPhysicalMinMireds default = 0x009A;
     ram      attribute colorTempPhysicalMaxMireds default = 0x01C6;
     ram      attribute coupleColorTempToLevelMinMireds;
-    callback attribute startUpColorTemperatureMireds;
+    ram      attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;

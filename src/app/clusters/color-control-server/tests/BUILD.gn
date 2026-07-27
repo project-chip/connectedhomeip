@@ -22,10 +22,10 @@ chip_test_suite("tests") {
   test_sources = [
     "TestColorControlAttributes.cpp",
     "TestColorControlCluster.cpp",
-    "TestColorControlClusterBackwardsCompatibility.cpp",
     "TestColorControlCommands.cpp",
     "TestColorControlCoupling.cpp",
     "TestColorControlPersistence.cpp",
+    "TestColorControlScenes.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

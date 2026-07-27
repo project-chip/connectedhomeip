@@ -25,14 +25,13 @@ source_set("color-control-server") {
     "ColorControlCluster.h",
     "ColorControlColorState.h",
     "ColorControlDelegate.h",
-    "ColorControlSceneInvalidator.h",
-    "LevelControlCoupling.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/cluster-building-blocks",
     "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
