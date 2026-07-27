@@ -15,9 +15,41 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 source_set("thermostat-server") {
-  sources = []
+  sources = [
+    "PresetStructWithOwnedMembers.cpp",
+    "PresetStructWithOwnedMembers.h",
+    "Setpoint.cpp",
+    "Setpoint.h",
+    "SetpointAttributes.h",
+    "SetpointAttributes.cpp",
+    "SetpointLimits.h",
+    "SetpointRange.h",
+    "Setpoints.cpp",
+    "Setpoints.h",
+    "Temperature.h",
+    "ThermostatClusterAtomic.cpp",
+    "ThermostatClusterEvents.cpp",
+    "ThermostatClusterEvents.h",
+    "ThermostatAttributeShim.cpp",
+    "ThermostatAttributeShim.h",
+    "ThermostatClusterPresets.cpp",
+    "ThermostatClusterPresets.h",
+    "ThermostatClusterRead.cpp",
+    "ThermostatClusterSetpoints.cpp",
+    "ThermostatClusterSetpoints.h",
+    "ThermostatClusterSuggestions.cpp",
+    "ThermostatClusterWrite.cpp",
+    "ThermostatCluster.cpp",
+    "ThermostatCluster.h",
+    "ThermostatDelegate.h",
+    "ThermostatSuggestionStructWithOwnedMembers.cpp",
+    "ThermostatSuggestionStructWithOwnedMembers.h",
+  ]
 
   public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/support:span",
     "${chip_root}/src/system",
     "${chip_root}/zzz_generated/app-common/clusters/Thermostat",

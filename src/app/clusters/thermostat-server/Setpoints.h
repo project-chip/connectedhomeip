@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include "Setpoint.h"

@@ -22,7 +22,6 @@
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/util/attribute-storage.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -32,7 +31,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
-#include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -49,8 +47,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features)
+ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes) :
+    DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
 {
     auto hasHeating = mFeatures.Has(Feature::kHeating);
     auto hasCooling = mFeatures.Has(Feature::kCooling);
@@ -101,70 +99,62 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         // Setpoints
-        { hasHeating, OccupiedHeatingSetpoint::kMetadataEntry },
-        { hasCooling, OccupiedCoolingSetpoint::kMetadataEntry },
-        { hasHeating && hasOccupancy, UnoccupiedHeatingSetpoint::kMetadataEntry },
-        { hasCooling && hasOccupancy, UnoccupiedCoolingSetpoint::kMetadataEntry },
+        { HasAttribute(OccupiedHeatingSetpoint::Id), OccupiedHeatingSetpoint::kMetadataEntry },
+        { HasAttribute(OccupiedCoolingSetpoint::Id), OccupiedCoolingSetpoint::kMetadataEntry },
+        { HasAttribute(UnoccupiedHeatingSetpoint::Id), UnoccupiedHeatingSetpoint::kMetadataEntry },
+        { HasAttribute(UnoccupiedCoolingSetpoint::Id), UnoccupiedCoolingSetpoint::kMetadataEntry },
 
         // Setpoint Limits
-        { hasHeating, AbsMinHeatSetpointLimit::kMetadataEntry },
-        { hasHeating, AbsMaxHeatSetpointLimit::kMetadataEntry },
-        { hasCooling, AbsMinCoolSetpointLimit::kMetadataEntry },
-        { hasCooling, AbsMaxCoolSetpointLimit::kMetadataEntry },
-        { hasHeating, MinHeatSetpointLimit::kMetadataEntry },
-        { hasHeating, MaxHeatSetpointLimit::kMetadataEntry },
-        { hasCooling, MinCoolSetpointLimit::kMetadataEntry },
-        { hasCooling, MaxCoolSetpointLimit::kMetadataEntry },
+        { HasAttribute(AbsMinHeatSetpointLimit::Id), AbsMinHeatSetpointLimit::kMetadataEntry },
+        { HasAttribute(AbsMaxHeatSetpointLimit::Id), AbsMaxHeatSetpointLimit::kMetadataEntry },
+        { HasAttribute(AbsMinCoolSetpointLimit::Id), AbsMinCoolSetpointLimit::kMetadataEntry },
+        { HasAttribute(AbsMaxCoolSetpointLimit::Id), AbsMaxCoolSetpointLimit::kMetadataEntry },
+        { HasAttribute(MinHeatSetpointLimit::Id), MinHeatSetpointLimit::kMetadataEntry },
+        { HasAttribute(MaxHeatSetpointLimit::Id), MaxHeatSetpointLimit::kMetadataEntry },
+        { HasAttribute(MinCoolSetpointLimit::Id), MinCoolSetpointLimit::kMetadataEntry },
+        { HasAttribute(MaxCoolSetpointLimit::Id), MaxCoolSetpointLimit::kMetadataEntry },
 
         // Deadband
-        { hasAuto, MinSetpointDeadBand::kMetadataEntry },
+        { HasAttribute(MinSetpointDeadBand::Id), MinSetpointDeadBand::kMetadataEntry },
 
         // Feature-based State
-        { hasOccupancy, Occupancy::kMetadataEntry },
-        { hasAuto, ThermostatRunningMode::kMetadataEntry },
+        { HasAttribute(Occupancy::Id), Occupancy::kMetadataEntry },
+        { HasAttribute(ThermostatRunningMode::Id), ThermostatRunningMode::kMetadataEntry },
 
         // Other optional attributes
-        { !mFeatures.Has(Feature::kLocalTemperatureNotExposed), LocalTemperatureCalibration::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, OutdoorTemperature::Id), OutdoorTemperature::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id), RemoteSensing::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, ThermostatRunningState::Id),
-          ThermostatRunningState::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, SetpointChangeSource::Id),
-          SetpointChangeSource::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, SetpointChangeAmount::Id),
-          SetpointChangeAmount::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, SetpointChangeSourceTimestamp::Id),
-          SetpointChangeSourceTimestamp::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, ThermostatProgrammingOperationMode::Id),
-          ThermostatProgrammingOperationMode::kMetadataEntry },
+        { HasAttribute(LocalTemperatureCalibration::Id), LocalTemperatureCalibration::kMetadataEntry },
+        { HasAttribute(OutdoorTemperature::Id), OutdoorTemperature::kMetadataEntry },
+        { HasAttribute(RemoteSensing::Id), RemoteSensing::kMetadataEntry },
+        { HasAttribute(ThermostatRunningState::Id), ThermostatRunningState::kMetadataEntry },
+        { HasAttribute(SetpointChangeSource::Id), SetpointChangeSource::kMetadataEntry },
+        { HasAttribute(SetpointChangeAmount::Id), SetpointChangeAmount::kMetadataEntry },
+        { HasAttribute(SetpointChangeSourceTimestamp::Id), SetpointChangeSourceTimestamp::kMetadataEntry },
+        { HasAttribute(ThermostatProgrammingOperationMode::Id), ThermostatProgrammingOperationMode::kMetadataEntry },
 
         // Setpoint Holds
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id),
-          TemperatureSetpointHold::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id),
-          TemperatureSetpointHoldDuration::kMetadataEntry },
-        { emberAfContainsAttribute(mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id),
-          SetpointHoldExpiryTimestamp::kMetadataEntry },
+        { HasAttribute(TemperatureSetpointHold::Id), TemperatureSetpointHold::kMetadataEntry },
+        { HasAttribute(TemperatureSetpointHoldDuration::Id), TemperatureSetpointHoldDuration::kMetadataEntry },
+        { HasAttribute(SetpointHoldExpiryTimestamp::Id), SetpointHoldExpiryTimestamp::kMetadataEntry },
 
         // Presets
-        { mFeatures.Has(Feature::kPresets), PresetTypes::kMetadataEntry },
-        { mFeatures.Has(Feature::kPresets), NumberOfPresets::kMetadataEntry },
-        { mFeatures.Has(Feature::kPresets), ActivePresetHandle::kMetadataEntry },
-        { mFeatures.Has(Feature::kPresets), Presets::kMetadataEntry },
+        { HasAttribute(PresetTypes::Id), PresetTypes::kMetadataEntry },
+        { HasAttribute(NumberOfPresets::Id), NumberOfPresets::kMetadataEntry },
+        { HasAttribute(ActivePresetHandle::Id), ActivePresetHandle::kMetadataEntry },
+        { HasAttribute(Presets::Id), Presets::kMetadataEntry },
 
         // Schedules
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), ScheduleTypes::kMetadataEntry },
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), NumberOfSchedules::kMetadataEntry },
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), NumberOfScheduleTransitions::kMetadataEntry },
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), NumberOfScheduleTransitionPerDay::kMetadataEntry },
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), ActiveScheduleHandle::kMetadataEntry },
-        { mFeatures.Has(Feature::kMatterScheduleConfiguration), Schedules::kMetadataEntry },
+        { HasAttribute(ScheduleTypes::Id), ScheduleTypes::kMetadataEntry },
+        { HasAttribute(NumberOfSchedules::Id), NumberOfSchedules::kMetadataEntry },
+        { HasAttribute(NumberOfScheduleTransitions::Id), NumberOfScheduleTransitions::kMetadataEntry },
+        { HasAttribute(NumberOfScheduleTransitionPerDay::Id), NumberOfScheduleTransitionPerDay::kMetadataEntry },
+        { HasAttribute(ActiveScheduleHandle::Id), ActiveScheduleHandle::kMetadataEntry },
+        { HasAttribute(Schedules::Id), Schedules::kMetadataEntry },
 
         // Suggestions
-        { mFeatures.Has(Feature::kThermostatSuggestions), MaxThermostatSuggestions::kMetadataEntry },
-        { mFeatures.Has(Feature::kThermostatSuggestions), ThermostatSuggestions::kMetadataEntry },
-        { mFeatures.Has(Feature::kThermostatSuggestions), CurrentThermostatSuggestion::kMetadataEntry },
-        { mFeatures.Has(Feature::kThermostatSuggestions), ThermostatSuggestionNotFollowingReason::kMetadataEntry },
+        { HasAttribute(MaxThermostatSuggestions::Id), MaxThermostatSuggestions::kMetadataEntry },
+        { HasAttribute(ThermostatSuggestions::Id), ThermostatSuggestions::kMetadataEntry },
+        { HasAttribute(CurrentThermostatSuggestion::Id), CurrentThermostatSuggestion::kMetadataEntry },
+        { HasAttribute(ThermostatSuggestionNotFollowingReason::Id), ThermostatSuggestionNotFollowingReason::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -423,26 +413,87 @@ std::optional<System::Clock::Milliseconds16> ThermostatCluster::GetMaxAtomicWrit
 
 void ThermostatCluster::OnAtomicWriteTimeout() {}
 
+bool ThermostatCluster::HasAttribute(AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case LocalTemperature::Id:
+    case ControlSequenceOfOperation::Id:
+    case SystemMode::Id:
+        return true;
+    case OutdoorTemperature::Id:
+        return mOptionalAttributes.OutdoorTemperature;
+    case Occupancy::Id:
+        return mFeatures.Has(Feature::kOccupancy);
+    case AbsMinHeatSetpointLimit::Id:
+        return mOptionalAttributes.AbsMinHeatSetpointLimit;
+    case AbsMaxHeatSetpointLimit::Id:
+        return mOptionalAttributes.AbsMaxHeatSetpointLimit;
+    case AbsMinCoolSetpointLimit::Id:
+        return mOptionalAttributes.AbsMinCoolSetpointLimit;
+    case AbsMaxCoolSetpointLimit::Id:
+        return mOptionalAttributes.AbsMaxCoolSetpointLimit;
+    case LocalTemperatureCalibration::Id:
+        return mOptionalAttributes.LocalTemperatureCalibration;
+    case OccupiedCoolingSetpoint::Id:
+        return mFeatures.Has(Feature::kCooling);
+    case OccupiedHeatingSetpoint::Id:
+        return mFeatures.Has(Feature::kHeating);
+    case UnoccupiedHeatingSetpoint::Id:
+        return mFeatures.Has(Feature::kHeating) && mFeatures.Has(Feature::kOccupancy);
+    case UnoccupiedCoolingSetpoint::Id:
+        return mFeatures.Has(Feature::kCooling) && mFeatures.Has(Feature::kOccupancy);
+    case MinHeatSetpointLimit::Id:
+        return mOptionalAttributes.MinHeatSetpointLimit;
+    case MaxHeatSetpointLimit::Id:
+        return mOptionalAttributes.MaxHeatSetpointLimit;
+    case MinCoolSetpointLimit::Id:
+        return mOptionalAttributes.MinCoolSetpointLimit;
+    case MaxCoolSetpointLimit::Id:
+        return mOptionalAttributes.MaxCoolSetpointLimit;
+    case MinSetpointDeadBand::Id:
+        return mFeatures.Has(Feature::kAutoMode);
+    case RemoteSensing::Id:
+        return mOptionalAttributes.RemoteSensing;
+    case ThermostatRunningMode::Id:
+        return mOptionalAttributes.ThermostatRunningMode;
+    case TemperatureSetpointHold::Id:
+        return mOptionalAttributes.TemperatureSetpointHold;
+    case TemperatureSetpointHoldDuration::Id:
+        return mOptionalAttributes.TemperatureSetpointHoldDuration;
+    case ThermostatRunningState::Id:
+        return mOptionalAttributes.ThermostatRunningState;
+    case SetpointChangeSource::Id:
+        return mOptionalAttributes.SetpointChangeSource;
+    case SetpointChangeAmount::Id:
+        return mOptionalAttributes.SetpointChangeAmount;
+    case SetpointChangeSourceTimestamp::Id:
+        return mOptionalAttributes.SetpointChangeSourceTimestamp;
+    case SetpointHoldExpiryTimestamp::Id:
+        return mOptionalAttributes.SetpointHoldExpiryTimestamp;
+    case PresetTypes::Id:
+    case NumberOfPresets::Id:
+    case ActivePresetHandle::Id:
+    case Presets::Id:
+        return mFeatures.Has(Feature::kPresets);
+    case ScheduleTypes::Id:
+    case NumberOfSchedules::Id:
+    case NumberOfScheduleTransitions::Id:
+    case NumberOfScheduleTransitionPerDay::Id:
+    case ActiveScheduleHandle::Id:
+    case Schedules::Id:
+        return mFeatures.Has(Feature::kMatterScheduleConfiguration);
+    case MaxThermostatSuggestions::Id:
+    case ThermostatSuggestions::Id:
+    case CurrentThermostatSuggestion::Id:
+    case ThermostatSuggestionNotFollowingReason::Id:
+        return mFeatures.Has(Feature::kThermostatSuggestions);
+    default:
+        return false;
+    }
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    // TODO
-    // Get from the "real thermostat"
-    // current mode
-    // current occupied heating setpoint
-    // current unoccupied heating setpoint
-    // current occupied cooling setpoint
-    // current unoccupied cooling setpoint
-    // and update the zcl cluster values
-    // This should be a callback defined function
-    // with weak binding so that real thermostat
-    // can get the values.
-    // or should this just be the responsibility of the thermostat application?
-
-    // To prevent warning
-    (void) endpoint;
-}

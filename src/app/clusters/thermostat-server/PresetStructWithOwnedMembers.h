@@ -26,7 +26,9 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <stddef.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {

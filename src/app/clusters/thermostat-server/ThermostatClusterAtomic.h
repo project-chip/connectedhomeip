@@ -21,7 +21,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/persistence/AttributePersistence.h>
-#include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
@@ -51,6 +50,7 @@ public:
         virtual Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId)  = 0;
 
         virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) = 0;
+        virtual bool HasAttribute(chip::AttributeId attributeId) = 0;
     };
 
     /**
@@ -133,6 +133,15 @@ private:
     ScopedNodeId mNodeId;
 
     Delegate * mDelegate = nullptr;
+
+    /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
+    /// @param endpoint The associated endpoint for the AtomicRequest invocation
+    /// @param attributeRequests The list of requested attributes
+    /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
+    /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
+    /// @return Status::Success if the request is valid, an error status if it is not
+    Protocols::InteractionModel::Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                                Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 };
 
 } // namespace Thermostat

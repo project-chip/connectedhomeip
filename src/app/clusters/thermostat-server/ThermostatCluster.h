@@ -48,7 +48,37 @@ class ThermostatCluster : public DefaultServerCluster, chip::FabricTable::Delega
 {
 
 public:
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features);
+
+    struct OptionalAttributes
+    {
+        bool AbsMinHeatSetpointLimit = false;
+        bool AbsMaxHeatSetpointLimit = false;
+        bool AbsMinCoolSetpointLimit = false;
+        bool AbsMaxCoolSetpointLimit = false;
+
+        bool LocalTemperatureCalibration = false;
+
+        bool MinHeatSetpointLimit = false;
+        bool MaxHeatSetpointLimit = false;
+        bool MinCoolSetpointLimit = false;
+        bool MaxCoolSetpointLimit = false;
+
+        bool RemoteSensing                   = false;
+        bool ThermostatRunningMode           = false;
+        bool TemperatureSetpointHold         = false;
+        bool TemperatureSetpointHoldDuration = false;
+        bool ThermostatRunningState          = false;
+        bool SetpointChangeSource            = false;
+        bool SetpointChangeAmount            = false;
+        bool SetpointChangeSourceTimestamp   = false;
+
+        bool SetpointHoldExpiryTimestamp = false;
+        bool OutdoorTemperature          = false;
+
+        OptionalAttributes() = default;
+    };
+
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -77,6 +107,7 @@ public:
     Protocols::InteractionModel::Status OnAtomicWriteRollback(AttributeId attributeId) override;
 
     std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
+    bool HasAttribute(chip::AttributeId attributeId) override;
 
     void OnAtomicWriteTimeout();
 
@@ -103,6 +134,8 @@ public:
     Setpoints mSetpoints;
 
 private:
+    OptionalAttributes mOptionalAttributes;
+
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
 
     Thermostat::Delegate * mDelegate;
@@ -166,7 +199,11 @@ private:
     void ReEvaluateCurrentSuggestion();
 };
 
-ThermostatCluster * ClusterForEndpoint(EndpointId endpointId);
+ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
+inline ThermostatCluster * ClusterForEndpoint(EndpointId endpointId)
+{
+    return FindClusterOnEndpoint(endpointId);
+}
 
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 

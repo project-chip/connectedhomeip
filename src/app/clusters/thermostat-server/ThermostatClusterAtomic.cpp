@@ -115,78 +115,6 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
 }
 
-/// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
-/// @param endpoint The associated endpoint for the AtomicRequest invocation
-/// @param attributeRequests The list of requested attributes
-/// @param attributeStatusCount The number of attribute statuses in attributeStatuses
-/// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
-/// @return Status::Success if the request is valid, an error status if it is not
-Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                              Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
-{
-
-    size_t attributeStatusCount = 0;
-    if (!CountAttributeRequests(attributeRequests, attributeStatusCount))
-    {
-        // We errored reading the list
-        return Status::InvalidCommand;
-    }
-    if (attributeStatusCount == 0)
-    {
-        // List can't be empty
-        return Status::InvalidCommand;
-    }
-    attributeStatuses.Alloc(attributeStatusCount);
-    for (size_t i = 0; i < attributeStatusCount; ++i)
-    {
-        attributeStatuses[i].attributeID = kInvalidAttributeId;
-        attributeStatuses[i].statusCode  = 0;
-    }
-    auto attributeIdsIter = attributeRequests.begin();
-    size_t index          = 0;
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
-
-        for (size_t i = 0; i < index; ++i)
-        {
-            auto & attributeStatus = attributeStatuses[i];
-            if (attributeStatus.attributeID == attributeId)
-            {
-                // Double-requesting an attribute is invalid
-                return Status::InvalidCommand;
-            }
-        }
-        attributeStatuses[index].attributeID = attributeId;
-        attributeStatuses[index].statusCode  = to_underlying(Status::Success);
-        index++;
-    }
-    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return Status::InvalidCommand;
-    }
-    for (size_t i = 0; i < index; ++i)
-    {
-        auto & attributeStatus = attributeStatuses[i];
-        const EmberAfAttributeMetadata * metadata =
-            emberAfLocateAttributeMetadata(endpoint, Thermostat::Id, attributeStatus.attributeID);
-
-        if (metadata != nullptr)
-        {
-            // This is definitely an attribute we know about.
-            continue;
-        }
-
-        if (IsSupportedGlobalAttributeNotInMetadata(attributeStatus.attributeID))
-        {
-            continue;
-        }
-
-        // This is not a valid attribute on the Thermostat cluster on the supplied endpoint
-        return Status::InvalidCommand;
-    }
-    return Status::Success;
-}
 
 } // anonymous namespace
 
@@ -509,6 +437,77 @@ void AtomicWriteSession::OnAtomicWriteTimeout()
         mDelegate->OnAtomicWriteRollback(mAttributeIds[i]);
     }
     ResetAtomicWrite();
+}
+
+
+/// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
+/// @param endpoint The associated endpoint for the AtomicRequest invocation
+/// @param attributeRequests The list of requested attributes
+/// @param attributeStatusCount The number of attribute statuses in attributeStatuses
+/// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
+/// @return Status::Success if the request is valid, an error status if it is not
+Status AtomicWriteSession::BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+                              Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+{
+
+    size_t attributeStatusCount = 0;
+    if (!CountAttributeRequests(attributeRequests, attributeStatusCount))
+    {
+        // We errored reading the list
+        return Status::InvalidCommand;
+    }
+    if (attributeStatusCount == 0)
+    {
+        // List can't be empty
+        return Status::InvalidCommand;
+    }
+    attributeStatuses.Alloc(attributeStatusCount);
+    for (size_t i = 0; i < attributeStatusCount; ++i)
+    {
+        attributeStatuses[i].attributeID = kInvalidAttributeId;
+        attributeStatuses[i].statusCode  = 0;
+    }
+    auto attributeIdsIter = attributeRequests.begin();
+    size_t index          = 0;
+    while (attributeIdsIter.Next())
+    {
+        auto & attributeId = attributeIdsIter.GetValue();
+
+        for (size_t i = 0; i < index; ++i)
+        {
+            auto & attributeStatus = attributeStatuses[i];
+            if (attributeStatus.attributeID == attributeId)
+            {
+                // Double-requesting an attribute is invalid
+                return Status::InvalidCommand;
+            }
+        }
+        attributeStatuses[index].attributeID = attributeId;
+        attributeStatuses[index].statusCode  = to_underlying(Status::Success);
+        index++;
+    }
+    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return Status::InvalidCommand;
+    }
+    for (size_t i = 0; i < index; ++i)
+    {
+        auto & attributeStatus = attributeStatuses[i];
+        if (mDelegate->HasAttribute(attributeStatus.attributeID))
+        {
+            // This is definitely an attribute we know about.
+            continue;
+        }
+        
+        if (IsSupportedGlobalAttributeNotInMetadata(attributeStatus.attributeID))
+        {
+            continue;
+        }
+
+        // This is not a valid attribute on the Thermostat cluster on the supplied endpoint
+        return Status::InvalidCommand;
+    }
+    return Status::Success;
 }
 
 } // namespace Thermostat

@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/util/attribute-storage.h>
-#include <protocols/interaction_model/Constants.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
