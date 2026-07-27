@@ -124,7 +124,7 @@ void WifiInterface::ResetIPNotificationStates()
 
 void WifiInterface::NotifyWifiTaskInitialized(void)
 {
-    sl_wfx_startup_ind_t evt = { 0 };
+    sl_wfx_startup_ind_t evt = { { 0 } };
 
     // TODO: We should move this to the init function and not the notification function
     // Creating a timer which will be used to retry connection with AP

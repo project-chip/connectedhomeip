@@ -72,7 +72,7 @@ jobs:
                 platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+              uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
@@ -136,7 +136,7 @@ jobs:
             # scope, letting the pins bump together and stay consistent (see lint.yml check).
             - name: Perform CodeQL Analysis
               if: ${{ inputs.run-codeql }}
-              uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+              uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
               with:
                   category: "/language:cpp"
                   upload: False
@@ -156,7 +156,7 @@ jobs:
                   output: "sarif-results/cpp.sarif"
             - name: Upload SARIF
               if: ${{ inputs.run-codeql }}
-              uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+              uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
               with:
                   sarif_file: "sarif-results/cpp.sarif"
             - name: Upload loc as a Build Artifact
@@ -226,7 +226,7 @@ jobs:
             # deactivate until a better workaround is found
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+            #   uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
             #   with:
             #       languages: "cpp"
             - name: Setup and Build Simulated Device
@@ -504,7 +504,7 @@ jobs:
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+            #   uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
             #   with:
             #       languages: "cpp"
 
