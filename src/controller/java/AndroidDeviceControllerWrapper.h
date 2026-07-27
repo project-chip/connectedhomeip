@@ -257,7 +257,7 @@ private:
 
     // Java object containing the ThreadCredentialsNeeded Listener
     jobject mThreadCredentialsNeededListenerObject = nullptr;
-    jmethodID mThreadCredentialsNeededListener = nullptr;
+    jmethodID mThreadCredentialsNeededListener     = nullptr;
 
     // Java object containing the WifiCredentialsNeeded Listener
     jobject mWifiCredentialsNeededListenerObject;
