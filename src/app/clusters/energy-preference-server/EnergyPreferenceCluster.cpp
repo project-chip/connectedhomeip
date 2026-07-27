@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
- #include "EnergyPreferenceCluster.h"
+#include "EnergyPreferenceCluster.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>

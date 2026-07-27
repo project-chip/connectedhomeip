@@ -15,5 +15,5 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 #include "CodegenIntegration.h"
