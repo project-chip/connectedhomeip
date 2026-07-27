@@ -211,7 +211,7 @@ class NetworkLink(NetworkResource):
         while time.time() - start_time < 10:
             # We're not interested in stderr, so we can discard it.
             if 'tentative' not in subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL):
-                log.info("No more tentative addresses")
+                log.debug("No more tentative addresses")
                 return True
             time.sleep(0.1)
 
