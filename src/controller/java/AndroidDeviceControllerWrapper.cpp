@@ -400,6 +400,29 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 void AndroidDeviceControllerWrapper::Shutdown()
 {
     VerifyOrReturn(mIsInitialized);
+
+    // Listener objects are JNI global refs and must be released during teardown.
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env != nullptr)
+    {
+        if (mThreadCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
+            mThreadCredentialsNeededListenerObject = nullptr;
+        }
+        if (mWifiCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mWifiCredentialsNeededListenerObject);
+            mWifiCredentialsNeededListenerObject = nullptr;
+        }
+    }
+    else
+    {
+        ChipLogError(Controller, "Could not get JNIEnv for current thread during Shutdown");
+    }
+    mThreadCredentialsNeededListener = nullptr;
+    mWifiCredentialsNeededListener   = nullptr;
+
     getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
