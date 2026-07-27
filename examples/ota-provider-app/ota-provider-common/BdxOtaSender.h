@@ -47,9 +47,9 @@ private:
     // Null-terminated string representing file designator
     char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
     std::unordered_map<std::string, std::string> mFileDesignatorMap;
-    uint32_t mNumBytesSent = 0;
-    bool     mLastReceiveInitStartOffsetBitSet = false;
-    uint32_t mLastReceiveInitStartOffset       = 0;
+    uint32_t mNumBytesSent                 = 0;
+    bool mLastReceiveInitStartOffsetBitSet = false;
+    uint32_t mLastReceiveInitStartOffset   = 0;
 
     bool mInitialized = false;
 

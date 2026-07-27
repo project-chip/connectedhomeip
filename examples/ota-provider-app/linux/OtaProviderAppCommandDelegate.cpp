@@ -63,7 +63,7 @@ Json::Value OtaProviderAppCommandHandler::BuildBDXResumeOffsetResponse(uint16_t 
 {
     Json::Value payload(Json::objectValue);
     payload["StartOffsetBitSet"] = GetOtaProviderExample().GetStartOffsetBitSet();
-    payload["StartOffset"] = GetOtaProviderExample().GetStartOffset();
+    payload["StartOffset"]       = GetOtaProviderExample().GetStartOffset();
     return payload;
 }
 
@@ -174,7 +174,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         out["Name"]     = "BDXResumeOffsetResponse";
         out["Cluster"]  = cluster;
         out["Endpoint"] = endpoint;
-        out["Payload"] = self->BuildBDXResumeOffsetResponse(endpoint);
+        out["Payload"]  = self->BuildBDXResumeOffsetResponse(endpoint);
 
         if (delegate && delegate->GetPipes())
         {

@@ -244,9 +244,9 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         # command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
         # self.write_to_app_pipe(command, self.fifo_in)
         # response_data = self.read_from_app_pipe(self.fifo_out)
-# 
+#
         # logger.info("Out of band command response: %s", response_data)
-# 
+#
         # # Verify that the DUT obtains the User Consent from the user prior to transfer of software update image
         # user_consent_needed = response_data['Payload']['UserConsentNeeded']
         # asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")

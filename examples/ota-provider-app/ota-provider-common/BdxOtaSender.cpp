@@ -116,7 +116,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
         // Set the last receive init start offset and bit set
         mLastReceiveInitStartOffset       = static_cast<uint32_t>(mTransfer.GetStartOffset());
-        mLastReceiveInitStartOffsetBitSet = (mLastReceiveInitStartOffset != 0);    
+        mLastReceiveInitStartOffsetBitSet = (mLastReceiveInitStartOffset != 0);
 
         // Store the file designator used during block query
         uint16_t fdl       = 0;
