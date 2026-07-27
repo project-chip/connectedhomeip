@@ -28,6 +28,7 @@
 #endif
 
 #include <FreeRTOS.h>
+#include <semphr.h>
 #include <task.h>
 #if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <utils_log.h>
@@ -38,8 +39,22 @@ namespace Logging {
 namespace Platform {
 
 static char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+static StaticSemaphore_t sLogMutexStorage;
+static SemaphoreHandle_t sLogMutex = xSemaphoreCreateMutexStatic(&sLogMutexStorage);
+
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
+    // Logging is synchronous and may block on UART output, so it is not safe from interrupt context.
+    if (xPortIsInsideInterrupt())
+    {
+        return;
+    }
+
+    const bool shouldLock = xTaskGetSchedulerState() == taskSCHEDULER_RUNNING;
+    if (shouldLock && xSemaphoreTake(sLogMutex, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
 #if !PW_RPC_ENABLED
     int lmsg = 0;
 
@@ -111,6 +126,11 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     const char * newline = "\r\n";
     PigweedLogger::putString(newline, strlen(newline));
 #endif
+
+    if (shouldLock)
+    {
+        xSemaphoreGive(sLogMutex);
+    }
 }
 
 } // namespace Platform
