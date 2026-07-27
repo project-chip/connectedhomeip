@@ -736,6 +736,10 @@
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
         (EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback,                                           \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
+        (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback,                                           \
     };
 
 // clang-format off
@@ -1281,8 +1285,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(249), \
       .attributeCount = 23, \
       .clusterSize = 10, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayColorControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 112 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \

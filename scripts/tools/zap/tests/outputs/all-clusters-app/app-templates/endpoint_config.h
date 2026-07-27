@@ -2999,6 +2999,10 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayThermostatUserInterfaceConfigurationServer[] = {                              \
         (EmberAfGenericClusterFunction) MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback,        \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
+        (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback,                                           \
     };
 
 // clang-format off
@@ -4531,8 +4535,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(638), \
       .attributeCount = 54, \
       .clusterSize = 315, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayColorControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 242 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
