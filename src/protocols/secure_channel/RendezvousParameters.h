@@ -164,6 +164,23 @@ public:
         return *this;
     }
 
+    // Value equality over every member: they are all inputs to the rendezvous/PASE attempt, so two
+    // sets of parameters are interchangeable only if all of them match.
+    bool operator==(const RendezvousParameters & other) const
+    {
+        return mPeerAddress == other.mPeerAddress &&            //
+            mSetupPINCode == other.mSetupPINCode &&             //
+            mSetupDiscriminator == other.mSetupDiscriminator && //
+            mMRPConfig == other.mMRPConfig
+#if CONFIG_NETWORK_LAYER_BLE
+            && mBleLayer == other.mBleLayer &&                  //
+            mConnectionObject == other.mConnectionObject &&     //
+            mDiscoveredObject == other.mDiscoveredObject
+#endif // CONFIG_NETWORK_LAYER_BLE
+            ;
+    }
+    bool operator!=(const RendezvousParameters & other) const { return !(*this == other); }
+
 private:
     Transport::PeerAddress mPeerAddress; ///< the peer node address
     uint32_t mSetupPINCode = 0;          ///< the target peripheral setup PIN Code

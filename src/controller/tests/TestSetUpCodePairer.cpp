@@ -22,7 +22,11 @@
 #include <controller/SetUpCodePairer.h>
 #include <controller/tests/SetUpCodePairerTestAccess.h>
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
+#include <lib/dnssd/Types.h>
+#include <lib/support/CodeUtils.h>
+#include <system/SystemClock.h>
 #include <transport/raw/PeerAddress.h>
 
 #include <memory>
@@ -32,6 +36,35 @@ using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
+
+constexpr uint16_t kDiscriminatorA = 0xABC;
+constexpr uint16_t kDiscriminatorB = 0xDEF;
+
+Inet::IPAddress ParseIP(const char * str)
+{
+    Inet::IPAddress addr;
+    // The callers pass valid literals; treat a parse failure as a test bug.
+    VerifyOrDie(Inet::IPAddress::FromString(str, addr));
+    return addr;
+}
+
+// InterfaceId::PlatformType is an integer on the host builds these tests run on; cast explicitly so
+// the suite's -Wconversion stays clean regardless of the exact underlying type.
+Inet::InterfaceId MakeInterfaceId(unsigned int id)
+{
+    return Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(id));
+}
+
+// Build a single-address commissionable-node resolution record for the given address and interface.
+Dnssd::CommonResolutionData MakeResolutionData(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
+{
+    Dnssd::CommonResolutionData data;
+    data.interfaceId  = interfaceId;
+    data.numIPs       = 1;
+    data.ipAddress[0] = ip;
+    data.port         = 5540;
+    return data;
+}
 
 // DeviceCommissioner is too large to embed in a test fixture (it exceeds
 // the pw_unit_test light backend's static memory pool).  Heap-allocate it
@@ -160,6 +193,98 @@ TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
     // mCurrentPASEParameters must be cleared — stale UDP params must not
     // survive to confuse a later ReconfirmRecord check.
     EXPECT_FALSE(Access().HasCurrentPASEParameters());
+}
+
+// A non-link-local address advertised on two different interfaces resolves to the same
+// interface-less PeerAddress (we rely on the routing table, not the discovery interface), so the
+// two candidates must be treated as coalescible.
+TEST_F(TestSetUpCodePairer, CanCoalesce_NonLinkLocalSameAddressDifferentInterfaces)
+{
+    const Inet::IPAddress global = ParseIP("2001:db8::1");
+    SetUpCodePairerParameters a(MakeResolutionData(global, MakeInterfaceId(1)), kDiscriminatorA, 0);
+    SetUpCodePairerParameters b(MakeResolutionData(global, MakeInterfaceId(2)), kDiscriminatorA, 0);
+    EXPECT_TRUE(a.CanCoalesceWith(b));
+}
+
+// A link-local address keeps its interface in the PeerAddress, so the same address on two
+// interfaces is two genuinely distinct destinations and must not coalesce.
+TEST_F(TestSetUpCodePairer, CannotCoalesce_LinkLocalSameAddressDifferentInterfaces)
+{
+    const Inet::IPAddress lla = ParseIP("fe80::1");
+    SetUpCodePairerParameters a(MakeResolutionData(lla, MakeInterfaceId(1)), kDiscriminatorA, 0);
+    SetUpCodePairerParameters b(MakeResolutionData(lla, MakeInterfaceId(2)), kDiscriminatorA, 0);
+    EXPECT_FALSE(a.CanCoalesceWith(b));
+}
+
+// The long discriminator selects which setup payload's passcode we use, so candidates that share a
+// PeerAddress but carry different discriminators must not coalesce.
+TEST_F(TestSetUpCodePairer, CannotCoalesce_DifferentLongDiscriminator)
+{
+    const Inet::IPAddress global = ParseIP("2001:db8::1");
+    SetUpCodePairerParameters a(MakeResolutionData(global, Inet::InterfaceId::Null()), kDiscriminatorA, 0);
+    SetUpCodePairerParameters b(MakeResolutionData(global, Inet::InterfaceId::Null()), kDiscriminatorB, 0);
+    EXPECT_FALSE(a.CanCoalesceWith(b));
+}
+
+// MRP configuration is a PASE connection input; candidates that differ only in their MRP intervals
+// must not coalesce.
+TEST_F(TestSetUpCodePairer, CannotCoalesce_DifferentMRPConfig)
+{
+    const Inet::IPAddress global = ParseIP("2001:db8::1");
+    auto dataA                   = MakeResolutionData(global, Inet::InterfaceId::Null());
+    dataA.mrpRetryIntervalIdle   = System::Clock::Milliseconds32(1000);
+    auto dataB                   = MakeResolutionData(global, Inet::InterfaceId::Null());
+    dataB.mrpRetryIntervalIdle   = System::Clock::Milliseconds32(2000);
+    SetUpCodePairerParameters a(dataA, kDiscriminatorA, 0);
+    SetUpCodePairerParameters b(dataB, kDiscriminatorA, 0);
+    EXPECT_FALSE(a.CanCoalesceWith(b));
+}
+
+// Different IP addresses are different destinations and must not coalesce.
+TEST_F(TestSetUpCodePairer, CannotCoalesce_DifferentAddress)
+{
+    SetUpCodePairerParameters a(MakeResolutionData(ParseIP("2001:db8::1"), Inet::InterfaceId::Null()), kDiscriminatorA, 0);
+    SetUpCodePairerParameters b(MakeResolutionData(ParseIP("2001:db8::2"), Inet::InterfaceId::Null()), kDiscriminatorA, 0);
+    EXPECT_FALSE(a.CanCoalesceWith(b));
+}
+
+// NotifyCommissionableDeviceDiscovered must drop a duplicate address within a single advertisement
+// (the same non-link-local IP listed twice) instead of queuing a redundant PASE attempt.  Waiting
+// for PASE is asserted so ConnectToDiscoveredDevice does not drain the queue before we inspect it.
+TEST_F(TestSetUpCodePairer, NotifyDiscovered_DropsDuplicateAddressesInOneRecord)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForPASE(true);
+
+    const Inet::IPAddress global = ParseIP("2001:db8::1");
+    auto data                    = MakeResolutionData(global, Inet::InterfaceId::Null());
+    data.numIPs                  = 2;
+    data.ipAddress[0]            = global;
+    data.ipAddress[1]            = global; // same address advertised twice
+
+    Access().NotifyCommissionableDeviceDiscovered(data, kDiscriminatorA);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+}
+
+// The same non-link-local device rediscovered on a second interface must not add a second identical
+// queue entry, but a genuinely different address must.
+TEST_F(TestSetUpCodePairer, NotifyDiscovered_CoalescesAcrossCallbacks)
+{
+    Access().SetRemoteId(1);
+    Access().SetWaitingForPASE(true);
+
+    const Inet::IPAddress global = ParseIP("2001:db8::1");
+    Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(global, MakeInterfaceId(1)), kDiscriminatorA);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    // Same non-link-local address, different interface -> coalesces.
+    Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(global, MakeInterfaceId(2)), kDiscriminatorA);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    // Different address -> new entry.
+    Access().NotifyCommissionableDeviceDiscovered(MakeResolutionData(ParseIP("2001:db8::2"), MakeInterfaceId(1)),
+                                                  kDiscriminatorA);
+    EXPECT_EQ(Access().GetDiscoveredParametersCount(), 2u);
 }
 
 } // namespace
