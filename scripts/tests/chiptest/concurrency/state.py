@@ -125,3 +125,88 @@ class ProcessState:
             yield
         finally:
             self.phase = ProcessPhase.READY
+
+
+class WithException(Protocol):
+    """Protocol for objects that hold an exception."""
+
+    @property
+    def exception(self) -> BaseException | None:
+        ...
+
+
+class ProcessGroupState:
+    """State of a group of processes.
+
+    It is used for synchronized lifecycle coordination and error propagation between the parent and child processes.
+    """
+
+    def __init__(self, mp_manager: SyncManager) -> None:
+        self._state_changed = mp_manager.Condition()
+        self._states: list[ProcessState] = []
+        self._exception_holders: list[WithException] = []
+        self.process_ready_queue: CancellableQueue[int] = CancellableQueue(mp_manager)
+
+    def register_process_state(self, state: ProcessState) -> threading.Condition:
+        """Register a process state as part of the process group.
+
+        Used to notify the parent process when any of the child processes change their state. The returned condition needs to be
+        used by the child process to notify the parent process when its state changes.
+        """
+        with self._state_changed:
+            self._states.append(state)
+            self._exception_holders.append(state)
+            self._state_changed.notify_all()
+        return self._state_changed
+
+    def register_exception_holder(self, holder: WithException) -> threading.Condition:
+        """Register an object which has an exception.
+
+        It can be, e.g., a thread which can generate an exception. The returned condition needs to be used by the object to notify
+        the parent process when its exception changes.
+        """
+        with self._state_changed:
+            self._exception_holders.append(holder)
+            self._state_changed.notify_all()
+        return self._state_changed
+
+    def __len__(self) -> int:
+        return len(self._states)
+
+    @property
+    def phase_min(self) -> ProcessPhase:
+        """Return the minimum phase of all registered subprocesses, or NOT_STARTED if there are no registered processes."""
+        return min((state.phase for state in self._states), default=ProcessPhase.NOT_STARTED)
+
+    @property
+    def phase_max(self) -> ProcessPhase:
+        """Return the maximum phase of all registered subprocesses, or NOT_STARTED if there are no registered processes."""
+        return max((state.phase for state in self._states), default=ProcessPhase.NOT_STARTED)
+
+    def count_by_phase(self, phase: ProcessPhase) -> int:
+        """Return the number of registered subprocesses in the given phase."""
+        return sum(state.phase == phase for state in self._states)
+
+    @property
+    def working_count(self) -> int:
+        """Return the number of registered subprocesses in the WORKING phase."""
+        return self.count_by_phase(ProcessPhase.WORKING)
+
+    def wait_for(self, predicate: Callable[[Iterable[ProcessState]], bool], timeout: float | None = None):
+        """Wait for the given state predicate to become True, with an optional timeout."""
+        with self._state_changed:
+            return self._state_changed.wait_for(lambda: predicate(self._states), timeout)
+
+    def collect_exceptions(self) -> Literal[True]:
+        """Collect exceptions from all registered exception holders.
+
+        Raise them as an ExceptionGroup if there are any, or return True if there are no exceptions, which allows to use this method
+        in a predicate for wait_for.
+        """
+        if (exceptions := tuple(ex_holder.exception
+                                for ex_holder in self._exception_holders
+                                if isinstance(ex_holder.exception, BaseException))):
+            if len(exceptions) == 1:
+                raise exceptions[0]
+            raise BaseExceptionGroup("Caught exceptions in process group", exceptions)
+        return True

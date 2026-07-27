@@ -446,6 +446,13 @@ class TestRunTime(StrEnum):
     DARWIN_FRAMEWORK_TOOL_PYTHON = 'darwin_framework_tool_python'  # use the python yaml test parser with chip-tool
 
 
+class TestConcurrencySchedulerType(StrEnum):
+    """Type of scheduler used for concurrent test execution."""
+
+    FAST = auto()
+    REPRODUCIBLE = auto()
+
+
 @dataclass
 class TestJobConfig:
     """Worker configuration which is a subset of command line options."""
@@ -457,6 +464,7 @@ class TestJobConfig:
     test_timeout_seconds: int | None
     value_wait_extra_duration_ms: int | None
     concurrency: int
+    concurrency_scheduler: TestConcurrencySchedulerType
 
 
 @dataclass

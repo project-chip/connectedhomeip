@@ -23,7 +23,7 @@ from typing import Generic, TypeVar
 
 from chiptest.concurrency.config import ProcessConfig
 from chiptest.concurrency.context import with_annotated_exception
-from chiptest.concurrency.state import ProcessPhase, ProcessState
+from chiptest.concurrency.state import ProcessGroupState, ProcessPhase, ProcessState
 from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 
 log = logging.getLogger(__name__)
@@ -71,14 +71,15 @@ class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
     # Methods run in the parent process.
 
     def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfigT,
-                 work_queue: CancellableQueue[WorkRequestT], rsp_queue: CancellableQueue[WorkResponseT]) -> None:
+                 work_queue: CancellableQueue[WorkRequestT], rsp_queue: CancellableQueue[WorkResponseT],
+                 group_state: ProcessGroupState | None = None) -> None:
         # Neither mp_context or mp_manager should be saved as fields, as they are not picklable between processes. They can be used
         # to initialize some shared resources in the constructor.
 
         self._config = config
         self.work_queue = work_queue
         self._rsp_queue = rsp_queue
-        self.state = ProcessState(mp_manager, config)
+        self.state = ProcessState(mp_manager, config, group_state)
 
         # Create multiprocessing.Process in the given context.
         self._proc = mp_context.Process(target=self.run, name=self._config.name)
