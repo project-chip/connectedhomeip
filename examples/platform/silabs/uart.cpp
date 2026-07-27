@@ -155,6 +155,7 @@ typedef struct
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 #define UART_MAX_QUEUE_SIZE 125
 #else
+static constexpr uint32_t kUartTxCompleteFlag = 1;
 #if CHIP_DETAIL_LOGGING
 #define UART_MAX_QUEUE_SIZE 60
 #else
@@ -166,7 +167,6 @@ typedef struct
 
 #define SILABS_TRUNCATED_TERMINATOR "....."
 
-static constexpr uint32_t kUartTxCompleteFlag = 1;
 static osThreadId_t sUartTaskHandle;
 constexpr uint32_t kUartTaskSize = 1024;
 static uint8_t uartStack[kUartTaskSize];
