@@ -166,8 +166,8 @@ class TC_COMPRO_2_9(COMPROBaseTest):
                 address=NullValue,
                 transport=single_transport,
                 discriminator=0,
-                vendorId=0,
-                productId=0,
+                vendorID=0,
+                productID=0,
                 timeout=30,
             )),
             ("ProxyDisconnectRequest", cp.Commands.ProxyDisconnectRequest(

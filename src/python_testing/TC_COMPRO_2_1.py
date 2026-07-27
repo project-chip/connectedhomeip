@@ -100,8 +100,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
                      "DUT returns a uint16 value >= 1"),
             TestStep(9, "TH reads CachedResults attribute (if BGS supported)",
                      "DUT returns null (no cached results when background scan is not running)"),
-            TestStep(10, "TH reads WiFiBand attribute (if present in AttributeList)",
-                     "DUT returns a WiFiBandBitmap with only valid bits set"),
+            TestStep(10, "TH reads WiFiBand attribute (if WI feature supported)",
+                     "DUT returns a WiFiBandBitmap with at least one of the 2G4 (bit 0) or "
+                     "5G (bit 2) bits set and no undefined bits"),
             TestStep(11, "TH writes Transport attribute with a value different from step 3",
                      "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
             TestStep(12, "TH reads Transport attribute",
@@ -116,9 +117,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             TestStep(16, "TH reads MaxCachedResults attribute (if BGS supported)",
                      "DUT returns the same value as step 6 (value unchanged)"),
             TestStep(17, "TH writes WiFiBand attribute with a value different from step 10 "
-                     "(if present in AttributeList)",
+                     "(if WI feature supported)",
                      "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
-            TestStep(18, "TH reads WiFiBand attribute (if present in AttributeList)",
+            TestStep(18, "TH reads WiFiBand attribute (if WI feature supported)",
                      "DUT returns the same value as step 10 (value unchanged)"),
         ]
 
@@ -134,6 +135,7 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         feature_map = await self.read_feature_map()
         logger.info("FeatureMap = 0x%04x", feature_map)
         has_bgs = self.has_feature_bgs(feature_map)
+        has_wi = self.has_feature_wi(feature_map)
 
         # Step 3 — Transport (mandatory).  Defined transport bits per spec are
         # BLE (bit 1), WiFiPAF (bit 3) and NTL (bit 4); bits 0, 2 and 5-7 are
@@ -197,28 +199,37 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.mark_step_range_skipped(6, 9)
 
-        # Step 10 — WiFiBand (WiFiBandBitmap).  Conformance is [WI]: optional even
-        # when WI is supported, so a WI proxy MAY omit the attribute.  Gate on its
-        # actual presence in the AttributeList rather than on the WI feature.  The
-        # spec constraint is "desc": WiFiBand indicates the bands supported for
-        # PAFTP.  WI does not require the WiFiPAF transport bit, so a value of 0 is
-        # valid when WI is advertised without WiFiPAF.  Only require at least one
-        # band when the WiFiPAF transport is advertised; always reject undefined
-        # bits.
+        # Step 10 — WiFiBand (WiFiBandBitmap).  Conformance is WI: the attribute is
+        # MANDATORY when the WiFiNetworkInterface (WI) feature is supported and
+        # absent otherwise (spec WiFiBand attribute row: quality F, access R V,
+        # conformance WI).  Per the test plan the value SHALL have at least one of
+        # the 2G4 (bit 0) or 5G (bit 2) bits set.  Gate on the WI feature (matching
+        # the plan's F_WI PICS gate) and cross-check that the attribute's presence
+        # in the AttributeList agrees with the advertised feature.
         wifi_band = None
-        self.step(10)
         has_wifiband = await self.attribute_guard(endpoint=self.cp_endpoint, attribute=cp.Attributes.WiFiBand)
-        if has_wifiband:
+        if has_wi:
+            self.step(10)
+            asserts.assert_true(
+                has_wifiband,
+                "WI feature is advertised but the WiFiBand attribute is absent; "
+                "WiFiBand is mandatory when the WI feature is supported.")
             wifi_band = await self.read_wifi_band()
             logger.info("WiFiBand = 0x%04x", wifi_band)
             valid_band_mask = (cp.Bitmaps.WiFiBandBitmap.k2g4 |
                                cp.Bitmaps.WiFiBandBitmap.k5g)
             asserts.assert_equal(wifi_band & ~valid_band_mask, 0,
                                  f"WiFiBand 0x{wifi_band:04x} contains undefined band bits")
-            if transport & cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF:
-                asserts.assert_not_equal(
-                    wifi_band, 0,
-                    "WiFiBand must have at least one band bit set when WiFiPAF transport is supported")
+            asserts.assert_not_equal(
+                wifi_band, 0,
+                "WiFiBand must have at least one of the 2G4 or 5G band bits set "
+                "when the WI feature is supported")
+        else:
+            asserts.assert_false(
+                has_wifiband,
+                "WiFiBand attribute is present but the WI feature is not advertised; "
+                "WiFiBand conformance is WI (present only when WI is supported).")
+            self.skip_step(10)
 
         # ------------------------------------------------------------------
         # Steps 11-18 — Transport, MaxSessions, MaxCachedResults and WiFiBand
@@ -281,9 +292,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.mark_step_range_skipped(15, 16)
 
-        # Steps 17-18 — WiFiBand ([WI]: present only if advertised in the
-        # AttributeList, as determined in step 10)
-        if has_wifiband:
+        # Steps 17-18 — WiFiBand (WI: present iff the WI feature is supported,
+        # as determined in step 10)
+        if has_wi:
             # Step 17 — write a different value → UNSUPPORTED_WRITE
             self.step(17)
             await self.expect_write_rejected(

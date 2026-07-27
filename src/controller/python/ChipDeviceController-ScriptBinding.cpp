@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <list>
 #include <memory>
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,9 +128,12 @@ public:
               uint16_t discriminator, uint32_t setupPinCode)
     {
         // Guard against re-entrancy: if a previous session is still in flight,
-        // reset it before overwriting state.
+        // reset it before overwriting state.  Init() is only called from Python
+        // at the start of a fresh CommissionViaProxy (never from within a
+        // CommandSender callback), so clearing the list here cannot destroy a
+        // sender that is mid-callback higher up the stack.
         DeactivateProxyTransport();
-        mProxyCmdSender.reset();
+        mProxyCmdSenders.clear();
 
         mDevCtrl          = devCtrl;
         mPairingDelegate  = pairingDelegate;
@@ -209,7 +213,16 @@ public:
         auto timeout = chip::System::Clock::Seconds16(request.responseTimeout + 10);
         ReturnErrorOnFailure(cmdSender->SendCommandRequest(sessionOpt.Value(), chip::MakeOptional(timeout)));
 
-        mProxyCmdSender = std::move(cmdSender);
+        // Own the sender until its OnDone fires.  Processing a response drives the
+        // commissioning stack synchronously, which frequently emits the next
+        // ProxyMessageRequest from *inside* this sender's OnResponse — so a single
+        // owning pointer would be reassigned (and the still-executing sender
+        // destroyed) mid-callback.  Holding each sender in a list and reaping it
+        // only in OnDone avoids that use-after-free.  SendCommandRequest has
+        // succeeded here, so OnDone is guaranteed to be called exactly once; on the
+        // earlier failure returns above, OnDone is never called and cmdSender is
+        // freed when it goes out of scope.
+        mProxyCmdSenders.push_back(std::move(cmdSender));
         return CHIP_NO_ERROR;
     }
 
@@ -245,8 +258,10 @@ public:
 
     void OnDone(chip::app::CommandSender * sender) override
     {
-        if (mProxyCmdSender.get() == sender)
-            mProxyCmdSender.reset();
+        // Destroy the finished sender.  OnDone is the sanctioned point to free a
+        // CommandSender, so erasing (and thus destroying) it here is safe.
+        mProxyCmdSenders.remove_if(
+            [sender](const chip::Platform::UniquePtr<chip::app::CommandSender> & s) { return s.get() == sender; });
     }
 
 private:
@@ -303,7 +318,11 @@ private:
 
     chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;
     chip::SessionHolder mProxySession;
-    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyCmdSender;
+    // Outstanding ProxyMessageRequest senders, each owned until its OnDone fires.
+    // A list (not a single pointer) because a response can synchronously trigger
+    // the next request from inside the current sender's callback; see
+    // SendProxyMessage/OnDone.
+    std::list<chip::Platform::UniquePtr<chip::app::CommandSender>> mProxyCmdSenders;
     chip::Controller::CommissioningParameters mCommParams;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback{ OnDeviceConnected, this };

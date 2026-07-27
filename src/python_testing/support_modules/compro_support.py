@@ -349,7 +349,6 @@ import json
 import logging
 import os
 import sys
-import typing
 
 from mobly import asserts
 
@@ -479,11 +478,11 @@ class EDFixture:
         app_path: str,
         discriminator: int,
         passcode: int,
-        ssh_host: typing.Optional[str] = None,
+        ssh_host: str | None = None,
         ssh_user: str = "ubuntu",
         extra_args: str = "",
         ed_transport: str = "wifipaf",
-        serial_port: typing.Optional[str] = None,
+        serial_port: str | None = None,
         serial_baud: int = 115200,
     ):
         self._app_path = app_path
@@ -498,8 +497,8 @@ class EDFixture:
         # "remote" == not an in-process subprocess: driven over SSH or serial.
         self._remote = bool(ssh_host or serial_port)
         self._remote_desc = ssh_host or (f"serial:{serial_port}" if serial_port else "local")
-        self._process: typing.Optional[asyncio.subprocess.Process] = None
-        self._remote_pid: typing.Optional[int] = None
+        self._process: asyncio.subprocess.Process | None = None
+        self._remote_pid: int | None = None
         self._validate_extra_args_for_transport()
 
     @property
@@ -805,7 +804,7 @@ class COMPROBaseTest(MatterBaseTest):
     # ED fixture helpers
     # ------------------------------------------------------------------
 
-    def _ed_fixture_from_params(self) -> typing.Optional[EDFixture]:
+    def _ed_fixture_from_params(self) -> EDFixture | None:
         """Build an EDFixture from user-defined test parameters, or return None.
 
         Supported user-defined arguments:
@@ -840,8 +839,8 @@ class COMPROBaseTest(MatterBaseTest):
 
     async def ensure_ed_commissionable(
         self,
-        ed: typing.Optional[EDFixture],
-        manual_prompt: typing.Optional[str] = None,
+        ed: EDFixture | None,
+        manual_prompt: str | None = None,
     ):
         """Ensure the ED is in commissionable state (automated or manual).
 
@@ -860,8 +859,8 @@ class COMPROBaseTest(MatterBaseTest):
 
     async def ensure_ed_not_commissionable(
         self,
-        ed: typing.Optional[EDFixture],
-        manual_prompt: typing.Optional[str] = None,
+        ed: EDFixture | None,
+        manual_prompt: str | None = None,
     ):
         """Ensure the ED is NOT in commissionable state (automated or manual).
 

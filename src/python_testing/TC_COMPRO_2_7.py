@@ -75,7 +75,6 @@ For max_sessions > 1 supply additional EDs via ed2_*, ed3_*, ... arguments:
 """
 
 import logging
-import typing
 
 from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, EDFixture, commission_if_needed
@@ -125,7 +124,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                      "Each disconnect returns SUCCESS"),
         ]
 
-    def _ed_fixture_for_index(self, n: int) -> typing.Optional[EDFixture]:
+    def _ed_fixture_for_index(self, n: int) -> EDFixture | None:
         """Build an EDFixture for ED #n (1-based) from user params.
 
         ED #1 uses the standard ed_* params; ED #2+ use ed2_*, ed3_*, etc.
@@ -195,7 +194,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
 
         # Step 5 — ensure max_sessions EDs commissionable simultaneously
         self.step(5)
-        ed_fixtures: list[typing.Optional[EDFixture]] = []
+        ed_fixtures: list[EDFixture | None] = []
         for n in range(1, max_sessions + 1):
             disc_n = self._discriminator_for_index(n)
             ed_n = self._ed_fixture_for_index(n)
@@ -224,8 +223,8 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                     address=NullValue,
                     transport=proxy_transport,
                     discriminator=disc_n,
-                    vendorId=0,
-                    productId=0,
+                    vendorID=0,
+                    productID=0,
                     timeout=proxy_connect_timeout,
                     wiFiBand=proxy_wifi_band,
                 ),
@@ -265,8 +264,8 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                     address=NullValue,
                     transport=proxy_transport,
                     discriminator=overflow_disc,
-                    vendorId=0,
-                    productId=0,
+                    vendorID=0,
+                    productID=0,
                     timeout=30,
                     wiFiBand=proxy_wifi_band,
                 ),

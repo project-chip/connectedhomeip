@@ -215,8 +215,8 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                                          f"No scan result matched ED discriminator {expected_discriminator}")
             result = matches[0]
 
-        logger.info("Scan result: discriminator=%d transport=0x%02x vendorId=%d productId=%d",
-                    result.discriminator, result.transport, result.vendorId, result.productId)
+        logger.info("Scan result: discriminator=%d transport=0x%02x vendorID=%d productID=%d",
+                    result.discriminator, result.transport, result.vendorID, result.productID)
 
         # Transport must be non-zero
         asserts.assert_not_equal(result.transport, 0,
