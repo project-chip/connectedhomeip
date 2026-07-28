@@ -2155,10 +2155,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-
-<< << << < HEAD
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
-== == == =
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
         """Commission a single DUT devices over NTL.
         The discovery_cap_bitmask is patched to keep only the NTL bit ON.
