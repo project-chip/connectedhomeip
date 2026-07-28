@@ -67,14 +67,20 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
         while True:
             work = self.work_queue.get()
 
-            with (self.state.working_context(),
-                  self._config.log_config.fmt_context(task=work.test.name, level=self._config.log_config.level_tests),
-                  TestResult.measure_execution(work.test.name, self._config.process_id, work.iteration, self._config.dry_run) as result):
-                work.test.Run(self.runner, self.apps_register, self._config, self.thread_ba_host, self.thread_ba_port)
+            result: TestResult | None = None
+            try:
+                with (self.state.working_context(),
+                      self._config.log_config.fmt_context(task=work.test.name, level=self._config.log_config.level_tests),
+                      TestResult.measure_execution(work.test.name, self._config.process_id, work.iteration,
+                                                   self._config.dry_run) as result):
+                    work.test.Run(self.runner, self.apps_register, self._config, self.thread_ba_host, self.thread_ba_port)
+            finally:
+                if result is None:
+                    return
 
-            self._rsp_queue.put(result)
-            if isinstance(result.exception, KeyboardInterrupt):
-                raise result.exception
+                self._rsp_queue.put(result)
+                if isinstance(result.exception, KeyboardInterrupt):
+                    raise result.exception
 
 
 class GenericWorkerProcess(WorkerProcess):
