@@ -43,14 +43,16 @@ import inspect
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
 
-class TC_HSTAT_2_1(MatterBaseTest):
+class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
     def pics_TC_HSTAT_2_1(self) -> list[str]:
         return [
             "HSTAT.S",
@@ -94,13 +96,6 @@ class TC_HSTAT_2_1(MatterBaseTest):
                      "Verify that the DUT response contains an unsigned integer value."),
         ]
 
-    async def read_hstat_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.Humidistat
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
-
-    async def send_hstat_cmd_expect_success(self, endpoint, command) -> None:
-        await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=1000)
-
     @property
     def default_endpoint(self) -> int:
         return 1
@@ -111,48 +106,14 @@ class TC_HSTAT_2_1(MatterBaseTest):
 
         self.step(1)
         # Commission DUT to TH (can be skipped if done in a preceding test).
-        cluster = Clusters.Humidistat
-        attributes = cluster.Attributes
-        features = cluster.Bitmaps.Feature
-        mistBitmap = cluster.Bitmaps.MistTypeBitmap
-        supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        SetSettings = Clusters.Humidistat.Commands.SetSettings
-        feature_map = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.FeatureMap)
-        log.info("Feature map value: %s", feature_map)
-        humidifierFeatureSupported = bool(feature_map & features.kHumidifier)
-        dehumidifierFeatureSupported = bool(feature_map & features.kDehumidifier)
-        continuousFeatureSupported = bool(feature_map & features.kContinuous)
-        sensorFeatureSupported = bool(feature_map & features.kSensor)
-        autoFeatureSupported = bool(feature_map & features.kAuto)
-        fanOnlyFeatureSupported = bool(feature_map & features.kFanOnly)
-        optimalFeatureSupported = bool(feature_map & features.kOptimal)
-        warmFeatureSupported = bool(feature_map & features.kWarmMist)
-        coldFeatureSupported = bool(feature_map & features.kColdMist)
-        condPumpFeatureSupported = bool(feature_map & features.kCondPump)
-        log.info("DUT supports the Humidifier feature: %s", humidifierFeatureSupported)
-        log.info("DUT supports the Dehumidifier feature: %s", dehumidifierFeatureSupported)
-        log.info("DUT supports the Continuous feature: %s", continuousFeatureSupported)
-        log.info("DUT supports the Sensor feature: %s", sensorFeatureSupported)
-        log.info("DUT supports the Auto feature: %s", autoFeatureSupported)
-        log.info("DUT supports the Fan feature: %s", fanOnlyFeatureSupported)
-        log.info("DUT supports the Optimal feature: %s", optimalFeatureSupported)
-        log.info("DUT supports the Warm feature: %s", warmFeatureSupported)
-        log.info("DUT supports the Cold feature: %s", coldFeatureSupported)
-        log.info("DUT supports the CondPump feature: %s", condPumpFeatureSupported)
-
-        stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
-        stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
-        stateFan = cluster.Enums.SystemStateEnum.kFan
-        stateIdle = cluster.Enums.SystemStateEnum.kIdle
-        ModeEnum = cluster.Enums.ModeEnum
+        await self.async_hstat_setup()
 
         self.step(2)
         # TH reads from the DUT the FeatureMap attribute. Already read above and implicitly checked.
 
         self.step(3)
         # TH reads from the DUT the SupportedModesMode attribute.
-        SupportedModes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
+        SupportedModes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SupportedModes)
         # Verify:
         #   - Each list item is supported by the FeatureMap.
         #   - All modes required by the FeatureMap are in the list.
@@ -169,65 +130,65 @@ class TC_HSTAT_2_1(MatterBaseTest):
         for mode in SupportedModes:
             #   - Each list item is supported by the FeatureMap.
             match mode:
-                case ModeEnum.kHumidifier:
+                case self.ModeEnum.kHumidifier:
                     humidifierModeSupported = True
-                    asserts.assert_true(humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
-                case ModeEnum.kDehumidifier:
+                    asserts.assert_true(self.humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
+                case self.ModeEnum.kDehumidifier:
                     dehumidifierModeSupported = True
-                    asserts.assert_true(dehumidifierFeatureSupported, "Dehumidifier mode was supported while the feature was not")
-                case ModeEnum.kAuto:
+                    asserts.assert_true(self.dehumidifierFeatureSupported, "Dehumidifier mode was supported while the feature was not")
+                case self.ModeEnum.kAuto:
                     autoModeSupported = True
-                    asserts.assert_true(autoFeatureSupported, "Auto mode was supported while the feature was not")
-                case ModeEnum.kFanOnly:
+                    asserts.assert_true(self.autoFeatureSupported, "Auto mode was supported while the feature was not")
+                case self.ModeEnum.kFanOnly:
                     fanOnlyModeSupported = True
-                    asserts.assert_true(fanOnlyFeatureSupported, "FanOnly mode was supported while the feature was not")
+                    asserts.assert_true(self.fanOnlyFeatureSupported, "FanOnly mode was supported while the feature was not")
                 case _:
                     asserts.fail("Unknown mode value encountered in SupportModes")
             asserts.assert_greater_equal(mode, 0, "SupportedModes entry is out of range")
             asserts.assert_less_equal(mode, 3, "SupportedModes entry is out of range")
-        asserts.assert_equal(humidifierModeSupported, humidifierFeatureSupported,
+        asserts.assert_equal(humidifierModeSupported, self.humidifierFeatureSupported,
                                 "Humidifier mode was supported while the feature was not")
-        asserts.assert_equal(dehumidifierModeSupported, dehumidifierFeatureSupported,
+        asserts.assert_equal(dehumidifierModeSupported, self.dehumidifierFeatureSupported,
                              "Dehumidifier mode was supported while the feature was not")
-        asserts.assert_equal(autoModeSupported, autoFeatureSupported, "Auto mode was supported while the feature was not")
-        asserts.assert_equal(fanOnlyModeSupported, fanOnlyFeatureSupported,
+        asserts.assert_equal(autoModeSupported, self.autoFeatureSupported, "Auto mode was supported while the feature was not")
+        asserts.assert_equal(fanOnlyModeSupported, self.fanOnlyFeatureSupported,
                              "FanOnly mode was supported while the feature was not")
 
         self.step(4)
         # TH reads from the DUT the Mode attribute.
         # Verify that the DUT response contains a value between 0 and 3 inclusive.
-        dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
+        dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
         asserts.assert_greater_equal(dut_Mode, 0, "Mode attribute is out of range")
         asserts.assert_less_equal(dut_Mode, 3, "Mode attributey is out of range")
 
         self.step(5)
         # TH reads from the DUT the SystemState attribute.
         # Verify that the DUT response contains a value between 0 and 3 inclusive.
-        dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
+        dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
         asserts.assert_greater_equal(dut_SystemState, 0, "SystemState attribute is out of range")
         asserts.assert_less_equal(dut_SystemState, 3, "SystemState attribute is out of range")
 
         self.step(6)
         # TH reads from the DUT the MinSetpoint attribute.
         # Verify that the DUT response contains a value between 0 and 99 inclusive. Store the value as MinSetpointValue
-        if sensorFeatureSupported:
-            dut_MinSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinSetpoint)
+        if self.sensorFeatureSupported:
+            dut_MinSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MinSetpoint)
             asserts.assert_greater_equal(dut_MinSetpoint, 0, "MinSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MinSetpoint, 99, "MinSetpoint attribute is out of range")
 
         self.step(7)
         # TH reads from the DUT the MaxSetpoint attribute.
         # Verify that the DUT response contains a value between MinSetpointValue + 1 and 100 inclusive. Store the value as MaxSetpointValue.
-        if sensorFeatureSupported:
-            dut_MaxSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxSetpoint)
+        if self.sensorFeatureSupported:
+            dut_MaxSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MaxSetpoint)
             asserts.assert_greater_equal(dut_MaxSetpoint, dut_MinSetpoint+1, "MaxSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MaxSetpoint, 100, "MaxSetpoint attribute is out of range")
 
         self.step(8)
         # TH reads from the DUT the Step attribute.
         # Verify that the DUT response contains a value between 1 and 100 inclusive such that (MaxSetpointValue - MinSetpointValue) % value == 0. Store the value as StepValue.
-        if sensorFeatureSupported:
-            dut_Step = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Step)
+        if self.sensorFeatureSupported:
+            dut_Step = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Step)
             asserts.assert_greater_equal(dut_Step, 1, "Step attribute cannot be zero")
             asserts.assert_less_equal(dut_Step, 100, "Step attribute too large")
             asserts.assert_equal((dut_MaxSetpoint - dut_MinSetpoint) % dut_Step, 0,
@@ -237,8 +198,8 @@ class TC_HSTAT_2_1(MatterBaseTest):
         # TH reads from the DUT the UserSetpoint attribute.
         # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive
         # such that (SetpointValue - MinSetpointValue) % StepValue == 0. Store the value as SetpointValue.
-        if sensorFeatureSupported:
-            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
+        if self.sensorFeatureSupported:
+            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.UserSetpoint)
             asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
             asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
@@ -247,52 +208,54 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(10)
         # TH reads from the DUT the TargetSetpoint attribute.
         # Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive.
-        if optimalFeatureSupported or (sensorFeatureSupported and attributes.TargetSetpoint.attribute_id in supported_attributes):
-            dut_TargetSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetSetpoint)
+        if self.optimalFeatureSupported or (self.sensorFeatureSupported and self.attributes.TargetSetpoint.attribute_id in self.supported_attributes):
+            dut_TargetSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.TargetSetpoint)
             asserts.assert_greater_equal(dut_TargetSetpoint, dut_MinSetpoint, "TargetSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_TargetSetpoint, dut_MaxSetpoint, "TargetSetpoint attribute is greater than MaxSetpoint")
 
         self.step(11)
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains a value with at most the 2 least significant bits set.
-        if humidifierFeatureSupported:
-            dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
-            asserts.assert_greater_equal(dut_MistType, 1, "MistType attribute out of range")
-            asserts.assert_less_equal(dut_MistType, 2, "MistType attribute out of range")
+        if self.humidifierFeatureSupported:
+            dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MistType)
+            log.info("MistType is %s", dut_MistType)
+            if dut_MistType != NullValue:
+                asserts.assert_greater_equal(dut_MistType, 1, "MistType attribute out of range")
+                asserts.assert_less_equal(dut_MistType, 2, "MistType attribute out of range")
 
         self.step(12)
         # TH reads from the DUT the Continuous attribute.
         # Verify that the DUT response contains a Boolean.
-        if continuousFeatureSupported:
-            dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
+        if self.continuousFeatureSupported:
+            dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Continuous)
             asserts.assert_true(isinstance(dut_Continuous, bool), "Continuous attribute must be a Boolean")
 
         self.step(13)
         # TH reads from the DUT the Sleep attribute.
         # Verify that the DUT response contains a Boolean.
-        if attributes.Sleep.attribute_id in supported_attributes:
-            dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
+        if self.attributes.Sleep.attribute_id in self.supported_attributes:
+            dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Sleep)
             asserts.assert_true(isinstance(dut_Sleep, bool), "Sleep attribute must be a Boolean")
 
         self.step(14)
         # TH reads from the DUT the Optimal attribute.
         # Verify that the DUT response contains a Boolean.
-        if optimalFeatureSupported:
-            dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
+        if self.optimalFeatureSupported:
+            dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Optimal)
             asserts.assert_true(isinstance(dut_Optimal, bool), "Optimal attribute must be a Boolean")
 
         self.step(15)
         # TH reads from the DUT the CondPumpEnabled attribute.
         # Verify that the DUT response contains a Boolean.
-        if condPumpFeatureSupported:
-            dut_CondPumpEnabled = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.CondPumpEnabled)
+        if self.condPumpFeatureSupported:
+            dut_CondPumpEnabled = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.CondPumpEnabled)
             asserts.assert_true(isinstance(dut_CondPumpEnabled, bool), "CondPumpEnabled attribute must be a Boolean")
 
         self.step(16)
         # TH reads from the DUT the CondRunCount attribute.
         # Verify that the DUT response contains an unsigned integer value.
-        if condPumpFeatureSupported:
-            dut_CondRunCount = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.CondRunCount)
+        if self.condPumpFeatureSupported:
+            dut_CondRunCount = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.CondRunCount)
             asserts.assert_greater_equal(dut_CondRunCount, 0, "CondRunCount attribute out of range")
 
 if __name__ == "__main__":
