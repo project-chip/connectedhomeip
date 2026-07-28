@@ -169,5 +169,3 @@ void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterCluste
         },
         integrationDelegate, clusterShutdownType);
 }
-
-void MatterThermostatClusterServerShutdownCallback(EndpointId endpointId) {}

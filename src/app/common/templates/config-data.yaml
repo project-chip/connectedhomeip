@@ -60,7 +60,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
@@ -79,7 +78,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:

@@ -57,20 +57,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
 
-void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
-{
-
-    // Temp. code for testing purpose, need to be updated
-    const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(Zcl, "Failed to set Thermostat %s: %x", attributeName, to_underlying(status));
-        }
-    };
-
-    logOnFailure(Thermostat::Attributes::FeatureMap::Set(endpoint, 0x23), "feature map");
-}
-
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting log provider.");

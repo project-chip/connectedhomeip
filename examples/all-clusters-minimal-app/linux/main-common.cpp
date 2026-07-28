@@ -83,6 +83,7 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 }
 
 void ApplicationShutdown() {}
@@ -91,34 +92,4 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
     chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
-
-void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    ChipLogError(Zcl, "emberAfThermostatClusterServerInitCallback!");
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return;
-    }
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-    cluster->SetDelegate(&delegate);
-
-    // TODO
-    // Get from the "real thermostat"
-    // current mode
-    // current occupied heating setpoint
-    // current unoccupied heating setpoint
-    // current occupied cooling setpoint
-    // current unoccupied cooling setpoint
-    // and update the zcl cluster values
-    // This should be a callback defined function
-    // with weak binding so that real thermostat
-    // can get the values.
-    // or should this just be the responsibility of the thermostat application?
 }

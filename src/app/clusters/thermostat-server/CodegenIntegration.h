@@ -24,4 +24,6 @@ namespace chip::app::Clusters::Thermostat {
 
 ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
 } // namespace chip::app::Clusters::Thermostat
