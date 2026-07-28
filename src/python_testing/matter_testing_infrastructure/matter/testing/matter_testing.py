@@ -2227,7 +2227,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         return result
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
->>>>>> > 130cdd24ac(Add nfc discovery in setupcodepairer final(  # 72715))
         """Open a commissioning window on the target device.
 
         Args:
