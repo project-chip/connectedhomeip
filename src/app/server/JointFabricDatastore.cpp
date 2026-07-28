@@ -530,7 +530,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     }
     if (commandData.groupKeySetID.IsNull() == false)
     {
+<<<<<<< HEAD
         if (mGroupInformationEntries[index].groupKeySetID != commandData.groupKeySetID.Value())
+=======
+        if (mGroupInformationEntries[index].groupKeySetID.IsNull() ||
+            mGroupInformationEntries[index].groupKeySetID.Value() != commandData.groupKeySetID.Value())
+>>>>>>> 90f5775d89 (Apply AI-generated patch for unchecked nullable dereferences in JFDS (#73096))
         {
             // If the groupKeySetID is being updated, we need to ensure that the new key set exists
             ReturnErrorOnFailure(AddNodeKeySetEntry(commandData.groupID, commandData.groupKeySetID.Value()));
@@ -544,7 +549,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 
     if (commandData.groupCAT.IsNull() == false)
     {
+<<<<<<< HEAD
         if (mGroupInformationEntries[index].groupCAT != commandData.groupCAT.Value())
+=======
+        if (mGroupInformationEntries[index].groupCAT.IsNull() ||
+            mGroupInformationEntries[index].groupCAT.Value() != commandData.groupCAT.Value())
+>>>>>>> 90f5775d89 (Apply AI-generated patch for unchecked nullable dereferences in JFDS (#73096))
         {
             anyGroupCATFieldUpdated = true;
         }
@@ -553,7 +563,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     }
     if (commandData.groupCATVersion.IsNull() == false)
     {
+<<<<<<< HEAD
         if (mGroupInformationEntries[index].groupCATVersion != commandData.groupCATVersion.Value())
+=======
+        if (mGroupInformationEntries[index].groupCATVersion.IsNull() ||
+            mGroupInformationEntries[index].groupCATVersion.Value() != commandData.groupCATVersion.Value())
+>>>>>>> 90f5775d89 (Apply AI-generated patch for unchecked nullable dereferences in JFDS (#73096))
         {
             anyGroupCATFieldUpdated = true;
         }
