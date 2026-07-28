@@ -39,15 +39,14 @@
 import logging
 
 from mobly import asserts
+from TC_HSTAT_Test_Base import HSTATBase
 
-import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.interaction_model import InteractionModelError, Status
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -228,7 +227,7 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         self.step(17)
         # TH sends command SetSettings with the Sleep field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
-        if not (self.attributes.Sleep.attribute_id in self.supported_attributes):
+        if self.attributes.Sleep.attribute_id not in self.supported_attributes):
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=True)
 
         self.step(18)
@@ -240,8 +239,9 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         self.step(19)
         # TH sends command SetSettings with the MistType field set to Cold
         # Verify DUT responds w/ status SUCCESS(0x00)
-        if not (self.attributes.MistType.attribute_id in self.supported_attributes):
+        if self.attributes.MistType.attribute_id not in self.supported_attributes:
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, mistType=True)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
