@@ -655,7 +655,7 @@ class IDMBaseTest(BasicCompositionTests):
                 attr_list,
                 f"Expected attribute list does not match for cluster {cluster_id}"
             )
-        return read_request
+        return read_request.attributes
 
     async def read_unsupported_endpoint(self):
         """Find an unsupported endpoint and attempt to read from it.
