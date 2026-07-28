@@ -117,7 +117,7 @@ overridable API. Steps:
 
 Some `ClosureManager` APIs (`Init`, cluster `On*Command` handlers) are virtual
 so shared `closure-common/` code can reach your leaf. Override the matching
-`*Impl()` on `CustomerAppManager` — do not override the virtuals directly.
+`*Impl()` on `CustomerAppManager` — do not override the virtual methods directly.
 
 ### DataModelCallbacks and CustomerAppTask
 
