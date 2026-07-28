@@ -36,20 +36,26 @@
 
 import logging
 
+from mobly import asserts
+
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.interaction_model import InteractionModelError, Status
+from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
 # Auto-generated from test specification: [TC-HSTAT-2.3] Setpoint functionality with DUT as Server
 
 
-class TC_HSTAT_2_3(MatterBaseTest):
+class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
 
     def pics_TC_HSTAT_2_3(self) -> list[str]:
         return [
             "HSTAT.S",
+            "HSTAT.S.F03"
         ]
 
     def desc_TC_HSTAT_2_3(self) -> str:
@@ -57,7 +63,7 @@ class TC_HSTAT_2_3(MatterBaseTest):
 
     def steps_TC_HSTAT_2_3(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", ""),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(3, "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
@@ -88,75 +94,118 @@ class TC_HSTAT_2_3(MatterBaseTest):
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_HSTAT_2_3(self):
+        endpoint = self.get_endpoint()
+
         self.step(1)
         # Commission DUT to TH (can be skipped if done in a preceding test).
-        #
+        await self.setup()
 
         self.step(2)
         # TH sends command On to the On/Off cluster on the same endpoint as this cluster.
         # Verify DUT responds w/ status SUCCESS(0x00)
+        await self.send_onoff_on_cmd_expect_success(endpoint=endpoint)
 
         self.step(3)
         # TH reads from the DUT the MinSetpoint attribute.
         # Store the value as MinSetpointValue
+        dut_MinSetpoint = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MinSetpoint)
 
         self.step(4)
         # TH reads from the DUT the MaxSetpoint attribute.
         # Store the value as MaxSetpointValue.
+        dut_MaxSetpoint = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MaxSetpoint)
 
         self.step(5)
         # TH reads from the DUT the Step attribute.
         # Store the value as StepValue.
+        dut_Step = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Step)
 
         self.step(6)
         # TH sends command SetSettings with the Mode field set to Humidifier or Dehumidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
+        if self.humidifierFeatureSupported:
+            await self.write_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeHumidifier))
+        else:
+            await self.write_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeDehumidifier))
 
         self.step(7)
         # TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False
         # Verify DUT responds w/ status SUCCESS(0x00)
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=False, sleep=False, optimal=False)
 
         self.step(8)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue.
         # Verify DUT responds w/ status SUCCESS(0x00)
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, userSetpoint=dut_MinSetpoint)
 
         self.step(9)
         # TH reads from the DUT the UserSetpoint attribute.
         # Verify that the DUT response contains a value of MinSetpointValue
+        dut_Setpoint = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.UserSetpoint)
+        asserts.assert_equal(dut_Setpoint, dut_MinSetpoint, "UserSetpoint is not MinSetpoint as expacted")
 
         self.step(10)
         # Individually subscribe to the UserSetpoint attribute
         # This will receive updates when this attribute changes value.
+        userSetpointSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.UserSetpoint)
+        await userSetpointSubscription.start(self.default_controller, self.dut_node_id, endpoint)
+        reportsReceived = [] 
 
         self.step(11)
         # TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue.
         # Verify DUT responds w/ status SUCCESS(0x00)
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, userSetpoint=dut_MaxSetpoint)
+        if dut_Setpoint != dut_MaxSetpoint:
+            reportsReceived.append(userSetpointSubscription.wait_for_attribute_report().value)
 
         self.step(12)
         # TH reads from the DUT the UserSetpoint attribute.
         # Verify that the DUT response contains a value of MaxSetpointValue
+        dut_Setpoint = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.UserSetpoint)
+        asserts.assert_equal(dut_Setpoint, dut_MaxSetpoint, "UserSetpoint is not MaxSetpoint as expacted")
 
         self.step(13)
         # TH writes to the DUT the UserSetpoint attribute with MinSetpointValue + StepValue.
         # Verify DUT responds w/ status SUCCESS(0x00)
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, userSetpoint=dut_MinSetpoint+dut_Step)
+        if dut_Setpoint != dut_MinSetpoint+dut_Step:
+            reportsReceived.append(userSetpointSubscription.wait_for_attribute_report().value)
 
         self.step(14)
         # TH reads from the DUT the UserSetpoint attribute.
-        # Verify that the DUT response contains a value of MinSetpointValue + StepValue. Verify: If no reports were received, fail the test. If (MaxSetpointValue - MinSetpointValue) = StepValue, verify 1 report was received and the value is MaxSetpointValue. If (MaxSetpointValue - MinSetpointValue) > StepValue, verify 2 reports were received and: The value for the first report is MaxSetpointValue. The value for the second report is MinSetpointValue + StepValue.
+        # Verify that the DUT response contains a value of MinSetpointValue + StepValue.
+        # Verify: If no reports were received, fail the test.
+        # If (MaxSetpointValue - MinSetpointValue) = StepValue, verify 1 report was received and the value is MaxSetpointValue.
+        # If (MaxSetpointValue - MinSetpointValue) > StepValue, verify 2 reports were received and: The value for the first report is MaxSetpointValue.
+        # The value for the second report is MinSetpointValue + StepValue.
+        dut_Setpoint = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.UserSetpoint)
+        asserts.assert_equal(dut_Setpoint, dut_MinSetpoint+dut_Step, "UserSetpoint is not MinSetpoint+Step as expacted")
+        asserts.assert_greater_equal(len(reportsReceived), 0, "No reports received")
+        asserts.assert_equal(reportsReceived[0], dut_MaxSetpoint, "First report is not MaxSetpoint")
+        if len(reportsReceived) > 1:
+            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step, "Second report is not dut_MinSetpoint+dut_Step")
 
         self.step(15)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
+        await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
 
         self.step(16)
         # TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
+        await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, userSetpoint=dut_MaxSetpoint+1, error=Status.ConstraintError)
 
         self.step(17)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue+1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
+        if dut_Step > 1:
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
 
 
 if __name__ == '__main__':

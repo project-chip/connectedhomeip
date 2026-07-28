@@ -20,7 +20,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class HSTATBase:
     This is a base class for Humidistat cluster tests.
     """
 
-    async def async_hstat_setup(self):
+    async def setup(self):
         self.cluster = Clusters.Humidistat
         self.attributes = self.cluster.Attributes
         self.features = self.cluster.Bitmaps.Feature
@@ -37,7 +37,7 @@ class HSTATBase:
         self.SetSettings = self.cluster.Commands.SetSettings
         self.SystemStatus = self.cluster.Enums.SystemStateEnum
 
-        self.supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=self.get_endpoint(), attribute=self.attributes.AttributeList)
+        self.supported_attributes = await self.read_attribute_expect_success(endpoint=self.get_endpoint(), attribute=self.attributes.AttributeList)
 
         feature_map = await self.read_single_attribute_check_success(
             endpoint=self.get_endpoint(), cluster=self.cluster, attribute=self.attributes.FeatureMap)
@@ -70,22 +70,23 @@ class HSTATBase:
         self.stateIdle = self.cluster.Enums.SystemStateEnum.kIdle
         self.ModeEnum = self.cluster.Enums.ModeEnum
 
-    async def read_hstat_attribute_expect_success(self, endpoint, attribute):
+    async def read_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.Humidistat
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_hstat_attribute_expect_success(self, endpoint, attribute):
+    async def write_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.Humidistat
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute)])
         err_msg = "Received error status {} when writing {}:{}".format(str(result[0].Status), str(cluster), str(attribute))
         asserts.assert_equal(result[0].Status, Status.Success, err_msg)
 
-    async def send_hstat_cmd_expect_success(self, endpoint, command) -> None:
-        await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=1000)
+    async def send_SetSettingsCommand_expect_success(self, endpoint, **kwargs) -> None:
+        await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=endpoint, timedRequestTimeoutMs=1000)
 
-    async def send_hstat_cmd_expect_error(self, endpoint, command, error: Status) -> None:
+    async def send_SetSettingsCommand_expect_error(self, endpoint, **kwargs) -> None:
+        error = kwargs.pop("error", Status.Success)
         try:
-            await self.send_single_cmd(cmd=command, endpoint=endpoint, timedRequestTimeoutMs=1000)
+            await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=endpoint, timedRequestTimeoutMs=1000)
             asserts.assert_true(False, "Unexpected command success, command=%s", command)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")

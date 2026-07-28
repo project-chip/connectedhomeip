@@ -110,12 +110,12 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
 
         self.step(1)
         # Commissioning already done.
-        await self.async_hstat_setup()
+        await self.setup()
 
         self.step(2)
         # TH reads from the DUT the SupportedModesMode attribute.
         # Store the value as SupportedModes.
-        SupportedModes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SupportedModes)
+        SupportedModes = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SupportedModes)
 
         self.step(3)
         # TH sends command Off to the On/Off cluster on the same endpoint as this cluster.
@@ -125,14 +125,14 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         self.step(4)
         # TH reads from the DUT the SystemState attribute.
         # Verify that the DUT response contains a value of Idle
-        dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
+        dut_SystemState = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
         asserts.assert_equal(dut_SystemState, self.stateIdle, "SystemState is not idle")
 
         self.step(5)
         # TH reads from the DUT the MistType attribute.
         # Verify that the DUT response contains the NULL value.
         if self.humidifierFeatureSupported:
-            dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MistType)
+            dut_MistType = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.MistType)
             log.info("MistType is %s", dut_MistType)
             asserts.assert_equal(dut_MistType, NullValue, "MistType is not NULL and should be")
 
@@ -144,7 +144,7 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         self.step(7)
         # TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False
         # Verify DUT responds w/ status SUCCESS(0x00)
-        await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(continuous=False, sleep=False, optimal=False))
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=False, sleep=False, optimal=False)
 
         self.step(8)
         # Individually subscribe to the Mode and SystemState attributes
@@ -153,9 +153,9 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         stateSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.SystemState)
         await modeSubscription.start(self.default_controller, self.dut_node_id, endpoint)
         await stateSubscription.start(self.default_controller, self.dut_node_id, endpoint)
-        dut_CurrentMode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
+        dut_CurrentMode = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
         log.info("Current mode: %s", dut_CurrentMode)
-        dut_CurrentState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
+        dut_CurrentState = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
         log.info("Current state: %s", dut_CurrentState)
 
         modeReportsExpected = []
@@ -166,18 +166,18 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         # For each update, the DUT shall return a SUCCESS status code.
         *mostModes, lastMode = SupportedModes
         for mode in mostModes:
-            await self.write_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(mode))
+            await self.write_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(mode))
             if dut_CurrentMode != mode:
                 modeReportsReceived.append(modeSubscription.wait_for_attribute_report().value)
                 modeReportsExpected.append(mode)
-                dut_CurrentMode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
-                dut_CurrentState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
+                dut_CurrentMode = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
+                dut_CurrentState = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.SystemState)
 
         self.step(10)
         # Send the SetSettings command with the Mode field set to the remaining value from SupportedModes
         # Verify DUT responds w/ status SUCCESS(0x00) After all updates have been performed, verify: The order of the values of the Mode attribute reports matches the order of the SupportedModes list. The order of the values of the SystemState attribute reports matches the order of the SupportedModes list. Where the value in the SupportedModes list is Humidifier, the value in associated report SHALL be Humidifying or Idle. Where the value in the SupportedModes list is Dehumidifier, the value in associated report SHALL be Dehumidifying or Idle. Where the value in the SupportedModes list is FanOnly, the value in associated report SHALL be Fan. Where the value in the SupportedModes list is Auto, there MAY be one fewer report than for the Mode attribute or the corresponding report value SHALL be Idle, Humidifying or Dehumidifying.
-        dut_CurrentMode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
-        await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(mode=lastMode))
+        dut_CurrentMode = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode)
+        await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, mode=lastMode)
         if dut_CurrentMode != lastMode:
             modeReportsReceived.append(modeSubscription.wait_for_attribute_report().value)
             modeReportsExpected.append(lastMode)
@@ -191,57 +191,57 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         # TH sends command SetSettings with the Mode field to humidifier or dehumidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.humidifierFeatureSupported:
-            await self.write_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeHumidifier))
+            await self.write_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeHumidifier))
         else:
-            await self.write_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeDehumidifier))
+            await self.write_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Mode(self.modeDehumidifier))
 
         self.step(12)
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.humidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_error(endpoint=endpoint, command=self.SetSettings(mode=self.modeHumidifier), error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, mode=self.modeHumidifier, error=Status.ConstraintError)
 
         self.step(13)
         # TH sends command SetSettings with the Mode field set to Dehumidifier
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.dehumidifierFeatureSupported:
-            await self.send_hstat_cmd_expect_error(endpoint=endpoint, command=self.SetSettings(mode=self.modeDehumidifier), error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, mode=self.modeDehumidifier, error=Status.ConstraintError)
 
         self.step(14)
         # TH sends command SetSettings with the Mode field set to FanOnly
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.fanOnlyFeatureSupported:
-            await self.send_hstat_cmd_expect_error(endpoint=endpoint, command=self.SetSettings(mode=self.modeFanOnly), error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, mode=self.modeFanOnly, error=Status.ConstraintError)
 
         self.step(15)
         # TH sends command SetSettings with the Mode field set to Auto
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
         if not self.autoFeatureSupported:
-            await self.send_hstat_cmd_expect_error(endpoint=endpoint, command=self.SetSettings(mode=self.modeAuto), error=Status.ConstraintError)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, mode=self.modeAuto, error=Status.ConstraintError)
 
         self.step(16)
         # TH sends command SetSettings with the Continuous field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not self.continuousFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(continuous=True))
+            await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=True)
 
         self.step(17)
         # TH sends command SetSettings with the Sleep field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not (self.attributes.Sleep.attribute_id in self.supported_attributes):
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(continuous=True))
+            await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=True)
 
         self.step(18)
         # TH sends command SetSettings with the Optimal field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not self.optimalFeatureSupported:
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(optimal=True))
+            await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, optimal=True)
 
         self.step(19)
         # TH sends command SetSettings with the MistType field set to Cold
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not (self.attributes.MistType.attribute_id in self.supported_attributes):
-            await self.send_hstat_cmd_expect_success(endpoint=endpoint, command=self.SetSettings(mistType=True))
+            await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, mistType=True)
 
 if __name__ == "__main__":
     default_matter_test_main()
