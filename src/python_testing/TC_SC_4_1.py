@@ -95,6 +95,15 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 TCP_PICS_STR = "MCORE.SC.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
 
+# Timeout for a single subtype PTR browse:
+#   - Browses that get an answer end early via MdnsDiscovery's discovery-silence
+#     monitor; the full 5s is only paid by candidates that never answer.
+#   - Sized so an unanswered browse still spans the initial mDNS query plus two
+#     retransmissions (RFC 6762 §5.2: queries at ~0/1/3s) before the subtype is
+#     treated as not advertised.
+#   - Candidates browse concurrently, so a verification pass pays one 5s window total.
+SUBTYPE_BROWSE_TIMEOUT_SEC = 5
+
 
 class SetupCodeType(enum.IntEnum):
     MANUAL_CODE = 0
@@ -103,6 +112,9 @@ class SetupCodeType(enum.IntEnum):
 
 
 class TC_SC_4_1(MatterBaseTest):
+    # Cached by get_exposed_device_types() so its per-endpoint Descriptor
+    # reads run once per test instead of once per verification pass
+    _exposed_device_types: set[int] | None = None
 
     def steps_TC_SC_4_1(self):
         return [
@@ -254,6 +266,28 @@ class TC_SC_4_1(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
+    async def get_exposed_device_types(self) -> set[int]:
+        """Returns the union of device types the DUT exposes across all endpoints
+        (Descriptor cluster DeviceTypeList), memoized for the test run. The Primary
+        Device Type is always a member of this set (Data Model spec, 'Primary
+        Device Type' selection rules)."""
+        if self._exposed_device_types is None:
+            parts_list = await self.read_single_attribute_check_success(
+                endpoint=ROOT_NODE_ENDPOINT_ID,
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.PartsList
+            )
+            device_types: set[int] = set()
+            for endpoint_id in (ROOT_NODE_ENDPOINT_ID, *parts_list):
+                device_type_list = await self.read_single_attribute_check_success(
+                    endpoint=endpoint_id,
+                    cluster=Clusters.Descriptor,
+                    attribute=Clusters.Descriptor.Attributes.DeviceTypeList
+                )
+                device_types.update(entry.deviceType for entry in device_type_list)
+            self._exposed_device_types = device_types
+        return self._exposed_device_types
+
     def get_dut_instance_name(self, log_result: bool = False) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
@@ -308,15 +342,11 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
+    async def _verify_discriminator_subtype_advertisements(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
         # Determine discriminator type (Long or Short) to verify
-        size_txt = "Long" if is_long_discriminator else "Short"
         assert_valid_discriminator_subtype = (
             assert_valid_long_discriminator_subtype if is_long_discriminator else assert_valid_short_discriminator_subtype
         )
-
-        # Verify that the Discriminator subtype is present
-        asserts.assert_in(discriminator_subtype, subtypes, f"'{size_txt} Discriminator Subtype' must be present.")
 
         # Verify that it contains a valid 12-bit (Long) or 4 bit (Short) variable
         # length decimal number in ASCII text, omitting any leading zeros value
@@ -349,21 +379,21 @@ class TC_SC_4_1(MatterBaseTest):
         # Construct CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
-        # TH performs a browse for the rest of the 'Commissionable Service' subtypes
-        subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
-
         # *** LONG/SHORT DISCRIMINATOR SUBTYPE ***
-        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
+        await self._verify_discriminator_subtype_advertisements(discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
         if extended_discovery:
-            # When in Extended Discovery Dode, verify that the _CM subtype is NOT present
-            asserts.assert_not_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
+            # When in Extended Discovery Mode, verify that the _CM subtype is NOT present
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[cm_subtype],
+                discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
+                log_output=True
+            )
+            asserts.assert_equal(len(ptr_records), 0, f"In Commissioning Mode Subtype '{cm_subtype}' must NOT be present.")
         else:
             # When NOT in Extended Discovery Mode, verify that the _CM subtype is present
-            asserts.assert_in(cm_subtype, subtypes, f"In Commissioning Mode Subtype '{cm_subtype}' must be present.")
-
             # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
             ptr_records = await MdnsDiscovery().get_ptr_records(
                 service_types=[cm_subtype],
@@ -380,52 +410,87 @@ class TC_SC_4_1(MatterBaseTest):
                                  "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
-        # Check for the presence of the 'Vendor Subtype' _V
-        vendor_subtype = next((s for s in subtypes if s.startswith('_V')), None)
+        # TH reads the VendorId attribute from the Basic Information cluster
+        vendor_id = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            endpoint=ROOT_NODE_ENDPOINT_ID
+        )
+
+        # Construct the expected 'Vendor Subtype' _V from the DUT's VendorID
+        vendor_subtype = f"_V{int(vendor_id)}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        assert_valid_vendor_subtype(vendor_subtype)
+
+        # TH performs a PTR record query against the 'Vendor Subtype'
+        ptr_records = await MdnsDiscovery().get_ptr_records(
+            service_types=[vendor_subtype],
+            discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
+            log_output=True
+        )
 
         # If present:
-        if vendor_subtype:
-            # Verify that it contains a valid 16-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Vendor Subtype' value
-            assert_valid_vendor_subtype(vendor_subtype)
-
-            # TH performs a PTR record query against the 'Vendor Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[vendor_subtype],
-                log_output=True
-            )
-
-            # If present:
-            if len(ptr_records) > 0:
-                # Verify that the 'Vendor Subtype' PTR record's instance name
-                # is equal to the Discriminator Subtype PTR record's instance name
-                vendor_subtype_ptr = ptr_records[0]
-                asserts.assert_equal(vendor_subtype_ptr.instance_name, discriminator_ptr_instance_name,
-                                     "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        if len(ptr_records) > 0:
+            # Verify that the 'Vendor Subtype' PTR record's instance name
+            # is equal to the Discriminator Subtype PTR record's instance name
+            vendor_subtype_ptr = ptr_records[0]
+            asserts.assert_equal(vendor_subtype_ptr.instance_name, discriminator_ptr_instance_name,
+                                 "'Vendor Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** DEVTYPE SUBTYPE ***
-        # Check for the presence of the 'Devtype Subtype' _T
-        devtype_subtype = next((s for s in subtypes if s.startswith('_T')), None)
+        # The 'Devtype Subtype' _T value is the DUT's Primary Device Type. Candidate
+        # values are always constructible: from the DT TXT key when advertised,
+        # otherwise from the device types the DUT exposes via the Descriptor cluster
+        # (the Primary Device Type SHALL be one of them, per the Data Model spec
+        # 'Primary Device Type' selection rules)
 
-        # If present:
-        if devtype_subtype:
-            # Verify that it contains a valid 32-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Devtype Subtype' value
-            assert_valid_devtype_subtype(devtype_subtype)
+        # TH reads the value from the Devtype TXT key (DT)
+        txt_record = await MdnsDiscovery().get_txt_record(
+            service_name=f"{discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
+            service_type=MdnsServiceType.COMMISSIONABLE.value
+        )
+        dt_key = txt_record.txt.get('DT') if txt_record and txt_record.txt else None
 
-            # TH performs a PTR record query against the 'Devtype Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[devtype_subtype],
+        # TH reads the device types the DUT exposes (Descriptor cluster, all endpoints)
+        exposed_device_types = await self.get_exposed_device_types()
+
+        # The DT key is optional; when present, its value (the DUT's claimed
+        # Primary Device Type) is used as the single candidate; when absent,
+        # the candidates are all the device types the DUT exposes, among which the
+        # Primary Device Type is guaranteed to be
+        if dt_key is not None and dt_key.isdigit():
+            candidate_device_types = [int(dt_key)]
+        else:
+            candidate_device_types = sorted(exposed_device_types)
+
+        # Construct the candidate 'Devtype Subtype' names
+        candidate_subtypes = [f"_T{dt}._sub.{MdnsServiceType.COMMISSIONABLE.value}" for dt in candidate_device_types]
+        for candidate_subtype in candidate_subtypes:
+            assert_valid_devtype_subtype(candidate_subtype)
+
+        # TH performs a PTR record query against each candidate 'Devtype Subtype'
+        # concurrently; at most one (the Primary Device Type) should answer
+        results = await asyncio.gather(*[
+            MdnsDiscovery().get_ptr_records(
+                service_types=[subtype],
+                discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
                 log_output=True
             )
+            for subtype in candidate_subtypes
+        ])
+        answered = [(device_type, subtype, records[0])
+                    for device_type, subtype, records in zip(candidate_device_types, candidate_subtypes, results) if records]
 
-            # If present:
-            if len(ptr_records) > 0:
-                # Verify that the 'Devtype Subtype' PTR record's instance name
-                # is equal to the Discriminator Subtype PTR record's instance name.
-                devtype_subtype_ptr = ptr_records[0]
-                asserts.assert_equal(devtype_subtype_ptr.instance_name, discriminator_ptr_instance_name,
-                                     "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        # If present:
+        if answered:
+            # Verify that only one Devtype subtype is advertised (the Primary Device Type)
+            asserts.assert_equal(len(answered), 1,
+                                 f"Only the Primary Device Type subtype must be advertised, found: {[subtype for _, subtype, _ in answered]}")
+            device_type, devtype_subtype, devtype_subtype_ptr = answered[0]
+
+            # Verify that the 'Devtype Subtype' PTR record's instance name
+            # is equal to the Discriminator Subtype PTR record's instance name.
+            asserts.assert_equal(devtype_subtype_ptr.instance_name, discriminator_ptr_instance_name,
+                                 "'Devtype Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
     async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
         # TH performs a 'Commissionable Service' SRV record query

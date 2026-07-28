@@ -22,6 +22,7 @@
  */
 
 #include <errno.h>
+#include <memory>
 
 #include <pw_unit_test/framework.h>
 
@@ -497,23 +498,27 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
+/**
+ * Holds resources needed by SessionManager tests.
+ * Managed via std::unique_ptr in the test fixture to ensure they are destroyed
+ * before Platform::MemoryShutdown() is called in TearDown.
+ */
+struct SessionManagerTestResources
 {
-    static FabricTableHolder fabricTableHolder;
-    static secure_channel::MessageCounterManager gMessageCounterManager;
-    static chip::TestPersistentStorageDelegate deviceStorage;
-    static chip::Crypto::DefaultSessionKeystore sessionKeystore;
-    static bool sInitialized = false;
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
-    if (!sInitialized)
-    {
-        EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
-        sInitialized = true;
-    }
+    CHIP_ERROR Init() { return fabricTableHolder.Init(); }
+};
 
+void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager, SessionManagerTestResources & resources)
+{
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &resources.messageCounterManager,
+                                  &resources.deviceStorage, &resources.fabricTableHolder.GetFabricTable(),
+                                  resources.sessionKeystore));
 }
 
 // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
@@ -552,10 +557,22 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
 class TestSessionManagerDispatch : public ::testing::Test
 {
 protected:
-    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
-    void TearDown() { mContext.Shutdown(); }
+    void SetUp() override
+    {
+        ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR);
+        mResources = std::make_unique<SessionManagerTestResources>();
+        ASSERT_EQ(mResources->Init(), CHIP_NO_ERROR);
+    }
+    void TearDown() override
+    {
+        // Force cleanup of resources (which may release platform memory)
+        // before mContext.Shutdown() calls Platform::MemoryShutdown().
+        mResources.reset();
+        mContext.Shutdown();
+    }
 
     TestContext mContext;
+    std::unique_ptr<SessionManagerTestResources> mResources;
 };
 
 TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
@@ -565,7 +582,7 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
     SessionManager sessionManager;
     TestSessionManagerCallback callback;
 
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
     sessionManager.SetMessageDelegate(&callback);
 
     IPAddress addr;
@@ -668,7 +685,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
 
     SessionManager sessionManager;
     TestGroupPrivacyMessageDelegate delegate;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
     sessionManager.SetMessageDelegate(&delegate);
 
     // Loads test parameters for GroupId 2
@@ -731,7 +748,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
 
     SessionManager sessionManager;
     TestGroupPrivacyMessageDelegate delegate;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
     sessionManager.SetMessageDelegate(&delegate);
 
     // Loads test parameters for GroupId 2
@@ -781,7 +798,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
     using namespace chip::TestCerts;
 
     SessionManager sessionManager;
-    TestSessionManagerInit(mContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager, *mResources);
 
     // Loads test parameters for GroupId 2
     const MessageTestEntry & testEntry = theMessageTestVector[7];
