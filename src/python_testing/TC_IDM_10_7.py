@@ -234,13 +234,17 @@ class TC_IDM_10_7(DeviceConformanceTests):
                 log.error("Descriptor cluster missing on Endpoint 0")
                 return False
 
-            parts_list = descriptor_cluster.get(Clusters.Descriptor.Attributes.PartsList, [])
+            if Clusters.Descriptor.Attributes.PartsList not in descriptor_cluster:
+                log.error("Endpoint 0 PartsList is missing")
+                return False
+            parts_list = descriptor_cluster[Clusters.Descriptor.Attributes.PartsList]
             log.info("Endpoint 0 PartsList: %s", parts_list)
 
             # Check that every other Endpoints (listed in PartsList of EP0 descriptor) have a Descriptor cluster:
             for endpoint_id in parts_list:
                 if endpoint_id == 0:
-                    continue
+                    log.error("Endpoint 0 must not be listed in Endpoint 0 PartsList")
+                    return False
 
                 if endpoint_id not in self.endpoints:
                     log.error("Endpoint %s listed in PartsList is missing from self.endpoints", endpoint_id)

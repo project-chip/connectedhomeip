@@ -21,11 +21,13 @@ import os
 import sys
 import unittest
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from TC_IDM_10_7 import TC_IDM_10_7
 
 import matter.clusters as Clusters
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+logging.disable(logging.CRITICAL)
 
 
 def make_descriptor_cluster(parts_list=None):
@@ -172,7 +174,7 @@ class TestTCIDM107MandatoryClustersPresence(unittest.TestCase):
 
         self.assertFalse(self.tc._check_mandatory_clusters_presence())
 
-    def test_success_when_parts_list_missing_defaults_to_empty(self):
+    def test_failure_when_parts_list_missing(self):
         self.tc.endpoints = {
             0: {
                 Clusters.Descriptor: {},
@@ -183,15 +185,23 @@ class TestTCIDM107MandatoryClustersPresence(unittest.TestCase):
             }
         }
 
+        self.assertFalse(self.tc._check_mandatory_clusters_presence())
+
+    def test_success_when_parts_list_empty(self):
+        self.tc.endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
         self.assertTrue(self.tc._check_mandatory_clusters_presence())
 
-    def test_success_when_parts_list_contains_endpoint_0(self):
+    def test_failure_when_parts_list_contains_endpoint_0(self):
         self.tc.endpoints = {
             0: make_ep0(include_network_commissioning=False, parts_list=[0, 1]),
             1: {Clusters.Descriptor: make_descriptor_cluster([])},
         }
 
-        self.assertTrue(self.tc._check_mandatory_clusters_presence())
+        self.assertFalse(self.tc._check_mandatory_clusters_presence())
 
     def test_failure_on_exception(self):
         self.tc.endpoints = {
