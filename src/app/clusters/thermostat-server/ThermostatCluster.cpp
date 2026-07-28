@@ -92,8 +92,9 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
 
-    ChipLogProgress(Zcl, "Fetching attributes hasOccupancy: %d, hasHeating: %d, hasCooling: %d, hasAuto: %d", mFeatures.Has(Feature::kOccupancy),
-                    mFeatures.Has(Feature::kHeating), mFeatures.Has(Feature::kCooling), mFeatures.Has(Feature::kAutoMode));
+    ChipLogProgress(Zcl, "Fetching attributes hasOccupancy: %d, hasHeating: %d, hasCooling: %d, hasAuto: %d",
+                    mFeatures.Has(Feature::kOccupancy), mFeatures.Has(Feature::kHeating), mFeatures.Has(Feature::kCooling),
+                    mFeatures.Has(Feature::kAutoMode));
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         // Setpoints
