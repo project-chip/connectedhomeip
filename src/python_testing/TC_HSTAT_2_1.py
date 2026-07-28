@@ -38,7 +38,6 @@
 
 
 import logging
-import inspect
 
 from mobly import asserts
 
@@ -146,9 +145,9 @@ class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
                     asserts.fail("Unknown mode value encountered in SupportModes")
             asserts.assert_greater_equal(mode, 0, "SupportedModes entry is out of range")
             asserts.assert_less_equal(mode, 3, "SupportedModes entry is out of range")
-        asserts.assert_equal(humidifierModeSupported, self.humidifierFeatureSupported,
-                                "Humidifier mode was supported while the feature was not")
-        asserts.assert_equal(dehumidifierModeSupported, self.dehumidifierFeatureSupported,
+        asserts.assert_equal(humidifierModeSupported, humidifierFeatureSupported,
+                             "Humidifier mode was supported while the feature was not")
+        asserts.assert_equal(dehumidifierModeSupported, dehumidifierFeatureSupported,
                              "Dehumidifier mode was supported while the feature was not")
         asserts.assert_equal(autoModeSupported, self.autoFeatureSupported, "Auto mode was supported while the feature was not")
         asserts.assert_equal(fanOnlyModeSupported, self.fanOnlyFeatureSupported,
@@ -257,6 +256,7 @@ class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
         if self.condPumpFeatureSupported:
             dut_CondRunCount = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.CondRunCount)
             asserts.assert_greater_equal(dut_CondRunCount, 0, "CondRunCount attribute out of range")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
