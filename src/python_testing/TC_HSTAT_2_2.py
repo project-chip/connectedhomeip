@@ -227,7 +227,7 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         self.step(17)
         # TH sends command SetSettings with the Sleep field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
-        if self.attributes.Sleep.attribute_id not in self.supported_attributes):
+        if self.attributes.Sleep.attribute_id not in self.supported_attributes:
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=True)
 
         self.step(18)
