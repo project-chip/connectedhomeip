@@ -23,8 +23,8 @@ namespace app {
 
 WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
                                Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate), mContext(context)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)), mWindowCoveringDelegate(delegate),
+    mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
