@@ -53,6 +53,12 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::Init(AttributeChangeCallback * at
                         static_cast<decltype(this)>(req->priv)->OnDataReceived(msg, false);
                     }),
                     self, kInvokeTimeout);
+        // A revert may have run while otbr was away; its deprovision could
+        // not be delivered then, so deliver it now.
+        if (self->mRevertPending && self->SubmitDeprovision() == CHIP_NO_ERROR)
+        {
+            self->mRevertPending = false;
+        }
     });
     mOtbr.SetNotificationCallback([](UbusWatch & watch, void * appState, ubus_request_data * req, const char * notification,
                                      blob_attr * msg) { static_cast<decltype(this)>(appState)->OnDataReceived(msg, true); });
@@ -168,6 +174,7 @@ void OpenThreadUbusBorderRouterDelegate::SetActiveDataset(const Thread::Operatio
     mActiveDataset           = activeDataset;
     mActivateDatasetCallback = callback;
     mActivateDatasetSequence = sequenceNum;
+    mActivationPending       = true;
     return;
 
 exit:
@@ -205,10 +212,20 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::SetPendingDataset(const Thread::O
 
 CHIP_ERROR OpenThreadUbusBorderRouterDelegate::RevertActiveDataset()
 {
+    // The fail-safe expiry handler calls this for every expired fail-safe,
+    // whether or not it carried a dataset activation: a failed commissioning
+    // attempt by an unrelated controller must not wipe the network. Only an
+    // activation that has not been committed may be reverted.
+    VerifyOrReturnError(mActivationPending, CHIP_NO_ERROR);
+    mActivationPending = false;
+    // The provision may still be in flight; without the callback its
+    // completion is a no-op instead of completing the reverted activation
+    // (and a new attempt meanwhile would read as Busy).
+    mActivateDatasetCallback = nullptr;
+
     // SetActiveDataset is only accepted when no dataset is configured, so
     // reverting means returning to the unprovisioned state rather than
     // restoring a previous dataset.
-    VerifyOrReturnError(mOtbr.Resolved(), CHIP_ERROR_NOT_CONNECTED);
 
     // deprovision detaches gracefully before erasing, so its reply can be
     // seconds away; fire the request asynchronously and let the otbr
@@ -216,6 +233,20 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::RevertActiveDataset()
     // away: returning to unprovisioned is the outcome either way.
     mActiveDataset.Clear();
     mAttributeChangeCallback->ReportAttributeChanged(ActiveDatasetTimestamp::Id);
+
+    CHIP_ERROR err = SubmitDeprovision();
+    if (err != CHIP_NO_ERROR)
+    {
+        // The fail-safe fires once; remember the revert so the deprovision is
+        // delivered when otbr comes back rather than never.
+        mRevertPending = true;
+    }
+    return err;
+}
+
+CHIP_ERROR OpenThreadUbusBorderRouterDelegate::SubmitDeprovision()
+{
+    VerifyOrReturnError(mOtbr.Resolved(), CHIP_ERROR_NOT_CONNECTED);
 
     auto * invoke    = new ProvisionRequest;
     invoke->delegate = this;
@@ -235,12 +266,29 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::RevertActiveDataset()
         if (ret != 0 || self->otError != 0)
         {
             ChipLogError(AppServer, "deprovision failed: ubus %d, otError %u", ret, self->otError);
+            // otbr kept state this delegate no longer reports. Pull its truth
+            // back into the cache so the two do not quietly diverge; a
+            // connection-failed completion needs no resync and the context
+            // may already be gone.
+            if (ret != UBUS_STATUS_CONNECTION_FAILED)
+            {
+                self->delegate->ResyncFromOtbr();
+            }
         }
         delete self;
     };
     ubus_complete_request_async(&mUbusManager.Context(), &invoke->req);
 
     return CHIP_NO_ERROR;
+}
+
+void OpenThreadUbusBorderRouterDelegate::ResyncFromOtbr()
+{
+    VerifyOrReturn(mOtbr.Resolved());
+    ubus_invoke(&mUbusManager.Context(), mOtbr.ObjectID(), "status", nullptr, ([](ubus_request * req, int type, blob_attr * msg) {
+        static_cast<OpenThreadUbusBorderRouterDelegate *>(req->priv)->OnDataReceived(msg, false);
+    }),
+                this, kInvokeTimeout);
 }
 
 void OpenThreadUbusBorderRouterDelegate::OnDataReceived(blob_attr * msg, bool notification)
