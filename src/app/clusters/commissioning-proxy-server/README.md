@@ -27,6 +27,17 @@ aggregation:
 | `CommissioningProxyScanCache`      | `CachedResults` / `NumCachedResults` (one entry per device, per-entry TTL, `MaxCachedResults` cap)                        |
 | `CommissioningProxyScanAggregator` | Combines a multi-transport `ProxyScanRequest` into one `ProxyScanResponse`                                                |
 
+A fourth transport-agnostic component, `CommissioningProxyBgScanRegistry`, ships
+with the cluster but is **instantiated one per transport and owned by the
+driver** rather than composed by the cluster:
+`ProxyBackGroundScanStartRequest`/`ProxyBackGroundScanStopRequest` fan out to
+every matching driver, so the per-fabric records they arbitrate are necessarily
+transport-local. It holds the per-fabric scan requests and their lifetime
+timers, the spec transport/band overlap arithmetic on Stop, and the
+paused/deferred state used while the radio is held by a connect or foreground
+scan — leaving the driver only the hardware start/stop. See [Background
+scanning](#background-scanning).
+
 The application supplies **only the platform-specific transport work** by
 implementing the `CommissioningProxyTransport` driver interface (one per
 physical transport, e.g. BLE or Wi-Fi PAF) and registering it with the cluster.
@@ -94,20 +105,23 @@ Per the SDK cluster guidance, a cluster that triggers platform-specific actions
 uses a **Delegate (or Driver) interface**, while a cluster's own attribute state
 is pushed through setters rather than fetched from a delegate. This cluster
 follows that split precisely, so instead of one do-everything delegate there are
-three homes for what such a delegate would otherwise hold:
+four homes for what such a delegate would otherwise hold:
 
-| Concern                                                           | Lives in                                           | Why                                                                                       |
-| ----------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Transport actions (Connect / Scan / SendMessage / Disconnect / …) | `CommissioningProxyTransport` driver               | The only genuinely platform-specific surface (BlueZ GATT, wpa_supplicant NAN).            |
-| Writable attributes (`ScanMaxTime`, `CacheTimeout`) + cache view  | The cluster (members + setters) and its subsystems | The cluster owns change-reporting, so a driver can never forget `NotifyAttributeChanged`. |
-| Static capabilities (`MaxSessions`, `MaxCachedResults`, bands)    | `Config` (constructor argument)                    | Fixed device facts, not actions.                                                          |
+| Concern                                                           | Lives in                                            | Why                                                                                                              |
+| ----------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Transport actions (Connect / Scan / SendMessage / Disconnect / …) | `CommissioningProxyTransport` driver                | The only genuinely platform-specific surface (BlueZ GATT, wpa_supplicant NAN).                                   |
+| Writable attributes (`ScanMaxTime`, `CacheTimeout`) + cache view  | The cluster (members + setters) and its subsystems  | The cluster owns change-reporting, so a driver can never forget `NotifyAttributeChanged`.                        |
+| Static capabilities (`MaxSessions`, `MaxCachedResults`, bands)    | `Config` (constructor argument)                     | Fixed device facts, not actions.                                                                                 |
+| Background-scan fabric records, band arithmetic, pause/resume     | `CommissioningProxyBgScanRegistry` (one per driver) | Transport-agnostic logic, but held per transport because background Start/Stop fan out to every matching driver. |
 
 **How multiple platforms plug in.** A platform provides one
 `CommissioningProxyTransport` implementation per physical transport and
 registers it with `RegisterTransport()`. The cluster dispatches each command to
 the driver whose `GetTransportType()` matches the request's transport bit, and
 drivers report async results back through the cluster's shared subsystems
-(`Sessions()`, `ScanCache()`, `ScanAggregator()`). A new platform therefore
+(`Sessions()`, `ScanCache()`, `ScanAggregator()`). Background scanning is
+inherited the same way: the driver holds a `CommissioningProxyBgScanRegistry`
+and implements its three-method `HardwareControl` hook. A new platform therefore
 writes only its GATT/NAN driver and inherits all session/scan/message
 bookkeeping unchanged.
 
@@ -155,8 +169,16 @@ public:
     // background-scan results to mHost->ScanCache().Report().
     Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime) override;
 
-    // ... CancelPendingConnect / Disconnect / BgScanStart / BgScanStop /
-    //     OnAllSessionsClosed / IsConnectPending / Shutdown
+    // Background scan: forward to the driver's CommissioningProxyBgScanRegistry,
+    // which owns the per-fabric records, lifetime timers and band arithmetic
+    // (see Background scanning below).
+    Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+                                                    FabricIndex fabricIndex, NodeId nodeId) override;
+    Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
+                                                   FabricIndex fabricIndex, NodeId nodeId) override;
+
+    // ... CancelPendingConnect / Disconnect / OnAllSessionsClosed /
+    //     IsConnectPending / Shutdown
 
 private:
     CommissioningProxyCluster * mHost = nullptr;
@@ -237,25 +259,108 @@ only after the cluster has validated the request; the driver does the
 transport-specific work and reports results back through the host cluster's
 subsystems.
 
-| Method                   | Description                                                         |
-| ------------------------ | ------------------------------------------------------------------- |
-| `GetTransportType()`     | The single transport bit this driver services (`kBle` / `kWiFiPAF`) |
-| `SetHost()`              | Bind the host cluster (set to null at cluster teardown)             |
-| `Connect()`              | Open a transport session; allocate + register it via `Sessions()`   |
-| `SendMessage()`          | Forward a packet; reply routed back via `Sessions()`                |
-| `Scan()`                 | Foreground scan; results reported to `ScanAggregator()`             |
-| `BgScanStart()`          | Start a background scan; results reported to `ScanCache()` (BGS)    |
-| `BgScanStop()`           | Stop a background scan (BGS)                                        |
-| `CancelPendingConnect()` | Cancel an in-flight connect (null-SessionID disconnect)             |
-| `Disconnect()`           | Tear down an active proxy session                                   |
-| `OnAllSessionsClosed()`  | Notified when the last session across all transports closes         |
-| `IsConnectPending()`     | Whether a connect is in flight (counted against `MaxSessions`)      |
-| `Shutdown()`             | Cancel driver timers/state before cluster destruction               |
+| Method                   | Description                                                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GetTransportType()`     | The single transport bit this driver services (`kBle` / `kWiFiPAF`)                                                                                                                    |
+| `SetHost()`              | Bind the host cluster (set to null at cluster teardown)                                                                                                                                |
+| `Connect()`              | Open a transport session; allocate + register it via `Sessions()`                                                                                                                      |
+| `SendMessage()`          | Forward a packet; reply routed back via `Sessions()`                                                                                                                                   |
+| `Scan()`                 | Foreground scan; results reported to `ScanAggregator()`                                                                                                                                |
+| `BgScanStart()`          | Start a background scan for the given `(fabricIndex, nodeId)`; normally forwarded to the driver's `CommissioningProxyBgScanRegistry::Start()`. Results reported to `ScanCache()` (BGS) |
+| `BgScanStop()`           | Stop a background scan for the given `(fabricIndex, nodeId)`; normally forwarded to `CommissioningProxyBgScanRegistry::Stop()` (BGS)                                                   |
+| `CancelPendingConnect()` | Cancel an in-flight connect (null-SessionID disconnect)                                                                                                                                |
+| `Disconnect()`           | Tear down an active proxy session                                                                                                                                                      |
+| `OnAllSessionsClosed()`  | Notified when the last session across all transports closes                                                                                                                            |
+| `IsConnectPending()`     | Whether a connect is in flight (counted against `MaxSessions`)                                                                                                                         |
+| `Shutdown()`             | Cancel driver timers/state before cluster destruction                                                                                                                                  |
 
 Note there is **no** `ProxyScanRequest`/`ProxyMessageRequest`/etc. delegate
 hook: those commands' spec logic, session tracking, message routing, and scan
 aggregation live in the cluster and its subsystems; the driver only exposes the
 transport primitives above.
+
+## Background scanning
+
+`ProxyBackGroundScanStartRequest`/`ProxyBackGroundScanStopRequest` are
+per-fabric and MAY name several transports, so the cluster validates the request
+(BGS/WI feature gating, reserved transport and band bits, supported bands) and
+then fans it out to every registered driver whose transport bit is set, passing
+the requesting fabric index and node id taken from the subject descriptor. Start
+reports the first non-success status a driver returned; Stop returns `NOT_FOUND`
+only when no driver had a matching record.
+
+Everything a driver then has to do that is _not_ radio work is provided by
+`CommissioningProxyBgScanRegistry` — one instance per driver, constructed with a
+reference to the driver's `HardwareControl` implementation:
+
+| Registry call      | Responsibility                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Start()`          | Add or refresh the `(fabricIndex, nodeId)` record and its transport/band mask, arm its lifetime timer, start the hardware if it is the first record |
+| `Stop()`           | Remove the requested transports/bands from the record; stop the hardware once no records remain                                                     |
+| `Pause()`          | Suspend the hardware scan while the radio is needed for a connect or foreground scan; records stay registered (idempotent)                          |
+| `ResumeIfNeeded()` | Restart a paused scan once the radio is free; no-op if not paused or if no records remain                                                           |
+| `Shutdown()`       | Cancel every lifetime timer and stop the hardware scan if the registry owns it                                                                      |
+
+`Start()` with `timeoutSecs == 0` means no lifetime timer, i.e. scan until an
+explicit Stop. `Stop()` applies the spec's transport/band arithmetic: a zero
+transport mask means "stop the listed bands only"; a record left with no
+transports or no bands is removed; `SUCCESS` is returned even when nothing
+overlapped, and `NOT_FOUND` only when the fabric has no record at all.
+
+The driver supplies the only transport-specific parts via `HardwareControl`:
+
+| Hook                   | Contract                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)                 |
+| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                          |
+| `ClearCachedResults()` | Drop this transport's cached results (`host->ScanCache().ClearTransport(...)`) whenever the last record is removed |
+
+`StartHardwareScan()` returns `CHIP_NO_ERROR` when the scan is running,
+`CHIP_ERROR_BUSY` when the radio is currently held — the registry keeps the
+records, stays paused and retries on the next `ResumeIfNeeded()` — and any other
+error is a hard failure that rejects the triggering `Start()`.
+
+A driver therefore wires background scanning up as a small `HardwareControl`
+implementation plus one registry instance, and forwards the two driver methods
+to it:
+
+```cpp
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+
+class MyBleBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
+{
+public:
+    // Returns CHIP_ERROR_BUSY when the single scanner is held by a connect or a
+    // foreground scan; the registry then defers and retries on resume.
+    CHIP_ERROR StartHardwareScan() override { return StartMyPlatformScan(OnBgScanDiscovery); }
+    void StopHardwareScan() override { StopMyPlatformScan(); }
+    void ClearCachedResults() override { sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle); }
+};
+
+// Declared before the registry so it outlives it: the registry's destructor may
+// call back into these hooks.
+MyBleBgScanHardware sHardware;
+CommissioningProxyBgScanRegistry sBgScan(sHardware);
+
+Status MyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex, NodeId nodeId)
+{
+    return sBgScan.Start(fabricIndex, nodeId, GetTransportType(), wiFiBands, timeout);
+}
+
+Status MyBleTransport::BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
+                                 FabricIndex fabricIndex, NodeId nodeId)
+{
+    return sBgScan.Stop(fabricIndex, nodeId, transport, wiFiBands);
+}
+```
+
+`CHIP_ERROR_BUSY` is the load-bearing case: on BLE the scanner is owned by a
+connect or foreground scan, and on Wi-Fi PAF a `ProxyConnect` owns the single
+NAN subscribe slot. A driver reports the conflict from `StartHardwareScan()`,
+calls `Pause()` when it takes the radio and `ResumeIfNeeded()` when it releases
+it, and the registry keeps the Commissioner's background scan registered across
+the gap. `ResumeIfNeeded()` must be wrapped in `PlatformMgr().ScheduleWork()` if
+the "radio freed" path could otherwise re-enter the driver.
 
 ## Async Command Handling
 
