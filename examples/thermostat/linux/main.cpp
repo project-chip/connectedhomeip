@@ -72,10 +72,10 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-
 void ApplicationInit()
 {
-    chip::app::Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    chip::app::Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
+                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 }
 
 void ApplicationShutdown() {}
