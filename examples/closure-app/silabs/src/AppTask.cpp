@@ -175,7 +175,7 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
     GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
@@ -184,9 +184,9 @@ CHIP_ERROR AppTask::AppInit()
     AppManagerInstance().Init();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     UpdateClosureUI(nullptr);
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -195,8 +195,8 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     BaseApplication::InitCompleteCallback(err);
     return err;
@@ -340,7 +340,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 void AppTask::DMClosureControlClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
     ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     using namespace chip::app::Clusters::ClosureControl::Attributes;
     switch (attributePath.mAttributeId)
     {
@@ -355,7 +355,7 @@ void AppTask::DMClosureControlClusterAttributeChangedCallback(const chip::app::C
     default:
         break;
     }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 }
 
 void AppTask::DMClosureDimensionClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
