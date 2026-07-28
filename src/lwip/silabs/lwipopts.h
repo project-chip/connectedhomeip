@@ -40,13 +40,10 @@
 #define MEM_ALIGNMENT (4)
 #define MEMP_NUM_TCP_SEG (TCP_SND_QUEUELEN + 1)
 #define LWIP_TIMEVAL_PRIVATE (0)
-#if 1
+
 #define MEM_LIBC_MALLOC (1)
 #define mem_clib_free vPortFree
 #define mem_clib_malloc pvPortMalloc
-#else
-#define MEM_LIBC_MALLOC (0)
-#endif
 
 #define LWIP_COMPAT_MUTEX (0)
 #define SYS_LIGHTWEIGHT_PROT (1)
