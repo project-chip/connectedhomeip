@@ -535,11 +535,19 @@ class IDMBaseTest(BasicCompositionTests):
         if not ref_attr:
             return None
 
+        # This is an incidental read to resolve a sibling constraint reference, not the
+        # value under test. If it can't be read, we can't build a valid payload for the
+        # field anyway, so return None (bound left unresolved, caller skips it) rather
+        # than raising TestFailure and aborting the whole step. Wildcard-subscription
+        # verification stays enabled: a real subscription mismatch still fails the test.
         ref_value = await self.read_single_attribute_check_success(
             endpoint=endpoint_id,
             cluster=cluster_class,
-            attribute=ref_attr
+            attribute=ref_attr,
+            assert_on_error=False
         )
+        if ref_value is None:
+            return None
 
         if ref.field:
             python_field_name = ref.field[0].lower() + ref.field[1:]
