@@ -392,6 +392,12 @@ template("siwx917_sdk") {
     # Suppress VLA warnings for wifi-sdk files that use variable-length arrays
     cflags += [ "-Wno-vla" ]
 
+    # WiSeConnect sl_debug_log() forwards a non-literal format to vprintf
+    cflags += [
+      "-Wno-missing-format-attribute",
+      "-Wno-format-nonliteral",
+    ]
+
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
