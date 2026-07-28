@@ -37,13 +37,13 @@
 import logging
 
 from mobly import asserts
+from TC_HSTAT_Test_Base import HSTATBase
 
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.interaction_model import InteractionModelError, Status
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
         # This will receive updates when this attribute changes value.
         userSetpointSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.UserSetpoint)
         await userSetpointSubscription.start(self.default_controller, self.dut_node_id, endpoint)
-        reportsReceived = [] 
+        reportsReceived = []
 
         self.step(11)
         # TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue.
