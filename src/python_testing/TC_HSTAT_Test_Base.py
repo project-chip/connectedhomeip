@@ -24,6 +24,7 @@ from matter.interaction_model import Status
 
 log = logging.getLogger(__name__)
 
+
 class HSTATBase:
     """
     This is a base class for Humidistat cluster tests.
@@ -77,7 +78,7 @@ class HSTATBase:
     async def write_hstat_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.Humidistat
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute)])
-        err_msg = "Received error status {} when writing {}:{}".format(str(result[0].Status), str(cluster), str(attribute))
+        err_msg = f"Received error status {str(result[0].Status)} when writing {str(cluster)}:{str(attribute)}"
         asserts.assert_equal(result[0].Status, Status.Success, err_msg)
 
     async def send_hstat_cmd_expect_success(self, endpoint, command) -> None:

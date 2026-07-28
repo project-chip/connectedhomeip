@@ -40,13 +40,12 @@
 import logging
 
 from mobly import asserts
+from TC_HSTAT_Test_Base import HSTATBase
 
-import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -134,7 +133,8 @@ class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
                     asserts.assert_true(self.humidifierFeatureSupported, "Humidifier mode was supported while the feature was not")
                 case self.ModeEnum.kDehumidifier:
                     dehumidifierModeSupported = True
-                    asserts.assert_true(self.dehumidifierFeatureSupported, "Dehumidifier mode was supported while the feature was not")
+                    asserts.assert_true(self.dehumidifierFeatureSupported,
+                                        "Dehumidifier mode was supported while the feature was not")
                 case self.ModeEnum.kAuto:
                     autoModeSupported = True
                     asserts.assert_true(self.autoFeatureSupported, "Auto mode was supported while the feature was not")
