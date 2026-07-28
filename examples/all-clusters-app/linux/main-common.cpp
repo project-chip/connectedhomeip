@@ -315,9 +315,6 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
 
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
-
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                             uint16_t maxReadLength)

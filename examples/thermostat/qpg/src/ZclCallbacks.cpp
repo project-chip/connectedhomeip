@@ -55,8 +55,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
-
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "Setting log provider.");
