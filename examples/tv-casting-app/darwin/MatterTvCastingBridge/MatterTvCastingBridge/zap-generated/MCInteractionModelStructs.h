@@ -149,4 +149,13 @@
 @property (nonatomic, copy) NSString * _Nonnull presetName;
 @end
 
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCMediaFileManagementClusterFileDescriptionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fileID;
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@end
+
 #endif /* MCStructsObjc_h */
