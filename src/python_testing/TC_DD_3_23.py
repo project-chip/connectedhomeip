@@ -119,7 +119,8 @@ class TC_DD_3_23(MatterBaseTest):
 
         # Step 3: Perform the commissioning again to check if the device is already commissioned and commissioning fails
         self.step(3)
-        commissioning_success = await self.commission_devices()
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        commissioning_success = await self.commission_ntl_devices(payload)
         asserts.assert_false(
             commissioning_success,
             "Device Commissioning using nfc transport has succeeded when it should have failed"
@@ -130,7 +131,8 @@ class TC_DD_3_23(MatterBaseTest):
 
         # Step 5: Perform the commissioning again to check if the device is already commissioned and commissioning fails
         self.step(5)
-        commissioning_success = await self.commission_devices()
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        commissioning_success = await self.commission_ntl_devices(payload)
         asserts.assert_false(
             commissioning_success,
             "Device Commissioning using nfc transport has succeeded when it should have failed"
