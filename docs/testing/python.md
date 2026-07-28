@@ -105,7 +105,7 @@ the tests. Please see [Running tests in CI](#running-tests-in-ci).
 whether a test needs a commissioned device, an uncommissioned one, performs
 commissioning itself, or needs no device at all. Instead of deriving from
 `MatterBaseTest` directly, a test should derive from the marker base class that
-matches what it requires. These markers are **declarative only** — they add no
+matches what it requires. These markers are currently **declarative only** — they add no
 runtime behavior and do not change method resolution order, setup, teardown, or
 test discovery. They give tooling (the Test Harness, CI selection, the
 structural check below) a single static signal for what each test needs.
