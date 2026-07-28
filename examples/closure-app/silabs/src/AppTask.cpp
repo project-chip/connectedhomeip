@@ -306,8 +306,8 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                     }
 
                     // Move to the target position with latch set to false and preserved speed value
-                    auto status = AppManagerInstance().GetClosureControlCluster().HandleMoveTo(
-                        MakeOptional(targetPosition), latch, speed);
+                    auto status =
+                        AppManagerInstance().GetClosureControlCluster().HandleMoveTo(MakeOptional(targetPosition), latch, speed);
                     if (status != Protocols::InteractionModel::Status::Success)
                     {
                         ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));

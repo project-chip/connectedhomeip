@@ -56,9 +56,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The closure example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs platform.
+The closure example is intended to serve both as a means to explore the workings
+of Matter as well as a template for creating real products based on the Silicon
+Labs platform.
 
 Unlike the lighting example (single CRTP chain on `AppTask`), this app keeps a
 separate `ClosureManager` for closure domain logic and a second CRTP chain for
@@ -67,10 +67,10 @@ product customization. See
 
 ## Extending Base App Implementation
 
-| Concern | Base | CRTP hook layer | Customer leaf |
-| ------- | ---- | --------------- | ------------- |
-| Lifecycle / UI / buttons / DM callbacks | `AppTask` | [`AppTaskImpl`](include/AppTaskImpl.h) | [`CustomerAppTask`](../../platform/silabs/customer/CustomerAppTask.h) |
-| Closure domain logic (motion, latch, panels) | `ClosureManager` | [`ClosureManagerImpl`](include/ClosureManagerImpl.h) | [`CustomerAppManager`](include/customer/CustomerAppManager.h) |
+| Concern                                      | Base             | CRTP hook layer                                      | Customer leaf                                                         |
+| -------------------------------------------- | ---------------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
+| Lifecycle / UI / buttons / DM callbacks      | `AppTask`        | [`AppTaskImpl`](include/AppTaskImpl.h)               | [`CustomerAppTask`](../../platform/silabs/customer/CustomerAppTask.h) |
+| Closure domain logic (motion, latch, panels) | `ClosureManager` | [`ClosureManagerImpl`](include/ClosureManagerImpl.h) | [`CustomerAppManager`](include/customer/CustomerAppManager.h)         |
 
 ### CustomerAppTask
 
@@ -129,10 +129,9 @@ can customize via `DMPostAttributeChangeCallbackImpl()` in `CustomerAppTask`.
 
 Closure-specific cluster attribute-changed callbacks
 (`MatterClosureControlClusterServerAttributeChangedCallback`,
-`MatterClosureDimensionClusterServerAttributeChangedCallback`) are forwarders
-in `AppTask.cpp` and dispatch to
-`DMClosureControlClusterAttributeChangedCallback` /
-`DMClosureDimensionClusterAttributeChangedCallback`, customized via the
+`MatterClosureDimensionClusterServerAttributeChangedCallback`) are forwarders in
+`AppTask.cpp` and dispatch to `DMClosureControlClusterAttributeChangedCallback`
+/ `DMClosureDimensionClusterAttributeChangedCallback`, customized via the
 matching `*Impl()` hooks on `CustomerAppTask`.
 
 Forwarding into `AppTask` still goes through CRTP as in

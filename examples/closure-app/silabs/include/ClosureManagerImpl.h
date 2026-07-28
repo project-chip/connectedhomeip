@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "ClosureManager.h"
 #include "CRTPHelpers.h"
+#include "ClosureManager.h"
 
 /**
  * @brief CRTP override layer for `ClosureManager`.
@@ -87,16 +87,10 @@ public:
     }
 
     // Advance closure endpoints toward their MoveTo target
-    void HandleClosureMotionAction()
-    {
-        CRTP_OPTIONAL_VOID_DISPATCH(ClosureManagerImpl, Derived, HandleClosureMotionActionImpl);
-    }
+    void HandleClosureMotionAction() { CRTP_OPTIONAL_VOID_DISPATCH(ClosureManagerImpl, Derived, HandleClosureMotionActionImpl); }
 
     // Unlatch the closure endpoint before continuing motion
-    void HandleClosureUnlatchAction()
-    {
-        CRTP_OPTIONAL_VOID_DISPATCH(ClosureManagerImpl, Derived, HandleClosureUnlatchActionImpl);
-    }
+    void HandleClosureUnlatchAction() { CRTP_OPTIONAL_VOID_DISPATCH(ClosureManagerImpl, Derived, HandleClosureUnlatchActionImpl); }
 
     // Compute the next panel position step toward the target
     bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,

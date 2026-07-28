@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include "ClosureManager.h"
 #include "AppConfig.h"
 #include "AppTask.h"
-#include "ClosureManager.h"
 #include "CustomerAppManager.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -718,8 +718,8 @@ void ClosureManager::HandleClosureMotionAction()
     bool isEndPoint3ProgressPossible = false;
 
     // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
-    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint2CurrentState.Value(), mClosurePanelEndpoint2TargetState.Value(),
-                                           mClosurePanelEndpoint2NextPosition))
+    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint2CurrentState.Value(),
+                                                  mClosurePanelEndpoint2TargetState.Value(), mClosurePanelEndpoint2NextPosition))
     {
         VerifyOrReturn(!mClosurePanelEndpoint2NextPosition.IsNull(),
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
@@ -734,8 +734,8 @@ void ClosureManager::HandleClosureMotionAction()
     }
 
     // Get the Next Current State to be set for the endpoint 3, if target postion is not reached.
-    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint3CurrentState.Value(), mClosurePanelEndpoint3TargetState.Value(),
-                                           mClosurePanelEndpoint3NextPosition))
+    if (AppManagerInstance().GetPanelNextPosition(mClosurePanelEndpoint3CurrentState.Value(),
+                                                  mClosurePanelEndpoint3TargetState.Value(), mClosurePanelEndpoint3NextPosition))
     {
         VerifyOrReturn(!mClosurePanelEndpoint3NextPosition.IsNull(),
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
