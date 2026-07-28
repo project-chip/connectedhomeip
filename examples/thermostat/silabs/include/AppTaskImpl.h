@@ -68,6 +68,11 @@ public:
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallbackImpl, attributePath, type, size, value);
     }
 
+    void DMThermostatClusterInit(chip::EndpointId endpoint)
+    {
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMThermostatClusterInitImpl, endpoint);
+    }
+
 private:
     friend Derived;
 
@@ -92,4 +97,6 @@ private:
     {
         AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
     }
+
+    void DMThermostatClusterInitImpl(chip::EndpointId endpoint) { AppTask::DMThermostatClusterInit(endpoint); }
 };

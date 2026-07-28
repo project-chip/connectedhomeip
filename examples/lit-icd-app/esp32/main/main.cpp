@@ -66,10 +66,16 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // GPIO9-GPIO14 could be used to wake up ESP32-H2.
 // For ESP32-H2 DevKitM, the boot button is GPIO9.
 #define UAT_GPIO GPIO_NUM_9
+#elif defined(CONFIG_IDF_TARGET_ESP32H21)
+// GPIO5-GPIO11 could be used to wake up ESP32-H21.
+#define UAT_GPIO GPIO_NUM_6
 #elif defined(CONFIG_IDF_TARGET_ESP32C6)
 // GPIO0-GPIO7 could be used to wake up ESP32-C6.
 // For ESP32-C6 DevKitC, the boot button is GPIO9, we cannot use it to wake up the chip.
 #define UAT_GPIO GPIO_NUM_7
+#elif defined(CONFIG_IDF_TARGET_ESP32H4)
+// GPIO0-GPIO5 could be used to wake up ESP32-H4.
+#define UAT_GPIO GPIO_NUM_4
 #else
 #error "Unsupport IDF target"
 #endif
@@ -84,7 +90,8 @@ static AppDeviceCallbacks EchoCallbacks;
 
 static void UatButtonHandler(UatButton * button)
 {
-    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+    RETURN_SAFELY_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 }
 
 static void InitServer(intptr_t context)
@@ -130,9 +137,10 @@ extern "C" void app_main()
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
     static UatButton sButton;
     sButton.Init(UAT_GPIO, ESP_EXT1_WAKEUP_ANY_LOW);
     sButton.SetUatButtonPressCallback(UatButtonHandler);
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

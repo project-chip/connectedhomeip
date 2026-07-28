@@ -22,8 +22,8 @@ import re
 import sys
 import time
 import traceback
+from collections.abc import Mapping
 from enum import IntEnum
-from typing import Mapping, Union
 from urllib.parse import urljoin
 
 import requests
@@ -128,7 +128,7 @@ class CHIPVirtualHome:
             last_find = this_find + len(s)
         return True
 
-    def reset_thread_devices(self, devices: Union[list[str], str]):
+    def reset_thread_devices(self, devices: list[str] | str):
         """
         Reset device's thread settings and verify state.
         """
@@ -160,7 +160,7 @@ class CHIPVirtualHome:
         self.logger.error("Device %s does not reach expected role", self.get_device_pretty_id(device_id))
         raise AssertionError
 
-    def form_thread_network(self, device_id: str, expected_role: Union[str, list[str]], timeout: int = 15,
+    def form_thread_network(self, device_id: str, expected_role: str | list[str], timeout: int = 15,
                             dataset: str = ""):
         """
         Start Thread Network with provided dataset. If dataset is not provided then default will be set.

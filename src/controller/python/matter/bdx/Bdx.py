@@ -19,8 +19,8 @@ import asyncio
 import builtins
 import ctypes
 from asyncio.futures import Future
+from collections.abc import Callable
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
-from typing import Callable, Optional
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
@@ -113,7 +113,7 @@ def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction,
     transaction.handleResult(result)
 
 
-def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size: Optional[int] = None) -> PyChipError:
+def _PrepareForBdxTransfer(future: Future, data: bytes | None, max_block_size: int | None = None) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
     before the BDX transfer is initiated.
 
@@ -150,7 +150,7 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size
     return res
 
 
-def PrepareToReceiveBdxData(future: Future, max_block_size: Optional[int] = None) -> PyChipError:
+def PrepareToReceiveBdxData(future: Future, max_block_size: int | None = None) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer where this device receives data. This must be called before the BDX
     transfer is initiated.
 

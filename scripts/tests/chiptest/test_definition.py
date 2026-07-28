@@ -27,10 +27,16 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum, auto
 from pathlib import Path
-from types import MappingProxyType
+
+from python_path import PythonPath
 
 from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
+
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+
+with PythonPath(CHIP_ROOT / 'src/python_testing/matter_testing_infrastructure', relative_to=__file__):
+    from matter.testing.commissioning_types import CommissioningMethod
 
 log = logging.getLogger(__name__)
 
@@ -250,7 +256,7 @@ class KnownSubprocessEntry:
     target_name: str | None = None
 
 
-BUILTIN_SUBPROC_DATA = MappingProxyType({
+BUILTIN_SUBPROC_DATA = {
     # Matter applications
     'all-clusters': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
     'all-devices': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
@@ -283,10 +289,9 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
     'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
 
-
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
     'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.TOOL)
-})
+}
 
 
 class PathsFinderProto(typing.Protocol):
@@ -298,12 +303,10 @@ class SubprocessInfoRepo(dict):
     # We don't want to explicitly reference PathsFinder type because we
     # don't want to create a dependency on the diskcache module which PathsFinder imports.
     # Instead we just want a dict-like object
-    def __init__(self, paths: PathsFinderProto,
-                 subproc_knowhow: MappingProxyType[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
-                 *args, **kwargs):
+    def __init__(self, paths: PathsFinderProto, subproc_knowhow: dict[str, KnownSubprocessEntry] | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.paths = paths
-        self.subproc_knowhow = subproc_knowhow
+        self.subproc_knowhow = subproc_knowhow if subproc_knowhow is not None else BUILTIN_SUBPROC_DATA.copy()
 
     def addSpec(self, spec: str, kind: SubprocessKind | None = None):
         """Add a path to the repo as specified on the command line"""
@@ -440,6 +443,19 @@ class TestRunTime(StrEnum):
 
 
 @dataclass
+class TestJobConfig:
+    """Worker configuration which is a subset of command line options."""
+    commissioning_method: CommissioningMethod
+    dry_run: bool
+    subproc_info_repo: SubprocessInfoRepo
+    pics_file: Path
+    test_runtime: TestRunTime
+    test_timeout_seconds: int | None
+    value_wait_extra_duration_ms: int | None
+    concurrency: int
+
+
+@dataclass
 class TestDefinition:
     name: str
     run_name: str
@@ -462,48 +478,29 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
-            pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
-            test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
-            ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None,
-            op_network: str = 'WiFi',
-            thread_ba_host: str | None = None,
-            thread_ba_port: int | None = None,
-            wifipaf_wifi: bool = False,
-            value_wait_extra_duration_ms: int | None = None
-            ):
+    def Run(self, runner: Runner, apps_register: AppsRegister, config: TestJobConfig, thread_ba_host: str | None = None,
+            thread_ba_port: int | None = None):
         """
         Executes the given test case using the provided runner for execution.
         Will iterate and execute every target.
         """
         for target in self.targets:
             log.info('Executing %s::%s', self.name, target.name)
-            self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                          test_runtime, ble_controller_app, ble_controller_tool, op_network, thread_ba_host, thread_ba_port,
-                          wifipaf_wifi, value_wait_extra_duration_ms)
+            self._RunImpl(target, runner, apps_register, config, thread_ba_host, thread_ba_port)
 
-    def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
-                 pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
-                 test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
-                 ble_controller_app: int | None = None,
-                 ble_controller_tool: int | None = None,
-                 op_network: str = 'WiFi',
-                 thread_ba_host: str | None = None,
-                 thread_ba_port: int | None = None,
-                 wifipaf_wifi: bool = False,
-                 value_wait_extra_duration_ms: int | None = None):
+    def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, config: TestJobConfig,
+                 thread_ba_host: str | None = None, thread_ba_port: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
 
         loggedCapturedLogs = False
         try:
-            if target.command not in subproc_info_repo:
+            if target.command not in config.subproc_info_repo:
                 log.warning("Path to default target '%s' for test '%s' is not known, test will likely fail",
                             target.command, self.name)
-            if not dry_run:
-                for key, subproc in subproc_info_repo.items():
+            if not config.dry_run:
+                for key, subproc in config.subproc_info_repo.items():
                     # Do not add tools to the register
                     if subproc.kind == SubprocessKind.TOOL:
                         continue
@@ -514,15 +511,15 @@ class TestDefinition:
                         for arg in target.arguments:
                             subproc = subproc.with_args(arg)
 
-                    if op_network == 'Thread':
+                    if config.commissioning_method.op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID
                         subproc = subproc.with_args("--thread-node-id=2")
 
-                    if ble_controller_app is not None:
-                        subproc = subproc.with_args("--ble-controller", str(ble_controller_app))
-                        if op_network == 'WiFi':
+                    if config.commissioning_method.ble_controller_app is not None:
+                        subproc = subproc.with_args("--ble-controller", str(config.commissioning_method.ble_controller_app))
+                        if config.commissioning_method.op_network == 'WiFi':
                             subproc = subproc.with_args("--wifi")
-                    elif wifipaf_wifi:
+                    elif config.commissioning_method == CommissioningMethod.WIFIPAF_WIFI:
                         subproc = subproc.with_args("--wifi", "--wifipaf", "freq_list=2437")
 
                     app = App(runner, subproc)
@@ -540,7 +537,7 @@ class TestDefinition:
                     apps_register.add(f'{key}#2', app)
                     app.factoryReset()
 
-            if dry_run:
+            if config.dry_run:
                 tool_storage_dir = None
                 tool_storage_args = []
             else:
@@ -548,7 +545,7 @@ class TestDefinition:
                 tool_storage_args = ['--storage-directory', tool_storage_dir]
 
             # Only start and pair the default app
-            if dry_run:
+            if config.dry_run:
                 setupCode = '${SETUP_PAYLOAD}'
             else:
                 app = apps_register.get('default')
@@ -556,53 +553,54 @@ class TestDefinition:
                 assert app.setupCode is not None, "Setup code should have been set in app.start()"
                 setupCode = app.setupCode
 
-            assert 'chip-tool' in subproc_info_repo, \
+            assert 'chip-tool' in config.subproc_info_repo, \
                 "Chip tool should have been set for selected test runtime"
-            assert 'chip-tool-with-python' in subproc_info_repo, \
+            assert 'chip-tool-with-python' in config.subproc_info_repo, \
                 "Chip tool with Python should have been set for selected test runtime"
             pairing_server_args = []
 
-            pairing_cmd = subproc_info_repo['chip-tool-with-python']
-            if ble_controller_tool is not None:
-                if op_network == 'WiFi':
+            pairing_cmd = config.subproc_info_repo['chip-tool-with-python']
+            if config.commissioning_method.ble_controller_tool is not None:
+                if config.commissioning_method.op_network == 'WiFi':
                     pairing_cmd = pairing_cmd.with_args(
                         "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
-                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
-                elif op_network == 'Thread':
+                    pairing_server_args = ["--ble-controller", str(config.commissioning_method.ble_controller_tool)]
+                elif config.commissioning_method.op_network == 'Thread':
                     pairing_cmd = pairing_cmd.with_args(
                         "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_SETUP_QR_CODE)
-                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
-            elif wifipaf_wifi:
+                    pairing_server_args = ["--ble-controller", str(config.commissioning_method.ble_controller_tool)]
+            elif config.commissioning_method == CommissioningMethod.WIFIPAF_WIFI:
                 pairing_cmd = pairing_cmd.with_args("pairing", "wifipaf-wifi", TEST_NODE_ID,
                                                     "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR)
-            elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
+            elif config.commissioning_method.op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
                 pairing_cmd = pairing_cmd.with_args(
                     "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
                     "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
             else:
                 pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
-            if target.command == 'lit-icd' and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            if target.command == 'lit-icd' and config.test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                 pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
-            test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
+            test_cmd = config.subproc_info_repo['chip-tool-with-python'].with_args(
+                'tests', self.run_name, '--PICS', str(config.pics_file))
             test_cmd = test_cmd.with_args(*target.test_arguments)
-            if value_wait_extra_duration_ms is not None:
-                test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
+            if config.value_wait_extra_duration_ms is not None:
+                test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(config.value_wait_extra_duration_ms))
 
             interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 
-            if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            if config.test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                 interactive_server_args = interactive_server_args + ['--interface-id', '-1']
 
             server_args = (
-                '--server_path', str(subproc_info_repo['chip-tool'].path),
+                '--server_path', str(config.subproc_info_repo['chip-tool'].path),
                 '--server_arguments', ' '.join(interactive_server_args))
 
             pairing_cmd = pairing_cmd.with_args(*server_args)
             test_cmd = test_cmd.with_args(*server_args)
 
-            if dry_run:
+            if config.dry_run:
                 log.info("Pairing command: %s", shlex.join(pairing_cmd.to_cmd()))
                 log.info("Testcase command: %s", shlex.join(test_cmd.to_cmd()))
             else:
@@ -611,7 +609,7 @@ class TestDefinition:
                 runner.RunSubprocess(
                     test_cmd,
                     name='TEST', dependencies=[apps_register],
-                    timeout_seconds=timeout_seconds)
+                    timeout_seconds=config.test_timeout_seconds)
 
         except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

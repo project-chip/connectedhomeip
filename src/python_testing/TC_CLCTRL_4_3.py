@@ -33,7 +33,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -253,7 +252,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = None
 
             if overall_current_state is NullValue:
@@ -309,8 +308,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("5b", "5u")
         else:
             self.step("5b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = None
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = None
             if overall_current_state is NullValue:
                 current_latch = NullValue
             else:
@@ -379,8 +378,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             sub_handler.reset()
 
             self.step("5m")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = None
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = None
             if overall_current_state is NullValue:
                 current_latch = NullValue
             else:
@@ -442,7 +441,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("6b", "6h")
         else:
             self.step("6b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = None
             if overall_current_state is NullValue:
                 current_speed = NullValue
@@ -540,8 +539,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_latching_supported:
 
             self.step("8b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = overall_current_state.latch
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = overall_current_state.latch
             log.info("CurrentLatch: %s", current_latch)
 
             if current_latch is True and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
@@ -609,10 +608,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_position_supported:
 
             self.step("9b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
-            current_latch: typing.Union[Nullable,
-                                        bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            current_latch: Nullable | bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
             log.info("current_position: %s, current_latch: %s", current_position, current_latch)
 
             self.step("9c")
@@ -664,10 +662,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_speed_supported:
 
             self.step("10b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
-            current_latch: typing.Union[Nullable,
-                                        bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            current_latch: Nullable | bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
             log.info("current_speed: %s, current_latch: %s", current_speed, current_latch)
 
             self.step("10c")

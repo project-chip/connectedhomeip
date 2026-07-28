@@ -31,7 +31,7 @@ typedef struct hsm_pake_context_s
 {
     uint8_t spake_context[32];
     size_t spake_context_len;
-    uint8_t spake_objId;
+    uint16_t spake_objId;
 } hsm_pake_context_t;
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 

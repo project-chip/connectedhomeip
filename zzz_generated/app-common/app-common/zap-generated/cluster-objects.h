@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.h>
 #include <clusters/ApplicationLauncher/Events.h>
 #include <clusters/ApplicationLauncher/Structs.h>
+#include <clusters/AudioControl/Attributes.h>
+#include <clusters/AudioControl/Commands.h>
+#include <clusters/AudioControl/Events.h>
+#include <clusters/AudioControl/Structs.h>
 #include <clusters/AudioOutput/Attributes.h>
 #include <clusters/AudioOutput/Commands.h>
 #include <clusters/AudioOutput/Events.h>
@@ -335,6 +339,10 @@
 #include <clusters/LowPower/Commands.h>
 #include <clusters/LowPower/Events.h>
 #include <clusters/LowPower/Structs.h>
+#include <clusters/MediaFileManagement/Attributes.h>
+#include <clusters/MediaFileManagement/Commands.h>
+#include <clusters/MediaFileManagement/Events.h>
+#include <clusters/MediaFileManagement/Structs.h>
 #include <clusters/MediaInput/Attributes.h>
 #include <clusters/MediaInput/Commands.h>
 #include <clusters/MediaInput/Events.h>

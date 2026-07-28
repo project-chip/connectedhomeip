@@ -61,7 +61,6 @@
 import asyncio
 import enum
 import logging
-from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
@@ -263,7 +262,7 @@ class TC_SC_4_1(MatterBaseTest):
             log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
-    def get_discriminator_subtype(self, is_obcw: bool = False) -> Optional[tuple[str, str]]:
+    def get_discriminator_subtype(self, is_obcw: bool = False) -> tuple[str, str] | None:
         # TH constructs the Discriminator Subtype using the DUT's Long or Short Discriminator
         discriminator: str | None = None
         discriminator_subtype: str | None = None
@@ -292,7 +291,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> Optional[str]:
+    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> str | None:
 
         # TH performs a PTR record query against the Discriminator Subtype
         ptr_records = await MdnsDiscovery().get_ptr_records(

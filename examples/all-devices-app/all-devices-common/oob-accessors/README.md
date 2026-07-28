@@ -29,7 +29,7 @@ classDiagram
     class BooleanStateSensorAccessor {
         +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) std::optional~CHIP_ERROR~
     }
-    class BooleanStateSensorDevice {
+    class BooleanStateSensor {
     }
 
     class PigweedAttributeAccessor {
@@ -42,7 +42,7 @@ classDiagram
 
     OOBAccessorRegistry "1" *-- "many" OOBAccessor
     BooleanStateSensorAccessor --|> OOBAccessor
-    BooleanStateSensorAccessor "1" --> "1" BooleanStateSensorDevice : references
+    BooleanStateSensorAccessor "1" --> "1" BooleanStateSensor : references
     PigweedAttributeAccessor --> OOBAccessorRegistry : uses
     ShellCommandHandler --> OOBAccessorRegistry : uses
 ```
