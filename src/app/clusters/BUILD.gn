@@ -83,6 +83,7 @@ source_set("clusters") {
     "switch-server",
     "temperature-control-server",
     "temperature-measurement-server",
+    "thermostat-server",
     "thread-border-router-management-server",
     "thread-network-diagnostics-server",
     "thread-network-directory-server",

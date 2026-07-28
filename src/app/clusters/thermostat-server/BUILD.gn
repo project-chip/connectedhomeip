@@ -32,6 +32,7 @@ source_set("thermostat-server") {
     "ThermostatCluster.cpp",
     "ThermostatCluster.h",
     "ThermostatClusterAtomic.cpp",
+    "ThermostatClusterAtomic.h",
     "ThermostatClusterEvents.cpp",
     "ThermostatClusterEvents.h",
     "ThermostatClusterPresets.cpp",
