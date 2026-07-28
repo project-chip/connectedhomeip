@@ -36,14 +36,15 @@ from chiptest.concurrency.context import SYNC_MANAGER_PATH, mp_wrapped_spawn_con
 from chiptest.concurrency.state import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.concurrency.worker import WorkerJob
+from chiptest.concurrency.worker_pool import worker_pool_class
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
 from chiptest.runner import SubprocessKind
 from chiptest.status import PeriodicStatusThread
-from chiptest.test_definition import CommissioningMethod, SubprocessInfoRepo, TestDefinition, TestJobConfig, TestRunTime, TestConcurrencySchedulerType, TestTag
+from chiptest.test_definition import (CommissioningMethod, SubprocessInfoRepo, TestConcurrencySchedulerType, TestDefinition,
+                                      TestJobConfig, TestRunTime, TestTag)
 from chipyaml.paths_finder import PathsFinder
-from chiptest.concurrency.worker_pool import worker_pool_class
 
 log = logging.getLogger(__name__)
 
