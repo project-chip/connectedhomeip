@@ -37,12 +37,12 @@
 import logging
 
 from mobly import asserts
+from TC_HSTAT_Test_Base import HSTATBase
 
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -120,7 +120,6 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
                     self.mark_all_remaining_steps_skipped(2)
                     return
 
-
         self.step(2)
         # TH sends command On to the On/Off cluster on the same endpoint as this cluster.
         # Verify DUT responds w/ status SUCCESS(0x00)
@@ -145,15 +144,15 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
         if self.continuousFeatureSupported:
             continuousSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.Continuous)
             await continuousSubscription.start(self.default_controller, self.dut_node_id, endpoint)
-            continuousReportsReceived = [] 
+            continuousReportsReceived = []
         if self.attributes.Sleep.attribute_id in self.supported_attributes:
             sleepSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.Sleep)
             await sleepSubscription.start(self.default_controller, self.dut_node_id, endpoint)
-            sleepReportsReceived = [] 
+            sleepReportsReceived = []
         if self.optimalFeatureSupported:
             optimalSubscription = AttributeSubscriptionHandler(self.cluster, self.attributes.Optimal)
             await optimalSubscription.start(self.default_controller, self.dut_node_id, endpoint)
-            optimalReportsReceived = [] 
+            optimalReportsReceived = []
 
         self.step(5)
         # TH sends command SetSettings with the Continuous field set to True.
@@ -230,7 +229,7 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
         #
         # Need to fix the remaining test cases. They should only be run if the appropriate trigger PICS are indicated.
         #
-        
+
         if self.attributes.Continuous.attribute_id not in self.supported_attributes:
             self.mark_step_range_skipped(14, 16)
         else:
