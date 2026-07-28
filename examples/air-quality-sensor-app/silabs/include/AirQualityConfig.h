@@ -46,6 +46,10 @@
 // <i> Default: 300
 #define EXTREMELY_POOR_THRESHOLD 300
 
+// <o SENSOR_TIMER_PERIOD_MS> Sensor sampling period in milliseconds
+// <i> Default: 30000 (30 seconds)
+#define SENSOR_TIMER_PERIOD_MS 30000
+
 // <<< end of configuration section >>>
 
 #endif // SL_MATTER_AIR_QUALITY_CONFIG_H

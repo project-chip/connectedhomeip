@@ -760,10 +760,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Access Control
  *
- * The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances.
+ * The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterAccessControl : MTRGenericBaseCluster
@@ -877,7 +874,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Actions
  *
- * This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
+ * This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose logical grouping and actions.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterActions : MTRGenericBaseCluster
@@ -3684,7 +3681,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Administrator Commissioning
  *
- * Commands to trigger a Node to allow a new Administrator to commission it.
+ * This cluster is used to trigger a Node to allow a new Administrator to commission it.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterAdministratorCommissioning : MTRGenericBaseCluster
@@ -5415,7 +5412,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Cluster Air Quality
  *
- * Attributes for reporting air quality classification
+ * This cluster provides an interface to air quality classification using distinct levels with human-readable labels.
  */
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRBaseClusterAirQuality : MTRGenericBaseCluster
@@ -7434,6 +7431,18 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 + (void)readAttributeActiveMessageIDsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+- (void)readAttributeSupportedLanguageCodesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedLanguageCodesWithParams:(MTRSubscribeParams *)params
+                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                             reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedLanguageCodesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedMimeTypesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedMimeTypesWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedMimeTypesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -9504,6 +9513,14 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)calibrateWithParams:(MTRClosureControlClusterCalibrateParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)calibrateWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GroupedMoveTo
+ *
+ * This command is intended to be invoked using groupcast addressing to move a group of closures to a target position, latch, and/or perform the movement at a specific speed.
+ */
+- (void)groupedMoveToWithParams:(MTRClosureControlClusterGroupedMoveToParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)groupedMoveToWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeCountdownTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCountdownTimeWithParams:(MTRSubscribeParams *)params
@@ -9610,6 +9627,20 @@ MTR_PROVISIONALLY_AVAILABLE
  * This command is used to move a dimension of the closure to a target position by a number of steps.
  */
 - (void)stepWithParams:(MTRClosureDimensionClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GroupedSetTarget
+ *
+ * This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position, latch, and/or perform the movement at a specific speed.
+ */
+- (void)groupedSetTargetWithParams:(MTRClosureDimensionClusterGroupedSetTargetParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)groupedSetTargetWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GroupedStep
+ *
+ * This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position by a number of steps.
+ */
+- (void)groupedStepWithParams:(MTRClosureDimensionClusterGroupedStepParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeCurrentStateWithCompletion:(void (^)(MTRClosureDimensionClusterDimensionStateStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentStateWithParams:(MTRSubscribeParams *)params
@@ -14805,7 +14836,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Play
  *
- * Upon receipt, this SHALL play media.
+ * This command is used to start playback of the media.
  */
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)playWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14813,7 +14844,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Pause
  *
- * Upon receipt, this SHALL pause media.
+ * This command is used to pause playback of the media.
  */
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)pauseWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14821,7 +14852,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Stop
  *
- * Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched.
+ * This command is used to stop playback of the media.
  */
 - (void)stopWithParams:(MTRMediaPlaybackClusterStopParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)stopWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14829,7 +14860,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command StartOver
  *
- * Upon receipt, this SHALL Start Over with the current media playback item.
+ * This command is used to start playback of the media from the beginning.
  */
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)startOverWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14837,7 +14868,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Previous
  *
- * Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item.
+ * This command is used to go back to the previous media playback item.
  */
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)previousWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14845,7 +14876,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Next
  *
- * Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item.
+ * This command is used to go to the next media playback item.
  */
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)nextWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14853,7 +14884,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Rewind
  *
- * Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).
+ * This command is used to rewind the media.
  */
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)rewindWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14861,7 +14892,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command FastForward
  *
- * Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).
+ * This command is used to fast forward the media.
  */
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)fastForwardWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -14869,37 +14900,37 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SkipForward
  *
- * Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:
+ * This command is used to skip forward in the media.
  */
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command SkipBackward
  *
- * Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
+ * This command is used to skip backward in the media.
  */
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command Seek
  *
- * Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
+ * This command is used to seek to a specific position in the media.
  */
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ActivateAudioTrack
  *
- * Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT.
+ * This command is used to activate a specific Audio Track for the media being played.
  */
 - (void)activateAudioTrackWithParams:(MTRMediaPlaybackClusterActivateAudioTrackParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command ActivateTextTrack
  *
- * Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT.
+ * This command is used to activate a specific Text Track for the media being played.
  */
 - (void)activateTextTrackWithParams:(MTRMediaPlaybackClusterActivateTextTrackParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command DeactivateTextTrack
  *
- * If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it.
+ * This command is used to deactivate a specific Text Track for the media being played.
  */
 - (void)deactivateTextTrackWithParams:(MTRMediaPlaybackClusterDeactivateTextTrackParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)deactivateTextTrackWithCompletion:(MTRStatusCompletion)completion
@@ -14970,6 +15001,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeAvailableTextTracksWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAvailableCommandsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAvailableCommandsWithParams:(MTRSubscribeParams *)params
+                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAvailableCommandsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeContentInfoWithCompletion:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeContentInfoWithParams:(MTRSubscribeParams *)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeContentInfoWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRMediaPlaybackClusterContentInfoStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -15260,6 +15303,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch content from the specified URL.
  */
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command ContentReplicationRequest
+ *
+ * Upon receipt, this SHALL request replication information for the currently playing content.
+ */
+- (void)contentReplicationRequestWithParams:(MTRContentLauncherClusterContentReplicationRequestParams * _Nullable)params completion:(void (^)(MTRContentLauncherClusterContentReplicationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)contentReplicationRequestWithCompletion:(void (^)(MTRContentLauncherClusterContentReplicationResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command PlayPreset
+ *
+ * This command will play the preset passed in.
+ */
+- (void)playPresetWithParams:(MTRContentLauncherClusterPlayPresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeAcceptHeaderWithParams:(MTRSubscribeParams *)params
@@ -15274,6 +15331,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeSupportedStreamingProtocolsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+- (void)readAttributeMovableWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMovableWithParams:(MTRSubscribeParams *)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMovableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributePresetsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributePresetsWithParams:(MTRSubscribeParams *)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributePresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -15325,7 +15394,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Audio Output
  *
- * This cluster provides an interface for controlling the Output on a media device such as a TV.
+ * This cluster provides an interface for controlling the Output on a Video Player device such as a TV.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterAudioOutput : MTRGenericBaseCluster
@@ -15405,7 +15474,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Application Launcher
  *
- * This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
+ * This cluster provides an interface for launching applications on a Video Player device such as a TV.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterApplicationLauncher : MTRGenericBaseCluster
@@ -15499,7 +15568,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Cluster Application Basic
  *
- * This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.
+ * This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document).
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseClusterApplicationBasic : MTRGenericBaseCluster
@@ -15627,6 +15696,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)logoutWithCompletion:(MTRStatusCompletion)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command GetDeviceAuthURI
+ *
+ * This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App.
+ */
+- (void)getDeviceAuthURIWithParams:(MTRAccountLoginClusterGetDeviceAuthURIParams * _Nullable)params completion:(void (^)(MTRAccountLoginClusterGetDeviceAuthURIResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)getDeviceAuthURIWithCompletion:(void (^)(MTRAccountLoginClusterGetDeviceAuthURIResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeOAuthLoggedInWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeOAuthLoggedInWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeOAuthLoggedInWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -15962,6 +16045,116 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+@end
+
+/**
+ * Cluster Media File Management
+ *
+ * This cluster provides an interface for managing and sharing media files on devices such as Streaming Speakers, Smart TVs, or other media playback devices.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterMediaFileManagement : MTRGenericBaseCluster
+
+/**
+ * Command AddFile
+ *
+ * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage.
+ */
+- (void)addFileWithParams:(MTRMediaFileManagementClusterAddFileParams *)params completion:(void (^)(MTRMediaFileManagementClusterAddFileResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command DeleteFile
+ *
+ * Upon receipt, this command SHALL delete the specified media file from the device's storage.
+ */
+- (void)deleteFileWithParams:(MTRMediaFileManagementClusterDeleteFileParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command RequestSharedFiles
+ *
+ * Upon receipt, this command SHALL initiate a request for the server to share files with the requesting client.
+ */
+- (void)requestSharedFilesWithParams:(MTRMediaFileManagementClusterRequestSharedFilesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command GetSharedFile
+ *
+ * Upon receipt, this command SHALL retrieve information about a file that was previously shared with the requesting client.
+ */
+- (void)getSharedFileWithParams:(MTRMediaFileManagementClusterGetSharedFileParams *)params completion:(void (^)(MTRMediaFileManagementClusterGetSharedFileResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command OfferFile
+ *
+ * Upon receipt, this command SHALL indicate that the requesting client wishes to share a file with the server.
+ */
+- (void)offerFileWithParams:(MTRMediaFileManagementClusterOfferFileParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeTotalStorageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeTotalStorageWithParams:(MTRSubscribeParams *)params
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeTotalStorageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAvailableStorageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAvailableStorageWithParams:(MTRSubscribeParams *)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAvailableStorageWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAvailableFilesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAvailableFilesWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAvailableFilesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedMimeTypesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedMimeTypesWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedMimeTypesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseClusterMediaFileManagement (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
@@ -21576,6 +21769,9 @@ typedef NS_OPTIONS(uint32_t, MTRMessagesFeature) {
     MTRMessagesFeatureConfirmationResponse MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x2,
     MTRMessagesFeatureConfirmationReply MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4,
     MTRMessagesFeatureProtectedMessages MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x8,
+    MTRMessagesFeatureSpokenMessages MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRMessagesFeatureAudioMessages MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRMessagesFeatureMultiModalMessages MTR_PROVISIONALLY_AVAILABLE = 0x40,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 typedef NS_OPTIONS(uint8_t, MTRMessagesMessageControlBitmap) {
@@ -21584,6 +21780,8 @@ typedef NS_OPTIONS(uint8_t, MTRMessagesMessageControlBitmap) {
     MTRMessagesMessageControlBitmapReplyMessage MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4,
     MTRMessagesMessageControlBitmapMessageConfirmed MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x8,
     MTRMessagesMessageControlBitmapMessageProtected MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x10,
+    MTRMessagesMessageControlBitmapSpokenMessage MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRMessagesMessageControlBitmapAudioMessage MTR_PROVISIONALLY_AVAILABLE = 0x40,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 typedef NS_ENUM(uint8_t, MTRDeviceEnergyManagementAdjustmentCause) {
@@ -22520,6 +22718,7 @@ typedef NS_OPTIONS(uint32_t, MTRClosureControlFeature) {
     MTRClosureControlFeatureCalibration MTR_PROVISIONALLY_AVAILABLE = 0x40,
     MTRClosureControlFeatureProtection MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRClosureControlFeatureManuallyOperable MTR_PROVISIONALLY_AVAILABLE = 0x100,
+    MTRClosureControlFeatureAccess MTR_PROVISIONALLY_AVAILABLE = 0x200,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRClosureControlLatchControlModesBitmap) {
@@ -22597,6 +22796,7 @@ typedef NS_OPTIONS(uint32_t, MTRClosureDimensionFeature) {
     MTRClosureDimensionFeatureTranslation MTR_PROVISIONALLY_AVAILABLE = 0x20,
     MTRClosureDimensionFeatureRotation MTR_PROVISIONALLY_AVAILABLE = 0x40,
     MTRClosureDimensionFeatureModulation MTR_PROVISIONALLY_AVAILABLE = 0x80,
+    MTRClosureDimensionFeatureAccess MTR_PROVISIONALLY_AVAILABLE = 0x100,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRClosureDimensionLatchControlModesBitmap) {
@@ -23847,6 +24047,13 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackCharacteristic) {
     MTRMediaPlaybackCharacteristicKaraoke MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x11,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+typedef NS_ENUM(uint8_t, MTRMediaPlaybackMediaType) {
+    MTRMediaPlaybackMediaTypeGeneric MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRMediaPlaybackMediaTypeTVShow MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRMediaPlaybackMediaTypeMusic MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRMediaPlaybackMediaTypePodcast MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
     MTRMediaPlaybackPlaybackStatePlaying MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRMediaPlaybackPlaybackStatePaused MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -24131,12 +24338,24 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterAny MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRContentLauncherQueueType) {
+    MTRContentLauncherQueueTypeReplace MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRContentLauncherQueueTypeNext MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRContentLauncherQueueTypeLast MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRContentLauncherStatus) {
     MTRContentLauncherStatusSuccess MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00,
     MTRContentLauncherStatusURLNotAvailable MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x01,
     MTRContentLauncherStatusAuthFailed MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x02,
     MTRContentLauncherStatusTextTrackNotAvailable MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
     MTRContentLauncherStatusAudioTrackNotAvailable MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRContentLauncherStatusInvalidData MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRContentLauncherStatusAccountMismatch MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRContentLauncherStatusContentAppNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRContentLauncherStatusReplicationNotAllowed MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRContentLauncherStatusReplicationNotSupported MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRContentLauncherStatusPresetNotFound MTR_PROVISIONALLY_AVAILABLE = 0x0A,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
@@ -24151,6 +24370,9 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
     MTRContentLauncherFeatureAdvancedSeek MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4,
     MTRContentLauncherFeatureTextTracks MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x8,
     MTRContentLauncherFeatureAudioTracks MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x10,
+    MTRContentLauncherFeatureContentReplication MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRContentLauncherFeatureContentQueueing MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRContentLauncherFeaturePresets MTR_PROVISIONALLY_AVAILABLE = 0x80,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
@@ -24198,6 +24420,10 @@ typedef NS_ENUM(uint8_t, MTRApplicationBasicApplicationStatus) {
     MTRApplicationBasicApplicationStatusActiveVisibleNotFocus MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint32_t, MTRAccountLoginFeature) {
+    MTRAccountLoginFeatureOAuth MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRContentControlStatusCode) {
     MTRContentControlStatusCodeInvalidPINCode MTR_PROVISIONALLY_AVAILABLE = 0x02,
     MTRContentControlStatusCodeInvalidRating MTR_PROVISIONALLY_AVAILABLE = 0x03,
@@ -24236,6 +24462,20 @@ typedef NS_ENUM(uint8_t, MTRContentAppObserverStatus) {
     MTRContentAppObserverStatusSuccess MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRContentAppObserverStatusUnexpectedData MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+typedef NS_ENUM(uint8_t, MTRMediaFileManagementFileStatus) {
+    MTRMediaFileManagementFileStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRMediaFileManagementFileStatusInsufficientStorage MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRMediaFileManagementFileStatusInvalidFileID MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRMediaFileManagementFileStatusAuthenticationFailed MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRMediaFileManagementFileStatusFileNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRMediaFileManagementFileStatusInvalidRequest MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRMediaFileManagementFileStatusUnsupportedMimeType MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRMediaFileManagementFeature) {
+    MTRMediaFileManagementFeatureMediaSharing MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRAudioControlUnmutePolicy) {
     MTRAudioControlUnmutePolicyUnmuteOrChangeVolume MTR_PROVISIONALLY_AVAILABLE = 0x00,

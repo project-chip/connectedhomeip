@@ -275,11 +275,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step2_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'22222222222222222222222222222222',
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
         try:
@@ -306,11 +306,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step4_groupKeySet)
         # Verify that the DUT responds with Status as CONSTRAINT_ERROR
@@ -325,11 +325,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step5_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step5_groupKeySet)
         try:
@@ -341,11 +341,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step6_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=2,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step6_groupKeySet)
         try:
@@ -373,11 +373,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step8_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x0FFF,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220001,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220002,
-            epochKey2=b'99999999999999999999999999999999',
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
             epochStartTime2=2220003)
         cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step8_groupKeySet)
         try:
@@ -429,11 +429,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         _groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x0000,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'22222222222222222222222222222222',
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(_groupKeySet)
         try:

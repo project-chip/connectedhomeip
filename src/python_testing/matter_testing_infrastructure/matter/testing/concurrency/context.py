@@ -17,8 +17,9 @@ import logging
 import subprocess
 import threading
 from abc import abstractmethod
+from collections.abc import Callable
 from types import TracebackType
-from typing import Any, Callable, Generic, Self, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 log = logging.getLogger(__name__)
 
@@ -44,10 +45,14 @@ class TerminableResourceBase(contextlib.AbstractContextManager, Generic[Internal
         try:
             return resource if (resource := self.resource_start()) is not None else self
         except BaseException as start_ex:
-            log.error("Failed to start resource %s: %r", self._name, start_ex)
-            start_ex.add_note(f"Failure during start of resource {self._name}")
+            if not isinstance(start_ex, KeyboardInterrupt):
+                log.error("Failed to start resource %s: %r", self._name, start_ex)
+                start_ex.add_note(f"Failure during start of resource {self._name}")
+
             try:
                 self.resource_terminate()
+            except KeyboardInterrupt:
+                raise
             except BaseException as term_ex:
                 log.error("Failed to terminate resource %s during start failure: %r", self._name, term_ex)
                 raise term_ex.with_traceback(term_ex.__traceback__) from start_ex
@@ -61,6 +66,8 @@ class TerminableResourceBase(contextlib.AbstractContextManager, Generic[Internal
             self.resource_terminate()
             if self._terminate_debug_logging:
                 log.debug("Terminated %s", self._name)
+        except KeyboardInterrupt:
+            raise
         except BaseException as e:
             log.error("Failed to terminate resource %s: %r", self._name, e)
             e.add_note(f"Failure during termination of resource {self._name}")

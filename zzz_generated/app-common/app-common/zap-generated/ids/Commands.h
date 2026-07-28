@@ -99,6 +99,7 @@
 #include <clusters/LevelControl/CommandIds.h>
 #include <clusters/LocalizationConfiguration/CommandIds.h>
 #include <clusters/LowPower/CommandIds.h>
+#include <clusters/MediaFileManagement/CommandIds.h>
 #include <clusters/MediaInput/CommandIds.h>
 #include <clusters/MediaPlayback/CommandIds.h>
 #include <clusters/Messages/CommandIds.h>
