@@ -35,8 +35,8 @@ every matching driver, so the per-fabric records they arbitrate are necessarily
 transport-local. It holds the per-fabric scan requests and their lifetime
 timers, the spec transport/band overlap arithmetic on Stop, and the
 paused/deferred state used while the radio is held by a connect or foreground
-scan — leaving the driver only the hardware start/stop. See [Background
-scanning](#background-scanning).
+scan — leaving the driver only the hardware start/stop. See
+[Background scanning](#background-scanning).
 
 The application supplies **only the platform-specific transport work** by
 implementing the `CommissioningProxyTransport` driver interface (one per
