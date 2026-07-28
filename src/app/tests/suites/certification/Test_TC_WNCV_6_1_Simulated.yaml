@@ -14,6 +14,13 @@
 
 name: 3.4.7. [TC-WNCV-6.1] Basic Commands Verification with client as DUT
 
+CI:
+    - name: "Test against all-devices/window-covering"
+      app: all-devices
+      args:
+          - --device
+          - window-covering
+
 PICS:
     - WNCV.C
 

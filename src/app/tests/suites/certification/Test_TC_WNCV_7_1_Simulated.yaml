@@ -16,6 +16,13 @@ name:
     36.4.8. [TC-WNCV-7.1] GoToPercentage Commands Verification with client as
     DUT
 
+CI:
+    - name: "Test against all-devices/window-covering"
+      app: all-devices
+      args:
+          - --device
+          - window-covering
+
 PICS:
     - WNCV.C
 

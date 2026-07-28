@@ -16,6 +16,13 @@ name:
     Window Covering [TC-WNCV-4.2] GoToTiltPercentage command Long-Run
     Verification [DUT as Server]
 
+CI:
+    - name: "Test against all-devices/window-covering"
+      app: all-devices
+      args:
+          - --device
+          - window-covering
+
 PICS:
     - WNCV.S
 
