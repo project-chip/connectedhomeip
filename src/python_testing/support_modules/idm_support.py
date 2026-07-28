@@ -619,26 +619,41 @@ class IDMBaseTest(BasicCompositionTests):
         Returns:
             Read response dictionary
         """
-        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [endpoint])
-        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-        asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+        # Use Read (not ReadAttribute): ReadAttribute returns only the codegen-parsed dict,
+        # whereas Read returns a response object that also carries tlvAttributes.
+        read_request = await self.default_controller.Read(self.dut_node_id, [endpoint])
+
+        # Use tlvAttributes (raw cluster/attribute IDs) rather than the codegen-parsed
+        # .attributes dict. The parsed dict is keyed by generated Cluster classes, so any
+        # cluster the controller has no codegen class for (e.g. a manufacturer-specific
+        # cluster in the 0xVVVV_FC00-0xVVVV_FFFE range) is silently dropped, which would
+        # make the returned cluster set disagree with the DUT's ServerList.
+        tlv_attributes = read_request.tlvAttributes
+        server_list_id = Clusters.Descriptor.Attributes.ServerList.attribute_id
+        attribute_list_id = Clusters.Descriptor.Attributes.AttributeList.attribute_id
+
+        asserts.assert_in(Clusters.Descriptor.id, tlv_attributes[endpoint], "Descriptor cluster not in output")
+        asserts.assert_in(server_list_id, tlv_attributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
-        server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
+        returned_cluster_ids = sorted(tlv_attributes[endpoint].keys())
+        server_list = sorted(tlv_attributes[endpoint][Clusters.Descriptor.id][server_list_id])
         asserts.assert_equal(
             returned_cluster_ids,
             server_list,
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
-        for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
-                             if a != Clusters.Attribute.DataVersion]
+        for cluster_id in tlv_attributes[endpoint]:
+            # Skip non-standard clusters: the controller has no codegen for them, so
+            # their AttributeList cannot be validated against a known attribute set here.
+            if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
+                continue
+            returned_attrs = sorted(tlv_attributes[endpoint][cluster_id].keys())
+            attr_list = sorted(tlv_attributes[endpoint][cluster_id][attribute_list_id])
             asserts.assert_equal(
-                sorted(attribute_ids),
-                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                f"Expected attribute list does not match for cluster {cluster}"
+                returned_attrs,
+                attr_list,
+                f"Expected attribute list does not match for cluster {cluster_id}"
             )
         return read_request
 
