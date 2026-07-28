@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import enum
 import logging
 import multiprocessing
@@ -585,7 +586,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         log.error("%s", error)
         raise SystemExit(2) from None
     finally:
-        with run_summary:
+        with run_summary, contextlib.suppress(BrokenPipeError):
             if summary_file is not None:
                 run_summary.write_json(summary_file)
 
