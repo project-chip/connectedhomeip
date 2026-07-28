@@ -297,7 +297,7 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             # console.print(f"FeatureMap: {featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]}")
 
             featureMapValue = featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]
-            featureMapBitString = "{:08b}".format(featureMapValue).lstrip("0")
+            featureMapBitString = f"{featureMapValue:08b}".lstrip("0")
             for bitLocation in range(len(featureMapBitString)):
                 if featureMapValue >> bitLocation & 1 == 1:
                     # console.print(f"{clusterPICS}{featureTag}{bitLocation:02x}")

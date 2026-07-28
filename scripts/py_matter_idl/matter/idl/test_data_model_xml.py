@@ -61,8 +61,7 @@ def XmlToIdl(what: str | list[str]) -> Idl:
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 

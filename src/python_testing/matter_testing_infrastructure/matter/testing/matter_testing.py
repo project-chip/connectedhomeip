@@ -102,6 +102,26 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
+def compute_mrp_retransmission_timeout_sec(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, node_id: int) -> float:
+    """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
+    session_params = dev_ctrl.GetRemoteSessionParameters(node_id)
+    # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
+    # idle=500ms, active=300ms.
+    negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else None
+    negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else None
+    if negotiated_idle_interval_ms is None:
+        negotiated_idle_interval_ms = 500
+    if negotiated_active_interval_ms is None:
+        negotiated_active_interval_ms = 300
+
+    # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
+    base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
+
+    # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
+    backoff_sum = 1 + 1.6 + 2.56 + 4.096
+    return base_interval_ms * backoff_sum * 1.375 / 1000.0
+
+
 def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> str | None:
     created_codes = []
     for idx, discriminator in enumerate(matter_test_config.discriminators):
@@ -2729,7 +2749,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+        err_msg = f"Did not see expected error when reading {str(cluster)}:{str(attribute)}"
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
         if assert_on_error:
@@ -2790,7 +2810,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe_out):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+            raise FileNotFoundError(f"CANNOT FIND {app_pipe_out!r}")
 
         dut_ip: str | None = os.getenv(ip_env_var) if ip_env_var else None
 
@@ -2888,7 +2908,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+            raise FileNotFoundError(f"CANNOT FIND {app_pipe!r}")
 
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
@@ -2914,7 +2934,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info("Using DUT user name: %s", dut_uname)
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            cmd = f"echo \"{command_fixed}\" | ssh {dut_uname}@{dut_ip} \'cat > {app_pipe}\'"
             os.system(cmd)
 
     async def send_single_cmd(
