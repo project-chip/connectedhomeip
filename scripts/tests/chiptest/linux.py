@@ -81,7 +81,7 @@ class LinuxWorkerProcess(WorkerProcess):
         tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
 
         if self._config.tmp_dir_clear:
-            shutil.rmtree(tmp_dir)
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
         tmp_dir.mkdir(parents=True, exist_ok=True)
 
