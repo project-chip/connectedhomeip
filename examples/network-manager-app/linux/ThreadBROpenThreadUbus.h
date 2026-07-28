@@ -42,7 +42,11 @@ public:
     // otbr implements MGMT_PENDING_SET via its set_pending method, so a running
     // network can be migrated rather than only formed.
     bool GetPanChangeSupported() override { return true; }
-    CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CommitActiveDataset() override
+    {
+        mActivationPending = false;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const chip::Thread::OperationalDataset & pendingDataset) override;
 
@@ -64,6 +68,11 @@ private:
     Thread::OperationalDataset mPendingDataset;
     ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
     uint32_t mActivateDatasetSequence;
+    // An activation that has not been committed yet. Only such an activation
+    // may be reverted: the fail-safe expiry handler reverts unconditionally,
+    // including for fail-safes that never touched the dataset, and reverting
+    // then would wipe a network provisioned outside Matter.
+    bool mActivationPending = false;
 };
 
 } // namespace chip

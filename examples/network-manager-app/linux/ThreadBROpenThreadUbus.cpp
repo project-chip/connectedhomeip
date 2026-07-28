@@ -161,6 +161,7 @@ void OpenThreadUbusBorderRouterDelegate::SetActiveDataset(const Thread::Operatio
     mActiveDataset           = activeDataset;
     mActivateDatasetCallback = callback;
     mActivateDatasetSequence = sequenceNum;
+    mActivationPending       = true;
     return;
 
 exit:
@@ -198,6 +199,17 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::SetPendingDataset(const Thread::O
 
 CHIP_ERROR OpenThreadUbusBorderRouterDelegate::RevertActiveDataset()
 {
+    // The fail-safe expiry handler calls this for every expired fail-safe,
+    // whether or not it carried a dataset activation: a failed commissioning
+    // attempt by an unrelated controller must not wipe the network. Only an
+    // activation that has not been committed may be reverted.
+    VerifyOrReturnError(mActivationPending, CHIP_NO_ERROR);
+    mActivationPending = false;
+    // The provision may still be in flight; without the callback its
+    // completion is a no-op instead of completing the reverted activation
+    // (and a new attempt meanwhile would read as Busy).
+    mActivateDatasetCallback = nullptr;
+
     // SetActiveDataset is only accepted when no dataset is configured, so
     // reverting means returning to the unprovisioned state rather than
     // restoring a previous dataset.
