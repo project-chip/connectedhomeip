@@ -29,6 +29,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_3_24(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_3_24(self) -> str:
         return "[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"
 
@@ -85,7 +87,6 @@ class TC_DD_3_24(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info("NFC Tag data : '%s'", nfc_tag_data)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"
@@ -110,7 +111,8 @@ class TC_DD_3_24(MatterBaseTest):
                  getattr(self, "default_controller", None),
                  hex(id(self.default_controller)) if hasattr(self, "default_controller") else "N/A")
 
-        commissioning_success = await self.commission_devices()
+        # Force a commissioning over NTL
+        commissioning_success = await self.commission_ntl_device(payload)
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
