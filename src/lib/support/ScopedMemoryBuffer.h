@@ -98,18 +98,16 @@ protected:
         return buffer;
     }
 
-    template <typename T>
-    void Alloc(size_t elementCount)
+    void Alloc(size_t elementCount, size_t elementSize)
     {
         Free();
-        mBuffer = Impl::template MemoryAlloc<T>(elementCount);
+        mBuffer = Impl::MemoryAlloc(elementCount, elementSize);
     }
 
-    template <typename T>
-    void Calloc(size_t elementCount)
+    void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
-        mBuffer = Impl::template MemoryCalloc<T>(elementCount);
+        mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
     }
 
 private:
@@ -118,22 +116,30 @@ private:
 
 /**
  * Helper class that forwards memory management tasks to Platform::Memory* calls.
+ * Note that it is required that the second size_t argument passed to
+ * MemoryAlloc/MemoryCalloc by ScopedMemoryBuffer is the size of the
+ * ScopedMemoryBuffer's T parameter.
  */
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+template <typename T>
 class PlatformMemoryManagement
 {
 public:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    template <typename T>
-    static void * MemoryAlloc(size_t num)
-    {
-        return chip::Platform::MemoryAllocTyped<T>(num);
-    }
-    template <typename T>
-    static void * MemoryCalloc(size_t num)
-    {
-        return chip::Platform::MemoryCallocTyped<T>(num);
-    }
+    static void * MemoryAlloc(size_t num, size_t) { return chip::Platform::MemoryAllocTyped<T>(num); }
+    static void * MemoryCalloc(size_t num, size_t) { return chip::Platform::MemoryCallocTyped<T>(num); }
 };
+#else
+class SimplePlatformMemoryManagement
+{
+public:
+    static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
+    static void * MemoryAlloc(size_t num, size_t size) { return chip::Platform::MemoryAlloc(num * size); }
+    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
+};
+template <typename T>
+using PlatformMemoryManagement = SimplePlatformMemoryManagement;
+#endif
 
 } // namespace Impl
 
@@ -145,7 +151,7 @@ public:
  *
  * For a single element RAII with dtor, use Platform::UniquePtr<>
  */
-template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
+template <typename T, typename MemoryManagement = Impl::PlatformMemoryManagement<T>>
 class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 {
     friend class Impl::ScopedMemoryBufferBase<MemoryManagement>;
@@ -170,14 +176,14 @@ public:
 
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
-        Base::template Calloc<T>(elementCount);
+        Base::Calloc(elementCount, sizeof(T));
         ExecuteConstructors(elementCount);
         return *this;
     }
 
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::template Alloc<T>(elementCount);
+        Base::Alloc(elementCount, sizeof(T));
         ExecuteConstructors(elementCount);
         return *this;
     }

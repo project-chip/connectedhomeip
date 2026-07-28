@@ -40,17 +40,15 @@ public:
         mAllocCount--;
         chip::Platform::MemoryFree(p);
     }
-    template <typename T>
-    static void * MemoryAlloc(size_t num)
+    static void * MemoryAlloc(size_t num, size_t)
     {
         mAllocCount++;
-        return chip::Platform::MemoryAllocTyped<T>(num);
+        return chip::Platform::MemoryAllocTyped<char>(num);
     }
-    template <typename T>
-    static void * MemoryCalloc(size_t num)
+    static void * MemoryCalloc(size_t num, size_t)
     {
         mAllocCount++;
-        return chip::Platform::MemoryCallocTyped<T>(num);
+        return chip::Platform::MemoryCallocTyped<char>(num);
     }
 
 private:
