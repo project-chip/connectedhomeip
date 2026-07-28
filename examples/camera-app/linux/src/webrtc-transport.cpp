@@ -208,12 +208,7 @@ void WebrtcTransport::Start()
                                   [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
                                   [this](bool connected) { this->OnConnectionStateChanged(connected); },
                                   [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); },
-                                  [this](bool gatheringComplete) {
-                                      if (mOnGatheringState)
-                                      {
-                                          mOnGatheringState(gatheringComplete, mRequestArgs.sessionId);
-                                      }
-                                  });
+                                  [this](bool gatheringComplete) { this->OnGatheringStateChanged(gatheringComplete); });
 }
 
 void WebrtcTransport::Stop()
