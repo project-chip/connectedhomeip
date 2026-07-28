@@ -285,6 +285,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         transports_to_test = [b for b in all_defined_transports if valid_transports & b]
 
         # Variables set by each iteration and used by steps 10–14.
+        asserts.assert_true(len(transports_to_test) > 0, "No supported transports found to test")
         single_transport = transports_to_test[0]
         single_band: int | None = (self.pick_single_transport_bit(valid_bands)
                                    if has_wi and (transports_to_test[0] == kWiFiPAF_bit)
