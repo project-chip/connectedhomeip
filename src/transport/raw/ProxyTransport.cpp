@@ -52,7 +52,9 @@ void ProxyTransportBase::Close()
 
 bool ProxyTransportBase::CanSendToPeer(const PeerAddress & address)
 {
-    return address.GetTransportType() == Type::kProxy;
+    // Only claim a kProxy address while active; SendMessage also gates on mActive,
+    // so an inactive proxy transport should not advertise it can carry the address.
+    return mActive && address.GetTransportType() == Type::kProxy;
 }
 
 CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf)

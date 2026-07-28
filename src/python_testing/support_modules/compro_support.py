@@ -349,6 +349,7 @@ import json
 import logging
 import os
 import sys
+from collections.abc import Awaitable, Callable
 
 from mobly import asserts
 
@@ -827,7 +828,7 @@ class COMPROBaseTest(MatterBaseTest):
         app_path = params.get('ed_app_path')
         if not app_path:
             return None
-        return EDFixture(
+        ed = EDFixture(
             app_path=app_path,
             discriminator=int(params.get('ed_discriminator', 3841)),
             passcode=int(params.get('ed_passcode', 20202021)),
@@ -837,6 +838,38 @@ class COMPROBaseTest(MatterBaseTest):
             ed_transport=params.get('ed_transport', 'wifipaf'),
             serial_port=params.get('ed_serial_port'),
         )
+        # Safety net: stop the ED unconditionally in teardown so that a test which
+        # raises before its own ensure_ed_not_commissionable() does not leave the ED
+        # advertising (and, in remote-SSH mode, the eth0 block engaged) for the next
+        # run.  stop() is idempotent, so the explicit happy-path call is harmless.
+        self._register_cleanup(ed.stop)
+        return ed
+
+    # ------------------------------------------------------------------
+    # Unconditional per-test cleanup
+    # ------------------------------------------------------------------
+
+    def _register_cleanup(self, coro_factory: Callable[[], Awaitable]) -> None:
+        """Register a zero-arg async callable to run in teardown_test (LIFO).
+
+        Use for cleanup that must happen even when a later step raises — stopping
+        the ED, unpairing a device, removing a second fabric — instead of relying
+        on the cleanup being the last happy-path statement.
+        """
+        if not hasattr(self, "_compro_cleanups"):
+            self._compro_cleanups = []
+        self._compro_cleanups.append(coro_factory)
+
+    def teardown_test(self):
+        # Run registered cleanups newest-first, each guarded so one failure does
+        # not skip the rest, before the framework's own teardown.
+        for factory in reversed(getattr(self, "_compro_cleanups", [])):
+            try:
+                self.event_loop.run_until_complete(factory())
+            except Exception as exc:
+                logger.warning("teardown_test: cleanup failed (continuing): %s", exc)
+        self._compro_cleanups = []
+        super().teardown_test()
 
     async def ensure_ed_commissionable(
         self,

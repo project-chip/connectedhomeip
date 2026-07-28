@@ -181,6 +181,26 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         asserts.assert_true(success, "Failed to commission DUT to Fabric B (TH2)")
         logger.info("Step 1: DUT commissioned to Fabric A (TH1) and Fabric B (TH2)")
 
+        # Remove TH2 (Fabric B) from the DUT unconditionally at teardown so a failure
+        # in any later step still leaves the DUT clean for the next non-factory-reset
+        # run (otherwise the next AddNOCForNewFabricFromExisting fails — see the
+        # step-1 comment above).
+        async def _remove_th2_fabric():
+            th2_fabric_index = await self.read_single_attribute(
+                dev_ctrl=th2,
+                node_id=self.dut_node_id,
+                endpoint=0,
+                attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
+            )
+            await self.default_controller.SendCommand(
+                nodeId=self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_index),
+            )
+            logger.info("TH2 fabric (index %d) removed from DUT", th2_fabric_index)
+
+        self._register_cleanup(_remove_th2_fabric)
+
         # ----------------------------------------------------------------
         # Step 2 — Ensure ED is commissionable
         # The ED remains commissionable for the full duration of the test.
@@ -483,6 +503,17 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         results = {"TH1": th1_result, "TH2": th2_result}
         busy_count = sum(1 for r in results.values() if isinstance(r, InteractionModelError))
 
+        # Each successful responder must return an internally-consistent
+        # ProxyScanResponse (numberOfResults matching the entry count).  Full
+        # non-cross-delivery between fabrics cannot be proven with a single shared
+        # physical ED, but this at least rejects a malformed / mis-routed response.
+        for name, r in results.items():
+            if not isinstance(r, InteractionModelError):
+                asserts.assert_equal(
+                    r.numberOfResults, len(r.proxyScanResult),
+                    f"Step 17: {name} ProxyScanResponse.numberOfResults ({r.numberOfResults}) must "
+                    f"equal the number of ProxyScanResult entries ({len(r.proxyScanResult)})")
+
         if busy_count == 1:
             # Mechanism 3 — exactly one BUSY, one ProxyScanResponse.
             logger.info("Step 17: DUT used Mechanism 3 (BUSY)")
@@ -506,19 +537,8 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                 f"Step 17: both TH1 and TH2 returned errors — at most one BUSY is valid "
                 f"(TH1={th1_result}, TH2={th2_result})")
 
-        # Remove TH2 (Fabric B) from the DUT so re-runs without factory-reset succeed.
-        th2_fabric_index = await self.read_single_attribute(
-            dev_ctrl=th2,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
-        )
-        await self.default_controller.SendCommand(
-            nodeId=self.dut_node_id,
-            endpoint=0,
-            payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_index),
-        )
-        logger.info("TH2 fabric (index %d) removed from DUT", th2_fabric_index)
+        # Fabric B removal now runs unconditionally in teardown (registered in
+        # step 1), so a failure above still leaves the DUT clean for the next run.
 
         await self.ensure_ed_not_commissionable(
             ed,

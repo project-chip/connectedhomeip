@@ -218,12 +218,28 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         logger.info("Scan result: discriminator=%d transport=0x%02x vendorID=%d productID=%d",
                     result.discriminator, result.transport, result.vendorID, result.productID)
 
-        # Transport must be non-zero
+        # Transport must be non-zero and indicate a SINGLE transport
+        # (CommissioningProxy.adoc ScanResultStruct Transport field: "SHALL indicate
+        # the single transport of the scan result").
         asserts.assert_not_equal(result.transport, 0,
                                  "ScanResultStruct.Transport must be non-zero")
+        asserts.assert_equal(result.transport & (result.transport - 1), 0,
+                             f"ScanResultStruct.Transport 0x{result.transport:02x} must have exactly "
+                             "one bit set (single transport)")
         # Discriminator range: 0-4095
         asserts.assert_less_equal(result.discriminator, 4095,
                                   "ScanResultStruct.Discriminator must be <= 4095")
+        # Each device is reported once per (Discriminator, VendorID, ProductID, Transport)
+        # — the ProxyScanResponse must not contain duplicate tuples.
+        seen_keys = set()
+        for r in response.proxyScanResult:
+            key = (r.discriminator, r.vendorID, r.productID, r.transport)
+            asserts.assert_true(
+                key not in seen_keys,
+                f"Duplicate scan result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
+                f"productID={r.productID}, transport=0x{r.transport:02x}); each device must be "
+                "reported once per discriminator/VendorID/ProductID/transport")
+            seen_keys.add(key)
         # WiFiBand is populated only when the result's transport is PAFTP
         # (CommissioningProxy.adoc WiFiBand Field of ScanResultStruct).  For
         # BLE-discovered entries it is null even when the WI feature is on.

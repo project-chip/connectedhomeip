@@ -295,8 +295,22 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         result = cached_results[0]
         asserts.assert_not_equal(result.transport, 0,
                                  "CachedResult entry Transport must be non-zero")
+        asserts.assert_equal(result.transport & (result.transport - 1), 0,
+                             f"CachedResult entry Transport 0x{result.transport:02x} must have exactly "
+                             "one bit set (single transport)")
         asserts.assert_less_equal(result.discriminator, 4095,
                                   "CachedResult entry Discriminator must be <= 4095")
+        # Cache holds one entry per unique device (CommissioningProxy.adoc CachedResults:
+        # "each unique device based on discriminator, VendorID, ProductID and Transport").
+        seen_keys = set()
+        for r in cached_results:
+            key = (r.discriminator, r.vendorID, r.productID, r.transport)
+            asserts.assert_true(
+                key not in seen_keys,
+                f"Duplicate cached result for (discriminator={r.discriminator}, vendorID={r.vendorID}, "
+                f"productID={r.productID}, transport=0x{r.transport:02x}); CachedResults must hold one "
+                "entry per unique discriminator/VendorID/ProductID/Transport")
+            seen_keys.add(key)
         # WiFiBand is populated only for PAFTP results (CommissioningProxy.adoc
         # WiFiBand Field of ScanResultStruct).  A BLE-discovered entry leaves it
         # null even when the WI feature is supported.
