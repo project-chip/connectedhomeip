@@ -12,7 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+
 name: 39.2.2. [TC-WNCV-2.2] ConfigStatus attribute [DUT as Server]
+
+CI:
+    - name: "Test against all-devices/window-covering"
+      app: all-devices
+      args:
+          - --device
+          - window-covering
 
 PICS:
     - WNCV.S
