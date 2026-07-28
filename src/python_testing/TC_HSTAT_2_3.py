@@ -55,7 +55,7 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
     def pics_TC_HSTAT_2_3(self) -> list[str]:
         return [
             "HSTAT.S",
-            "HSTAT.S.F03"
+            "HSTAT.S.F_SENSOR"
         ]
 
     def desc_TC_HSTAT_2_3(self) -> str:

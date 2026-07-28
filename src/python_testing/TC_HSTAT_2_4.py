@@ -155,77 +155,77 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
             await optimalSubscription.start(self.default_controller, self.dut_node_id, endpoint)
             optimalReportsReceived = [] 
 
-        self.step(5)
-        # TH sends command SetSettings with the Continuous field set to True.
-        # Verify DUT responds w/ status SUCCESS(0x00)
         if self.continuousFeatureSupported:
+            self.step(5)
+            # TH sends command SetSettings with the Continuous field set to True.
+            # Verify DUT responds w/ status SUCCESS(0x00)
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=True)
             continuousReportsReceived.append(continuousSubscription.wait_for_attribute_report().value)
 
-        self.step(6)
-        # TH reads from the DUT the Continuous attribute.
-        # Verify that the DUT response contains a value of True
-        if self.continuousFeatureSupported:
+            self.step(6)
+            # TH reads from the DUT the Continuous attribute.
+            # Verify that the DUT response contains a value of True
             dut_Continuous = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Continuous)
             asserts.assert_true(dut_Continuous, "Continuous attribute was not True")
 
-        self.step(7)
-        # TH writes to the DUT the Continuous attribute with False.
-        # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False.
-        if self.continuousFeatureSupported:
+            self.step(7)
+            # TH writes to the DUT the Continuous attribute with False.
+            # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Continuous with the first having a value of True and the second having a value of False.
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, continuous=False)
             continuousReportsReceived.append(continuousSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(continuousReportsReceived), 2, "Wrong number of reports received for Continuous")
             asserts.assert_equal(continuousReportsReceived[0], True, "First report for Continuous is not True")
             asserts.assert_equal(continuousReportsReceived[1], False, "Second report for Continuous is not False")
+        else:
+            self.mark_step_range_skipped(5, 7)
 
-        self.step(8)
-        # TH sends command SetSettings with the Sleep field set to True.
-        # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.Sleep.attribute_id in self.supported_attributes:
+            self.step(8)
+            # TH sends command SetSettings with the Sleep field set to True.
+            # Verify DUT responds w/ status SUCCESS(0x00)
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, sleep=True)
             sleepReportsReceived.append(sleepSubscription.wait_for_attribute_report().value)
 
-        self.step(9)
-        # TH reads from the DUT the Sleep attribute.
-        # Verify that the DUT response contains a value of True
-        if self.attributes.Sleep.attribute_id in self.supported_attributes:
+            self.step(9)
+            # TH reads from the DUT the Sleep attribute.
+            # Verify that the DUT response contains a value of True
             dut_Sleep = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Sleep)
             asserts.assert_true(dut_Sleep, "Sleep attribute was not True")
 
-        self.step(10)
-        # TH writes to the DUT the Sleep attribute with False.
-        # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False.
-        if self.attributes.Sleep.attribute_id in self.supported_attributes:
+            self.step(10)
+            # TH writes to the DUT the Sleep attribute with False.
+            # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Sleep with the first having a value of True and the second having a value of False.
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, sleep=False)
             sleepReportsReceived.append(sleepSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(sleepReportsReceived), 2, "Wrong number of reports received for Sleep")
             asserts.assert_equal(sleepReportsReceived[0], True, "First report for Sleep is not True")
             asserts.assert_equal(sleepReportsReceived[1], False, "Second report for Sleep is not False")
+        else:
+            self.mark_step_range_skipped(8, 10)
 
-        self.step(11)
-        # TH sends command SetSettings with the Optimal field set to True.
-        # Verify DUT responds w/ status SUCCESS(0x00)
         if self.optimalFeatureSupported:
+            self.step(11)
+            # TH sends command SetSettings with the Optimal field set to True.
+            # Verify DUT responds w/ status SUCCESS(0x00)
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, optimal=True)
             optimalReportsReceived.append(optimalSubscription.wait_for_attribute_report().value)
 
-        self.step(12)
-        # TH reads from the DUT the Optimal attribute.
-        # Verify that the DUT response contains a value of True
-        if self.optimalFeatureSupported:
+            self.step(12)
+            # TH reads from the DUT the Optimal attribute.
+            # Verify that the DUT response contains a value of True
             dut_Optimal = await self.read_attribute_expect_success(endpoint=endpoint, attribute=self.attributes.Optimal)
             asserts.assert_true(dut_Optimal, "Optimal attribute was not True")
 
-        self.step(13)
-        # TH writes to the DUT the Optimal attribute with False.
-        # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False.
-        if self.optimalFeatureSupported:
+            self.step(13)
+            # TH writes to the DUT the Optimal attribute with False.
+            # Verify DUT responds w/ status SUCCESS(0x00) Confirm 2 attribute reports for Optimal with the first having a value of True and the second having a value of False.
             await self.send_SetSettingsCommand_expect_success(endpoint=endpoint, optimal=False)
             optimalReportsReceived.append(optimalSubscription.wait_for_attribute_report().value)
             asserts.assert_equal(len(optimalReportsReceived), 2, "Wrong number of reports received for Optimal")
             asserts.assert_equal(optimalReportsReceived[0], True, "First report for Sleep is not Optimal")
             asserts.assert_equal(optimalReportsReceived[1], False, "Second report for Sleep is not Optimal")
+        else:
+            self.mark_step_range_skipped(11, 12)
 
         #
         # Need to fix the remaining test cases. They should only be run if the appropriate trigger PICS are indicated.
