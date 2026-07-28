@@ -2155,8 +2155,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-
-<< << << < HEAD
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
 == == == =
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
