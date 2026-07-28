@@ -81,7 +81,7 @@ class FundamentalType(enum.Enum):
             return "single"
         if self == FundamentalType.DOUBLE:
             return "double"
-        raise Exception("Type not handled: %r" % self)
+        raise Exception(f"Type not handled: {self!r}")
 
     @property
     def byte_count(self):
@@ -91,7 +91,7 @@ class FundamentalType(enum.Enum):
             return 4
         if self == FundamentalType.DOUBLE:
             return 8
-        raise Exception("Type not handled: %r" % self)
+        raise Exception(f"Type not handled: {self!r}")
 
     @property
     def bits(self):
