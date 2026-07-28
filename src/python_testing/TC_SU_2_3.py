@@ -373,7 +373,6 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         #
         # Anything else (bit set with wrong offset, offset > 0 without the
         # bit, etc.) is a protocol violation and fails the test.
-        # ------------------------------------------------------------------
         resumed_downloading = await self.wait_for_requestor_state_or_none(
             event_cb,
             requestorCluster.Enums.UpdateStateEnum.kDownloading,
