@@ -138,7 +138,24 @@ bool UbusManager::Connect()
     VerifyOrReturnValue(CheckAndLog(ubus_connect_ctx(&Context(), mUbusSocketPath), "ubus_connect_ctx"), false);
     Context().connection_lost = [](ubus_context * ctx) { static_cast<UbusManager *>(ctx)->HandleConnectionLost(); };
     ubus_add_uloop(&Context());
+    if (mHostedObject != nullptr)
+    {
+        // A new connection means a new bus client: the object has to be
+        // published again. Ids assigned by a previous connection are stale.
+        mHostedObject->id = 0;
+        CheckAndLog(ubus_add_object(&Context(), mHostedObject), "ubus_add_object");
+    }
     return true;
+}
+
+void UbusManager::Host(ubus_object & object)
+{
+    VerifyOrDie(mInitialized && mHostedObject == nullptr);
+    mHostedObject = &object;
+    if (Connected())
+    {
+        CheckAndLog(ubus_add_object(&Context(), mHostedObject), "ubus_add_object");
+    }
 }
 
 void UbusManager::Register(UbusWatch & watch)
