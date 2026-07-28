@@ -67,7 +67,7 @@ endif()
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=format)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(app PRIVATE -Wno-error=maybe-uninitialized)
+    target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 endif()
 
 project(matter-zephyr-light)
