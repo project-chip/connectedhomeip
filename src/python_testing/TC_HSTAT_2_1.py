@@ -145,9 +145,9 @@ class TC_HSTAT_2_1(MatterBaseTest, HSTATBase):
                     asserts.fail("Unknown mode value encountered in SupportModes")
             asserts.assert_greater_equal(mode, 0, "SupportedModes entry is out of range")
             asserts.assert_less_equal(mode, 3, "SupportedModes entry is out of range")
-        asserts.assert_equal(humidifierModeSupported, humidifierFeatureSupported,
+        asserts.assert_equal(humidifierModeSupported, self.humidifierFeatureSupported,
                              "Humidifier mode was supported while the feature was not")
-        asserts.assert_equal(dehumidifierModeSupported, dehumidifierFeatureSupported,
+        asserts.assert_equal(dehumidifierModeSupported, self.dehumidifierFeatureSupported,
                              "Dehumidifier mode was supported while the feature was not")
         asserts.assert_equal(autoModeSupported, self.autoFeatureSupported, "Auto mode was supported while the feature was not")
         asserts.assert_equal(fanOnlyModeSupported, self.fanOnlyFeatureSupported,
