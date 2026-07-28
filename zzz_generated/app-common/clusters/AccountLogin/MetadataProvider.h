@@ -23,6 +23,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AccountLogin
         using namespace Clusters::AccountLogin::Attributes;
         switch (attributeId)
         {
+        case OAuthLoggedIn::Id:
+            return OAuthLoggedIn::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -43,6 +45,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Accoun
             return Login::kMetadataEntry;
         case Logout::Id:
             return Logout::kMetadataEntry;
+        case GetDeviceAuthURI::Id:
+            return GetDeviceAuthURI::kMetadataEntry;
 
         default:
             return std::nullopt;

@@ -71,7 +71,7 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
-def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
+def default_paa_rootstore_from_root(root_path: pathlib.Path) -> pathlib.Path | None:
     """Attempt to find a PAA trust store following SDK convention at `root_path`
 
     This attempts to find {root_path}/credentials/development/paa-root-certs.
@@ -223,8 +223,8 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
     def show_prompt(self,
                     msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
+                    placeholder: str | None = None,
+                    default_value: str | None = None) -> None:
         """
         This method is called when the test runner needs to prompt the user for input.
 
@@ -316,9 +316,8 @@ def _find_test_class():
     leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
 
     if len(leaf_subclasses) != 1:
-        print(
-            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
-            str([subclass.__name__ for subclass in leaf_subclasses]))
+        print('Exactly one subclass of `MatterBaseTest` should be in the main file. '
+              f'Found {str([subclass.__name__ for subclass in leaf_subclasses])}.')
         sys.exit(1)
 
     return leaf_subclasses[0]
@@ -336,7 +335,8 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = parse_matter_test_args()
+    p = matter_test_args_parser()
+    matter_test_config = convert_args_to_matter_config(p.parse_args())
 
     # Find the test class in the test script.
     test_class = _find_test_class()
@@ -553,8 +553,8 @@ class MockTestRunner:
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: Optional[int] = None,
-                 pics: Optional[dict[str, bool]] = None, paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
+                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -620,7 +620,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
-        print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
+        print(f"error: chip-tool credentials path {args.chip_tool_credentials_path} doesn't exist!")
         return False
     config.chip_tool_credentials_path = args.chip_tool_credentials_path
 
@@ -800,12 +800,12 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name)
-        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name!r}")
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
-        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
+        raise FileNotFoundError(f"CANNOT FIND {config.pipe_name_out!r}")
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
@@ -842,7 +842,7 @@ def str_from_manual_code(s: str) -> str:
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid manual code format, does not match %s" % regex)
+        raise ValueError(f"Invalid manual code format, does not match {regex}")
 
     return s
 
@@ -851,7 +851,7 @@ def int_named_arg(s: str) -> tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid int argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid int argument format, does not match {regex}")
 
     name = match.group("name")
     if match.group("hex_value"):
@@ -865,7 +865,7 @@ def str_named_arg(s: str) -> tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid string argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid string argument format, does not match {regex}")
 
     return (match.group("name"), match.group("value"))
 
@@ -874,7 +874,7 @@ def float_named_arg(s: str) -> tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid float argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid float argument format, does not match {regex}")
 
     name = match.group("name")
     value = float(match.group("value"))
@@ -886,7 +886,7 @@ def json_named_arg(s: str) -> tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid JSON argument format, does not match {regex}")
 
     name = match.group("name")
     value = json.loads(match.group("value"))
@@ -898,7 +898,7 @@ def bool_named_arg(s: str) -> tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s, re.IGNORECASE)
     if not match:
-        raise ValueError("Invalid bool argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid bool argument format, does not match {regex}")
 
     name = match.group("name")
     if match.group("truth_value"):
@@ -913,7 +913,7 @@ def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
+        raise ValueError(f"Invalid bytes as hex argument format, does not match {regex}")
 
     name = match.group("name")
     value_str = match.group("value")
@@ -942,7 +942,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[list[str]] = None):
+def matter_test_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -960,7 +960,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
-                             help="PAA trust store path (default: %s)" % str(paa_path_default))
+                             help=f"PAA trust store path (default: {str(paa_path_default)})")
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
                              help="Path to JSON file containing the device attestation revocation set.")
     basic_group.add_argument('--ble-controller', action="store", type=int,
@@ -968,11 +968,11 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
                              default=TestingDefaults.CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % TestingDefaults.CONTROLLER_NODE_ID)
+                             help=f'NodeID to use for initial/default controller (default: {TestingDefaults.CONTROLLER_NODE_ID})')
     basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
+                             f'and NodeID to assign if commissioning (default: {TestingDefaults.DUT_NODE_ID})', nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None,
                              help="The full path of the app to send an out-of-band command from test to app")
@@ -1029,7 +1029,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x%04X)" % TestingDefaults.ADMIN_VENDOR_ID)
+                                  help=f"VendorID to use during commissioning (default 0x{TestingDefaults.ADMIN_VENDOR_ID:04X})")
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
@@ -1061,7 +1061,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     fabric_group.add_argument('-r', '--root-index', type=root_index,
                               metavar='ROOT_INDEX_OR_NAME', default=TestingDefaults.TRUST_ROOT_INDEX,
                               help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % TestingDefaults.TRUST_ROOT_INDEX)
+                              f'alpha/beta/gamma are aliases for 1/2/3. Default ({TestingDefaults.TRUST_ROOT_INDEX})')
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
                               metavar='PATH',
@@ -1081,7 +1081,4 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    if not argv:
-        argv = sys.argv[1:]
-
-    return convert_args_to_matter_config(parser.parse_args(argv))
+    return parser

@@ -9,7 +9,7 @@ import random
 import string
 import sys
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -129,9 +129,9 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Optional[CertificateIssuerPrivateKeyTypes],
+        key: CertificateIssuerPrivateKeyTypes | None,
         bundle_root: bool,
-    ) -> tuple[Optional[Path], Path]:
+    ) -> tuple[Path | None, Path]:
         """
         Private method that help with saving certificate and key to the hierarchy folder.
         This tool isn't meant to be used in production, but instead to help with development
@@ -164,7 +164,7 @@ class CAHierarchy:
         dns: str,
         public_key: CertificatePublicKeyTypes,
         duration: datetime.timedelta,
-        ip_address: Optional[str] = None
+        ip_address: str | None = None
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
@@ -264,7 +264,7 @@ class CAHierarchy:
     def gen_keypair(self, dns: str,
                     override=False,
                     duration: datetime.timedelta = datetime.timedelta(hours=1),
-                    ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
+                    ip_address: str | None = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.

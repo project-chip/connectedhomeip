@@ -82,9 +82,11 @@ def parse_paa_root_certs(cmdpipe, paa_list):
                 paa_list.append(copy.deepcopy(result))
 
 
-def write_cert(certificate, subject):
-    filename = 'dcld_mirror_' + \
-        re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
+def write_cert(certificate, subject, subject_key_id):
+    # Include subject_key_id in filename to handle multiple certs with same subject
+    sanitized_subject = re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
+    sanitized_skid = re.sub('[^a-zA-Z0-9_-]', '', re.sub('[: ]', '_', subject_key_id))
+    filename = f'dcld_mirror_{sanitized_subject}_{sanitized_skid}'
     with open(filename + '.pem', 'w+') as outfile:
         outfile.write(certificate)
     # convert pem file to der
@@ -166,7 +168,7 @@ def fetch_cd_signing_certs(store_path):
         certificate, subject = get_cert_from_rest(rest_node_url, subject, subject_key_id)
 
         print(f"Downloaded CD signing cert with subject: {subject}")
-        write_cert(certificate, subject)
+        write_cert(certificate, subject, subject_key_id)
 
     os.chdir(original_dir)
 
@@ -220,7 +222,7 @@ def fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use
         certificate = certificate.rstrip('\n')
 
         print(f"Downloaded PAA certificate with subject: {subject}")
-        write_cert(certificate, subject)
+        write_cert(certificate, subject, paa['subjectKeyId'])
 
     os.chdir(original_dir)
 

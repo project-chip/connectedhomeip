@@ -27,8 +27,9 @@ on ``sys.path``.
 
 from __future__ import annotations
 
+import enum
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -43,14 +44,50 @@ class PaseParams:
         discriminator: The device's long or short discriminator.
         passcode: The setup PIN code (passcode).
     """
-    setup_code: Optional[str] = None
-    discriminator: Optional[int] = None
-    passcode: Optional[int] = None
+    setup_code: str | None = None
+    discriminator: int | None = None
+    passcode: int | None = None
 
-    def resolve_setup_code(self, dev_ctrl: Any) -> Optional[str]:
+    def resolve_setup_code(self, dev_ctrl: Any) -> str | None:
         """Resolve manual pairing code via the controller when needed."""
         if self.setup_code:
             return self.setup_code
         if self.passcode is not None and self.discriminator is not None:
             return dev_ctrl.CreateManualCode(self.discriminator, self.passcode)
         return None
+
+
+class CommissioningMethod(enum.StrEnum):
+    ON_NETWORK = "on-network"
+    BLE_WIFI = "ble-wifi"
+    BLE_THREAD = "ble-thread"
+    THREAD_MESHCOP = "thread-meshcop"
+    WIFIPAF_WIFI = "wifipaf-wifi"
+
+    @property
+    def wifi_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_WIFI, CommissioningMethod.WIFIPAF_WIFI}
+
+    @property
+    def thread_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_THREAD, CommissioningMethod.THREAD_MESHCOP}
+
+    @property
+    def app_link_name(self) -> str:
+        return "wlx-app" if self.wifi_required else "eth-app"
+
+    @property
+    def tool_link_name(self) -> str:
+        return "wlx-tool" if self == CommissioningMethod.WIFIPAF_WIFI else "eth-tool"
+
+    @property
+    def op_network(self) -> str:
+        return "Thread" if self.thread_required else "WiFi"
+
+    @property
+    def ble_controller_app(self) -> int | None:
+        return 0 if self in {CommissioningMethod.BLE_WIFI, CommissioningMethod.BLE_THREAD} else None
+
+    @property
+    def ble_controller_tool(self) -> int | None:
+        return 1 if self in {CommissioningMethod.BLE_WIFI, CommissioningMethod.BLE_THREAD} else None
