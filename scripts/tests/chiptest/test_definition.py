@@ -45,13 +45,11 @@ TEST_PASSCODE = '20202021'
 TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 TEST_THREAD_DATASET = '0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff'
 
+# The Linux platform persists device configuration under these fixed paths (see src/platform/Linux/CHIPLinuxStorage.h). They are not
+# covered by --KVS, so they have to be removed explicitly on a factory reset. Otherwise an application inherits the vendor and
+# product ID persisted by whichever application booted first in the worker's /tmp, which makes tests using a hardcoded setup payload
+# fail with a product ID mismatch.
 PERSISTENT_CONFIG_PATHS = frozenset({'/tmp/chip_factory.ini', '/tmp/chip_config.ini', '/tmp/chip_counters.ini'})
-"""
-The Linux platform persists device configuration under these fixed paths (see src/platform/Linux/CHIPLinuxStorage.h). They are not
-covered by --KVS, so they have to be removed explicitly on a factory reset. Otherwise an application inherits the vendor and product
-ID persisted by whichever application booted first in the worker's /tmp, which makes tests using a hardcoded setup payload fail with
-a product ID mismatch.
-"""
 
 
 class App:
