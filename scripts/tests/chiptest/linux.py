@@ -81,7 +81,8 @@ class LinuxWorkerProcess(WorkerProcess):
         tmp_dir = self._config.tmp_dir_worker_base / str(self._config.process_id)
 
         if self._config.tmp_dir_clear:
-            shutil.rmtree(tmp_dir)
+            with contextlib.suppress(FileNotFoundError):
+                shutil.rmtree(tmp_dir)
 
         tmp_dir.mkdir(parents=True, exist_ok=True)
 
