@@ -26,7 +26,6 @@
 #include <air-quality-sensor-manager.h>
 #if SL_MATTER_DISPLAY_ENABLED
 #include "glib.h"
-#include "lcd.h"
 #endif // SL_MATTER_DISPLAY_ENABLED
 
 using namespace chip::app::Clusters;

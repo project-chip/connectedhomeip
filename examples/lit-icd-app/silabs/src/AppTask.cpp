@@ -26,13 +26,6 @@
 
 #include "LEDWidget.h"
 
-#if SL_MATTER_DISPLAY_ENABLED
-#include "lcd.h"
-#if SL_MATTER_QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // SL_MATTER_QR_CODE_ENABLED
-#endif // SL_MATTER_DISPLAY_ENABLED
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>

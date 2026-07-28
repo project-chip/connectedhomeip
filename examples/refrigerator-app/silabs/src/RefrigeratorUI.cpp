@@ -23,7 +23,6 @@
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include "glib.h"
-#include "lcd.h"
 #include <lib/support/logging/CHIPLogging.h>
 
 // Only needed for wifi NCP devices

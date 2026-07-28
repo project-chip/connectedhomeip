@@ -20,7 +20,6 @@
 
 #include "ThermostatIcons.h"
 #include "glib.h"
-#include "lcd.h"
 
 class ThermostatUI
 {

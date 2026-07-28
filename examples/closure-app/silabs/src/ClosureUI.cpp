@@ -24,7 +24,6 @@
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include "glib.h"
-#include "lcd.h"
 
 // Only needed for wifi NCP devices
 #if defined(SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)

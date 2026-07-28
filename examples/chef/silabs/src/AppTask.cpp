@@ -23,13 +23,6 @@
 
 #include "LEDWidget.h"
 
-#if SL_MATTER_DISPLAY_ENABLED
-#include "lcd.h"
-#if SL_MATTER_QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // SL_MATTER_QR_CODE_ENABLED
-#endif // SL_MATTER_DISPLAY_ENABLED
-
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>

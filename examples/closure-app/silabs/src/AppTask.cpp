@@ -25,10 +25,6 @@
 #if SL_MATTER_DISPLAY_ENABLED
 #include "ClosureUI.h"
 #include "ClosureUIStrings.h"
-#include "lcd.h"
-#if SL_MATTER_QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // SL_MATTER_QR_CODE_ENABLED
 #endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <ClosureManager.h>

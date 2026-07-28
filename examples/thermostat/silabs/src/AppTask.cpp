@@ -25,7 +25,6 @@
 
 #if SL_MATTER_DISPLAY_ENABLED
 #include "ThermostatUI.h"
-#include "lcd.h"
 #endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
