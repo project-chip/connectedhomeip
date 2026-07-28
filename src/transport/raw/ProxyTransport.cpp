@@ -60,6 +60,7 @@ bool ProxyTransportBase::CanSendToPeer(const PeerAddress & address)
 CHIP_ERROR ProxyTransportBase::SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kProxy, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mActive, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 

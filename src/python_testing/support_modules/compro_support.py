@@ -959,8 +959,14 @@ class COMPROBaseTest(MatterBaseTest):
             nodes = await self.default_controller.DiscoverCommissionableNodes(
                 filterType=discovery.FilterType.LONG_DISCRIMINATOR,
                 filter=setup_info.filter_value, stopOnFirst=True, timeoutSecond=15)
-            asserts.assert_true(bool(nodes), "DUT not discoverable on-network for PASE")
-            node = nodes[0] if isinstance(nodes, list) else nodes
+            # DiscoverCommissionableNodes is annotated as returning a single node or
+            # None as well as a list, so normalise before indexing.
+            if not isinstance(nodes, list):
+                nodes = [nodes] if nodes is not None else []
+            asserts.assert_true(len(nodes) > 0,
+                                "DUT not discoverable on-network for PASE "
+                                f"(long discriminator {setup_info.filter_value})")
+            node = nodes[0]
             addrs = node.addresses or []
             # Prefer a routable (non-link-local) address: EstablishPASESessionIP
             # needs an interface scope for link-local, which discovery omits.

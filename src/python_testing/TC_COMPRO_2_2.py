@@ -142,6 +142,8 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # to match EDFixture's default so an ED started via ed_app_path (without an
         # explicit ed_discriminator) is still validated.
         expected_discriminator = int(params.get('ed_discriminator', 3841))
+        asserts.assert_true(0 <= expected_discriminator <= 4095,
+                            f"ed_discriminator {expected_discriminator} out of range (0-4095)")
         ed_transport = params.get('ed_transport', 'wifipaf')
 
         # Step 1 — commissioning done by framework
@@ -206,14 +208,13 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         asserts.assert_equal(response.numberOfResults, len(response.proxyScanResult),
                              "NumberOfResults must equal the number of ProxyScanResult entries")
 
-        # Validate the first (or matching) result entry
-        result = response.proxyScanResult[0]
-        if expected_discriminator:
-            # Find the entry matching the known ED discriminator
-            matches = [r for r in response.proxyScanResult if r.discriminator == expected_discriminator]
-            asserts.assert_greater_equal(len(matches), 1,
-                                         f"No scan result matched ED discriminator {expected_discriminator}")
-            result = matches[0]
+        # Validate the entry matching the known ED discriminator.  A discriminator is
+        # always in scope (ed_discriminator defaults to EDFixture's 3841), including
+        # the legal value 0, so the match is unconditional.
+        matches = [r for r in response.proxyScanResult if r.discriminator == expected_discriminator]
+        asserts.assert_greater_equal(len(matches), 1,
+                                     f"No scan result matched ED discriminator {expected_discriminator}")
+        result = matches[0]
 
         logger.info("Scan result: discriminator=%d transport=0x%02x vendorID=%d productID=%d",
                     result.discriminator, result.transport, result.vendorID, result.productID)
@@ -382,11 +383,8 @@ class TC_COMPRO_2_2(COMPROBaseTest):
                     "simultaneously (e.g. BLE and WiFiPAF), then press Enter to continue."))
             response = await self._send_scan_request(valid_transports, valid_bands if has_wi else None,
                                                      timeout_sec=response_deadline)
-            if expected_discriminator:
-                ed_entries = [r for r in response.proxyScanResult
-                              if r.discriminator == expected_discriminator]
-            else:
-                ed_entries = list(response.proxyScanResult)
+            ed_entries = [r for r in response.proxyScanResult
+                          if r.discriminator == expected_discriminator]
             logger.info("Step 13: %d ProxyScanResult entries for the ED: %s",
                         len(ed_entries),
                         [f"disc={e.discriminator} transport=0x{e.transport:02x}" for e in ed_entries])
