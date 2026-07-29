@@ -137,6 +137,47 @@ public:
 
     /**
      *  @brief
+     *    Enable or disable Wi-Fi NAN USD PAF Commissioning Transport
+     *    advertising.
+     *
+     *  @note
+     *    Enabling establishes a publish using the advertising
+     *    parameters most-recently set with `WiFiPafSetParam`.
+     *    Consequently, those parameters **must** have been set, with
+     *    a non-empty frequency list, before advertising is enabled.
+     *
+     *  @note
+     *    Disabling cancels the publish identified by
+     *    `inOutPublishId`, which **must** be a valid, defined
+     *    identifier previously returned by this method. The value is
+     *    left unmodified on return; the caller is responsible for
+     *    invalidating its copy.
+     *
+     *  @param[in]      inEnabled
+     *    A Boolean indicating whether Wi-Fi NAN USD PAF Commissioning
+     *    Transport advertising should be enabled (`true`) or disabled
+     *    (`false`).
+     *
+     *  @param[in,out]  inOutPublishId
+     *    A reference to mutable storage for the publish identifier.
+     *    On input, when `inEnabled` is deasserted, the identifier of
+     *    the publish to cancel. On output, when `inEnabled` is
+     *    asserted and the underlying implementation assigned a
+     *    defined identifier, the identifier of the newly-established
+     *    publish; otherwise, left unmodified.
+     *
+     *  @retval  CHIP_ERROR_INCORRECT_STATE
+     *    If `inEnabled` is asserted and no advertising frequency list
+     *    has been set; or if `inEnabled` is deasserted and
+     *    `inOutPublishId` is not a valid, defined publish identifier.
+     *
+     *  @sa WiFiPafSetParam
+     *
+     */
+    virtual CHIP_ERROR WiFiPafSetAdvertisingEnabled(bool inEnabled, uint32_t & inOutPublishId) = 0;
+
+    /**
+     *  @brief
      *    Set the Wi-Fi NAN USD PAF Commissioning Transport resource
      *    availability.
      *
