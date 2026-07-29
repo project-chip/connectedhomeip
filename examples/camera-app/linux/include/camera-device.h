@@ -32,8 +32,6 @@
 
 #include <gst/gst.h>
 
-using namespace chip::literals;
-
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
@@ -93,10 +91,10 @@ constexpr uint8_t kMaxZoomValue = 75;
 // detection
 static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
         { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
-          chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */ }};
+          chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package")))}};
 
 /**
- * Examples of other ambient contexts for illustrative purposes only
+ * Examples of other ambient contexts for illustrative purposes only, note that _span requires that you are within the chip namespace
  * Person
     { .namespaceID = static_cast<uint8_t>(0x49),
       .tag         = static_cast<uint8_t>(0x03),
