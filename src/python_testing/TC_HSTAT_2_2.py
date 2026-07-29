@@ -232,14 +232,14 @@ class TC_HSTAT_2_2(MatterBaseTest, HSTATBase):
         # TH sends command SetSettings with the Optimal field set to True
         # Verify DUT responds w/ status SUCCESS(0x00)
         if not self.optimalFeatureSupported:
-                        await self.send_SetSettingsCommand_expect_success(optimal=True)
+            await self.send_SetSettingsCommand_expect_success(optimal=True)
 
         self.step(19)
         # TH sends command SetSettings with the MistType field set to Cold
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.attributes.MistType.attribute_id not in self.supported_attributes:
-                        await self.send_SetSettingsCommand_expect_success(mistType=True)
+            await self.send_SetSettingsCommand_expect_success(mistType=True)
 
 
 if __name__ == "__main__":
-        default_matter_test_main()
+    default_matter_test_main()

@@ -37,13 +37,13 @@
 import logging
 
 from mobly import asserts
+from TC_HSTAT_Test_Base import HSTATBase
 
+from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.clusters.Types import NullValue
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class TC_HSTAT_2_5(MatterBaseTest, HSTATBase):
     def pics_TC_HSTAT_2_5(self) -> list[str]:
         return [
             "HSTAT.S",
-            "HSTAT.S.F00" # Supports the Humidifier feature
+            "HSTAT.S.F00"  # Supports the Humidifier feature
         ]
 
     def desc_TC_HSTAT_2_5(self) -> str:
@@ -180,6 +180,7 @@ class TC_HSTAT_2_5(MatterBaseTest, HSTATBase):
         # Verify that the DUT response contains the NULL value.
         dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
         asserts.assert_equal(dut_MistType, NullValue, "MistType is not NULL as expected")
+
 
 if __name__ == '__main__':
     default_matter_test_main()
