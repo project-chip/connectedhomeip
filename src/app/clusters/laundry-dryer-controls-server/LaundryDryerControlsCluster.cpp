@@ -34,10 +34,19 @@ namespace app {
 namespace Clusters {
 
 LaundryDryerControlsCluster::LaundryDryerControlsCluster(EndpointId endpointId, LaundryDryerControls::Delegate & delegate) :
-    DefaultServerCluster({ endpointId, LaundryDryerControls::Id }), mDelegate(delegate)
+    DefaultServerCluster({ endpointId, LaundryDryerControls::Id }), mDelegate(&delegate)
+{}
+
+LaundryDryerControlsCluster::LaundryDryerControlsCluster(EndpointId endpointId) :
+    DefaultServerCluster({ endpointId, LaundryDryerControls::Id }), mDelegate(nullptr)
 {}
 
 LaundryDryerControlsCluster::~LaundryDryerControlsCluster() = default;
+
+void LaundryDryerControlsCluster::SetDelegate(LaundryDryerControls::Delegate & delegate)
+{
+    mDelegate = &delegate;
+}
 
 Protocols::InteractionModel::Status
 LaundryDryerControlsCluster::SetSelectedDrynessLevel(DataModel::Nullable<DrynessLevelEnum> drynessLevel)
@@ -132,10 +141,12 @@ DataModel::ActionReturnStatus LaundryDryerControlsCluster::WriteAttribute(const 
 // Gets the supported dryness levels one by one from the delegate and encodes them into a list.
 CHIP_ERROR LaundryDryerControlsCluster::EncodeSupportedDrynessLevels(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     for (size_t i = 0; true; i++)
     {
         DrynessLevelEnum supportedDrynessLevel;
-        auto err = mDelegate.GetSupportedDrynessLevelAtIndex(i, supportedDrynessLevel);
+        auto err = mDelegate->GetSupportedDrynessLevelAtIndex(i, supportedDrynessLevel);
 
         // Return once we've run off the end of the supported dryness level list on the delegate.
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -151,10 +162,12 @@ CHIP_ERROR LaundryDryerControlsCluster::EncodeSupportedDrynessLevels(const Attri
 // Checks whether the given dryness level is one of the levels advertised by the delegate.
 bool LaundryDryerControlsCluster::IsSupportedDrynessLevel(DrynessLevelEnum drynessLevel)
 {
+    VerifyOrReturnValue(mDelegate != nullptr, false);
+
     for (size_t i = 0; true; i++)
     {
         DrynessLevelEnum supportedDrynessLevel;
-        auto err = mDelegate.GetSupportedDrynessLevelAtIndex(i, supportedDrynessLevel);
+        auto err = mDelegate->GetSupportedDrynessLevelAtIndex(i, supportedDrynessLevel);
 
         // Either we ran off the end of the list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED) or the delegate
         // could not provide the list; in both cases the value is not a supported option.

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
-#
-# Codegen-specific sources (e.g. CodegenIntegration.cpp/.h) will be added here
-# when the codegen integration layer is implemented.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+)

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Codegen-specific sources (e.g. CodegenIntegration.cpp/.h) will be added here
-# when the codegen integration layer is implemented.
-app_config_dependent_sources = []
+app_config_dependent_sources = [
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
+]
