@@ -374,7 +374,7 @@ jobs:
                 TSAN_OPTIONS: report_bugs=0
               run: |
                   PATH=$PWD/objdir-clone:$PATH ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
@@ -398,7 +398,7 @@ jobs:
                 TSAN_OPTIONS: report_bugs=0
               run: |
                   PATH=$PWD/objdir-clone:$PATH ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
@@ -419,7 +419,7 @@ jobs:
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
@@ -451,7 +451,7 @@ jobs:
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
@@ -478,7 +478,7 @@ jobs:
                 TSAN_OPTIONS: report_bugs=0
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
@@ -504,7 +504,7 @@ jobs:
                 TSAN_OPTIONS: report_bugs=0
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "/usr/bin/time -v ./scripts/tests/run_test_suite.py \
+                  "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
