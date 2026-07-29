@@ -13,10 +13,6 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/laundry-dryer-controls-delegate.h"
-    "${CLUSTER_DIR}/laundry-dryer-controls-server.cpp"
-    "${CLUSTER_DIR}/laundry-dryer-controls-server.h"
-)
+#
+# Codegen-specific sources (e.g. CodegenIntegration.cpp/.h) will be added here
+# when the codegen integration layer is implemented.
