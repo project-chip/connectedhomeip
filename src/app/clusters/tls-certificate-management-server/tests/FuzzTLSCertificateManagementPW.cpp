@@ -43,7 +43,9 @@
  *        - ClientIntermediateCertsDoNotCrash: a client cert minted from the keypair
  *          PrepareClientCertificate just stored, so the match check passes and the
  *          fuzzer-controlled intermediateCertificates list drives serialization
- *          across the 31000-byte capacity boundary.
+ *          across the 31000-byte capacity boundary. Sizes are fuzzed as integers, not
+ *          as byte-string lengths, so the boundary stays reachable in libFuzzer-compat
+ *          mode where the encoded input is bounded by -max_len.
  */
 
 #include <cstddef>
@@ -85,9 +87,17 @@ constexpr uint8_t kNonce[32]   = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x0
                                    0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20 };
 
 constexpr size_t kClientCertCapacity = CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES;
-// Room for a TLV array whose payload alone can exceed the persistence capacity.
-constexpr size_t kIntermediateScratchBytes = kClientCertCapacity + 2048;
-constexpr size_t kMaxIntermediateCount     = 8;
+constexpr size_t kMaxIntermediateCount = 8;
+// Per-blob size ceiling: comfortably past the persistence capacity, so a single
+// intermediate can overrun the buffer on its own.
+constexpr uint16_t kMaxIntermediateBytes = 33000;
+// Bytes of fuzzer-chosen pattern kept per blob; the pattern is tiled to fill the
+// requested size (see BuildIntermediates).
+constexpr size_t kMaxIntermediatePatternBytes = 64;
+
+// A fuzzer-requested intermediate certificate: a target size plus the byte pattern
+// to fill it with.
+using IntermediateSpec = std::pair<uint16_t, std::vector<uint8_t>>;
 
 // Generate a valid, self-signed cert carrying keypair's public key (mirrors the
 // cluster gtest's GenerateTestCertificate). Gives the mutator a well-formed DER
@@ -103,6 +113,27 @@ CHIP_ERROR GenerateSelfSignedCert(Crypto::P256Keypair & keypair, MutableByteSpan
     // validityStart=1 (just after CHIP epoch), validityEnd=kNullCertTime (9999) → always valid.
     X509CertRequestParams params = { 1, 1, kNullCertTime, subjectDN, subjectDN };
     return NewRootX509Cert(params, keypair, certSpan);
+}
+
+// Expand each spec into a blob of the requested size by tiling its byte pattern.
+// Size is carried as an integer rather than as the length of a fuzzed byte string so
+// that a small input can still request a blob large enough to overrun the 31000-byte
+// persistence buffer: in libFuzzer-compat mode the whole encoded input is bounded by
+// -max_len (4096 by default), which no byte-string domain can grow past.
+std::vector<std::vector<uint8_t>> BuildIntermediates(const std::vector<IntermediateSpec> & specs)
+{
+    std::vector<std::vector<uint8_t>> blobs;
+    blobs.reserve(specs.size());
+    for (const auto & [size, pattern] : specs)
+    {
+        std::vector<uint8_t> blob(size, 0);
+        for (size_t i = 0; i < blob.size() && !pattern.empty(); i++)
+        {
+            blob[i] = pattern[i % pattern.size()];
+        }
+        blobs.push_back(std::move(blob));
+    }
+    return blobs;
 }
 
 // Encode the fuzzer-supplied blobs as a TLV array of octet strings and point list
@@ -326,9 +357,11 @@ FUZZ_TEST(FuzzTLSCertificateManagementPW, ClientUpdateDoesNotCrash)
 // mints and stores a keypair; we read it back, mint a self-signed cert carrying its
 // public key, and hand that to UpdateClientCertificateEntry so the pubkey-match check
 // passes. The fuzzer then controls the intermediateCertificates list, i.e. the bulk of
-// what SetTableEntry serializes into PersistenceBuffer<31000>. Blob sizes span that
-// capacity, so both the accepted-write and the bounded-TLVWriter rejection are covered.
-void ClientIntermediateCertsDoNotCrash(const std::vector<std::vector<uint8_t>> & intermediates)
+// what SetTableEntry serializes into PersistenceBuffer<31000>. Each intermediate is
+// described as (target size, byte pattern) so the requested size is independent of the
+// input length; sizes reach past the capacity, covering both the accepted write and the
+// bounded TLV writer's rejection.
+void ClientIntermediateCertsDoNotCrash(const std::vector<IntermediateSpec> & specs)
 {
     Fixture & fx = ResetFixture();
 
@@ -363,8 +396,16 @@ void ClientIntermediateCertsDoNotCrash(const std::vector<std::vector<uint8_t>> &
     entry.ccdid = id.Value();
     entry.clientCertificate.SetValue(chip::app::DataModel::MakeNullable(ByteSpan(certSpan)));
 
-    // scratch backs the list's TLV reader for as long as entry is in use.
-    std::vector<uint8_t> scratch(kIntermediateScratchBytes);
+    // scratch backs the list's TLV reader for as long as entry is in use. Sized from
+    // the requested total so an over-capacity list is handed to the cluster intact and
+    // rejected there, rather than being dropped by a too-small harness buffer.
+    const std::vector<std::vector<uint8_t>> intermediates = BuildIntermediates(specs);
+    size_t scratchBytes                                   = 64;
+    for (const auto & blob : intermediates)
+    {
+        scratchBytes += blob.size() + 8;
+    }
+    std::vector<uint8_t> scratch(scratchBytes);
     app::DataModel::DecodableList<ByteSpan> list;
     if (SetIntermediateCertificates(intermediates, MutableByteSpan(scratch.data(), scratch.size()), list) == CHIP_NO_ERROR)
     {
@@ -376,19 +417,21 @@ void ClientIntermediateCertsDoNotCrash(const std::vector<std::vector<uint8_t>> &
     ReadBackClientEntry(fx, id.Value());
 }
 
-std::vector<std::vector<std::vector<uint8_t>>> IntermediateSeeds()
+std::vector<std::vector<IntermediateSpec>> IntermediateSeeds()
 {
+    const std::vector<uint8_t> pattern = { 0x30, 0x82, 0x01, 0x0a };
     return {
-        {},                                                                     // no intermediates: the plain accepted-write path
-        { std::vector<uint8_t>(100, 0x30) },                                    // one small blob, comfortably under capacity
-        { std::vector<uint8_t>(kClientCertCapacity + 100, 0x30) },              // single blob past the 31000-byte buffer
-        std::vector<std::vector<uint8_t>>(8, std::vector<uint8_t>(3800, 0x30)), // 30400 bytes: just under
-        std::vector<std::vector<uint8_t>>(8, std::vector<uint8_t>(4000, 0x30)), // 32000 bytes: just over
+        {},                                                                // no intermediates: the plain accepted-write path
+        { { 100, pattern } },                                              // one small blob, comfortably under capacity
+        { { static_cast<uint16_t>(kClientCertCapacity + 100), pattern } }, // single blob past the 31000-byte buffer
+        std::vector<IntermediateSpec>(8, { 3800, pattern }),               // 30400 bytes total: just under
+        std::vector<IntermediateSpec>(8, { 4000, pattern }),               // 32000 bytes total: just over
     };
 }
 
 FUZZ_TEST(FuzzTLSCertificateManagementPW, ClientIntermediateCertsDoNotCrash)
-    .WithDomains(VectorOf(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(kClientCertCapacity + 256))
+    .WithDomains(VectorOf(PairOf(InRange<uint16_t>(0, kMaxIntermediateBytes),
+                                 VectorOf(Arbitrary<uint8_t>()).WithMaxSize(kMaxIntermediatePatternBytes)))
                      .WithMaxSize(kMaxIntermediateCount)
                      .WithSeeds(&IntermediateSeeds));
 
