@@ -31,6 +31,7 @@ class HSTATBase:
     """
 
     async def setup(self):
+        self.endpoint = self.get_endpoint()
         self.cluster = Clusters.Humidistat
         self.attributes = self.cluster.Attributes
         self.features = self.cluster.Bitmaps.Feature
@@ -38,7 +39,7 @@ class HSTATBase:
         self.SetSettings = self.cluster.Commands.SetSettings
         self.SystemStatus = self.cluster.Enums.SystemStateEnum
 
-        self.supported_attributes = await self.read_attribute_expect_success(endpoint=self.get_endpoint(), attribute=self.attributes.AttributeList)
+        self.supported_attributes = await self.read_attribute_expect_success(attribute=self.attributes.AttributeList)
 
         feature_map = await self.read_single_attribute_check_success(
             endpoint=self.get_endpoint(), cluster=self.cluster, attribute=self.attributes.FeatureMap)
@@ -71,30 +72,30 @@ class HSTATBase:
         self.stateIdle = self.cluster.Enums.SystemStateEnum.kIdle
         self.ModeEnum = self.cluster.Enums.ModeEnum
 
-    async def read_attribute_expect_success(self, endpoint, attribute):
+    async def read_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.Humidistat
-        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.get_endpoint(), cluster=cluster, attribute=attribute)
 
-    async def write_attribute_expect_success(self, endpoint, attribute):
+    async def write_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.Humidistat
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute)])
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.get_endpoint(), attribute)])
         err_msg = f"Received error status {str(result[0].Status)} when writing {str(cluster)}:{str(attribute)}"
         asserts.assert_equal(result[0].Status, Status.Success, err_msg)
 
-    async def send_SetSettingsCommand_expect_success(self, endpoint, **kwargs) -> None:
-        await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=endpoint, timedRequestTimeoutMs=1000)
+    async def send_SetSettingsCommand_expect_success(self, **kwargs) -> None:
+        await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
 
-    async def send_SetSettingsCommand_expect_error(self, endpoint, **kwargs) -> None:
+    async def send_SetSettingsCommand_expect_error(self, **kwargs) -> None:
         error = kwargs.pop("error", Status.Success)
         try:
-            await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
             asserts.assert_true(False, "Unexpected command success, command=%s", command)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass
 
-    async def send_onoff_on_cmd_expect_success(self, endpoint) -> None:
-        await self.send_single_cmd(cmd=Clusters.OnOff.Commands.On(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+    async def send_onoff_on_cmd_expect_success(self) -> None:
+        await self.send_single_cmd(cmd=Clusters.OnOff.Commands.On(), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
 
-    async def send_onoff_off_cmd_expect_success(self, endpoint) -> None:
-        await self.send_single_cmd(cmd=Clusters.OnOff.Commands.Off(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+    async def send_onoff_off_cmd_expect_success(self) -> None:
+        await self.send_single_cmd(cmd=Clusters.OnOff.Commands.Off(), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
