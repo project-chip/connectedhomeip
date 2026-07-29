@@ -15,22 +15,16 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 source_set("commissioning-proxy-server") {
-  # NOTE: CommissioningProxyCluster.{cpp,h} and CommissioningProxyDelegate.h are
-  # intentionally NOT listed here.  They are instead listed in
-  # app_config_dependent_sources.gni so that they are compiled in the consumer's
-  # target context (chip_data_model() iterates the gni and pulls them into the
-  # app's data-model target).  This is required because the cluster's transport
-  # advertisement reads CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF and CONFIG_NETWORK_LAYER_BLE
-  # (the latter via <ble/BleConfig.h>) at compile time, and those macros are only
-  # set as expected when the consumer's CHIPProjectAppConfig.h / BLE buildconfig is
-  # in scope.  If the .cpp were compiled in this source_set's own target the
-  # platform defaults would always win.
-  #
-  # The transport-agnostic subsystems below have NO build-flag dependency, so they
-  # are compiled here in the cluster's own target.
+  # The cluster and its subsystems are independent of the application
+  # configuration: the transports the cluster advertises come from the drivers
+  # registered at runtime, not from build flags. Only the code-generation
+  # integration is application-config dependent, so CodegenIntegration.{cpp,h}
+  # is listed in app_config_dependent_sources.{gni,cmake} instead.
   sources = [
     "CommissioningProxyBgScanRegistry.cpp",
     "CommissioningProxyBgScanRegistry.h",
+    "CommissioningProxyCluster.cpp",
+    "CommissioningProxyCluster.h",
     "CommissioningProxyScanAggregator.cpp",
     "CommissioningProxyScanAggregator.h",
     "CommissioningProxyScanCache.cpp",
@@ -39,6 +33,8 @@ source_set("commissioning-proxy-server") {
     "CommissioningProxySessionManager.h",
     "CommissioningProxyTransport.h",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
