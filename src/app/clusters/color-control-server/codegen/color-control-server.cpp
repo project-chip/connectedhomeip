@@ -306,7 +306,9 @@ public:
             {
             case EnhancedColorMode::kCurrentHueAndCurrentSaturation:
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-                ColorControlServer::Instance().moveToHueAndSaturation(endpoint, colorHueTransitionState->finalHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue), transitionTime10th, false);
+                ColorControlServer::Instance().moveToHueAndSaturation(
+                    endpoint, colorHueTransitionState->finalHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
+                    transitionTime10th, false);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             case EnhancedColorMode::kCurrentXAndCurrentY:
