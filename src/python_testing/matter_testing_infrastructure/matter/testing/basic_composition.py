@@ -142,6 +142,7 @@ def JsonToMatterTlv(json_filename: str) -> AttributeCache:
 
 
 class BasicCompositionTests(MatterBaseTest):
+    disable_wildcard_subscription = True
     # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
     # or its setup process. Providing type hints here for mypy.
     default_controller: ChipDeviceController
