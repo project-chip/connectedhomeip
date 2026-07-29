@@ -31,6 +31,8 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
+inline constexpr uint64_t kCheckInCounterMax = (1ULL << 32);
+
 CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
                                                          const Crypto::Hmac128KeyHandle & hmacKeyHandle,
                                                          const CounterType & counter, const ByteSpan & appData,
@@ -77,8 +79,9 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
 }
 
 CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
-                                                      const Crypto::Hmac128KeyHandle & hmacKeyHandle, const ByteSpan & payload,
-                                                      CounterType & counter, MutableByteSpan & appData)
+                                                      const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType startCounter,
+                                                      CounterType clientOffset, const ByteSpan & payload, CounterType & offset,
+                                                      MutableByteSpan & appData)
 {
     size_t appDataSize = GetAppDataSize(payload);
 
@@ -122,10 +125,18 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
         VerifyOrReturnError(memcmp(nonce.data(), calculatedNonceBuffer, sizeof(calculatedNonceBuffer)) == 0, CHIP_ERROR_INTERNAL);
     }
 
+    // Validate that the counter is not a duplicate
+    CounterType receivedCounterOffset = (tempCounter - startCounter) % kCheckInCounterMax;
+    if (receivedCounterOffset <= clientOffset)
+    {
+        ChipLogError(ICD, "A duplicate check-in message was received and discarded");
+        return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+    }
+
     // We have successfully decrypted and validated Check-In message
     // Set output values
 
-    counter = tempCounter;
+    offset = receivedCounterOffset;
     // Shift to remove the counter from the appData
     memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
     appData.reduce_size(appDataSize);
