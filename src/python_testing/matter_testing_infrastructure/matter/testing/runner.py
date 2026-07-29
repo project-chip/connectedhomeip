@@ -773,7 +773,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         if args.manual_code:
             LOGGER.warning("WARNING: Provided manual code is ignored for NFC commissioning. "
                            "The onboarding data is read directly from the NFC tag.")
-            args.manual_code = None
+            args.manual_code = []
 
         if args.qr_code:
             LOGGER.warning("WARNING: Provided qr-code is ignored for NFC commissioning. "
