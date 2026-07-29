@@ -36,12 +36,13 @@
 
 import logging
 
+from TC_HSTAT_Test_Base import HSTATBase
+
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.clusters.Types import NullValue
-from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -120,6 +121,7 @@ class TC_HSTAT_2_6(MatterBaseTest, HSTATBase):
         # Verify that the DUT response contains the NULL value.
         dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
         asserts.assert_equal(dut_MistType, NullValue, "MistType is not NULL as expected")
+
 
 if __name__ == '__main__':
     default_matter_test_main()
