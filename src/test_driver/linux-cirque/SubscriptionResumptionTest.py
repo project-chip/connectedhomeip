@@ -115,7 +115,7 @@ class TestSubscriptionResumption(CHIPVirtualHome):
         self.assertTrue(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Resuming 1 subscriptions in 1 seconds",
             "Registered a ReadHandler that will schedule a report"]),
-            "SubscriptionResumption test failed: cannot find matching string from device {}".format(server_device_id))
+            f"SubscriptionResumption test failed: cannot find matching string from device {server_device_id}")
 
 
 if __name__ == "__main__":
