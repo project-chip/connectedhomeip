@@ -760,26 +760,25 @@ def convert_args_to_matter_config(args: argparse.Namespace):
             LOGGER.warning("WARNING: NFC_Reader_index not found in global_test_params; "
                            "defaulting to 0.")
             config.global_test_params["NFC_Reader_index"] = 0
-
         if args.passcodes:
             LOGGER.warning("WARNING: Provided passcode is ignored for NFC commissioning. "
                            "The onboarding data is read directly from the NFC tag.")
-            args.passcodes.clear()
+            args.passcodes = []
 
         if args.discriminators:
             LOGGER.warning("WARNING: Provided discriminator is ignored for NFC commissioning. "
                            "The onboarding data is read directly from the NFC tag.")
-            args.discriminators.clear()
+            args.discriminators = []
 
         if args.manual_code:
             LOGGER.warning("WARNING: Provided manual code is ignored for NFC commissioning. "
                            "The onboarding data is read directly from the NFC tag.")
-            args.manual_code.clear()
+            args.manual_code = None
 
         if args.qr_code:
             LOGGER.warning("WARNING: Provided qr-code is ignored for NFC commissioning. "
                            "The onboarding data is read directly from the NFC tag.")
-            args.qr_code.clear()
+            args.qr_code = None
 
         from matter.testing.nfc import NFCReader
         nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
