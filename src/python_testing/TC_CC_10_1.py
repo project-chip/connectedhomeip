@@ -107,7 +107,7 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep(
                 "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xE0 }]}]'"),
             TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
-            TestStep("6c", "TH reads the _CurrentSaturation attribute_ from DUT."),
+            TestStep("6c", "TH reads the _CurrentHue and _CurrentSaturation attribute_ from DUT."),
             TestStep(
                 "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
             TestStep("7b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03 and the _TransitionTime_ omitted."),
@@ -254,6 +254,11 @@ class TC_CC_10_1(MatterBaseTest):
                     continue
 
                 for AV in EFS.attributeValueList:
+                    if AV.attributeID == 0x0000:
+                        asserts.assert_less_equal(AV.valueUnsigned8, 230, "View Scene failed on Hue above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned8, 170, "View Scene failed on Hue below limit")
+
+                for AV in EFS.attributeValueList:
                     if AV.attributeID == 0x0001:
                         asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Saturation above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Saturation below limit")
@@ -367,11 +372,12 @@ class TC_CC_10_1(MatterBaseTest):
                     self.kGroup1,
                     0x02,
                     0,
-                    "Sat Scene",
+                    "HueSat Scene",
                     [
                         self._prepare_cc_extension_field_set(
                             [
                                 Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x4001, valueUnsigned8=0x00),
+                                Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0000, valueUnsigned8=0xE0),
                                 Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=0x0001, valueUnsigned8=0xE0)
                             ]
                         )
@@ -388,7 +394,7 @@ class TC_CC_10_1(MatterBaseTest):
             await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RecallScene(self.kGroup1, 0x02))
         self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
-            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentSaturation, 0xD8, 0xE8)])
+            await self.poll_until_attributes_in_range(cluster, [(attributes.CurrentSaturation, 0xD8, 0xE8), (attributes.CurrentHue, 0xD8, 0xE8)])
 
         self.step("7a")
         if self.pics_guard(self.check_pics("CC.S.F03")):

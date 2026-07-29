@@ -101,6 +101,13 @@ public:
                 saturationValue = 0x00;
             }
             AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount);
+
+            uint8_t hueValue;
+            if (Status::Success != Attributes::CurrentHue::Get(endpoint, &hueValue))
+            {
+                hueValue = 0x00;
+            }
+            AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentHue::Id, hueValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
@@ -231,6 +238,13 @@ public:
                                                                           colorSaturationTransitionState->highLimit);
                 }
                 break;
+            case Attributes::CurrentHue::Id:
+                if (SupportsColorMode(endpoint, EnhancedColorMode::kCurrentHueAndCurrentSaturation))
+                {
+                    VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                    colorHueTransitionState->finalHue = decodePair.valueUnsigned8.Value();
+                }
+                break;
             case Attributes::ColorLoopActive::Id:
                 VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
                 loopActiveValue = decodePair.valueUnsigned8.Value();
@@ -292,8 +306,7 @@ public:
             {
             case EnhancedColorMode::kCurrentHueAndCurrentSaturation:
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-                ColorControlServer::Instance().moveToSaturation(
-                    endpoint, static_cast<uint8_t>(colorSaturationTransitionState->finalValue), transitionTime10th);
+                ColorControlServer::Instance().moveToHueAndSaturation(endpoint, colorHueTransitionState->finalHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue), transitionTime10th, false);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             case EnhancedColorMode::kCurrentXAndCurrentY:
