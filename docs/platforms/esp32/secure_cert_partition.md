@@ -311,19 +311,6 @@ property of the TEE build, not of the Matter code.
 | **TEE + HMAC/PBKDF2**      | Never                | Inside the TEE                 | HMAC peripheral + ESP-TEE                    | No key in flash; derived on demand; signing isolated in the secure world. Recommended for HMAC-capable SoCs. |
 | **TEE + ECDSA peripheral** | Never                | ECDSA peripheral, gated by TEE | ECDSA peripheral + ESP-TEE                   | Hardware signing with peripheral access locked to the secure world. For non-HMAC SoCs.                       |
 
-Notes on the design decision:
-
--   An earlier iteration **stored** the DAC private key in TEE secure storage
-    and signed it through a TEE-bound mbedTLS context. That has been dropped in
-    favor of deriving the key (HMAC/PBKDF2) so that no key — not even an
-    encrypted blob — needs to be stored on the device. The `secure_storage`
-    partition is therefore not used to hold the DAC key.
--   The PBKDF2 path keeps the DAC key out of REE RAM entirely (signing happens
-    in the TEE), which is stronger than the plain `esp_secure_cert` software
-    paths where the key is loaded into application memory at sign time.
--   For SoCs with neither an HMAC nor an ECDSA peripheral, fall back to the
-    default-format key protected by flash encryption.
-
 ## 1.7 Protecting the DAC private key
 
 The DAC private key is the most sensitive secret on the device: anything that
