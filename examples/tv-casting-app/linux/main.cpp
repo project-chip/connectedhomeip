@@ -39,6 +39,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
 using namespace chip;
@@ -143,6 +144,14 @@ int main(int argc, char * argv[])
 #endif
 
     VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
+
+    // Configure the KVS data file path before InitChipStack() (which calls
+    // PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()).
+    // This ensures the casting app uses its own KVS file, separate from the tv-app.
+#ifdef CHIP_CONFIG_KVS_PATH
+    chip::DeviceLayer::GetStoragePaths().SetKVSDataFile(CHIP_CONFIG_KVS_PATH);
+#endif
+
     VerifyOrDie(CHIP_NO_ERROR == chip::DeviceLayer::PlatformMgr().InitChipStack());
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -162,8 +171,6 @@ int main(int argc, char * argv[])
 #endif
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -47,6 +49,7 @@ private:
     static KeyValueStoreManagerImpl sInstance;
 
     bool mInitialized = false;
+    std::string mFilePath;
 };
 
 /**

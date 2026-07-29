@@ -63,6 +63,11 @@ static constexpr Option sOptions[] = {
     { "command", false },
     { "PICS", false },
     { "KVS", false },
+    { "kvs-directory", false },
+    { "kvs-data", false },
+    { "kvs-factory", false },
+    { "kvs-config", false },
+    { "kvs-counters", false },
     { "interface-id", false },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", false },

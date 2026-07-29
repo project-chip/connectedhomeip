@@ -31,6 +31,8 @@ static_library("Tizen") {
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
     "../GLibTypeDeleter.h",
+    "../Linux/CHIPLinuxStoragePaths.cpp",
+    "../Linux/CHIPLinuxStoragePaths.h",
     "../SingletonConfigurationManager.cpp",
     "AppPreference.cpp",
     "AppPreference.h",

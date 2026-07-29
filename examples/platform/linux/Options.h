@@ -82,9 +82,13 @@ struct LinuxDeviceOptions
     uint16_t securedCommissionerPort    = CHIP_PORT + 12; // TODO: why + 12?
     chip::FabricId commissionerFabricId = chip::kUndefinedFabricId;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    const char * command                = nullptr;
-    const char * PICS                   = nullptr;
-    const char * KVS                    = nullptr;
+    const char * command = nullptr;
+    const char * PICS    = nullptr;
+    chip::Optional<std::string> KVSDirectory;
+    chip::Optional<std::string> KVSDataFile;
+    chip::Optional<std::string> KVSFactoryFile;
+    chip::Optional<std::string> KVSConfigFile;
+    chip::Optional<std::string> KVSCountersFile;
     const char * app_pipe               = "";
     const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();

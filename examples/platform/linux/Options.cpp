@@ -23,6 +23,8 @@
 
 #include "Options.h"
 
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
+
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -92,7 +94,12 @@ enum
 #endif
     kDeviceOption_Command,
     kDeviceOption_PICS,
-    kDeviceOption_KVS,
+    kDeviceOption_KVSFilePath,
+    kDeviceOption_KVSDirectory,
+    kDeviceOption_KVSDataFile,
+    kDeviceOption_KVSFactoryFile,
+    kDeviceOption_KVSConfigFile,
+    kDeviceOption_KVSCountersFile,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
     kDeviceOption_AppPipeOut,
@@ -207,7 +214,12 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
-    { "KVS", kArgumentRequired, kDeviceOption_KVS },
+    { "KVS", kArgumentRequired, kDeviceOption_KVSFilePath },
+    { "kvs-directory", kArgumentRequired, kDeviceOption_KVSDirectory },
+    { "kvs-data", kArgumentRequired, kDeviceOption_KVSDataFile },
+    { "kvs-factory", kArgumentRequired, kDeviceOption_KVSFactoryFile },
+    { "kvs-config", kArgumentRequired, kDeviceOption_KVSConfigFile },
+    { "kvs-counters", kArgumentRequired, kDeviceOption_KVSCountersFile },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
     { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
@@ -374,7 +386,23 @@ const char * sDeviceOptionHelp =
     "       A file containing PICS items.\n"
     "\n"
     "  --KVS <filepath>\n"
-    "       A file to store Key Value Store items.\n"
+    "       A file to store Key Value Store items. (deprecated, use --kvs-data instead)\n"
+    "\n"
+    "  --kvs-directory <dirpath>\n"
+    "       Base directory for all KVS files. Individual file locations will be derived from this path.\n"
+    "       Default: " CHIP_DEFAULT_BASE_DIR "\n"
+    "\n"
+    "  --kvs-data <filepath>\n"
+    "       Full path to the KVS data file. Default: " CHIP_DEFAULT_BASE_DIR "/" CHIP_DEFAULT_DATA_FILENAME "\n"
+    "\n"
+    "  --kvs-factory <filepath>\n"
+    "       Full path to the Factory KVS file. Default: " CHIP_DEFAULT_BASE_DIR "/" CHIP_DEFAULT_FACTORY_FILENAME "\n"
+    "\n"
+    "  --kvs-config <filepath>\n"
+    "       Full path to the Config KVS file. Default: " CHIP_DEFAULT_BASE_DIR "/" CHIP_DEFAULT_CONFIG_FILENAME "\n"
+    "\n"
+    "  --kvs-counters <filepath>\n"
+    "       Full path to the Counters KVS file. Default: " CHIP_DEFAULT_BASE_DIR "/" CHIP_DEFAULT_COUNTERS_FILENAME "\n"
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
@@ -742,8 +770,29 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().PICS = aValue;
         break;
 
-    case kDeviceOption_KVS:
-        LinuxDeviceOptions::GetInstance().KVS = aValue;
+    case kDeviceOption_KVSFilePath:
+        // Deprecated: --KVS is now an alias for --kvs-data
+        LinuxDeviceOptions::GetInstance().KVSDataFile.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSDirectory:
+        LinuxDeviceOptions::GetInstance().KVSDirectory.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSDataFile:
+        LinuxDeviceOptions::GetInstance().KVSDataFile.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSFactoryFile:
+        LinuxDeviceOptions::GetInstance().KVSFactoryFile.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSConfigFile:
+        LinuxDeviceOptions::GetInstance().KVSConfigFile.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSCountersFile:
+        LinuxDeviceOptions::GetInstance().KVSCountersFile.SetValue(std::string(aValue));
         break;
 
     case kDeviceOption_AppPipe:
@@ -1050,6 +1099,39 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+#ifdef CHIP_CONFIG_KVS_PATH
+    // Apply KVS paths to the platform layer after parsing
+    auto & options = LinuxDeviceOptions::GetInstance();
+    chip::DeviceLayer::ChipLinuxStoragePaths paths;
+
+    // Handle --kvs-directory: set base directory for all KVS files
+    if (options.KVSDirectory.HasValue())
+    {
+        paths.SetBaseDir(options.KVSDirectory.Value());
+    }
+
+    // Set explicit paths if provided (these override base directory)
+    if (options.KVSDataFile.HasValue())
+    {
+        paths.SetKVSDataFile(options.KVSDataFile.Value());
+    }
+    if (options.KVSFactoryFile.HasValue())
+    {
+        paths.SetFactoryFile(options.KVSFactoryFile.Value());
+    }
+    if (options.KVSConfigFile.HasValue())
+    {
+        paths.SetConfigFile(options.KVSConfigFile.Value());
+    }
+    if (options.KVSCountersFile.HasValue())
+    {
+        paths.SetCountersFile(options.KVSCountersFile.Value());
+    }
+
+    chip::DeviceLayer::SetStoragePaths(paths);
+#endif // CHIP_CONFIG_KVS_PATH
+
     return CHIP_NO_ERROR;
 }
 

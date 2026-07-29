@@ -59,6 +59,8 @@ static_library("Darwin") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../Linux/CHIPLinuxStoragePaths.cpp",
+    "../Linux/CHIPLinuxStoragePaths.h",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",

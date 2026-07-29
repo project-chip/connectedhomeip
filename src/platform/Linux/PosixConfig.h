@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <functional>
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
@@ -52,8 +51,11 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
+    static const char kConfigNamespace_ChipKVS[];
 
     // Key definitions for well-known keys.
+    static const Key kConfigKey_KVS;
+
     static const Key kConfigKey_SerialNum;
     static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
@@ -110,6 +112,8 @@ public:
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
+    static ChipLinuxStorage * GetChipLinuxDataStorage();
+
 private:
     static ChipLinuxStorage * GetStorageForNamespace(Key key);
 };
@@ -121,11 +125,6 @@ struct PosixConfig::Key
 
     bool operator==(const Key & other) const;
 };
-
-inline bool PosixConfig::Key::operator==(const Key & other) const
-{
-    return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer
