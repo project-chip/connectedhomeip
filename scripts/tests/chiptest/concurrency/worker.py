@@ -75,12 +75,10 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
                                                    self._config.dry_run) as result):
                     work.test.Run(self.runner, self.apps_register, self._config, self.thread_ba_host, self.thread_ba_port)
             finally:
-                if result is None:
-                    return
-
-                self._rsp_queue.put(result)
-                if isinstance(result.exception, KeyboardInterrupt):
-                    raise result.exception
+                if result is not None:
+                    self._rsp_queue.put(result)
+                    if isinstance(result.exception, KeyboardInterrupt):
+                        raise result.exception
 
 
 class GenericWorkerProcess(WorkerProcess):
