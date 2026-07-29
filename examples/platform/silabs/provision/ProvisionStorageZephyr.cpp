@@ -236,7 +236,7 @@ CHIP_ERROR Storage::SetHardwareVersionString(const char * value, size_t len)
 CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 {
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    size_t size    = 0;
+    size_t size = 0;
     ReturnErrorOnFailure(ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size));
 }
 
