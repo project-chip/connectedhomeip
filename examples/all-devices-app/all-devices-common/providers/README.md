@@ -43,22 +43,21 @@ The supported JSON keys are:
 
 Pre-existing test vector JSON files are available in the Matter SDK repository
 under:
-[`credentials/development/commissioner_dut/`](../../../../credentials/development/commissioner_dut/)
+[`credentials/development/attestation/`](../../../../credentials/development/attestation/)
 
 Examples:
 
--   **Valid CMS v3 CD Vector**:
-    `credentials/development/commissioner_dut/struct_cd_cms_v3/test_case_vector.json`
--   **Official CD Vector**:
-    `credentials/development/commissioner_dut/struct_cd_official_cd/test_case_vector.json`
--   **Attestation Fallback / PID Mismatch Vector**:
-    `credentials/development/commissioner_dut/struct_dac_subject_pid_mismatch/test_case_vector.json`
+-   **Test Credentials for VID=0xFFF1 PID=0x8000**:
+    `credentials/development/attestation/TestCredentials-FFF1-8000.json`
+-   **Test Credentials for VID=0xFFF2 PID=0x8001**:
+    `credentials/development/attestation/TestCredentials-FFF2-8001.json`
 
 Example invocation:
 
 ```bash
 ./out/linux-x64-all-devices-clang/all-devices-app \
-  --dac_provider credentials/development/commissioner_dut/struct_cd_cms_v3/test_case_vector.json \
+  --dac_provider credentials/development/attestation/TestCredentials-FFF1-8000.json \
+  --vendor-id 0xFFF1 \
   --product-id 0x8000
 ```
 
