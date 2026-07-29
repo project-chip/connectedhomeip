@@ -246,8 +246,7 @@ void ReadBackClientEntry(Fixture & fx, TLSCCDID cid)
 {
     CertificateTable::ClientBuffer getBuf;
     CertificateTable::BufferedClientCert got(getBuf);
-    if (fx.table.GetClientCertificateEntry(kFabric, cid, got) == CHIP_NO_ERROR &&
-        got.GetCert().intermediateCertificates.HasValue())
+    if (fx.table.GetClientCertificateEntry(kFabric, cid, got) == CHIP_NO_ERROR && got.GetCert().intermediateCertificates.HasValue())
     {
         auto iter = got.GetCert().intermediateCertificates.Value().begin();
         while (iter.Next())
@@ -380,9 +379,9 @@ void ClientIntermediateCertsDoNotCrash(const std::vector<std::vector<uint8_t>> &
 std::vector<std::vector<std::vector<uint8_t>>> IntermediateSeeds()
 {
     return {
-        {},                                                    // no intermediates: the plain accepted-write path
-        { std::vector<uint8_t>(100, 0x30) },                    // one small blob, comfortably under capacity
-        { std::vector<uint8_t>(kClientCertCapacity + 100, 0x30) }, // single blob past the 31000-byte buffer
+        {},                                                                     // no intermediates: the plain accepted-write path
+        { std::vector<uint8_t>(100, 0x30) },                                    // one small blob, comfortably under capacity
+        { std::vector<uint8_t>(kClientCertCapacity + 100, 0x30) },              // single blob past the 31000-byte buffer
         std::vector<std::vector<uint8_t>>(8, std::vector<uint8_t>(3800, 0x30)), // 30400 bytes: just under
         std::vector<std::vector<uint8_t>>(8, std::vector<uint8_t>(4000, 0x30)), // 32000 bytes: just over
     };
