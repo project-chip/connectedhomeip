@@ -50,6 +50,7 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_18(MatterTestCommissionedDevice, AVSMTestBase):
+    disable_wildcard_subscription = True
 
     def desc_TC_AVSM_2_18(self) -> str:
         return "[TC-AVSM-2.18] Validate persistence of allocated video streams with DUT"

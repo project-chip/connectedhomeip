@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import contextlib
 import queue
 import threading
 import time
@@ -43,6 +42,9 @@ def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable
 
     Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
     as the manager process explicitly ignores SIGINT.
+
+    TODO: Revisit this implementation so that we don't use busy waiting. It is possibly an issue with Python standard library, and
+    how it handles signals in a multi-process environment.
     """
     if predicate is not None:
         if not isinstance(waitable, WaitableFor):
@@ -162,13 +164,14 @@ class CancellableQueue(TerminableResource, Generic[QueueElementT]):
         """
         with self._cond:
             if timeout != 0:
-                # First check without waiting, to avoid race conditions and unnecessary waiting. Allows to pass QueueCancelled and
-                # EndOfQueue exceptions to the consumer without waiting for the condition.
-                with contextlib.suppress(queue.Empty):
-                    return self.get(timeout=0)
-
-                # We wait for the condition within the timeout (or infinitely when timeout=None).
-                if not wait_for_mp_managed(self._cond, timeout_sec=timeout):
+                # Wait with a level-triggered predicate that re-checks the real queue/cancel/close state on every poll. This
+                # prevents lost wakeups from cross-process notify() from causing indefinite hangs: even if a notify is lost between
+                # poll windows, the next poll will see the item already in the queue.
+                if not wait_for_mp_managed(
+                    self._cond,
+                    predicate=lambda: not self._queue.empty() or self._cancel_event.is_set() or self._end_of_queue.is_set(),
+                    timeout_sec=timeout
+                ):
                     raise TimeoutError("Timeout when waiting for queue item")
 
             # Check for cancel event.
