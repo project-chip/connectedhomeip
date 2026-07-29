@@ -46,6 +46,11 @@
  *          across the 31000-byte capacity boundary. Sizes are fuzzed as integers, not
  *          as byte-string lengths, so the boundary stays reachable in libFuzzer-compat
  *          mode where the encoded input is bounded by -max_len.
+ *
+ *      Each property runs a full lifecycle on the entry it provisions: insert, update
+ *      in place, read back, enumerate, remove, and finally RemoveFabric, so the
+ *      deserialize and storage-deletion paths see whatever state the fuzzed write left
+ *      behind.
  */
 
 #include <cstddef>
@@ -57,7 +62,11 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteAttributePath.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
@@ -70,6 +79,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -160,12 +170,75 @@ CHIP_ERROR SetIntermediateCertificates(const std::vector<std::vector<uint8_t>> &
     return list.Decode(reader);
 }
 
+// CertificateTableImpl::RemoveFabric reaches the storage deletion paths only if
+// InteractionModelEngine has a DataModelProvider, and the single thing it asks of that
+// provider is the endpoint list. Everything else is stubbed out as not-implemented; a
+// real provider would drag the generated ember configuration into this harness.
+class SingleEndpointProvider : public app::DataModel::Provider
+{
+public:
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<app::DataModel::EndpointEntry> & builder) override
+    {
+        ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+        return builder.Append({ kEndpoint, kInvalidEndpointId, app::DataModel::EndpointCompositionPattern::kFullFamily });
+    }
+
+    CHIP_ERROR DeviceTypes(EndpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR ClientClusters(EndpointId, ReadOnlyBufferBuilder<ClusterId> &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ServerClusters(EndpointId, ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId, MutableCharSpan &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#endif
+    CHIP_ERROR EventInfo(const app::ConcreteEventPath &, app::DataModel::EventEntry &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR Attributes(const app::ConcreteClusterPath &, ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR GeneratedCommands(const app::ConcreteClusterPath &, ReadOnlyBufferBuilder<CommandId> &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR AcceptedCommands(const app::ConcreteClusterPath &,
+                                ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    app::DataModel::ActionReturnStatus ReadAttribute(const app::DataModel::ReadAttributeRequest &,
+                                                     app::AttributeValueEncoder &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    app::DataModel::ActionReturnStatus WriteAttribute(const app::DataModel::WriteAttributeRequest &,
+                                                      app::AttributeValueDecoder &) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void ListAttributeWriteNotification(const app::ConcreteAttributePath &, app::DataModel::ListWriteOperation,
+                                        FabricIndex) override
+    {}
+    std::optional<app::DataModel::ActionReturnStatus> InvokeCommand(const app::DataModel::InvokeRequest &, TLV::TLVReader &,
+                                                                    app::CommandHandler *) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
 // One-time, leaked, reused-across-inputs harness state (FuzzTest re-invokes the
 // property many times; the storage delegate is cleared per input in the property).
 struct Fixture
 {
     TestPersistentStorageDelegate storage;
     CertificateTableImpl table;
+    SingleEndpointProvider provider;
     std::vector<uint8_t> validCertSeed;
 };
 
@@ -180,6 +253,7 @@ Fixture & GetFixture()
         auto * fx = new Fixture();
         SuccessOrDie(fx->table.Init(fx->storage));
         SuccessOrDie(fx->table.SetEndpoint(kEndpoint));
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&fx->provider);
 
         Crypto::P256Keypair keypair;
         uint8_t certBuf[Credentials::kMaxDERCertLength];
@@ -194,8 +268,11 @@ Fixture & GetFixture()
         std::atexit([] {
             if (gFixture != nullptr)
             {
-                // Destroy the fixture (runs Finish + frees members) before shutting the
-                // allocator down, so no outstanding allocation trips leak detection.
+                // Drop the engine's pointer to the fixture-owned provider before the
+                // fixture goes away, then destroy the fixture (runs Finish + frees
+                // members) before shutting the allocator down, so no outstanding
+                // allocation trips leak detection.
+                app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
                 delete gFixture;
                 gFixture = nullptr;
             }
@@ -231,10 +308,18 @@ void RootUpsertDoesNotCrash(const std::vector<uint8_t> & certBytes)
         return;
     }
 
+    const TLSCAID cid = id.Value();
+
+    // Upsert the same id a second time. The first call takes the insert arm; this one
+    // takes the update arm, overwriting a buffer that already holds an entry.
+    Optional<TLSCAID> existingId;
+    existingId.SetValue(cid);
+    RETURN_SAFELY_IGNORED fx.table.UpsertRootCertificateEntry(kFabric, existingId, buffer,
+                                                              ByteSpan(certBytes.data(), certBytes.size()));
+
     // Lifecycle round-trip: read the provisioned cert back out (deserialize
     // path), enumerate, then remove. Exercises Get/Has/Count/Iterate/Remove, none of
     // which the write-only path reaches.
-    const TLSCAID cid = id.Value();
     CertificateTable::RootBuffer getBuf;
     CertificateTable::BufferedRootCert got(getBuf);
     RETURN_SAFELY_IGNORED fx.table.GetRootCertificateEntry(kFabric, cid, got);
@@ -253,6 +338,9 @@ void RootUpsertDoesNotCrash(const std::vector<uint8_t> & certBytes)
                                                                return CHIP_NO_ERROR;
                                                            });
     RETURN_SAFELY_IGNORED fx.table.RemoveRootCertificate(kFabric, cid);
+
+    // Fabric teardown: walks both tables plus the global certificate bookkeeping.
+    RETURN_SAFELY_IGNORED fx.table.RemoveFabric(kFabric);
 }
 
 std::vector<std::vector<uint8_t>> RootSeeds()
@@ -270,6 +358,21 @@ std::vector<std::vector<uint8_t>> RootSeeds()
 
 FUZZ_TEST(FuzzTLSCertificateManagementPW, RootUpsertDoesNotCrash)
     .WithDomains(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(4096).WithSeeds(&RootSeeds));
+
+// Re-run PrepareClientCertificate for an id that already exists. Unlike the
+// fresh-id call this loads the stored entry and deserializes the persisted keypair
+// instead of minting one, and returns without writing.
+void RePrepareClientCertificate(Fixture & fx, CertificateTable::ClientBuffer & buffer, TLSCCDID cid)
+{
+    Optional<TLSCCDID> existingId;
+    existingId.SetValue(cid);
+
+    uint8_t csrBuf[Crypto::kMIN_CSR_Buffer_Size];
+    uint8_t sigBuf[Crypto::kMax_ECDSA_Signature_Length];
+    MutableByteSpan csr(csrBuf);
+    MutableByteSpan sig(sigBuf);
+    RETURN_SAFELY_IGNORED fx.table.PrepareClientCertificate(kFabric, ByteSpan(kNonce), buffer, existingId, csr, sig);
+}
 
 // Walk the read-back client entry, including the intermediateCertificates list the
 // deserializer re-pointed into the persistence buffer.
@@ -301,6 +404,9 @@ void ReadBackClientEntry(Fixture & fx, TLSCCDID cid)
             return CHIP_NO_ERROR;
         });
     RETURN_SAFELY_IGNORED fx.table.RemoveClientCertificate(kFabric, cid);
+
+    // Fabric teardown: walks both tables plus the global certificate bookkeeping.
+    RETURN_SAFELY_IGNORED fx.table.RemoveFabric(kFabric);
 }
 
 // FUZZ_TEST 2: fuzzer-controlled client certificate bytes -> PrepareClientCertificate
@@ -325,6 +431,8 @@ void ClientUpdateDoesNotCrash(const std::vector<uint8_t> & certBytes)
     {
         return;
     }
+
+    RePrepareClientCertificate(fx, buffer, id.Value());
 
     ClientCertStruct entry;
     entry.ccdid = id.Value();
@@ -376,6 +484,8 @@ void ClientIntermediateCertsDoNotCrash(const std::vector<IntermediateSpec> & spe
     {
         return;
     }
+
+    RePrepareClientCertificate(fx, buffer, id.Value());
 
     CertificateTable::ClientBuffer keyBuf;
     CertificateTable::BufferedClientCert stored(keyBuf);
