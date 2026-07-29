@@ -76,7 +76,7 @@ class WrappedProcessPool(Generic[WrappedProcessT, ConfigT, WorkRequestT, WorkRes
         """
         exceptions: list[Exception] = []
         with ThreadPoolExecutor(max_workers=len(self._pool), thread_name_prefix=thread_name_prefix) as thread_pool:
-            for result in as_completed(thread_pool.submit(lambda process: fn(process), process) for process in self._pool):
+            for result in as_completed(thread_pool.submit(fn, process) for process in self._pool):
                 try:
                     result.result()
                 except Exception as e:
