@@ -1637,11 +1637,7 @@ CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Opt
 
 std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> CameraDevice::GetSupportedAmbientContexts()
 {
-    static std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> ambientContexts = {
-        { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
-          MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */ }
-    };
-    return ambientContexts;
+    return kSupportedAmbientContexts;
 }
 
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)

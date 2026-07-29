@@ -28,8 +28,12 @@
 
 #include "default-media-controller.h"
 #include <protocols/interaction_model/StatusCode.h>
+#include <lib/support/Span.h>
 
 #include <gst/gst.h>
+
+using namespace chip::literals;
+
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
@@ -67,7 +71,7 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
-static constexpr uint8_t kMaxAnalysisStreams         = 8;   // Spec is upper limit of uint8
+static constexpr uint8_t kMaxAnalysisStreams         = 8;   // Spec max is 255
 
 // StreamIDs typically start from 0 and monotonically increase. Setting
 // Invalid value to a large and practically unused value.
@@ -84,6 +88,37 @@ constexpr int16_t kMaxPanValue  = 90;
 constexpr int16_t kMinTiltValue = -90;
 constexpr int16_t kMaxTiltValue = 90;
 constexpr uint8_t kMaxZoomValue = 75;
+
+// Camera defined set of supported detectable ambient contexts; for the purposes of the app this is limited to package
+// detection
+static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
+        { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
+          chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */ }};
+
+/**
+ * Examples of other ambient contexts for illustrative purposes only
+ * Person
+    { .namespaceID = static_cast<uint8_t>(0x49),
+      .tag         = static_cast<uint8_t>(0x03),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Person"_span)) }
+ * Pet, Dog, Cat
+    {{ .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x05),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Pet"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x06),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Dog"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x07),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Cat"_span)) }}
+ * Package delivery and retrieval
+    {{ .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x08),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageDelivery"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x09),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageRetrieval"_span)) }}
+**/
 
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
