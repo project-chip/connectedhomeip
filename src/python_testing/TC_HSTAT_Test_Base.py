@@ -89,7 +89,7 @@ class HSTATBase:
         error = kwargs.pop("error", Status.Success)
         try:
             await self.send_single_cmd(cmd=self.SetSettings(**kwargs), endpoint=self.get_endpoint(), timedRequestTimeoutMs=1000)
-            asserts.assert_true(False, "Unexpected command success, command=%s", command)
+            asserts.assert_true(False, "Unexpected command success, for command SetSettings")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass

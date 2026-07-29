@@ -36,6 +36,7 @@
 
 import logging
 
+from mobly import asserts
 from TC_HSTAT_Test_Base import HSTATBase
 
 from matter.clusters.Types import NullValue
