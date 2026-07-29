@@ -17,17 +17,12 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("commissioning-proxy") {
-  # Transport-agnostic session/scan/message bookkeeping now lives in the
-  # commissioning-proxy-server cluster and its subsystems (pulled in via deps
-  # below), so the example only supplies the device wiring and the per-transport
-  # drivers.  CommissioningProxyCluster.cpp is normally compiled via
-  # chip_data_model() from app_config_dependent_sources.gni, but all-devices-app
-  # has no chip_data_model() rule so we compile it directly here.
-  # CodegenIntegration.cpp is intentionally excluded — it wires the Ember/codegen
-  # path which this app does not use.
+  # The cluster and its transport-agnostic session/scan/message bookkeeping come
+  # from the commissioning-proxy-server source_set in deps below, so the example
+  # only supplies the device wiring and the per-transport drivers.  This app has
+  # no chip_data_model() rule, so CodegenIntegration.cpp is never compiled — it
+  # wires the Ember/codegen path which this app does not use.
   sources = [
-    "${chip_root}/src/app/clusters/commissioning-proxy-server/CommissioningProxyCluster.cpp",
-    "${chip_root}/src/app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h",
     "CommissioningProxyDevice.cpp",
     "CommissioningProxyDevice.h",
   ]
