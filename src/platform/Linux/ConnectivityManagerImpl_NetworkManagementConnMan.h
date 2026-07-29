@@ -167,6 +167,7 @@ public:
 
     void StartNonConcurrentWiFiManagement() override final;
     void StartWiFiManagement() override final;
+    void StopWiFiManagement() override final;
 
     // Wi-Fi Station Control Plane Management
 
@@ -615,6 +616,7 @@ private:
     void ScrubWiFiClientConnectPassphraseLocked() noexcept;
     void ShutdownClientConnectSessionLocked(std::unique_lock<std::mutex> & inOutLock) noexcept;
     CHIP_ERROR StartNetworkManagementOnGLib() noexcept;
+    CHIP_ERROR StopNetworkManagementOnGLib(GDBusConnManClient & inOutClient) noexcept;
     CHIP_ERROR UpdateManagerPropertiesLocked(GVariant * inProperties) noexcept;
     CHIP_ERROR UpdateNetworkServiceConnectivityLocked() noexcept;
     CHIP_ERROR UpdateServicesLocked(GVariant * inServices) noexcept;
@@ -630,6 +632,7 @@ private:
     CHIP_ERROR ManagerRegisterAgentLocked(std::unique_lock<std::mutex> & inOutLock, const char * inPath) noexcept;
     CHIP_ERROR ManagerUnregisterAgent(const char * inPath) noexcept;
     CHIP_ERROR ManagerUnregisterAgentLocked(std::unique_lock<std::mutex> & inOutLock, const char * inPath) noexcept;
+    void ObjectsUnregisterPropertyChangedOnGLib(GHashTable * inProxies) noexcept;
     CHIP_ERROR ServiceConnectLocked(std::unique_lock<std::mutex> & inOutLock, ConnManService * inService) noexcept;
     CHIP_ERROR ServiceRemoveLocked(std::unique_lock<std::mutex> & inOutLock, ConnManService * inService) noexcept;
     void ServiceRegisterPropertyChangedOnGLib(ConnManService * inService) noexcept;
@@ -718,6 +721,14 @@ private:
 
     // clang-format off
     std::mutex                           mConnManMutex;
+
+    /**
+     *  Indicates whether a start has been requested and not yet
+     *  stopped. Distinct from IsWiFiManagementStarted(), which
+     *  reports whether the manager proxy is live; between the two, a
+     *  start is in flight.
+     */
+    bool                                 mConnManStarted;
     GDBusConnManClient                   mConnManClient CHIP_GUARDED_BY(mConnManMutex);
     GDBusConnManAgent                    mConnManAgentServer CHIP_GUARDED_BY(mConnManMutex);
     ConnectivityManagerImpl *            mConnectivityManagerImpl;

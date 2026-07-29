@@ -1656,6 +1656,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::Init(ConnectivityMa
         mNetworkServiceStates[i].mDescription = sNetworkServiceTypeDescriptors[i].mDescription;
     }
 
+    mConnManStarted = false;
     mWiFiActiveScanState.Reset();
     mWiFiClientConnectPassphrase.reset();
     mWiFiClusterConnectAssociationStarted = false;
@@ -1899,6 +1900,8 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiManagement()
 
     mConnManClient = GDBusConnManClient{};
 
+    mConnManStarted = true;
+
     // IMPORTANT: Do not synchronously wait on the GLib thread while
     //            holding mConnManMutex.
     //
@@ -1908,7 +1911,104 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiManagement()
 
     CHIP_ERROR err = UnlockAndInvokeOnGLibContextSync(lock, [this]() -> CHIP_ERROR { return StartNetworkManagementOnGLib(); });
 
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start Wi-Fi management"));
+    VerifyOrReturn(err == CHIP_NO_ERROR, mConnManStarted = false; ChipLogError(DeviceLayer, "Failed to start Wi-Fi management"));
+}
+
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::StopNetworkManagementOnGLib(GDBusConnManClient & inOutClient) noexcept
+{
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "Stop network management");
+
+    // Disconnect explicitly rather than relying on final unref: an
+    // in-flight asynchronous call may still hold a proxy reference,
+    // and the handler user data is 'this'.
+
+    ObjectsUnregisterPropertyChangedOnGLib(inOutClient.mServiceProxies.get());
+    ObjectsUnregisterPropertyChangedOnGLib(inOutClient.mTechnologyProxies.get());
+
+    if (inOutClient.mManagerProxy)
+    {
+        g_signal_handlers_disconnect_by_data(inOutClient.mManagerProxy.get(), this);
+    }
+
+    inOutClient = GDBusConnManClient{};
+
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl_NetworkManagementConnMan::StopWiFiManagement()
+{
+    std::unique_lock<std::mutex> lock(mConnManMutex);
+    GDBusConnManClient client;
+
+    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "Stop Wi-Fi management");
+
+    // 1. Retire everything connman can still call *into* us with: the
+    //    registered agent, the pending service against which agent
+    //    requests are path-matched, and the cached credential. May
+    //    temporarily drop the lock.
+
+    ShutdownClientConnectSessionLocked(lock);
+
+    // 2. Retire Matter-thread work we have armed.
+
+    DeviceLayer::SystemLayer().CancelTimer(HandleNetworkServiceConnectivityDebounce, this);
+
+    // 3. Note any outstanding cluster operation. Stop is a terminator
+    //    for the Matter connect/scan scope, and that scope's
+    //    exactly-once completion guarantee is ours to honor; the
+    //    completions are dispatched in step 6, once this object is
+    //    fully stopped, because the dispatch fallback path completes
+    //    synchronously off the lock and may re-enter.
+
+    const bool connectPending = mWiFiClusterConnectPending;
+    const bool scanActive     = mWiFiActiveScanState.IsActive();
+
+    // 4. Quiesce session state so that any completion that wins a
+    //    race with this teardown finds nothing to do.
+
+    mWiFiActiveScanState.Reset();
+    mWiFiClusterConnectScanState.Reset();
+    mWiFiClusterConnectAssociationStarted = false;
+    mWiFiClusterConnectPending            = false;
+    mWiFiClusterConnectServiceError.reset();
+    mWiFiStationConnected = false;
+
+    // 5. Detach the D-Bus client state under the lock, so that
+    //    IsWiFiManagementStarted() is false the instant the lock is
+    //    released, independent of when the GLib-side destruction
+    //    runs. Clearing the started flag additionally disarms any
+    //    manager-proxy creation still in flight, which would
+    //    otherwise install itself in #OnManagerReady and silently
+    //    restart management behind this stop.
+
+    client         = std::move(mConnManClient);
+    mConnManClient = GDBusConnManClient{};
+
+    mConnManStarted = false;
+
+    // 6. Destroy the detached state on the GLib thread, where the
+    //    proxies were created and their signals are dispatched.
+
+    if (client.mManagerProxy)
+    {
+        LogErrorOnFailure(
+            UnlockAndInvokeOnGLibContextSync(lock, [&]() -> CHIP_ERROR { return StopNetworkManagementOnGLib(client); }));
+    }
+
+    // 7. Complete any operation noted in step 3, now that a
+    //    re-entrant completion can only observe a stopped object.
+
+    if (connectPending)
+    {
+        LogErrorOnFailure(DispatchWiFiConnectFinishedLocked(lock, Status::kUnknownError, CharSpan(), 0));
+    }
+
+    if (scanActive)
+    {
+        LogErrorOnFailure(DispatchWiFiScanFinishedLocked(lock, Status::kUnknownError, CharSpan(), nullptr));
+    }
 }
 
 // Introspection
@@ -4679,7 +4779,10 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ScrubWiFiClientConnectPas
  *  connman may still reach into while a connect request is
  *  outstanding: the registered agent, the pending service proxy
  *  against which agent requests are path-matched, and the cached
- *  credential from which `Agent.RequestInput` is answered.
+ *  credential from which `Agent.RequestInput` is answered. It
+ *  additionally retires an agent that was exported but never
+ *  registered, which connman cannot reach but which would otherwise
+ *  outlive the session.
  *
  *  @note
  *    Which to call: *"can connman still call my agent?"* -- if it can,
@@ -4692,10 +4795,18 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ScrubWiFiClientConnectPas
  *    point until it does.
  *
  *  @note
+ *    The reachability test admits one exception: an agent exported
+ *    without a completed registration is unreachable by connman, yet
+ *    is still retired here, because #ManagerRegisterAgentLocked
+ *    refuses the next export with #CHIP_ERROR_ALREADY_INITIALIZED
+ *    until it is.
+ *
+ *  @note
  *    The `Locked` suffix denotes the precondition that the caller
  *    holds `mConnManMutex`; this is verified by assertion. The lock
- *    may be temporarily released by the agent unregistration, which is
- *    why this takes the lock and #ConcludeWiFiClusterConnectLocked does not.
+ *    may be temporarily released by the agent unregistration, which
+ *    is why this takes the lock and #ConcludeWiFiClusterConnectLocked
+ *    does not.
  *
  *  @param[in,out]  inOutLock
  *    A reference to the mutable, held class lock.
@@ -4713,7 +4824,19 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownClientConnectSess
 
     if (mConnManAgentServer.mRegistered)
     {
+        // Unregistration retires the export as part of its own
+        // teardown; see ManagerUnregisterAgentLocked.
+
         LogErrorOnFailure(ManagerUnregisterAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANAGER_CONNMAN_AGENT_PATH));
+    }
+    else if (mConnManAgentServer.mExported)
+    {
+        // Exported without registration: connman cannot reach the
+        // skeleton, but ManagerRegisterAgentLocked refuses the next
+        // connect with CHIP_ERROR_ALREADY_INITIALIZED until the
+        // export is retired.
+
+        ShutdownAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANAGER_CONNMAN_AGENT_PATH);
     }
 
     mConnManAgentServer.mPendingService.reset();
@@ -4999,6 +5122,61 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerUnregisterAg
     return retval;
 }
 
+/**
+ *  @brief
+ *    Disconnect the property-changed handlers this object installed
+ *    on every proxy in a connman object proxy table.
+ *
+ *  The peer of `ServiceRegisterPropertyChangedOnGLib` and
+ *  `TechnologyRegisterPropertyChangedOnGLib`. Handlers are matched by
+ *  closure data rather than by retained handler identifier: `this` is
+ *  unique to the object, the tables map path to proxy with no room
+ *  for a parallel identifier without an owning value struct, and
+ *  `G_SIGNAL_MATCH_DATA` is type-agnostic across the service and
+ *  technology proxy types. Proxy-internal handlers are not registered
+ *  with `this` and are therefore untouched.
+ *
+ *  @note
+ *    Disconnection is explicit rather than implicit in the final
+ *    unref because an in-flight asynchronous call may still hold a
+ *    proxy reference past the teardown.
+ *
+ *  @note
+ *    The `OnGLib` suffix denotes the precondition that this runs on
+ *    the GLib thread and holds no class lock; the former is verified
+ *    by assertion.
+ *
+ *  @param[in]  inProxies
+ *    A pointer to the mutable connman object proxy table to sweep.
+ *
+ *  @sa ServiceRegisterPropertyChangedOnGLib
+ *  @sa TechnologyRegisterPropertyChangedOnGLib
+ *
+ *  @private
+ *
+ */
+void ConnectivityManagerImpl_NetworkManagementConnMan::ObjectsUnregisterPropertyChangedOnGLib(GHashTable * inProxies) noexcept
+{
+    GHashTableIter iter;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
+
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    VerifyOrReturn(inProxies != nullptr);
+
+    g_hash_table_iter_init(&iter, inProxies);
+
+    while (g_hash_table_iter_next(&iter, &key, &value))
+    {
+        (void) key;
+
+        VerifyOrReturn(value != nullptr);
+
+        g_signal_handlers_disconnect_by_data(G_OBJECT(value), this);
+    }
+}
+
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ServiceConnectLocked(std::unique_lock<std::mutex> & inOutLock,
                                                                                   ConnManService * inService) noexcept
 {
@@ -5229,7 +5407,6 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ReportNetworkServiceConne
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * inObject, GAsyncResult * inResult)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager * manager;
     GAutoPtr<GError> err;
 
     ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to manager");
@@ -5243,13 +5420,23 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * 
 
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    manager = conn_man_manager_proxy_new_for_bus_finish(inResult, &err.GetReceiver());
+    // Adopt the result immediately: every path below this point,
+    // including the early return, must dispose of it.
+
+    GAutoPtr<ConnManManager> manager(conn_man_manager_proxy_new_for_bus_finish(inResult, &err.GetReceiver()));
+
+    // A stop may have run while this call was in flight. Installing
+    // the proxy now would reconnect the manager signal handlers and
+    // silently restart management with no start outstanding.
+
+    VerifyOrReturn(mConnManStarted,
+                   ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "manager ready after stop; discarding"));
 
     if (manager && err.get() == nullptr)
     {
         ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connected to manager");
 
-        mConnManClient.mManagerProxy.reset(manager);
+        mConnManClient.mManagerProxy.reset(manager.release());
 
         // Establish manager signal handlers.
 
