@@ -757,14 +757,29 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if "nfc" in (args.commissioning_method or []):
 
         if "NFC_Reader_index" not in config.global_test_params:
-            LOGGER.error("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for "
-                         "NFC commissioning tests")
-            sys.exit(1)
+            LOGGER.warning("WARNING: NFC_Reader_index not found in global_test_params; "
+                           "defaulting to 0.")
+            config.global_test_params["NFC_Reader_index"] = 0
 
-        if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
-            LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
+        if args.passcodes:
+            LOGGER.warning("WARNING: Provided passcode is ignored for NFC commissioning. "
                          "The onboarding data is read directly from the NFC tag.")
-            sys.exit(1)
+            args.passcodes.clear()
+
+        if args.discriminators:
+            LOGGER.warning("WARNING: Provided discriminator is ignored for NFC commissioning. "
+                         "The onboarding data is read directly from the NFC tag.")
+            args.discriminators.clear()
+
+        if args.manual_code:
+            LOGGER.warning("WARNING: Provided manual code is ignored for NFC commissioning. "
+                         "The onboarding data is read directly from the NFC tag.")
+            args.manual_code.clear()
+
+        if args.qr_code:
+            LOGGER.warning("WARNING: Provided qr-code is ignored for NFC commissioning. "
+                         "The onboarding data is read directly from the NFC tag.")
+            args.qr_code.clear()
 
         from matter.testing.nfc import NFCReader
         nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
