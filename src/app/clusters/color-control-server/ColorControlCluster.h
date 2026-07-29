@@ -30,6 +30,7 @@
 #include <clusters/ColorControl/Commands.h>
 #include <clusters/ColorControl/Enums.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h> // CharSpan for CompensationText (app-owned storage)
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <variant>
@@ -99,12 +100,12 @@ struct ChromaticityPoint
     DataModel::Nullable<uint8_t> intensity{};
 };
 
-// ---- StaticConfig (§3.2.7 Fixed descriptors: primaries / white point / color points) ----
-// Every field here is a Fixed (F) + read-only attribute, and each is OPTIONAL (conformance O; primaries
-// additionally gated on NumberOfPrimaries). Presence is modelled with std::optional so the application
-// advertises exactly the descriptors it has — an absent optional → UnsupportedAttribute on read. These
-// are device constants owned by the app and handed in by const pointer (Config::sc); never in mState,
-// never persisted, never reported.
+// ---- StaticConfig (app-owned, read-only values the cluster serves but never mutates) ----
+// Contains the Fixed (F) descriptors of §3.2.7 (primaries) plus the two read-only OPTIONAL
+// drift-compensation reports (§3.2.6.4 / §3.2.7.8) and the  white points / color points . Every field is OPTIONAL (conformance O;
+// primaries additionally gated on NumberOfPrimaries). Presence is modelled with std::optional so the application advertises exactly
+// what it has — an absent optional → UnsupportedAttribute on read. These are device constants owned by the app and handed in by
+// const pointer (Config::sc); never in mState, never persisted, never mutated by the cluster.
 struct StaticConfig
 {
     std::optional<ChromaticityPoint> primaries[6]; // Primary1..6; present ones up to NumberOfPrimaries
@@ -113,6 +114,14 @@ struct StaticConfig
     std::optional<ChromaticityPoint> colorPointR;
     std::optional<ChromaticityPoint> colorPointG;
     std::optional<ChromaticityPoint> colorPointB;
+
+    // DriftCompensation / CompensationText: read-only *reports* of the color/intensity-drift compensation
+    // mechanism the device uses.  An app that performs
+    // e.g. optical-color feedback sets driftCompensation to that value so the report is truthful; leaving
+    // it absent only omits the report, it never disables the underlying mechanism.
+    // Note: Leagcy cluster doesn't support these
+    std::optional<ColorControl::DriftCompensationEnum> driftCompensation;
+    std::optional<CharSpan> compensationText; // references app-owned storage (outlives the cluster)
 };
 
 // ---- State (always present) ----

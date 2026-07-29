@@ -39,7 +39,7 @@ using chip::System::SystemClock; // bare SystemClock() used throughout for the w
 
 namespace {
 static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
-static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
+static constexpr uint16_t MAX_CIE_XY_VALUE = 65279; // this value comes directly from the ZCL specification table 5.3
 
 static constexpr uint8_t MIN_SATURATION_VALUE = 0;
 static constexpr uint8_t MAX_SATURATION_VALUE = 254;
@@ -1720,9 +1720,15 @@ CHIP_ERROR ColorControlCluster::Attributes(const ConcreteClusterPath & path,
     const bool cpr          = sc && sc->colorPointR.has_value();
     const bool cpg          = sc && sc->colorPointG.has_value();
     const bool cpb          = sc && sc->colorPointB.has_value();
+    // Drift-compensation reports (§3.2.6.4 / §3.2.7.8): advertised only when the app opts in by supplying them.
+    const bool drift = sc && sc->driftCompensation.has_value();
+    const bool comp  = sc && sc->compensationText.has_value();
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { true, ColorControl::Attributes::RemainingTime::kMetadataEntry }, // optional, but we run transitions
+
+        { drift, ColorControl::Attributes::DriftCompensation::kMetadataEntry },
+        { comp, ColorControl::Attributes::CompensationText::kMetadataEntry },
 
         { hs, ColorControl::Attributes::CurrentHue::kMetadataEntry },
         { hs, ColorControl::Attributes::CurrentSaturation::kMetadataEntry },
@@ -2167,6 +2173,15 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     case Attributes::EnhancedColorMode::Id:
         // Derived from the active variant; GetEnhancedColorMode() is the single source of that mapping.
         return encoder.Encode(GetEnhancedColorMode());
+
+    // ---- Drift-compensation reports (§3.2.6.4 / §3.2.7.8): app-owned, read-only. Absent → not reported
+    // (UnsupportedAttribute), which is NOT DriftCompensationEnum::kNone (a positive "no compensation").
+    case DriftCompensation::Id:
+        VerifyOrReturnValue(mStaticConfig && mStaticConfig->driftCompensation.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(mStaticConfig->driftCompensation.value());
+    case CompensationText::Id:
+        VerifyOrReturnValue(mStaticConfig && mStaticConfig->compensationText.has_value(), Status::UnsupportedAttribute);
+        return encoder.Encode(mStaticConfig->compensationText.value());
 
     // ---- plain stored state ----
     case RemainingTime::Id:
