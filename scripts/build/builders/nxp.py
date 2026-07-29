@@ -408,7 +408,15 @@ class NxpBuilder(GnBuilder):
 
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
-            cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
+            # Force the Zephyr SDK toolchain instead of leaving the variant
+            # unset. On Zephyr 4.3 the vendored FindZephyr-sdk.cmake uses
+            # 'if("zephyr" STREQUAL ${ZEPHYR_TOOLCHAIN_VARIANT})', which parses
+            # to '("zephyr" STREQUAL )' and fails with "Unknown arguments
+            # specified" when the variable expands to empty (Zephyr 4.4
+            # switched to MATCHES and is not affected). Setting it explicitly
+            # selects the same auto-detected variant without tripping the
+            # if() parser.
+            cmd += '\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr'
         else:
             if self.build_system is NxpBuildSystem.CMAKE and self.app.name != "UNIT_TEST":
                 build_flags += " " + "-DCONF_FILE_NAME=%s" % self.get_conf_file()
