@@ -37,12 +37,13 @@
 import logging
 
 from mobly import asserts
-from TC_HSTAT_Test_Base import HSTATBase
 
+from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from TC_HSTAT_Test_Base import HSTATBase
 
 log = logging.getLogger(__name__)
 
@@ -102,6 +103,24 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
     @property
     def default_endpoint(self) -> int:
         return 1
+
+    async def disallow_continuous_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000000)
+
+    async def allow_continuous_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000001)
+
+    async def disallow_sleep_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000002)
+
+    async def allow_sleep_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000003)
+
+    async def disallow_optimal_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000004)
+
+    async def allow_optimal_event(self):
+        await self.send_test_event_triggers(eventTrigger=0x0205000000000005)
 
     @async_test_body
     async def test_TC_HSTAT_2_4(self):
@@ -224,56 +243,65 @@ class TC_HSTAT_2_4(MatterBaseTest, HSTATBase):
             asserts.assert_equal(optimalReportsReceived[0], True, "First report for Sleep is not Optimal")
             asserts.assert_equal(optimalReportsReceived[1], False, "Second report for Sleep is not Optimal")
         else:
-            self.mark_step_range_skipped(11, 12)
+            self.mark_step_range_skipped(11, 13)
 
         #
         # Need to fix the remaining test cases. They should only be run if the appropriate trigger PICS are indicated.
         #
 
-        if self.attributes.Continuous.attribute_id not in self.supported_attributes:
-            self.mark_step_range_skipped(14, 16)
-        else:
+        if (self.attributes.Continuous.attribute_id in self.supported_attributes) and (self.check_pics("HSTAT.S.M.ContinuousError")):
             self.step(14)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowContinuous event.
             # Verify DUT responds w/ status SUCCESS(0x00).
+            await self.disallow_continuous_event()
 
             self.step(15)
             # TH sends command SetSettings with the Continuous field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, continuous=True, error=Status.INVALID_IN_STATE)
 
             self.step(16)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowContinuous event.
             # Verify DUT responds w/ status SUCCESS(0x00).
-
-        if self.attributes.Sleep.attribute_id not in self.supported_attributes:
-            self.mark_step_range_skipped(17, 19)
+            await self.allow_continuous_event()
         else:
+            self.mark_step_range_skipped(14, 16)
+
+        if (self.attributes.Sleep.attribute_id in self.supported_attributes) and (self.check_pics("HSTAT.S.M.SleepError")):
             self.step(17)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowSleep event.
             # Verify DUT responds w/ status SUCCESS(0x00).
+            await self.disallow_sleep_event()
 
             self.step(18)
             # TH sends command SetSettings with the Sleep field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, sleep=True, error=Status.INVALID_IN_STATE)
 
             self.step(19)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowSleep event.
             # Verify DUT responds w/ status SUCCESS(0x00).
-
-        if self.attributes.Optimal.attribute_id not in self.supported_attributes:
-            self.mark_step_range_skipped(20, 22)
+            await self.allow_sleep_event()
         else:
+            self.mark_step_range_skipped(17, 19)
+
+        if (self.attributes.Optimal.attribute_id in self.supported_attributes) and (self.check_pics("HSTAT.S.M.OptimalError")):
             self.step(20)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowOptimal event.
             # Verify DUT responds w/ status SUCCESS(0x00).
+            await self.disallow_optimal_event()
 
             self.step(21)
             # TH sends command SetSettings with the Optimal field set to True
             # Verify DUT responds w/ status INVALID_IN_STATE(0xcb)
+            await self.send_SetSettingsCommand_expect_error(endpoint=endpoint, optimal=True, error=Status.INVALID_IN_STATE)
 
             self.step(22)
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowOptimal event.
             # Verify DUT responds w/ status SUCCESS(0x00).
+            await self.allow_optimal_event()
+        else:
+            self.mark_step_range_skipped(20, 22)
 
 
 if __name__ == '__main__':
