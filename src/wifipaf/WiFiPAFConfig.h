@@ -147,6 +147,11 @@ static_assert(
 /*
  * Ref: [4.748] Supported Maximum Service Specific Info Length
  */
+#ifdef __ZEPHYR__
+// Zephyr WiFi NAN driver limitation
+#define CHIP_PAF_DEFAULT_MTU 128
+#else
 #define CHIP_PAF_DEFAULT_MTU 350
+#endif // __ZEPHYR__
 
 #include <lib/core/CHIPConfig.h>

@@ -688,6 +688,13 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 		within a range of +/- the value of this option.
 
+config CHIP_WIFI_PAF
+	bool "Enable Wi-Fi with PAFTP support"
+	depends on CHIP_WIFI
+	help
+	  Enable PAFTP (Public Action Frame Transport Protocol) support for Matter-over-Wi-Fi devices.
+	  This allows the device to use Wi-Fi Aware (NAN) for commissioning and service discovery.
+
 # Platform additions and configuration
 
 config CHIP_SYSTEM_THREAD_LOCAL_STORAGE

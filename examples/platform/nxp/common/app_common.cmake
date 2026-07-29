@@ -32,6 +32,7 @@ set(CHIP_ENABLE_ZCL_ARG ON)
 
 if (CONFIG_CHIP_APP_COMMON)
     target_sources(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_delegate/source/CommonAppDelegate.cpp    
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskBase.cpp
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/source/CommonDeviceCallbacks.cpp
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/source/CHIPDeviceManager.cpp
@@ -39,6 +40,7 @@ if (CONFIG_CHIP_APP_COMMON)
     )
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_config
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_delegate/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/include

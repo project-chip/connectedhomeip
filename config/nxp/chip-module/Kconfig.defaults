@@ -48,6 +48,7 @@ config CHIP_TASK_PRIORITY
 
 config CHIP_TASK_STACK_SIZE
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
+	default 9216 if CHIP_WIFI_PAF
 	default 10240
 
 config MAX_EVENT_QUEUE_SIZE
@@ -189,6 +190,7 @@ config INIT_STACKS
 	default y
 
 config NET_MGMT_EVENT_STACK_SIZE
+	default 2048 if CHIP_WIFI_PAF
 	default 1024
 
 config NET_MGMT_EVENT_QUEUE_SIZE

@@ -22,6 +22,7 @@
 #include "AppFactoryData.h"
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
+#include "CommonAppDelegate.h"
 
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
@@ -214,6 +215,8 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
 #endif
+
+    initParams.appDelegate = &chip::NXP::App::GetAppDelegate();
 
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();

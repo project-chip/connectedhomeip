@@ -60,6 +60,7 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_delegate/include
 )
 
 target_sources(app
@@ -69,6 +70,7 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/source/CHIPDeviceManager.cpp
     ${THERMOSTAT_NXP_COMMON_DIR}/main/DeviceCallbacks.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/source/CommonDeviceCallbacks.cpp
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_delegate/source/CommonAppDelegate.cpp
     ${THERMOSTAT_NXP_COMMON_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/source/AppTaskBase.cpp
