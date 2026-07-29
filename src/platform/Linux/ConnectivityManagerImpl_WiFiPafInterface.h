@@ -178,6 +178,31 @@ public:
 
     /**
      *  @brief
+     *    Set the Wi-Fi NAN USD PAF Commissioning Transport
+     *    advertising parameters.
+     *
+     *  @note
+     *    Only the advertising frequency list is retained, and it is
+     *    deep copied. The caller retains ownership of
+     *    `inWiFiPAFAdvertiseParams` and of any storage associated with
+     *    it. Any previously-set parameters are replaced.
+     *
+     *  @note
+     *    The parameters are latched for use by a subsequent call to
+     *    `WiFiPafSetAdvertisingEnabled` and have no effect on a
+     *    publish that is already active.
+     *
+     *  @param[in]  inWiFiPAFAdvertiseParams
+     *    A reference to the immutable Wi-Fi NAN USD PAF Commissioning
+     *    Transport advertising parameters to set.
+     *
+     *  @sa WiFiPafSetAdvertisingEnabled
+     *
+     */
+    virtual void WiFiPafSetParam(const ConnectivityManager::WiFiPAFAdvertiseParam & inWiFiPafAdvertiseParams) = 0;
+
+    /**
+     *  @brief
      *    Set the Wi-Fi NAN USD PAF Commissioning Transport resource
      *    availability.
      *
