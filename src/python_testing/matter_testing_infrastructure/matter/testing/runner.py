@@ -763,22 +763,22 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         if args.passcodes:
             LOGGER.warning("WARNING: Provided passcode is ignored for NFC commissioning. "
-                         "The onboarding data is read directly from the NFC tag.")
+                           "The onboarding data is read directly from the NFC tag.")
             args.passcodes.clear()
 
         if args.discriminators:
             LOGGER.warning("WARNING: Provided discriminator is ignored for NFC commissioning. "
-                         "The onboarding data is read directly from the NFC tag.")
+                           "The onboarding data is read directly from the NFC tag.")
             args.discriminators.clear()
 
         if args.manual_code:
             LOGGER.warning("WARNING: Provided manual code is ignored for NFC commissioning. "
-                         "The onboarding data is read directly from the NFC tag.")
+                           "The onboarding data is read directly from the NFC tag.")
             args.manual_code.clear()
 
         if args.qr_code:
             LOGGER.warning("WARNING: Provided qr-code is ignored for NFC commissioning. "
-                         "The onboarding data is read directly from the NFC tag.")
+                           "The onboarding data is read directly from the NFC tag.")
             args.qr_code.clear()
 
         from matter.testing.nfc import NFCReader
