@@ -27,8 +27,8 @@
 #include "zone-manager.h"
 
 #include "default-media-controller.h"
-#include <protocols/interaction_model/StatusCode.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
 
@@ -92,8 +92,9 @@ constexpr uint8_t kMaxZoomValue = 75;
 // Camera defined set of supported detectable ambient contexts; for the purposes of the app this is limited to package
 // detection
 static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
-        { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
-          chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */ }};
+    { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Package"_span)) /* Identified Object:Package */ }
+};
 
 /**
  * Examples of other ambient contexts for illustrative purposes only
