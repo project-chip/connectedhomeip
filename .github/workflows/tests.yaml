@@ -703,8 +703,6 @@ jobs:
                      --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
                      --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                      --summary-file test-summaries/chip-tool-python.json \
-                     --concurrency-scheduler reproducible \
-                     --clear-worker-state \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -727,8 +725,6 @@ jobs:
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --summary-file test-summaries/purposeful-failures.json \
-                     --concurrency-scheduler reproducible \
-                     --clear-worker-state \
                   "
 
             - name: Print test run summaries
