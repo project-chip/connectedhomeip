@@ -91,11 +91,12 @@ constexpr uint8_t kMaxZoomValue = 75;
 // detection
 static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
     { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
-      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package")))}
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package"))) }
 };
 
 /**
- * Examples of other ambient contexts for illustrative purposes only, note that _span requires that you are within the chip namespace
+ * Examples of other ambient contexts for illustrative purposes only, note that _span requires that you are within the chip
+namespace
  * Person
     { .namespaceID = static_cast<uint8_t>(0x49),
       .tag         = static_cast<uint8_t>(0x03),
