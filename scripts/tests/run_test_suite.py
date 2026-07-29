@@ -542,6 +542,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         value_wait_extra_duration_ms, concurrency, concurrency_scheduler)
     worker_config = WorkerConfig.from_test_job_config(context.obj.log_config, test_config, tmp_dir_clear=clear_worker_state)
 
+    # Workers need their own network and mount namespaces. An unprivileged user can only create them from within a user namespace,
+    # hence --map-root-user. As root we must not ask for one: --map-root-user maps uid 0 only, so every other uid (e.g. the owner of
+    # a CI workspace) becomes unmapped (nobody) inside the worker, and CAP_DAC_OVERRIDE does not apply to unmapped owners. Files
+    # written relative to the working directory (like the OpenThread simulation thread.log and tmp/*.flash) then fail with EACCES.
+    wrapper_linux = "unshare -n -m" if os.getuid() == 0 else "unshare --map-root-user -n -m"
+
     try:
         with (SyncManager(address=SYNC_MANAGER_PATH) as mp_manager,
 
@@ -554,7 +560,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
               ResultProcessingThread(run_summary, expected_failures, keep_going, result_queue) as result_thread,
 
               # Worker context.
-              mp_wrapped_spawn_context(wrapper_linux="unshare --map-root-user -n -m") as mp_ctx,
+              mp_wrapped_spawn_context(wrapper_linux=wrapper_linux) as mp_ctx,
               worker_pool_class(concurrency_scheduler)(mp_ctx, mp_manager, result_thread, worker_config) as pool):
 
             # Status thread is a daemon thread which will close once log_msg_counter is closed.
