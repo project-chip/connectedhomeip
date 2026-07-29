@@ -45,6 +45,9 @@ DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
 
 ELIGIBILITY_COMMENT_MARKER = "<!-- pr-checker-bot-eligibility-marker -->"
 
+MERGEABLE_RETRY_LIMIT = 3
+MERGEABLE_BACKOFF_FACTOR = 5
+
 # Timeout after which uncompleted check suites from known non-critical external apps
 # on Dependabot PRs are considered stale/indefinitely queued.
 DEPENDABOT_STALE_SUITE_TIMEOUT = timedelta(hours=6)
@@ -470,15 +473,16 @@ class PRContext:
             return None
 
         # Retry logic if mergeability is still computing on GitHub
-        for attempt in range(1, 4):
-            sleep_time = 5 * attempt
+        for attempt in range(1, MERGEABLE_RETRY_LIMIT + 1):
+            sleep_time = MERGEABLE_BACKOFF_FACTOR * attempt
             log.info(
-                "PR #%d mergeability state is computing. Retrying in %d seconds... (Attempt %d/3)",
+                "PR #%d mergeability state is computing. Retrying in %d seconds... (Attempt %d/%d)",
                 self.pr.number,
                 sleep_time,
                 attempt,
+                MERGEABLE_RETRY_LIMIT,
             )
-            time.sleep(sleep_time)  # Increasing backoff: 5s, 10s, 15s
+            time.sleep(sleep_time)  # Increasing backoff
             try:
                 self.pr = self.repo.get_pull(self.pr.number)
             except Exception as e:

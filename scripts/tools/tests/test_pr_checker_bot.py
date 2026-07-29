@@ -30,7 +30,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, UnresolvedThread, ValidationCheck  # noqa: E402
+from pr_checker_bot import (  # noqa: E402
+    ELIGIBILITY_COMMENT_MARKER,
+    MERGEABLE_BACKOFF_FACTOR,
+    MERGEABLE_RETRY_LIMIT,
+    PRContext,
+    PrCheckerBot,
+    UnresolvedThread,
+    ValidationCheck,
+)
 
 
 class TestPrCheckerBot(unittest.TestCase):
@@ -1270,7 +1278,7 @@ esp32:
 
         self.assertTrue(context.mergeable)
         self.mock_repo.get_pull.assert_called_once_with(1)
-        mock_sleep.assert_called_once_with(5)
+        mock_sleep.assert_called_once_with(MERGEABLE_BACKOFF_FACTOR)
 
     @patch("time.sleep", return_value=None)
     def test_mergeable_retry_failure(self, mock_sleep: MagicMock) -> None:
@@ -1294,9 +1302,10 @@ esp32:
         from unittest.mock import call
 
         self.assertIsNone(context.mergeable)
-        self.assertEqual(mock_sleep.call_count, 3)
-        mock_sleep.assert_has_calls([call(5), call(10), call(15)])
-        self.assertEqual(self.mock_repo.get_pull.call_count, 3)
+        self.assertEqual(mock_sleep.call_count, MERGEABLE_RETRY_LIMIT)
+        expected_calls = [call(MERGEABLE_BACKOFF_FACTOR * i) for i in range(1, MERGEABLE_RETRY_LIMIT + 1)]
+        mock_sleep.assert_has_calls(expected_calls)
+        self.assertEqual(self.mock_repo.get_pull.call_count, MERGEABLE_RETRY_LIMIT)
 
     @patch("time.sleep", return_value=None)
     def test_mergeable_no_retry_if_closed(self, mock_sleep: MagicMock) -> None:
