@@ -1,18 +1,18 @@
 /*
- *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
+ *	Copyright (c) 2026 Project CHIP Authors
+ *	All rights reserved.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *	Licensed under the Apache License, Version 2.0 (the "License");
+ *	you may not use this file except in compliance with the License.
+ *	You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *		http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *	Unless required by applicable law or agreed to in writing, software
+ *	distributed under the License is distributed on an "AS IS" BASIS
+ *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *	See the License for the specific language governing permissions and
+ *	limitations under the License.
  */
 
 /*
@@ -23,20 +23,20 @@
 /delete-node/ &storage_partition;
 
 &flash0 {
-    partitions {
-        slot0_partition: partition@c000 {
-            label = "image-0";
-            reg = <0x0000c000 DT_SIZE_K(1552)>;
-        };
+	partitions {
+		slot0_partition: partition@c000 {
+			reg = <0x0000c000 DT_SIZE_K(1552)>;
+			label = "image-0";
+		};
 
-        slot1_partition: partition@190000 {
-            label = "image-1";
-            reg = <0x00190000 DT_SIZE_K(1552)>;
-        };
+		slot1_partition: partition@190000 {
+			reg = <0x00190000 DT_SIZE_K(1552)>;
+			label = "image-1";
+		};
 
-        storage_partition: partition@314000 {
-            label = "storage";
-            reg = <0x00314000 DT_SIZE_K(48)>;
-        };
-    };
+		storage_partition: partition@314000 {
+			reg = <0x00314000 DT_SIZE_K(48)>;
+			label = "storage";
+		};
+	};
 };
