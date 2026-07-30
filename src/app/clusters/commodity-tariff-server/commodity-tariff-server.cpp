@@ -523,9 +523,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
 
-    // Use a fixed-size array with maximum expected components
-    constexpr size_t MAX_COMPONENTS = 16; // Adjust this based on your maximum expected components
-    std::array<Structs::TariffComponentStruct::Type, MAX_COMPONENTS> tempArray;
+    // A tariff period references at most kTariffPeriodItemMaxIDs tariff components, enforced when the
+    // TariffPeriods attribute is validated, so size the working array to that same bound.
+    std::array<Structs::TariffComponentStruct::Type, CommodityTariffConsts::kTariffPeriodItemMaxIDs> tempArray;
     size_t componentCount = 0;
 
     if (period == nullptr)
