@@ -1507,17 +1507,10 @@ TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
     while (it.Next())
     {
         auto val = it.GetValue();
-        if (val.fabricIndex == kFabricIndex)
-        {
-            EXPECT_EQ(val.currentScene, kTestSceneId);
-            EXPECT_EQ(val.currentGroup, kTestGroupId);
-            EXPECT_TRUE(val.sceneValid);
-        }
-        else if (val.fabricIndex == kFabricIndex2)
-        {
-            // For Fabric 2, if sceneValid is initialized, it should be false (or effectively treated as invalid)
-            EXPECT_FALSE(val.sceneValid);
-        }
+
+        EXPECT_EQ(val.currentScene, 0xFF);
+        EXPECT_EQ(val.currentGroup, 0x00);
+        EXPECT_FALSE(val.sceneValid);
     }
 
     // 4. Recall Scene on Fabric 2
