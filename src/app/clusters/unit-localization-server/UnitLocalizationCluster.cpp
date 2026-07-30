@@ -117,8 +117,8 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
     VerifyOrReturnError(SetAttributeValue(mTemperatureUnit, newTempUnit, TemperatureUnit::Id), CHIP_NO_ERROR);
 
     AttributePersistence attrPersistence{ mContext->attributeStorage };
-    return attrPersistence.StoreNativeEndianValue(
-        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), mTemperatureUnit);
+    return attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id),
+                                                  mTemperatureUnit);
 }
 
 CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,
