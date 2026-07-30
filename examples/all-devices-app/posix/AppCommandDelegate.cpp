@@ -707,7 +707,8 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+        LogErrorOnFailure(
+            cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
     }
 };
 
