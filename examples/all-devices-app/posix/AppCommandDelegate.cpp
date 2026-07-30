@@ -575,7 +575,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCharging));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
     }
 };
 
@@ -625,7 +625,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCharging));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
     }
 };
 
@@ -650,7 +650,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kDocked));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
     }
 };
 
@@ -669,7 +669,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
     }
 };
 
@@ -688,7 +688,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
     }
 };
 
@@ -707,7 +707,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
     }
 };
 
@@ -726,7 +726,7 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
+        LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
     }
 };
 
