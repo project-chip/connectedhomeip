@@ -64,6 +64,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/event_attribute_reporting.py",
     "matter/testing/global_attribute_ids.py",
     "matter/testing/global_stash.py",
+    "matter/testing/harness_params.py",
     "matter/testing/linux/__init__.py",
     "matter/testing/linux/bluetooth.py",
     "matter/testing/linux/dbus.py",
@@ -78,6 +79,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/metadata.py",
     "matter/testing/nfc.py",
     "matter/testing/pics.py",
+    "matter/testing/pixit.py",
     "matter/testing/problem_notices.py",
     "matter/testing/runner.py",
     "matter/testing/spec_parsing.py",
@@ -88,6 +90,7 @@ pw_python_package("matter-testing-module") {
   ]
   tests = [
     "matter/testing/test_metadata.py",
+    "matter/testing/test_pixit.py",
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",
     "matter/testing/test_data_model_errata.py",

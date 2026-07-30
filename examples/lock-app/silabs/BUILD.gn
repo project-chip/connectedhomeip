@@ -62,6 +62,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -86,6 +87,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -105,9 +107,8 @@ silabs_executable("lock_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "src/AppTask.cpp",
-    "src/DataModelCallbacks.cpp",
-    "src/LockManager.cpp",
     "src/LockMigration.cpp",
   ]
 
@@ -142,8 +143,8 @@ silabs_executable("lock_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/Rpc.cpp",
     ]
 
     deps += [

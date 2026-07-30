@@ -4870,7 +4870,7 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [

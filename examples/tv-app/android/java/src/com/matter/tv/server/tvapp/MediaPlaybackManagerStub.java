@@ -234,4 +234,24 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   public MediaTrack getActiveTrack(boolean audio) {
     return (audio ? activeAudioTrack : activeTextTrack);
   }
+
+  @Override
+  public int[] getAvailableCommands() {
+    return new int[] {
+      REQUEST_PLAY,
+      REQUEST_PAUSE,
+      REQUEST_STOP,
+      REQUEST_NEXT,
+      REQUEST_PREVIOUS,
+      REQUEST_REWIND,
+      REQUEST_FAST_FORWARD,
+      REQUEST_SEEK,
+    };
+  }
+
+  @Override
+  public MediaPlaybackContentInfo getContentInfo() {
+    return new MediaPlaybackContentInfo(
+        MediaPlaybackContentInfo.MEDIA_TYPE_TV_SHOW, "Example Show", null, null, null);
+  }
 }
