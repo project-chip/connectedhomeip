@@ -1170,7 +1170,24 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 } // namespace TemperatureControl
 
 namespace RefrigeratorAlarm {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Mask {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace Mask
+
+namespace State {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace State
+
+namespace Supported {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace Supported
+
+} // namespace Attributes
 } // namespace RefrigeratorAlarm
 
 namespace DishwasherMode {
@@ -1268,7 +1285,29 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 } // namespace SmokeCoAlarm
 
 namespace DishwasherAlarm {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Mask {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace Mask
+
+namespace Latch {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace Latch
+
+namespace State {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace State
+
+namespace Supported {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+} // namespace Supported
+
+} // namespace Attributes
 } // namespace DishwasherAlarm
 
 namespace MicrowaveOvenMode {

@@ -6118,7 +6118,72 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 } // namespace TemperatureControl
 
 namespace RefrigeratorAlarm {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Mask {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace Mask
+
+namespace State {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace State
+
+namespace Supported {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace Supported
+
+} // namespace Attributes
 } // namespace RefrigeratorAlarm
 
 namespace DishwasherMode {
@@ -6479,7 +6544,93 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 } // namespace SmokeCoAlarm
 
 namespace DishwasherAlarm {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Mask {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace Mask
+
+namespace Latch {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace Latch
+
+namespace State {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace State
+
+namespace Supported {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace Supported
+
+} // namespace Attributes
 } // namespace DishwasherAlarm
 
 namespace MicrowaveOvenMode {

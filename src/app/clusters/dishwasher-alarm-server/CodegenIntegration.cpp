@@ -32,6 +32,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
+using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
 
 namespace {
 
@@ -88,14 +89,23 @@ public:
 
         BitFlags<DishwasherAlarm::Feature> features(featureMap);
 
-        BitMask<DishwasherAlarm::AlarmBitmap> supported{};
-        BitMask<DishwasherAlarm::AlarmBitmap> latch{};
+        AlarmMap supported{};
+        if (auto value = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Supported::Id))
+        {
+            supported = *value;
+        }
+
+        AlarmMap latch{};
+        if (auto value = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Latch::Id))
+        {
+            latch = *value;
+        }
 
         AlarmBaseCluster::Config config{
             .feature         = features,
             .clusterRevision = GetClusterRevision(DishwasherAlarm::Id),
-            .supported       = AlarmMap(supported.Raw()),
-            .latch           = AlarmMap(latch.Raw()),
+            .supported       = supported,
+            .latch           = latch,
             .supportsModifyEnabledAlarms =
                 EndpointHasCommand(endpointId, DishwasherAlarm::Id, DishwasherAlarm::Commands::ModifyEnabledAlarms::Id),
             .delegate = &gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
@@ -104,6 +114,17 @@ public:
         gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(
             gDishwasherAlarmClusters[clusterInstanceIndex].userDelegate);
         gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, DishwasherAlarm::Id, config);
+
+        AlarmBaseCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
+        if (auto mask = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Mask::Id))
+        {
+            cluster.SetMaskValue(*mask);
+        }
+        if (auto state = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, State::Id))
+        {
+            cluster.SetStateValue(*state, true);
+        }
+
         return gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Registration();
     }
 

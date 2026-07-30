@@ -31,6 +31,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
+using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
 
 namespace {
 
@@ -53,18 +54,33 @@ public:
         (void) optionalAttributeBits;
         (void) featureMap;
 
-        BitMask<RefrigeratorAlarm::AlarmBitmap> supported{};
+        AlarmMap supported{};
+        if (auto value = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, Supported::Id))
+        {
+            supported = *value;
+        }
 
         AlarmBaseCluster::Config config{
             .feature                     = BitFlags<AlarmBase::Feature>(),
             .clusterRevision             = GetClusterRevision(RefrigeratorAlarm::Id),
-            .supported                   = AlarmMap(supported.Raw()),
+            .supported                   = supported,
             .latch                       = {},
             .supportsModifyEnabledAlarms = false,
             .delegate                    = nullptr,
         };
 
         gRefrigeratorAlarmClusters[clusterInstanceIndex].Create(endpointId, RefrigeratorAlarm::Id, config);
+
+        AlarmBaseCluster & cluster = gRefrigeratorAlarmClusters[clusterInstanceIndex].Cluster();
+        if (auto mask = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, Mask::Id))
+        {
+            cluster.SetMaskValue(*mask);
+        }
+        if (auto state = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, State::Id))
+        {
+            cluster.SetStateValue(*state, true);
+        }
+
         return gRefrigeratorAlarmClusters[clusterInstanceIndex].Registration();
     }
 

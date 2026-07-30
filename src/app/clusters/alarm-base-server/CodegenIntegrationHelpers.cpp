@@ -18,8 +18,11 @@
 
 #include <app/clusters/alarm-base-server/CodegenIntegrationHelpers.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
+#include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
+
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters::AlarmBase {
 
@@ -33,6 +36,17 @@ uint32_t GetClusterRevision(ClusterId clusterId)
         }
     }
     return 0;
+}
+
+std::optional<AlarmMap> ReadAttributeDefaultFromEmber(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+{
+    using chip::Protocols::InteractionModel::Status;
+
+    uint32_t raw = 0;
+    Status status =
+        emberAfReadAttribute(endpointId, clusterId, attributeId, reinterpret_cast<uint8_t *>(&raw), sizeof(raw));
+    VerifyOrReturnValue(status == Status::Success, std::nullopt);
+    return AlarmMap(raw);
 }
 
 bool EndpointHasCommand(EndpointId endpointId, ClusterId clusterId, CommandId commandId)
