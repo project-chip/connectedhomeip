@@ -99,7 +99,7 @@ public:
     void SetUp() override
     {
         mCluster       = std::make_unique<GroupsCluster>(kTestEndpointId,
-                                                         GroupsCluster::Context{
+                                                   GroupsCluster::Context{
                                                              .groupDataProvider   = mGroupDataProvider,
                                                              .scenesIntegration   = &mScenesDelegate,
                                                              .identifyIntegration = &mIdentifyDelegate,
