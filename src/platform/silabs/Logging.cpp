@@ -26,7 +26,7 @@
 #include <string.h>
 
 #ifdef PW_RPC_ENABLED
-#include "PigweedLogger.h"
+#include "pigweed_rpc/PigweedLogger.h"
 #endif
 
 // RTT Buffer size and name

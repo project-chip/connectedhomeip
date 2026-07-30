@@ -22,7 +22,7 @@
 
 #ifndef SLI_SI91X_MCU_INTERFACE
 
-#include "application_properties.h"
+#include "api/application_properties.h"
 
 #if defined(SL_COMPONENT_CATALOG_PRESENT)
 #include "sl_component_catalog.h"

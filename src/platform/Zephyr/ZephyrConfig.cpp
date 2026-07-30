@@ -115,7 +115,7 @@ int ConfigValueCallback(const char * name, size_t configSize, settings_read_cb r
     // Found requested key
     const ssize_t bytesRead = readCb(cbArg, request.destination, request.bufferSize);
     request.result          = bytesRead > 0 ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    request.configSize      = bytesRead > 0 ? bytesRead : 0;
+    request.configSize      = bytesRead > 0 ? static_cast<size_t>(bytesRead) : 0;
 
     // Return 1 to stop processing further keys
     return 1;
@@ -288,7 +288,7 @@ void ZephyrConfig::RunConfigUnitTest()
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<ZephyrConfig>();
 }
 
-bool ZephyrConfig::BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[SETTINGS_MAX_NAME_LEN])
+bool ZephyrConfig::BuildCounterConfigKey(::chip::Platform::PersistedStorage::Key counterId, char key[])
 {
     constexpr size_t KEY_PREFIX_LEN = sizeof(NAMESPACE_COUNTERS) - 1;
     const size_t keySuffixLen       = strlen(counterId) + 1; // including null-character
