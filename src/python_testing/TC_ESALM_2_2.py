@@ -72,10 +72,10 @@ class TC_ESALM_2_2(MatterBaseTest):
         cmd = cluster.Commands.SetElectricalAlarmThresholds(**kwargs)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-            asserts.fail("Expected %s but command succeeded" % expected_status)
+            asserts.fail(f"Expected {expected_status} but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
-                                 "Expected %s, got %s" % (expected_status, e.status))
+                                 f"Expected {expected_status}, got {e.status}")
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_ESALM_2_2(self):

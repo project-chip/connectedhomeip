@@ -203,7 +203,7 @@ class TC_ESALM_2_4(MatterBaseTest):
         for alarm_bit, feat_bit, name in feature_alarm_map:
             if supported & alarm_bit:
                 asserts.assert_true(feature_map & feat_bit,
-                                    "%s set in Supported but corresponding feature bit not set in FeatureMap" % name)
+                                    f"{name} set in Supported but corresponding feature bit not set in FeatureMap")
 
 
 if __name__ == "__main__":

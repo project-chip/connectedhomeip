@@ -133,7 +133,7 @@ class TC_ESALM_2_3(MatterBaseTest):
                 asserts.fail("Expected INVALID_COMMAND but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidCommand,
-                                     "Expected INVALID_COMMAND, got %s" % e.status)
+                                     f"Expected INVALID_COMMAND, got {e.status}")
             mask_val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.Mask)
             asserts.assert_equal(mask_val, 0, "Mask changed after INVALID_COMMAND rejection")
@@ -158,7 +158,7 @@ class TC_ESALM_2_3(MatterBaseTest):
                 asserts.fail("Expected UNSUPPORTED_COMMAND but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.UnsupportedCommand,
-                                     "Expected UNSUPPORTED_COMMAND, got %s" % e.status)
+                                     f"Expected UNSUPPORTED_COMMAND, got {e.status}")
         else:
             self.mark_current_step_skipped()
 
@@ -225,7 +225,7 @@ class TC_ESALM_2_3(MatterBaseTest):
                 asserts.fail("Expected UNSUPPORTED_COMMAND but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.UnsupportedCommand,
-                                     "Expected UNSUPPORTED_COMMAND, got %s" % e.status)
+                                     f"Expected UNSUPPORTED_COMMAND, got {e.status}")
         else:
             self.mark_current_step_skipped()
 
