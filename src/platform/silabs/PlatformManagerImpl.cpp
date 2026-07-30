@@ -199,10 +199,7 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
 
     switch (eventData->header.id)
     {
-// TODO: Work around until we unify the data structures behind a Matter level common structure
-#if WF200_WIFI
-    case SL_WFX_STARTUP_IND_ID:
-#endif
+
     case to_underlying(WifiInterface::WifiEvent::kStartUp):
         memcpy(&event.Platform.event.WFXSystemEvent.data.startupEvent, eventData,
                sizeof(event.Platform.event.WFXSystemEvent.data.startupEvent));
