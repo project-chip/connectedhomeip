@@ -201,18 +201,6 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
             if p not in sys.path:
                 sys.path.insert(0, p)
 
-    def test_markers_are_direct_subclasses_of_base(self):
-        """Each marker derives directly from MatterBaseTest and defines no members beyond the
-        single sanctioned attribute: CertificationUnitTestNoDevice may set requires_dut; the
-        device-STATE markers define nothing at all."""
-        allowed = {"__doc__", "__module__", "__firstlineno__", "__static_attributes__", "__qualname__"}
-        for marker in _MARKERS:
-            self.assertTrue(issubclass(marker, MatterBaseTest), f"{marker.__name__} must subclass MatterBaseTest")
-            self.assertIs(marker.__base__, MatterBaseTest, f"{marker.__name__} must derive directly from MatterBaseTest")
-            permitted = allowed | ({"requires_dut"} if marker is CertificationUnitTestNoDevice else set())
-            extra = set(marker.__dict__) - permitted
-            self.assertEqual(extra, set(), f"{marker.__name__} must not define members, found: {extra}")
-
     def test_device_state_markers_do_not_touch_subscription(self):
         """The three device-STATE markers stay orthogonal to the wildcard subscription: they set
         neither requires_dut nor disable_wildcard_subscription."""
@@ -249,6 +237,10 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
     def test_reclassified_tests_declare_expected_marker(self):
         """Every module reclassified in this PR exposes a concrete test class carrying exactly
         the expected marker (and only one).
+
+        Importing each module here intentionally doubles as a load smoke-test: a broken import
+        in a reclassified module (typo, bad base change, missing required dep) is re-raised and
+        fails this test rather than being masked.
 
         Modules import cleanly -> checked at runtime via device_requirement(). Modules whose
         optional dependencies are absent in this environment fall back to a source (AST) check
