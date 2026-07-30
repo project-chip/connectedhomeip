@@ -318,20 +318,38 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
-    // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
-    if (AppOptions::GetConfig().enableGroupcast)
+    // TODO(#72056): Once groupcast is enabled by default, this block of code should not be dependent on the app argument.
+    bool enableGroupcast = AppOptions::GetConfig().enableGroupcast;
+
+    // SetGroupcastEnabled() is called both here and in Server.cpp. It is called in Server.cpp so there is a general sdk-wide
+    // location where the value is set, no matter which app is being run. It must be called here because this value
+    // must be set in order to properly startup the devices (with devices.Startup()) further down in this function. 
+    // This is because this value indicidating if groupcast is enabled at run time (based on the all devices app 
+    // --groupcast argument) must be correct in scenarios such as to correctly instantiate (or not instantiate) 
+    // the groupcast cluster, which happens before Server initialization. Server init (with Server::GetInstance().Init(initParams)) 
+    // cannot be moved to be before devices.Startup() either, as server is dependednt on the DataModelProvider devices.Startup() creates.
+    gGroupDataProvider.SetGroupcastEnabled(enableGroupcast);
+
+    // This groupcastEnabledOverride is set here so that the app argument of --groupcast is respected when SetGroupcastEnabled()
+    // is called in Server.cpp. In this case, the override is required so that the default value of CHIP_CONFIG_ENABLE_GROUPCAST
+    // is not used. CHIP_CONFIG_ENABLE_GROUPCAST is always set to true for the all devices app so that use of groupcast can be 
+    // configured at run-time, in contrast to many apps which can just configure this at compile time. This exists in order to 
+    // enable both legacy groups and the newer groupcast paths easily in various scenarios (like testing). This override ensures
+    // the value from IsGroupcastEnabled() remains consistent for the app's entire run-time (from the previous line setting the value,
+    // and Server.cpp doing the same).
+    initParams.groupcastEnabledOverride = enableGroupcast;
+
+    if (enableGroupcast)
     {
         static chip::Access::Examples::GroupAuxiliaryAccessControlDelegateImpl groupAuxDelegate;
         SuccessOrDie(groupAuxDelegate.Initialize(&gGroupDataProvider, &Server::GetInstance().GetFabricTable()));
         initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
-        gGroupDataProvider.SetGroupcastEnabled(true);
     }
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
     SuccessOrDie(gGroupDataProvider.Init());
-    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
