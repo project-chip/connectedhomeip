@@ -17,13 +17,17 @@
 
 #include "CodegenIntegration.h"
 
+#include <app/data-model/Nullable.h>
 #include <app/static-cluster-config/LaundryDryerControls.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LaundryDryerControls;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -85,3 +89,62 @@ void MatterLaundryDryerControlsClusterShutdownCallback(EndpointId endpointId, Ma
         },
         integrationDelegate, shutdownType);
 }
+
+namespace chip::app::Clusters::LaundryDryerControls {
+
+namespace LaundryDryerControlsServer {
+
+// Delegate should be valid until the cluster on the endpoint is destroyed. This will probably happen at the end of the program.
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    VerifyOrDie(delegate != nullptr);
+    SetDelegate(endpoint, *delegate);
+}
+
+void SetDelegate(EndpointId endpoint, Delegate & delegate)
+{
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster != nullptr)
+    {
+        cluster->SetDelegate(delegate);
+    }
+    else
+    {
+        ChipLogError(Zcl, "LaundryDryerControls cluster on endpoint %d not found", endpoint);
+    }
+}
+
+Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnValue(cluster != nullptr, Status::Failure);
+    return cluster->SetSelectedDrynessLevel(DataModel::MakeNullable(newSelectedDrynessLevel));
+}
+
+Status GetSelectedDrynessLevel(EndpointId endpointId, DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnValue(cluster != nullptr, Status::Failure);
+    selectedDrynessLevel = cluster->GetSelectedDrynessLevel();
+    return Status::Success;
+}
+
+} // namespace LaundryDryerControlsServer
+
+LaundryDryerControlsCluster * FindClusterOnEndpoint(EndpointId endpoint)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * serverCluster = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpoint,
+            .clusterId                 = LaundryDryerControls::Id,
+            .fixedClusterInstanceCount = kLaundryDryerControlsFixedClusterCount,
+            .maxClusterInstanceCount   = kLaundryDryerControlsMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return static_cast<LaundryDryerControlsCluster *>(serverCluster);
+}
+
+} // namespace chip::app::Clusters::LaundryDryerControls

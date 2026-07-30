@@ -19,8 +19,32 @@
 
 #include "LaundryDryerControlsCluster.h"
 
-// NOTE: The backward-compatible LaundryDryerControlsServer helper API
-// (SetDefaultDelegate / SetSelectedDrynessLevel / GetSelectedDrynessLevel /
-// FindClusterOnEndpoint) is intentionally not yet declared here. It will be
-// added in a follow-up together with the shims that keep legacy application
-// code (e.g. examples/all-clusters-app, examples/chef) linking.
+namespace chip::app::Clusters::LaundryDryerControls {
+
+namespace LaundryDryerControlsServer {
+
+/**
+ * Set the delegate of the laundry dryer server at the given endpoint.
+ * @param endpoint ID of the endpoint
+ * @param delegate The delegate at the endpoint.
+ * The delegate should be valid until the cluster on the endpoint is destroyed. This will probably happen at the end of the program.
+ * @note This function can be called only after Server::Init is called.
+ */
+void SetDelegate(EndpointId endpoint, Delegate & delegate);
+
+/// Same as SetDelegate, kept for backward compatibility. Use SetDelegate instead.
+/// @param delegate SHOULD NOT be nullptr.
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+/**
+ * API to set/get the SelectedDrynessLevel attribute.
+ */
+Protocols::InteractionModel::Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel);
+Protocols::InteractionModel::Status GetSelectedDrynessLevel(EndpointId endpointId,
+                                                            DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
+
+} // namespace LaundryDryerControlsServer
+
+LaundryDryerControlsCluster * FindClusterOnEndpoint(EndpointId endpoint);
+
+} // namespace chip::app::Clusters::LaundryDryerControls
