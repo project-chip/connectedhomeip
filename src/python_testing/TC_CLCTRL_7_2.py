@@ -45,7 +45,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
