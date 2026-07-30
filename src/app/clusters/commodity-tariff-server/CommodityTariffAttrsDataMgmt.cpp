@@ -28,6 +28,7 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
+using namespace chip::app::CommodityTariffContainers;
 using namespace CommodityTariffConsts;
 
 #define VerifyOrReturnError_LogSend(expr, code, ...)                                                                               \
@@ -72,12 +73,15 @@ static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
     }
 }
 
-static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::unordered_set<uint32_t> & seen)
+template <size_t Capacity>
+static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs,
+                            chip::app::CommodityTariffContainers::CTC_UnorderedSet<uint32_t, Capacity> & seen)
 {
     for (auto id : IDs)
     {
-        if (!seen.insert(id).second)
+        if (!seen.insert(id))
         {
+            ChipLogError(AppServer, "Duplicate ID %" PRIu32 " - ID already exists", id);
             return true; // Duplicate found
         }
     }
@@ -404,8 +408,10 @@ CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue, void 
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Check that the current day pattern item has no duplicated dayEntryIDs
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->DayPatternsDayEntryIDs))
+
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->RefsToDayEntryIDsFromDays))
     {
+        ChipLogError(AppServer, "The DayPattern entry Duplicate DayEntryID found ");
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
@@ -415,13 +421,6 @@ CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue, void 
 CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, void * aCtx)
 {
     auto * ctx = static_cast<TariffUpdateCtx *>(aCtx);
-
-    // Check for duplicate IDs
-    if (!ctx->DayEntryKeyIDs.insert(entryNewValue.dayEntryID).second)
-    {
-        ChipLogError(AppServer, "Duplicate dayEntryID found");
-        return CHIP_ERROR_DUPLICATE_KEY_ID;
-    }
 
     VerifyOrReturnError_LogSend(entryNewValue.startTime < kDayEntryDurationLimit, CHIP_ERROR_INVALID_ARGUMENT,
                                 "DayEntry startTime must be less than %u", kDayEntryDurationLimit);
@@ -548,7 +547,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
-    if (!ctx->TariffComponentKeyIDsFeatureMap.insert({ entryNewValue.tariffComponentID, entryFeatures.Raw() }).second)
+    if (!ctx->TariffComponentKeyIDsFeatureMap.insert(entryNewValue.tariffComponentID, entryFeatures.Raw()))
     {
         ChipLogError(AppServer, "Duplicate tariffComponentID found");
         return CHIP_ERROR_DUPLICATE_KEY_ID;
@@ -560,7 +559,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
 CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, void * aCtx)
 {
     auto * ctx = static_cast<TariffUpdateCtx *>(aCtx);
-    std::unordered_set<uint32_t> entryTcIDs;
+    CTC_UnorderedSet<uint32_t, kTariffPeriodItemMaxIDs> entryTcIDs;
 
     if (!entryNewValue.label.IsNull())
     {
@@ -583,7 +582,7 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     // Checks that dayEntryIDs references has no duplicates among another TP entries
-    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->TariffPeriodsDayEntryIDs))
+    if (CommonUtilities::HasDuplicateIDs(entryNewValue.dayEntryIDs, ctx->RefsToDayEntryIDsFromTariffPeriods))
     {
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
@@ -594,8 +593,7 @@ CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewValue, voi
         return CHIP_ERROR_DUPLICATE_KEY_ID;
     }
 
-    // ctx->TariffPeriodsDayEntryIDs.merge(entryDeIDs);
-    ctx->TariffPeriodsTariffComponentIDs.merge(entryTcIDs);
+    ctx->RefsToTariffComponentIDsFromTariffPeriods.merge(entryTcIDs);
 
     return CHIP_NO_ERROR;
 }
@@ -715,6 +713,9 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<TariffInformationStruct::Type>>
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct::Type>>>::ValidateNewValue()
 {
+    // Temporary DE's ID values storage just for dups checking
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayEntriesAttrMaxLength> dayEntryKeyIDs;
+
     // Required field check
     if (GetNewValueRef().IsNull())
     {
@@ -734,6 +735,13 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct:
     // Validate each entry
     for (const auto & item : newList)
     {
+        // Check for duplicate IDs
+        if (!dayEntryKeyIDs.insert(item.dayEntryID))
+        {
+            ChipLogError(AppServer, "Duplicate dayEntryID found");
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
         // Validate entry contents
         CHIP_ERROR entryErr = ValidateListEntry(item, ctx);
         if (entryErr != CHIP_NO_ERROR)
@@ -748,6 +756,9 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayEntryStruct:
 template <>
 CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::ValidateNewValue()
 {
+    // DayPattern ID Tracking
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDayPatternsAttrMaxLength> dayPatternKeyIDs;
+
     if (GetNewValueRef().IsNull())
     {
         return CHIP_NO_ERROR; // Assuming null is valid for day patterns
@@ -767,7 +778,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
     // Validate each pattern
     for (const auto & item : newList)
     {
-        if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second)
+        if (!dayPatternKeyIDs.insert(item.dayPatternID))
         {
             ChipLogError(AppServer, "Duplicate dayPatternID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
@@ -902,7 +913,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
         }
 
         // Check for duplicates
-        if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ctx->IndividualDaysDayEntryIDs))
+        if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ctx->RefsToDayEntryIDsFromDays))
         {
             ChipLogError(AppServer, "Duplicate dayEntryID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
@@ -929,7 +940,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
 
     TariffUpdateCtx * ctx = static_cast<TariffUpdateCtx *>(mAuxData);
 
-    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = ctx->CalendarPeriodsDayPatternIDs;
+    auto & RefsToDayPatternIDsFromCalendarPeriods = ctx->RefsToDayPatternIDsFromCalendarPeriods;
 
     auto & tariffStartDate = ctx->TariffStartTimestamp;
 
@@ -950,7 +961,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         }
 
         // Check for duplicate dayPatternIDs
-        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs))
+        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, RefsToDayPatternIDsFromCalendarPeriods))
         {
             ChipLogError(AppServer, "Duplicate dayPatternID found in CalendarPeriods");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
