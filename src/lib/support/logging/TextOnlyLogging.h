@@ -126,9 +126,10 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
     ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, (ERROR_CODE).Format())
 
 #define ChipLogFailure(...)                                                                                                        \
-    CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                  \
+    CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                   \
                             ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,        \
-                            ChipLogFailure_NO_VA_ARGS)(__VA_ARGS__)
+                            ChipLogFailure_NO_VA_ARGS)                                                                             \
+    (__VA_ARGS__)
 
 #if CHIP_PROGRESS_LOGGING
 /**

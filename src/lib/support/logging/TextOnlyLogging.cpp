@@ -231,7 +231,6 @@ void LogVerifyOrDieWithMsg(uint8_t module, const char * msg)
     chipAbort();
 }
 
-
 #if CHIP_LOG_FILTERING
 std::atomic<uint8_t> gLogFilter(kLogCategory_Max);
 

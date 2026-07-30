@@ -442,11 +442,9 @@ inline void chipDie(void)
  *
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
-#define VerifyOrDie(aCondition)                                                                                                    \
-    VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__))
+#define VerifyOrDie(aCondition) VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__))
 #elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition)                                                                                                    \
-    VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
+#define VerifyOrDie(aCondition) VerifyOrDo(aCondition, ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -501,8 +499,7 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject)                                                                                 \
-    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject);                                                                       \
-               ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
+    VerifyOrDo(aCondition, ::chip::DumpObjectToLog(aObject); ::chip::Logging::LogVerifyOrDie(__FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDieWithObject(aCondition, aObject) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -552,8 +549,8 @@ inline void chipDie(void)
 #define VerifyOrDieWithMsg(...)                                                                                                    \
     CHIP_VERIFY_OR_DIE_WITH_MSG_SELECT(__VA_ARGS__, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS,                        \
                                        VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS,         \
-                                       VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_NO_VA_ARGS)(     \
-        __VA_ARGS__)
+                                       VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_VA_ARGS, VerifyOrDieWithMsg_NO_VA_ARGS)      \
+    (__VA_ARGS__)
 
 /**
  *  @def LogErrorOnFailure(expr)
