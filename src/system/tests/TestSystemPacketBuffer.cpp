@@ -1748,25 +1748,25 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
 {
     static const char kPayload[] = "Hello, world!";
 
-    // A failed allocation reaches the writer as a null handle. Construction must leave the
-    // writer null instead of dereferencing it, so that callers can test IsNull() as documented.
+    // A failed allocation reaches the writer as a null handle. Construction must leave the writer
+    // null instead of dereferencing it, so that callers can test IsNull() as documented, and writing
+    // to it must be inert. Fit() reports only whether the input fit, so it does not by itself
+    // distinguish a null writer from a usable one; Finalize() is null in both cases below.
+
+    // Sized constructor, written past its zero capacity, so Fit() is false.
     PacketBufferWriter sized(PacketBufferHandle(), sizeof(kPayload));
     EXPECT_TRUE(sized.IsNull());
     EXPECT_EQ(sized.Size(), static_cast<size_t>(0));
-
-    PacketBufferHandle empty;
-    PacketBufferWriter unsized(std::move(empty));
-    EXPECT_TRUE(unsized.IsNull());
-    EXPECT_EQ(unsized.Size(), static_cast<size_t>(0));
-
-    // Writing to a null writer must be inert, and Finalize() must yield a null handle.
     sized.Put(kPayload);
     EXPECT_FALSE(sized.Fit());
     EXPECT_TRUE(sized.Finalize().IsNull());
 
-    // A null writer that was never written to trivially fits, so Fit() alone does not distinguish it
-    // from a usable writer. Finalize() must still yield a null handle, so that a caller checking only
-    // its result cannot mistake a failed allocation for an empty buffer.
+    // Unsized constructor, never written, so Fit() is true; only the null result of Finalize() keeps
+    // a caller from mistaking a failed allocation for an empty buffer.
+    PacketBufferHandle empty;
+    PacketBufferWriter unsized(std::move(empty));
+    EXPECT_TRUE(unsized.IsNull());
+    EXPECT_EQ(unsized.Size(), static_cast<size_t>(0));
     EXPECT_TRUE(unsized.Fit());
     EXPECT_TRUE(unsized.Finalize().IsNull());
 }
