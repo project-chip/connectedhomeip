@@ -59,7 +59,7 @@ constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-constexpr uint16_t kOptionWiFiPAF       = 0xffde;
+constexpr uint16_t kOptionWiFiPAF = 0xffde;
 #endif
 
 DeviceTypeParser AppOptions::sParser;
