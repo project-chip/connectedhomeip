@@ -23,6 +23,7 @@
 #include <controller/CurrentFabricRemover.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <credentials/CertificationDeclaration.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -71,14 +72,34 @@ public:
 
 private:
     void PrintDeviceInformation();
-    void PrintCert(const char * name, chip::ByteSpan & buffer);
+    void PrintCert(const char * name, chip::ByteSpan buffer);
+
+    CHIP_ERROR SetBuffer(chip::Platform::ScopedMemoryBufferWithSize<uint8_t> & buf, const chip::ByteSpan & span)
+    {
+        VerifyOrReturnError(buf.Alloc(span.size()), CHIP_ERROR_NO_MEMORY);
+        memcpy(buf.Get(), span.data(), span.size());
+        return CHIP_NO_ERROR;
+    }
+
+    chip::Optional<chip::ByteSpan> GetBuffer(const chip::Platform::ScopedMemoryBufferWithSize<uint8_t> & buf) const
+    {
+        if (!buf.Get())
+        {
+            return chip::Optional<chip::ByteSpan>();
+        }
+        return chip::MakeOptional(chip::ByteSpan(buf.Get(), buf.AllocatedSize()));
+    }
+
+    chip::Optional<chip::ByteSpan> DacDerBuffer() const { return GetBuffer(mDacCertBuf); }
+    chip::Optional<chip::ByteSpan> PaiDerBuffer() const { return GetBuffer(mPaiCertBuf); }
+    chip::Optional<chip::ByteSpan> CdBuffer() const { return GetBuffer(mCdBuf); }
+    chip::Optional<chip::ByteSpan> PaaDerBuffer() const { return GetBuffer(mPaaCertBuf); }
 
     // Device attestation information
-    chip::ByteSpan mDacDerBuffer;
-    chip::ByteSpan mPaiDerBuffer;
-    chip::Optional<chip::ByteSpan> mCdBuffer;
-    uint8_t mPaaCertBuf[chip::Credentials::kMaxDERCertLength];
-    chip::Optional<chip::ByteSpan> mPaaDerBuffer;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mDacCertBuf;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiCertBuf;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuf;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mPaaCertBuf;
     uint16_t mVendorId;
     uint16_t mProductId;
     chip::Credentials::AttestationVerificationResult mAttestationResult;
