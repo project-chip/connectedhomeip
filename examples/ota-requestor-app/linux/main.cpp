@@ -90,7 +90,6 @@ NamedPipeCommands sChipNamedPipeCommands;
 OtaRequestorAppCommandDelegate sOtaRequestorAppCommandDelegate;
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
-// chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize]  = "/tmp/test.bin";
 bool gAutoApplyImage                            = false;
 bool gSendNotifyUpdateApplied                   = true;
