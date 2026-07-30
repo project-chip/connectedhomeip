@@ -165,7 +165,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_voltage, int), "UnderVoltageThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overvolt and has_undervolt:
+        if has_overvolt and has_undervolt and over_voltage is not None and over_voltage is not NullValue and under_voltage is not None and under_voltage is not NullValue:
             asserts.assert_greater_equal(over_voltage, under_voltage + 1,
                                          "OverVoltageThreshold must be >= UnderVoltageThreshold + 1")
 
