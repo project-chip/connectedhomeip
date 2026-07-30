@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
 #include <app/clusters/alarm-base-server/CodegenIntegrationHelpers.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
@@ -33,6 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
 using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -90,15 +92,17 @@ public:
         BitFlags<DishwasherAlarm::Feature> features(featureMap);
 
         AlarmMap supported{};
-        if (auto value = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Supported::Id))
+        BitMask<DishwasherAlarm::AlarmBitmap> supportedDefault{};
+        if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
         {
-            supported = *value;
+            supported = AlarmMap(supportedDefault.Raw());
         }
 
         AlarmMap latch{};
-        if (auto value = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Latch::Id))
+        BitMask<DishwasherAlarm::AlarmBitmap> latchDefault{};
+        if (Latch::GetDefault(endpointId, &latchDefault) == Status::Success)
         {
-            latch = *value;
+            latch = AlarmMap(latchDefault.Raw());
         }
 
         AlarmBaseCluster::Config config{
@@ -116,13 +120,17 @@ public:
         gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, DishwasherAlarm::Id, config);
 
         AlarmBaseCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
-        if (auto mask = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, Mask::Id))
+
+        BitMask<DishwasherAlarm::AlarmBitmap> maskDefault{};
+        if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
         {
-            cluster.SetMaskValue(*mask);
+            cluster.SetMaskValue(AlarmMap(maskDefault.Raw()));
         }
-        if (auto state = ReadAttributeDefaultFromEmber(endpointId, DishwasherAlarm::Id, State::Id))
+
+        BitMask<DishwasherAlarm::AlarmBitmap> stateDefault{};
+        if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetStateValue(*state, true);
+            cluster.SetStateValue(AlarmMap(stateDefault.Raw()), true);
         }
 
         return gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Registration();

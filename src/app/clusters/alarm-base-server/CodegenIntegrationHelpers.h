@@ -18,18 +18,12 @@
 
 #pragma once
 
-#include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <optional>
 
 namespace chip::app::Clusters::AlarmBase {
 
 uint32_t GetClusterRevision(ClusterId clusterId);
 
 bool EndpointHasCommand(EndpointId endpointId, ClusterId clusterId, CommandId commandId);
-
-/// Reads the current Ember-stored value for a RAM attribute (typically the ZAP default loaded at init).
-std::optional<AlarmMap> ReadAttributeDefaultFromEmber(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId);
 
 } // namespace chip::app::Clusters::AlarmBase

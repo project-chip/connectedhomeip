@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
 #include <app/clusters/alarm-base-server/CodegenIntegrationHelpers.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
@@ -32,6 +33,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
 using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -55,9 +57,10 @@ public:
         (void) featureMap;
 
         AlarmMap supported{};
-        if (auto value = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, Supported::Id))
+        BitMask<RefrigeratorAlarm::AlarmBitmap> supportedDefault{};
+        if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
         {
-            supported = *value;
+            supported = AlarmMap(supportedDefault.Raw());
         }
 
         AlarmBaseCluster::Config config{
@@ -72,13 +75,17 @@ public:
         gRefrigeratorAlarmClusters[clusterInstanceIndex].Create(endpointId, RefrigeratorAlarm::Id, config);
 
         AlarmBaseCluster & cluster = gRefrigeratorAlarmClusters[clusterInstanceIndex].Cluster();
-        if (auto mask = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, Mask::Id))
+
+        BitMask<RefrigeratorAlarm::AlarmBitmap> maskDefault{};
+        if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
         {
-            cluster.SetMaskValue(*mask);
+            cluster.SetMaskValue(AlarmMap(maskDefault.Raw()));
         }
-        if (auto state = ReadAttributeDefaultFromEmber(endpointId, RefrigeratorAlarm::Id, State::Id))
+
+        BitMask<RefrigeratorAlarm::AlarmBitmap> stateDefault{};
+        if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetStateValue(*state, true);
+            cluster.SetStateValue(AlarmMap(stateDefault.Raw()), true);
         }
 
         return gRefrigeratorAlarmClusters[clusterInstanceIndex].Registration();
