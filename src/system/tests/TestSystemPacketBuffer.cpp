@@ -1763,6 +1763,12 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
     sized.Put(kPayload);
     EXPECT_FALSE(sized.Fit());
     EXPECT_TRUE(sized.Finalize().IsNull());
+
+    // A null writer that was never written to trivially fits, so Fit() alone does not distinguish it
+    // from a usable writer. Finalize() must still yield a null handle, so that a caller checking only
+    // its result cannot mistake a failed allocation for an empty buffer.
+    EXPECT_TRUE(unsized.Fit());
+    EXPECT_TRUE(unsized.Finalize().IsNull());
 }
 
 } // namespace System
