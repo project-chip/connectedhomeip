@@ -784,7 +784,7 @@ public:
      *  @param[in]  aPacket A handle to PacketBuffer, to be used as backing store for the BufferWriter.
      *                      May be null, e.g. when it holds the result of a failed allocation; the
      *                      resulting BufferWriter is null and accepts no data.
-     *  @param[in]  aSize   Maximum number of octects to write into the packet buffer.
+     *  @param[in]  aSize   Maximum number of octets to write into the packet buffer.
      */
     PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) : Writer(WritableSpan(aPacket, aSize))
     {
