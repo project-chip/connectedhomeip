@@ -36,6 +36,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_5_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/sear_1_5_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -115,7 +130,7 @@ class TC_SEAR_1_5(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         supported_area_ids = await self.read_supported_areas(step=2)
         asserts.assert_true(len(supported_area_ids) > 0, "SupportedAreas is empty")
@@ -140,7 +155,7 @@ class TC_SEAR_1_5(MatterBaseTest):
                 if SelectedAreas wasn't empty, and SelectedAreas is empty"
             self.print_step("5", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1),
                                            endpoint=self.endpoint)
             else:
@@ -153,7 +168,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             test_step = "Manually intervene to put the device in a state that allows it to execute the SkipArea command"
             self.print_step("7", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                 await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=[7, 1234567]),
                                            endpoint=self.endpoint)
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1),
@@ -237,7 +252,7 @@ class TC_SEAR_1_5(MatterBaseTest):
             test_step = "Manually intervene to put the device in a state that allows it to execute the SkipArea command"
             self.print_step("18", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                 await self.send_single_cmd(cmd=Clusters.Objects.ServiceArea.Commands.SelectAreas(newAreas=[7, 1234567]),
                                            endpoint=self.endpoint)
                 await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=1),

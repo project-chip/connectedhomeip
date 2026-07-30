@@ -23,6 +23,9 @@
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -515,6 +518,436 @@ public:
     }
 };
 
+// The following handlers simulate RVC hardware/environment events for the Robotic Vacuum Cleaner
+// device type, mirroring the named-pipe protocol implemented by examples/rvc-app so the same
+// RVC/Service Area test scripts can drive either application.
+
+class RvcResetCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Reset"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * operationalStateCluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!operationalStateCluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        LogErrorOnFailure(operationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
+
+        auto * serviceAreaCluster = delegate->GetClusterImplementationRegistry()
+                                        .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        if (serviceAreaCluster)
+        {
+            serviceAreaCluster->ClearSelectedAreas();
+            serviceAreaCluster->ClearProgress();
+            serviceAreaCluster->SetCurrentArea(DataModel::NullNullable);
+            serviceAreaCluster->SetEstimatedEndTime(DataModel::NullNullable);
+        }
+
+        ChipLogProgress(AppServer, "Reset RVC device on endpoint %d", endpointId);
+    }
+};
+
+class RvcChargerFoundCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ChargerFound"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (cluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+        {
+            ChipLogError(AppServer, "'ChargerFound' is only accepted when the device is in the 'SeekingCharger' state.");
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCharging));
+    }
+};
+
+class RvcChargedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Charged"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (cluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kCharging))
+        {
+            ChipLogError(AppServer, "'Charged' is only accepted when the device is in the 'Charging' state.");
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
+    }
+};
+
+class RvcChargingCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Charging"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (cluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
+        {
+            ChipLogError(AppServer, "'Charging' is only accepted when the device is in the 'Docked' state.");
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCharging));
+    }
+};
+
+class RvcDockedCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "Docked"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (cluster->GetCurrentOperationalState() != to_underlying(OperationalState::OperationalStateEnum::kStopped))
+        {
+            ChipLogError(AppServer, "'Docked' is only accepted when the device is in the 'Stopped' state.");
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kDocked));
+    }
+};
+
+class RvcEmptyingDustBinCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "EmptyingDustBin"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+    }
+};
+
+class RvcCleaningMopCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "CleaningMop"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+    }
+};
+
+class RvcFillingWaterTankCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "FillingWaterTank"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+    }
+};
+
+class RvcUpdatingMapsCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "UpdatingMaps"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        LogErrorOnFailure(cluster->SetOperationalState(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
+    }
+};
+
+class RvcErrorEventCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "ErrorEvent"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "RvcOperationalStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("Error") || !json["Error"].isString())
+        {
+            ChipLogError(AppServer, "Invalid ErrorEvent command: missing 'Error' field");
+            return;
+        }
+
+        std::string error = json["Error"].asString();
+        uint8_t errorStateId;
+
+        if (error == "UnableToStartOrResume")
+        {
+            errorStateId = to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume);
+        }
+        else if (error == "UnableToCompleteOperation")
+        {
+            errorStateId = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        }
+        else if (error == "CommandInvalidInState")
+        {
+            errorStateId = to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState);
+        }
+        else if (error == "FailedToFindChargingDock")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock);
+        }
+        else if (error == "Stuck")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kStuck);
+        }
+        else if (error == "DustBinMissing")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing);
+        }
+        else if (error == "DustBinFull")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull);
+        }
+        else if (error == "WaterTankEmpty")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty);
+        }
+        else if (error == "WaterTankMissing")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing);
+        }
+        else if (error == "WaterTankLidOpen")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen);
+        }
+        else if (error == "MopCleaningPadMissing")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+        }
+        else if (error == "CannotReachTargetArea")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+        }
+        else if (error == "DirtyWaterTankFull")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+        }
+        else if (error == "DirtyWaterTankMissing")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+        }
+        else if (error == "WheelsJammed")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+        }
+        else if (error == "BrushJammed")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+        }
+        else if (error == "NavigationSensorObscured")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
+        }
+        else if (error == "BatteryLow" || error == "LowBattery")
+        {
+            errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+        }
+        else
+        {
+            ChipLogError(AppServer, "Unhandled ErrorEvent 'Error' value: %s", error.c_str());
+            return;
+        }
+
+        OperationalState::Structs::ErrorStateStruct::Type err;
+        err.errorStateID = errorStateId;
+        cluster->OnOperationalErrorDetected(err);
+    }
+};
+
+class RvcAddMapCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddMap"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetClusterImplementationRegistry()
+                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("MapId") || !json.isMember("MapName"))
+        {
+            ChipLogError(AppServer, "Invalid AddMap command: missing 'MapId'/'MapName'");
+            return;
+        }
+
+        uint32_t mapId      = json["MapId"].asUInt();
+        std::string mapName = json["MapName"].asString();
+        cluster->AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size()));
+    }
+};
+
+class RvcRemoveMapCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveMap"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetClusterImplementationRegistry()
+                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("MapId"))
+        {
+            ChipLogError(AppServer, "Invalid RemoveMap command: missing 'MapId'");
+            return;
+        }
+
+        cluster->RemoveSupportedMap(json["MapId"].asUInt());
+    }
+};
+
+class RvcAddAreaCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddArea"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetClusterImplementationRegistry()
+                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("AreaId"))
+        {
+            ChipLogError(AppServer, "Invalid AddArea command: missing 'AreaId'");
+            return;
+        }
+
+        ServiceArea::AreaStructureWrapper area;
+        area.SetAreaId(json["AreaId"].asUInt());
+        if (json.isMember("MapId"))
+        {
+            area.SetMapId(json["MapId"].asUInt());
+        }
+        if (json.isMember("LocationName"))
+        {
+            std::string locationName = json["LocationName"].asString();
+            area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
+                                 DataModel::NullNullable);
+        }
+
+        cluster->AddSupportedArea(area);
+    }
+};
+
+class RvcRemoveAreaCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveArea"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetClusterImplementationRegistry()
+                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("AreaId"))
+        {
+            ChipLogError(AppServer, "Invalid RemoveArea command: missing 'AreaId'");
+            return;
+        }
+
+        cluster->RemoveSupportedArea(json["AreaId"].asUInt());
+    }
+};
+
 } // namespace
 
 void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -593,4 +1026,18 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcResetCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargerFoundCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargedCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcChargingCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcDockedCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcEmptyingDustBinCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcCleaningMopCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcFillingWaterTankCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcUpdatingMapsCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcErrorEventCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcAddMapCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcRemoveMapCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcAddAreaCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RvcRemoveAreaCommandHandler>());
 }
