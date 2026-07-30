@@ -42,9 +42,8 @@ std::optional<AlarmMap> ReadAttributeDefaultFromEmber(EndpointId endpointId, Clu
 {
     using chip::Protocols::InteractionModel::Status;
 
-    uint32_t raw = 0;
-    Status status =
-        emberAfReadAttribute(endpointId, clusterId, attributeId, reinterpret_cast<uint8_t *>(&raw), sizeof(raw));
+    uint32_t raw  = 0;
+    Status status = emberAfReadAttribute(endpointId, clusterId, attributeId, reinterpret_cast<uint8_t *>(&raw), sizeof(raw));
     VerifyOrReturnValue(status == Status::Success, std::nullopt);
     return AlarmMap(raw);
 }
