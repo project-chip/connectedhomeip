@@ -112,6 +112,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // Forward the event to the generic base classes as needed.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
+    {
+        UpdateLwipDefaultNetIf();
+    }
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
     if (event->Type == kPlatformNxpIpChangeEvent)
@@ -290,6 +296,12 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
             BrHandleStateChange();
 #endif
         }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        // Re-evaluate the default netif on IPv6 change.
+        UpdateLwipDefaultNetIf();
+#endif
+
         err = PlatformMgr().PostEvent(&event);
         SuccessOrDie(err);
 
@@ -297,6 +309,26 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+void ConnectivityManagerImpl::UpdateLwipDefaultNetIf()
+{
+    struct netif * threadNetIf = ThreadStackMgrImpl().ThreadNetIf();
+
+    // Use the Thread netif as default only when Wi-Fi is not connected and Thread link is up.
+    // When Wi-Fi is brought up, default netif is already set to Wi-Fi interface.
+
+    LOCK_TCPIP_CORE();
+    if (!_IsWiFiStationConnected() && threadNetIf != nullptr && netif_is_link_up(threadNetIf))
+    {
+        if (netif_default != threadNetIf)
+        {
+            netif_set_default(threadNetIf);
+        }
+    }
+    UNLOCK_TCPIP_CORE();
+}
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
