@@ -62,100 +62,37 @@ from matter.testing.runner import TestStep, default_matter_test_main
 # Create a logger
 logger = logging.getLogger(__name__)
 
+# Spec-mandated minimum intervals the DUT must observe before issuing another
+# QueryImage command. These are requirements on the DUT, not tuning knobs — they
+# apply to any device and are never derived from the test budget.
+SPEC_GUARD_S1_SEC = 120
+SPEC_GUARD_S2_SEC = 120
+SPEC_GUARD_S3_SEC = 180
+# Fail Step 5 if UpdateStateProgress makes no progress for this long while waiting for
+# kApplying. Generous on purpose: UpdateStateProgress has quality Q (quieter reporting),
+# so devices may report progress sparsely.
+DOWNLOAD_STALL_TIMEOUT_SEC = 600
+# Nominal execution reserve kept aside for each not-yet-started step when handing the
+# remaining test budget to a wait, so early steps cannot starve later ones.
+STEP_RESERVE_SEC = 60
+
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
 
-    def matcher_ota_updatestate(self, step_name, start_states, allowed_states, min_interval_sec, final_state=None):
-        """
-        Generic matcher for OTA UpdateState across multiple steps.
+    # The DUT reboots mid-test in Step 5. The framework's background wildcard
+    # subscription (autoResubscribe=False) would silently die there with a stale value
+    # cache, and its report traffic competes with the BDX transfer on constrained
+    # devices — so opt out of it for this test.
+    disable_wildcard_subscription = True
 
-        Args:
-            step_name (str): Name of the step, used in logging.
-            start_states (list[int]): States that trigger the start of the interval timer.
-            allowed_states (list[int]): States allowed during the interval. Any other state is considered unexpected.
-            min_interval_sec (float): Minimum duration of the interval in seconds.
-            final_state (int, optional): If provided, matcher waits for this state after interval completes.
-
-        Returns:
-            matcher_obj (AttributeMatcher): Matcher object to be used in event subscriptions.
-            state_sequence (list): List of observed states during the interval.
-            unexpected_states (set): Set of unexpected states observed during the interval.
-            interval_duration (list): List containing the duration (in seconds) of the interval, or None if not completed.
-
-        Notes:
-            tolerance_sec (float): Used to allow for minor timing deviations when checking if the minimum interval has been reached.
-        """
-
-        seen_states = set()
-        state_sequence = []
-        unexpected_states = set()
-        final_seen = False
-        start_seen = False
-
-        t_start_interval = None
-        t_end_interval = None
-        interval_duration = [None]
-        tolerance_sec = 0.5
-
-        logger.info('%s: OTA matcher: start=%s, allowed=%s', step_name, start_states, allowed_states)
-
-        def matcher(report):
-            nonlocal final_seen, t_start_interval, t_end_interval, start_seen
-            val = report.value
-            if val is None:
-                return False
-
-            current_time = time.time()
-
-            # Record state if new
-            if val not in seen_states:
-                state_sequence.append(val)
-                seen_states.add(val)
-                logger.info('%s: State observed: %s at %s', step_name, val, current_time)
-
-            # First start_state observed
-            if val in start_states and not start_seen:
-                start_seen = True
-                t_start_interval = current_time
-                logger.info('%s: First start state recorded: %s', step_name, val)
-                logger.info('%s: t_start_interval: %s', step_name, t_start_interval)
-                return False
-
-            # Check unexpected states during interval
-            if start_seen and t_start_interval is not None and t_end_interval is None:
-                if current_time - t_start_interval < min_interval_sec - tolerance_sec:
-                    if val not in allowed_states:
-                        unexpected_states.add(val)
-                        logger.info('%s: Unexpected state during interval: %s', step_name, val)
-
-            # End interval after min time
-            if start_seen and t_start_interval is not None and t_end_interval is None:
-                if current_time - t_start_interval >= min_interval_sec + tolerance_sec:
-                    t_end_interval = current_time
-                    interval_duration[0] = t_end_interval - t_start_interval
-                    logger.info('%s: Interval completed after %ss', step_name, min_interval_sec)
-                    logger.info('%s: t_end_interval: %s', step_name, t_end_interval)
-                    logger.info('%s: interval_duration: %s', step_name, interval_duration)
-
-                    return final_state is None
-
-            # Final state check
-            if final_state and val == final_state and t_end_interval is not None:
-                final_seen = True
-                if val not in seen_states:
-                    state_sequence.append(val)
-                    seen_states.add(val)
-                logger.info('%s: Final state %s observed, matcher ending', step_name, val)
-                return True
-
-            return False
-
-        matcher_obj = AttributeMatcher.from_callable(
-            description=f"{step_name} - Match OTA UpdateState, start={start_states}, allowed={allowed_states}, final={final_state}",
-            matcher=matcher
-        )
-
-        return matcher_obj, state_sequence, unexpected_states, interval_duration
+    @property
+    def default_timeout(self) -> int:
+        # Used only when no --timeout is passed on the command line (CI passes
+        # --timeout 2100 via the test-runner args above). Real devices have unbounded
+        # download/apply times, so default to a generous budget: every long wait is
+        # event-driven and ends early on fast devices, so an oversized budget only
+        # costs time when something is genuinely wrong.
+        return 7200
 
     def desc_TC_SU_2_2(self) -> str:
         return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor"
@@ -225,6 +162,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         if not self.ota_image or not os.path.exists(self.ota_image):
             raise FileNotFoundError(f'Invalid ota_image: {self.ota_image}.')
 
+        # All device-dependent waits below are sized from the remaining overall test
+        # budget (asyncio.wait_for timeout) instead of per-device constants, since
+        # download/apply/recovery durations of a real DUT cannot be known up front.
+        self.start_test_budget_clock()
+
         self.step(0)
         # Controller has already commissioned the requestor
 
@@ -291,9 +233,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         #
         #   Phase B — guard a 120s window using await_duration_asserting_no_forbidden().
         #             That method evaluates each report exactly once at dequeue time, so there
-        #             is no polling-loop re-evaluation drift that allowed kDownloading to slip
-        #             through the 119.5 s–120.5 s dead zone in the old matcher_ota_updatestate
-        #             approach.  tolerance_sec=1.0 shrinks the strict window to 119s so states
+        #             is no polling-loop re-evaluation drift that would let kDownloading slip
+        #             through a dead zone around the 120s boundary.
+        #             tolerance_sec=1.0 shrinks the strict window to 119s so states
         #             arriving within the last second of the nominal interval are not flagged.
         #             kDownloading that arrives after the 119s window (i.e. after the DUT
         #             correctly observed the minimum delay) does not cause a failure.
@@ -335,7 +277,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         t_delayed_on_query_s1 = subscription_attr_state_busy.await_first_value_asserting_no_forbidden(
             target_value=kDelayedOnQuery_s1,
             forbidden_values={kDownloading_s1, kApplying_s1},
-            timeout_sec=120,
+            # Reserve the spec guard windows of Steps 1-3 plus a nominal reserve for
+            # each remaining step (2-6).
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=SPEC_GUARD_S1_SEC + SPEC_GUARD_S2_SEC + SPEC_GUARD_S3_SEC + 5 * STEP_RESERVE_SEC),
         )
         logger.info('%s: Phase A complete — kDelayedOnQuery at %.2f', step_number_s1, t_delayed_on_query_s1)
 
@@ -347,7 +292,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             '%s: Phase B — guarding 120s minimum interval (tolerance %ss). kDownloading/kApplying forbidden.', step_number_s1, tolerance_s1_sec)
 
         subscription_attr_state_busy.await_duration_asserting_no_forbidden(
-            duration_sec=120,
+            duration_sec=SPEC_GUARD_S1_SEC,
             forbidden_values={kDownloading_s1, kApplying_s1},
             tolerance_sec=tolerance_s1_sec,
         )
@@ -356,8 +301,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info('%s: Phase B complete — elapsed since kDelayedOnQuery: %.2fs', step_number_s1, elapsed_s1)
 
         asserts.assert_true(
-            elapsed_s1 >= 120,
-            f"{step_number_s1}: Elapsed since kDelayedOnQuery was {elapsed_s1:.2f}s, expected >= 120s")
+            elapsed_s1 >= SPEC_GUARD_S1_SEC,
+            f"{step_number_s1}: Elapsed since kDelayedOnQuery was {elapsed_s1:.2f}s, expected >= {SPEC_GUARD_S1_SEC}s")
 
         subscription_attr_state_busy.cancel()
 
@@ -422,7 +367,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         t_querying_s2 = subscription_attr_state_updatenotavailable.await_first_value_asserting_no_forbidden(
             target_value=kQuerying_s2,
             forbidden_values={kDownloading_s2, kApplying_s2},
-            timeout_sec=120,
+            # Reserve the spec guard windows of Steps 2-3 plus a nominal reserve for
+            # each remaining step (3-6).
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=SPEC_GUARD_S2_SEC + SPEC_GUARD_S3_SEC + 4 * STEP_RESERVE_SEC),
         )
         logger.info('%s: Phase A complete — kQuerying at %.2f, 120s guard window starts', step_number_s2, t_querying_s2)
 
@@ -430,7 +378,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Phase B — 120s guard window; kDownloading/kApplying are forbidden.
         # ------------------------------------------------------------------------------------
         tolerance_s2 = 2.0
-        min_interval_s2 = 120
+        min_interval_s2 = SPEC_GUARD_S2_SEC
 
         logger.info(
             '%s: Phase B — guarding %ss minimum interval (tolerance %ss). kDownloading/kApplying forbidden.', step_number_s2, min_interval_s2, tolerance_s2)
@@ -515,7 +463,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         t_delayed_on_query_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
             target_value=kDelayedOnQuery_s3,
             forbidden_values={kDownloading_s3, kApplying_s3},
-            timeout_sec=120,
+            # Reserve the Step 3 DelayedActionTime window plus a nominal reserve for
+            # each remaining step (4-6).
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=SPEC_GUARD_S3_SEC + 3 * STEP_RESERVE_SEC),
         )
         logger.info('%s: Phase A complete — kDelayedOnQuery at %.2f, 180s guard window starts',
                     step_number_s3, t_delayed_on_query_s3)
@@ -526,7 +477,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # DUT's next query will trigger a download.
         # ------------------------------------------------------------------------------------
         tolerance_s3 = 5.0
-        min_interval_s3 = 180
+        min_interval_s3 = SPEC_GUARD_S3_SEC
 
         logger.info(
             '%s: Phase B — guarding %ss DelayedActionTime (tolerance %ss). kDownloading/kApplying forbidden. This will take ~3 minutes.', step_number_s3, min_interval_s3, tolerance_s3)
@@ -544,7 +495,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         t_downloading_s3 = subscription_attr_state_busy_180s.await_first_value_asserting_no_forbidden(
             target_value=kDownloading_s3,
             forbidden_values=set(),
-            timeout_sec=120,
+            # Nominal reserve for each remaining step (4-6); no spec guard windows left.
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=3 * STEP_RESERVE_SEC),
         )
 
         elapsed_s3 = t_downloading_s3 - t_delayed_on_query_s3
@@ -638,8 +590,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         s4_forbidden_states = {kDownloading_s4, kApplying_s4}
 
         # --- Transition 1: Idle → Querying ---
+        # BDX recovery time (timeout + retry backoff) is vendor-specific and unbounded by
+        # the spec, so the outer limit is the remaining test budget (reserving a nominal
+        # slice for Steps 5-6) rather than a guessed constant. The 60s re-announce loop
+        # below is the liveness mechanism that picks the DUT up as soon as it recovers.
         event1 = None
-        s4_timeout = 900  # 15 min: accommodates DUT recovering from a stuck BDX transfer
+        s4_timeout = self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC)
         t_s4_start = time.time()
 
         while time.time() - t_s4_start < s4_timeout:
@@ -649,7 +605,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             except queue.Empty:
                 # No event for 60 s — DUT may have missed AnnounceOTAProvider while busy.
                 # Re-send so the DUT queries as soon as it returns to kIdle.
-                logger.info("%s: No event in 60s, re-sending AnnounceOTAProvider (elapsed: %.0fs / %ss)",
+                logger.info("%s: No event in 60s, re-sending AnnounceOTAProvider (elapsed: %.0fs / %.0fs)",
                             step_number_s4, time.time() - t_s4_start, s4_timeout)
                 await self.announce_ota_provider(
                     controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
@@ -670,13 +626,14 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             logger.info("%s: Discarding stale event: %s → %s", step_number_s4, evt.previousState, evt.newState)
 
         asserts.assert_true(event1 is not None,
-                            f"{step_number_s4}: Idle→Querying transition not found within {s4_timeout}s")
+                            f"{step_number_s4}: Idle→Querying transition not found within {s4_timeout:.0f}s "
+                            "(remaining test budget exhausted)")
 
         # --- Transition 2: Querying → Idle ---
         # Apply the same stale-event filtering as Transition 1 — earlier steps may have left
         # residual events in the queue (e.g. kDownloading→kIdle from an aborted BDX session).
         event2 = None
-        s4_t2_timeout = 120
+        s4_t2_timeout = self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC)
         t_s4_t2_start = time.time()
 
         while time.time() - t_s4_t2_start < s4_t2_timeout:
@@ -701,7 +658,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             logger.info("%s: Discarding stale event (transition 2): %s → %s", step_number_s4, evt2.previousState, evt2.newState)
 
         asserts.assert_true(event2 is not None,
-                            f"{step_number_s4}: Querying→Idle transition not found within {s4_t2_timeout}s")
+                            f"{step_number_s4}: Querying→Idle transition not found within {s4_t2_timeout:.0f}s "
+                            "(remaining test budget exhausted)")
 
         subscription_state_invalid_uri.cancel()
 
@@ -817,27 +775,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.3 - Wait for download to start
         # ------------------------------------------------------------------------------------
-        # Start the kApplying subscription before waiting for kDownloading/progress so there
-        # is no gap between the two subscriptions — kApplying could fire while subscription_attr
-        # is still active, and we must not miss it.
-        subscription_attr_applying = AttributeSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
-        )
-
-        await subscription_attr_applying.start(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=20,
-            keepSubscriptions=True
-        )
-
-        subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=800.0)
+        subscription_attr.await_all_expected_report_matches(
+            [matcher_combined_obj],
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
         logger.info('%s: Step #5.3 - UpdateState (Available sequence) matcher has completed.', step_number_s5)
-        subscription_attr.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.4 - Verify image transfer from TH/OTA-P to DUT is successfully started.
@@ -862,21 +803,40 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.5 - Wait for kApplying to confirm the BDX transfer is fully
         # complete, then kill the provider. The DUT will finish applying and reboot on its own.
+        #
+        # The download duration of a real DUT is unknown, so instead of an absolute timeout
+        # this wait is bounded by a progress-stall watchdog: as long as UpdateStateProgress
+        # keeps advancing, the wait continues (up to the remaining test budget). Reports
+        # already queued from Step 5.3 (kDownloading, early progress) are harmless: they are
+        # not the target and merely count as liveness. expected_attribute is required here
+        # because the cluster-wide queue also carries UpdateStateProgress ints, which would
+        # otherwise compare equal to UpdateStateEnum values.
         # ------------------------------------------------------------------------------------
-        logger.info('%s: Step #5.5 - Waiting for kApplying to confirm download complete.', step_number_s5)
+        logger.info('%s: Step #5.5 - Waiting for kApplying (progress-stall watchdog: %ss).',
+                    step_number_s5, DOWNLOAD_STALL_TIMEOUT_SEC)
 
-        def matcher_applying(report):
-            val = report.value
-            return val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+        kApplying_s5 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
+        last_progress_s5 = [None]
 
-        matcher_applying_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s5} - Wait for kApplying",
-            matcher=matcher_applying
+        def progress_liveness_s5(report):
+            if report.attribute != Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
+                return False
+            val = getattr(report.value, "value", report.value)
+            if val is None or val == last_progress_s5[0]:
+                return False
+            last_progress_s5[0] = val
+            return True
+
+        subscription_attr.await_first_value_asserting_no_forbidden(
+            target_value=kApplying_s5,
+            forbidden_values=set(),
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC),
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            stall_timeout_sec=DOWNLOAD_STALL_TIMEOUT_SEC,
+            liveness_matcher=progress_liveness_s5,
         )
-
-        subscription_attr_applying.await_all_expected_report_matches([matcher_applying_obj], timeout_sec=800.0)
         logger.info('%s: Step #5.5 - kApplying observed — BDX transfer complete.', step_number_s5)
-        subscription_attr_applying.cancel()
+        subscription_attr.cancel()
 
         logger.info('%s: Step #5.5 - Killing provider (download done, DUT applying firmware).', step_number_s5)
         self.current_provider_app_proc.terminate()
@@ -884,29 +844,37 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.6 - Wait for DUT to reboot after applying V2 firmware.
         # Expire the stale session so the controller reconnects cleanly, then poll until
-        # GetConnectedDevice succeeds (DUT is back online).
+        # GetConnectedDevice succeeds (DUT is back online). Applying firmware on a real DUT
+        # (signature check, flash bank copy, reboot, mDNS re-advertisement) has no known
+        # upper bound and offers no observable liveness signal, so the polling loop itself
+        # is the liveness mechanism and runs until the remaining test budget is exhausted.
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #5.6 - Expiring stale session and waiting for DUT to reboot.', step_number_s5)
         controller.ExpireSessions(requestor_node_id)
 
-        reboot_timeout_sec = 120
+        reboot_timeout_sec = self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC)
         poll_interval_sec = 5
         reconnect_timeout_ms = 5000
         reconnected = False
-        for attempt in range(reboot_timeout_sec // poll_interval_sec):
+        t_reboot_start = time.time()
+        attempt = 0
+        while time.time() - t_reboot_start < reboot_timeout_sec:
+            attempt += 1
             await asyncio.sleep(poll_interval_sec)
             try:
                 await controller.GetConnectedDevice(
                     requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
-                logger.info('%s: Step #5.6 - DUT reconnected after OTA reboot (attempt %s).', step_number_s5, attempt + 1)
+                logger.info('%s: Step #5.6 - DUT reconnected after OTA reboot (attempt %s).', step_number_s5, attempt)
                 break
             except (TimeoutError, ChipDeviceCtrl.ChipStackError):
-                logger.info('%s: Step #5.6 - Waiting for DUT to come back online (attempt %s/%s)...',
-                            step_number_s5, attempt + 1, reboot_timeout_sec // poll_interval_sec)
+                logger.info('%s: Step #5.6 - Waiting for DUT to come back online (attempt %s, elapsed %.0fs / %.0fs)...',
+                            step_number_s5, attempt, time.time() - t_reboot_start, reboot_timeout_sec)
 
         asserts.assert_true(
-            reconnected, f'{step_number_s5}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
+            reconnected,
+            f'{step_number_s5}: DUT did not come back online within {reboot_timeout_sec:.0f}s after OTA reboot '
+            '(remaining test budget exhausted).')
 
         # Allow the DUT to finish post-OTA housekeeping (attribute writes, data-version
         # bumps on the OTA Requestor cluster) before Step 6 establishes a subscription.
@@ -991,10 +959,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # The DUT is on V2 and the provider offers V2, so the DUT should query (kQuerying)
         # but reject the image and return to kIdle without downloading.
         #
-        # Two-phase wait to reliably cover the full kIdle→kQuerying→kIdle cycle:
-        #   Phase 1 (720 s): accept kQuerying or kIdle.  kQuerying is transient — the DUT
+        # Two-phase wait to reliably cover the full kIdle→kQuerying→kIdle cycle (both
+        # phases are bounded by the remaining test budget — the query cadence of a real
+        # DUT is vendor-specific):
+        #   Phase 1: accept kQuerying or kIdle.  kQuerying is transient — the DUT
         #     may complete the entire cycle between subscription polls, so a bare kIdle counts.
-        #   Phase 2 (60 s): always runs after Phase 1.  Resets history and waits for kIdle.
+        #   Phase 2: always runs after Phase 1.  Resets history and waits for kIdle.
         #     This prevents a false pass when Phase 1 fires on a periodic keepalive kIdle
         #     (max_interval_sec=30) that arrives before the DUT starts querying.
         # ------------------------------------------------------------------------------------
@@ -1024,7 +994,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=phase1_matcher_s6
         )
 
-        subscription_s6.await_all_expected_report_matches([phase1_matcher_s6_obj], timeout_sec=720.0)
+        subscription_s6.await_all_expected_report_matches(
+            [phase1_matcher_s6_obj], timeout_sec=self.remaining_test_budget_sec())
 
         # Phase 2: reset and wait for kIdle.
         logger.info('%s: Phase 2: awaiting kIdle to confirm query cycle completed without download.', step_number_s6)
@@ -1047,7 +1018,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=phase2_matcher_s6
         )
 
-        subscription_s6.await_all_expected_report_matches([phase2_matcher_s6_obj], timeout_sec=120.0)
+        subscription_s6.await_all_expected_report_matches(
+            [phase2_matcher_s6_obj], timeout_sec=self.remaining_test_budget_sec())
         logger.info('%s: Step #6.2 - Query cycle fully completed after announce.', step_number_s6)
         subscription_s6.cancel()
 
