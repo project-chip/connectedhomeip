@@ -170,10 +170,8 @@ public:
     CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override;
     CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override;
     CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override;
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override;
 
     // Integration methods for other cluster integrations
-    CHIP_ERROR MakeSceneInvalid(FabricIndex aFabricIdx);
     CHIP_ERROR StoreCurrentScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RecallScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RemoveFabric(FabricIndex aFabricIndex);
@@ -193,8 +191,7 @@ private:
         return mFabricSceneInfo.SetSceneInfoStruct(fabric, sceneInfoStruct);
     }
 
-    CHIP_ERROR UpdateFabricSceneInfo(FabricIndex fabric, Optional<GroupId> group, Optional<SceneId> scene,
-                                     Optional<bool> sceneValid);
+    CHIP_ERROR UpdateFabricSceneInfo(FabricIndex fabric);
 
     CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID, const SceneId & sceneID);
 

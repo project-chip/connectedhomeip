@@ -85,8 +85,6 @@ public:
 
     CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override { return CHIP_NO_ERROR; }
-
     uint32_t mGroupWillBeRemovedCallCount = 0;
     FabricIndex mLastFabricIndex          = kUndefinedFabricIndex;
     GroupId mLastGroupId                  = kUndefinedGroupId;
@@ -101,7 +99,7 @@ public:
     void SetUp() override
     {
         mCluster       = std::make_unique<GroupsCluster>(kTestEndpointId,
-                                                   GroupsCluster::Context{
+                                                         GroupsCluster::Context{
                                                              .groupDataProvider   = mGroupDataProvider,
                                                              .scenesIntegration   = &mScenesDelegate,
                                                              .identifyIntegration = &mIdentifyDelegate,

@@ -1623,9 +1623,6 @@ Status ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, ui
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, optionsMask, optionsOverride), Status::Success);
 
     Status status = moveToHueAndSaturation(endpoint, hue, saturation, transitionTime, isEnhanced);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -1804,9 +1801,6 @@ Status ColorControlServer::moveToSaturationCommand(EndpointId endpoint,
 
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
     Status status = moveToSaturation(endpoint, commandData.saturation, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -1972,9 +1966,6 @@ Status ColorControlServer::colorLoopCommand(EndpointId endpoint, const Commands:
         }
     }
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return Status::Success;
 }
 
@@ -2227,9 +2218,6 @@ Status ColorControlServer::moveToColorCommand(EndpointId endpoint, const Command
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColor(endpoint, commandData.colorX, commandData.colorY, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 
@@ -2779,9 +2767,6 @@ Status ColorControlServer::moveToColorTempCommand(EndpointId endpoint,
     VerifyOrReturnValue(shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride), Status::Success);
 
     Status status = moveToColorTemp(endpoint, commandData.colorTemperatureMireds, commandData.transitionTime);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     return status;
 }
 

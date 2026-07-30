@@ -267,11 +267,6 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         }
     }
 
-    //  the scene has been changed (the value of on/off has changed) so
-    //  the current scene as described in the attribute table is invalid,
-    //  so mark it as invalid (just writes the valid/invalid attribute)
-    Internal::Scenes::MarkInvalid(endpoint);
-
     // The returned status is based solely on the On/Off cluster.  Errors in the
     // Level Control and/or Scenes cluster are ignored.
     return Status::Success;
@@ -734,8 +729,8 @@ static inline void unreg(OnOffEffect * inst)
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
                          EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
-    mEndpoint(endpoint),
-    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
+    mEndpoint(endpoint), mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier),
+    mEffectVariant(effectVariant)
 {
     reg(this);
 };
