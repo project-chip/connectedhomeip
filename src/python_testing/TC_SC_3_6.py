@@ -135,7 +135,7 @@ class TC_SC_3_6(MatterBaseTest):
         all_names = []
         for fabric_idx in range(num_fabrics_to_commission):
             for controller_idx in range(num_controllers_per_fabric):
-                all_names.append("RD%d%s" % (fabric_idx + 1, chr(ord('A') + controller_idx)))
+                all_names.append(f"RD{fabric_idx + 1}{chr(ord('A') + controller_idx)}")
         log.info("Client names that will be used: %s", all_names)
         client_list = []
 

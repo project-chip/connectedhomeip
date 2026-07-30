@@ -72,6 +72,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (pw_enable_fuzz_test_targets) {
     group("pw_fuzz_tests") {
       deps = [
+        "${chip_root}/src/app/clusters/tls-certificate-management-server/tests:fuzz-tls-certificate-management-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-ble-endpoint-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-ble-layer-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/ble/tests:fuzz-btp-engine-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
