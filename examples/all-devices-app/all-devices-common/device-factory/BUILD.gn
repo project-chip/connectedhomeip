@@ -34,6 +34,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",

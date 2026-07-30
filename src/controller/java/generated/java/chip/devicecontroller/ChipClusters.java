@@ -29402,6 +29402,8 @@ public class ChipClusters {
 
     private static final long MESSAGES_ATTRIBUTE_ID = 0L;
     private static final long ACTIVE_MESSAGE_I_DS_ATTRIBUTE_ID = 1L;
+    private static final long SUPPORTED_LANGUAGE_CODES_ATTRIBUTE_ID = 2L;
+    private static final long SUPPORTED_MIME_TYPES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -29418,11 +29420,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses) {
-      presentMessagesRequest(callback, messageID, priority, messageControl, startTime, duration, messageText, responses, 0);
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, Optional<String> languageCode, Optional<String> messageURI) {
+      presentMessagesRequest(callback, messageID, priority, messageControl, startTime, duration, messageText, responses, languageCode, messageURI, 0);
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, int timedInvokeTimeoutMs) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, Optional<String> languageCode, Optional<String> messageURI, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -29453,6 +29455,14 @@ public class ChipClusters {
       final long responsesFieldID = 6L;
       BaseTLVType responsestlvValue = responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(responsesFieldID, responsestlvValue));
+
+      final long languageCodeFieldID = 7L;
+      BaseTLVType languageCodetlvValue = languageCode.<BaseTLVType>map((nonOptionallanguageCode) -> new StringType(nonOptionallanguageCode)).orElse(new EmptyType());
+      elements.add(new StructElement(languageCodeFieldID, languageCodetlvValue));
+
+      final long messageURIFieldID = 8L;
+      BaseTLVType messageURItlvValue = messageURI.<BaseTLVType>map((nonOptionalmessageURI) -> new StringType(nonOptionalmessageURI)).orElse(new EmptyType());
+      elements.add(new StructElement(messageURIFieldID, messageURItlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -29488,6 +29498,14 @@ public class ChipClusters {
 
     public interface ActiveMessageIDsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<byte[]> value);
+    }
+
+    public interface SupportedLanguageCodesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<String> value);
+    }
+
+    public interface SupportedMimeTypesAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<String> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -29552,6 +29570,58 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_MESSAGE_I_DS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedLanguageCodesAttribute(
+        SupportedLanguageCodesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_LANGUAGE_CODES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<String> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_LANGUAGE_CODES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedLanguageCodesAttribute(
+        SupportedLanguageCodesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_LANGUAGE_CODES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<String> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_LANGUAGE_CODES_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedMimeTypesAttribute(
+        SupportedMimeTypesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MIME_TYPES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<String> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_MIME_TYPES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedMimeTypesAttribute(
+        SupportedMimeTypesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_MIME_TYPES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<String> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_MIME_TYPES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

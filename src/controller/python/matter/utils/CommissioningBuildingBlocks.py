@@ -17,7 +17,6 @@
 
 import logging
 import os
-import typing
 
 from .. import clusters as Clusters
 from ..ChipDeviceCtrl import ChipDeviceController, NOCChain
@@ -141,7 +140,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     return controllerList
 
 
-async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, Clusters.OperationalCredentials.Commands.NOCResponse | None, NOCChain | None]:
     ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:

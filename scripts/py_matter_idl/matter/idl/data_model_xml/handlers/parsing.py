@@ -15,7 +15,6 @@
 import logging
 import re
 from dataclasses import dataclass
-from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
@@ -30,7 +29,7 @@ class ParsedType:
     is_list: bool = False
 
 
-def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
+def ParseInt(value: str, data_type: DataType | None = None) -> int:
     """
     Convert a string that is a known integer into an actual number.
 
@@ -47,7 +46,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
     return int(value)
 
 
-def ParseOptionalInt(value: str) -> Optional[int]:
+def ParseOptionalInt(value: str) -> int | None:
     """Parses numbers as long as they are in an expected format of numbers.
 
        "1" parses to 1
@@ -271,7 +270,7 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
             log.warning("Found an event with 'desc' priority: '%s'", attrs.items())
             priority = EventPriority.CRITICAL
         else:
-            raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+            raise Exception(f"UNKNOWN event priority: {attrs['priority']!r}")
     else:
         priority = EventPriority.INFO
 
@@ -291,7 +290,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         return AccessPrivilege.MANAGE
     if value == "admin":
         return AccessPrivilege.ADMINISTER
-    raise Exception("UNKNOWN privilege level: %r" % value)
+    raise Exception(f"UNKNOWN privilege level: {value!r}")
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:

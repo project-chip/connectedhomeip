@@ -16,7 +16,7 @@
 #
 
 import xml.etree.ElementTree as ElementTree
-from typing import Callable
+from collections.abc import Callable
 
 from mobly import asserts
 
@@ -103,6 +103,15 @@ class TestConformanceSupport(MatterBaseTest):
             info = ConformanceAssessmentData(feature_map=f, attribute_list=[], all_command_list=[], cluster_revision=1)
             asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.PROVISIONAL)
         asserts.assert_equal(str(xml_callable), 'P')
+
+    def test_conformance_described(self):
+        xml = '<describedConform />'
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            info = ConformanceAssessmentData(feature_map=f, attribute_list=[], all_command_list=[], cluster_revision=1)
+            asserts.assert_equal(xml_callable(info).decision, ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(str(xml_callable), 'Desc')
 
     def test_conformance_zigbee(self):
         xml = '<condition name="Zigbee"/>'

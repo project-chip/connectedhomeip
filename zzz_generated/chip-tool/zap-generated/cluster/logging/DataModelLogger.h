@@ -415,6 +415,10 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::DecodableType & value);
 
@@ -964,6 +968,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Messages::Events::MessagePresented::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Messages::Events::MessageComplete::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Messages::Events::MessageNotPresented::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Events::PowerAdjustStart::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

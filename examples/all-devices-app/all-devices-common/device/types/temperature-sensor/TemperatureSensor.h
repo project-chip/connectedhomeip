@@ -27,7 +27,8 @@ namespace app {
 class TemperatureSensor : public SingleEndpoint
 {
 public:
-    TemperatureSensor(TimerDelegate & timerDelegate, Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
+    TemperatureSensor(TimerDelegate & timerDelegate, Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                      Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~TemperatureSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -42,6 +43,7 @@ public:
 protected:
     TimerDelegate & mTimerDelegate;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
+    Clusters::TemperatureMeasurementCluster::OptionalAttributeSet mOptionalAttributes;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureMeasurementCluster;
 };

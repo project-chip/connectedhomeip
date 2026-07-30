@@ -20,7 +20,6 @@ import subprocess
 import sys
 import unittest
 from dataclasses import dataclass, field
-from typing import Optional
 
 import yaml
 
@@ -31,7 +30,7 @@ CHIP_ROOT = os.path.abspath(os.path.join(
 
 @dataclass
 class ProgramArguments:
-    stamp_file: Optional[str] = None
+    stamp_file: str | None = None
     regenerate_golden: bool = False
     output_directory: str = ''
 

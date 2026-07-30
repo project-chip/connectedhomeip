@@ -7843,6 +7843,8 @@ public static class MessagesClusterMessageStruct {
   public @Nullable Long duration;
   public String messageText;
   public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
+  public Optional<String> languageCode;
+  public Optional<String> messageURI;
   private static final long MESSAGE_ID_ID = 0L;
   private static final long PRIORITY_ID = 1L;
   private static final long MESSAGE_CONTROL_ID = 2L;
@@ -7850,6 +7852,8 @@ public static class MessagesClusterMessageStruct {
   private static final long DURATION_ID = 4L;
   private static final long MESSAGE_TEXT_ID = 5L;
   private static final long RESPONSES_ID = 6L;
+  private static final long LANGUAGE_CODE_ID = 7L;
+  private static final long MESSAGE_URI_ID = 8L;
 
   public MessagesClusterMessageStruct(
     byte[] messageID,
@@ -7858,7 +7862,9 @@ public static class MessagesClusterMessageStruct {
     @Nullable Long startTime,
     @Nullable Long duration,
     String messageText,
-    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses,
+    Optional<String> languageCode,
+    Optional<String> messageURI
   ) {
     this.messageID = messageID;
     this.priority = priority;
@@ -7867,6 +7873,8 @@ public static class MessagesClusterMessageStruct {
     this.duration = duration;
     this.messageText = messageText;
     this.responses = responses;
+    this.languageCode = languageCode;
+    this.messageURI = messageURI;
   }
 
   public StructType encodeTlv() {
@@ -7878,6 +7886,8 @@ public static class MessagesClusterMessageStruct {
     values.add(new StructElement(DURATION_ID, duration != null ? new UIntType(duration) : new NullType()));
     values.add(new StructElement(MESSAGE_TEXT_ID, new StringType(messageText)));
     values.add(new StructElement(RESPONSES_ID, responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(LANGUAGE_CODE_ID, languageCode.<BaseTLVType>map((nonOptionallanguageCode) -> new StringType(nonOptionallanguageCode)).orElse(new EmptyType())));
+    values.add(new StructElement(MESSAGE_URI_ID, messageURI.<BaseTLVType>map((nonOptionalmessageURI) -> new StringType(nonOptionalmessageURI)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7893,6 +7903,8 @@ public static class MessagesClusterMessageStruct {
     @Nullable Long duration = null;
     String messageText = null;
     Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
+    Optional<String> languageCode = Optional.empty();
+    Optional<String> messageURI = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -7929,6 +7941,16 @@ public static class MessagesClusterMessageStruct {
           ArrayType castingValue = element.value(ArrayType.class);
           responses = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.MessagesClusterMessageResponseOptionStruct.decodeTlv(elementcastingValue)));
         }
+      } else if (element.contextTagNum() == LANGUAGE_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          languageCode = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == MESSAGE_URI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          messageURI = Optional.of(castingValue.value(String.class));
+        }
       }
     }
     return new MessagesClusterMessageStruct(
@@ -7938,7 +7960,9 @@ public static class MessagesClusterMessageStruct {
       startTime,
       duration,
       messageText,
-      responses
+      responses,
+      languageCode,
+      messageURI
     );
   }
 
@@ -7966,6 +7990,12 @@ public static class MessagesClusterMessageStruct {
     output.append("\n");
     output.append("\tresponses: ");
     output.append(responses);
+    output.append("\n");
+    output.append("\tlanguageCode: ");
+    output.append(languageCode);
+    output.append("\n");
+    output.append("\tmessageURI: ");
+    output.append(messageURI);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -13202,34 +13232,110 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     return output.toString();
   }
 }
+public static class AmbientSensingUnionClusterContributorStatusChangeStruct {
+  public Integer contributorIndex;
+  public Integer previousContributorStatus;
+  public Integer currentContributorStatus;
+  private static final long CONTRIBUTOR_INDEX_ID = 0L;
+  private static final long PREVIOUS_CONTRIBUTOR_STATUS_ID = 1L;
+  private static final long CURRENT_CONTRIBUTOR_STATUS_ID = 2L;
+
+  public AmbientSensingUnionClusterContributorStatusChangeStruct(
+    Integer contributorIndex,
+    Integer previousContributorStatus,
+    Integer currentContributorStatus
+  ) {
+    this.contributorIndex = contributorIndex;
+    this.previousContributorStatus = previousContributorStatus;
+    this.currentContributorStatus = currentContributorStatus;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTRIBUTOR_INDEX_ID, new UIntType(contributorIndex)));
+    values.add(new StructElement(PREVIOUS_CONTRIBUTOR_STATUS_ID, new UIntType(previousContributorStatus)));
+    values.add(new StructElement(CURRENT_CONTRIBUTOR_STATUS_ID, new UIntType(currentContributorStatus)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientSensingUnionClusterContributorStatusChangeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer contributorIndex = null;
+    Integer previousContributorStatus = null;
+    Integer currentContributorStatus = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTRIBUTOR_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contributorIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PREVIOUS_CONTRIBUTOR_STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          previousContributorStatus = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_CONTRIBUTOR_STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentContributorStatus = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientSensingUnionClusterContributorStatusChangeStruct(
+      contributorIndex,
+      previousContributorStatus,
+      currentContributorStatus
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientSensingUnionClusterContributorStatusChangeStruct {\n");
+    output.append("\tcontributorIndex: ");
+    output.append(contributorIndex);
+    output.append("\n");
+    output.append("\tpreviousContributorStatus: ");
+    output.append(previousContributorStatus);
+    output.append("\n");
+    output.append("\tcurrentContributorStatus: ");
+    output.append(currentContributorStatus);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AmbientSensingUnionClusterUnionContributorStruct {
   public @Nullable Long contributorNodeID;
   public @Nullable Integer contributorEndpointID;
-  public Optional<String> contributorName;
-  public Integer contributorHealth;
+  public @Nullable String contributorName;
+  public Integer contributorStatus;
   private static final long CONTRIBUTOR_NODE_ID_ID = 0L;
   private static final long CONTRIBUTOR_ENDPOINT_ID_ID = 1L;
   private static final long CONTRIBUTOR_NAME_ID = 2L;
-  private static final long CONTRIBUTOR_HEALTH_ID = 3L;
+  private static final long CONTRIBUTOR_STATUS_ID = 3L;
 
   public AmbientSensingUnionClusterUnionContributorStruct(
     @Nullable Long contributorNodeID,
     @Nullable Integer contributorEndpointID,
-    Optional<String> contributorName,
-    Integer contributorHealth
+    @Nullable String contributorName,
+    Integer contributorStatus
   ) {
     this.contributorNodeID = contributorNodeID;
     this.contributorEndpointID = contributorEndpointID;
     this.contributorName = contributorName;
-    this.contributorHealth = contributorHealth;
+    this.contributorStatus = contributorStatus;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONTRIBUTOR_NODE_ID_ID, contributorNodeID != null ? new UIntType(contributorNodeID) : new NullType()));
     values.add(new StructElement(CONTRIBUTOR_ENDPOINT_ID_ID, contributorEndpointID != null ? new UIntType(contributorEndpointID) : new NullType()));
-    values.add(new StructElement(CONTRIBUTOR_NAME_ID, contributorName.<BaseTLVType>map((nonOptionalcontributorName) -> new StringType(nonOptionalcontributorName)).orElse(new EmptyType())));
-    values.add(new StructElement(CONTRIBUTOR_HEALTH_ID, new UIntType(contributorHealth)));
+    values.add(new StructElement(CONTRIBUTOR_NAME_ID, contributorName != null ? new StringType(contributorName) : new NullType()));
+    values.add(new StructElement(CONTRIBUTOR_STATUS_ID, new UIntType(contributorStatus)));
 
     return new StructType(values);
   }
@@ -13240,8 +13346,8 @@ public static class AmbientSensingUnionClusterUnionContributorStruct {
     }
     @Nullable Long contributorNodeID = null;
     @Nullable Integer contributorEndpointID = null;
-    Optional<String> contributorName = Optional.empty();
-    Integer contributorHealth = null;
+    @Nullable String contributorName = null;
+    Integer contributorStatus = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONTRIBUTOR_NODE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13256,12 +13362,12 @@ public static class AmbientSensingUnionClusterUnionContributorStruct {
       } else if (element.contextTagNum() == CONTRIBUTOR_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          contributorName = Optional.of(castingValue.value(String.class));
+          contributorName = castingValue.value(String.class);
         }
-      } else if (element.contextTagNum() == CONTRIBUTOR_HEALTH_ID) {
+      } else if (element.contextTagNum() == CONTRIBUTOR_STATUS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          contributorHealth = castingValue.value(Integer.class);
+          contributorStatus = castingValue.value(Integer.class);
         }
       }
     }
@@ -13269,7 +13375,7 @@ public static class AmbientSensingUnionClusterUnionContributorStruct {
       contributorNodeID,
       contributorEndpointID,
       contributorName,
-      contributorHealth
+      contributorStatus
     );
   }
 
@@ -13286,8 +13392,8 @@ public static class AmbientSensingUnionClusterUnionContributorStruct {
     output.append("\tcontributorName: ");
     output.append(contributorName);
     output.append("\n");
-    output.append("\tcontributorHealth: ");
-    output.append(contributorHealth);
+    output.append("\tcontributorStatus: ");
+    output.append(contributorStatus);
     output.append("\n");
     output.append("}\n");
     return output.toString();
