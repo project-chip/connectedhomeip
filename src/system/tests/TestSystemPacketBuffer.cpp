@@ -1761,8 +1761,8 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
     EXPECT_FALSE(sized.Fit());
     EXPECT_TRUE(sized.Finalize().IsNull());
 
-    // Unsized constructor, never written, so Fit() is true; only the null result of Finalize() keeps
-    // a caller from mistaking a failed allocation for an empty buffer.
+    // Unsized constructor, never written, so Fit() is true: it reflects capacity, not validity, and
+    // gives no warning here. A caller that skipped the IsNull() check still sees Finalize() yield null.
     PacketBufferHandle empty;
     PacketBufferWriter unsized(std::move(empty));
     EXPECT_TRUE(unsized.IsNull());
