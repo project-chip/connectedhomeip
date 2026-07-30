@@ -199,14 +199,7 @@ void VerifyCommand::PrintDeviceInformation()
         printf("No PAA\n");
     }
 
-    if (mAttestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
-    {
-        printf("Valid certs\n");
-    }
-    else
-    {
-        printf("Invalid cert: %u\n", static_cast<uint16_t>(mAttestationResult));
-    }
+    printf("Attestation: %s\n", GetAttestationResultDescription(mAttestationResult));
 }
 
 void VerifyCommand::PrintCert(const char * name, chip::ByteSpan & buffer)
