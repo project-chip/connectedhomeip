@@ -3374,7 +3374,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 class MatterTestCommissionedDevice(MatterBaseTest):
     """Marker: the test requires a DUT already commissioned before test execution.
 
-    Classification follows the DUT-under-test's required starting state, not incidental
+    Classification follows the DUT's required starting state, not incidental
     commissioning actions. A test that opens a commissioning window and commissions a
     *second* fabric, or commissions a helper/peer device, while its own DUT is already
     commissioned is still MatterTestCommissionedDevice."""
@@ -3383,7 +3383,7 @@ class MatterTestCommissionedDevice(MatterBaseTest):
 class MatterTestUncommissionedDevice(MatterBaseTest):
     """Marker: the test requires an uncommissioned / commissionable DUT (not yet on a fabric).
 
-    Used for tests whose DUT-under-test must arrive uncommissioned and that do not perform
+    Used for tests whose DUT must arrive uncommissioned and that do not perform
     protocol commissioning of it (e.g. out-of-box discovery / advertising checks). Tests
     that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner."""
 
