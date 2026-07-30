@@ -130,7 +130,8 @@ class TC_ESALM_3_1(MatterBaseTest):
 
         state_sub.reset()
         event_sub.reset()
-        await self.send_test_event_triggers(eventTrigger=int(trigger_active, 0))
+        trigger_active_val = int(trigger_active, 0) if isinstance(trigger_active, str) else int(trigger_active)
+        await self.send_test_event_triggers(eventTrigger=trigger_active_val)
 
         def state_has_triggered_bit(report):
             return bool(report.value & triggered_bit)
@@ -164,7 +165,8 @@ class TC_ESALM_3_1(MatterBaseTest):
         state_sub.reset()
         event_sub.reset()
         if trigger_clear is not None:
-            await self.send_test_event_triggers(eventTrigger=int(trigger_clear, 0))
+            trigger_clear_val = int(trigger_clear, 0) if isinstance(trigger_clear, str) else int(trigger_clear)
+            await self.send_test_event_triggers(eventTrigger=trigger_clear_val)
         else:
             self.mark_current_step_skipped()
 

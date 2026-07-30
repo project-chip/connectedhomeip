@@ -153,7 +153,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(3, "TH sends SetElectricalAlarmThresholds with OverVoltageThreshold = ORIG + 1000; reads back",
                   "SUCCESS. Read-back equals ORIG + 1000.")
         if has_overvolt:
-            new_over_voltage = orig_over_voltage + 1000
+            base_val = orig_over_voltage if isinstance(orig_over_voltage, int) else 230000
+            new_over_voltage = base_val + 1000
             await self._send_set_thresholds(endpoint, overVoltageThreshold=new_over_voltage)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverVoltageThreshold)
@@ -164,7 +165,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(4, "TH sends SetElectricalAlarmThresholds with UnderVoltageThreshold = ORIG - 1000; reads back",
                   "SUCCESS. Read-back equals ORIG - 1000.")
         if has_undervolt:
-            new_under_voltage = orig_under_voltage - 1000
+            base_val = orig_under_voltage if isinstance(orig_under_voltage, int) else 110000
+            new_under_voltage = base_val - 1000
             await self._send_set_thresholds(endpoint, underVoltageThreshold=new_under_voltage)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderVoltageThreshold)
@@ -188,7 +190,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(6, "TH sends SetElectricalAlarmThresholds with OverFrequencyThreshold = ORIG + 1000; reads back",
                   "SUCCESS. Read-back equals ORIG + 1000.")
         if has_overfreq:
-            new_over_freq = orig_over_frequency + 1000
+            base_val = orig_over_frequency if isinstance(orig_over_frequency, int) else 50000
+            new_over_freq = base_val + 1000
             await self._send_set_thresholds(endpoint, overFrequencyThreshold=new_over_freq)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverFrequencyThreshold)
@@ -199,7 +202,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(7, "TH sends SetElectricalAlarmThresholds with UnderFrequencyThreshold = ORIG - 1000; reads back",
                   "SUCCESS. Read-back equals ORIG - 1000.")
         if has_underfreq:
-            new_under_freq = orig_under_frequency - 1000
+            base_val = orig_under_frequency if isinstance(orig_under_frequency, int) else 50000
+            new_under_freq = base_val - 1000
             await self._send_set_thresholds(endpoint, underFrequencyThreshold=new_under_freq)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderFrequencyThreshold)
@@ -210,7 +214,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(8, "TH sends SetElectricalAlarmThresholds with OverPowerThreshold = ORIG + 1000; reads back",
                   "SUCCESS. Read-back equals ORIG + 1000.")
         if has_overpower:
-            new_over_power = orig_over_power + 1000
+            base_val = orig_over_power if isinstance(orig_over_power, int) else 10000
+            new_over_power = base_val + 1000
             await self._send_set_thresholds(endpoint, overPowerThreshold=new_over_power)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverPowerThreshold)
@@ -221,7 +226,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(9, "TH sends SetElectricalAlarmThresholds with UnderPowerThreshold = ORIG - 1000; reads back",
                   "SUCCESS. Read-back equals ORIG - 1000.")
         if has_underpower:
-            new_under_power = orig_under_power - 1000
+            base_val = orig_under_power if isinstance(orig_under_power, int) else 1000
+            new_under_power = base_val - 1000
             await self._send_set_thresholds(endpoint, underPowerThreshold=new_under_power)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderPowerThreshold)
@@ -232,7 +238,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(10, "TH sends SetElectricalAlarmThresholds with OverCurrentThreshold = ORIG + 1000; reads back",
                   "SUCCESS. Read-back equals ORIG + 1000.")
         if has_overcur:
-            new_over_current = orig_over_current + 1000
+            base_val = orig_over_current if isinstance(orig_over_current, int) else 16000
+            new_over_current = base_val + 1000
             await self._send_set_thresholds(endpoint, overCurrentThreshold=new_over_current)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.OverCurrentThreshold)
@@ -243,7 +250,8 @@ class TC_ESALM_2_2(MatterBaseTest):
         self.step(11, "TH sends SetElectricalAlarmThresholds with UnderCurrentThreshold = ORIG - 1000; reads back",
                   "SUCCESS. Read-back equals ORIG - 1000.")
         if has_undercur:
-            new_under_current = orig_under_current - 1000
+            base_val = orig_under_current if isinstance(orig_under_current, int) else 1000
+            new_under_current = base_val - 1000
             await self._send_set_thresholds(endpoint, underCurrentThreshold=new_under_current)
             readback = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attrs.UnderCurrentThreshold)

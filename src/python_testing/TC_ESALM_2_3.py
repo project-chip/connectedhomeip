@@ -168,7 +168,8 @@ class TC_ESALM_2_3(MatterBaseTest):
             await self.check_test_event_triggers_enabled()
             trigger_code = self.user_params.get("PIXIT.ESALM.TEST_EVENT_TRIGGER", None)
             if trigger_code is not None:
-                await self.send_test_event_triggers(eventTrigger=int(trigger_code, 0))
+                trigger_val = int(trigger_code, 0) if isinstance(trigger_code, str) else int(trigger_code)
+                await self.send_test_event_triggers(eventTrigger=trigger_val)
                 state = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attrs.State)
                 latch = await self.read_single_attribute_check_success(

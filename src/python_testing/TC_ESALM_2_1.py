@@ -165,7 +165,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_voltage, int), "UnderVoltageThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overvolt and has_undervolt and over_voltage is not None and over_voltage is not NullValue and under_voltage is not None and under_voltage is not NullValue:
+        if has_overvolt and has_undervolt and isinstance(over_voltage, int) and isinstance(under_voltage, int):
             asserts.assert_greater_equal(over_voltage, under_voltage + 1,
                                          "OverVoltageThreshold must be >= UnderVoltageThreshold + 1")
 
@@ -186,7 +186,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_frequency, int), "UnderFrequencyThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overfreq and has_underfreq:
+        if has_overfreq and has_underfreq and isinstance(over_frequency, int) and isinstance(under_frequency, int):
             asserts.assert_greater_equal(over_frequency, under_frequency + 1,
                                          "OverFrequencyThreshold must be >= UnderFrequencyThreshold + 1")
 
@@ -207,7 +207,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_power, int), "UnderPowerThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overpower and has_underpower:
+        if has_overpower and has_underpower and isinstance(over_power, int) and isinstance(under_power, int):
             asserts.assert_greater_equal(over_power, under_power + 1,
                                          "OverPowerThreshold must be >= UnderPowerThreshold + 1")
 
@@ -228,7 +228,7 @@ class TC_ESALM_2_1(MatterBaseTest):
             asserts.assert_true(isinstance(under_current, int), "UnderCurrentThreshold must be int64")
         else:
             self.mark_current_step_skipped()
-        if has_overcur and has_undercur:
+        if has_overcur and has_undercur and isinstance(over_current, int) and isinstance(under_current, int):
             asserts.assert_greater_equal(over_current, under_current + 1,
                                          "OverCurrentThreshold must be >= UnderCurrentThreshold + 1")
 
