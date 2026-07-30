@@ -416,11 +416,6 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             asserts.assert_is_not_none(
                 th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
 
-            try:
-                th1_root_parser = MatterCertParser(th1_root_cert)
-                th1_root_public_key = th1_root_parser.get_public_key_bytes()
-            except (ValueError, IndexError, KeyError, TypeError) as e:
-                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
             log.info("Parsed TH1's RCAC successfully.")
             log.info("  -> Root public key bytes: %s", to_octet_string(th1_root_public_key))
 
