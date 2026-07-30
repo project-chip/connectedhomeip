@@ -35,6 +35,7 @@ class Metadata:
     script_gdb: bool = False
     timeout: float | None = None
     quiet: bool = False
+    pre_existing_fabric: bool = False
 
 
 class NamedStringIO(StringIO):
