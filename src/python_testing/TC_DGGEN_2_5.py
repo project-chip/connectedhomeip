@@ -163,7 +163,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
 
         # TH1 reads the DUT’s DeviceLoadStatus attribute in General Diagnostics cluster.
         self.step(8)
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DeviceLoadStatus):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DeviceLoadStatus):
             deviceLoadStatus2 = await self.read_single_attribute_check_success(
                 cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 

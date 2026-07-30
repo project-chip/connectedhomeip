@@ -531,7 +531,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                                                                                    attribute=cluster.Attributes.NextTariffComponents)
         await self.check_next_tariff_components_attribute(endpoint, NextTariffComponentsValue)
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
             self.step("20")
 
@@ -552,7 +552,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             else:  # attribute is not supported at all
                 self.skip_step("20")
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
 
             self.step("21")
 
@@ -677,7 +677,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
         await self.verify_reporting(subscription_handler.attribute_reports, cluster.Attributes.NextTariffComponents,
                                     "NextTariffComponents", NextTariffComponentsValue)
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
 
             self.step("41")
 
@@ -698,7 +698,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
             else:  # attribute is not supported at all
                 self.skip_step("41")
 
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
 
             self.step("42")
 

@@ -91,7 +91,7 @@ class TC_CADMIN_1_10(CADMINBaseTest):
         MATTER_1_5_1 = 0x01050100
         spec_version_attribute = Clusters.BasicInformation.Attributes.SpecificationVersion
 
-        if await self.attribute_guard(endpoint=0, attribute=spec_version_attribute):
+        if self.attribute_guard(endpoint=0, attribute=spec_version_attribute):
             spec_version = await self.read_single_attribute_check_success(
                 dev_ctrl=self.TH1,
                 cluster=Clusters.BasicInformation,

@@ -279,7 +279,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         hasEventsFeature = False
 
         self.step("1a")
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
 
             events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
