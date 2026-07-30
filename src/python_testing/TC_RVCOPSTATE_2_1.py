@@ -320,7 +320,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 test_step = "Manually put the device in the unable to complete operation error state"
                 self.print_step("7e", test_step)
                 if self.is_ci:
-                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "UnableToCompleteOperation"})
+                    self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint,
+                                           "Error": "UnableToCompleteOperation"})
                 else:
                     self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
                 await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)

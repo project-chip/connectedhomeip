@@ -369,7 +369,8 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddArea", "EndpointId": self.endpoint, "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
+                self.write_to_app_pipe({"Name": "AddArea", "EndpointId": self.endpoint,
+                                       "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

@@ -539,8 +539,9 @@ public:
 
         LogErrorOnFailure(operationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
 
-        auto * serviceAreaCluster = delegate->GetClusterImplementationRegistry()
-                                        .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        auto * serviceAreaCluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                endpointId);
         if (serviceAreaCluster)
         {
             serviceAreaCluster->ClearSelectedAreas();
@@ -843,8 +844,9 @@ public:
     const char * GetName() const override { return "AddMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry()
-                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
@@ -869,8 +871,9 @@ public:
     const char * GetName() const override { return "RemoveMap"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry()
-                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
@@ -893,8 +896,9 @@ public:
     const char * GetName() const override { return "AddArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry()
-                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
@@ -930,8 +934,9 @@ public:
     const char * GetName() const override { return "RemoveArea"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry()
-                              .GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "ServiceAreaCluster not found on endpoint %d", endpointId);
