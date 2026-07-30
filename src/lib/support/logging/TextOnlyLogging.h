@@ -35,6 +35,7 @@
 #pragma once
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 
 #include <lib/support/Assertions.h>
 #include <lib/support/Compiler.h>
@@ -116,8 +117,18 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  *  @param[in]  MSG         The log message format string.
  *  @param[in]  ...         Optional arguments for the log message.
  */
-#define ChipLogFailure(ERROR_CODE, MOD, MSG, ...)                                                                                  \
-    ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, ERROR_CODE.Format());
+#define CHIP_LOG_FAILURE_SELECT(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
+
+#define ChipLogFailure_NO_VA_ARGS(ERROR_CODE, MOD, MSG)                                                                            \
+    ::chip::Logging::LogFailure(::chip::Logging::kLogModule_##MOD, ERROR_CODE, MSG)
+
+#define ChipLogFailure_VA_ARGS(ERROR_CODE, MOD, MSG, ...)                                                                          \
+    ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, (ERROR_CODE).Format())
+
+#define ChipLogFailure(...)                                                                                                        \
+    CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                  \
+                            ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,        \
+                            ChipLogFailure_NO_VA_ARGS)(__VA_ARGS__)
 
 #if CHIP_PROGRESS_LOGGING
 /**
@@ -453,6 +464,17 @@ static constexpr uint16_t kMaxModuleNameLen = 3;
 
 void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
+void LogFailure(uint8_t module, CHIP_ERROR err, const char * msg);
+void LogFailure(uint8_t module, CHIP_ERROR err);
+void LogVerifyOrReturnError(const char * expr, int line, CHIP_ERROR code);
+#if CHIP_CONFIG_ERROR_SOURCE
+void LogVerifyOrReturnErrorWithSource(CHIP_ERROR code, const char * file, int line);
+#endif
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+[[noreturn]] void LogVerifyOrDie(const char * file, int line, const char * condition = nullptr);
+[[noreturn]] void LogSuccessOrDie(const char * file, int line, CHIP_ERROR err, const char * expr = nullptr);
+#endif
+[[noreturn]] void LogVerifyOrDieWithMsg(uint8_t module, const char * msg);
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_LOG
 #ifndef ChipPlatformLog
@@ -496,6 +518,26 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
 #else // _CHIP_USE_LOGGING
 
 inline void SetLogRedirectCallback(LogRedirectCallback_t callback) {}
+inline void LogFailure(uint8_t, CHIP_ERROR, const char *) {}
+inline void LogFailure(uint8_t, CHIP_ERROR) {}
+inline void LogVerifyOrReturnError(const char *, int, CHIP_ERROR) {}
+#if CHIP_CONFIG_ERROR_SOURCE
+inline void LogVerifyOrReturnErrorWithSource(CHIP_ERROR, const char *, int) {}
+#endif
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+[[noreturn]] inline void LogVerifyOrDie(const char *, int, const char * = nullptr)
+{
+    chipAbort();
+}
+[[noreturn]] inline void LogSuccessOrDie(const char *, int, CHIP_ERROR, const char * = nullptr)
+{
+    chipAbort();
+}
+#endif
+[[noreturn]] inline void LogVerifyOrDieWithMsg(uint8_t, const char *)
+{
+    chipAbort();
+}
 
 #endif // _CHIP_USE_LOGGING
 
