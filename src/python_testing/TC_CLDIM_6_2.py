@@ -58,7 +58,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
-class TC_CLDIM_6_2(MatterBaseTest):
+class TC_CLDIM_6_2(MatterTestCommissionedDevice):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

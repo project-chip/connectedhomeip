@@ -79,7 +79,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState)
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
-class TC_CLCTRL_7_4(MatterBaseTest):
+class TC_CLCTRL_7_4(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

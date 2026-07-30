@@ -87,7 +87,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
-class TC_CLCTRL_7_1(MatterBaseTest):
+class TC_CLCTRL_7_1(MatterTestCommissionedDevice):
     @property
     def default_timeout(self) -> int:
         return 90

@@ -78,7 +78,7 @@ def current_speed_matcher(speed: Clusters.Globals.Enums.ThreeLevelAutoEnum) -> A
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Speed is {speed}", matcher=predicate)
 
 
-class TC_CLCTRL_7_3(MatterBaseTest):
+class TC_CLCTRL_7_3(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
