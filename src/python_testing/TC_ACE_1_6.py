@@ -348,7 +348,7 @@ class TC_ACE_1_6(MatterBaseTest):
         unified_sub = await self.default_controller.Read(
             nodeId=self.dut_node_id,
             attributes=[(0, Clusters.GroupKeyManagement)],
-            events=[0],
+            events=[(0, Clusters.Groupcast, 1), (0, Clusters.AccessControl, 1)],
             reportInterval=(0, 30),
             keepSubscriptions=True,
             autoResubscribe=False
