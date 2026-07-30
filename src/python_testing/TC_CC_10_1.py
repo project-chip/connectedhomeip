@@ -46,7 +46,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
-kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
+kCCAttributeValueIDs = [0x0000, 0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
 kTempTolerance = 0.15
 
 
@@ -105,9 +105,9 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("5c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep("5d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep(
-                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xE0 }]}]'"),
+                "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0xE0 }, { AttributeID: 0x4001, ValueUnsigned8: 0xE0 }, { AttributeID: 0x0001, ValueUnsigned8: 0xE0 }]}]'"),
             TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
-            TestStep("6c", "TH reads the _CurrentHue and _CurrentSaturation attribute_ from DUT."),
+            TestStep("6c", "TH reads the _CurrentHue attribute_ and _CurrentSaturation attribute_ from DUT."),
             TestStep(
                 "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x01 }, { AttributeID: 0x0003, ValueUnsigned16: 16334 },{ AttributeID: 0x0004, ValueUnsigned16: 13067 }]}]'"),
             TestStep("7b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x03 and the _TransitionTime_ omitted."),
@@ -258,7 +258,6 @@ class TC_CC_10_1(MatterBaseTest):
                         asserts.assert_less_equal(AV.valueUnsigned8, 230, "View Scene failed on Hue above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned8, 170, "View Scene failed on Hue below limit")
 
-                for AV in EFS.attributeValueList:
                     if AV.attributeID == 0x0001:
                         asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Saturation above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Saturation below limit")
