@@ -413,7 +413,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if pre_existing_fabric:
         # Some devices (custom commissioning) may show up at cert with a fabric already on the device
         # to simulate this in the CI, this option allows the user to pre-commission the device onto
-        # an ephermeral fabric.
+        # an ephemeral fabric.
         # This is done using the commission-only-re-open-window flag in the device testing framework.
         # That flag commissions the device and then re-opens the commissioning window with the same
         # discriminator and passcode.
