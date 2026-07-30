@@ -23,7 +23,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, base_pics_facts_to_pics_codes,
                                  derive_base_pics_facts_from_device_wildcard, generate_device_element_pics_from_device_wildcard,
                                  read_pics_from_file)
@@ -31,8 +31,7 @@ from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 
 
-class TestPicsHelpers(MatterBaseTest):
-    requires_dut = False
+class TestPicsHelpers(CertificationUnitTestNoDevice):
 
     def test_pics_generation(self):
         xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
