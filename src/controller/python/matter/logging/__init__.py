@@ -33,7 +33,7 @@ def _RedirectToPythonLogging(category, module, message):
     module = module.decode('utf-8')
     message = message.decode('utf-8')
 
-    logger = logging.getLogger('matter.native.%s' % module)
+    logger = logging.getLogger(f'matter.native.{module}')
 
     if category == LOG_CATEGORY_ERROR:
         logger.error("%s", message)
