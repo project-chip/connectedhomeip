@@ -98,9 +98,18 @@ void VerifyCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommiss
     {
         chip::MutableByteSpan paaDerBuffer(mPaaCertBuf);
 
-        const chip::Credentials::AttestationTrustStore * trustStore = chip::Credentials::GetTestAttestationTrustStore();
+        auto * verifier        = CurrentCommissioner().GetDeviceAttestationVerifier();
+        auto * defaultVerifier = static_cast<chip::Credentials::DefaultDACVerifier *>(verifier);
+        const chip::Credentials::AttestationTrustStore * trustStore     = defaultVerifier->GetAttestationTrustStore();
+        const chip::Credentials::AttestationTrustStore * testTrustStore = chip::Credentials::GetTestAttestationTrustStore();
 
-        if (trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer) == CHIP_NO_ERROR)
+        CHIP_ERROR err = trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
+        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            // Use test trust store as fallback.
+            err = testTrustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
+        }
+        if (err == CHIP_NO_ERROR)
         {
             mPaaDerBuffer = Optional(ByteSpan(paaDerBuffer.data(), paaDerBuffer.size()));
         }
