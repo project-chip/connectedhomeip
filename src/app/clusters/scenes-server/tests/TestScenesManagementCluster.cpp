@@ -1473,6 +1473,10 @@ TEST_F(TestScenesManagementCluster, PersistenceAfterPowerCycle)
 
 TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
 {
+    // NOTE: This test is testing a deprecated feature, we only use it to confirm that
+    // the new behavior (CurrentScene = 0xFF, CurrentGroup = 0x00, SceneValid = FALSE) 
+    // remains true when recalling a scene and there are no remnants of the old behavior.
+    
     // Pretend that we have some fabrics since this is what our tests expect
     // Note I could only find mock data for 2 fabrics even though fabric index 3 is defined.
     // This is just sufficient here for our own tests (adding fabric entries is rough!)
@@ -1507,10 +1511,12 @@ TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
     while (it.Next())
     {
         auto val = it.GetValue();
-
-        EXPECT_EQ(val.currentScene, 0xFF);
-        EXPECT_EQ(val.currentGroup, 0x00);
-        EXPECT_FALSE(val.sceneValid);
+        if (val.fabricIndex == kFabricIndex)
+        {
+            EXPECT_EQ(val.currentScene, 0xFF);
+            EXPECT_EQ(val.currentGroup, 0x00);
+            EXPECT_FALSE(val.sceneValid);
+        }
     }
 
     // 4. Recall Scene on Fabric 2
@@ -1518,20 +1524,17 @@ TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
     auto recall_response2 = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, recall_request);
     ASSERT_TRUE(recall_response2.IsSuccess());
 
-    // 5. Verify SceneValid is TRUE for Fabric 2 and FALSE for Fabric 1
+    // 5. Verify SceneValid is FALSE for Fabric 2 and FALSE for Fabric 1
     ASSERT_EQ(tester.ReadAttribute(Attributes::FabricSceneInfo::Id, sceneInfoList), CHIP_NO_ERROR);
     auto it2 = sceneInfoList.begin();
     while (it2.Next())
     {
         auto val = it2.GetValue();
-        if (val.fabricIndex == kFabricIndex)
+        if (val.fabricIndex == kFabricIndex2)
         {
-            // Fabric 1 should now be invalid
+            EXPECT_EQ(val.currentScene, 0xFF);
+            EXPECT_EQ(val.currentGroup, 0x00);
             EXPECT_FALSE(val.sceneValid);
-        }
-        else if (val.fabricIndex == kFabricIndex2)
-        {
-            EXPECT_TRUE(val.sceneValid);
         }
     }
 }

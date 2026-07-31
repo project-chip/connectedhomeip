@@ -160,6 +160,7 @@ public:
 
     // FabricTable::Delegate implementation
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     /// Removes the data persisted for this cluster
     ///

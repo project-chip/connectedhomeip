@@ -256,6 +256,12 @@ void ScenesManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, F
     mFabricSceneInfo.ClearSceneInfoStruct(fabricIndex);
 }
 
+void ScenesManagementCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    // Update FabricSceneInfo for the committed fabric
+    LogErrorOnFailure(UpdateFabricSceneInfo(fabricIndex));
+}
+
 CHIP_ERROR ScenesManagementCluster::StoreSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID, const SceneId & sceneID)
 {
     ScopedSceneTable sceneTable(mSceneTableProvider);
