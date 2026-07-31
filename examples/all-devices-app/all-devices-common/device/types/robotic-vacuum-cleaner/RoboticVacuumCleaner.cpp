@@ -15,8 +15,11 @@
  *    limitations under the License.
  */
 
+#include <clusters/RvcCleanMode/Metadata.h>
+#include <clusters/RvcRunMode/Metadata.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <devices/Types.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
@@ -39,6 +42,28 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
                                BitMask<Clusters::ServiceArea::Feature>());
     ReturnErrorOnFailure(provider.AddCluster(mServiceAreaCluster.Registration()));
 
+    mRunModeCluster.Create(endpoint, Clusters::RvcRunMode::Id,
+                           Clusters::ModeBaseCluster::Config{
+                               .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                               .optionalAttributeSet   = {},
+                               .appDelegate            = mRunModeDelegate,
+                               .onOffValueForStartUp   = false,
+                               .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                               .clusterRevision        = Clusters::RvcRunMode::kRevision,
+                           });
+    ReturnErrorOnFailure(provider.AddCluster(mRunModeCluster.Registration()));
+
+    mCleanModeCluster.Create(endpoint, Clusters::RvcCleanMode::Id,
+                             Clusters::ModeBaseCluster::Config{
+                                 .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                                 .optionalAttributeSet   = {},
+                                 .appDelegate            = mCleanModeDelegate,
+                                 .onOffValueForStartUp   = false,
+                                 .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+                                 .clusterRevision        = Clusters::RvcCleanMode::kRevision,
+                             });
+    ReturnErrorOnFailure(provider.AddCluster(mCleanModeCluster.Registration()));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     transaction.Commit();
@@ -48,6 +73,16 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
 void RoboticVacuumCleaner::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mCleanModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mCleanModeCluster.Cluster()));
+        mCleanModeCluster.Destroy();
+    }
+    if (mRunModeCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mRunModeCluster.Cluster()));
+        mRunModeCluster.Destroy();
+    }
     if (mServiceAreaCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mServiceAreaCluster.Cluster()));
