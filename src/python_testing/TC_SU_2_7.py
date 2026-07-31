@@ -45,8 +45,10 @@
 #       --string-arg provider_app_pipe_out:/tmp/provider_2_7_fifo_out
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
+#       --string-arg ota_image_extra:${SU_OTA_REQUESTOR_V3}
+#       --int-arg ota_image_expected_version_extra:3
 #       --int-arg ota_image_download_timeout:360
-#       --timeout 1800
+#       --timeout 2100
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --app-pipe /tmp/requestor_2_7_fifo
 #       --app-pipe-out /tmp/requestor_2_7_fifo_out
@@ -87,17 +89,21 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     provider_setup_pincode = 2321
     requestor_node_id = None
     ota_image_download_timeout = 0
+    disable_wildcard_subscription = True
 
     @async_test_body
     async def setup_test(self):
         super().setup_test()
+
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
         self.requestor_node_id = self.dut_node_id
         self.controller = self.default_controller
 
         self.ota_image = self.user_params.get('ota_image')
+        self.ota_image_extra = self.user_params.get('ota_image_extra')
         self.expected_software_version = self.user_params.get('ota_image_expected_version')
+        self.expected_software_version_extra = self.user_params.get('ota_image_expected_version_extra')
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
@@ -117,11 +123,18 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         if not self.expected_software_version:
             asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
 
+        if not self.expected_software_version_extra:
+            asserts.fail(
+                "Missing OTA image software version. Speficy using --int-arg ota_image_expected_version_extra:<ota_image_expected_version>")
+
         if not self.provider_app_path:
             asserts.fail("Missing provider app path . Speficy using --string-arg provider_app_path:<provider_app_path>")
 
         if not self.ota_image:
             asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
+
+        if not self.ota_image_extra:
+            asserts.fail("Missing ota image extra path . Speficy using --string-arg ota_image_extra:<ota_image>")
 
         if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
             asserts.fail(
@@ -274,9 +287,12 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
 
         self.terminate_provider()
-        await self.request_device_factory_reset()
+        await self.request_device_reboot()
 
         self.step(2)
+        # set the values of ota image to extra (next version)
+        self.ota_image = self.ota_image_extra
+        self.expected_software_version = self.expected_software_version_extra
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
