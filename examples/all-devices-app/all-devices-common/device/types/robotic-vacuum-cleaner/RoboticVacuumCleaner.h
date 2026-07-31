@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/mode-base/impl/LoggingRvcCleanModeDelegate.h>
+#include <device/capabilities/mode-base/impl/LoggingRvcRunModeDelegate.h>
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
@@ -37,6 +40,8 @@ public:
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
     Clusters::ServiceArea::ServiceAreaCluster & ServiceArea() { return mServiceAreaCluster.Cluster(); }
+    Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
+    Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
 
 private:
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
@@ -45,6 +50,12 @@ private:
     Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
     Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
     LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
+
+    Clusters::RvcRunMode::LoggingRvcRunModeDelegate mRunModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
+
+    Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate mCleanModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 };
 
 } // namespace chip::app
