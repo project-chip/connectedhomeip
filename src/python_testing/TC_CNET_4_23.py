@@ -26,7 +26,7 @@ from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 import matter.clusters as Clusters
 from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -151,7 +151,7 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
         f"{' for target device ID: ' + str(target_device_id) if target_device_id else ''}")
 
 
-class TC_CNET_4_23(MatterBaseTest):
+class TC_CNET_4_23(MatterTestCommissioner):
 
     async def _validate_network_config_response(
         self,
