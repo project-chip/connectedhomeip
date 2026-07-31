@@ -78,7 +78,7 @@ class TC_IDM_5_2(IDMBaseTest):
         # Test Setup with robust endpoint/cluster discovery
         await self.setup_class_helper(allow_pase=False)
 
-        # Step 1: TH sends a Timed Request Message with timeout (e.g., 200ms) for an invoke command
+        # Step 1: TH sends a Timed Request Message with timeout (e.g., 700ms) for an invoke command
         self.step(1)
         await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
