@@ -377,6 +377,12 @@ CHIP_ERROR Instance::CopyCharSpan(const CharSpan src, Platform::ScopedMemoryBuff
 
 CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & src)
 {
+    // Reject an oversize component list before freeing the previous state so a
+    // rejected value leaves mCurrentPrice untouched.
+    if (!src.IsNull() && src.Value().components.HasValue() && (src.Value().components.Value().size() > kMaxComponentsPerPriceEntry))
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
 
     // Free the priceStruct
     if (mOwnedCurrentPriceStructBuffer.Get() != nullptr)
@@ -424,10 +430,6 @@ CHIP_ERROR Instance::CopyPrice(const DataModel::Nullable<Structs::CommodityPrice
         if (src.Value().components.HasValue())
         {
             auto & components = src.Value().components.Value();
-            if (components.size() > kMaxComponentsPerPriceEntry)
-            {
-                return CHIP_ERROR_BAD_REQUEST;
-            }
             if (!mOwnedCurrentPriceComponentBuffer.Calloc(components.size()))
             {
                 return CHIP_ERROR_NO_MEMORY;
@@ -585,15 +587,17 @@ CHIP_ERROR Instance::CopyPriceStructWithinForecast(
 
 CHIP_ERROR Instance::CopyPriceForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type> & src)
 {
-
-    CheckAndFreeForecastBuffers();
-    // At this point our local storage should be unallocated
-
+    // Reject an oversize list before freeing the previous state so a rejected
+    // value leaves mPriceForecast untouched.
     size_t entries = src.size();
     if (entries > kMaxForecastEntries)
     {
         return CHIP_ERROR_BAD_REQUEST;
     }
+
+    CheckAndFreeForecastBuffers();
+    // At this point our local storage should be unallocated
+
     if (!mOwnedForecastPriceStructBuffer.Calloc(entries))
     {
         return CHIP_ERROR_NO_MEMORY;
