@@ -185,6 +185,16 @@ void VerifyCommand::PrintDeviceInformation()
     printf("PAI:\n");
     PrintCert("CERTIFICATE", PaiDerBuffer().Value());
 
+    if (PaaDerBuffer().HasValue())
+    {
+        printf("PAA:\n");
+        PrintCert("CERTIFICATE", PaaDerBuffer().Value());
+    }
+    else
+    {
+        printf("No PAA\n");
+    }
+
     if (CdBuffer().HasValue())
     {
         auto cdBuffer = CdBuffer().Value();
@@ -198,16 +208,6 @@ void VerifyCommand::PrintDeviceInformation()
     else
     {
         printf("No CD\n");
-    }
-
-    if (PaaDerBuffer().HasValue())
-    {
-        printf("PAA:\n");
-        PrintCert("CERTIFICATE", PaaDerBuffer().Value());
-    }
-    else
-    {
-        printf("No PAA\n");
     }
 
     printf("Attestation: %s\n", GetAttestationResultDescription(mAttestationResult));
