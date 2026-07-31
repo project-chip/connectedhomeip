@@ -20,6 +20,7 @@
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
@@ -69,8 +70,14 @@ const char * GetClusterTypeName<chip::app::Clusters::ServiceArea::ServiceAreaClu
     return "chip::app::Clusters::ServiceArea::ServiceAreaCluster";
 }
 
-chip::app::ServerClusterInterface *
-AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint)
+template <>
+const char * GetClusterTypeName<chip::app::Clusters::ModeBaseCluster>()
+{
+    return "chip::app::Clusters::ModeBaseCluster";
+}
+
+chip::app::ServerClusterInterface * AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(
+    const char * typeName, chip::EndpointId endpoint, std::optional<chip::ClusterId> clusterId)
 {
     auto it = mClusters.find(typeName);
     if (it == mClusters.end())
@@ -83,7 +90,7 @@ AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType
         auto paths = cluster->GetPaths();
         for (const auto & path : paths)
         {
-            if (path.mEndpointId == endpoint)
+            if (path.mEndpointId == endpoint && (!clusterId.has_value() || path.mClusterId == *clusterId))
             {
                 return cluster;
             }
