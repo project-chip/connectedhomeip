@@ -240,9 +240,6 @@ jobs:
             - name: Build example LIT ICD App (Target:ESP32H2)
               run: scripts/examples/esp_example.sh lit-icd-app sdkconfig.defaults esp32h2
 
-            - name: Build example Pigweed App
-              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
-
             - name: Build example Lock App (Target:ESP32C6)
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults esp32c6
 
