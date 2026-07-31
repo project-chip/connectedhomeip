@@ -55,14 +55,8 @@ public:
     void SetCASEClient(CASEClient * client) { mSessionSetup->mCASEClient = client; }
     CASEClient * GetCASEClient() const { return mSessionSetup->mCASEClient; }
     void SetStateConnecting() { mSessionSetup->mState = OperationalSessionSetup::State::Connecting; }
-    void CleanupCASEClientImmediately()
-    {
-        mSessionSetup->CleanupCASEClient(/* deferRelease = */ false);
-    }
-    void CleanupCASEClientAfterCallback()
-    {
-        mSessionSetup->CleanupCASEClient(/* deferRelease = */ true);
-    }
+    void CleanupCASEClientImmediately() { mSessionSetup->CleanupCASEClient(/* deferRelease = */ false); }
+    void CleanupCASEClientAfterCallback() { mSessionSetup->CleanupCASEClient(/* deferRelease = */ true); }
     void MoveToSecureConnected() { mSessionSetup->MoveToState(OperationalSessionSetup::State::SecureConnected); }
     void MoveToNeedsAddress() { mSessionSetup->MoveToState(OperationalSessionSetup::State::NeedsAddress); }
 
