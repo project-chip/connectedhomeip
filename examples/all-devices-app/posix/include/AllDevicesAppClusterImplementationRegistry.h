@@ -19,6 +19,7 @@
 
 #include <app/util/basic-types.h>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -75,16 +76,20 @@ public:
         mClusters[name].push_back(instance);
     }
 
+    // If several instances of the same ClusterType are registered on the same endpoint (e.g. two
+    // ModeBaseCluster instances backing RVC Run Mode and RVC Clean Mode), pass clusterId to select
+    // the one you want.
     template <typename ClusterType>
-    ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint)
+    ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint, std::optional<chip::ClusterId> clusterId = std::nullopt)
     {
         const char * name = GetClusterTypeName<ClusterType>();
-        auto * cluster    = GetClusterInterfaceByEndpointAndType(name, endpoint);
+        auto * cluster    = GetClusterInterfaceByEndpointAndType(name, endpoint, clusterId);
         return static_cast<ClusterType *>(cluster);
     }
 
 private:
-    chip::app::ServerClusterInterface * GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint);
+    chip::app::ServerClusterInterface * GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint,
+                                                                             std::optional<chip::ClusterId> clusterId);
 
     std::map<std::string, std::vector<chip::app::ServerClusterInterface *>> mClusters;
 };
