@@ -181,7 +181,7 @@ class BasePicsFacts:
     them against the supplied PICS file.
 
     The MCORE.COM.* transport-related PICS (WIFI / THR / ETH / WIRELESS and
-    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived here, 
+    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived here,
     the band PICS are about Public Action
     Frame support on the corresponding band, which is not protocol-
     observable from a wildcard read. PICSGenerator continues to derive

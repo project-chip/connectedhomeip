@@ -39,7 +39,7 @@ sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceException  # noqa: E402
 from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
 from matter.testing.pics import BasePicsFacts, derive_base_pics_facts_from_device_wildcard  # noqa: E402
-from matter.testing.spec_parsing import XmlEvent, build_xml_clusters  # noqa: E402
+from matter.testing.spec_parsing import XmlEvent, build_xml_clusters, dm_from_spec_version  # noqa: E402
 
 console = None
 xml_clusters = None
