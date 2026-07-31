@@ -108,8 +108,8 @@
 #define ReturnLogErrorOnFailure(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
             return __err;                                                                                                          \
@@ -119,8 +119,8 @@
 #define ReturnLogErrorOnFailure(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ::chip::Logging::LogFailure(::chip::Logging::kLogModule_NotSpecified, __err);                                          \
             return __err;                                                                                                          \
@@ -573,8 +573,8 @@ inline void chipDie(void)
 #define LogErrorOnFailure(expr)                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
         }                                                                                                                          \
@@ -583,8 +583,8 @@ inline void chipDie(void)
 #define LogErrorOnFailure(expr)                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             ::chip::Logging::LogFailure(::chip::Logging::kLogModule_NotSpecified, __err);                                          \
         }                                                                                                                          \

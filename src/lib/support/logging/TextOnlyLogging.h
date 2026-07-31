@@ -95,16 +95,13 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  *
  */
 #define ChipLogError(MOD, MSG, ...) ChipInternalLog(MOD, ERROR, MSG, ##__VA_ARGS__)
-#else // CHIP_ERROR_LOGGING
-#define ChipLogError(MOD, MSG, ...) ((void) 0)
-#endif // CHIP_ERROR_LOGGING
 
 /**
  * @def ChipLogFailure(err, MOD, MSG, ...)
  *
  * @brief
  *   Log a chip message with a formatted ChipError for the specified module in the 'Error'
- *   category.
+ *   category if and only if ERROR_CODE is not CHIP_NO_ERROR.
  *
  *  Example usage:
  *
@@ -112,7 +109,7 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  *    ChipLogFailure(errCode, Module, "Failure message: %s", param);
  *  @endcode
  *
- *  @param[in]  ERROR_CODE  A CHIP_ERROR to log.
+ *  @param[in]  ERROR_CODE  A CHIP_ERROR to log if failure.
  *  @param[in]  MOD         The log module to use.
  *  @param[in]  MSG         The log message format string.
  *  @param[in]  ...         Optional arguments for the log message.
@@ -123,12 +120,23 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
     ::chip::Logging::LogFailure(::chip::Logging::kLogModule_##MOD, ERROR_CODE, MSG)
 
 #define ChipLogFailure_VA_ARGS(ERROR_CODE, MOD, MSG, ...)                                                                          \
-    ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, (ERROR_CODE).Format())
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!::chip::ChipError::IsSuccess(ERROR_CODE))                                                                             \
+        {                                                                                                                          \
+            ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, (ERROR_CODE).Format());                                  \
+        }                                                                                                                          \
+    } while (false)
 
 #define ChipLogFailure(...)                                                                                                        \
-    CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                  \
+    CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                   \
                             ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,        \
                             ChipLogFailure_NO_VA_ARGS)(__VA_ARGS__)
+
+#else // CHIP_ERROR_LOGGING
+#define ChipLogError(MOD, MSG, ...) ((void) 0)
+#define ChipLogFailure(...) ((void) 0)
+#endif // CHIP_ERROR_LOGGING
 
 #if CHIP_PROGRESS_LOGGING
 /**
@@ -464,6 +472,10 @@ static constexpr uint16_t kMaxModuleNameLen = 3;
 
 void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
+
+/**
+ * Log a failure message with error code if err != CHIP_NO_ERROR.
+ */
 void LogFailure(uint8_t module, CHIP_ERROR err, const char * msg);
 void LogFailure(uint8_t module, CHIP_ERROR err);
 void LogVerifyOrReturnError(const char * expr, int line, CHIP_ERROR code);
