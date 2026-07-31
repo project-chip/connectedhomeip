@@ -56,15 +56,15 @@ class TC_IDM_5_2(IDMBaseTest):
     def steps_TC_IDM_5_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
-            TestStep(1, "TH sends a Timed Request Message with the timeout value set. (Example - 200 milliseconds).",
+            TestStep(1, "TH sends a Timed Request Message with the timeout value set. (Example - 700 milliseconds).",
                      "On the TH verify the DUT sends a status response back to TH."),
-            TestStep(2, "TH sends a Timed Request Message(Timed Write Transaction) with the timeout value set. (Example - 200 milliseconds)." +
+            TestStep(2, "TH sends a Timed Request Message(Timed Write Transaction) with the timeout value set. (Example - 700 milliseconds)." +
                      "Wait for the status response message to be received. Send the Write Request Message to the DUT.",
                      "On the TH verify DUT sends back a Write Response after performing the write action. Verify by sending a ReadRequest that the Write action was performed correctly."),
-            TestStep(3, "TH sends a Timed Request Message(Timed Invoke Transaction) with the timeout value set. (Example - 200 milliseconds)" +
+            TestStep(3, "TH sends a Timed Request Message(Timed Invoke Transaction) with the timeout value set. (Example - 700 milliseconds)" +
                      "Wait for the status response message to be received. Wait for 5 seconds(Timer has expired) and then send the Invoke Request Message to the DUT.",
                      "If the device being certified is Matter release 1.4 or later, timeout error should be returned. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either timeout or unsupported access error."),
-            TestStep(4, "TH sends a Timed Request Message(Timed Write Transaction) with the timeout value set. (Example - 200 milliseconds)." +
+            TestStep(4, "TH sends a Timed Request Message(Timed Write Transaction) with the timeout value set. (Example - 700 milliseconds)." +
                      "Wait for the status response message to be received.  Wait for 5 seconds(Timer has expired) and then send the Write Request Message to the DUT.",
                      "If the device being certified is Matter release 1.4 or later, timeout error should be returned. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either timeout or unsupported access error."),
         ]
@@ -84,12 +84,12 @@ class TC_IDM_5_2(IDMBaseTest):
             nodeId=self.dut_node_id,
             endpoint=endpoint,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0),
-            timedRequestTimeoutMs=200,
+            timedRequestTimeoutMs=700,
         )
 
         # Step 2: TH sends a Timed Request Message (Timed Write Transaction) with timeout,
         # waits for status response, then sends Write Request
-        TIMED_REQUEST_TIMEOUT_MS = 500
+        TIMED_REQUEST_TIMEOUT_MS = 700
         self.step(2)
         # Preserve the original NodeLabel so the test can restore it at the end.
         original_node_label = await self.read_single_attribute_check_success(
