@@ -39,5 +39,6 @@ void registerCommandsVerify(Commands & commands, CredentialIssuerCommands * cred
         make_unique<VerifyWithPayload>(credsIssuerConfig),
     };
 
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for verifying device attestation information without commissioning.");
 }

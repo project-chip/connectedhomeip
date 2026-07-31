@@ -100,9 +100,10 @@ private:
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiCertBuf;
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuf;
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mPaaCertBuf;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    chip::Credentials::AttestationVerificationResult mAttestationResult;
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    chip::Credentials::AttestationVerificationResult mAttestationResult =
+        chip::Credentials::AttestationVerificationResult::kInternalError;
 
     NodeId mNodeId            = chip::kUndefinedNodeId;
     char * mOnboardingPayload = nullptr;

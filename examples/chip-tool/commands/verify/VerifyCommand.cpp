@@ -110,7 +110,11 @@ void VerifyCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommiss
         uint8_t paaScratchBuf[chip::Credentials::kMaxDERCertLength];
         chip::MutableByteSpan paaDerBuffer(paaScratchBuf);
 
-        CHIP_ERROR err = trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
+        CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+        if (trustStore != nullptr)
+        {
+            err = trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
+        }
         if (err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
             // Use test trust store as fallback.
