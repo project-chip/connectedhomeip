@@ -42,7 +42,7 @@ public:
     void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
 
 private:
-    ModeBaseCluster * mCluster                                       = nullptr;
+    ModeBaseCluster * mCluster                                           = nullptr;
     OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
 };
 
