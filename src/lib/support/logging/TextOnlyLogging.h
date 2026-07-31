@@ -131,7 +131,8 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogFailure(...)                                                                                                        \
     CHIP_LOG_FAILURE_SELECT(__VA_ARGS__, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,                   \
                             ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS, ChipLogFailure_VA_ARGS,        \
-                            ChipLogFailure_NO_VA_ARGS)(__VA_ARGS__)
+                            ChipLogFailure_NO_VA_ARGS)                                                                             \
+    (__VA_ARGS__)
 
 #else // CHIP_ERROR_LOGGING
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
