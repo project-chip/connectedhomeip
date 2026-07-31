@@ -65,13 +65,14 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 
         if (aTargetState != State::Connecting)
         {
-            // Cleanup must observe the old state. Defer destruction when
-            // leaving Connecting unsuccessfully from a CASESession delegate
-            // callback. On successful CASE completion, release immediately
-            // to make the client slot available to another establishment.
+            // Defer destruction when leaving Connecting unsuccessfully from a
+            // CASESession delegate callback. On successful CASE completion,
+            // release immediately to make the client slot available to another
+            // establishment.
             CleanupCASEClient(/* deferRelease = */ mState == State::Connecting && aTargetState != State::SecureConnected);
         }
 
+        // Cleanup must observe the old state before this assignment.
         mState = aTargetState;
     }
 }
