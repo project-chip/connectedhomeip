@@ -25,6 +25,7 @@ source_set("mode-base-delegate") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/mode-base-server",
+    "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

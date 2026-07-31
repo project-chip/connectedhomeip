@@ -18,6 +18,8 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/AppDelegate.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <clusters/RvcRunMode/Enums.h>
 
 namespace chip::app::Clusters::RvcRunMode {
@@ -33,6 +35,15 @@ public:
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+
+    // Bound after construction so ChangeToMode can drive the RVC Operational State cluster the
+    // same way examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice does.
+    void SetCluster(ModeBaseCluster * cluster) { mCluster = cluster; }
+    void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
+
+private:
+    ModeBaseCluster * mCluster                                       = nullptr;
+    OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
 };
 
 } // namespace chip::app::Clusters::RvcRunMode
