@@ -327,19 +327,13 @@ void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
-            if (!haveIPv4Conn)
-            {
-                memset(&m_ip4addr, 0, sizeof(m_ip4addr));
-            }
+            VerifyOrDo(!haveIPv4Conn, memset(&m_ip4addr, 0, sizeof(m_ip4addr)));
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
         }
 
         if (haveIPv6Conn != hadIPv6Conn)
         {
-            if (!haveIPv6Conn)
-            {
-                memset(&m_ip6addr, 0, sizeof(m_ip6addr));
-            }
+            VerifyOrDo(!haveIPv6Conn, memset(&m_ip6addr, 0, sizeof(m_ip6addr)));
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
         }
     }

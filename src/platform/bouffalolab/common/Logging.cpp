@@ -21,6 +21,7 @@
 
 #include <CHIPDevicePlatformConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/Constants.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -49,16 +50,10 @@ static SemaphoreHandle_t sLogMutex = xSemaphoreCreateRecursiveMutexStatic(&sLogM
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     // Logging is synchronous and may block on UART output, so it is not safe from interrupt context.
-    if (xPortIsInsideInterrupt())
-    {
-        return;
-    }
+    VerifyOrReturn(!xPortIsInsideInterrupt());
 
     const bool shouldLock = xTaskGetSchedulerState() == taskSCHEDULER_RUNNING;
-    if (shouldLock && xSemaphoreTakeRecursive(sLogMutex, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    VerifyOrReturn(!shouldLock || xSemaphoreTakeRecursive(sLogMutex, portMAX_DELAY) == pdTRUE);
 #if !PW_RPC_ENABLED
     int lmsg = 0;
 
@@ -131,10 +126,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     PigweedLogger::putString(newline, strlen(newline));
 #endif
 
-    if (shouldLock)
-    {
-        xSemaphoreGiveRecursive(sLogMutex);
-    }
+    VerifyOrDo(shouldLock, xSemaphoreGiveRecursive(sLogMutex));
 }
 
 } // namespace Platform
