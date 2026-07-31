@@ -2135,7 +2135,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Guard/Condition Helpers (PICS, Attribute, etc.)
     #
 
-    def check_pics(self, pics_key: str, endpoint: int | None) -> bool:
+    def check_pics(self, pics_key: str, endpoint: int | None = None) -> bool:
         """Check if a PICS (Protocol Implementation Conformance Statement) key is enabled.
 
         PICS are stored as an endpoint-keyed tree {endpoint: {code: bool}}.
