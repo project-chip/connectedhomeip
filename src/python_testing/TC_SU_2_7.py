@@ -293,7 +293,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # set the values of ota image to extra (next version)
         self.ota_image = self.ota_image_extra
         self.expected_software_version = self.expected_software_version_extra
-        self.starqt_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
             setup_pincode=self.provider_setup_pincode,
