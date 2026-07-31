@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/AppDelegate.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <clusters/RvcCleanMode/Enums.h>
 
 namespace chip::app::Clusters::RvcCleanMode {
@@ -33,6 +34,13 @@ public:
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+
+    // Bound after construction: the cleaning mode may only change while the RVC Run Mode cluster
+    // is Idle, mirroring examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice.
+    void SetRunModeCluster(ModeBaseCluster * runModeCluster) { mRunModeCluster = runModeCluster; }
+
+private:
+    ModeBaseCluster * mRunModeCluster = nullptr;
 };
 
 } // namespace chip::app::Clusters::RvcCleanMode

@@ -27,6 +27,10 @@ namespace {
 
 using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
 
+constexpr uint8_t kModeIdle     = 0;
+constexpr uint8_t kModeCleaning = 1;
+constexpr uint8_t kModeMapping  = 2;
+
 const ModeTagStructType kIdleTags[]     = { { .value = to_underlying(ModeTag::kIdle) } };
 const ModeTagStructType kCleaningTags[] = { { .value = to_underlying(ModeTag::kCleaning) } };
 const ModeTagStructType kMappingTags[]  = { { .value = to_underlying(ModeTag::kMapping) } };
@@ -39,9 +43,9 @@ struct ModeOption
 };
 
 const ModeOption kModeOptions[] = {
-    { "Idle"_span, 0, Span<const ModeTagStructType>(kIdleTags) },
-    { "Cleaning"_span, 1, Span<const ModeTagStructType>(kCleaningTags) },
-    { "Mapping"_span, 2, Span<const ModeTagStructType>(kMappingTags) },
+    { "Idle"_span, kModeIdle, Span<const ModeTagStructType>(kIdleTags) },
+    { "Cleaning"_span, kModeCleaning, Span<const ModeTagStructType>(kCleaningTags) },
+    { "Mapping"_span, kModeMapping, Span<const ModeTagStructType>(kMappingTags) },
 };
 
 } // namespace
@@ -72,7 +76,51 @@ CHIP_ERROR LoggingRvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, Data
 void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     ChipLogProgress(Zcl, "LoggingRvcRunModeDelegate: ChangeToMode(%u) received.", newMode);
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+
+    if (mCluster == nullptr || mOperationalStateCluster == nullptr)
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+        return;
+    }
+
+    uint8_t currentState = mOperationalStateCluster->GetCurrentOperationalState();
+    uint8_t currentMode  = mCluster->GetCurrentMode();
+
+    switch (currentState)
+    {
+    case to_underlying(OperationalState::OperationalStateEnum::kStopped):
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
+        // We could be in the charging state with a run mode != idle.
+        if (currentMode != kModeIdle && newMode != kModeIdle)
+        {
+            response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
+            return;
+        }
+        LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+        return;
+
+    case to_underlying(OperationalState::OperationalStateEnum::kRunning):
+        if (newMode != kModeIdle)
+        {
+            response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
+            return;
+        }
+        LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(
+            to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+        response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+        return;
+
+    default:
+        break;
+    }
+
+    // If we fall through, the change is not supported in the current state.
+    response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+    response.statusText.SetValue("This change is not allowed at this time"_span);
 }
 
 } // namespace chip::app::Clusters::RvcRunMode

@@ -27,6 +27,8 @@ namespace {
 
 using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
 
+constexpr uint8_t kRunModeIdle = 0;
+
 const ModeTagStructType kQuickTags[] = { { .value = to_underlying(ModeTag::kVacuum) },
                                          { .value = to_underlying(ModeTag::kQuick) } };
 const ModeTagStructType kAutoTags[]  = { { .value = to_underlying(ModeTag::kAuto) }, { .value = to_underlying(ModeTag::kVacuum) } };
@@ -85,6 +87,14 @@ CHIP_ERROR LoggingRvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, Da
 void LoggingRvcCleanModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     ChipLogProgress(Zcl, "LoggingRvcCleanModeDelegate: ChangeToMode(%u) received.", newMode);
+
+    if (mRunModeCluster != nullptr && mRunModeCluster->GetCurrentMode() != kRunModeIdle)
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+        response.statusText.SetValue("Change of the cleaning mode is only allowed in Idle."_span);
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
