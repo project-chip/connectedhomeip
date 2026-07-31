@@ -1474,9 +1474,9 @@ TEST_F(TestScenesManagementCluster, PersistenceAfterPowerCycle)
 TEST_F(TestScenesManagementCluster, RecallSceneInvalidatesOtherFabrics)
 {
     // NOTE: This test is testing a deprecated feature, we only use it to confirm that
-    // the new behavior (CurrentScene = 0xFF, CurrentGroup = 0x00, SceneValid = FALSE) 
+    // the new behavior (CurrentScene = 0xFF, CurrentGroup = 0x00, SceneValid = FALSE)
     // remains true when recalling a scene and there are no remnants of the old behavior.
-    
+
     // Pretend that we have some fabrics since this is what our tests expect
     // Note I could only find mock data for 2 fabrics even though fabric index 3 is defined.
     // This is just sufficient here for our own tests (adding fabric entries is rough!)
