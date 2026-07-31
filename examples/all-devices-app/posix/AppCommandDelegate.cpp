@@ -21,10 +21,13 @@
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <clusters/RvcCleanMode/ClusterId.h>
+#include <clusters/RvcRunMode/ClusterId.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
@@ -538,6 +541,21 @@ public:
         }
 
         LogErrorOnFailure(operationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
+
+        auto * runModeCluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeBaseCluster>(
+            endpointId, chip::app::Clusters::RvcRunMode::Id);
+        if (runModeCluster)
+        {
+            runModeCluster->UpdateCurrentMode(0); // Idle
+        }
+
+        auto * cleanModeCluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeBaseCluster>(
+                endpointId, chip::app::Clusters::RvcCleanMode::Id);
+        if (cleanModeCluster)
+        {
+            cleanModeCluster->UpdateCurrentMode(0); // Quick
+        }
 
         auto * serviceAreaCluster =
             delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
