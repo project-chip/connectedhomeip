@@ -25,13 +25,13 @@ from mobly import asserts, signals
 import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestUncommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DD_1_5(MatterBaseTest):
+class TC_DD_1_5(MatterTestUncommissionedDevice):
     disable_wildcard_subscription = True
 
     def desc_TC_DD_1_5(self) -> str:

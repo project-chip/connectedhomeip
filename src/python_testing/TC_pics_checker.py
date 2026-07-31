@@ -106,7 +106,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                          "Manual pairing code PICS is set if QR or NFC is set on EP0; skipped elsewhere."),
                 TestStep(10, "When endpoint is 0: for every Base/MCORE PICS code derivable from the wildcard read (bridge role, OTA requestor/provider, multi-endpoint groups, MCORE.ROLE.COMMISSIONEE, MCORE.IDM.S), ensure each code's value in the PICS file matches what the device protocol reports. Skipped on other endpoints since Base/MCORE codes are conventionally declared only in EP0's PICS slice.",
                          "Base/MCORE PICS exactly match the device on EP0; skipped elsewhere."),
-                TestStep(11, "If --bool-arg assert_mandatory_events is set: for every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file. Skipped by default.",
+                TestStep(11, "For every event the spec marks MANDATORY for clusters on this endpoint (excluding OTA clusters, which appear to have no PICS codes today), ensure the corresponding event PICS code (cluster.S.E<id>) is marked in the PICS file.",
                          "Event PICS match spec conformance for clusters on this endpoint."),
                 TestStep(12, "If any of the checks failed, fail the test")]
 

@@ -68,15 +68,14 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 # the wildcard (commissionee, server, bridge, OTA, multi-endpoint groups,
 # Wi-Fi bands, mandatory events). Adds the MCORE.COM.WIFI/THR/ETH/WIRELESS
 # transport bits that the shared helper deliberately does not derive while
-# GRL stress-test feedback is outstanding (Cecille, May 2026). Once the
-# test-plans cleanup PRs land, this extension can be deleted and the
-# generator can use BasePicsFacts directly.
+# GRL stress-test feedback is outstanding. Once the test-plans cleanup PRs
+# land, this extension can be deleted and the generator can use
+# BasePicsFacts directly.
 @dataclass
 class _BasePicsFacts(BasePicsFacts):
     supports_wifi: bool = False
     supports_thread: bool = False
     supports_ethernet: bool = False
-
 
 def _extract_event_id(item_number: str | None) -> int | None:
     """
@@ -443,7 +442,7 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             # console.print(f"FeatureMap: {featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]}")
 
             featureMapValue = featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]
-            featureMapBitString = "{:08b}".format(featureMapValue).lstrip("0")
+            featureMapBitString = f"{featureMapValue:08b}".lstrip("0")
             for bitLocation in range(len(featureMapBitString)):
                 if featureMapValue >> bitLocation & 1 == 1:
                     # console.print(f"{clusterPICS}{featureTag}{bitLocation:02x}")
@@ -454,8 +453,8 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             # Transport bits the shared helper does not derive yet. Keep
             # MCORE.COM.WIFI / THR / ETH driven from the featuremap here
-            # until Cecille's test-plans cleanup PRs land and these PICS
-            # items are removed from Base.xml.
+            # until the test-plans cleanup PRs land and these PICS items
+            # are removed from Base.xml.
             if server == _NETWORK_COMMISSIONING_CLUSTER_ID:
                 if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_WIFI):
                     transport_supports_wifi = True
@@ -662,22 +661,10 @@ class DeviceMappingTest(MatterBaseTest):
             specVersion = specVersionResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
             console.print(f"Specification version received from device: {specVersion:x}")
 
-            if specVersion == 0x1030000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-            elif specVersion == 0x1040000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-            elif specVersion == 0x1040100:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
-            elif specVersion == 0x1040200:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
-            elif specVersion == 0x1050000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-            elif specVersion == 0x1050100:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
-            elif specVersion == 0x1060000:
-                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
-            else:
-                console.print("FAILURE: Specification version reported by device not supported")
+            try:
+                xml_clusters, problems = build_xml_clusters(dm_from_spec_version(specVersion))
+            except ConformanceException as e:
+                console.print(f"FAILURE: Specification version reported by device not supported: {e}")
                 return
 
         # Run device mapping function
