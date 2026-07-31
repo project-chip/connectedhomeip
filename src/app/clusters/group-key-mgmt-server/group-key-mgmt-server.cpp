@@ -1,6 +1,10 @@
 /**
  *
+<<<<<<< HEAD:src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
  *    Copyright (c) 2020-2022 Project CHIP Authors
+=======
+ *    Copyright (c) 2020-2026 Project CHIP Authors
+>>>>>>> 975029f2a7 (GroupKeyManagement: fix EndpointIterator leak in GroupTableCodec::Encode (#73296)):src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -86,19 +90,24 @@ struct GroupTableCodec
         auto iter = mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id));
         if (nullptr != iter)
         {
+            CHIP_ERROR endpointEncodeErr = CHIP_NO_ERROR;
             while (iter->Next(mapping))
             {
-                ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
+                endpointEncodeErr = writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id));
+                if (endpointEncodeErr != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
             iter->Release();
+            ReturnErrorOnFailure(endpointEncodeErr);
         }
         ReturnErrorOnFailure(writer.EndContainer(inner));
         // GroupName
         uint32_t name_size = static_cast<uint32_t>(strnlen(mInfo.name, GroupDataProvider::GroupInfo::kGroupNameMax));
         ReturnErrorOnFailure(writer.PutString(TagGroupName(), mInfo.name, name_size));
 
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
+        return writer.EndContainer(outer);
     }
 };
 
