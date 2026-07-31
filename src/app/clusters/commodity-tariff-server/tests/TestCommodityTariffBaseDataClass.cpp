@@ -423,6 +423,10 @@ struct TestResourceStruct
     CHIP_ERROR fillLabel(const CharSpan & aLabel)
     {
         labelBuffer.CopyFromSpan(aLabel);
+        if (!aLabel.empty())
+        {
+            VerifyOrReturnError(labelBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        }
         label = CharSpan(labelBuffer.Get(), aLabel.size());
         return CHIP_NO_ERROR;
     }
@@ -431,6 +435,10 @@ struct TestResourceStruct
     {
         Span<const uint32_t> tmpSpan = Span<const uint32_t>(aList.data(), aList.size());
         listBuffer.CopyFromSpan(tmpSpan);
+        if (!tmpSpan.empty())
+        {
+            VerifyOrReturnError(listBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        }
 
         nestedList = DataModel::List<const uint32_t>(listBuffer.Get(), tmpSpan.size());
         return CHIP_NO_ERROR;
