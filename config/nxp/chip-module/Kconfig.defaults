@@ -684,6 +684,11 @@ config MBEDTLS_PSA_CRYPTO_STORAGE_C
 config SECURE_STORAGE
 	default y
 
+# The SGI-PKC multi-part AEAD path has a CCM tag-verification defect, so use the
+# validated one-shot single-part API instead (mirrors the NXP FreeRTOS default).
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+	default y if PSA_CRYPTO_DRIVER_SGI_PKC
+
 endif # CHIP_CRYPTO_PSA
 
 config WIFI_NM_WPA_SUPPLICANT_CRYPTO_MBEDTLS_PSA
