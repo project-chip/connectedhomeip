@@ -55,7 +55,16 @@ public:
     void SetCASEClient(CASEClient * client) { mSessionSetup->mCASEClient = client; }
     CASEClient * GetCASEClient() const { return mSessionSetup->mCASEClient; }
     void SetStateConnecting() { mSessionSetup->mState = OperationalSessionSetup::State::Connecting; }
-    void CleanupCASEClient() { mSessionSetup->CleanupCASEClient(); }
+    void CleanupCASEClientImmediately()
+    {
+        mSessionSetup->CleanupCASEClient(/* deferRelease = */ false);
+    }
+    void CleanupCASEClientAfterCallback()
+    {
+        mSessionSetup->CleanupCASEClient(/* deferRelease = */ true);
+    }
+    void MoveToSecureConnected() { mSessionSetup->MoveToState(OperationalSessionSetup::State::SecureConnected); }
+    void MoveToNeedsAddress() { mSessionSetup->MoveToState(OperationalSessionSetup::State::NeedsAddress); }
 
 private:
     OperationalSessionSetup * mSessionSetup = nullptr;
@@ -195,10 +204,30 @@ TEST_F(TestOperationalSessionSetupFallback, ImmediateCASEClientCleanupReleasesIn
     ASSERT_NE(caseClient, nullptr);
 
     access.SetCASEClient(caseClient);
-    access.CleanupCASEClient();
+    access.CleanupCASEClientImmediately();
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+}
+
+TEST_F(TestOperationalSessionSetupFallback, SuccessfulCASEClientCleanupReleasesInline)
+{
+    CASEClient * caseClient = mCASEClientPool.Allocate();
+    ASSERT_NE(caseClient, nullptr);
+
+    auto * sessionSetup = chip::Platform::New<OperationalSessionSetup>(CreateCASEClientInitParams(), &mCASEClientPool,
+                                                                       ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
+    ASSERT_NE(sessionSetup, nullptr);
+
+    chip::Testing::OperationalSessionSetupTestAccess access(sessionSetup);
+    access.SetCASEClient(caseClient);
+    access.SetStateConnecting();
+    access.MoveToSecureConnected();
+
+    EXPECT_EQ(access.GetCASEClient(), nullptr);
+    EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+
+    chip::Platform::Delete(sessionSetup);
 }
 
 TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseSessionSetupAfterReturn)
@@ -213,11 +242,13 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseS
     chip::Testing::OperationalSessionSetupTestAccess access(sessionSetup);
     access.SetCASEClient(caseClient);
     access.SetStateConnecting();
-    access.CleanupCASEClient();
+    access.MoveToNeedsAddress();
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);
 
+    // The session setup can be released before the queued cleanup executes;
+    // the client pool must remain alive until the System Layer drains it.
     chip::Platform::Delete(sessionSetup);
     DrainSystemLayer();
 
@@ -236,8 +267,7 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupLeaksWhenSy
     ASSERT_NE(caseClient, nullptr);
 
     access.SetCASEClient(caseClient);
-    access.SetStateConnecting();
-    access.CleanupCASEClient();
+    access.CleanupCASEClientAfterCallback();
 
     EXPECT_EQ(access.GetCASEClient(), nullptr);
     EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);

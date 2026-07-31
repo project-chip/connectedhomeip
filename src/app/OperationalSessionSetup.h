@@ -378,7 +378,7 @@ private:
      */
     bool AttachToExistingSecureSession();
 
-    void CleanupCASEClient();
+    void CleanupCASEClient(bool deferRelease);
 
     /**
      * Helper to get the System::Layer from the session manager.

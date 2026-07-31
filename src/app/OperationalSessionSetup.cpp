@@ -65,7 +65,11 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 
         if (aTargetState != State::Connecting)
         {
-            CleanupCASEClient();
+            // Cleanup must observe the old state. Defer destruction when
+            // leaving Connecting unsuccessfully from a CASESession delegate
+            // callback. On successful CASE completion, release immediately
+            // to make the client slot available to another establishment.
+            CleanupCASEClient(/* deferRelease = */ mState == State::Connecting && aTargetState != State::SecureConnected);
         }
 
         mState = aTargetState;
@@ -339,7 +343,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     if (err != CHIP_NO_ERROR)
     {
         MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
-        CleanupCASEClient();
+        CleanupCASEClient(/* deferRelease = */ false);
         return err;
     }
 
@@ -504,7 +508,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
 
-    CleanupCASEClient();
+    CleanupCASEClient(/* deferRelease = */ true);
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -532,7 +536,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     {
         // Got an invalid session, just dispatch an error.  We have to do this
         // so we don't leak.
-        CleanupCASEClient();
+        CleanupCASEClient(/* deferRelease = */ true);
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
 
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -544,7 +548,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 }
 
-void OperationalSessionSetup::CleanupCASEClient()
+void OperationalSessionSetup::CleanupCASEClient(bool deferRelease)
 {
     CASEClient * caseClient = mCASEClient;
     if (caseClient == nullptr)
@@ -557,7 +561,7 @@ void OperationalSessionSetup::CleanupCASEClient()
 
     auto releaseClient = [clientPool, caseClient]() { clientPool->Release(caseClient); };
 
-    if (mState != State::Connecting)
+    if (!deferRelease)
     {
         releaseClient();
         return;
