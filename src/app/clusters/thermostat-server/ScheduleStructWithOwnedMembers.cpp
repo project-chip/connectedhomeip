@@ -226,7 +226,7 @@ ScheduleStructWithOwnedMembers::SetTransitions(const DataModel::List<const Sched
         index++;
     }
     transitionsCount = index;
-    transitions       = DataModel::List<const ScheduleTransitionStruct::Type>(transitionsData, transitionsCount);
+    transitions      = DataModel::List<const ScheduleTransitionStruct::Type>(transitionsData, transitionsCount);
     return CHIP_NO_ERROR;
 }
 
@@ -242,7 +242,7 @@ CHIP_ERROR ScheduleStructWithOwnedMembers::SetTransitions(
     }
     ReturnErrorOnFailure(iter.GetStatus());
     transitionsCount = index;
-    transitions       = DataModel::List<const ScheduleTransitionStruct::Type>(transitionsData, transitionsCount);
+    transitions      = DataModel::List<const ScheduleTransitionStruct::Type>(transitionsData, transitionsCount);
     return CHIP_NO_ERROR;
 }
 

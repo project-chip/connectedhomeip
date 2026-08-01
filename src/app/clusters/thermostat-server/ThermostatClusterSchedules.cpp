@@ -265,9 +265,9 @@ CHIP_ERROR ValidateTransitionsPerDay(Delegate * delegate, const ScheduleStructWi
     }
 
     static constexpr ScheduleDayOfWeekBitmap kDays[] = {
-        ScheduleDayOfWeekBitmap::kSunday, ScheduleDayOfWeekBitmap::kMonday,   ScheduleDayOfWeekBitmap::kTuesday,
+        ScheduleDayOfWeekBitmap::kSunday,    ScheduleDayOfWeekBitmap::kMonday,   ScheduleDayOfWeekBitmap::kTuesday,
         ScheduleDayOfWeekBitmap::kWednesday, ScheduleDayOfWeekBitmap::kThursday, ScheduleDayOfWeekBitmap::kFriday,
-        ScheduleDayOfWeekBitmap::kSaturday, ScheduleDayOfWeekBitmap::kAway,
+        ScheduleDayOfWeekBitmap::kSaturday,  ScheduleDayOfWeekBitmap::kAway,
     };
 
     for (auto day : kDays)
@@ -595,11 +595,11 @@ Status ThermostatAttrAccess::PrecommitSchedules(EndpointId endpoint)
     return Status::Success;
 }
 
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::SetActiveScheduleRequest::DecodableType & commandData)
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
-    auto status = gThermostatAttrAccess.SetActiveSchedule(commandPath.mEndpointId, DataModel::MakeNullable(commandData.scheduleHandle));
+    auto status =
+        gThermostatAttrAccess.SetActiveSchedule(commandPath.mEndpointId, DataModel::MakeNullable(commandData.scheduleHandle));
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -609,9 +609,8 @@ bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
 } // namespace app
 } // namespace chip
 
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::SetActiveScheduleRequest::DecodableType & commandData)
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
     return Thermostat::emberAfThermostatClusterSetActiveScheduleRequestCallback(commandObj, commandPath, commandData);
 }

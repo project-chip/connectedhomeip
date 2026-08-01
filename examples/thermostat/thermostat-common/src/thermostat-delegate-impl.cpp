@@ -41,8 +41,8 @@ ThermostatDelegate::ThermostatDelegate()
     mNextFreeIndexInThermostatSuggestionsList   = 0;
     mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
     mNumberOfSchedules                          = kMaxNumberOfSchedulesSupported;
-    mNextFreeIndexInSchedulesList                = 0;
-    mNextFreeIndexInPendingSchedulesList          = 0;
+    mNextFreeIndexInSchedulesList               = 0;
+    mNextFreeIndexInPendingSchedulesList        = 0;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
@@ -552,8 +552,7 @@ void ThermostatDelegate::InitializeSchedules()
     transitions[1].transitionTime  = 1320; // 22:00
     transitions[1].heatingSetpoint = MakeOptional(static_cast<int16_t>(1800));
 
-    TEMPORARY_RETURN_IGNORED mSchedules[0].SetTransitions(
-        DataModel::List<const ScheduleTransitionStruct::Type>(transitions));
+    TEMPORARY_RETURN_IGNORED mSchedules[0].SetTransitions(DataModel::List<const ScheduleTransitionStruct::Type>(transitions));
     mSchedules[0].SetBuiltIn(DataModel::MakeNullable(true));
 
     mNextFreeIndexInSchedulesList = 1;
@@ -681,7 +680,7 @@ CHIP_ERROR ThermostatDelegate::CommitPendingSchedules()
 {
     mNextFreeIndexInSchedulesList = 0;
     for (uint8_t indexInPendingSchedules = 0; indexInPendingSchedules < mNextFreeIndexInPendingSchedulesList;
-        indexInPendingSchedules++)
+         indexInPendingSchedules++)
     {
         const ScheduleStructWithOwnedMembers & pendingSchedule = mPendingSchedules[indexInPendingSchedules];
         mSchedules[mNextFreeIndexInSchedulesList]              = pendingSchedule;

@@ -77,12 +77,12 @@ private:
     CHIP_ERROR SetTransitionAtIndex(size_t index, const Structs::ScheduleTransitionStruct::Type & transition);
 
     uint8_t scheduleHandleData[kScheduleHandleSize] = { 0 };
-    char scheduleNameData[kScheduleNameSize]         = { 0 };
-    uint8_t presetHandleData[kScheduleHandleSize]    = { 0 };
+    char scheduleNameData[kScheduleNameSize]        = { 0 };
+    uint8_t presetHandleData[kScheduleHandleSize]   = { 0 };
 
     Structs::ScheduleTransitionStruct::Type transitionsData[kScheduleTransitionsMax];
     uint8_t transitionPresetHandleData[kScheduleTransitionsMax][kScheduleHandleSize] = {};
-    size_t transitionsCount                                                         = 0;
+    size_t transitionsCount                                                          = 0;
 };
 
 } // namespace Thermostat
