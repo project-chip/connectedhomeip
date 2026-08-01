@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
-                                                                      temperature value, SetpointAttributes & changedAttributes)
+                                                                          temperature value, SetpointAttributes & changedAttributes)
 {
     switch (attributeId)
     {
@@ -98,7 +98,6 @@ DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints 
 
 DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData)
 {
-
     auto & mode    = commandData.mode;
     int16_t amount = static_cast<int16_t>(commandData.amount * 10);
 

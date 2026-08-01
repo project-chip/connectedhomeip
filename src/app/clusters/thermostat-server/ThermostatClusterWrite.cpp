@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,9 +39,8 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                         AttributeValueDecoder & decoder)
+                                                                              AttributeValueDecoder & decoder)
 {
-
     switch (request.path.mAttributeId)
     {
     case OccupiedCoolingSetpoint::Id:
@@ -59,14 +57,12 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
     }
     case MinSetpointDeadBand::Id: {
-
         int16_t db;
         ReturnErrorOnFailure(decoder.Decode(db));
         if (db < 0 || db > 127)
         {
             return Status::ConstraintError;
         }
-        // Per spec change, invisibly swallow valid writes to Deadband
         return Status::Success;
     }
     case RemoteSensing::Id: {
@@ -92,10 +88,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return Status::Success;
     }
     case ControlSequenceOfOperation::Id:
-        // Per spec, we silently ignore any attempts to write to this attribute
         return Status::Success;
     case SystemMode::Id: {
-
         SystemModeEnum requestedSystemMode;
         ReturnErrorOnFailure(decoder.Decode(requestedSystemMode));
         if (EnsureKnownEnumValue(requestedSystemMode) == SystemModeEnum::kUnknownEnumValue)
@@ -141,96 +135,17 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 }
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                AttributeValueDecoder & decoder)
+                                                                    AttributeValueDecoder & decoder)
 {
     auto attributeId         = request.path.mAttributeId;
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
-    switch (attributeId)
+    if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
     {
-    case Presets::Id: {
-
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(MakeOptional(attributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
-                            ChipLogError(Zcl, "Presets are not editable"));
-
-        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
-        // otherwise return BUSY.
-        if (!mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
-        {
-            ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
-            return CHIP_IM_GLOBAL_STATUS(Busy);
-        }
-
-        // If the list operation is replace all, clear the existing pending list, iterate over the new presets list
-        // and add to the pending presets list.
-        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-        {
-            // Clear the pending presets list
-            mDelegate->ClearPendingPresetList();
-
-            Presets::TypeInfo::DecodableType newPresetsList;
-            ReturnErrorOnFailure(decoder.Decode(newPresetsList));
-
-            // Iterate over the presets and call the delegate to append to the list of pending presets.
-            auto iter = newPresetsList.begin();
-            while (iter.Next())
-            {
-                const PresetStruct::Type & preset = iter.GetValue();
-                ReturnErrorOnFailure(AppendPendingPreset(preset));
-            }
-            return iter.GetStatus();
-        }
-
-        // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.
-        if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-        {
-            PresetStruct::Type preset;
-            ReturnErrorOnFailure(decoder.Decode(preset));
-            return AppendPendingPreset(preset);
-        }
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
+        return Status::InvalidInState;
     }
-    break;
-    case Schedules::Id:
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    default: {
-        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
-        {
-            ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
-            return Status::InvalidInState;
-        }
-        auto result = NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteNonAtomicAttribute(request, decoder));
-        if (result.IsSuccess() && mFeatures.Has(Feature::kPresets))
-        {
-            bool clearActivePreset = false;
-            bool occupied          = true;
-            if (mFeatures.Has(Feature::kOccupancy))
-            {
-                occupied = mOccupancy.Has(OccupancyBitmap::kOccupied);
-            }
-            switch (attributeId)
-            {
-            case OccupiedHeatingSetpoint::Id:
-            case OccupiedCoolingSetpoint::Id:
-                clearActivePreset = occupied;
-                break;
-            case UnoccupiedHeatingSetpoint::Id:
-            case UnoccupiedCoolingSetpoint::Id:
-                clearActivePreset = !occupied;
-                break;
-            }
-            if (clearActivePreset)
-            {
-                ChipLogProgress(Zcl, "Setting active preset to null");
-                SetActivePreset(std::nullopt);
-            }
-        }
-        return result;
-    }
-    }
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteNonAtomicAttribute(request, decoder));
 }
 
 } // namespace Thermostat

@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -91,7 +90,6 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
 CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-
     ChipLogProgress(Zcl, "Fetching attributes hasOccupancy: %d, hasHeating: %d, hasCooling: %d, hasAuto: %d",
                     mFeatures.Has(Feature::kOccupancy), mFeatures.Has(Feature::kHeating), mFeatures.Has(Feature::kCooling),
                     mFeatures.Has(Feature::kAutoMode));
@@ -151,7 +149,7 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
 
         // Suggestions
         { HasAttribute(MaxThermostatSuggestions::Id), MaxThermostatSuggestions::kMetadataEntry },
-        { HasAttribute(ThermostatSuggestions::Id), ThermostatSuggestions::kMetadataEntry },
+        { HasAttribute(Attributes::ThermostatSuggestions::Id), Attributes::ThermostatSuggestions::kMetadataEntry },
         { HasAttribute(CurrentThermostatSuggestion::Id), CurrentThermostatSuggestion::kMetadataEntry },
         { HasAttribute(ThermostatSuggestionNotFollowingReason::Id), ThermostatSuggestionNotFollowingReason::kMetadataEntry },
     };
@@ -244,7 +242,7 @@ void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricI
 }
 
 CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
@@ -274,7 +272,6 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-
     if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicResponse::Id }));
@@ -287,8 +284,8 @@ CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                              chip::TLV::TLVReader & input_arguments,
-                                                                              CommandHandler * handler)
+                                                                            chip::TLV::TLVReader & input_arguments,
+                                                                            CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -296,11 +293,6 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
         Commands::SetpointRaiseLower::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
         return SetpointRaiseLower(request_data);
-    }
-    case Commands::SetActivePresetRequest::Id: {
-        Commands::SetActivePresetRequest::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return SetActivePreset(request_data.presetHandle);
     }
     case Commands::AtomicRequest::Id: {
         Commands::AtomicRequest::DecodableType request_data;
@@ -318,16 +310,6 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
             return Status::InvalidCommand;
         }
     }
-    case Commands::AddThermostatSuggestion::Id: {
-        Commands::AddThermostatSuggestion::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return AddThermostatSuggestion(handler, request.path, request_data);
-    }
-    case Commands::RemoveThermostatSuggestion::Id: {
-        Commands::RemoveThermostatSuggestion::DecodableType request_data;
-        ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return RemoveThermostatSuggestion(handler, request.path, request_data);
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -335,82 +317,44 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
 
 Status ThermostatCluster::OnAtomicWriteBegin(AttributeId attributeId)
 {
-    switch (attributeId)
-    {
-    case Presets::Id:
-        if (mDelegate == nullptr)
-        {
-            return Status::InvalidInState;
-        }
-        mDelegate->InitializePendingPresets();
-        break;
-    default:
-        break;
-    }
     return Status::Success;
 }
 
 Status ThermostatCluster::OnAtomicWritePrecommit(AttributeId attributeId)
 {
-    switch (attributeId)
-    {
-    case Presets::Id:
-        return PrecommitPresets();
-    default:
-        break;
-    }
     return Status::Success;
 }
 
 Status ThermostatCluster::OnAtomicWriteCommit(AttributeId attributeId)
 {
-    switch (attributeId)
-    {
-    case Presets::Id: {
-        if (mDelegate == nullptr)
-        {
-            return Status::InvalidInState;
-        }
-        ClusterStatusCode status(mDelegate->CommitPendingPresets());
-        if (status.IsSuccess())
-        {
-            NotifyAttributeChanged(attributeId);
-        }
-        return status.GetStatus();
-    }
-    default:
-        break;
-    }
     return Status::Success;
 }
 
 Status ThermostatCluster::OnAtomicWriteRollback(AttributeId attributeId)
 {
-    switch (attributeId)
-    {
-    case Presets::Id:
-        if (mDelegate == nullptr)
-        {
-            return Status::InvalidInState;
-        }
-        mDelegate->ClearPendingPresetList();
-        break;
-    default:
-        break;
-    }
     return Status::Success;
 }
 
 std::optional<System::Clock::Milliseconds16> ThermostatCluster::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
 {
-    if (mDelegate == nullptr)
-    {
-        return std::nullopt;
-    }
-    return mDelegate->GetMaxAtomicWriteTimeout(attributeId);
+    return std::nullopt;
 }
 
 void ThermostatCluster::OnAtomicWriteTimeout() {}
+
+bool ThermostatCluster::IsActiveSetpoint(AttributeId attributeId) const
+{
+    if (IsOccupied())
+    {
+        return (attributeId == Attributes::OccupiedHeatingSetpoint::Id ||
+                attributeId == Attributes::OccupiedCoolingSetpoint::Id);
+    }
+    else
+    {
+        return (attributeId == Attributes::UnoccupiedHeatingSetpoint::Id ||
+                attributeId == Attributes::UnoccupiedCoolingSetpoint::Id);
+    }
+}
 
 bool ThermostatCluster::HasAttribute(AttributeId attributeId)
 {
@@ -483,7 +427,7 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     case Schedules::Id:
         return mFeatures.Has(Feature::kMatterScheduleConfiguration);
     case MaxThermostatSuggestions::Id:
-    case ThermostatSuggestions::Id:
+    case Attributes::ThermostatSuggestions::Id:
     case CurrentThermostatSuggestion::Id:
     case ThermostatSuggestionNotFollowingReason::Id:
         return mFeatures.Has(Feature::kThermostatSuggestions);

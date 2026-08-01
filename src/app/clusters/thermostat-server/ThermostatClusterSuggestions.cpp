@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +14,12 @@
  *    limitations under the License.
  */
 
+#include "ThermostatClusterSuggestions.h"
 #include "ThermostatCluster.h"
-#include "ThermostatClusterPresets.h"
-#include "ThermostatSuggestionStructWithOwnedMembers.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -34,14 +35,9 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
 using namespace System::Clock;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-
 namespace {
 
-CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
+CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatSuggestions::Delegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -51,7 +47,6 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
 
     for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1); i >= 0; i--)
     {
-
         ThermostatSuggestionStructWithOwnedMembers suggestion;
         err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
         ReturnErrorOnFailure(err);
@@ -65,7 +60,7 @@ CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
     return err;
 }
 
-Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueIDToRemove)
+Status RemoveFromThermostatSuggestionsList(chip::app::Clusters::Thermostat::ThermostatSuggestions::Delegate * delegate, uint8_t uniqueIDToRemove)
 {
     VerifyOrReturnValue(delegate != nullptr, Status::Failure);
 
@@ -95,9 +90,80 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
 
 } // anonymous namespace
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+std::optional<DataModel::ActionReturnStatus> ThermostatSuggestions::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                                  AttributeValueEncoder & encoder)
+{
+    if (mDelegate == nullptr)
+    {
+        return std::nullopt;
+    }
+
+    switch (request.path.mAttributeId)
+    {
+    case MaxThermostatSuggestions::Id:
+        return encoder.Encode(mDelegate->GetMaxThermostatSuggestions());
+    case Attributes::ThermostatSuggestions::Id: {
+        auto & delegate = mDelegate;
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (size_t i = 0; true; i++)
+            {
+                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
+                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(thermostatSuggestion));
+            }
+        });
+    }
+    case CurrentThermostatSuggestion::Id: {
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
+        mDelegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
+        return encoder.Encode(currentThermostatSuggestion);
+    }
+    case ThermostatSuggestionNotFollowingReason::Id:
+        return encoder.Encode(mDelegate->GetThermostatSuggestionNotFollowingReason());
+    default:
+        return std::nullopt;
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus> ThermostatSuggestions::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                  TLV::TLVReader & input_arguments,
+                                                                                  CommandHandler * handler, bool & handled)
+{
+    if (mDelegate == nullptr)
+    {
+        return std::nullopt;
+    }
+
+    switch (request.path.mCommandId)
+    {
+    case Commands::AddThermostatSuggestion::Id: {
+        Commands::AddThermostatSuggestion::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return AddThermostatSuggestion(handler, request.path, commandData, handled);
+    }
+    case Commands::RemoveThermostatSuggestion::Id: {
+        Commands::RemoveThermostatSuggestion::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return RemoveThermostatSuggestion(handler, request.path, commandData);
+    }
+    default:
+        return std::nullopt;
+    }
+}
+
 std::optional<DataModel::ActionReturnStatus>
-ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                           const Commands::AddThermostatSuggestion::DecodableType & commandData)
+ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                               const Commands::AddThermostatSuggestion::DecodableType & commandData, bool & handled)
 {
     if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
     {
@@ -111,30 +177,26 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
 
     if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null for endpoint %u", commandPath.mEndpointId);
+        ChipLogError(Zcl, "SuggestionsDelegate is null for endpoint %u", commandPath.mEndpointId);
         return Status::InvalidInState;
     }
 
-    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
     {
         return Status::InvalidInState;
     }
 
-    // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
-    if (!IsPresetHandlePresentInPresets(mDelegate, commandData.presetHandle))
+    if (mPresets != nullptr && !mPresets->IsPresetHandlePresentInPresets(commandData.presetHandle))
     {
         return Status::NotFound;
     }
 
-    // If the thermostat suggestions list is full, return RESOURCE_EXHAUSTED.
     if (mDelegate->GetNumberOfThermostatSuggestions() >= mDelegate->GetMaxThermostatSuggestions())
     {
         return Status::ResourceExhausted;
     }
 
-    // If the effective time in UTC is greater than current time in UTC plus 24 hours, return INVALID_COMMAND.
     const uint32_t kSecondsInDay = 24 * 60 * 60;
     if (!commandData.effectiveTime.IsNull() &&
         (commandData.effectiveTime.Value() > currentMatterEpochTimestampInSeconds + kSecondsInDay))
@@ -142,7 +204,6 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
         return Status::InvalidCommand;
     }
 
-    // Remove any expired suggestions before adding to the list.
     CHIP_ERROR err = RemoveExpiredSuggestions(mDelegate);
     if (err != CHIP_NO_ERROR)
     {
@@ -166,7 +227,6 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
 
     uint32_t effectiveTime             = commandData.effectiveTime.ValueOr(currentMatterEpochTimestampInSeconds);
     thermostatSuggestion.effectiveTime = effectiveTime;
-
     thermostatSuggestion.expirationTime = effectiveTime + (commandData.expirationInMinutes * kSecondsPerMinute);
 
     err = mDelegate->AppendToThermostatSuggestionsList(thermostatSuggestion);
@@ -178,26 +238,28 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
         return Status::Failure;
     }
 
-    NotifyAttributeChanged(ThermostatSuggestions::Id);
+    if (mCluster != nullptr)
+    {
+        mCluster->NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
+    }
 
-    // Re-evaluate the current thermostat suggestion.
     ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
     commandObj->AddResponse(commandPath, response);
-
+    handled = true;
+    
     return std::nullopt;
 }
 
 std::optional<DataModel::ActionReturnStatus>
-ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                              const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+ThermostatSuggestions::RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                  const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
-
     if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null for endpoint %u", commandPath.mEndpointId);
+        ChipLogError(Zcl, "SuggestionsDelegate is null for endpoint %u", commandPath.mEndpointId);
         return Status::InvalidInState;
     }
 
@@ -211,20 +273,21 @@ ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const
         return status;
     }
 
-    NotifyAttributeChanged(ThermostatSuggestions::Id);
+    if (mCluster != nullptr)
+    {
+        mCluster->NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
+    }
 
-    // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
     TEMPORARY_RETURN_IGNORED RemoveExpiredSuggestions(mDelegate);
     ReEvaluateCurrentSuggestion();
 
     return Status::Success;
 }
 
-void ThermostatCluster::ReEvaluateCurrentSuggestion()
+void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
 {
     if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null for endpoint %u", mPath.mEndpointId);
         return;
     }
 
@@ -235,19 +298,20 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
     MutableByteSpan beforeReevaluationHandleSpan(buffer);
     auto beforeReevaluationHandle = DataModel::MakeNullable(beforeReevaluationHandleSpan);
 
-    CHIP_ERROR err = mDelegate->GetActivePresetHandle(beforeReevaluationHandle);
-    if (err != CHIP_NO_ERROR)
+    if (mPresets != nullptr && mPresets->GetDelegate() != nullptr)
     {
-        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
-                     err.Format());
-        return;
+        CHIP_ERROR err = mPresets->GetDelegate()->GetActivePresetHandle(beforeReevaluationHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to GetActivePresetHandle with error: %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
     }
 
-    err = mDelegate->ReEvaluateCurrentSuggestion();
+    CHIP_ERROR err = mDelegate->ReEvaluateCurrentSuggestion();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
-                     err.Format());
+        ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion with error: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
@@ -262,34 +326,39 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
         }
     }
 
-    // If the current thermostat suggestion changed, notify the attribute changed.
-    NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
-
-    uint8_t afterReevaluationBuffer[kPresetHandleSize];
-    MutableByteSpan afterReevaluationHandleSpan(afterReevaluationBuffer);
-    auto afterReevaluationHandle = DataModel::MakeNullable(afterReevaluationHandleSpan);
-
-    err = mDelegate->GetActivePresetHandle(afterReevaluationHandle);
-    if (err != CHIP_NO_ERROR)
+    if (mCluster != nullptr)
     {
-        ChipLogError(Zcl, "Failed to GetActivePresetHandle at endpoint %u with error: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
-                     err.Format());
-        return;
+        mCluster->NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
     }
 
-    if (beforeReevaluationHandle.IsNull() && afterReevaluationHandle.IsNull())
+    if (mPresets != nullptr && mPresets->GetDelegate() != nullptr)
     {
-        return;
-    }
+        uint8_t afterReevaluationBuffer[kPresetHandleSize];
+        MutableByteSpan afterReevaluationHandleSpan(afterReevaluationBuffer);
+        auto afterReevaluationHandle = DataModel::MakeNullable(afterReevaluationHandleSpan);
 
-    if (!beforeReevaluationHandle.IsNull() && !afterReevaluationHandle.IsNull() &&
-        beforeReevaluationHandle.Value().data_equal(afterReevaluationHandle.Value()))
-    {
-        return;
-    }
+        err = mPresets->GetDelegate()->GetActivePresetHandle(afterReevaluationHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            return;
+        }
 
-    // If the active preset handle changed, notify the attribute changed.
-    NotifyAttributeChanged(ActivePresetHandle::Id);
+        if (beforeReevaluationHandle.IsNull() && afterReevaluationHandle.IsNull())
+        {
+            return;
+        }
+
+        if (!beforeReevaluationHandle.IsNull() && !afterReevaluationHandle.IsNull() &&
+            beforeReevaluationHandle.Value().data_equal(afterReevaluationHandle.Value()))
+        {
+            return;
+        }
+
+        if (mCluster != nullptr)
+        {
+            mCluster->NotifyAttributeChanged(ActivePresetHandle::Id);
+        }
+    }
 }
 
 } // namespace Thermostat
