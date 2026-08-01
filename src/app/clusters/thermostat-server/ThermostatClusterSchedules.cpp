@@ -379,13 +379,35 @@ Status ThermostatAttrAccess::SetActiveSchedule(EndpointId endpoint, DataModel::N
 CHIP_ERROR ThermostatAttrAccess::AppendPendingSchedule(Thermostat::Delegate * delegate,
                                                        const ScheduleStruct::DecodableType & newSchedule)
 {
-    // Count the incoming transitions before making an owned copy, since our owned storage has a fixed capacity.
+    // Validate field sizes up front: ScheduleStructWithOwnedMembers::operator= silently logs-and-clears fields that
+    // don't fit its owned buffers rather than failing, so an oversized field here would otherwise turn into a
+    // silently-truncated (null/missing) field instead of the ConstraintError the spec calls for.
+    if (!newSchedule.scheduleHandle.IsNull() && newSchedule.scheduleHandle.Value().size() > kScheduleHandleSize)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if (newSchedule.name.HasValue() && newSchedule.name.Value().size() > kScheduleNameSize)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    if (newSchedule.presetHandle.HasValue() && newSchedule.presetHandle.Value().size() > kScheduleHandleSize)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    // Count the incoming transitions before making an owned copy, since our owned storage has a fixed capacity, and
+    // validate each transition's preset handle size for the same reason as above.
     size_t incomingTransitionsCount = 0;
     {
         auto transitionsIter = newSchedule.transitions.begin();
         while (transitionsIter.Next())
         {
             incomingTransitionsCount++;
+            const auto & transition = transitionsIter.GetValue();
+            if (transition.presetHandle.HasValue() && transition.presetHandle.Value().size() > kScheduleHandleSize)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
         }
         ReturnErrorOnFailure(transitionsIter.GetStatus());
         if (incomingTransitionsCount > kScheduleTransitionsMax)

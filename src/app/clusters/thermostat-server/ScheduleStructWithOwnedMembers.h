@@ -49,8 +49,8 @@ public:
     ScheduleStructWithOwnedMembers() = default;
     ScheduleStructWithOwnedMembers(const Structs::ScheduleStruct::Type & other);
     ScheduleStructWithOwnedMembers(const Structs::ScheduleStruct::DecodableType & other);
-    // Copy construction deleted: a defaulted copy ctor would shallow-copy the inherited spans into the source's buffers.
-    ScheduleStructWithOwnedMembers(const ScheduleStructWithOwnedMembers & other) = delete;
+    // Deep-copies the buffers and re-binds the inherited spans to this object's own buffers.
+    ScheduleStructWithOwnedMembers(const ScheduleStructWithOwnedMembers & other);
     ScheduleStructWithOwnedMembers & operator=(const Structs::ScheduleStruct::Type & other);
     ScheduleStructWithOwnedMembers & operator=(const Structs::ScheduleStruct::DecodableType & other);
     ScheduleStructWithOwnedMembers & operator=(const ScheduleStructWithOwnedMembers & other);

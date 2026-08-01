@@ -37,6 +37,10 @@ ScheduleStructWithOwnedMembers::ScheduleStructWithOwnedMembers(const ScheduleStr
     *this = other;
 }
 
+ScheduleStructWithOwnedMembers::ScheduleStructWithOwnedMembers(const ScheduleStructWithOwnedMembers & other) :
+    ScheduleStructWithOwnedMembers(static_cast<const ScheduleStruct::Type &>(other))
+{}
+
 ScheduleStructWithOwnedMembers & ScheduleStructWithOwnedMembers::operator=(const ScheduleStruct::Type & other)
 {
     SetSystemMode(other.systemMode);
