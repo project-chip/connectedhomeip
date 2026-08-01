@@ -1298,6 +1298,22 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #define CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS 90000
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
+ *
+ * @brief
+ *   Log the setup passcode and the onboarding codes derived from it.
+ *
+ *  @note
+ *    Convenient during development, where the log is the only place to read the
+ *    code from. A product that has another way to present it — a label, a
+ *    display, an administration interface — should set this to 0, so that the
+ *    passcode does not end up in a system log that outlives commissioning.
+ */
+#ifndef CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
+#define CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD 1
+#endif
+
 // -------------------- Test Setup (PASE) Configuration --------------------
 
 /**

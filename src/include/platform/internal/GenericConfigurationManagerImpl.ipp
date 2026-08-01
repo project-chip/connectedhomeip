@@ -768,6 +768,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
 
     CommissionableDataProvider * cdp = GetCommissionableDataProvider();
 
+#if CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
     {
         uint32_t setupPasscode;
         if ((cdp == nullptr) || (cdp->GetSetupPasscode(setupPasscode) != CHIP_NO_ERROR))
@@ -776,6 +777,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         }
         ChipLogProgress(DeviceLayer, "  Setup Pin Code (0 for UNKNOWN/ERROR): %" PRIu32 "", setupPasscode);
     }
+#endif // CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
 
     {
         uint16_t setupDiscriminator;

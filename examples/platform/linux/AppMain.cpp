@@ -670,10 +670,12 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     ConfigurationMgr().LogDeviceConfig();
 
+#if CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
     {
         ChipLogProgress(NotSpecified, "==== Onboarding payload for Standard Commissioning Flow ====");
         PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
     }
+#endif // CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
 
 #if defined(PW_RPC_ENABLED)
     rpc::Init(LinuxDeviceOptions::GetInstance().rpcServerPort);
@@ -1028,7 +1030,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // noise.
     ConfigurationMgr().LogDeviceConfig();
 
+#if CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
+#endif // CHIP_DEVICE_CONFIG_LOG_ONBOARDING_PAYLOAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
