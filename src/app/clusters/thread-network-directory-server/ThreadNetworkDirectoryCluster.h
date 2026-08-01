@@ -44,10 +44,32 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+    // Application-facing accessors: a border router records and retracts the network it is on
+    // through the cluster, so subscribers are notified and the data version moves. Each keeps
+    // the cluster's invariants on its own.
+
+    // Records a network, replacing an entry with the same Extended PAN ID. The dataset needs the
+    // sub-TLVs AddNetwork requires and a newer Active Timestamp than the stored entry; recording
+    // the stored dataset again is a no-op.
+    CHIP_ERROR AddOrUpdateNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId, ByteSpan dataset);
+
+    // Retracts a network. A preference naming it is cleared first; SetPreferredNetwork moves it
+    // elsewhere if wanted.
+    CHIP_ERROR ForgetNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId);
+
+    // Reads PreferredExtendedPanID; empty when null.
+    CHIP_ERROR GetPreferredNetwork(std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> & extendedPanId);
+
+    // Points PreferredExtendedPanID at a listed network, or clears it when given nullptr.
+    CHIP_ERROR SetPreferredNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId * extendedPanId);
+
 private:
     using ExtendedPanId = ThreadNetworkDirectoryStorage::ExtendedPanId;
 
     // Attribute handling helpers
+    ConcreteDataAttributePath PreferredExtendedPanIdPath() const;
+    // The sub-TLVs the specification requires of a directory entry.
+    static CHIP_ERROR ValidateDatasetForDirectory(ByteSpan dataset, ByteSpan & outExtendedPanId, uint64_t & outActiveTimestamp);
     CHIP_ERROR ReadExtendedPanId(const ConcreteDataAttributePath & aPath, std::optional<ExtendedPanId> & outExPanId);
     CHIP_ERROR ReadPreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadThreadNetworks(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
