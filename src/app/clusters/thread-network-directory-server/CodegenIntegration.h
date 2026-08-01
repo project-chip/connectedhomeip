@@ -46,6 +46,30 @@ public:
 
     CHIP_ERROR Init();
 
+    // Records a network the application knows of its own accord, e.g. the
+    // border router's own, replacing any entry with the same Extended PAN ID
+    // that it is newer than by Active Timestamp.
+    CHIP_ERROR AddOrUpdateNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId, ByteSpan dataset)
+    {
+        return mCluster.Cluster().AddOrUpdateNetwork(extendedPanId, dataset);
+    }
+
+    // Retracts one, clearing PreferredExtendedPanID if it named that network.
+    CHIP_ERROR ForgetNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId)
+    {
+        return mCluster.Cluster().ForgetNetwork(extendedPanId);
+    }
+
+    CHIP_ERROR GetPreferredNetwork(std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> & extendedPanId)
+    {
+        return mCluster.Cluster().GetPreferredNetwork(extendedPanId);
+    }
+
+    CHIP_ERROR SetPreferredNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId * extendedPanId)
+    {
+        return mCluster.Cluster().SetPreferredNetwork(extendedPanId);
+    }
+
 private:
     DefaultThreadNetworkDirectoryStorage mStorage;
     RegisteredServerCluster<ThreadNetworkDirectoryCluster> mCluster;
