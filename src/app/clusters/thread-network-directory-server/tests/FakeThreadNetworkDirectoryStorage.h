@@ -86,6 +86,10 @@ public:
 
     CHIP_ERROR RemoveNetwork(const ExtendedPanId & exPanId) override
     {
+        if (mRejectRemove)
+        {
+            return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        }
         for (auto it = mNetworks.begin(); it != mNetworks.end(); ++it)
         {
             if (it->panId == exPanId)
@@ -97,7 +101,13 @@ public:
         return CHIP_ERROR_NOT_FOUND;
     }
 
+    // Makes RemoveNetwork fail without touching the list, as a storage whose
+    // index write did not commit would.
+    void SetRejectRemove(bool reject) { mRejectRemove = reject; }
+
 private:
+    bool mRejectRemove = false;
+
     struct NetworkEntry
     {
         ExtendedPanId panId;

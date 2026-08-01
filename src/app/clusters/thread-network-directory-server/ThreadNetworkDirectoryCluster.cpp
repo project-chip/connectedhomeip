@@ -278,6 +278,113 @@ exit:
     return (status == IMStatus::Failure && err == CHIP_ERROR_NO_MEMORY) ? IMStatus::ResourceExhausted : status;
 }
 
+ConcreteDataAttributePath ThreadNetworkDirectoryCluster::PreferredExtendedPanIdPath() const
+{
+    return ConcreteDataAttributePath(mPath.mEndpointId, ThreadNetworkDirectory::Id,
+                                     ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id);
+}
+
+// "It SHALL contain at least the following sub-TLVs: Active Timestamp, Channel, Channel Mask,
+// Extended PAN ID, Network Key, Network Mesh-Local Prefix, Network Name, PAN ID, PKSc, and Security Policy."
+CHIP_ERROR ThreadNetworkDirectoryCluster::ValidateDatasetForDirectory(ByteSpan dataset, ByteSpan & outExtendedPanId)
+{
+    OperationalDatasetView view;
+    union
+    {
+        uint16_t channel;
+        uint8_t masterKey[kSizeMasterKey];
+        uint8_t meshLocalPrefix[kSizeMeshLocalPrefix];
+        char networkName[kSizeNetworkName + 1];
+        uint16_t panId;
+        uint8_t pksc[kSizePSKc];
+        uint32_t securityPolicy;
+        uint64_t activeTimestamp;
+    } unused;
+    ByteSpan unusedSpan;
+
+    ReturnErrorOnFailure(view.Init(dataset));
+    ReturnErrorOnFailure(view.GetExtendedPanIdAsByteSpan(outExtendedPanId));
+    ReturnErrorOnFailure(view.GetActiveTimestamp(unused.activeTimestamp));
+    ReturnErrorOnFailure(view.GetChannel(unused.channel));
+    ReturnErrorOnFailure(view.GetChannelMask(unusedSpan));
+    ReturnErrorOnFailure(view.GetMasterKey(unused.masterKey));
+    ReturnErrorOnFailure(view.GetMeshLocalPrefix(unused.meshLocalPrefix));
+    ReturnErrorOnFailure(view.GetNetworkName(unused.networkName));
+    ReturnErrorOnFailure(view.GetPanId(unused.panId));
+    ReturnErrorOnFailure(view.GetPSKc(unused.pksc));
+    ReturnErrorOnFailure(view.GetSecurityPolicy(unused.securityPolicy));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadNetworkDirectoryCluster::AddOrUpdateNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId,
+                                                             ByteSpan dataset)
+{
+    // An entry an application records has to satisfy the same constraints as
+    // one a client adds, or a controller reading ThreadNetworks gets something
+    // the cluster's own command would have rejected.
+    ByteSpan datasetExtendedPanId;
+    ReturnErrorOnFailure(ValidateDatasetForDirectory(dataset, datasetExtendedPanId));
+    VerifyOrReturnError(ExtendedPanId(datasetExtendedPanId) == extendedPanId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // The increasing Active Timestamp rule that AddNetwork enforces is not
+    // applied here. It exists to stop one client regressing another's entry;
+    // an application recording what its own border router reports is the
+    // authority on that network, and a re-formed network legitimately starts
+    // over.
+    ReturnErrorOnFailure(mStorage.AddOrUpdateNetwork(extendedPanId, dataset));
+    NotifyAttributeChanged(ThreadNetworks::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadNetworkDirectoryCluster::ForgetNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId & extendedPanId)
+{
+    // "If not null, the value ... SHALL match the ExtendedPanID of a network in
+    // the ThreadNetworks attribute". Clear the preference before the removal
+    // rather than after: if the removal then fails, a null preference is still
+    // a legal state, whereas one naming a network that is gone is not.
+    std::optional<ExtendedPanId> preferred;
+    ReturnErrorOnFailure(GetPreferredNetwork(preferred));
+    const bool clearedPreference = preferred.has_value() && preferred.value() == extendedPanId;
+    if (clearedPreference)
+    {
+        ReturnErrorOnFailure(SetPreferredNetwork(nullptr));
+    }
+
+    CHIP_ERROR err = mStorage.RemoveNetwork(extendedPanId);
+    if (err != CHIP_NO_ERROR)
+    {
+        // The network is still listed, so the preference it carried is still
+        // legal: put it back. If that write fails too, the cleared preference
+        // is the legal remnant of the double fault, and the removal error is
+        // the one worth reporting either way.
+        if (clearedPreference)
+        {
+            (void) SetPreferredNetwork(&extendedPanId);
+        }
+        return err;
+    }
+    NotifyAttributeChanged(ThreadNetworks::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+ThreadNetworkDirectoryCluster::GetPreferredNetwork(std::optional<ThreadNetworkDirectoryStorage::ExtendedPanId> & extendedPanId)
+{
+    return ReadExtendedPanId(PreferredExtendedPanIdPath(), extendedPanId);
+}
+
+CHIP_ERROR ThreadNetworkDirectoryCluster::SetPreferredNetwork(const ThreadNetworkDirectoryStorage::ExtendedPanId * extendedPanId)
+{
+    // Same constraint the attribute write enforces: a preference has to name a
+    // network that is actually in the list.
+    VerifyOrReturnError(extendedPanId == nullptr || mStorage.ContainsNetwork(*extendedPanId), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const ByteSpan value = (extendedPanId != nullptr) ? ByteSpan(extendedPanId->bytes) : ByteSpan();
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(PreferredExtendedPanIdPath(), value));
+    NotifyAttributeChanged(ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id);
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus ThreadNetworkDirectoryCluster::HandleRemoveNetworkRequest(
     const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req)
 {
