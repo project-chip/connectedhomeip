@@ -52,6 +52,7 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
@@ -338,4 +339,15 @@ Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clust
 
     // Finally we just do not support external attributes in all-clusters at this point
     return Status::Failure;
+}
+
+
+void MatterThermostatClusterInitCallback(EndpointId endpointId)
+{
+    chip::app::Clusters::Thermostat::ServerInit<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId);
+}
+
+void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId, clusterShutdownType);
 }

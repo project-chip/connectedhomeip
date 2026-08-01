@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,13 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/****************************************************************************
- * @file
- * @brief APIs for the  Thermostat cluster.
- *
- *******************************************************************************
- ******************************************************************************/
 
 #pragma once
 
@@ -46,9 +38,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster : public DefaultServerCluster, private chip::FabricTable::Delegate, private AtomicWriteSession::Delegate
+class ThermostatCluster : public DefaultServerCluster, public FabricTable::Delegate, public AtomicWriteSession::Delegate
 {
-
 public:
     struct OptionalAttributes
     {
@@ -112,6 +103,9 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
 
+    // Exposing for feature clusters to be able to notify when they change an attribute
+    using DefaultServerCluster::NotifyAttributeChanged;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -132,6 +126,7 @@ public:
 
     EndpointId Endpoint() const { return mPath.mEndpointId; }
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
+    Thermostat::Delegate * GetDelegate() const { return mDelegate; }
 
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
     Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override;
@@ -162,10 +157,15 @@ public:
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
 
-    Setpoints mSetpoints;
+    AtomicWriteSession & GetAtomicWriteSession() { return mAtomicWriteSession; }
+    const AtomicWriteSession & GetAtomicWriteSession() const { return mAtomicWriteSession; }
+    Setpoints & GetSetpoints() { return mSetpoints; }
 
-private:
-    BitFlags<Thermostat::Feature> mFeatures;
+    virtual bool IsOccupied() const { return true; }
+    virtual bool IsActiveSetpoint(AttributeId attributeId) const;
+
+protected:
+    Setpoints mSetpoints;
     OptionalAttributes mOptionalAttributes;
     const DefaultValues mDefaultValues;
     FabricTable & mFabricTable;
@@ -191,7 +191,6 @@ private:
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
-
     DataModel::ActionReturnStatus HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, temperature value,
                                                        SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
@@ -200,35 +199,7 @@ private:
     Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
 
-    /**
-     * @brief Set the Active Preset to a given preset handle, or null
-     *
-     * @param presetHandle The handle of the preset to set active, or null to clear the active preset
-     * @return Success if the active preset was updated, an error code if not
-     */
-    Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
-
-    /**
-     * @brief Apply a preset to the pending lists of presets during an atomic write
-     *
-     * @param preset The preset to append
-     * @return CHIP_NO_ERROR if successful, an error code if not
-     */
-    CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
-
-    chip::Protocols::InteractionModel::Status PrecommitPresets();
-
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
-
-    std::optional<DataModel::ActionReturnStatus>
-    AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                            const Commands::AddThermostatSuggestion::DecodableType & commandData);
-
-    std::optional<DataModel::ActionReturnStatus>
-    RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                               const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
-
-    void ReEvaluateCurrentSuggestion();
 };
 
 } // namespace Thermostat
