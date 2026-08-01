@@ -1,0 +1,81 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+# ThermostatAttrAccess is a single class whose methods are defined across several .cpp files in
+# ../ (it is gated behind app_config_dependent_sources.gni rather than the thermostat-server
+# source_set, since it is only built into apps that include a Thermostat endpoint). Linking any one
+# translation unit therefore requires pulling in all of them here.
+source_set("thermostat-server-schedule-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ScheduleStructWithOwnedMembers.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ScheduleStructWithOwnedMembers.h",
+    "${chip_root}/src/app/clusters/thermostat-server/Setpoint.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/Setpoint.h",
+    "${chip_root}/src/app/clusters/thermostat-server/SetpointAttributes.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/SetpointAttributes.h",
+    "${chip_root}/src/app/clusters/thermostat-server/SetpointLimits.h",
+    "${chip_root}/src/app/clusters/thermostat-server/SetpointRange.h",
+    "${chip_root}/src/app/clusters/thermostat-server/Setpoints.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/Setpoints.h",
+    "${chip_root}/src/app/clusters/thermostat-server/Temperature.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatCluster.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatCluster.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterAtomic.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterEvents.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterEvents.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterPresets.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterPresets.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterSchedules.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterSchedules.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterSetpoints.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterSetpoints.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatClusterSuggestions.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatDelegate.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h",
+    "ThermostatAttrAccessTestAccess.h",
+    "ThermostatClusterTestStubs.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests:app-test-stubs",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/Thermostat",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "TestThermostatServerSchedules"
+
+  test_sources = [
+    "TestScheduleStructWithOwnedMembers.cpp",
+    "TestThermostatClusterSchedules.cpp",
+  ]
+
+  public_deps = [
+    ":thermostat-server-schedule-test-srcs",
+    "${chip_root}/src/lib/support",
+  ]
+}

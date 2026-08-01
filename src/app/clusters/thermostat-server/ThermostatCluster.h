@@ -31,6 +31,11 @@
 #include <app/CommandHandler.h>
 
 namespace chip {
+
+namespace Testing {
+class ThermostatAttrAccessTestAccess;
+} // namespace Testing
+
 namespace app {
 namespace Clusters {
 namespace Thermostat {
@@ -256,6 +261,10 @@ private:
     friend bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+
+    // Grants unit tests access to the private schedule-related methods below without resorting to
+    // #define private public.
+    friend class chip::Testing::ThermostatAttrAccessTestAccess;
 
     struct AtomicWriteSession
     {
