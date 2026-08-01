@@ -117,7 +117,7 @@ TEST_F(TestThermostatDelegateSchedules, AppendPreservesExplicitHandle)
 TEST_F(TestThermostatDelegateSchedules, AppendFailsWhenPendingListIsFull)
 {
     auto & delegate            = ThermostatDelegate::GetInstance();
-    constexpr size_t kCapacity = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType;
+    constexpr size_t kCapacity = static_cast<size_t>(kMaxNumberOfScheduleTypes) * kMaxNumberOfSchedulesOfEachType;
 
     for (size_t i = 0; i < kCapacity; i++)
     {

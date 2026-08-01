@@ -52,7 +52,7 @@ using namespace Protocols::InteractionModel;
 
 static_assert(kThermostatEndpointCount <= kEmberInvalidEndpointIndex, "Thermostat Delegate table size error");
 
-Delegate * gDelegateTable[kThermostatEndpointCount] = { nullptr };
+Delegate * gDelegateTable[kThermostatEndpointCount] = {};
 
 namespace chip {
 namespace app {

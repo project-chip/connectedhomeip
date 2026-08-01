@@ -56,7 +56,10 @@ constexpr uint8_t kUnknownHandle[] = { 0xFF };
 class FakeThermostatDelegate : public Delegate
 {
 public:
-    static constexpr size_t kMaxSchedules     = 4;
+    // ScheduleStructWithOwnedMembers embeds a fixed-size transitions buffer (kScheduleTransitionsMax), so each
+    // instance is large; keep this array just big enough for the tests (never more than 2 concurrently) to avoid
+    // blowing the per-function stack budget on constrained targets when this fake is constructed on the stack.
+    static constexpr size_t kMaxSchedules     = 2;
     static constexpr size_t kMaxScheduleTypes = 4;
 
     std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override
