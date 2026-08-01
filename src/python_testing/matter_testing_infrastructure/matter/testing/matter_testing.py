@@ -1446,23 +1446,36 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         self._validate_test_parameters()
-        # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # during framework cleanup. Gated on requires_dut so the capture applies no matter
-        # how or when the DUT is commissioned (runner or in-test), while unit tests skip it.
-        # Skipped while commissioning: the DUT is not on the fabric yet, and an operational
-        # read would send CASE Sigma1 to an uncommissioned device.
+        # Capture the ACL so _reset_acls_to_default can restore it during framework cleanup.
+        # Captured when:
+        # - the DUT is commissioned (runner or in-test)
+        # Skipped when:
+        # - requires_dut is False (unit tests, file mode)
+        # - is_commissioning is True (DUT not on the fabric yet)
+        # - the probe fails (PASE-only connection, or DUT absent/unreachable)
         dut_expected = not self.is_commissioning and self.requires_dut
         if dut_expected:
             try:
-                self._original_acl = self.event_loop.run_until_complete(
-                    self.read_single_attribute_check_success(
-                        cluster=Clusters.AccessControl,
-                        attribute=Clusters.AccessControl.Attributes.Acl,
-                        endpoint=0
-                    )
-                )
-            except Exception:
+                self.event_loop.run_until_complete(
+                    self.default_controller.GetConnectedDevice(
+                        nodeId=self.dut_node_id, allowPASE=False, timeoutMs=5000))
+            except Exception as e:
+                LOGGER.info("[CLN] No CASE session to the DUT (not commissioned, or unreachable), "
+                            "skipping pre-test ACL capture: %s", e)
                 self._original_acl = None
+            else:
+                try:
+                    self._original_acl = self.event_loop.run_until_complete(
+                        self.read_single_attribute_check_success(
+                            cluster=Clusters.AccessControl,
+                            attribute=Clusters.AccessControl.Attributes.Acl,
+                            endpoint=0
+                        )
+                    )
+                    LOGGER.info("[CLN] Pre-test ACL captured (%d entries)", len(self._original_acl))
+                except Exception as e:
+                    LOGGER.warning("[CLN] Pre-test ACL capture failed, teardown will skip ACL restore: %s", e)
+                    self._original_acl = None
 
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
