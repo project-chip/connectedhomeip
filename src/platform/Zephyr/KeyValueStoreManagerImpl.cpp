@@ -204,7 +204,7 @@ void LoadOneAndVerifyResult(const char * fullkey, void * dest_buf, size_t dest_s
         *result = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    *readSize = (bytesRead > 0) ? bytesRead : 0;
+    *readSize = (bytesRead > 0) ? static_cast<size_t>(bytesRead) : 0;
 
     return;
 }
