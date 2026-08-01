@@ -33,6 +33,7 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/posix/app_options/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
+      "${chip_root}/examples/thermostat/thermostat-common/tests",
     ]
 
     # TV Casting app tests (platform-independent)
