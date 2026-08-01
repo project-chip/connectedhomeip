@@ -336,6 +336,7 @@ void ThermostatAttrAccess::ResetAtomicWrite(EndpointId endpoint)
     if (delegate != nullptr)
     {
         delegate->ClearPendingPresetList();
+        delegate->ClearPendingScheduleList();
     }
     ClearTimer(endpoint);
     uint16_t ep =
@@ -473,8 +474,9 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         else
         {
             // This is a valid request to open an atomic write. Tell the delegate it
-            // needs to keep track of a pending preset list now.
+            // needs to keep track of a pending preset/schedule list now.
             delegate->InitializePendingPresets();
+            delegate->InitializePendingSchedules();
             ScheduleTimer(endpoint, timeout);
         }
     }
@@ -520,7 +522,7 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
             statusCode = PrecommitPresets(endpoint);
             break;
         case Schedules::Id:
-            statusCode = Status::Success;
+            statusCode = PrecommitSchedules(endpoint);
             break;
         default:
             commandObj->AddStatus(commandPath, Status::InvalidInState);
@@ -550,6 +552,11 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
                 }
                 break;
             case Schedules::Id:
+                err = delegate->CommitPendingSchedules();
+                if (err != CHIP_NO_ERROR)
+                {
+                    statusCode = Status::InvalidInState;
+                }
                 break;
             default:
                 // Not reachable, since we returned in this situation above.
