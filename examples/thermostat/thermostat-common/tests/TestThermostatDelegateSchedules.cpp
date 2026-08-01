@@ -101,12 +101,12 @@ TEST_F(TestThermostatDelegateSchedules, AppendAssignsHandleFromSystemModeWhenHan
 
 TEST_F(TestThermostatDelegateSchedules, AppendPreservesExplicitHandle)
 {
-    auto & delegate = ThermostatDelegate::GetInstance();
+    auto & delegate                   = ThermostatDelegate::GetInstance();
     constexpr uint8_t kCustomHandle[] = { 0xAB, 0xCD };
 
-    ASSERT_EQ(delegate.AppendToPendingScheduleList(
-                  MakeSchedule(SystemModeEnum::kHeat, DataModel::MakeNullable(ByteSpan(kCustomHandle)))),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        delegate.AppendToPendingScheduleList(MakeSchedule(SystemModeEnum::kHeat, DataModel::MakeNullable(ByteSpan(kCustomHandle)))),
+        CHIP_NO_ERROR);
 
     ScheduleStructWithOwnedMembers pending;
     ASSERT_EQ(delegate.GetPendingScheduleAtIndex(0, pending), CHIP_NO_ERROR);
@@ -116,7 +116,7 @@ TEST_F(TestThermostatDelegateSchedules, AppendPreservesExplicitHandle)
 
 TEST_F(TestThermostatDelegateSchedules, AppendFailsWhenPendingListIsFull)
 {
-    auto & delegate = ThermostatDelegate::GetInstance();
+    auto & delegate            = ThermostatDelegate::GetInstance();
     constexpr size_t kCapacity = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType;
 
     for (size_t i = 0; i < kCapacity; i++)
@@ -198,7 +198,7 @@ TEST_F(TestThermostatDelegateSchedules, ActiveScheduleHandleRoundTrips)
 
 TEST_F(TestThermostatDelegateSchedules, SetActiveScheduleHandleRejectsOversizedHandle)
 {
-    auto & delegate = ThermostatDelegate::GetInstance();
+    auto & delegate                            = ThermostatDelegate::GetInstance();
     uint8_t oversized[kScheduleHandleSize + 1] = { 0 };
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();

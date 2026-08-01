@@ -78,10 +78,7 @@ public:
         activePresetHandle.SetNull();
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override { return CHIP_NO_ERROR; }
     void InitializePendingPresets() override {}
     CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
@@ -201,9 +198,9 @@ public:
                          BitMask<ScheduleTypeFeaturesBitmap> features = BitMask<ScheduleTypeFeaturesBitmap>())
     {
         ScheduleTypeStruct::Type scheduleType;
-        scheduleType.systemMode           = systemMode;
-        scheduleType.numberOfSchedules    = numberOfSchedules;
-        scheduleType.scheduleTypeFeatures = features;
+        scheduleType.systemMode               = systemMode;
+        scheduleType.numberOfSchedules        = numberOfSchedules;
+        scheduleType.scheduleTypeFeatures     = features;
         mScheduleTypes[mScheduleTypesCount++] = scheduleType;
     }
 
@@ -218,8 +215,8 @@ public:
     ScheduleStructWithOwnedMembers mPendingSchedules[kMaxSchedules];
     size_t mPendingSchedulesCount = 0;
 
-    uint8_t mNumberOfSchedules                                    = kMaxSchedules;
-    uint8_t mNumberOfScheduleTransitions                          = kScheduleTransitionsMax;
+    uint8_t mNumberOfSchedules           = kMaxSchedules;
+    uint8_t mNumberOfScheduleTransitions = kScheduleTransitionsMax;
     DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionsPerDay;
 
     uint8_t mActiveScheduleHandleBuffer[kScheduleHandleSize] = { 0 };
@@ -481,7 +478,7 @@ TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsUnknownExisti
 
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(0) };
     ScheduleStruct::Type request = MakeNewScheduleRequest(storage);
-    request.scheduleHandle        = DataModel::MakeNullable(ByteSpan(kHandleA)); // Not present in Schedules.
+    request.scheduleHandle       = DataModel::MakeNullable(ByteSpan(kHandleA)); // Not present in Schedules.
 
     ScheduleStruct::DecodableType decoded;
     ASSERT_EQ(EncodeThenDecodeSchedule(request, decoded), CHIP_NO_ERROR);
@@ -504,8 +501,8 @@ TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsDuplicatePend
 
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(0) };
     ScheduleStruct::Type request = MakeNewScheduleRequest(storage);
-    request.scheduleHandle        = DataModel::MakeNullable(ByteSpan(kHandleA));
-    request.builtIn               = DataModel::MakeNullable(false);
+    request.scheduleHandle       = DataModel::MakeNullable(ByteSpan(kHandleA));
+    request.builtIn              = DataModel::MakeNullable(false);
 
     ScheduleStruct::DecodableType decoded;
     ASSERT_EQ(EncodeThenDecodeSchedule(request, decoded), CHIP_NO_ERROR);
@@ -527,8 +524,8 @@ TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleRejectsBuiltInMismat
 
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(0) };
     ScheduleStruct::Type request = MakeNewScheduleRequest(storage);
-    request.scheduleHandle        = DataModel::MakeNullable(ByteSpan(kHandleA));
-    request.builtIn               = DataModel::MakeNullable(false); // Mismatches existing built-in of true.
+    request.scheduleHandle       = DataModel::MakeNullable(ByteSpan(kHandleA));
+    request.builtIn              = DataModel::MakeNullable(false); // Mismatches existing built-in of true.
 
     ScheduleStruct::DecodableType decoded;
     ASSERT_EQ(EncodeThenDecodeSchedule(request, decoded), CHIP_NO_ERROR);
@@ -570,8 +567,8 @@ TEST_F(TestThermostatClusterSchedules, AppendPendingScheduleSucceedsForExistingH
 
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(0) };
     ScheduleStruct::Type request = MakeNewScheduleRequest(storage);
-    request.scheduleHandle        = DataModel::MakeNullable(ByteSpan(kHandleA));
-    request.builtIn               = DataModel::NullNullable; // Inherits built-in from the matching existing schedule.
+    request.scheduleHandle       = DataModel::MakeNullable(ByteSpan(kHandleA));
+    request.builtIn              = DataModel::NullNullable; // Inherits built-in from the matching existing schedule.
 
     ScheduleStruct::DecodableType decoded;
     ASSERT_EQ(EncodeThenDecodeSchedule(request, decoded), CHIP_NO_ERROR);

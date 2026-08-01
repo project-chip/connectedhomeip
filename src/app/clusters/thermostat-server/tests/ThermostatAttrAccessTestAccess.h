@@ -34,7 +34,7 @@ public:
     explicit ThermostatAttrAccessTestAccess(chip::app::Clusters::Thermostat::ThermostatAttrAccess * access) : mAccess(access) {}
 
     Protocols::InteractionModel::Status SetActiveSchedule(EndpointId endpoint,
-                                                           chip::app::DataModel::Nullable<ByteSpan> scheduleHandle)
+                                                          chip::app::DataModel::Nullable<ByteSpan> scheduleHandle)
     {
         return mAccess->SetActiveSchedule(endpoint, scheduleHandle);
     }

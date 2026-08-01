@@ -28,9 +28,9 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 
 namespace {
 
-constexpr uint8_t kHandleData[]  = { 0x01, 0x02, 0x03, 0x04 };
-constexpr char kNameData[]       = "Weekday schedule";
-constexpr uint8_t kPresetData[]  = { 0xAA, 0xBB };
+constexpr uint8_t kHandleData[] = { 0x01, 0x02, 0x03, 0x04 };
+constexpr char kNameData[]      = "Weekday schedule";
+constexpr uint8_t kPresetData[] = { 0xAA, 0xBB };
 
 ScheduleTransitionStruct::Type MakeTransition(uint16_t transitionTime, const Optional<ByteSpan> & presetHandle = NullOptional)
 {
@@ -161,8 +161,7 @@ TEST(TestScheduleStructWithOwnedMembers, SetTransitionsRejectsTooManyEntries)
 {
     std::vector<ScheduleTransitionStruct::Type> storage(kScheduleTransitionsMax + 1, MakeTransition(0));
     ScheduleStructWithOwnedMembers schedule;
-    EXPECT_EQ(schedule.SetTransitions(
-                  DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
+    EXPECT_EQ(schedule.SetTransitions(DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
               CHIP_ERROR_NO_MEMORY);
 }
 
@@ -171,8 +170,7 @@ TEST(TestScheduleStructWithOwnedMembers, SetTransitionsRejectsOversizedPresetHan
     uint8_t oversized[kScheduleHandleSize + 1] = { 0 };
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(0, MakeOptional(ByteSpan(oversized))) };
     ScheduleStructWithOwnedMembers schedule;
-    EXPECT_EQ(schedule.SetTransitions(
-                  DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
+    EXPECT_EQ(schedule.SetTransitions(DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
               CHIP_ERROR_NO_MEMORY);
 }
 
@@ -181,8 +179,7 @@ TEST(TestScheduleStructWithOwnedMembers, SetTransitionsStoresPresetHandleForEach
     std::vector<ScheduleTransitionStruct::Type> storage{ MakeTransition(100, MakeOptional(ByteSpan(kPresetData))),
                                                          MakeTransition(200) };
     ScheduleStructWithOwnedMembers schedule;
-    ASSERT_EQ(schedule.SetTransitions(
-                  DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
+    ASSERT_EQ(schedule.SetTransitions(DataModel::List<const ScheduleTransitionStruct::Type>(storage.data(), storage.size())),
               CHIP_NO_ERROR);
 
     ASSERT_EQ(schedule.GetTransitions().size(), 2u);
