@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,9 +34,8 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                               AttributeValueEncoder & encoder)
+                                                                 AttributeValueEncoder & encoder)
 {
-
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
@@ -114,155 +112,21 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case SetpointChangeSourceTimestamp::Id:
         // TODO: implement setpoint change attributes
         return Status::UnsupportedAttribute;
-    case PresetTypes::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetTypeStruct::Type presetType;
-                auto err = delegate->GetPresetTypeAtIndex(i, presetType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(presetType));
-            }
-        });
-    }
-    break;
-    case ScheduleTypes::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                ScheduleTypeStruct::Type scheduleType;
-                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(scheduleType));
-            }
-        });
-    }
-    break;
-    case NumberOfPresets::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfPresets()));
-    }
-    break;
     case NumberOfSchedules::Id:
     case NumberOfScheduleTransitions::Id:
     case NumberOfScheduleTransitionPerDay::Id:
         // TODO: implement number of schedules
         return Status::UnsupportedAttribute;
-    case ActivePresetHandle::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandleSpan(buffer);
-        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
-
-        CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
-        ReturnErrorOnFailure(err);
-
-        ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
-    }
-    break;
     case ActiveScheduleHandle::Id:
         // TODO: implement active schedule handle
         return Status::UnsupportedAttribute;
-    case Presets::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        auto & delegate          = mDelegate;
-        auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
-        {
-            return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-                for (uint8_t i = 0; true; i++)
-                {
-                    PresetStructWithOwnedMembers preset;
-                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
-                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    ReturnErrorOnFailure(err);
-                    ReturnErrorOnFailure(enc.Encode(preset));
-                }
-            });
-        }
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetStructWithOwnedMembers preset;
-                auto err = delegate->GetPresetAtIndex(i, preset);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(preset));
-            }
-        });
-    }
-    break;
     case Schedules::Id: {
         // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
-    break;
     case SetpointHoldExpiryTimestamp::Id: {
         ReturnErrorOnFailure(encoder.Encode(mSetpointHoldExpiryTimestamp));
     }
-    break;
-    case MaxThermostatSuggestions::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetMaxThermostatSuggestions()));
-    }
-    break;
-    case ThermostatSuggestions::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (size_t i = 0; true; i++)
-            {
-                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
-                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(thermostatSuggestion));
-            }
-        });
-    }
-    break;
-    case CurrentThermostatSuggestion::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
-
-        mDelegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
-        ReturnErrorOnFailure(encoder.Encode(currentThermostatSuggestion));
-    }
-    break;
-    case ThermostatSuggestionNotFollowingReason::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetThermostatSuggestionNotFollowingReason()));
-    }
-    break;
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
         return Status::UnsupportedAttribute;

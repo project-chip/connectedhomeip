@@ -90,3 +90,13 @@ int main(int argc, char * argv[])
     ChipLinuxAppMainLoop();
     return 0;
 }
+
+void MatterThermostatClusterInitCallback(EndpointId endpointId)
+{
+    chip::app::Clusters::Thermostat::ServerInit<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId);
+}
+
+void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId, clusterShutdownType);
+}
