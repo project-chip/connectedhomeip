@@ -17,8 +17,8 @@
 
 #include "LaundryDryerControlsCluster.h"
 
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/LaundryDryerControls/Ids.h>
 #include <clusters/LaundryDryerControls/Metadata.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -75,8 +75,7 @@ LaundryDryerControlsCluster::SetSelectedDrynessLevel(DataModel::Nullable<Dryness
             ConcreteAttributePath(mPath.mEndpointId, LaundryDryerControls::Id, SelectedDrynessLevel::Id), mSelectedDrynessLevel);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "LaundryDryerControls: Failed to persist SelectedDrynessLevel: %" CHIP_ERROR_FORMAT,
-                         err.Format());
+            ChipLogError(Zcl, "LaundryDryerControls: Failed to persist SelectedDrynessLevel: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
 

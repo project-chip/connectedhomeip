@@ -52,7 +52,8 @@ public:
 
     // Attribute Setters and Getters
     // SelectedDrynessLevel
-    Protocols::InteractionModel::Status SetSelectedDrynessLevel(DataModel::Nullable<LaundryDryerControls::DrynessLevelEnum> drynessLevel);
+    Protocols::InteractionModel::Status
+    SetSelectedDrynessLevel(DataModel::Nullable<LaundryDryerControls::DrynessLevelEnum> drynessLevel);
 
     // Attribute Getters
     // SelectedDrynessLevel
@@ -69,11 +70,12 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
+
 private:
     LaundryDryerControls::Delegate * mDelegate;
 
     // Attribute local storage
-    DataModel::Nullable<LaundryDryerControls::DrynessLevelEnum> mSelectedDrynessLevel {};
+    DataModel::Nullable<LaundryDryerControls::DrynessLevelEnum> mSelectedDrynessLevel{};
 
     // Helpers
     // Loads all the persistent attributes from the KVS.

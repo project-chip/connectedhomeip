@@ -42,7 +42,7 @@ class MockLaundryDryerControlsDelegate : public LaundryDryerControls::Delegate
 public:
     // Intentionally omits kExtra so it can be used as an unsupported value in tests.
     std::vector<DrynessLevelEnum> supportedLevels = { DrynessLevelEnum::kLow, DrynessLevelEnum::kNormal, DrynessLevelEnum::kMax };
-    CHIP_ERROR getSupportedError                   = CHIP_NO_ERROR;
+    CHIP_ERROR getSupportedError                  = CHIP_NO_ERROR;
 
     CHIP_ERROR GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDryness) override
     {
@@ -125,8 +125,9 @@ TEST_F(TestLaundryDryerControlsCluster, TestReadSelectedDrynessLevelDefaultsToNu
 
 TEST_F(TestLaundryDryerControlsCluster, TestWriteSupportedValue)
 {
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
+        CHIP_NO_ERROR);
 
     DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::SelectedDrynessLevel::Id, selectedDrynessLevel), CHIP_NO_ERROR);
@@ -151,8 +152,9 @@ TEST_F(TestLaundryDryerControlsCluster, TestWriteNullClearsSelection)
 TEST_F(TestLaundryDryerControlsCluster, TestWriteUnsupportedValueIsRejected)
 {
     // kExtra is a valid enum value but is not advertised by the delegate, so it must be rejected.
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kExtra)),
-              Status::ConstraintError);
+    EXPECT_EQ(
+        mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kExtra)),
+        Status::ConstraintError);
 
     // The attribute must remain unchanged (null).
     DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel = DataModel::MakeNullable(DrynessLevelEnum::kNormal);
@@ -163,16 +165,18 @@ TEST_F(TestLaundryDryerControlsCluster, TestWriteUnsupportedValueIsRejected)
 TEST_F(TestLaundryDryerControlsCluster, TestNoOpWrites)
 {
     // 1. Write an initial value (a change).
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
+        CHIP_NO_ERROR);
 
     auto & dirtyList = mClusterTester.GetDirtyList();
     EXPECT_EQ(dirtyList.size(), 1u);
     dirtyList.clear();
 
     // 2. Write the same value (no-op, no report).
-    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(
+        mClusterTester.WriteAttribute(Attributes::SelectedDrynessLevel::Id, DataModel::MakeNullable(DrynessLevelEnum::kNormal)),
+        CHIP_NO_ERROR);
     EXPECT_EQ(dirtyList.size(), 0u);
 }
 

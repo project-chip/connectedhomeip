@@ -31,8 +31,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr size_t kLaundryDryerControlsFixedClusterCount =
-    LaundryDryerControls::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kLaundryDryerControlsFixedClusterCount = LaundryDryerControls::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kLaundryDryerControlsMaxClusterCount =
     kLaundryDryerControlsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
