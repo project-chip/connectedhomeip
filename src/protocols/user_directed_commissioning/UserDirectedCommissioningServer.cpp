@@ -313,7 +313,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 chip::TLV::TLVType listContainerType = chip::TLV::kTLVType_List;
                 ReturnErrorOnFailure(reader.EnterContainer(listContainerType));
 
-                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumTargetAppInfos < sizeof(mTargetAppInfos))
+                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumTargetAppInfos < kMaxTargetAppInfos)
                 {
                     containerTag = reader.GetTag();
                     if (!TLV::IsContextTag(containerTag))
