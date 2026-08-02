@@ -39,7 +39,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                              AttributeValueDecoder & decoder)
+                                                                         AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -135,7 +135,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 }
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                    AttributeValueDecoder & decoder)
+                                                                AttributeValueDecoder & decoder)
 {
     auto attributeId         = request.path.mAttributeId;
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();

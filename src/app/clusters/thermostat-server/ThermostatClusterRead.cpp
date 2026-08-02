@@ -38,7 +38,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                 AttributeValueEncoder & encoder)
+                                                               AttributeValueEncoder & encoder)
 {
     bool localTemperatureNotExposedSupported = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
 

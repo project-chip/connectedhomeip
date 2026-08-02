@@ -95,7 +95,6 @@ public:
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-
     EndpointId Endpoint() { return mPath.mEndpointId; }
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
     Thermostat::Delegate * GetDelegate() const { return mDelegate; }

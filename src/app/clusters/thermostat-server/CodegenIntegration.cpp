@@ -21,7 +21,6 @@
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -31,49 +30,48 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-    ThermostatCluster::OptionalAttributes BaseIntegrationDelegate::GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features)
-    {
-        using namespace chip::app::Clusters::Thermostat::Attributes;
+ThermostatCluster::OptionalAttributes BaseIntegrationDelegate::GetOptionalAttributes(EndpointId endpointId,
+                                                                                     BitFlags<Thermostat::Feature> features)
+{
+    using namespace chip::app::Clusters::Thermostat::Attributes;
 
-        ThermostatCluster::OptionalAttributes optionalAttributes;
+    ThermostatCluster::OptionalAttributes optionalAttributes;
 
-        optionalAttributes.AbsMinHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMinHeatSetpointLimit::Id);
-        optionalAttributes.AbsMaxHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMaxHeatSetpointLimit::Id);
-        optionalAttributes.AbsMinCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMinCoolSetpointLimit::Id);
-        optionalAttributes.AbsMaxCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMaxCoolSetpointLimit::Id);
+    optionalAttributes.AbsMinHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMinHeatSetpointLimit::Id);
+    optionalAttributes.AbsMaxHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMaxHeatSetpointLimit::Id);
+    optionalAttributes.AbsMinCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMinCoolSetpointLimit::Id);
+    optionalAttributes.AbsMaxCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, AbsMaxCoolSetpointLimit::Id);
 
-        optionalAttributes.LocalTemperatureCalibration = !features.Has(Thermostat::Feature::kLocalTemperatureNotExposed) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, LocalTemperatureCalibration::Id);
-        optionalAttributes.MinHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, MinHeatSetpointLimit::Id);
-        optionalAttributes.MaxHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, MaxHeatSetpointLimit::Id);
-        optionalAttributes.MinCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, MinCoolSetpointLimit::Id);
-        optionalAttributes.MaxCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, MaxCoolSetpointLimit::Id);
-        optionalAttributes.RemoteSensing         = emberAfContainsAttribute(endpointId, Thermostat::Id, RemoteSensing::Id);
-        optionalAttributes.ThermostatRunningMode = features.Has(Thermostat::Feature::kAutoMode) &&
-            emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningMode::Id);
-        optionalAttributes.TemperatureSetpointHold =
-            emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id);
-        optionalAttributes.TemperatureSetpointHoldDuration =
-            emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id);
-        optionalAttributes.ThermostatRunningState =
-            emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningState::Id);
-        optionalAttributes.SetpointChangeSource = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSource::Id);
-        optionalAttributes.SetpointChangeAmount = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeAmount::Id);
-        optionalAttributes.SetpointChangeSourceTimestamp =
-            emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSourceTimestamp::Id);
-        optionalAttributes.SetpointHoldExpiryTimestamp =
-            emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id);
-        optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
-        return optionalAttributes;
-    }
+    optionalAttributes.LocalTemperatureCalibration = !features.Has(Thermostat::Feature::kLocalTemperatureNotExposed) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, LocalTemperatureCalibration::Id);
+    optionalAttributes.MinHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, MinHeatSetpointLimit::Id);
+    optionalAttributes.MaxHeatSetpointLimit = features.Has(Thermostat::Feature::kHeating) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, MaxHeatSetpointLimit::Id);
+    optionalAttributes.MinCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, MinCoolSetpointLimit::Id);
+    optionalAttributes.MaxCoolSetpointLimit = features.Has(Thermostat::Feature::kCooling) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, MaxCoolSetpointLimit::Id);
+    optionalAttributes.RemoteSensing         = emberAfContainsAttribute(endpointId, Thermostat::Id, RemoteSensing::Id);
+    optionalAttributes.ThermostatRunningMode = features.Has(Thermostat::Feature::kAutoMode) &&
+        emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningMode::Id);
+    optionalAttributes.TemperatureSetpointHold = emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id);
+    optionalAttributes.TemperatureSetpointHoldDuration =
+        emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id);
+    optionalAttributes.ThermostatRunningState = emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningState::Id);
+    optionalAttributes.SetpointChangeSource   = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSource::Id);
+    optionalAttributes.SetpointChangeAmount   = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeAmount::Id);
+    optionalAttributes.SetpointChangeSourceTimestamp =
+        emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSourceTimestamp::Id);
+    optionalAttributes.SetpointHoldExpiryTimestamp =
+        emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id);
+    optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
+    return optionalAttributes;
+}
 
 } // namespace Thermostat
 } // namespace Clusters
@@ -84,4 +82,6 @@ void __attribute__((weak)) MatterThermostatClusterInitCallback(EndpointId endpoi
 
 void __attribute__((weak)) MatterThermostatPluginServerInitCallback() {}
 
-void __attribute__((weak)) MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType) {}
+void __attribute__((weak))
+MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
+{}

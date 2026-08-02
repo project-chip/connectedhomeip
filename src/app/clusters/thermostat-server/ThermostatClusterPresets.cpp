@@ -216,7 +216,8 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(co
     case Presets::Id: {
         auto & delegate          = mDelegate;
         auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mCluster != nullptr && mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+        if (mCluster != nullptr &&
+            mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
         {
             return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -283,7 +284,8 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
     }
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
-    VerifyOrReturnError(mCluster != nullptr && mCluster->GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
+    VerifyOrReturnError(mCluster != nullptr &&
+                            mCluster->GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
     if (!mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
@@ -613,8 +615,14 @@ Status ThermostatPresets::PrecommitPresets()
         }
     }
 
-    auto heatLimits = mCluster != nullptr ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kHeat) : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinHeatSetpointLimit), AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxHeatSetpointLimit));
-    auto coolLimits = mCluster != nullptr ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kCool) : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinCoolSetpointLimit), AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxCoolSetpointLimit));
+    auto heatLimits = mCluster != nullptr
+        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kHeat)
+        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinHeatSetpointLimit),
+                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxHeatSetpointLimit));
+    auto coolLimits = mCluster != nullptr
+        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kCool)
+        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinCoolSetpointLimit),
+                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxCoolSetpointLimit));
 
     for (uint8_t i = 0; true; i++)
     {

@@ -341,7 +341,6 @@ Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clust
     return Status::Failure;
 }
 
-
 void MatterThermostatClusterInitCallback(EndpointId endpointId)
 {
     chip::app::Clusters::Thermostat::ServerInit<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId);
@@ -349,5 +348,6 @@ void MatterThermostatClusterInitCallback(EndpointId endpointId)
 
 void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId, clusterShutdownType);
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId,
+                                                                                                               clusterShutdownType);
 }

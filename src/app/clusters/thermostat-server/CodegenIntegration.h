@@ -33,7 +33,6 @@
 #include "ThermostatCluster.h"
 #include "ThermostatClusterWithFeatures.h"
 
-
 namespace chip::app::Clusters::Thermostat {
 
 constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
@@ -41,12 +40,13 @@ constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + C
 
 class BaseIntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-  protected:
+protected:
     ThermostatCluster::OptionalAttributes GetOptionalAttributes(EndpointId endpointId, BitFlags<Thermostat::Feature> features);
 };
 
 template <std::size_t Size, typename Cluster>
-class IntegrationDelegate : public BaseIntegrationDelegate {
+class IntegrationDelegate : public BaseIntegrationDelegate
+{
 public:
     // Declared and defined in one single place
     inline static std::array<LazyRegisteredServerCluster<Cluster>, Size> mClusters = {};
@@ -55,7 +55,6 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         BitFlags<Thermostat::Feature> features(featureMap);
-
 
         ChipLogError(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         mClusters[clusterInstanceIndex].Create(endpointId, features, GetOptionalAttributes(endpointId, features));
@@ -94,27 +93,27 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-   /* void ServerInit(EndpointId endpointId)
-    {
-        for (auto & cluster : mClusters)
-        {
-            if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
-            {
-                cluster.Cluster().ServerInit();
-            }
-        }
-    }
+    /* void ServerInit(EndpointId endpointId)
+     {
+         for (auto & cluster : mClusters)
+         {
+             if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
+             {
+                 cluster.Cluster().ServerInit();
+             }
+         }
+     }
 
-    void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
-    {
-        for (auto & cluster : mClusters)
-        {
-            if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
-            {
-                cluster.Cluster().ServerShutdown(clusterShutdownType);
-            }
-        }
-    }*/
+     void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
+     {
+         for (auto & cluster : mClusters)
+         {
+             if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
+             {
+                 cluster.Cluster().ServerShutdown(clusterShutdownType);
+             }
+         }
+     }*/
 };
 
 template <typename Cluster>

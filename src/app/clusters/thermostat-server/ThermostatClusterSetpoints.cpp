@@ -45,7 +45,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
-                                                                          temperature value, SetpointAttributes & changedAttributes)
+                                                                      temperature value, SetpointAttributes & changedAttributes)
 {
     switch (attributeId)
     {

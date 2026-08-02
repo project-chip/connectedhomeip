@@ -94,5 +94,6 @@ void MatterThermostatClusterInitCallback(EndpointId endpointId)
 
 void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId, clusterShutdownType);
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId,
+                                                                                                               clusterShutdownType);
 }
