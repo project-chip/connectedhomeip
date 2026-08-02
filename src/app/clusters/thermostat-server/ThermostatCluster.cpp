@@ -261,7 +261,7 @@ void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricI
 }
 
 CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
@@ -303,8 +303,8 @@ CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                            chip::TLV::TLVReader & input_arguments,
-                                                                            CommandHandler * handler)
+                                                                              chip::TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -365,8 +365,7 @@ bool ThermostatCluster::IsActiveSetpoint(AttributeId attributeId) const
 {
     if (IsOccupied())
     {
-        return (attributeId == Attributes::OccupiedHeatingSetpoint::Id ||
-                attributeId == Attributes::OccupiedCoolingSetpoint::Id);
+        return (attributeId == Attributes::OccupiedHeatingSetpoint::Id || attributeId == Attributes::OccupiedCoolingSetpoint::Id);
     }
     else
     {

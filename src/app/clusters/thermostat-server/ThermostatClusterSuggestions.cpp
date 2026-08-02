@@ -59,7 +59,8 @@ CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatS
     return err;
 }
 
-Status RemoveFromThermostatSuggestionsList(chip::app::Clusters::Thermostat::ThermostatSuggestions::Delegate * delegate, uint8_t uniqueIDToRemove)
+Status RemoveFromThermostatSuggestionsList(chip::app::Clusters::Thermostat::ThermostatSuggestions::Delegate * delegate,
+                                           uint8_t uniqueIDToRemove)
 {
     VerifyOrReturnValue(delegate != nullptr, Status::Failure);
 
@@ -224,8 +225,8 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
     thermostatSuggestion.uniqueID     = uniqueID;
     thermostatSuggestion.presetHandle = commandData.presetHandle;
 
-    uint32_t effectiveTime             = commandData.effectiveTime.ValueOr(currentMatterEpochTimestampInSeconds);
-    thermostatSuggestion.effectiveTime = effectiveTime;
+    uint32_t effectiveTime              = commandData.effectiveTime.ValueOr(currentMatterEpochTimestampInSeconds);
+    thermostatSuggestion.effectiveTime  = effectiveTime;
     thermostatSuggestion.expirationTime = effectiveTime + (commandData.expirationInMinutes * kSecondsPerMinute);
 
     err = mDelegate->AppendToThermostatSuggestionsList(thermostatSuggestion);
@@ -248,7 +249,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
     response.uniqueID = uniqueID;
     commandObj->AddResponse(commandPath, response);
     handled = true;
-    
+
     return std::nullopt;
 }
 

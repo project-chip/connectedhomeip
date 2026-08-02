@@ -34,7 +34,7 @@ namespace Clusters {
 namespace Thermostat {
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                              AttributeValueDecoder & decoder)
+                                                                         AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {

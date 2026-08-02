@@ -41,18 +41,18 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) = 0;
-        virtual uint8_t GetNumberOfPresets()                                                                  = 0;
-        virtual CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)             = 0;
-        virtual CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)      = 0;
-        virtual CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)   = 0;
-        virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & activePresetHandle)  = 0;
+        virtual CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType)       = 0;
+        virtual uint8_t GetNumberOfPresets()                                                                      = 0;
+        virtual CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)                  = 0;
+        virtual CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)           = 0;
+        virtual CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)       = 0;
+        virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & activePresetHandle)        = 0;
         virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
 
-        virtual void InitializePendingPresets() = 0;
-        virtual void ClearPendingPresetList() = 0;
+        virtual void InitializePendingPresets()                                                   = 0;
+        virtual void ClearPendingPresetList()                                                     = 0;
         virtual CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) = 0;
-        virtual CHIP_ERROR CommitPendingPresets() = 0;
+        virtual CHIP_ERROR CommitPendingPresets()                                                 = 0;
 
         virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
         {
@@ -90,9 +90,8 @@ public:
 
 private:
     ThermostatCluster * mCluster = nullptr;
-    Delegate * mDelegate             = nullptr;
+    Delegate * mDelegate         = nullptr;
 };
-
 
 } // namespace Thermostat
 } // namespace Clusters

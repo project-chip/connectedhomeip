@@ -42,7 +42,7 @@ uint8_t ThermostatDelegate::GetNumberOfThermostatSuggestions()
 }
 
 CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index,
-                                                            ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
+                                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
 {
     if (index < mNextFreeIndexInThermostatSuggestionsList)
     {
