@@ -510,6 +510,10 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppListOverflow)
     TLV::TLVWriter writer;
     writer.Init(payload + kHeaderLen, sizeof(payload) - kHeaderLen);
 
+    // ReadPayload expects an anonymous structure envelope before any context-tagged element.
+    TLV::TLVType envelopeType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, envelopeType), CHIP_NO_ERROR);
+
     TLV::TLVType listType;
     ASSERT_EQ(writer.StartContainer(TLV::ContextTag(kTestTargetAppListTag), TLV::kTLVType_List, listType), CHIP_NO_ERROR);
     for (uint16_t i = 0; i < kEntries; i++)
@@ -521,6 +525,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppListOverflow)
         ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
     }
     ASSERT_EQ(writer.EndContainer(listType), CHIP_NO_ERROR);
+
+    ASSERT_EQ(writer.EndContainer(envelopeType), CHIP_NO_ERROR);
     ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     IdentificationDeclaration idOut;
