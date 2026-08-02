@@ -18,24 +18,24 @@
 #pragma once
 
 #include <app/clusters/thermostat-server/PresetStructWithOwnedMembers.h>
-#include <app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h>
 #include <app/clusters/thermostat-server/ThermostatClusterOccupancy.h>
 #include <app/clusters/thermostat-server/ThermostatClusterPresets.h>
 #include <app/clusters/thermostat-server/ThermostatClusterSuggestions.h>
-#include <app/clusters/thermostat-server/ThermostatDelegate.h>
 #include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
+#include <app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-static constexpr uint8_t kMaxNumberOfPresetTypes         = 6;
-static constexpr uint8_t kMaxNumberOfScheduleTypes       = 2;
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
-static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
-static constexpr uint8_t kMaxNumberOfPresetsSupported   = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
-static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
+static constexpr uint8_t kMaxNumberOfPresetTypes           = 6;
+static constexpr uint8_t kMaxNumberOfScheduleTypes         = 2;
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType     = 1;
+static constexpr uint8_t kMaxNumberOfSchedulesOfEachType   = 1;
+static constexpr uint8_t kMaxNumberOfPresetsSupported      = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+static constexpr uint8_t kMaxNumberOfSchedulesSupported    = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
 
 class ThermostatDelegate : public Delegate,

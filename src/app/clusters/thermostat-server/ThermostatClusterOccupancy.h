@@ -53,20 +53,20 @@ public:
                                                                AttributeValueEncoder & encoder);
 
     ThermostatCluster * GetCluster() const { return mCluster; }
-    
-    bool IsOccupied() const {
-        if (mDelegate) {
+
+    bool IsOccupied() const
+    {
+        if (mDelegate)
+        {
             return mDelegate->GetOccupancy().Has(OccupancyBitmap::kOccupied);
         }
         return true;
     }
 
-
 private:
     ThermostatCluster * mCluster = nullptr;
-    Delegate * mDelegate             = nullptr;
+    Delegate * mDelegate         = nullptr;
 };
-
 
 } // namespace Thermostat
 } // namespace Clusters

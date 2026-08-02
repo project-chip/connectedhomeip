@@ -27,7 +27,6 @@
 
 #include <app/clusters/thermostat-server/ThermostatClusterWithFeatures.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;

@@ -40,15 +40,14 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual uint8_t GetMaxThermostatSuggestions()                                                             = 0;
-        virtual uint8_t GetNumberOfThermostatSuggestions()                                                        = 0;
+        virtual uint8_t GetMaxThermostatSuggestions()                                                                        = 0;
+        virtual uint8_t GetNumberOfThermostatSuggestions()                                                                   = 0;
         virtual CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
-                                                           ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) = 0;
+                                                          ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) = 0;
         virtual void GetCurrentThermostatSuggestion(
-            DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) = 0;
-        virtual DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap>
-        GetThermostatSuggestionNotFollowingReason()                                                                = 0;
-        virtual CHIP_ERROR GetUniqueID(uint8_t & uniqueID)                                                        = 0;
+            DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)                    = 0;
+        virtual DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() = 0;
+        virtual CHIP_ERROR GetUniqueID(uint8_t & uniqueID)                                                                    = 0;
         virtual CHIP_ERROR
         AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) = 0;
         virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t index)                                      = 0;
@@ -68,24 +67,24 @@ public:
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler, bool & handled);
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler,
+                                                               bool & handled);
 
-    std::optional<DataModel::ActionReturnStatus> AddThermostatSuggestion(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Commands::AddThermostatSuggestion::DecodableType & commandData, bool & handled);
+    std::optional<DataModel::ActionReturnStatus>
+    AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                            const Commands::AddThermostatSuggestion::DecodableType & commandData, bool & handled);
 
-    std::optional<DataModel::ActionReturnStatus> RemoveThermostatSuggestion(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                               const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
     void ReEvaluateCurrentSuggestion();
 
 private:
     ThermostatCluster * mCluster = nullptr;
-    Delegate * mDelegate             = nullptr;
-    ThermostatPresets * mPresets     = nullptr;
+    Delegate * mDelegate         = nullptr;
+    ThermostatPresets * mPresets = nullptr;
 };
-
 
 } // namespace Thermostat
 } // namespace Clusters

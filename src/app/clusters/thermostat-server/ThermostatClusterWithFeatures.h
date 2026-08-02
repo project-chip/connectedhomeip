@@ -33,7 +33,7 @@ class ThermostatClusterWithFeatures : public ThermostatCluster
 {
 public:
     static constexpr bool kHasCoreDelegate = (std::is_same_v<Thermostat::Delegate, Delegates> || ...);
-    static constexpr bool kHasPresets     = (std::is_same_v<ThermostatPresets::Delegate, Delegates> || ...);
+    static constexpr bool kHasPresets      = (std::is_same_v<ThermostatPresets::Delegate, Delegates> || ...);
     static constexpr bool kHasSuggestions  = (std::is_same_v<ThermostatSuggestions::Delegate, Delegates> || ...);
     static constexpr bool kHasOccupancy    = (std::is_same_v<ThermostatOccupancy::Delegate, Delegates> || ...);
 
@@ -101,7 +101,7 @@ public:
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                 AttributeValueEncoder & encoder) override
+                                                AttributeValueEncoder & encoder) override
     {
         if constexpr (kHasOccupancy)
         {
@@ -128,7 +128,7 @@ public:
     }
 
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                  AttributeValueDecoder & decoder) override
+                                                 AttributeValueDecoder & decoder) override
     {
         if constexpr (kHasPresets)
         {
@@ -150,8 +150,7 @@ public:
     }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override
     {
         if constexpr (kHasPresets)
         {
@@ -241,7 +240,8 @@ private:
     [[no_unique_address]] std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
 };
 
-using DefaultThermostatCluster = ThermostatClusterWithFeatures<Thermostat::Delegate, ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+using DefaultThermostatCluster = ThermostatClusterWithFeatures<Thermostat::Delegate, ThermostatPresets::Delegate,
+                                                               ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters
