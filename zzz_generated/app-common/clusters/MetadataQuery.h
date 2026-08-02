@@ -168,6 +168,8 @@
 #include <clusters/LocalizationConfiguration/MetadataProvider.h>
 #include <clusters/LowPower/Ids.h>
 #include <clusters/LowPower/MetadataProvider.h>
+#include <clusters/MediaFileManagement/Ids.h>
+#include <clusters/MediaFileManagement/MetadataProvider.h>
 #include <clusters/MediaInput/Ids.h>
 #include <clusters/MediaInput/MetadataProvider.h>
 #include <clusters/MediaPlayback/Ids.h>
@@ -735,6 +737,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == LowPower::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, LowPower::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaFileManagement::Id) || ...))
+    {
+        if (id == MediaFileManagement::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, MediaFileManagement::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == MediaInput::Id) || ...))
     {

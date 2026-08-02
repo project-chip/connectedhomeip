@@ -17,9 +17,10 @@
 
 import logging
 import re
+from collections.abc import Mapping
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any
 
 import yaml
 
@@ -97,7 +98,7 @@ def _has_no_separators(name: str) -> bool:
     return not bool(re.search(r'[\s/\-_]', name))
 
 
-def _validate_spec_revision(errata_data: dict[str, Any], active_spec_revision: Optional[str]) -> list[str]:
+def _validate_spec_revision(errata_data: dict[str, Any], active_spec_revision: str | None) -> list[str]:
     """Validates active specification revision against the errata compatibility list."""
     if 'compatible_specification_revisions' not in errata_data:
         return []
@@ -205,7 +206,7 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
 
 def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
-                 active_spec_revision: Optional[str] = None) -> list[ProblemNotice]:
+                 active_spec_revision: str | None = None) -> list[ProblemNotice]:
     """Applies a dictionary of errata override rules directly to the built in-memory AST.
 
     Returns a list of ProblemNotice warning/error records for any orphaned, unrecognized, or incompatible rules.

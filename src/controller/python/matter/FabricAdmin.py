@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from . import CertificateAuthority, ChipDeviceCtrl
 from .crypto import p256keypair
@@ -36,7 +36,7 @@ class FabricAdmin:
     # Hook invoked by NewController() each time a controller is created.
     # MatterBaseTest registers this in setup_class to auto-populate its
     # _extra_controllers list used for test cleanup in teardown_class.
-    _new_controller_hook: Optional[Callable] = None
+    _new_controller_hook: Callable | None = None
 
     @classmethod
     def _Handle(cls):
@@ -69,8 +69,8 @@ class FabricAdmin:
         self._isActive = True
         self._activeControllers: list[ChipDeviceCtrl.ChipDeviceController] = []
 
-    def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "",
-                      useTestCommissioner: bool = False, catTags: list[int] = [], keypair: Optional[p256keypair.P256Keypair] = None,
+    def NewController(self, nodeId: int | None = None, paaTrustStorePath: str = "",
+                      useTestCommissioner: bool = False, catTags: list[int] = [], keypair: p256keypair.P256Keypair | None = None,
                       dacRevocationSetPath: str = ""):
         ''' Create a new matter.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 

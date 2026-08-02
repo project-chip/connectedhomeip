@@ -114,7 +114,7 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #endif
 
@@ -154,7 +154,7 @@ app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
@@ -218,7 +218,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 
-#elif CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#elif CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -400,6 +400,17 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 
     PrintCurrentVersion();
 
+#if CONFIG_CHIP_SE05X
+    /* Se05x::PostInit() must complete before starting CHIP event loop task to avoid lock contention on se05x library mutexes
+     * between main thread and CHIP thread. */
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
+        goto exit;
+    }
+#endif
+
     /* Start a task to run the CHIP Device event loop. */
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -414,14 +425,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
-    }
-#endif
-
-#if CONFIG_CHIP_SE05X
-    err = chip::NXP::App::Se05x::PostInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 

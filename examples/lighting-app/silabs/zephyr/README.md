@@ -87,15 +87,17 @@ SoC and the network transport used by Matter.
 
     -   [Matter Prerequisites](../../../../docs/guides/BUILDING.md)
 
--   Install the Silicon Labs Zephyr SDK and tools:
+-   Install the Simplicity SDK for Zephyr and tools:
 
     -   Follow the
         [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
+    -   With additional instructions
+        [here](https://docs.silabs.com/zephyr/2026.6.0/zephyr-getting-started/getting-started-guide)
 
 -   Build the example application for your target:
 
     ```bash
-    cd silabs_zephyr
+    cd workspace
 
     # Wi-Fi build (SiWx917)
     west build -b siwx917_rb4338a connectedhomeip/examples/lighting-app/silabs/zephyr
@@ -139,7 +141,7 @@ SoC and the network transport used by Matter.
 -   Or flash using Simplicity Commander:
 
     ```bash
-    commander flash build/zephyr/zephyr.hex
+    commander flash build/zephyr/zephyr.hex (or .rps file if using the SiWx917)
     ```
 
 -   **Bootloader and connectivity firmware:**
@@ -148,9 +150,7 @@ SoC and the network transport used by Matter.
         application image. Pre-built bootloader and connectivity firmware
         binaries are available in the Assets section of the Releases page on
         [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
-    -   The **EFR32MG24** boards require a Gecko bootloader. Refer to the
-        Silicon Labs documentation for the appropriate bootloader image for your
-        board.
+    -   The **EFR32MG24** boards require MCUBoot for OTA support.
 
 ## Running the Complete Example
 
