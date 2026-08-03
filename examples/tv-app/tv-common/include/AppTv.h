@@ -26,10 +26,12 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
+#include <memory>
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "account-login/AccountLoginManager.h"
+#include "account-login/OAuthAccountLoginManager.h"
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "channel/ChannelManager.h"
@@ -78,13 +80,32 @@ public:
         ContentApp{ supportedClusters },
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN),
+        mAccountLoginDelegate(std::make_unique<AccountLoginManager>(setupPIN)),
         mContentLauncherDelegate({ "image/*", "video/*" },
                                  to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
+
+    // Variant used for apps that authenticate via OAuth instead of a setup PIN.
+    // Takes ownership of a concrete OAuthAccountLoginManager (rather than the
+    // generic AccountLoginDelegate interface) purely so mOAuthAccountLoginDelegate
+    // can capture the raw pointer up front, before it's moved into
+    // mAccountLoginDelegate - this avoids needing RTTI (dynamic_cast) later, which
+    // this codebase builds without.
+    ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                   const char * szApplicationVersion, std::unique_ptr<OAuthAccountLoginManager> oauthAccountLoginDelegate,
+                   std::vector<SupportedCluster> supportedClusters) :
+        ContentApp{ supportedClusters },
+        mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
+                                  szApplicationVersion),
+        mOAuthAccountLoginDelegate(oauthAccountLoginDelegate.get()),
+        mAccountLoginDelegate(std::move(oauthAccountLoginDelegate)),
+        mContentLauncherDelegate({ "image/*", "video/*" },
+                                 to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
+        mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
+
     virtual ~ContentAppImpl() {}
 
-    AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
+    AccountLoginDelegate * GetAccountLoginDelegate() override { return mAccountLoginDelegate.get(); };
     ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
@@ -99,9 +120,22 @@ public:
             productId == mApplicationBasicDelegate.HandleGetProductId();
     }
 
+    void SetEndpointId(EndpointId id) override
+    {
+        ContentApp::SetEndpointId(id);
+        if (mOAuthAccountLoginDelegate != nullptr)
+        {
+            mOAuthAccountLoginDelegate->SetEndpointId(id);
+        }
+    }
+
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;
-    AccountLoginManager mAccountLoginDelegate;
+    // Declared before mAccountLoginDelegate: when the OAuth ctor runs, this must
+    // capture the raw pointer before mAccountLoginDelegate's std::move() empties it,
+    // and member init order follows declaration order, not initializer-list order.
+    OAuthAccountLoginManager * mOAuthAccountLoginDelegate = nullptr;
+    std::unique_ptr<AccountLoginDelegate> mAccountLoginDelegate;
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
     ContentLauncherManager mContentLauncherDelegate;
