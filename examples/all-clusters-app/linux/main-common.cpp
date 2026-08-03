@@ -208,7 +208,7 @@ void ApplicationInit()
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
-    Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
+    Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster, chip::app::Clusters::Thermostat::ThermostatDelegate>(chip::EndpointId(1),
                                              &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,

@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
@@ -83,8 +84,9 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    if (auto status = Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
-                                                               &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    if (auto status = Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
+                                                               chip::app::Clusters::Thermostat::ThermostatDelegate>(
+            chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
         status != chip::Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
