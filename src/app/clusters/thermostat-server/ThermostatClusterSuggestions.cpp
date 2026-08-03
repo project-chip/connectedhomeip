@@ -166,7 +166,7 @@ std::optional<DataModel::ActionReturnStatus>
 ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                const Commands::AddThermostatSuggestion::DecodableType & commandData, bool & handled)
 {
-    if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
+    if (commandData.presetHandle.size() > kThermostatSuggestionPresetHandleSize)
     {
         return Status::ConstraintError;
     }
