@@ -17,7 +17,6 @@
 
 #include "CodegenIntegration.h"
 #include "ThermostatCluster.h"
-#include "CodegenIntegration.h"
 
 using namespace chip::Protocols::InteractionModel;
 
@@ -28,7 +27,6 @@ namespace Thermostat {
 namespace Attributes {
 
 namespace ControlSequenceOfOperation {
-
 
 Protocols::InteractionModel::Status
 Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value) // ControlSequenceOfOperationEnum
