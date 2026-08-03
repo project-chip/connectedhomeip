@@ -355,15 +355,9 @@ template("efr32_sdk") {
         ]
 
         if (is_series_2) {
-          libs += [
-            "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/xg24/release/liblinklayer.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/${compiler}/cortex-m33/hal/release/libble_host_hal_series2.a",
-          ]
+          libs += [ "${efr32_sdk_root}/bluetooth_le_host/build/${compiler}/cortex-m33/hal/release/libble_host_hal_series2.a" ]
         } else if (is_series_3) {
-          libs += [
-            "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/x301/release/liblinklayer.a",
-            "${efr32_sdk_root}/bluetooth_le_host/build/${compiler}/cortex-m33/hal/release/libble_host_hal_series3.a",
-          ]
+          libs += [ "${efr32_sdk_root}/bluetooth_le_host/build/${compiler}/cortex-m33/hal/release/libble_host_hal_series3.a" ]
         }
       }
     }
@@ -378,7 +372,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/emdrv/spidrv/config",
       ]
 
-      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_${compiler}_release.a" ]
+      libs += [
+        "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/xg24/release/liblinklayer.a",
+        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_${compiler}_release.a"
+      ]
 
       defines += [ "EFR32MG24" ]
     } else if (silabs_family == "mgm24") {
@@ -389,7 +386,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_built_in_phys/efr32xg24",
       ]
 
-      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_${compiler}_release.a" ]
+      libs += [
+        "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/xg24/release/liblinklayer.a",
+        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_${compiler}_release.a"
+      ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
         libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
@@ -414,7 +414,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_built_in_phys/efr32xg26",
       ]
 
-      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_${compiler}_release.a" ]
+      libs += [
+        "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/xg26/release/liblinklayer.a",
+        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_${compiler}_release.a"
+      ]
 
       defines += [ "EFR32MG26" ]
     } else if (silabs_family == "simg301") {
@@ -426,7 +429,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_pa_tables/sixg301",
       ]
 
-      libs += [ "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_sixg301_${compiler}_release.a" ]
+      libs += [
+        "${efr32_sdk_root}/bluetooth_le_controller/build/${compiler}/x301/release/liblinklayer.a",
+        "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_sixg301_${compiler}_release.a"
+      ]
 
       # Family-level Series 3 / HostCrypto defines required to build SDK sources.
       # Board-specific options (e.g. SL_TOKEN_MANAGER_BACKEND_EXT_FLASH, HFXO,
