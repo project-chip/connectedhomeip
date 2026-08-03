@@ -314,7 +314,13 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/examples/tv-app/tv-common/clusters/media-file-management/tests" ]
     }
 
-    tests += [ "${chip_root}/examples/thermostat/thermostat-common/tests" ]
+    # Thermostat schedule delegate test. Excluded on embedded targets: linked into a single
+    # combined test image (e.g. nRF Connect SDK's AllChipTests), this example's test-only
+    # globals/zap config end up sharing a process with every other cluster's unit tests,
+    # which segfaults unrelated suites (observed with TestPowerSourceCluster on native_posix).
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/thermostat/thermostat-common/tests" ]
+    }
   }
 
   chip_test_group("fake_platform_tests") {
