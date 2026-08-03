@@ -84,8 +84,9 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster, chip::app::Clusters::Thermostat::ThermostatDelegate>(chip::EndpointId(1),
-                                             &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
+                                             chip::app::Clusters::Thermostat::ThermostatDelegate>(
+        chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 }
 
 void ApplicationShutdown() {}

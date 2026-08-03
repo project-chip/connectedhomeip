@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "ThermostatCluster.h"
 #include "CodegenIntegration.h"
+#include "ThermostatCluster.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -33,7 +33,6 @@ namespace Thermostat {
 namespace Attributes {
 
 namespace ControlSequenceOfOperation {
-
 
 Protocols::InteractionModel::Status
 Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value) // ControlSequenceOfOperationEnum
