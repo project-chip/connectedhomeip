@@ -72,7 +72,10 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
 
 void AvAnalysisServerLogic::Shutdown()
 {
-    mDelegate->ShutdownApp();
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ShutdownApp();
+    }
 }
 
 bool AvAnalysisServerLogic::HasFeature(Feature aFeature) const
@@ -342,7 +345,10 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    if (mDelegate != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    }
 }
 
 /**

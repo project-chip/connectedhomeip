@@ -25,6 +25,8 @@ chip_test_suite("tests") {
     "TestRemoteAvAnalysisCluster.cpp",
   ]
 
+  sources = [ "MockAvAnalysisDelegate.h" ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

@@ -1,0 +1,57 @@
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#pragma once
+
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+class MockAvAnalysisDelegate : public AvAnalysisDelegate
+{
+public:
+    void ShutdownApp() override {}
+
+    Protocols::InteractionModel::Status EstablishAnalysisStream() override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    Protocols::InteractionModel::Status ActivateAnalysisStream() override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    Protocols::InteractionModel::Status DeactivateAnalysisStream() override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    Protocols::InteractionModel::Status RemoveAnalysisStream() override { return Protocols::InteractionModel::Status::Success; }
+
+    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override { return CHIP_NO_ERROR; }
+
+    bool CanAddContextTriggers() override { return true; }
+
+    void ActiveAmbientContextTriggersUpdated() override {}
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
+};
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

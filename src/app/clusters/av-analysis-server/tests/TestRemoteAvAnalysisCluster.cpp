@@ -33,6 +33,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#include "MockAvAnalysisDelegate.h"
+
 namespace {
 
 using namespace chip;
@@ -62,28 +64,6 @@ const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> t
 };
 
 // Minimal mock delegate for testing
-class MockAvAnalysisDelegate : public AvAnalysisDelegate
-{
-public:
-    void ShutdownApp() {}
-
-    Protocols::InteractionModel::Status EstablishAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status ActivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status DeactivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
-
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
-
-    bool CanAddContextTriggers() { return true; }
-
-    void ActiveAmbientContextTriggersUpdated() {}
-
-    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
-};
-
 struct TestRemoteAvAnalysisCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }

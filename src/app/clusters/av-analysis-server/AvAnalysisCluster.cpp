@@ -20,9 +20,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Commands.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Ids.h>
-#include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>

@@ -20,6 +20,7 @@ source_set("av-analysis-server") {
     "AvAnalysisCluster.h",
     "AvAnalysisLogic.cpp",
     "AvAnalysisLogic.h",
+    "AvAnalysisStorage.h",
   ]
 
   deps = [

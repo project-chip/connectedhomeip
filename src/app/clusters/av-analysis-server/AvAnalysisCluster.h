@@ -28,8 +28,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-constexpr uint8_t kMaxSpeakerLevel = 254;
-
 class AvAnalysisCluster;
 
 /** @brief
