@@ -691,7 +691,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
         // few seconds after GetDeviceAuthURI is called, with no further client
         // action needed. See OAuthAccountLoginManager.
         auto ptr =
-            std::make_unique<ContentAppImpl>("Vendor4", vendorId, "oauthAppId", productId, "Version4",
+            std::make_unique<ContentAppImpl>("Vendor5", vendorId, "oauthAppId", productId, "Version5",
                                              std::make_unique<OAuthAccountLoginManager>(), make_default_supported_clusters());
         mContentApps.emplace_back(std::move(ptr));
     }
