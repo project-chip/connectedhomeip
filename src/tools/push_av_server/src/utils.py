@@ -7,7 +7,6 @@ import os.path
 import pathlib
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ class WorkingDirectory:
     """
     tmp = None
 
-    def __init__(self, directory: Optional[str] = None) -> None:
+    def __init__(self, directory: str | None = None) -> None:
         if directory is None:
             self.tmp = tempfile.TemporaryDirectory(prefix="TC_PAVS_1_0")
         else:

@@ -116,7 +116,7 @@ class TestSubscriptionResumptionTimeout(CHIPVirtualHome):
         self.assertTrue(self.sequenceMatch(self.get_device_log(server_device_id).decode('utf-8'), [
             "Schedule subscription resumption when failing to establish session, Retries: 1",
             "Schedule subscription resumption when failing to establish session, Retries: 2"]),
-            "SubscriptionResumption test failed: cannot find matching string from device {}".format(server_device_id))
+            f"SubscriptionResumption test failed: cannot find matching string from device {server_device_id}")
 
 
 if __name__ == "__main__":

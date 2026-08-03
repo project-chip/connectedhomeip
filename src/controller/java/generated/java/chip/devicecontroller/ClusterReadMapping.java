@@ -8926,6 +8926,28 @@ public class ClusterReadMapping {
           readMessagesActiveMessageIDsCommandParams
         );
         result.put("readActiveMessageIDsAttribute", readMessagesActiveMessageIDsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMessagesSupportedLanguageCodesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMessagesSupportedLanguageCodesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MessagesCluster) cluster).readSupportedLanguageCodesAttribute(
+              (ChipClusters.MessagesCluster.SupportedLanguageCodesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMessagesClusterSupportedLanguageCodesAttributeCallback(),
+          readMessagesSupportedLanguageCodesCommandParams
+        );
+        result.put("readSupportedLanguageCodesAttribute", readMessagesSupportedLanguageCodesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMessagesSupportedMimeTypesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMessagesSupportedMimeTypesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MessagesCluster) cluster).readSupportedMimeTypesAttribute(
+              (ChipClusters.MessagesCluster.SupportedMimeTypesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMessagesClusterSupportedMimeTypesAttributeCallback(),
+          readMessagesSupportedMimeTypesCommandParams
+        );
+        result.put("readSupportedMimeTypesAttribute", readMessagesSupportedMimeTypesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readMessagesGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readMessagesGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

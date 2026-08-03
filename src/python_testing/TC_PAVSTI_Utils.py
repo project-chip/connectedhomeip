@@ -22,7 +22,6 @@ import random
 import shutil
 import tempfile
 from enum import StrEnum
-from typing import Optional
 
 import psutil
 import requests
@@ -108,7 +107,7 @@ class PushAvServerProcess(Subprocess):
         response.raise_for_status()
         return response.json()
 
-    def _post_json(self, endpoint: str, data: Optional[dict] = None) -> dict:
+    def _post_json(self, endpoint: str, data: dict | None = None) -> dict:
         url = f"{self.base_url}{endpoint}"
         response = requests.post(url, json=data or {}, verify=False, timeout=5)
         response.raise_for_status()
