@@ -257,9 +257,8 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
     VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
     temperature newTemp = newSetpoint.Temperature();
-    auto status =
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId()),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&newTemp), sizeof(newTemp)));
+    AttributePersistence persistence(mContext->attributeStorage);
+    auto status = persistence.StoreNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId() }, newTemp);
     if (status != CHIP_NO_ERROR)
     {
         return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
