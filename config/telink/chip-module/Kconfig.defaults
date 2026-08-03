@@ -529,6 +529,10 @@ config TELINK_TLX_SHA_HW_SLOTS
     default 2 if BOARD_TL3218X_RETENTION
     default 8 if SOC_RISCV_TELINK_TLX
 
+config NET_CONTEXT_RECV_PKTINFO
+    bool
+    default y
+
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG
