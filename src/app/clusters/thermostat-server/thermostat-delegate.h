@@ -133,6 +133,12 @@ public:
      *
      */
     virtual void ClearPendingPresetList() = 0;
+
+    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+
+    // This should be removed once #39949 is fixed.
+protected:
+    EndpointId mEndpointId = 0;
 };
 
 } // namespace Thermostat
