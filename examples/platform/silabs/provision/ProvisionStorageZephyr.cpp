@@ -70,7 +70,6 @@ constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto:
 constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
 #endif // SL_PROVISION_GENERATOR
 
-
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
 {
     size_t dataLen = 0;
