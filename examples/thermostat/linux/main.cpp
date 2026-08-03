@@ -74,7 +74,8 @@ static Identify gIdentify1 = {
 
 void ApplicationInit()
 {
-    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
+    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
+                                                                          chip::app::Clusters::Thermostat::ThermostatDelegate>(
             chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
         status != chip::Protocols::InteractionModel::Status::Success)
     {

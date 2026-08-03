@@ -70,23 +70,23 @@ public:
         }
         if constexpr (kHasPresets)
         {
-            if (auto * presets = dynamic_cast<ThermostatPresets::Delegate *>(delegate))
+            if constexpr (std::is_base_of_v<ThermostatPresets::Delegate, DelegateT>)
             {
-                mPresets.SetDelegate(presets);
+                mPresets.SetDelegate(delegate);
             }
         }
         if constexpr (kHasSuggestions)
         {
-            if (auto * suggestions = dynamic_cast<ThermostatSuggestions::Delegate *>(delegate))
+            if constexpr (std::is_base_of_v<ThermostatSuggestions::Delegate, DelegateT>)
             {
-                mSuggestions.SetDelegate(suggestions);
+                mSuggestions.SetDelegate(delegate);
             }
         }
         if constexpr (kHasOccupancy)
         {
-            if (auto * occupancy = dynamic_cast<ThermostatOccupancy::Delegate *>(delegate))
+            if constexpr (std::is_base_of_v<ThermostatOccupancy::Delegate, DelegateT>)
             {
-                mOccupancy.SetDelegate(occupancy);
+                mOccupancy.SetDelegate(delegate);
             }
         }
     }
