@@ -589,6 +589,9 @@ constexpr uint8_t kTestTargetAppListTag = 9;
 constexpr uint8_t kTestTargetAppTag     = 10;
 constexpr uint8_t kTestAppVendorIdTag   = 11;
 constexpr uint8_t kTestAppProductIdTag  = 12;
+
+// Mirrors IdentificationDeclaration::kMaxTargetAppInfos, which is also private.
+constexpr uint8_t kTestMaxTargetAppInfos = 10;
 } // namespace
 
 // A TargetAppList carrying more entries than the fixed array holds must be capped by
@@ -629,8 +632,10 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppListOverflow)
     IdentificationDeclaration idOut;
     idOut.ReadPayload(payload, kHeaderLen + writer.GetLengthWritten());
 
-    // The stored count must never exceed the array's element count.
-    EXPECT_LE(idOut.GetNumTargetAppInfos(), 10);
+    // The parser must fill the array to capacity and stop there. Asserting equality rather
+    // than an upper bound also fails if the list was not parsed at all, which would otherwise
+    // satisfy a bound check and skip the verification loop below.
+    EXPECT_EQ(idOut.GetNumTargetAppInfos(), kTestMaxTargetAppInfos);
 
     // Every entry the parser claims to have stored must be readable and correct.
     for (uint8_t i = 0; i < idOut.GetNumTargetAppInfos(); i++)
