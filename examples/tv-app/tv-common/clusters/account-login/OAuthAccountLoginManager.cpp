@@ -38,7 +38,14 @@ bool OAuthAccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifie
 bool OAuthAccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
     DeviceLayer::SystemLayer().CancelTimer(OnLoginTimerExpired, this);
-    mOAuthLoggedIn = false;
+    if (mOAuthLoggedIn)
+    {
+        mOAuthLoggedIn = false;
+        if (mEndpointId != kInvalidEndpointId)
+        {
+            MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::OAuthLoggedIn::Id);
+        }
+    }
     ChipLogProgress(Zcl, "OAuthAccountLoginManager::HandleLogout success");
     return true;
 }
