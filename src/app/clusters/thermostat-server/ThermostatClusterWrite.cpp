@@ -140,12 +140,13 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     auto attributeId         = request.path.mAttributeId;
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
-    if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(attributeId)))
+    if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
     {
-        ChipLogError(Zcl, "Can not write to non-atomic attributes during atomic write");
+        ChipLogError(Zcl, "Can not write to non-atomic attribute " ChipLogFormatMEI " during atomic write",
+                     ChipLogValueMEI(attributeId));
         return Status::InvalidInState;
     }
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteNonAtomicAttribute(request, decoder));
+    return NotifyAttributeChangedIfSuccess(attributeId, WriteNonAtomicAttribute(request, decoder));
 }
 
 } // namespace Thermostat
