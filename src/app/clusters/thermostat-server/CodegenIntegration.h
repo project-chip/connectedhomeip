@@ -81,7 +81,8 @@ public:
         return nullptr;
     }
 
-    Protocols::InteractionModel::Status SetDelegate(EndpointId endpoint, Thermostat::Delegate * delegate)
+    template <typename DelegateT>
+    Protocols::InteractionModel::Status SetDelegate(EndpointId endpoint, DelegateT * delegate)
     {
         Cluster * cluster = FindClusterOnEndpoint(endpoint);
         if (cluster == nullptr)
@@ -92,28 +93,6 @@ public:
         cluster->SetDelegate(delegate);
         return Protocols::InteractionModel::Status::Success;
     }
-
-    /* void ServerInit(EndpointId endpointId)
-     {
-         for (auto & cluster : mClusters)
-         {
-             if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
-             {
-                 cluster.Cluster().ServerInit();
-             }
-         }
-     }
-
-     void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
-     {
-         for (auto & cluster : mClusters)
-         {
-             if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
-             {
-                 cluster.Cluster().ServerShutdown(clusterShutdownType);
-             }
-         }
-     }*/
 };
 
 template <typename Cluster>
@@ -155,21 +134,11 @@ ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
     return integrationDelegate.FindClusterOnEndpoint(endpointId);
 }
 
-inline ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
-{
-    return FindClusterOnEndpoint<DefaultThermostatCluster>(endpointId);
-}
-
-template <typename Cluster>
-Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+template <typename Cluster, typename DelegateT>
+Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, DelegateT * delegate)
 {
     IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
     return integrationDelegate.SetDelegate(endpoint, delegate);
-}
-
-inline Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
-{
-    return SetDefaultDelegate<DefaultThermostatCluster>(endpoint, delegate);
 }
 
 } // namespace chip::app::Clusters::Thermostat
