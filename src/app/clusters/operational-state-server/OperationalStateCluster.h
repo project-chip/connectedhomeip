@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,16 @@
 
 #pragma once
 
-#include "OperationalStateDelegate.h"
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
+#include "operational-state-cluster-objects.h"
 #include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <clusters/OperationalState/Metadata.h>
+#include <clusters/OvenCavityOperationalState/Metadata.h>
+#include <clusters/RvcOperationalState/Metadata.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -31,315 +37,163 @@ namespace OperationalState {
 static constexpr uint8_t DerivedClusterNumberSpaceStart = 0x40;
 static constexpr uint8_t VendorNumberSpaceStart         = 0x80;
 
-class Uncopyable
-{
-protected:
-    Uncopyable() {}
-    ~Uncopyable() = default;
-
-private:
-    Uncopyable(const Uncopyable &)             = delete;
-    Uncopyable & operator=(const Uncopyable &) = delete;
-};
-
 /**
- * Instance is a class that represents an instance of a derivation of the operational state cluster.
- * It implements CommandHandlerInterface so it can generically handle commands for any derivation cluster id.
+ * OperationalStateCluster is the code-driven implementation of the Operational State cluster.
+ *
+ * It provides a base implementation for any derivation (e.g. RVC, OvenCavity).
  */
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
+class OperationalStateCluster : public DefaultServerCluster
 {
 public:
-    /**
-     * Creates an operational state cluster instance.
-     * The Init() function needs to be called for this instance to be registered and called by the
-     * interaction model at the appropriate times.
-     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId);
+    using OptionalAttributeSet = app::OptionalAttributeSet<OperationalState::Attributes::CountdownTime::Id>;
 
-    ~Instance() override;
-
-    /**
-     * Phase name's max length
-     */
     static constexpr uint8_t kMaxPhaseNameLength = 64;
 
-    /**
-     * Initialise the operational state server instance.
-     * This function must be called after defining an Instance class object.
-     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
-     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     */
-    CHIP_ERROR Init();
-
-    // Attribute setters
-    /**
-     * Set operational phase.
-     * @param aPhase The operational phase that should now be the current one.
-     * @return CHIP_ERROR_INVALID_ARGUMENT if aPhase is an invalid value. CHIP_NO_ERROR if set was successful.
-     */
-    CHIP_ERROR SetCurrentPhase(const app::DataModel::Nullable<uint8_t> & aPhase);
+    struct Config
+    {
+        OptionalAttributeSet optionalAttributes;
+    };
 
     /**
-     * Set current operational state to aOpState and the operational error to kNoError.
-     * NOTE: This method cannot be used to set the error state. The error state must be set via the
-     * OnOperationalErrorDetected method.
-     * @param aOpState The operational state that should now be the current one.
-     * @return CHIP_ERROR_INVALID_ARGUMENT if aOpState is an invalid value. CHIP_NO_ERROR if set was successful.
+     * Application delegate interface for OperationalStateCluster.
+     *
+     * Concrete delegates inherit from this and implement the pure-virtual methods.
+     * The codegen backward-compat layer (OperationalState::Delegate in OperationalStateDelegate.h)
+     * extends this with SetInstance/GetInstance for legacy Instance wrappers.
      */
+    class Delegate
+    {
+    public:
+        Delegate()          = default;
+        virtual ~Delegate() = default;
+
+        virtual app::DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
+
+        virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
+
+        virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) = 0;
+
+        virtual void HandlePauseStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleResumeStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleStartStateCallback(GenericOperationalError & err) = 0;
+
+        virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
+
+        /**
+         * Handle Command Callback in application: GoHome (RVC-specific).
+         * Default implementation returns kUnknownEnumValue (unsupported). Override in RVC delegates.
+         */
+        virtual void HandleGoHomeCommandCallback(GenericOperationalError & err)
+        {
+            err.Set(to_underlying(ErrorStateEnum::kUnknownEnumValue));
+        }
+    };
+
+    /**
+     * Construct an OperationalState cluster for the given endpoint.
+     *
+     * @param endpointId        The endpoint on which this cluster exists.
+     * @param delegate          Application delegate providing state lists and command callbacks.
+     *                          The caller must ensure the delegate outlives this object.
+     * @param config            Configuration including optional attributes to expose.
+     */
+    OperationalStateCluster(EndpointId endpointId, Delegate * delegate, const Config & config = {});
+
+    ~OperationalStateCluster() override = default;
+
+    // ---- Application-facing API ----
+
+    CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase);
     CHIP_ERROR SetOperationalState(uint8_t aOpState);
+    CHIP_ERROR SetOperationalState(OperationalStateEnum aOpState) { return SetOperationalState(to_underlying(aOpState)); }
 
-    // Attribute getters
-    /**
-     * Get current phase.
-     * @return The current phase.
-     */
-    app::DataModel::Nullable<uint8_t> GetCurrentPhase() const;
-
-    /**
-     * Get the current operational state.
-     * @return The current operational state value.
-     */
-    uint8_t GetCurrentOperationalState() const;
-
-    /**
-     * Get current operational error.
-     * @param error The GenericOperationalError to fill with the current operational error value
-     */
+    DataModel::Nullable<uint8_t> GetCurrentPhase() const { return mCurrentPhase; }
+    uint8_t GetCurrentOperationalState() const { return mOperationalState; }
     void GetCurrentOperationalError(GenericOperationalError & error) const;
 
-    /**
-     * @brief Whenever application delegate wants to possibly report a new updated time,
-     *        call this method. The `GetCountdownTime()` method will be called on the delegate.
-     */
     void UpdateCountdownTimeFromDelegate() { UpdateCountdownTime(/* fromDelegate = */ true); }
 
-    // Event triggers
-    /**
-     * @brief Called when the Node detects a OperationalError has been raised.
-     * Note: This function also sets the OperationalState attribute to Error.
-     * @param aError OperationalError which detects
-     */
     void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError);
-
-    /**
-     * @brief Called when the Node detects a OperationCompletion has been raised.
-     * @param aCompletionErrorCode CompletionErrorCode
-     * @param aTotalOperationalTime TotalOperationalTime
-     * @param aPausedTime PausedTime
-     */
     void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
                                        const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
 
-    // List change reporting
-    /**
-     * Reports that the contents of the operational state list has changed.
-     * The device SHALL call this method whenever it changes the operational state list.
-     */
     void ReportOperationalStateListChange();
-
-    /**
-     * Reports that the contents of the phase list has changed.
-     * The device SHALL call this method whenever it changes the phase list.
-     */
     void ReportPhaseListChange();
 
-    /**
-     * This function returns true if the phase value given exists in the PhaseList attribute, otherwise it returns false.
-     */
     bool IsSupportedPhase(uint8_t aPhase);
-
-    /**
-     * This function returns true if the operational state value given exists in the OperationalStateList attribute,
-     * otherwise it returns false.
-     */
     bool IsSupportedOperationalState(uint8_t aState);
 
+    // ---- DefaultServerCluster overrides ----
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
 protected:
-    /**
-     * Creates an operational state cluster instance for a given cluster ID.
-     * The Init() function needs to be called for this instance to be registered and called by the
-     * interaction model at the appropriate times.
-     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the operational state derived cluster to be instantiated.
-     */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
+    OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
+                            const Config & config = {});
 
-    /**
-     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is pause-compatible.
-     * Note: if a state outside the derived cluster number-space is given, this method returns false.
-     * @param aState The state to check.
-     * @return true if aState is pause-compatible, false otherwise.
-     */
     virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; }
-
-    /**
-     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is resume-compatible.
-     * Note: if a state outside the derived cluster number-space is given, this method returns false.
-     * @param aState The state to check.
-     * @return true if aState is pause-compatible, false otherwise.
-     */
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; }
 
-    /**
-     * Handles the invocation of derived cluster commands.
-     * If a derived cluster defines its own commands, this method SHALL be implemented by the derived cluster's class
-     * to handle the derived cluster's specific commands.
-     * @param handlerContext The command handler context containing information about the received command.
-     */
-    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) {}
+    virtual std::optional<DataModel::ActionReturnStatus>
+    HandleDerivedClusterCommand(const ConcreteCommandPath & path, chip::TLV::TLVReader & input, CommandHandler * handler)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 
-    /**
-     * Causes reporting/udpating of CountdownTime attribute from driver if sufficient changes have
-     * occurred (based on Q quality definition for operational state). Calls the Delegate::GetCountdownTime() method.
-     *
-     * @param fromDelegate true if the change notice was triggered by the delegate, false if internal to cluster logic.
-     */
     void UpdateCountdownTime(bool fromDelegate);
+    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate = */ false); }
 
-    /**
-     * @brief Whenever the cluster logic thinks time should be updated, call this.
-     */
-    void UpdateCountdownTimeFromClusterLogic() { UpdateCountdownTime(/* fromDelegate=*/false); }
+    Delegate * GetDelegate() { return mDelegate; }
 
 private:
     Delegate * mDelegate;
+    // ClusterRevision is not a fixed constant for this class: it varies by the concrete (derived)
+    // cluster. OperationalState and RvcOperationalState are at revision 3, while OvenCavityOperationalState
+    // is at revision 2, so each derived class passes its own value through the protected constructor.
+    const uint16_t mRevision;
+    const Config mConfig;
 
-    const EndpointId mEndpointId;
-    const ClusterId mClusterId;
-
-    // Attribute Data Store
-    app::DataModel::Nullable<uint8_t> mCurrentPhase;
-    uint8_t mOperationalState                 = 0; // assume 0 for now.
+    DataModel::Nullable<uint8_t> mCurrentPhase;
+    uint8_t mOperationalState                 = 0;
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
-    app::QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
+    QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
-    /**
-     * This method is inherited from CommandHandlerInterface.
-     * This reimplementation does not check that the cluster ID in the HandlerContext (the cluster the command relates to)
-     * matches the cluster ID of the RequestT type.
-     * These cluster IDs may be different in the case where a command defined in the base cluster is intended for a
-     * derived cluster.
-     */
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
+    // Selects which of the two commands handled by each shared helper is being processed.
+    enum class PauseOrResume : uint8_t
+    {
+        kPause,
+        kResume
+    };
+    enum class StartOrStop : uint8_t
+    {
+        kStart,
+        kStop
+    };
 
-    // Inherited from CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-
-    /**
-     * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
-     */
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * Handle Command: Pause.
-     * If the current state is not pause-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
-     * If the current state is paused, this method responds with an ErrorStateId of NoError but takes no action.
-     * Otherwise, this method calls the delegate's HandlePauseStateCallback.
-     */
-    void HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req);
-
-    /**
-     * Handle Command: Stop.
-     */
-    void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
-
-    /**
-     * Handle Command: Start.
-     */
-    void HandleStartState(HandlerContext & ctx, const Commands::Start::DecodableType & req);
-
-    /**
-     * Handle Command: Resume.
-     * If the current state is not resume-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
-     * Otherwise, this method calls the delegate's HandleResumeStateCallback.
-     */
-    void HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const ConcreteCommandPath & path,
+                                                                          chip::TLV::TLVReader & input, CommandHandler * handler,
+                                                                          PauseOrResume action);
+    std::optional<DataModel::ActionReturnStatus> HandleStartOrStopState(const ConcreteCommandPath & path,
+                                                                        chip::TLV::TLVReader & input, CommandHandler * handler,
+                                                                        StartOrStop action);
 };
 
 } // namespace OperationalState
-
-namespace RvcOperationalState {
-
-class Instance : public OperationalState::Instance
-{
-public:
-    /**
-     * Creates an RVC operational state cluster instance.
-     * The Init() function needs to be called for this instance to be registered and called by the
-     * interaction model at the appropriate times.
-     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId) :
-        OperationalState::Instance(aDelegate, aEndpointId, Id), mDelegate(aDelegate)
-    {}
-
-protected:
-    /**
-     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is pause-compatible.
-     * Note: if a state outside the derived cluster number-space is given, this method returns false.
-     * @param aState The state to check.
-     * @return true if aState is pause-compatible, false otherwise.
-     */
-    bool IsDerivedClusterStatePauseCompatible(uint8_t aState) override;
-
-    /**
-     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is resume-compatible.
-     * Note: if a state outside the derived cluster number-space is given, this method returns false.
-     * @param aState The state to check.
-     * @return true if aState is pause-compatible, false otherwise.
-     */
-    bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
-
-    /**
-     * Handles the invocation of RvcOperationalState specific commands
-     * @param handlerContext The command handler context containing information about the received command.
-     */
-    void InvokeDerivedClusterCommand(HandlerContext & handlerContext) override;
-
-private:
-    Delegate * mDelegate;
-
-    /**
-     * Handle Command: GoHome
-     */
-    void HandleGoHomeCommand(HandlerContext & ctx, const Commands::GoHome::DecodableType & req);
-};
-
-} // namespace RvcOperationalState
-
-namespace OvenCavityOperationalState {
-
-class Instance : public OperationalState::Instance
-{
-public:
-    /**
-     * Creates an oven cavity operational state cluster instance.
-     * The Init() function needs to be called for this instance to be registered and called by the
-     * interaction model at the appropriate times.
-     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
-     * @param aDelegate A pointer to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     */
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
-        OperationalState::Instance(aDelegate, aEndpointId, Id)
-    {}
-};
-
-} // namespace OvenCavityOperationalState
 
 } // namespace Clusters
 } // namespace app

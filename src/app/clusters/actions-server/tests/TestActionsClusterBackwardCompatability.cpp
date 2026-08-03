@@ -19,11 +19,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/actions-server/actions-server.h>
 
-// Stub for the ZAP-generated SetupURL::Get accessor. CodegenIntegration.cpp calls this
+// Stub for the ZAP-generated SetupURL::GetDefault accessor. CodegenIntegration.cpp calls this
 // at construction time to read the initial URL from Ember RAM. In tests there is no Ember
 // storage, so we return an empty string to simulate "attribute not populated".
 namespace chip::app::Clusters::Actions::Attributes::SetupURL {
-chip::Protocols::InteractionModel::Status Get(chip::EndpointId, chip::MutableCharSpan & value)
+chip::Protocols::InteractionModel::Status GetDefault(chip::EndpointId, chip::MutableCharSpan & value)
 {
     value.reduce_size(0);
     return chip::Protocols::InteractionModel::Status::Success;

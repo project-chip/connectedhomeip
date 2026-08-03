@@ -29,6 +29,7 @@
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -382,21 +383,32 @@ public:
             {
                 // update the current lift here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Current position lift percent 100ths changed to : %d", n * 100);
-                app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
+                {
+                    wc->SetCurrentPositionLiftPercent100ths(
+                        app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
+                }
             }
             else if (name == "Current Tilt")
             {
                 // update the current tilt here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Current position tilt percent 100ths changed to : %d", n * 100);
-                app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
+                {
+                    wc->SetCurrentPositionTiltPercent100ths(
+                        app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(n * 100)));
+                }
             }
             else if (name == "Opr Status")
             {
                 // update the operational status here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Operational status changed to : %d", n);
-                chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
-                    static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(n);
-                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
+                if (auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1))
+                {
+                    chip::BitMask<app::Clusters::WindowCovering::OperationalStatus> opStatus;
+                    opStatus.SetRaw(static_cast<uint8_t>(n));
+                    wc->SetOperationalStatus(opStatus);
+                }
             }
             else if (name == "Bat remaining")
             {
@@ -756,13 +768,23 @@ void SetupPretendDevices()
     AddEndpoint("1");
     AddCluster("Window Covering");
     AddAttribute("Current Lift", "5");
-    app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    auto wc = app::Clusters::WindowCovering::FindClusterOnEndpoint(1);
+    if (wc != nullptr)
+    {
+        wc->SetCurrentPositionLiftPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
+    }
     AddAttribute("Current Tilt", "5");
-    app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    if (wc != nullptr)
+    {
+        wc->SetCurrentPositionTiltPercent100ths(app::DataModel::MakeNullable(static_cast<chip::Percent100ths>(5 * 100)));
+    }
     AddAttribute("Opr Status", "0");
-    chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
-        static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(0);
-    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
+    if (wc != nullptr)
+    {
+        chip::BitMask<app::Clusters::WindowCovering::OperationalStatus> opStatus;
+        opStatus.SetRaw(0);
+        wc->SetOperationalStatus(opStatus);
+    }
 
     AddDevice("Battery");
     AddEndpoint("1");
@@ -838,14 +860,11 @@ void InitDeviceDisplay()
     // Initialize the screen manager
     ScreenManager::Init();
 
-    // Connect the status LED to VLEDs.
-    int vled1 = ScreenManager::AddVLED(TFT_GREEN);
-    int vled2 = ScreenManager::AddVLED(TFT_RED);
-    statusLED1.SetVLED(vled1, vled2);
-
-    int vled3 = ScreenManager::AddVLED(TFT_CYAN);
-    int vled4 = ScreenManager::AddVLED(TFT_ORANGE);
-    statusLED2.SetVLED(vled3, vled4);
+    // Wire status LEDs to virtual LEDs on display
+    static int sStatusLED1_VLED = ScreenManager::AddVLED(TFT_GREEN);
+    static int sStatusLED2_VLED = ScreenManager::AddVLED(TFT_CYAN);
+    statusLED1.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED1_VLED, state); });
+    statusLED2.SetStateChangeCallback([](LEDWidget *, bool state) { ScreenManager::SetVLED(sStatusLED2_VLED, state); });
 
     bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));

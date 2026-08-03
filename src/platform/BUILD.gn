@@ -154,6 +154,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
       "CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP=${chip_device_config_enable_thread_meshcop}",
+      "CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS=${chip_device_config_thread_discovery_interval_ms}",
     ]
 
     _enable_joint_fabric = chip_device_config_enable_joint_fabric
@@ -170,7 +171,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
         chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
-        chip_device_platform == "bl616" || chip_device_platform == "esp32") {
+        chip_device_platform == "bflb" || chip_device_platform == "esp32") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -186,9 +187,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     ]
 
     # TODO : Currently OpenThread Commissioner is only supported in linux, need to add support for more platform
+    # ot-commissioner bundles its own mbedTLS; excluding mbedtls and psa (both of
+    # which link CHIP's mbedTLS) avoids duplicate-symbol link failures.
     if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
-        chip_support_thread_meshcop && current_os == host_os &&
-        current_cpu == host_cpu) {
+        chip_crypto != "psa" && chip_support_thread_meshcop &&
+        current_os == host_os && current_cpu == host_cpu) {
       defines += [ "CHIP_SUPPORT_THREAD_MESHCOP=1" ]
     } else {
       defines += [ "CHIP_SUPPORT_THREAD_MESHCOP=0" ]
@@ -272,8 +275,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
-    } else if (chip_device_platform == "bl616") {
-      device_layer_target_define = "BL616"
+    } else if (chip_device_platform == "bflb") {
+      device_layer_target_define = "BFLB"
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
@@ -371,7 +374,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "NXP",
       "TELINK",
       "BL602",
-      "BL616",
+      "BFLB",
       "BL702",
       "BL702L",
       "FAKE",
@@ -653,8 +656,8 @@ if (chip_device_platform != "none") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
       _platform_target = "bouffalolab/BL602"
-    } else if (chip_device_platform == "bl616") {
-      _platform_target = "bouffalolab/BL616"
+    } else if (chip_device_platform == "bflb") {
+      _platform_target = "bouffalolab/BFLB"
     } else if (chip_device_platform == "bl702") {
       _platform_target = "bouffalolab/BL702"
     } else if (chip_device_platform == "bl702l") {

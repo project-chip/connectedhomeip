@@ -28,6 +28,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/KeyValueStoreManager.h>
@@ -125,10 +126,10 @@ static const GroupKey kGroup3Keyset1(kGroup3, kKeysetId1);
 static const GroupKey kGroup3Keyset2(kGroup3, kKeysetId2);
 static const GroupKey kGroup3Keyset3(kGroup3, kKeysetId3);
 
-static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet0(kKeysetId0, SecurityPolicy::kTrustFirst, 3);
 static KeySet kKeySet1(kKeysetId1, SecurityPolicy::kTrustFirst, 1);
 static KeySet kKeySet2(kKeysetId2, SecurityPolicy::kTrustFirst, 2);
-static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kCacheAndSync, 3);
+static KeySet kKeySet3(kKeysetId3, SecurityPolicy::kTrustFirst, 3);
 static KeySet kKeySet4(kKeysetId4, SecurityPolicy::kTrustFirst, 1);
 
 uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
@@ -874,6 +875,67 @@ TEST_F(TestGroupDataProvider, TestKeySets)
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetKeySet(kFabric2, kKeysetId2, keyset));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetKeySet(kFabric2, kKeysetId1, keyset));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, provider->GetKeySet(kFabric2, kKeysetId0, keyset));
+}
+
+TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    EXPECT_TRUE(provider);
+
+    // Reset test
+    ResetProvider(provider);
+
+    // 1. Add a valid KeySet (it will have TrustFirst policy)
+    EXPECT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1), CHIP_NO_ERROR);
+
+    // 2. Read the saved TLV from storage
+    auto keyName = DefaultStorageKeyAllocator::FabricKeyset(kFabric1, kKeysetId1);
+
+    uint8_t tlvBuffer[128] = {};
+    uint16_t tlvLength     = sizeof(tlvBuffer);
+    EXPECT_EQ(sDelegate.SyncGetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
+
+    // 3. Sanity check and patch the policy to CacheAndSync (1) in-place.
+    // We rely on the TLV encoding of KeySetData:
+    // - Outer structure start: 0x15
+    // - Policy field: Context Tag 1, U8/U16 value.
+    // Since value is 0 (kTrustFirst), it is encoded as 1-byte UInt8 (0x04) with Context Tag (0x20) -> 0x24.
+    // Tag is 1.
+    // Value is 0.
+    // So bytes are: [0x15, 0x24, 0x01, 0x00]
+    ASSERT_GE(tlvLength, 4u);
+    ASSERT_EQ(tlvBuffer[0], 0x15); // Structure
+    ASSERT_EQ(tlvBuffer[1], 0x24); // Context Tag 1-byte value
+    ASSERT_EQ(tlvBuffer[2], 0x01); // Tag 1 (Policy)
+    ASSERT_EQ(tlvBuffer[3], 0x00); // Value (kTrustFirst)
+
+    tlvBuffer[3] = 1; // Change to kCacheAndSync (1)
+
+    // 4. Write it back to storage
+    EXPECT_EQ(sDelegate.SyncSetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
+
+    // 5. Read it back via provider and verify it is remapped to TrustFirst
+    KeySet keyset;
+    EXPECT_EQ(provider->GetKeySet(kFabric1, kKeysetId1, keyset), CHIP_NO_ERROR);
+    EXPECT_EQ(keyset.policy, SecurityPolicy::kTrustFirst);
+}
+
+TEST_F(TestGroupDataProvider, TestKeySetInvalidPolicy)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    EXPECT_TRUE(provider);
+    ResetProvider(provider);
+
+    // Verify setting a keyset with an invalid security policy (like the currently unimplemented
+    // cache and sync policy), throws an error
+    KeySet keySetToSet(kKeysetId1, SecurityPolicy::kCacheAndSync, 1);
+    keySetToSet.epoch_keys[0].start_time = 1234;
+    memset(keySetToSet.epoch_keys[0].key, 0, sizeof(keySetToSet.epoch_keys[0].key));
+    EXPECT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, keySetToSet), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    // Verify setting the same keyset but with a valid policy works without error
+    keySetToSet.policy = SecurityPolicy::kTrustFirst;
+    EXPECT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, keySetToSet), CHIP_NO_ERROR);
 }
 
 TEST_F(TestGroupDataProvider, TestIpk)

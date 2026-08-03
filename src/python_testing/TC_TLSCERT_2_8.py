@@ -48,6 +48,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_8(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def pics_TC_TLSCERT_2_8(self):
         return ["TLSCERT.S"]
 

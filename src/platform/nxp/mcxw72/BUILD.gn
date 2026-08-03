@@ -42,15 +42,7 @@ source_set("nxp_factory_data") {
 }
 
 source_set("nxp_ota") {
-  public = [ "../common/ota/OTAImageProcessorImpl.h" ]
-
-  sources = ota_sources
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/app/clusters/ota-requestor:interface",
-    "${chip_root}/src/platform:platform",
-  ]
+  # Empty - OTA sources are compiled inside nxp_platform, gated on chip_enable_ota_requestor
 }
 
 config("nxp_platform_config") {
@@ -73,15 +65,14 @@ static_library("nxp_platform") {
     "-Wno-sign-compare",
   ]
   deps = []
-  defines = [
-    "NXP_DEVICE_MCXW7X=1",
-    "NXP_USE_MML=1",
-  ]
+  defines = [ "NXP_DEVICE_MCXW7X=1" ]
 
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
+    "../common/BootReason.h",
     "../common/CHIPDevicePlatformEvent.h",
+    "../common/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
@@ -94,7 +85,7 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
-    "../mcxw71/ConfigurationManagerImpl.cpp",
+    "BootReason.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
@@ -117,6 +108,7 @@ static_library("nxp_platform") {
     if (chip_crypto_spake2p == "custom") {
       sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
     }
+    sources += [ "../common/crypto/S200/S200KeyAllocator.h" ]
   }
 
   if (chip_enable_ble) {
@@ -127,17 +119,22 @@ static_library("nxp_platform") {
     ]
   }
 
-  # When the app is built using cmake, we must ensure the OTA platform files are also compiled.
-  # When the app is built using gn, the app selects the nxp_ota target through its build file.
-  if (nxp_external_sdk && chip_enable_ota_requestor) {
+  if (chip_enable_ota_requestor) {
     sources += ota_sources
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+    if (nxp_enable_ota_factory_data_processor) {
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
+    sources += [
+      "OTAFuseVerifier.cpp",
+      "OTAFuseVerifier.h",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (nxp_use_low_power) {
-    sources += [ "../mcxw71/LowPowerHooks.cpp" ]
+    sources += [ "LowPowerHooks.cpp" ]
   }
 
   deps += [
@@ -171,11 +168,16 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../common/factory_data/legacy/FactoryDataDriver.cpp",
-      "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
       "../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
     ]
+
+    if (nxp_enable_ota_factory_data_processor) {
+      sources += [
+        "../common/factory_data/legacy/FactoryDataDriver.cpp",
+        "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
+      ]
+    }
 
     defines += [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
   }
@@ -183,7 +185,7 @@ static_library("nxp_platform") {
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_deps += [
-    "${chip_root}/examples/platform/nxp/mcxw71/app/support:freertos_memory_utils",
+    "${chip_root}/examples/platform/nxp/mcxw72/app/support:freertos_memory_utils",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",

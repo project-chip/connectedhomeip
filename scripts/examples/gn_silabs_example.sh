@@ -38,7 +38,6 @@ fi
 
 USE_WIFI=false
 USE_DOCKER=false
-USE_GIT_SHA_FOR_VERSION=true
 GN_PATH="$PW_PATH/gn"
 USE_BOOTLOADER=false
 DOTFILE=".gn"
@@ -64,11 +63,8 @@ if [ "$#" == "0" ]; then
     <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
-            BRD4186A
-            BRD4187A
             BRD4186C
             BRD4187C
-            BRD2601B
             BRD2703A
             BRD2704A
             BRD4316A
@@ -108,8 +104,6 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
-        rs91x_wpa3_transition
-            Support for WPA3 transition mode on RS91x
         slc_gen_path
             Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
             (default: /third_party/silabs/slc_gen/<board>/)
@@ -231,11 +225,6 @@ else
                 optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
                 shift
                 ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift
@@ -282,11 +271,6 @@ else
                 shift
                 shift
                 ;;
-            *"sl_matter_version_str="*)
-                optArgs+="$1 "
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
             *)
                 if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
@@ -309,14 +293,6 @@ else
     if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-    fi
-
-    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
-        {
-            ShortCommitSha=$(git describe --always --dirty --exclude '*')
-            branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
-        } &>/dev/null
     fi
 
     # After a completed local install (.install-packages-done), run the Silabs package install step to check for updates. Docker never runs it (SDK is in the image).

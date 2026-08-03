@@ -39,6 +39,7 @@
 // Framesize for audio pipeline
 #define AUDIO_FRAMESIZE 20
 
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
@@ -897,10 +898,15 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                          allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+
+    mCurrentVideoFrameRate = framerate;
+
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
     GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
+                                                     allocatedStream.minResolution.height, framerate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -919,7 +925,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
-                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
+                    allocatedStream.minResolution.height, framerate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");
@@ -1629,6 +1635,11 @@ CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Opt
     return CameraError::SUCCESS;
 }
 
+std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> CameraDevice::GetSupportedAmbientContexts()
+{
+    return kSupportedAmbientContexts;
+}
+
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
 {
     mDetectionSensitivity = aSensitivity;
@@ -1887,6 +1898,11 @@ CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsU
 ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 {
     return mZoneManager;
+}
+
+AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
+{
+    return mAVAnalysisManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

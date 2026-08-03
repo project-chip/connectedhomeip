@@ -43,31 +43,32 @@ class PeriodicStatusThread(threading.Thread):
             return
 
         log.debug("Starting periodic status overview thread with periodicity of %i log lines", self.periodicity)
-        target_count = self.log_counter.total
-        while not self.log_counter.cancelled:
-            target_count += self.periodicity
-            self.log_counter.wait_for_count_or_cancel(target_count)
-            # We want to print the status one more time after cancellation to show the final result before termination.
+        with self.log_counter.register_user() as log_counter:
+            target_count = log_counter.total
+            while not log_counter.cancelled:
+                target_count += self.periodicity
+                log_counter.wait_for_count_or_cancel(target_count)
+                # We want to print the status one more time after cancellation to show the final result before termination.
 
-            with self.run_summary:
-                current_iteration = self.run_summary.current_iteration
-                iterations = self.run_summary.iterations
-                successful_tests = self.run_summary.passed
-                failed_tests = self.run_summary.failed
-                expected_test_count = self.run_summary.expected_test_count
+                with self.run_summary:
+                    current_iteration = self.run_summary.current_iteration
+                    iterations = self.run_summary.iterations
+                    successful_tests = self.run_summary.passed
+                    failed_tests = self.run_summary.failed
+                    expected_test_count = self.run_summary.expected_test_count
 
-            test_status: list[str] = []
-            if successful_tests > 0:
-                test_status.append(f"{successful_tests} successful")
-            if failed_tests > 0:
-                test_status.append(f"{failed_tests} failed")
-            if not test_status:
-                test_status.append("no tests completed")
+                test_status: list[str] = []
+                if successful_tests > 0:
+                    test_status.append(f"{successful_tests} successful")
+                if failed_tests > 0:
+                    test_status.append(f"{failed_tests} failed")
+                if not test_status:
+                    test_status.append("no tests completed")
 
-            status_message = (
-                f"Iteration {current_iteration}/{iterations}: "
-                f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)})"
-            )
-            log.info("", extra={"status": status_message, "count": False})
+                status_message = (
+                    f"Iteration {current_iteration}/{iterations}: "
+                    f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)})"
+                )
+                log.info("", extra={"status": status_message, "count": False})
 
         log.debug("Status overview thread has stopped")

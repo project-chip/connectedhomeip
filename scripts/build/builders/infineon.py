@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -34,7 +36,7 @@ class InfineonApp(Enum):
             return 'all-clusters-app'
         if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == InfineonApp.LOCK:
@@ -45,7 +47,7 @@ class InfineonApp(Enum):
             return 'chip-psoc6-clusters-example'
         if self == InfineonApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-psoc6-clusters-minimal-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == InfineonApp.LOCK:
@@ -56,7 +58,7 @@ class InfineonApp(Enum):
             return 'clusters_minimal_app.flashbundle.txt'
         if self == InfineonApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'infineon/psoc6')
@@ -68,25 +70,24 @@ class InfineonBoard(Enum):
     def GnArgName(self):
         if self == InfineonBoard.PSOC6BOARD:
             return 'CY8CKIT-062S2-43012'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class InfineonBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: InfineonApp = InfineonApp.LOCK,
                  board: InfineonBoard = InfineonBoard.PSOC6BOARD,
                  enable_ota_requestor: bool = False,
                  update_image: bool = False,
                  enable_trustm: bool = False):
-        super(InfineonBuilder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
-        self.extra_gn_options = ['psoc6_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = [f'psoc6_board="{board.GnArgName()}"']
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
@@ -102,6 +103,7 @@ class InfineonBuilder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ['out']
         if self.options.enable_link_map_file:
@@ -110,6 +112,7 @@ class InfineonBuilder(GnBuilder):
             name = f"{self.app.AppNamePrefix()}.{ext}"
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
 
+    @lock_output_dir
     def bundle_outputs(self):
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
             for line in filter(None, [x.strip() for x in f.readlines()]):

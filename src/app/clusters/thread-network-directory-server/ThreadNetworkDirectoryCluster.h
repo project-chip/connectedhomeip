@@ -17,12 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryStorage.h>
-#include <app/server/Server.h>
+#include <clusters/ThreadNetworkDirectory/Commands.h>
 #include <lib/core/CHIPError.h>
 
 #include <optional>
@@ -31,54 +29,43 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class ThreadNetworkDirectoryServer : private AttributeAccessInterface, private CommandHandlerInterface
+class ThreadNetworkDirectoryCluster : public DefaultServerCluster
 {
 public:
-    ThreadNetworkDirectoryServer(EndpointId endpoint, ThreadNetworkDirectoryStorage & storage);
-    ~ThreadNetworkDirectoryServer();
+    ThreadNetworkDirectoryCluster(EndpointId endpointId, ThreadNetworkDirectoryStorage & storage);
 
-    CHIP_ERROR Init();
-
-    ThreadNetworkDirectoryServer(ThreadNetworkDirectoryServer const &)             = delete;
-    ThreadNetworkDirectoryServer & operator=(ThreadNetworkDirectoryServer const &) = delete;
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 private:
     using ExtendedPanId = ThreadNetworkDirectoryStorage::ExtendedPanId;
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    void InvokeCommand(HandlerContext & handlerContext) override;
-
+    // Attribute handling helpers
     CHIP_ERROR ReadExtendedPanId(const ConcreteDataAttributePath & aPath, std::optional<ExtendedPanId> & outExPanId);
     CHIP_ERROR ReadPreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WritePreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadThreadNetworks(const ConcreteDataAttributePath & aPath, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WritePreferredExtendedPanId(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
-    void HandleAddNetworkRequest(HandlerContext & ctx, const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req);
-    void HandleRemoveNetworkRequest(HandlerContext & ctx,
-                                    const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req);
-    void HandleOperationalDatasetRequest(HandlerContext & ctx,
-                                         const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req);
+    // Command handling helpers
+    DataModel::ActionReturnStatus HandleAddNetworkRequest(const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req);
+    DataModel::ActionReturnStatus
+    HandleRemoveNetworkRequest(const ThreadNetworkDirectory::Commands::RemoveNetwork::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleOperationalDatasetRequest(CommandHandler & handler,
+                                    const ThreadNetworkDirectory::Commands::GetOperationalDataset::DecodableType & req,
+                                    const chip::app::ConcreteCommandPath & commandPath);
 
     ThreadNetworkDirectoryStorage & mStorage;
-};
-
-/**
- * A ThreadNetworkDirectoryServer using DefaultThreadNetworkDirectoryStorage.
- */
-class DefaultThreadNetworkDirectoryServer final : public ThreadNetworkDirectoryServer
-{
-public:
-    DefaultThreadNetworkDirectoryServer(EndpointId endpoint,
-                                        PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage()) :
-        ThreadNetworkDirectoryServer(endpoint, mStorage),
-        mStorage(storage)
-    {}
-
-private:
-    DefaultThreadNetworkDirectoryStorage mStorage;
 };
 
 } // namespace Clusters

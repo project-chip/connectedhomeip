@@ -434,9 +434,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     default:
         break;
     }
-
-    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    return;
 }
 
 static int OnUnsubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_error * error, struct ble_gatt_attr * attr,
@@ -2076,7 +2073,7 @@ void BLEManagerImpl::OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::C
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kConnectTimeout), HandleConnectTimeout, nullptr);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mDeviceScanner.StopScan();
+    LogErrorOnFailure(mDeviceScanner.StopScan());
 
     ConnectDevice(addr, kConnectTimeout);
 }
@@ -2147,7 +2144,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Initiate async scan
-    PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator)));
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()

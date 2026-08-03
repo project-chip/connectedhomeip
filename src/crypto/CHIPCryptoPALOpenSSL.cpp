@@ -1032,6 +1032,9 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     free_bn(tempbn);
     free_bn(order);
 
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

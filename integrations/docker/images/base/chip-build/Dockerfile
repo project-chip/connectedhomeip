@@ -206,3 +206,26 @@ RUN set -x \
     libgirepository1.0-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
+
+# Build and install OpenSSL 3.5 LTS from source.
+# Ubuntu 24.04 ships OpenSSL 3.0.x via libssl-dev (kept for apt dependency
+# resolution). Installing 3.5 into /usr/local makes it the default for
+# pkg-config based builds (e.g. chip-cert, CHIPCryptoPALOpenSSL) while the
+# system libssl-3 continues to satisfy runtime dependencies of other
+# apt-installed packages.
+# OpenSSL 3.5 is required for native ML-DSA / ML-KEM (post-quantum) support
+# in the default provider (FIPS 204 / FIPS 203).
+ARG OPENSSL_VERSION=3.5.0
+ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
+RUN set -x \
+    && cd /tmp \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz \
+    && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
+    && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
+    && cd openssl-${OPENSSL_VERSION} \
+    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && make -j$(nproc) \
+    && make install_sw \
+    && ldconfig \
+    && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
+    && : # last line

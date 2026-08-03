@@ -47,6 +47,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -538,6 +539,8 @@ public:
                           Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
                           Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
+    CHIP_ERROR GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize);
+
     /**
      * @brief
      *   Pair a CHIP device with the provided Rendezvous connection parameters.
@@ -798,7 +801,7 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    void FindCommissionableNode(char * instanceName) override;
+    void FindCommissionableNode(const char * instanceName) override;
 
     /**
      * @brief

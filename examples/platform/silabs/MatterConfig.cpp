@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "BaseApplication.h"
 #include <MatterConfig.h>
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
@@ -36,6 +35,11 @@
 #endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include <sl_component_catalog.h>
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+#include <sl_watchdog_manager.h>
+#endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
@@ -47,11 +51,11 @@
 #endif // SL_WIFI
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
-#include "Rpc.h"
+#include "pigweed_rpc/Rpc.h"
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
-#include "MatterShell.h"
+#include "shell/MatterShell.h"
 #endif
 
 #ifdef HEAP_MONITORING
@@ -88,6 +92,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif
+
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif // SILABS_LOG_OUT_UART
 
 #include <AppTask.h>
 
@@ -205,6 +213,9 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
+#if SILABS_LOG_OUT_UART
+    sendLogImmediately(false);
+#endif                                                       // SILABS_LOG_OUT_UART
     VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
     sMainTaskHandle = nullptr;
 }
@@ -362,13 +373,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    initParams.groupDataProvider->SetGroupcastEnabled(true);
-    // Inject group auxiliary access control delegate
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate sGroupAuxAccessDelegate(initParams.groupDataProvider);
-    initParams.groupAuxiliaryAccessControlDelegate = &sGroupAuxAccessDelegate;
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
-
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -415,16 +419,17 @@ void OnEM4Trigger(uint32_t duration)
 // FreeRTOS Callbacks
 // ================================================================================
 
+#ifdef SL_CATALOG_WATCHDOG_MANAGER_PRESENT
+void sl_watchdog_manager_user_idle_hook(void)
+#else
 extern "C" void vApplicationIdleHook(void)
+#endif
 {
 #if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     GetPlatform().SleepButtonActionHandler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-    GetPlatform().WatchdogFeed();
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -442,7 +447,7 @@ extern "C" void sl_matter_em4_check(uint32_t expected_idle_time_ms)
     if (chip::ICDConfigurationData::GetInstance().GetICDMode() == chip::ICDConfigurationData::ICDMode::LIT)
     {
         uint32_t idleDuration_seconds = chip::ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration().count();
-        uint32_t threshold_ms         = idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10;
+        uint32_t threshold_ms         = idleDuration_seconds * SL_MATTER_EM4_THRESHOLD_PERCENTAGE * 10;
         // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
         // Multiply by 10 to converts seconds into milliseconds (e.g. 90% of 1000sec in ms is 1000*90*10 = 900000ms)
         if (expected_idle_time_ms >= threshold_ms)

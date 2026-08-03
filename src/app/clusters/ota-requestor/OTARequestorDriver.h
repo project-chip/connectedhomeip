@@ -116,7 +116,7 @@ public:
     /// Driver portion of the logic for processing the AnnounceOTAProviders command
     virtual void
     ProcessAnnounceOTAProviders(const ProviderLocationType & providerLocation,
-                                app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason announcementReason) = 0;
+                                app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum announcementReason) = 0;
 
     /// Direct the driver to trigger the QueryImage command. The driver may choose to execute some internal
     /// logic and will then call an OTARequestorInterface API to actually send the command. The purpose of this

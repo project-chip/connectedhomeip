@@ -190,7 +190,7 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
     ChipLogProgress(Camera, "DeviceManager: Initiating WebRTC session for node=0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
     // Connect to the WebRTC transport provider on the device
-    CHIP_ERROR err = WebRTCManager::Instance().Connnect(*mCommissioner, mNodeId, kCameraEndpointId);
+    CHIP_ERROR err = WebRTCManager::Instance().Connect(*mCommissioner, mNodeId, kCameraEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to connect WebRTC manager. Error: %" CHIP_ERROR_FORMAT, err.Format());

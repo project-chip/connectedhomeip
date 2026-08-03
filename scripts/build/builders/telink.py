@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +36,7 @@ class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
@@ -55,6 +58,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'bridge-app'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -81,7 +86,7 @@ class TelinkApp(Enum):
             return 'thermostat'
         if self == TelinkApp.WINDOW_COVERING:
             return 'window-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
@@ -90,6 +95,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
         if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
         if self == TelinkApp.CONTACT_SENSOR:
@@ -118,7 +125,7 @@ class TelinkApp(Enum):
             return 'chip-telink-thermostat-example'
         if self == TelinkApp.WINDOW_COVERING:
             return 'chip-telink-window-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class TelinkBoard(Enum):
@@ -157,14 +164,15 @@ class TelinkBoard(Enum):
             return 'tl7218x_ml7m'
         if self == TelinkBoard.TL7218X_RETENTION:
             return 'tl7218x_retention'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class TelinkBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
                  enable_ota: bool = False,
@@ -181,8 +189,9 @@ class TelinkBuilder(Builder):
                  tflm_config: bool = False,
                  chip_enable_nfc_onboarding_payload: bool = False,
                  log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
+                 all_devices_enabled_devices=None,
                  ):
-        super(TelinkBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
@@ -199,6 +208,7 @@ class TelinkBuilder(Builder):
         self.tflm_config = tflm_config
         self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
         self.log_level = log_level
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -214,6 +224,7 @@ class TelinkBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -260,6 +271,9 @@ class TelinkBuilder(Builder):
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
+        if self.all_devices_enabled_devices:
+            flags.append(f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
+
         if self.log_level == TelinkLogLevel.DEFAULT:
             pass
         elif self.log_level == TelinkLogLevel.ALL:
@@ -271,7 +285,7 @@ class TelinkBuilder(Builder):
         elif self.log_level == TelinkLogLevel.NONE:
             flags.append("-DTLNK_LOG_LEVEL=none")
         else:
-            raise Exception("Unknown log level: %r" % self.log_level)
+            raise Exception(f"Unknown log level: {self.log_level!r}")
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -287,21 +301,30 @@ class TelinkBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling Telink at %s', self.output_dir)
 
-        cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
+        cmd = self.get_cmd_prefixes() + (f"ninja -C {self.output_dir}")
 
         if self.ninja_jobs is not None:
-            cmd += " -j%s" % str(self.ninja_jobs)
+            cmd += f" -j{str(self.ninja_jobs)}"
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    def _AllDevicesOutputName(self):
+        """Return the binary base name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            return 'example-device-app'
+        return 'all-devices-app'
+
+    @lock_output_dir
     def build_outputs(self):
+        app_name = self._AllDevicesOutputName() if self.app == TelinkApp.ALL_DEVICES else self.app.AppNamePrefix()
         yield BuilderOutput(
             os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
-            '%s.elf' % self.app.AppNamePrefix())
+            f'{app_name}.elf')
         if self.options.enable_link_map_file:
             yield BuilderOutput(
                 os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
-                '%s.map' % self.app.AppNamePrefix())
+                f'{app_name}.map')

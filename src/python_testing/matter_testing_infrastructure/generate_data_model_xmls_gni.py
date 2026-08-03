@@ -113,7 +113,7 @@ def _generate_gni_file(zip_dir: str, prefix: str, file_extensions: tuple[str], o
 
     # Step 5: Write the rendered content to the output file
     os.makedirs(output_dir, exist_ok=True)  # Ensure the output directory exists
-    with open(output_file, "wt") as f:
+    with open(output_file, "w") as f:
         f.write(output_content)
     print(f"{output_file} has been generated successfully.")
 

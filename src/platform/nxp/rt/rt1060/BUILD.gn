@@ -72,6 +72,7 @@ static_library("nxp_platform") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
+    "../../common/BootReason.h",
     "../../common/CHIPDevicePlatformEvent.h",
     "../../common/ConfigurationManagerImpl.cpp",
     "../../common/ConfigurationManagerImpl.h",
@@ -86,6 +87,7 @@ static_library("nxp_platform") {
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
     "../../common/SoftwareUpdateManagerImpl.h",
+    "BootReason.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
@@ -152,6 +154,7 @@ static_library("nxp_platform") {
   if (chip_enable_thread) {
     sources += [
       # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h",
       "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.h",

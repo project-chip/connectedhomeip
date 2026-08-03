@@ -171,6 +171,7 @@ PyChipError pychip_DeviceController_ResetLocalMRPConfig();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -192,13 +193,15 @@ PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::De
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
                                                             const char * borderAgentIPAddr, uint16_t borderAgentPort);
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen);
 
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
 PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                            uint16_t discriminator, uint8_t optionInt);
+                                                            uint16_t discriminator, uint8_t optionInt, uint32_t passcode);
 PyChipError pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(chip::Controller::DeviceCommissioner * devCtrl,
                                                                                     chip::NodeId remoteDeviceId);
 
@@ -386,6 +389,12 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                         ToPyChipError(CHIP_ERROR_BUFFER_TOO_SMALL));
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen)
+{
+    return ToPyChipError(devCtrl->GetLastThreadMeshcopDiscoveryDiagnosticJson(outJson, outJsonLen));
 }
 
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
@@ -804,6 +813,16 @@ PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceC
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_DeviceController_StopPairing(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    // Stop any in-progress PASE/commissioning session with this node and release the associated
+    // commissionee device proxy. Unlike pychip_ExpireSessions, this deliberately does NOT expire
+    // operational (CASE) sessions, so it is safe to call while a CASE session to the node is in use.
+    return ToPyChipError(devCtrl->StopPairing(nodeid));
+}
+
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(
@@ -895,7 +914,7 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    CommissioningParameters params;
+    CommissioningParameters params = sCommissioningParameters;
     return ToPyChipError(devCtrl->Commission(nodeid, params));
 }
 
@@ -910,7 +929,7 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
 PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                            uint16_t discriminator, uint8_t optionInt)
+                                                            uint16_t discriminator, uint8_t optionInt, uint32_t passcode)
 {
     const auto option = static_cast<Controller::CommissioningWindowOpener::CommissioningWindowOption>(optionInt);
     if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
@@ -919,19 +938,23 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
             devCtrl, nodeid, System::Clock::Seconds16(timeout)));
     }
 
-    if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
+    if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN ||
+        option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithProvidedPIN)
     {
         SetupPayload payload;
         auto opener =
             Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
-        PyChipError err =
-            ToPyChipError(opener->OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
-                                                              .SetNodeId(nodeid)
-                                                              .SetTimeout(timeout)
-                                                              .SetIteration(iteration)
-                                                              .SetDiscriminator(discriminator)
-                                                              .SetCallback(pairingDelegate->GetOpenWindowCallback(opener)),
-                                                          payload));
+        auto params = Controller::CommissioningWindowPasscodeParams()
+                          .SetNodeId(nodeid)
+                          .SetTimeout(timeout)
+                          .SetIteration(iteration)
+                          .SetDiscriminator(discriminator)
+                          .SetCallback(pairingDelegate->GetOpenWindowCallback(opener));
+        if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithProvidedPIN)
+        {
+            params.SetSetupPIN(passcode);
+        }
+        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(params, payload));
         return err;
     }
 

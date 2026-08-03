@@ -22,6 +22,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdlib.h>
 
 namespace chip {
@@ -650,7 +651,7 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
     uint8_t keys_count                       = 0;
     Crypto::GroupOperationalCredentials operational_keys[KeySet::kEpochKeysMax];
 
@@ -670,9 +671,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+        policy     = GroupDataProvider::SecurityPolicy::kTrustFirst;
         keys_count = 0;
-        memset(operational_keys, 0x00, sizeof(operational_keys));
+        Crypto::ClearSecretData(reinterpret_cast<uint8_t *>(operational_keys), sizeof(operational_keys));
         next = kInvalidKeysetId;
     }
 
@@ -748,6 +749,15 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // policy
         ReturnErrorOnFailure(reader.Next(TagPolicy()));
         ReturnErrorOnFailure(reader.Get(policy));
+        // CacheAndSync is unimplemented, and should not have been used as the default security policy.
+        // If a KeySet was saved with this policy, we re-map it here to be TrustFirst.
+        if (policy == GroupDataProvider::SecurityPolicy::kCacheAndSync)
+        {
+            ChipLogDetail(NotSpecified,
+                          "Re-mapping security policy from CacheAndSync to TrustFirst for keyset %u (fabric index %u)", keyset_id,
+                          fabric_index);
+            policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
+        }
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
@@ -955,7 +965,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -1077,7 +1087,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
@@ -1477,7 +1487,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(fabric.map_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1654,6 +1664,11 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
                         CHIP_ERROR_INVALID_ARGUMENT);
+    if (in_keyset.policy != SecurityPolicy::kTrustFirst)
+    {
+        ChipLogError(NotSpecified, "Unsupported group key security policy: %d", static_cast<int>(in_keyset.policy));
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
     FabricData fabric(fabric_index);
     KeySetData keyset;
 

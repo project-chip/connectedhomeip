@@ -38,6 +38,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -75,13 +76,24 @@ public:
         }
     }
 
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
+    void OnFabricRemoved(FabricIndex fabricIndex) override
+    {
+        mLastFabricRemovedIndex = fabricIndex;
+        mFabricRemovedCallCount++;
+    }
+
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> GetLastAnnounceCommandPayload() const
     {
         return mLastAnnounceCommandPayload;
     }
 
+    std::optional<FabricIndex> GetLastFabricRemovedIndex() const { return mLastFabricRemovedIndex; }
+    uint32_t GetFabricRemovedCallCount() const { return mFabricRemovedCallCount; }
+
 private:
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
+    std::optional<OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType> mLastAnnounceCommandPayload;
+    std::optional<FabricIndex> mLastFabricRemovedIndex;
+    uint32_t mFabricRemovedCallCount = 0;
 };
 
 struct TestOTARequestorCluster : public ::testing::Test
@@ -95,7 +107,7 @@ TEST_F(TestOTARequestorCluster, TestCreate)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 }
 
@@ -104,7 +116,7 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster,
@@ -121,7 +133,7 @@ TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(
@@ -136,7 +148,7 @@ TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(chip::Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
@@ -147,7 +159,7 @@ TEST_F(TestOTARequestorCluster, EventInfoTest)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     DataModel::EventEntry eventInfo;
@@ -173,9 +185,10 @@ TEST_F(TestOTARequestorCluster, EventInfoTest)
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 {
+    chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -191,19 +204,47 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     EXPECT_TRUE(result.IsSuccess());
 
     // Check that the payload was decoded correctly.
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
-        otaCommands.GetLastAnnounceCommandPayload();
+        *otaCommands.GetLastAnnounceCommandPayload();
     EXPECT_EQ(forwarded_payload.providerNodeID, static_cast<NodeId>(1234));
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
     EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
 }
 
-TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
+TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)
 {
+    chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Construct the payload with an unknown announcement reason. Sending kUnknownEnumValue is rejected by the encoder, so use an
+    // undefined value instead.
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
+    payload.announcementReason = static_cast<OtaSoftwareUpdateRequestor::AnnouncementReasonEnum>(99);
+    payload.endpoint           = 5;
+
+    // Invoke the command.
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(result.status,
+              std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError)));
+
+    // Check that the command wasn't passed on.
+    EXPECT_FALSE(otaCommands.GetLastAnnounceCommandPayload().has_value());
+}
+
+TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -220,9 +261,8 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     // Invoke the command.
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
     ASSERT_FALSE(result.IsSuccess());
-    EXPECT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status, // NOLINT(bugprone-unchecked-optional-access)
-              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status, DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -230,7 +270,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Testing::ClusterTester tester(cluster);
@@ -297,7 +337,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -336,7 +376,7 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -373,7 +413,7 @@ TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     auto & changeListener   = context.ChangeListener();
@@ -414,7 +454,7 @@ TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventGeneratesAnEvent)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
@@ -424,6 +464,7 @@ TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateVersionAppliedEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
     VersionApplied::DecodableType decodedEvent;
@@ -437,7 +478,7 @@ TEST_F(TestOTARequestorCluster, GenerateVersionAppliedEventBeforeStartupFails)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
 
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
 
@@ -451,7 +492,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
@@ -462,6 +503,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     auto generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     DownloadError::DecodableType decodedEvent;
@@ -476,6 +518,7 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventGeneratesAnEvent)
     EXPECT_EQ(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     generatedEvent = eventsGenerator.GetNextEvent();
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+    ASSERT_TRUE(generatedEvent.has_value());
     EXPECT_EQ(generatedEvent->eventOptions.mPath,
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
     ASSERT_EQ(generatedEvent->GetEventData(decodedEvent), CHIP_NO_ERROR);
@@ -492,13 +535,98 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventBeforeStartupFails)
     chip::Testing::TestServerClusterContext context;
     MockOtaCommands otaCommands;
     OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes);
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
 
     Testing::LogOnlyEvents & eventsGenerator = context.EventsGenerator();
 
     DownloadError::Type event{ 0x12345678u, 0x123456789ABCDEF0u, DataModel::NullNullable, DataModel::NullNullable };
     EXPECT_NE(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+}
+
+// OnFabricRemoved clears the removed fabric's DefaultOTAProviders entry, leaves other fabrics
+// untouched, and notifies the command interface exactly once with the removed fabricIndex.
+TEST_F(TestOTARequestorCluster, OnFabricRemovedClearsTargetFabricAndNotifiesRequestor)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Seed providers for two distinct fabrics.
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type providerA;
+    providerA.providerNodeID = 0x1111u;
+    providerA.endpoint       = 1;
+    providerA.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(providerA), CHIP_NO_ERROR);
+
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type providerB;
+    providerB.providerNodeID = 0x2222u;
+    providerB.endpoint       = 2;
+    providerB.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(providerB), CHIP_NO_ERROR);
+
+    // Sanity: both entries present.
+    {
+        auto it      = attributes.GetDefaultOtaProviderListIterator();
+        size_t count = 0;
+        while (it.Next())
+        {
+            count++;
+        }
+        EXPECT_EQ(count, 2u);
+    }
+
+    // Remove fabric 1. Pass the global FabricTable reference the production code path uses;
+    // OTARequestorCluster::OnFabricRemoved ignores the table arg (only the fabricIndex is used).
+    cluster.OnFabricRemoved(context.GetFabricTable(), /*fabricIndex=*/1);
+
+    // (a) Fabric 1's DefaultOTAProviders entry is gone; fabric 2's remains.
+    {
+        auto it = attributes.GetDefaultOtaProviderListIterator();
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue(), providerB);
+        EXPECT_FALSE(it.Next());
+    }
+
+    // (b) The command interface saw exactly one OnFabricRemoved(1) call.
+    EXPECT_EQ(otaCommands.GetFabricRemovedCallCount(), 1u);
+    ASSERT_TRUE(otaCommands.GetLastFabricRemovedIndex().has_value());
+    EXPECT_EQ(otaCommands.GetLastFabricRemovedIndex().value(), 1);
+}
+
+// Notification fires even when the removed fabric has no DefaultOTAProviders entry — in-flight
+// or persisted state may exist from an AnnounceOTAProvider-triggered OTA.
+TEST_F(TestOTARequestorCluster, OnFabricRemovedNotifiesRequestorEvenWithNoProvidersForThatFabric)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Provider exists for fabric 2 only; nothing for fabric 7.
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
+    provider.providerNodeID = 0x3333u;
+    provider.endpoint       = 1;
+    provider.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
+
+    cluster.OnFabricRemoved(context.GetFabricTable(), /*fabricIndex=*/7);
+
+    // Fabric 2's entry untouched.
+    {
+        auto it = attributes.GetDefaultOtaProviderListIterator();
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue(), provider);
+        EXPECT_FALSE(it.Next());
+    }
+
+    // Notification still happened (the requestor's hook decides whether there's anything to clear).
+    EXPECT_EQ(otaCommands.GetFabricRemovedCallCount(), 1u);
+    ASSERT_TRUE(otaCommands.GetLastFabricRemovedIndex().has_value());
+    EXPECT_EQ(otaCommands.GetLastFabricRemovedIndex().value(), 7);
 }
 
 } // namespace

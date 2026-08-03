@@ -24,7 +24,6 @@ declare_args() {
 
 static_library("freertos") {
   sources = [
-    "//src/platform/FreeRTOS/SystemTimeSupport.cpp",
     "//src/platform/SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -52,6 +51,8 @@ static_library("freertos") {
     "RTKConfig.cpp",
     "RTKConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
   ]
 
   deps = [

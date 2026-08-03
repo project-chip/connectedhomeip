@@ -42,6 +42,7 @@ list(
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp
+    ${chip_dir}/examples/platform/realtek/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.cpp
 )
 
 add_library(

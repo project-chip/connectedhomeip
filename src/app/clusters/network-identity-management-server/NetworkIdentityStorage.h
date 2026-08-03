@@ -72,14 +72,15 @@ public:
 
     enum class NetworkIdentityFlags : uint8_t
     {
-        kPopulateIdentifier       = (1 << 0),
-        kPopulateCreatedTimestamp = (1 << 1),
-        kPopulateCompactIdentity  = (1 << 2),
-        kPopulateKeypairHandle    = (1 << 3),
-        kPopulateClientCount      = (1 << 4),
+        kPopulateIdentityType     = (1 << 0),
+        kPopulateIdentifier       = (1 << 1),
+        kPopulateCreatedTimestamp = (1 << 2),
+        kPopulateCompactIdentity  = (1 << 3),
+        kPopulateKeypairHandle    = (1 << 4),
+        kPopulateClientCount      = (1 << 5),
 
-        kPopulateAll = kPopulateIdentifier | kPopulateCreatedTimestamp | kPopulateCompactIdentity | kPopulateKeypairHandle |
-            kPopulateClientCount
+        kPopulateAll = kPopulateIdentityType | kPopulateIdentifier | kPopulateCreatedTimestamp | kPopulateCompactIdentity |
+            kPopulateKeypairHandle | kPopulateClientCount
     };
 
     static constexpr size_t NetworkIdentityBufferSize(BitFlags<NetworkIdentityFlags> flags = NetworkIdentityFlags::kPopulateAll)
@@ -92,10 +93,10 @@ public:
     /// Input data for storing a Network Identity
     struct NetworkIdentityInfo
     {
-        NetworkIdentityManagement::IdentityTypeEnum type;
-        Credentials::CertificateKeyIdStorage identifier;
-        ByteSpan compactIdentity;
-        ByteSpan keypairHandle; ///< Opaque bytes at storage layer
+        NetworkIdentityManagement::IdentityTypeEnum type; ///< type of identity, retrieved only if kPopulateIdentityType
+        Credentials::CertificateKeyIdStorage identifier;  ///< 20-byte identifier, retrieved only if kPopulateIdentifier
+        ByteSpan compactIdentity;                         ///< identity certificate, retrieved only if kPopulateCompactIdentity
+        ByteSpan keypairHandle; ///< opaque bytes at storage layer, retrieved only if kPopulateKeypairHandle
 
         CHIP_ERROR GetKeypairHandle(Crypto::P256KeypairHandle & outHandle);
     };
@@ -169,11 +170,12 @@ public:
 
     enum class ClientFlags : uint8_t
     {
-        kPopulateIdentifier           = (1 << 0),
-        kPopulateCompactIdentity      = (1 << 1),
-        kPopulateNetworkIdentityIndex = (1 << 2),
+        kPopulateIdentityType         = (1 << 0),
+        kPopulateIdentifier           = (1 << 1),
+        kPopulateCompactIdentity      = (1 << 2),
+        kPopulateNetworkIdentityIndex = (1 << 3),
 
-        kPopulateAll = kPopulateIdentifier | kPopulateCompactIdentity | kPopulateNetworkIdentityIndex
+        kPopulateAll = kPopulateIdentityType | kPopulateIdentifier | kPopulateCompactIdentity | kPopulateNetworkIdentityIndex
     };
 
     static constexpr size_t ClientBufferSize(BitFlags<ClientFlags> flags = ClientFlags::kPopulateAll)
@@ -184,13 +186,14 @@ public:
 
     struct ClientInfo
     {
-        Credentials::CertificateKeyIdStorage identifier; ///< 20-byte client identifier, retrieved only if kPopulateIdentifier
-        ByteSpan compactIdentity; ///< Client Identity certificate, retrieved only if kPopulateCompactIdentity
+        NetworkIdentityManagement::IdentityTypeEnum identityType; ///< type of identity, retrieved only if kPopulateIdentityType
+        Credentials::CertificateKeyIdStorage identifier;          ///< 20-byte identifier, retrieved only if kPopulateIdentifier
+        ByteSpan compactIdentity; ///< identity certificate, retrieved only if kPopulateCompactIdentity
     };
 
     struct ClientEntry : public ClientInfo
     {
-        uint16_t index;                ///< always populated
+        uint16_t index;                ///< always retrieved
         uint16_t networkIdentityIndex; ///< retrieved only if kPopulateNetworkIdentityIndex
     };
 

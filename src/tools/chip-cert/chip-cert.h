@@ -496,7 +496,7 @@ extern int gNIDChipAttAttrPID;
  *
  *  @param[in]  aStatus     A boolean status to be evaluated.
  */
-#define VerifyTrueOrExit(aStatus) nlEXPECT(aStatus, exit)
+#define VerifyTrueOrExit(aStatus) VerifyOrExit(aStatus, {})
 
 /**
  *  @def ReportOpenSSLErrorAndExit(aFunct, ACTION)

@@ -123,10 +123,6 @@ PICS:
     - label: "Does the commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
 
-    - label:
-          "Does the commissioner support Discovery Capability over IP Network?"
-      id: MCORE.DD.DISCOVERY_IP
-
     - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
       id: MCORE.DD.DISCOVERY_PAF
 
@@ -358,6 +354,9 @@ PICS:
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -602,11 +601,6 @@ PICS:
           "Is the device a Client and supports subscribing to an attribute of
           DataType List"
       id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
-
-    - label:
-          "Is the device a Server and capable of generating large data which is
-          greater than 1 MTU(1280 bytes)"
-      id: MCORE.IDM.S.LargeData
 
     - label:
           "Is the device a Client and supports subscribing to an individual
@@ -8957,6 +8951,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:

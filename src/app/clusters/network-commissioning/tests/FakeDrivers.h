@@ -131,7 +131,11 @@ public:
 
     // Internal::WirelessDriver
     CHIP_ERROR CommitConfiguration() override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RevertConfiguration() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RevertConfiguration() override
+    {
+        mRevertConfigurationCalled = true;
+        return CHIP_NO_ERROR;
+    }
 
     uint8_t GetScanNetworkTimeoutSeconds() override { return 2; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 2; }
@@ -170,6 +174,9 @@ public:
 private:
     NetworkCommissioningStatusEnum mAddOrUpdateStatus = NetworkCommissioningStatusEnum::kUnknownError;
     bool mEnabledAllowed                              = false;
+
+public:
+    bool mRevertConfigurationCalled = false;
 };
 
 } // namespace Testing

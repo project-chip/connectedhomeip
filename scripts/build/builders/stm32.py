@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -25,17 +27,17 @@ class stm32App(Enum):
     def ExampleName(self):
         if self == stm32App.LIGHT:
             return 'lighting-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
             return 'chip-stm32-lighting-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == stm32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'stm32')
@@ -47,25 +49,24 @@ class stm32Board(Enum):
     def GetIC(self):
         if self == stm32Board.STM32WB55XX:
             return 'STM32WB5MM-DK'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class stm32Builder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: stm32App = stm32App.LIGHT,
                  board: stm32Board = stm32Board.STM32WB55XX):
-        super(stm32Builder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
 
         self.board = board
         self.app = app
 
         stm32_chip = self.board.GetIC()
-        self.extra_gn_options = ['stm32_ic_family="%s"' % stm32_chip]
+        self.extra_gn_options = [f'stm32_ic_family="{stm32_chip}"']
 
         self.extra_gn_options.append('chip_config_network_layer_ble=true')
         self.extra_gn_options.append('treat_warnings_as_errors=false')
@@ -75,6 +76,7 @@ class stm32Builder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["bin", "elf"]
         if self.options.enable_link_map_file:

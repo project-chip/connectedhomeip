@@ -80,7 +80,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     async def CommissionToStageSendCompleteAndCleanup(
             self, stage: int, expectedErrorPart: matter.native.ErrorSDKPart, expectedErrCode: int):
 
-        log.info("-----------------Fail on step {}-------------------------".format(stage))
+        log.info("-----------------Fail on step %s-------------------------", stage)
         params = await self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
@@ -152,7 +152,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         else:
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.extend_enum_if_value_doesnt_exist(3)
 
-        log.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = {}'.format(newloc))
+        log.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = %s', newloc)
         cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
             newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
         ret = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)

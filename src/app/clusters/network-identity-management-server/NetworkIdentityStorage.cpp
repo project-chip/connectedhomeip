@@ -117,6 +117,7 @@ CHIP_ERROR NetworkIdentityStorage::FindCurrentNetworkIdentityByIterating(Network
                                                                          BitFlags<NetworkIdentityFlags> flags,
                                                                          MutableByteSpan buffer)
 {
+    flags.Set(NetworkIdentityFlags::kPopulateIdentityType); // needed for the predicate
     return FindNetworkIdentityByIterating(
         outEntry, flags, buffer,
         [](const NetworkIdentityEntry & entry, const void * ctx) {

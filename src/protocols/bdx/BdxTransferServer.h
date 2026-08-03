@@ -33,7 +33,7 @@ class BdxTransferDiagnosticLog;
 class BDXTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    BDXTransferServer(){};
+    BDXTransferServer() = default;
 
     ~BDXTransferServer() { Shutdown(); };
 
@@ -51,10 +51,10 @@ protected:
     void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
-    System::Layer * mSystemLayer;
-    Messaging::ExchangeManager * mExchangeMgr;
+    System::Layer * mSystemLayer              = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    BDXTransferServerDelegate * mDelegate;
+    BDXTransferServerDelegate * mDelegate = nullptr;
     BdxTransferDiagnosticLogPool<CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS> mPoolDelegate;
 };
 

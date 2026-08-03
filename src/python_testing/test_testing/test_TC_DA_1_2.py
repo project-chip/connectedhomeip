@@ -21,14 +21,13 @@ import json
 import os
 import subprocess
 import sys
-from typing import Optional
 
 CHIP_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../../..'))
 RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')
 
 
-def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = False, additional_script_args: Optional[str] = None) -> int:
+def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = False, additional_script_args: str | None = None) -> int:
 
     reset = ""
     if factory_reset:
@@ -93,7 +92,7 @@ def main():
     def load_test_case_vector(cert_path, p) -> tuple[str, bool, int]:
         ''' Loads the test_case_vector.json and returns a tuple with the path, expected success response and the pid'''
         path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
-        with open(path, 'r') as f:
+        with open(path) as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
             pid = j['basic_info_pid']

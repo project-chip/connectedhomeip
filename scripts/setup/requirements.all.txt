@@ -10,7 +10,13 @@ virtualenv
 
 # device controller wheel package
 wheel; sys_platform == 'linux'
-pgi; sys_platform == 'linux'
+
+# PGI is not compatible with 3.14 - it is not maintained and uses
+# a deprecated 'pkgutil.get_loader'. Bluez integration can use either
+# of pgi or PyGobject (via gi)
+pgi; sys_platform == 'linux' and python_version < "3.14"
+PyGObject; sys_platform == 'linux' and python_version >= "3.14"
+
 pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
 pyobjc-framework-corebluetooth; sys_platform == 'darwin'

@@ -172,7 +172,7 @@ class TC_AVSM_2_12(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         self.adoSupported = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         self.vdoSupported = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         self.privSupported = aFeatureMap & cluster.Bitmaps.Feature.kPrivacy
@@ -188,19 +188,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             hdrEnabled = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
-            log.info(f"Rx'd HDRModeEnabled: {hdrEnabled}")
+            log.info("Rx'd HDRModeEnabled: %s", hdrEnabled)
 
             self.step(3)
             result = await self.write_single_attribute(attr.HDRModeEnabled(not hdrEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write HDRModeEnabled")
-            log.info(f"Tx'd HDRModeEnabled: {not hdrEnabled}")
+            log.info("Tx'd HDRModeEnabled: %s", not hdrEnabled)
 
             self.step(4)
             hdrEnabledNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HDRModeEnabled
             )
-            log.info(f"Rx'd HDRModeEnabled: {hdrEnabledNew}")
+            log.info("Rx'd HDRModeEnabled: %s", hdrEnabledNew)
             asserts.assert_equal(hdrEnabledNew, not hdrEnabled, "Value does not match what was written in step 3")
         else:
             log.info("HDR Feature not supported. Test steps skipped")
@@ -213,19 +213,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             softRecordingPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {softRecordingPrivMode}")
+            log.info("Rx'd SoftRecordingPrivacyModeEnabled: %s", softRecordingPrivMode)
 
             self.step(6)
             result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(not softRecordingPrivMode),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
-            log.info(f"Tx'd SoftRecordingPrivacyModeEnabled: {not softRecordingPrivMode}")
+            log.info("Tx'd SoftRecordingPrivacyModeEnabled: %s", not softRecordingPrivMode)
 
             self.step(7)
             softRecordingPrivModeNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftRecordingPrivacyModeEnabled: {softRecordingPrivModeNew}")
+            log.info("Rx'd SoftRecordingPrivacyModeEnabled: %s", softRecordingPrivModeNew)
             asserts.assert_equal(softRecordingPrivModeNew, not softRecordingPrivMode,
                                  "Value does not match what was written in step 6")
 
@@ -233,19 +233,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             softLivestreamPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {softLivestreamPrivMode}")
+            log.info("Rx'd SoftLivestreamPrivacyModeEnabled: %s", softLivestreamPrivMode)
 
             self.step(9)
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(not softLivestreamPrivMode),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd SoftLivestreamPrivacyModeEnabled: {not softLivestreamPrivMode}")
+            log.info("Tx'd SoftLivestreamPrivacyModeEnabled: %s", not softLivestreamPrivMode)
 
             self.step(10)
             softLivestreamPrivModeNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
             )
-            log.info(f"Rx'd SoftLivestreamPrivacyModeEnabled: {softLivestreamPrivModeNew}")
+            log.info("Rx'd SoftLivestreamPrivacyModeEnabled: %s", softLivestreamPrivModeNew)
             asserts.assert_equal(softLivestreamPrivModeNew, not softLivestreamPrivMode,
                                  "Value does not match what was written in step 9")
         else:
@@ -262,19 +262,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             nightVision = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVision
             )
-            log.info(f"Rx'd NightVision: {nightVision}")
+            log.info("Rx'd NightVision: %s", nightVision)
 
             self.step(12)
             nightVisionToWrite = (nightVision + 1) % 3
             result = await self.write_single_attribute(attr.NightVision(nightVisionToWrite),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write NightVision")
-            log.info(f"Tx'd NightVision: {nightVisionToWrite}")
+            log.info("Tx'd NightVision: %s", nightVisionToWrite)
 
             self.step(13)
             nightVisionNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.NightVision)
-            log.info(f"Rx'd NightVision: {nightVisionNew}")
+            log.info("Rx'd NightVision: %s", nightVisionNew)
             asserts.assert_equal(nightVisionNew, nightVisionToWrite, "Value does not match what was written in step 12")
 
             # NightVisionIllum is optional, so ensure it is present
@@ -282,19 +282,19 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.step(14)
                 nightVisionIllum = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum)
-                log.info(f"Rx'd NightVisionIllum: {nightVisionIllum}")
+                log.info("Rx'd NightVisionIllum: %s", nightVisionIllum)
 
                 self.step(15)
                 nightVisionIllumToWrite = (nightVisionIllum + 1) % 3
                 result = await self.write_single_attribute(attr.NightVisionIllum(nightVisionIllumToWrite),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write NightVisionIllum")
-                log.info(f"Tx'd NightVisionIllum: {nightVisionIllumToWrite}")
+                log.info("Tx'd NightVisionIllum: %s", nightVisionIllumToWrite)
 
                 self.step(16)
                 nightVisionIllumNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.NightVisionIllum)
-                log.info(f"Rx'd NightVisionIllum: {nightVisionIllumNew}")
+                log.info("Rx'd NightVisionIllum: %s", nightVisionIllumNew)
                 asserts.assert_equal(nightVisionIllumNew, nightVisionIllumToWrite,
                                      "Value does not match what was written for NightVisionIllum in step 15")
             else:
@@ -314,20 +314,20 @@ class TC_AVSM_2_12(MatterBaseTest):
             viewport = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Viewport
             )
-            log.info(f"Rx'd Viewport: {viewport}")
+            log.info("Rx'd Viewport: %s", viewport)
 
             self.step(18)
             viewportToWrite = Globals.Structs.ViewportStruct(viewport.x1+1, viewport.y1+1, viewport.x2+1, viewport.y2+1)
             result = await self.write_single_attribute(attr.Viewport(viewportToWrite),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write viewportToWrite")
-            log.info(f"Tx'd Viewport: {viewportToWrite}")
+            log.info("Tx'd Viewport: %s", viewportToWrite)
 
             self.step(19)
             viewportNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Viewport
             )
-            log.info(f"Rx'd Viewport: {viewportNew}")
+            log.info("Rx'd Viewport: %s", viewportNew)
             asserts.assert_equal(viewportNew, viewportToWrite, "Value does not match what was written in step 18")
         else:
             self.skip_step(17)
@@ -339,35 +339,35 @@ class TC_AVSM_2_12(MatterBaseTest):
             speakerMuted = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted
             )
-            log.info(f"Rx'd SpeakerMuted: {speakerMuted}")
+            log.info("Rx'd SpeakerMuted: %s", speakerMuted)
 
             self.step(21)
             result = await self.write_single_attribute(attr.SpeakerMuted(not speakerMuted),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SpeakerMuted")
-            log.info(f"Tx'd SpeakerMuted: {not speakerMuted}")
+            log.info("Tx'd SpeakerMuted: %s", not speakerMuted)
 
             self.step(22)
             speakerMutedNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMuted
             )
-            log.info(f"Rx'd SpeakerMuted: {speakerMutedNew}")
+            log.info("Rx'd SpeakerMuted: %s", speakerMutedNew)
             asserts.assert_equal(speakerMutedNew, not speakerMuted, "Value does not match what was written in step 21")
 
             speakerMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMinLevel)
-            log.info(f"Rx'd SpeakerMinLevel: {speakerMinLevel}")
+            log.info("Rx'd SpeakerMinLevel: %s", speakerMinLevel)
 
             speakerMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerMaxLevel)
-            log.info(f"Rx'd SpeakerMaxLevel: {speakerMaxLevel}")
+            log.info("Rx'd SpeakerMaxLevel: %s", speakerMaxLevel)
 
             # Only test write of new value if SpeakerMin != SpeakerMax
             if speakerMinLevel < speakerMaxLevel:
                 self.step(23)
                 speakerVolumeLevel = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel)
-                log.info(f"Rx'd SpeakerVolumeLevel: {speakerVolumeLevel}")
+                log.info("Rx'd SpeakerVolumeLevel: %s", speakerVolumeLevel)
                 matter_asserts.assert_int_in_range(speakerVolumeLevel, speakerMinLevel, speakerMaxLevel,
                                                    "Speaker Volume not between SpeakerMin and SpeakerMax")
 
@@ -379,12 +379,12 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.SpeakerVolumeLevel(newSpeakerVolume),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write SpeakerVolumeLevel")
-                log.info(f"Tx'd SpeakerVolumeLevel: {newSpeakerVolume}")
+                log.info("Tx'd SpeakerVolumeLevel: %s", newSpeakerVolume)
 
                 self.step(25)
                 speakerVolumeLevelNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.SpeakerVolumeLevel)
-                log.info(f"Rx'd SpeakerVolumeLevel: {speakerVolumeLevelNew}")
+                log.info("Rx'd SpeakerVolumeLevel: %s", speakerVolumeLevelNew)
                 asserts.assert_equal(speakerVolumeLevelNew, newSpeakerVolume,
                                      "Value does not match what was written for SpeakerVolumeLevel in step 24")
             else:
@@ -404,35 +404,35 @@ class TC_AVSM_2_12(MatterBaseTest):
             micMuted = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
-            log.info(f"Rx'd MicrophoneMuted: {micMuted}")
+            log.info("Rx'd MicrophoneMuted: %s", micMuted)
 
             self.step(27)
             result = await self.write_single_attribute(attr.MicrophoneMuted(not micMuted),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write MicrophoneMuted")
-            log.info(f"Tx'd MicrophoneMuted: {not micMuted}")
+            log.info("Tx'd MicrophoneMuted: %s", not micMuted)
 
             self.step(28)
             micMutedNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMuted
             )
-            log.info(f"Rx'd MicrophoneMuted: {micMutedNew}")
+            log.info("Rx'd MicrophoneMuted: %s", micMutedNew)
             asserts.assert_equal(micMutedNew, not micMuted, "Value does not match what was written in step 27")
 
             micMinLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMinLevel)
-            log.info(f"Rx'd MicrophoneMinLevel: {micMinLevel}")
+            log.info("Rx'd MicrophoneMinLevel: %s", micMinLevel)
 
             micMaxLevel = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneMaxLevel)
-            log.info(f"Rx'd MicrophoneMaxLevel: {micMaxLevel}")
+            log.info("Rx'd MicrophoneMaxLevel: %s", micMaxLevel)
 
             # Only test write of new value if MicMin != MicMax
             if micMinLevel < micMaxLevel:
                 self.step(29)
                 micVolumeLevel = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel)
-                log.info(f"Rx'd MicrophoneVolumeLevel: {micVolumeLevel}")
+                log.info("Rx'd MicrophoneVolumeLevel: %s", micVolumeLevel)
                 matter_asserts.assert_int_in_range(micVolumeLevel, micMinLevel, micMaxLevel,
                                                    "Microphone Volume not between MicMin and MicMax")
 
@@ -444,12 +444,12 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.MicrophoneVolumeLevel(newMicVolume),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write MicrophoneVolumeLevel")
-                log.info(f"Tx'd MicrophoneVolumeLevel: {newMicVolume}")
+                log.info("Tx'd MicrophoneVolumeLevel: %s", newMicVolume)
 
                 self.step(31)
                 micVolumeLevelNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneVolumeLevel)
-                log.info(f"Rx'd MicrophoneVolumeLevel: {micVolumeLevelNew}")
+                log.info("Rx'd MicrophoneVolumeLevel: %s", micVolumeLevelNew)
                 asserts.assert_equal(micVolumeLevelNew, newMicVolume,
                                      "Value does not match what was written for MicrophoneVolumeLevel in step 30")
             else:
@@ -462,18 +462,18 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.step(32)
                 micAGCEnabled = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled)
-                log.info(f"Rx'd MicrophoneAGCEnabled: {micAGCEnabled}")
+                log.info("Rx'd MicrophoneAGCEnabled: %s", micAGCEnabled)
 
                 self.step(33)
                 result = await self.write_single_attribute(attr.MicrophoneAGCEnabled(not micAGCEnabled),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write MicrophoneAGCEnabled")
-                log.info(f"Tx'd MicrophoneAGCEnabled: {not micAGCEnabled}")
+                log.info("Tx'd MicrophoneAGCEnabled: %s", not micAGCEnabled)
 
                 self.step(34)
                 micAGCEnabledNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneAGCEnabled)
-                log.info(f"Rx'd MicrophoneAGCEnabled: {micAGCEnabledNew}")
+                log.info("Rx'd MicrophoneAGCEnabled: %s", micAGCEnabledNew)
                 asserts.assert_equal(micAGCEnabledNew, not micAGCEnabled,
                                      "Value does not match what was written for MicrophoneAGCEnabled in step 33")
             else:
@@ -496,7 +496,7 @@ class TC_AVSM_2_12(MatterBaseTest):
             if await self.attribute_guard(endpoint=endpoint, attribute=attr.ImageRotation):
                 self.step(35)
                 imageRotation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
-                log.info(f"Rx'd ImageRotation: {imageRotation}")
+                log.info("Rx'd ImageRotation: %s", imageRotation)
 
                 self.step(36)
                 newImageRotation = random.randint(0, 359)
@@ -507,12 +507,12 @@ class TC_AVSM_2_12(MatterBaseTest):
                 result = await self.write_single_attribute(attr.ImageRotation(newImageRotation),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write ImageRotation")
-                log.info(f"Tx'd ImageRotation: {newImageRotation}")
+                log.info("Tx'd ImageRotation: %s", newImageRotation)
 
                 self.step(37)
                 imageRotationNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageRotation)
-                log.info(f"Rx'd ImageRotation: {imageRotationNew}")
+                log.info("Rx'd ImageRotation: %s", imageRotationNew)
                 asserts.assert_equal(imageRotationNew, newImageRotation,
                                      "Value does not match what was written for ImageRotation in step 36")
 
@@ -525,18 +525,18 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.step(38)
                 imageFlipHorizontal = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal)
-                log.info(f"Rx'd ImageFlipHorizontal: {imageFlipHorizontal}")
+                log.info("Rx'd ImageFlipHorizontal: %s", imageFlipHorizontal)
 
                 self.step(39)
                 result = await self.write_single_attribute(attr.ImageFlipHorizontal(not imageFlipHorizontal),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write ImageFlipHorizontal")
-                log.info(f"Tx'd ImageFlipHorizontal: {not imageFlipHorizontal}")
+                log.info("Tx'd ImageFlipHorizontal: %s", not imageFlipHorizontal)
 
                 self.step(40)
                 imageFlipHorizontalNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipHorizontal)
-                log.info(f"Rx'd ImageFlipHorizontal: {imageFlipHorizontalNew}")
+                log.info("Rx'd ImageFlipHorizontal: %s", imageFlipHorizontalNew)
                 asserts.assert_equal(imageFlipHorizontalNew, not imageFlipHorizontal,
                                      "Value does not match what was written for ImageFlipHorizontal in step 39")
             else:
@@ -548,18 +548,18 @@ class TC_AVSM_2_12(MatterBaseTest):
                 self.step(41)
                 imageFlipVertical = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical)
-                log.info(f"Rx'd ImageFlipVertical: {imageFlipVertical}")
+                log.info("Rx'd ImageFlipVertical: %s", imageFlipVertical)
 
                 self.step(42)
                 result = await self.write_single_attribute(attr.ImageFlipVertical(not imageFlipVertical),
                                                            endpoint_id=endpoint)
                 asserts.assert_equal(result, Status.Success, "Error when trying to write ImageFlipVertical")
-                log.info(f"Tx'd ImageFlipVertical: {not imageFlipVertical}")
+                log.info("Tx'd ImageFlipVertical: %s", not imageFlipVertical)
 
                 self.step(43)
                 imageFlipVerticalNew = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ImageFlipVertical)
-                log.info(f"Rx'd ImageFlipVertical: {imageFlipVerticalNew}")
+                log.info("Rx'd ImageFlipVertical: %s", imageFlipVerticalNew)
                 asserts.assert_equal(imageFlipVerticalNew, not imageFlipVertical,
                                      "Value does not match what was written for ImageFlipVertical in step 42")
             else:
@@ -582,19 +582,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             localVideoRecordingEnabled = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
-            log.info(f"Rx'd LocalVideoRecordingEnabled: {localVideoRecordingEnabled}")
+            log.info("Rx'd LocalVideoRecordingEnabled: %s", localVideoRecordingEnabled)
 
             self.step(45)
             result = await self.write_single_attribute(attr.LocalVideoRecordingEnabled(not localVideoRecordingEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write LocalVideoRecordingEnabled")
-            log.info(f"Tx'd LocalVideoRecordingEnabled: {not localVideoRecordingEnabled}")
+            log.info("Tx'd LocalVideoRecordingEnabled: %s", not localVideoRecordingEnabled)
 
             self.step(46)
             localVideoRecordingEnabledNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalVideoRecordingEnabled
             )
-            log.info(f"Rx'd LocalVideoRecordingEnabled: {localVideoRecordingEnabledNew}")
+            log.info("Rx'd LocalVideoRecordingEnabled: %s", localVideoRecordingEnabledNew)
             asserts.assert_equal(localVideoRecordingEnabledNew, not localVideoRecordingEnabled,
                                  "Value does not match what was written for LocalVideoRecordingEnabled in step 45")
         else:
@@ -607,19 +607,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             localSnapshotRecordingEnabled = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
-            log.info(f"Rx'd LocalSnapshotRecordingEnabled: {localSnapshotRecordingEnabled}")
+            log.info("Rx'd LocalSnapshotRecordingEnabled: %s", localSnapshotRecordingEnabled)
 
             self.step(48)
             result = await self.write_single_attribute(attr.LocalSnapshotRecordingEnabled(not localSnapshotRecordingEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write LocalSnapshotRecordingEnabled")
-            log.info(f"Tx'd LocalSnapshotRecordingEnabled: {not localSnapshotRecordingEnabled}")
+            log.info("Tx'd LocalSnapshotRecordingEnabled: %s", not localSnapshotRecordingEnabled)
 
             self.step(49)
             localSnapshotRecordingEnabledNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.LocalSnapshotRecordingEnabled
             )
-            log.info(f"Rx'd LocalSnapshotRecordingEnabled: {localSnapshotRecordingEnabledNew}")
+            log.info("Rx'd LocalSnapshotRecordingEnabled: %s", localSnapshotRecordingEnabledNew)
             asserts.assert_equal(localSnapshotRecordingEnabledNew, not localSnapshotRecordingEnabled,
                                  "Value does not match what was written for LocalSnapshotRecordingEnabled in step 48")
         else:
@@ -631,18 +631,18 @@ class TC_AVSM_2_12(MatterBaseTest):
             self.step(50)
             statusLightEnabled = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
-            log.info(f"Rx'd StatusLightEnabled: {statusLightEnabled}")
+            log.info("Rx'd StatusLightEnabled: %s", statusLightEnabled)
 
             self.step(51)
             result = await self.write_single_attribute(attr.StatusLightEnabled(not statusLightEnabled),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write StatusLightEnabled")
-            log.info(f"Tx'd StatusLightEnabled: {not statusLightEnabled}")
+            log.info("Tx'd StatusLightEnabled: %s", not statusLightEnabled)
 
             self.step(52)
             statusLightEnabledNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightEnabled)
-            log.info(f"Rx'd StatusLightEnabled: {statusLightEnabledNew}")
+            log.info("Rx'd StatusLightEnabled: %s", statusLightEnabledNew)
             asserts.assert_equal(statusLightEnabledNew, not statusLightEnabled,
                                  "Value does not match what was written for StatusLightEnabled in step 51")
         else:
@@ -654,19 +654,19 @@ class TC_AVSM_2_12(MatterBaseTest):
             self.step(53)
             statusLightBrightness = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
-            log.info(f"Rx'd StatusLightBrightness: {statusLightBrightness}")
+            log.info("Rx'd StatusLightBrightness: %s", statusLightBrightness)
 
             self.step(54)
             statusLightBrightnessToWrite = (statusLightBrightness + 1) % 4
             result = await self.write_single_attribute(attr.StatusLightBrightness(statusLightBrightnessToWrite),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write StatusLightBrightness")
-            log.info(f"Tx'd StatusLightBrightness: {statusLightBrightnessToWrite}")
+            log.info("Tx'd StatusLightBrightness: %s", statusLightBrightnessToWrite)
 
             self.step(55)
             statusLightBrightnessNew = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.StatusLightBrightness)
-            log.info(f"Rx'd StatusLightBrightness: {statusLightBrightnessNew}")
+            log.info("Rx'd StatusLightBrightness: %s", statusLightBrightnessNew)
             asserts.assert_equal(statusLightBrightnessNew, statusLightBrightnessToWrite,
                                  "Value does not match what was written for StatusLightBrightness in step 54")
         else:
