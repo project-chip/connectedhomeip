@@ -902,6 +902,7 @@ CHIP_ERROR FactoryDataProvider::ParseEl2GoBlob(const uint8_t * blob, size_t maxS
                          currentPtr - blob, tag, valueLength);
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
         });
+        size_t totalTlvSize = 1 + lengthFieldSize + valueLength;
 
         // Calculate pointer to value
         const uint8_t * valuePtr = currentPtr + 1 + lengthFieldSize;
