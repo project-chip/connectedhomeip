@@ -169,9 +169,6 @@ protected:
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
 };
 
-ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
-Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

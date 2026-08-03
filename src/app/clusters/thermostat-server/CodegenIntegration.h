@@ -127,17 +127,17 @@ void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShut
         integrationDelegate, clusterShutdownType);
 }
 
-template <typename Cluster>
-ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
+template <typename ClusterT>
+ClusterT * FindClusterOnEndpoint(EndpointId endpointId)
 {
-    IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
+    IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
     return integrationDelegate.FindClusterOnEndpoint(endpointId);
 }
 
-template <typename Cluster, typename DelegateT>
+template <typename ClusterT, typename DelegateT>
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, DelegateT * delegate)
 {
-    IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
+    IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
     return integrationDelegate.SetDelegate(endpoint, delegate);
 }
 
