@@ -40,14 +40,14 @@ using GetDeviceAuthURIResponse = chip::app::Clusters::AccountLogin::Commands::Ge
 class DLL_EXPORT OAuthAccountLoginManager : public AccountLoginDelegate
 {
 public:
-    inline void SetSetupPin(char * setupPin) override {};
+    inline void SetSetupPin(char * setupPin) override{};
 
     bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString,
                      const chip::Optional<chip::NodeId> & nodeId) override;
     bool HandleLogout(const chip::Optional<chip::NodeId> & nodeId) override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
-    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override {};
+    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override{};
 
     void HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper) override;
     bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };

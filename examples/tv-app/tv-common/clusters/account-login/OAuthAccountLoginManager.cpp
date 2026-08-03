@@ -67,7 +67,7 @@ void OAuthAccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetD
 
     DeviceLayer::SystemLayer().CancelTimer(OnLoginTimerExpired, this);
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kLoginDelaySeconds),
-                                                                    OnLoginTimerExpired, this);
+                                                                   OnLoginTimerExpired, this);
 }
 
 void OAuthAccountLoginManager::OnLoginTimerExpired(System::Layer * systemLayer, void * context)
