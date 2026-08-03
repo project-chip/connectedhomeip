@@ -331,13 +331,9 @@ bool ThermostatCluster::IsActiveSetpoint(AttributeId attributeId) const
 {
     if (IsOccupied())
     {
-        return (attributeId == Attributes::OccupiedHeatingSetpoint::Id || attributeId == Attributes::OccupiedCoolingSetpoint::Id);
+        return (attributeId == OccupiedHeatingSetpoint::Id || attributeId == OccupiedCoolingSetpoint::Id);
     }
-    else
-    {
-        return (attributeId == Attributes::UnoccupiedHeatingSetpoint::Id ||
-                attributeId == Attributes::UnoccupiedCoolingSetpoint::Id);
-    }
+    return (attributeId == UnoccupiedHeatingSetpoint::Id || attributeId == UnoccupiedCoolingSetpoint::Id);
 }
 
 bool ThermostatCluster::HasAttribute(AttributeId attributeId)
