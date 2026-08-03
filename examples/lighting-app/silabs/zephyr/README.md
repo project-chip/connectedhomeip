@@ -344,7 +344,7 @@ Build outputs:
 -   `build/mcuboot/zephyr/zephyr.bin` — MCUboot image (also flashed by
     `west flash`).
 -   `build/zephyr/zephyr/zephyr.signed.bin` — signed application image (sysbuild
-    names the main domain after the application directory basename, `zephyr`).
+    names the main domain after the application directory base name, `zephyr`).
 -   `build/zephyr/zephyr/matter.ota` — the image to serve from a Matter OTA
     Provider (produced by `config/silabs/app/zephyr-post-build.cmake`).
 
