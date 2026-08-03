@@ -71,12 +71,13 @@ class TC_CNET_4_4(MatterBaseTest):
 
         async def scan_and_check(ssid_to_scan: bytes | None, breadcrumb: int, expect_results: bool = True):
             all_security = 0
+            scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
             for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
                 all_security |= security_bitmask
 
             ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
             cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
-            scan_results = await self.send_single_cmd(cmd=cmd)
+            scan_results = await self.send_single_cmd(cmd=cmd, interactionTimeoutMs=scan_max_time_s * 1000)
             asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
             log.info("Scan results: %s", scan_results)
