@@ -482,8 +482,6 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
 }
 
-<<<<<<< HEAD
-=======
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
 {
     IdentificationDeclaration idOut;
@@ -551,7 +549,6 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
     EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
->>>>>>> 01db7c7be7 ([UDC] Fix off-by-one string copy in ReadPayload (#72604))
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
