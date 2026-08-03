@@ -45,10 +45,10 @@ public:
     static constexpr size_t kSizeOfSupportedTransports      = sizeof(uint16_t);
     static constexpr size_t kTCPFramingHeaderSize           = 4;
 
-    static constexpr size_t kEstimatedTLVSize = TLV::EstimateStructOverhead(
-        kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold, kSizeOfDataModelRevision,
-        kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion, kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports,
-        kTCPFramingHeaderSize);
+    static constexpr size_t kEstimatedTLVSize =
+        TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
+                                    kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kTCPFramingHeaderSize);
 
     // From Section 4.12.8 "Parameters and Constants" in chapter "Secure Channel".
     enum Tag : uint32_t
