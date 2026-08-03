@@ -1,28 +1,30 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
 import threading
-from typing import Any, BinaryIO, Callable, Optional, Pattern
+from collections.abc import Callable
+from re import Pattern
+from typing import Any, BinaryIO
 
 def forward_f(f_in: BinaryIO, f_out: BinaryIO,
-              cb: Optional[Callable[[bytes, bool], bytes]] = ...,
+              cb: Callable[[bytes, bool], bytes] | None = ...,
               is_stderr: bool = ...) -> None: ...
 
 
 class Subprocess(threading.Thread):
     program: str
     args: tuple[str, ...]
-    output_cb: Optional[Callable[[bytes, bool], bytes]]
+    output_cb: Callable[[bytes, bool], bytes] | None
     f_stdout: BinaryIO
     f_stderr: BinaryIO
-    output_match: Optional[Pattern[bytes]]
-    returncode: Optional[int]
+    output_match: Pattern[bytes] | None
+    returncode: int | None
     p: Any
     event: threading.Event
     event_started: threading.Event
-    expected_output: Optional[str | Pattern[bytes]]
+    expected_output: str | Pattern[bytes] | None
 
     def __init__(self, program: str, *args: str,
-                 output_cb: Optional[Callable[[bytes, bool], bytes]] = ...,
+                 output_cb: Callable[[bytes, bool], bytes] | None = ...,
                  f_stdout: BinaryIO = ...,
                  f_stderr: BinaryIO = ...) -> None: ...
 
@@ -33,13 +35,13 @@ class Subprocess(threading.Thread):
     def run(self) -> None: ...
 
     def start(self,
-              expected_output: Optional[str | Pattern[bytes]] = ...,
-              timeout: Optional[float] = ...) -> None: ...
+              expected_output: str | Pattern[bytes] | None = ...,
+              timeout: float | None = ...) -> None: ...
 
     def send(self, message: str, end: str = ...,
-             expected_output: Optional[str | Pattern[bytes]] = ...,
-             timeout: Optional[float] = ...) -> None: ...
+             expected_output: str | Pattern[bytes] | None = ...,
+             timeout: float | None = ...) -> None: ...
 
     def terminate(self) -> None: ...
 
-    def wait(self, timeout: Optional[float] = ...) -> Optional[int]: ...
+    def wait(self, timeout: float | None = ...) -> int | None: ...

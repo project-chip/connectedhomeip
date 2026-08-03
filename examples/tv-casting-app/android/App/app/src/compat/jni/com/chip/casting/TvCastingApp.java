@@ -1329,7 +1329,9 @@ public class TvCastingApp {
         startTime,
         duration,
         messageText,
-        responses);
+        responses,
+        Optional.empty(),
+        Optional.empty());
     return true;
   }
 }

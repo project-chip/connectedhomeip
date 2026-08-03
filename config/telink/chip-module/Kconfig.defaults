@@ -386,6 +386,9 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
 config CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
     default y
 
+config OPENTHREAD_SNTP_CLIENT
+    default y if OPENTHREAD_SOURCES
+
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
@@ -525,6 +528,10 @@ config TELINK_TLX_SHA_HW_SLOTS
     int
     default 2 if BOARD_TL3218X_RETENTION
     default 8 if SOC_RISCV_TELINK_TLX
+
+config NET_CONTEXT_RECV_PKTINFO
+    bool
+    default y
 
 endif # !ZEPHYR_VERSION_3_3
 

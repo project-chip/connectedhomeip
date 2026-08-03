@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ServiceAreaCluster.cpp"
-    "${CLUSTER_DIR}/service-area-cluster-objects.h"
-    "${CLUSTER_DIR}/service-area-delegate.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/service-area-server.h"
-    "${CLUSTER_DIR}/service-area-storage-delegate.cpp"
-    "${CLUSTER_DIR}/service-area-storage-delegate.h"
 )
