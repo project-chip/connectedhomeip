@@ -139,20 +139,20 @@ public:
 
 protected:
     OptionalAttributes mOptionalAttributes;
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
     Thermostat::Delegate * mDelegate = nullptr;
     AtomicWriteSession mAtomicWriteSession;
 
-    BitMask<RemoteSensingBitmap> mRemoteSensing;
-    BitMask<OccupancyBitmap> mOccupancy;
+    BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
+    BitMask<OccupancyBitmap> mOccupancy = BitMask<OccupancyBitmap>(0);
 
-    SystemModeEnum mSystemMode;
-    ThermostatRunningModeEnum mRunningMode;
-    BitMask<RelayStateBitmap> mRunningState;
-    DataModel::Nullable<int16_t> mLocalTemperature;
-    int8_t mLocalTemperatureCalibration;
+    SystemModeEnum mSystemMode = SystemModeEnum::kOff;
+    ThermostatRunningModeEnum mRunningMode = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState = BitMask<RelayStateBitmap>(0);
+    DataModel::Nullable<int16_t> mLocalTemperature = DataModel::Nullable<int16_t>();
+    int8_t mLocalTemperatureCalibration = 0;
 
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold;
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
 
