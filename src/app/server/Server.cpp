@@ -235,9 +235,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     SessionParameters localSessionParams;
-#endif
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
@@ -599,9 +597,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Don't provide an MRP local config, so each CASE initiation will use
             // the then-current value.
             .mrpLocalConfig = NullOptional,
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
             .localSessionParams = localSessionParams,
-#endif
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -614,9 +610,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mCASEServer.SetLocalSessionParameters(localSessionParams);
-#endif
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);

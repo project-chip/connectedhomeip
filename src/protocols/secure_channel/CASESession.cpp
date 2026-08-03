@@ -772,12 +772,8 @@ CHIP_ERROR CASESession::SendSigma1()
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
     encodeSigma1Inputs.initiatorSessionParams = mLocalSessionParams;
-#else
-    encodeSigma1Inputs.initiatorSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
-#endif
 
     // Try to find persistent session, and resume it.
     if (mSessionResumptionStorage != nullptr)
@@ -1117,12 +1113,8 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), outSigma2ResData.sigma2ResumeMIC));
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
     outSigma2ResData.responderSessionParams = mLocalSessionParams;
-#else
-    outSigma2ResData.responderSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
-#endif
 
     return CHIP_NO_ERROR;
 }
@@ -1289,12 +1281,8 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
                                          outSigma2Data.msgR2Encrypted.Get() + msgR2SignedEncLen,
                                          CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
     outSigma2Data.responderSessionParams = mLocalSessionParams;
-#else
-    outSigma2Data.responderSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
-#endif
 
     return CHIP_NO_ERROR;
 }

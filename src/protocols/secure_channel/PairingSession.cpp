@@ -144,7 +144,6 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionPa
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), maxPathsPerInvoke));
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     uint16_t supportedTransports = sessionParams.GetSupportedTransports();
     if (supportedTransports != 0)
     {
@@ -153,7 +152,6 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionPa
         uint32_t maxTCPPayloadSize = sessionParams.GetMaxTCPPayloadSize();
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxTCPPayloadSize), maxTCPPayloadSize));
     }
-#endif
 
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
@@ -248,7 +246,6 @@ CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag
         SuccessOrExit(err = tlvReader.Next());
     }
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSupportedTransports)
     {
         uint16_t supportedTransports;
@@ -268,7 +265,6 @@ CHIP_ERROR PairingSession::DecodeSessionParametersIfPresent(TLV::Tag expectedTag
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
     }
-#endif
 
     // Future proofing - Don't error out if there are other tags
 exit:

@@ -170,9 +170,7 @@ public:
      **/
     void Clear();
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
-#endif
 
     enum class State : uint8_t
     {
@@ -594,9 +592,7 @@ private:
 
     State mState;
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     SessionParameters mLocalSessionParams;
-#endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
