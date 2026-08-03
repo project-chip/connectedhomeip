@@ -8,7 +8,7 @@
 
 namespace chip::app {
 
-class MySensorDevice : public SingleEndpointDevice
+class WindowCovering : public SingleEndpointDevice
 {
 public:
     WindowCovering(WindowCoveringDelegate & delegate, TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
@@ -22,7 +22,7 @@ public:
     // Public cluster getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::WindowCoveringCluster & WindowCoveringCluster() { return mWindowCoveringCluster.Cluster(); }
-    Clusters::GroupsCluster & IdentifyCluster() { return mGroupsCluster.Cluster(); }
+    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 private:
     Clusters::WindowCovering::WindowCoveringDelegate & mWindowCoveringDelagate;
@@ -31,7 +31,7 @@ private:
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::WindowCoveringCluster> mWindowCoveringCluster;
-    LazyRegisteredServerCluster<Clusters::Groups> mGroupsCluster;
+    // LazyRegisteredServerCluster<Clusters::Groups> mGroupsCluster;
 };
 
 } // namespace chip::app
