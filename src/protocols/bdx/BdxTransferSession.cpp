@@ -709,7 +709,8 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
 
     if (IsTransferLengthDefinite())
     {
-        VerifyOrReturn(mNumBytesProcessed + blockMsg.DataLength <= mTransferLength,
+        // Subtraction avoids wrap-around of the size_t sum on 32-bit targets.
+        VerifyOrReturn(mTransferLength >= mNumBytesProcessed && blockMsg.DataLength <= mTransferLength - mNumBytesProcessed,
                        PrepareStatusReport(StatusCode::kLengthMismatch));
     }
 
@@ -742,7 +743,8 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
 
     if (IsTransferLengthDefinite())
     {
-        VerifyOrReturn(mNumBytesProcessed + blockEOFMsg.DataLength <= mTransferLength,
+        // Subtraction avoids wrap-around of the size_t sum on 32-bit targets.
+        VerifyOrReturn(mTransferLength >= mNumBytesProcessed && blockEOFMsg.DataLength <= mTransferLength - mNumBytesProcessed,
                        PrepareStatusReport(StatusCode::kLengthMismatch));
     }
 
