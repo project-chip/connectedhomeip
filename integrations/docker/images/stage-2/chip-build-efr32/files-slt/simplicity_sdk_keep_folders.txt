@@ -50,12 +50,8 @@ bluetooth_common/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a
 bluetooth_common/lib/build/llvm/cortex-m33/bgcommon/release/libbgcommon.a
 bluetooth_le_controller/build/gcc/x301/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg21/release/liblinklayer.a
-bluetooth_le_controller/build/gcc/xg22/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg26/release/liblinklayer.a
-bluetooth_le_controller/build/gcc/xg27/release/liblinklayer.a
-bluetooth_le_controller/build/gcc/xg28/release/liblinklayer.a
-bluetooth_le_controller/build/gcc/xg29/release/liblinklayer.a
 bluetooth_le_controller/build/llvm/xg24/release/liblinklayer.a
 bluetooth_le_controller/build/llvm/x301/release/liblinklayer.a
 bluetooth_le_host/build/gcc/cortex-m33/privacy/rpa_resolution/release/libble_host_rpa_resolution_stub.a
