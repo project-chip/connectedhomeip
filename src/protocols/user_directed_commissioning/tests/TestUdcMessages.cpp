@@ -9,6 +9,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
