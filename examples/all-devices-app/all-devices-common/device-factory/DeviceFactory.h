@@ -28,6 +28,7 @@
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
+#include <device/types/window-covering/impl/LoggingWindowCovering.h
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/Dishwasher.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
@@ -204,7 +205,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -542,6 +543,14 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
             RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleaner>(); });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
+        {
+            RegisterCreator("window-covering", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingMySensorDevice>(mContext->timerDelegate);
+            });
         }
 
         // at least one device type MUST be enabled
