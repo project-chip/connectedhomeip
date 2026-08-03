@@ -63,10 +63,13 @@ constexpr psa_key_id_t kDacPsaKeyId = 2;
 static constexpr ZephyrConfig::Key kProvisionRequestKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-req");
 static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_SL_FACTORY "provision-ver");
 
+constexpr size_t kDateStringLength = 8; // YYYYMMDD
+
+#ifdef SL_PROVISION_GENERATOR
 constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
 constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
+#endif // SL_PROVISION_GENERATOR
 
-constexpr size_t kDateStringLength = 8; // YYYYMMDD
 
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
 {
@@ -237,7 +240,7 @@ CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 {
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     size_t size = 0;
-    ReturnErrorOnFailure(ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size));
+    return ZephyrConfig::ReadConfigValueStr(kConfigKey_HardwareVersionString, value, max, size);
 }
 
 CHIP_ERROR Storage::SetManufacturingDate(const char * value, size_t len)
