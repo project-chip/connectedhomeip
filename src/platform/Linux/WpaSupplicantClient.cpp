@@ -397,7 +397,11 @@ CHIP_ERROR WpaSupplicantClient::GetConfiguredNetwork(NetworkCommissioning::Netwo
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
     if ((networkPath == nullptr) || (strcmp(networkPath, "/") == 0))
     {
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        if ((mWpaSupplicant.networkPath.get() == nullptr) || (strcmp(mWpaSupplicant.networkPath.get(), "/") == 0))
+        {
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+        networkPath = mWpaSupplicant.networkPath.get();
     }
 
     GAutoPtr<WpaSupplicant1Network> networkInfo(wpa_supplicant_1_network_proxy_new_for_bus_sync(
