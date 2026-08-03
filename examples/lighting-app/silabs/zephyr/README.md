@@ -302,15 +302,16 @@ This example supports Matter Over-The-Air (OTA) software updates via the generic
 Zephyr image processor (`src/platform/Zephyr/OTAImageProcessorImpl`) and
 MCUboot.
 
-OTA builds use [Zephyr Sysbuild](https://docs.zephyrproject.org/latest/build/sysbuild/index.html)
+OTA builds use
+[Zephyr Sysbuild](https://docs.zephyrproject.org/latest/build/sysbuild/index.html)
 so that MCUboot and the application are built, flashed, and debugged as
 coordinated domains. Enabling `CONFIG_CHIP_OTA_REQUESTOR` implies
 `CONFIG_BOOTLOADER_MCUBOOT` on the application; enable MCUboot in sysbuild with
 `SB_CONFIG_BOOTLOADER_MCUBOOT=y`.
 
 Overwrite-only upgrade mode and ECDSA-P256 signing are the defaults when MCUboot
-is enabled (see `Kconfig.sysbuild`). The app is signed with the MCUboot ECDSA-P256
-development key (`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE` /
+is enabled (see `Kconfig.sysbuild`). The app is signed with the MCUboot
+ECDSA-P256 development key (`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE` /
 `SB_CONFIG_BOOT_SIGNATURE_KEY_FILE`); replace it with a private key for
 production.
 
@@ -356,8 +357,8 @@ addresses from each image's runners configuration:
 west flash
 ```
 
-Or flash the merged hex with Simplicity Commander (addresses are embedded in
-the hex file):
+Or flash the merged hex with Simplicity Commander (addresses are embedded in the
+hex file):
 
 ```bash
 commander flash build/merged_xg24_rb4187c.hex
