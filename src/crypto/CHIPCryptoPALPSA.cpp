@@ -797,6 +797,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
+    ClearSecretData(privateKey, sizeof(privateKey));
     LogPsaError(status);
 
     return error;
