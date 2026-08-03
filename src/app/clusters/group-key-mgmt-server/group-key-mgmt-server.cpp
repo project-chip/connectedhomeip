@@ -1,10 +1,6 @@
 /**
  *
-<<<<<<< HEAD:src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
  *    Copyright (c) 2020-2022 Project CHIP Authors
-=======
- *    Copyright (c) 2020-2026 Project CHIP Authors
->>>>>>> 975029f2a7 (GroupKeyManagement: fix EndpointIterator leak in GroupTableCodec::Encode (#73296)):src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
