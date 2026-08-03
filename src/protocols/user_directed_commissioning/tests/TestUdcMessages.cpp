@@ -9,6 +9,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
@@ -484,8 +485,6 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
 }
 
-<<<<<<< HEAD
-=======
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
 {
     IdentificationDeclaration idOut;
@@ -553,7 +552,6 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
     EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
->>>>>>> 01db7c7be7 ([UDC] Fix off-by-one string copy in ReadPayload (#72604))
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;

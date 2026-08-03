@@ -239,15 +239,6 @@ CHIP_ERROR UserDirectedCommissioningServer::EncodeUDCMessage(const System::Packe
 
 CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t payloadBufferSize)
 {
-<<<<<<< HEAD
-    size_t i = 0;
-    while (i < std::min<size_t>(sizeof(mInstanceName), payloadBufferSize) && udcPayload[i] != '\0')
-    {
-        mInstanceName[i] = (char) udcPayload[i];
-        i++;
-    }
-    mInstanceName[i] = '\0';
-=======
     if (payloadBufferSize < sizeof(mInstanceName))
     {
         ChipLogError(AppServer, "UDC payload too short for instance name");
@@ -256,7 +247,6 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
 
     size_t instanceNameLen = strnlen(reinterpret_cast<const char *>(udcPayload), sizeof(mInstanceName) - 1);
     Platform::CopyString(mInstanceName, ByteSpan(udcPayload, instanceNameLen));
->>>>>>> 01db7c7be7 ([UDC] Fix off-by-one string copy in ReadPayload (#72604))
 
     if (payloadBufferSize <= sizeof(mInstanceName))
     {
