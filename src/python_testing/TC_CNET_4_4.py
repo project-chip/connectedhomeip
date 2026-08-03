@@ -68,10 +68,10 @@ class TC_CNET_4_4(MatterBaseTest):
         connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
+        scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
 
         async def scan_and_check(ssid_to_scan: bytes | None, breadcrumb: int, expect_results: bool = True):
             all_security = 0
-            scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
             for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
                 all_security |= security_bitmask
 
