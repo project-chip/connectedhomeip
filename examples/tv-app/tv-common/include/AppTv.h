@@ -97,8 +97,7 @@ public:
         ContentApp{ supportedClusters },
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mOAuthAccountLoginDelegate(oauthAccountLoginDelegate.get()),
-        mAccountLoginDelegate(std::move(oauthAccountLoginDelegate)),
+        mOAuthAccountLoginDelegate(oauthAccountLoginDelegate.get()), mAccountLoginDelegate(std::move(oauthAccountLoginDelegate)),
         mContentLauncherDelegate({ "image/*", "video/*" },
                                  to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
