@@ -6,9 +6,10 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-WindowCovering::WindowCovering(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMySensor, 1)), mTimerDelegate(timerDelegate),
-    mIdentifyDelegate(identifyDelegate)
+WindowCovering::WindowCovering(WindowCoveringDelegate & delegate, TimerDelegate & timerDelegate,
+                               Clusters::IdentifyDelegate & identifyDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
+    mWindowCoveringDelagate(delegate), mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -23,8 +24,8 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mMySensorCluster.Create(endpoint);
-    ReturnErrorOnFailure(provider.AddCluster(mMySensorCluster.Registration()));
+    mWindowCoveringCluster.Create(endpoint);
+    ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -34,10 +35,10 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 void WindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mMySensorCluster.IsConstructed())
+    if (mWindowCoveringCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mMySensorCluster.Cluster()));
-        mMySensorCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mWindowCoveringCluster.Cluster()));
+        mWindowCoveringCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
