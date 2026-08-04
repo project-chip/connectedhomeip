@@ -66,8 +66,9 @@ static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_S
 constexpr size_t kDateStringLength = 8; // YYYYMMDD
 
 #if SL_PROVISION_GENERATOR == 0
-[[maybe_unused]]constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
-[[maybe_unused]]constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
+[[maybe_unused]] constexpr size_t kSpake2pSaltB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
+[[maybe_unused]] constexpr size_t kSpake2pVerifierB64LengthMax =
+    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
 #endif // SL_PROVISION_GENERATOR == 0
 
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
