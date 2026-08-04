@@ -19,9 +19,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
-#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/dnssd/wire/HeapQName.h>
+#include <lib/dnssd/wire/QNameString.h>
+#include <lib/dnssd/wire/tests/QNameStrings.h>
 
 namespace {
 

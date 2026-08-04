@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
+#include <lib/dnssd/wire/QNameString.h>
 
 namespace mdns {
 namespace Minimal {

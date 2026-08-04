@@ -27,7 +27,7 @@
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>

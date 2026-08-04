@@ -24,7 +24,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/ServiceNaming.h>
-#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
+#include <lib/dnssd/wire/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>

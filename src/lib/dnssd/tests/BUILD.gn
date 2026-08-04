@@ -37,7 +37,7 @@ chip_test_suite("tests") {
     ]
 
     public_deps +=
-        [ "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:support" ]
+        [ "${chip_root}/src/lib/dnssd/wire/tests:support" ]
   }
 
   cflags = [ "-Wconversion" ]

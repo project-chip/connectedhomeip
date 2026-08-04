@@ -17,7 +17,7 @@
 
 #include "QueryResponder.h"
 
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
+#include <lib/dnssd/wire/QNameString.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
 
 #include <lib/support/logging/CHIPLogging.h>

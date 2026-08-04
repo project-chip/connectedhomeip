@@ -20,8 +20,8 @@
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>

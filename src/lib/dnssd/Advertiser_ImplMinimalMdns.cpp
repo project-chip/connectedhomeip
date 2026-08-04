@@ -30,7 +30,7 @@
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>

@@ -27,8 +27,8 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 
-#include <lib/dnssd/minimal_mdns/core/BytesRange.h>
-#include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
+#include <lib/dnssd/wire/BytesRange.h>
+#include <lib/dnssd/wire/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {

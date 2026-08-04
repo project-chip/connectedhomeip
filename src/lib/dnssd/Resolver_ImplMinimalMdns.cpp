@@ -27,7 +27,7 @@
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
