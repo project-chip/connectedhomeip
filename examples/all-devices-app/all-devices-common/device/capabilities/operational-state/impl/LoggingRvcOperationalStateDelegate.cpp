@@ -16,9 +16,42 @@
  */
 
 #include "LoggingRvcOperationalStateDelegate.h"
+#include <clusters/RvcOperationalState/Enums.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::Clusters::OperationalState {
+
+CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+{
+    static const GenericOperationalState kSupportedStates[] = {
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped), MakeOptional("Stopped"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger),
+                                MakeOptional("SeekingCharger"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging),
+                                MakeOptional("Charging"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked), MakeOptional("Docked"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin),
+                                MakeOptional("EmptyingDustBin"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop),
+                                MakeOptional("CleaningMop"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank),
+                                MakeOptional("FillingWaterTank"_span)),
+        GenericOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps),
+                                MakeOptional("UpdatingMaps"_span)),
+    };
+
+    if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    operationalState = kSupportedStates[index];
+    return CHIP_NO_ERROR;
+}
 
 void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
 {
