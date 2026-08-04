@@ -21,6 +21,7 @@
 
 #include "AppTvShellCommands.h"
 #include "AppTv.h"
+#include "messages/MessagesManager.h"
 
 #include <access/AccessControl.h>
 #include <inttypes.h>
@@ -464,13 +465,35 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     return error;
 }
 
+static CHIP_ERROR MessagesHandler(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    if (argc == 0 || strcmp(argv[0], "help") == 0)
+    {
+        streamer_printf(sout, "  help    Usage: messages <subcommand>\r\n");
+        streamer_printf(sout, "  list    List cached messages and their state. Usage: messages list\r\n");
+        streamer_printf(sout, "\r\n");
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "list") == 0)
+    {
+        GetMessagesManager()->LogCachedMessages();
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 void RegisterAppTvCommands()
 {
 
-    static const shell_command_t sDeviceComand = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
+    static const shell_command_t sDeviceComand   = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
+    static const shell_command_t sMessagesComand = { &MessagesHandler, "messages",
+                                                     "Messages cluster commands. Usage: messages [command_name]" };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&sMessagesComand, 1);
     return;
 }
 

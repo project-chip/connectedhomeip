@@ -16,10 +16,12 @@
 
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/EventManagement.h>
 #include <app/clusters/messages-server/messages-delegate.h>
 #include <app/clusters/messages-server/messages-server.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/tests/test-ember-api.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
@@ -32,6 +34,13 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+
+// EventManagement backing storage, so LogMessageQueuedEvent/LogMessagePresentedEvent/
+// LogMessageCompleteEvent can actually be logged and observed by tests.
+uint8_t gDebugEventBuffer[128];
+uint8_t gInfoEventBuffer[128];
+uint8_t gCritEventBuffer[128];
+chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 class FakeMessagesDelegate : public Delegate
 {
@@ -70,12 +79,27 @@ public:
     {
         chip::Testing::numEndpoints = kTestEndpointId + 1;
         SetDefaultDelegate(kTestEndpointId, &mDelegate);
+
+        const chip::app::LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        };
+
+        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
+        chip::app::EventManagement::CreateEventManagement(nullptr, MATTER_ARRAY_SIZE(logStorageResources), gCircularEventBuffer,
+                                                          logStorageResources, &mEventCounter);
     }
 
-    void TearDown() override { SetDefaultDelegate(kTestEndpointId, nullptr); }
+    void TearDown() override
+    {
+        chip::app::EventManagement::DestroyEventManagement();
+        SetDefaultDelegate(kTestEndpointId, nullptr);
+    }
 
 protected:
     FakeMessagesDelegate mDelegate;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 Commands::PresentMessagesRequest::Type MakeValidRequest()
@@ -331,4 +355,47 @@ TEST_F(TestMessagesCluster, ResponseOptionLabelTooLongRejected)
     auto request      = MakeValidRequest();
     request.responses = MakeOptional(DataModel::List<const Structs::MessageResponseOptionStruct::Type>(&option, 1));
     EXPECT_EQ(InvokePresentMessagesRequest(request), Status::ConstraintError);
+}
+
+TEST_F(TestMessagesCluster, LogMessageQueuedEventFires)
+{
+    static const uint8_t kMessageId[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    EventNumber before = EventManagement::GetInstance().GetLastEventNumber();
+    EXPECT_EQ(LogMessageQueuedEvent(kTestEndpointId, ByteSpan(kMessageId)), CHIP_NO_ERROR);
+    EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
+}
+
+TEST_F(TestMessagesCluster, LogMessagePresentedEventFires)
+{
+    static const uint8_t kMessageId[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    EventNumber before = EventManagement::GetInstance().GetLastEventNumber();
+    EXPECT_EQ(LogMessagePresentedEvent(kTestEndpointId, ByteSpan(kMessageId)), CHIP_NO_ERROR);
+    EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
+}
+
+TEST_F(TestMessagesCluster, LogMessageCompleteEventFiresWithNullResponse)
+{
+    static const uint8_t kMessageId[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    EventNumber before = EventManagement::GetInstance().GetLastEventNumber();
+    EXPECT_EQ(LogMessageCompleteEvent(kTestEndpointId, ByteSpan(kMessageId), Optional<DataModel::Nullable<uint32_t>>(),
+                                      Optional<DataModel::Nullable<CharSpan>>(),
+                                      DataModel::Nullable<FutureMessagePreferenceEnum>()),
+             CHIP_NO_ERROR);
+    EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
+}
+
+TEST_F(TestMessagesCluster, LogMessageCompleteEventFiresWithRealResponse)
+{
+    static const uint8_t kMessageId[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    EventNumber before = EventManagement::GetInstance().GetLastEventNumber();
+    EXPECT_EQ(LogMessageCompleteEvent(kTestEndpointId, ByteSpan(kMessageId),
+                                      MakeOptional(DataModel::Nullable<uint32_t>(static_cast<uint32_t>(1))),
+                                      MakeOptional(DataModel::Nullable<CharSpan>("Yes"_span)),
+                                      DataModel::Nullable<FutureMessagePreferenceEnum>(FutureMessagePreferenceEnum::kAllowed)),
+             CHIP_NO_ERROR);
+    EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
 }

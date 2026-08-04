@@ -68,6 +68,19 @@ public:
 // Logs a MessageNotPresented event for the given endpoint.
 CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue);
 
+// Logs a MessageQueued event for the given endpoint.
+CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId);
+
+// Logs a MessagePresented event for the given endpoint.
+CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId);
+
+// Logs a MessageComplete event for the given endpoint. responseId/reply/futureMessagesPreference
+// are null when the message was auto-dismissed rather than answered by a real user response.
+CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & messageId,
+                                   const chip::Optional<DataModel::Nullable<uint32_t>> & responseId,
+                                   const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
+                                   const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference);
+
 } // namespace Messages
 } // namespace Clusters
 } // namespace app

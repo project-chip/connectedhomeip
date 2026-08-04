@@ -100,6 +100,51 @@ CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan
     return err;
 }
 
+CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
+{
+    Events::MessageQueued::Type event{ .messageID = messageId };
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessageQueuedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+    }
+    return err;
+}
+
+CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
+{
+    Events::MessagePresented::Type event{ .messageID = messageId };
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessagePresentedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+    }
+    return err;
+}
+
+CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & messageId,
+                                   const chip::Optional<DataModel::Nullable<uint32_t>> & responseId,
+                                   const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
+                                   const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference)
+{
+    Events::MessageComplete::Type event{ .messageID                = messageId,
+                                         .responseID                = responseId,
+                                         .reply                     = reply,
+                                         .futureMessagesPreference = futureMessagesPreference };
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "LogMessageCompleteEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+    }
+    return err;
+}
+
 } // namespace Messages
 } // namespace Clusters
 } // namespace app
