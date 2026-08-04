@@ -619,7 +619,18 @@ public:
             return;
         }
 
-        LogErrorOnFailure(cluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
+        auto * runModeCluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeBaseCluster>(
+                endpointId, chip::app::Clusters::RvcRunMode::Id);
+        constexpr uint8_t kRunModeIdle = 0;
+        if (runModeCluster && runModeCluster->GetCurrentMode() != kRunModeIdle)
+        {
+            LogErrorOnFailure(cluster->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)));
+        }
+        else
+        {
+            LogErrorOnFailure(cluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+        }
     }
 };
 
