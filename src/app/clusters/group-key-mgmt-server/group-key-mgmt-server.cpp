@@ -86,19 +86,24 @@ struct GroupTableCodec
         auto iter = mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id));
         if (nullptr != iter)
         {
+            CHIP_ERROR endpointEncodeErr = CHIP_NO_ERROR;
             while (iter->Next(mapping))
             {
-                ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
+                endpointEncodeErr = writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id));
+                if (endpointEncodeErr != CHIP_NO_ERROR)
+                {
+                    break;
+                }
             }
             iter->Release();
+            ReturnErrorOnFailure(endpointEncodeErr);
         }
         ReturnErrorOnFailure(writer.EndContainer(inner));
         // GroupName
         uint32_t name_size = static_cast<uint32_t>(strnlen(mInfo.name, GroupDataProvider::GroupInfo::kGroupNameMax));
         ReturnErrorOnFailure(writer.PutString(TagGroupName(), mInfo.name, name_size));
 
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
+        return writer.EndContainer(outer);
     }
 };
 
