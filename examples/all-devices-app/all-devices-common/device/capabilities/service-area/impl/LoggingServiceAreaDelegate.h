@@ -52,8 +52,8 @@ public:
     void UpdateProgressOnExit();
 
 private:
-    ServiceAreaCluster * mCluster                                           = nullptr;
-    OperationalState::OperationalStateCluster * mOperationalStateCluster    = nullptr;
+    ServiceAreaCluster * mCluster                                        = nullptr;
+    OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
     std::function<void()> mActivityCompleteHandler;
 };
 

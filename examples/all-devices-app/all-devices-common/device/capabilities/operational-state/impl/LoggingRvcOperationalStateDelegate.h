@@ -42,10 +42,7 @@ public:
     // Bound after construction so Resume can tell whether the RVC is mid-task (Cleaning/Mapping)
     // before allowing it to leave Charging/Docked, mirroring examples/rvc-app's RvcDevice.
     void SetRunModeCluster(ModeBaseCluster * runModeCluster) { mRunModeCluster = runModeCluster; }
-    void SetServiceAreaCluster(ServiceArea::ServiceAreaCluster * serviceAreaCluster)
-    {
-        mServiceAreaCluster = serviceAreaCluster;
-    }
+    void SetServiceAreaCluster(ServiceArea::ServiceAreaCluster * serviceAreaCluster) { mServiceAreaCluster = serviceAreaCluster; }
     void SetServiceAreaDelegate(ServiceArea::LoggingServiceAreaDelegate * serviceAreaDelegate)
     {
         mServiceAreaDelegate = serviceAreaDelegate;
@@ -66,12 +63,12 @@ private:
     void SetDeviceToIdleState();
     void UpdateServiceAreaProgressOnExit();
 
-    ModeBaseCluster * mRunModeCluster                               = nullptr;
-    ServiceArea::ServiceAreaCluster * mServiceAreaCluster           = nullptr;
-    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate  = nullptr;
-    uint8_t mStateBeforePause                                       = 0;
-    bool mDocked                                                    = false;
-    bool mCharging                                                  = false;
+    ModeBaseCluster * mRunModeCluster                              = nullptr;
+    ServiceArea::ServiceAreaCluster * mServiceAreaCluster          = nullptr;
+    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate = nullptr;
+    uint8_t mStateBeforePause                                      = 0;
+    bool mDocked                                                   = false;
+    bool mCharging                                                 = false;
 };
 
 } // namespace chip::app::Clusters::OperationalState
