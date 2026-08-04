@@ -4386,6 +4386,29 @@ provisional cluster EnergyPreference = 155 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
+provisional cluster ElectricalDistribution = 162 {
+  revision 1;
+
+  enum EndOfLifeEnum : enum8 {
+    kNone = 0;
+    kDamaged = 1;
+    kDegraded = 2;
+    kExpired = 3;
+  }
+
+  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
+  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
+  provisional readonly attribute nullable int16u numberOfPoles = 2;
+  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
+  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
 provisional cluster ElectricalProtectionAlarm = 163 {
   revision 1;
@@ -4542,22 +4565,6 @@ provisional cluster ElectricalProtectionAlarm = 163 {
   provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
   provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
   provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
-/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
-provisional cluster ElectricalDistribution = 162 {
-  revision 1;
-
-  enum EndOfLifeEnum : enum8 {
-    kNone = 0;
-    kDamaged = 1;
-    kDegraded = 2;
-    kExpired = 3;
-  }
-
-  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
-  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
-  provisional readonly attribute nullable int16u numberOfPoles = 2;
-  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
-  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8489,6 +8496,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster ElectricalDistribution {
+    callback attribute maxContinuousCurrent;
+    callback attribute maxVoltage;
+    callback attribute numberOfPoles;
+    callback attribute endOfLife;
+    callback attribute serviceEntranceRated;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
   server cluster ElectricalProtectionAlarm {
     emits event Notify;
     callback attribute mask;
@@ -8501,12 +8521,6 @@ endpoint 1 {
     callback attribute shortCircuitRating;
     callback attribute residualCurrentRating;
     callback attribute arcFaultRating;
-  server cluster ElectricalDistribution {
-    callback attribute maxContinuousCurrent;
-    callback attribute maxVoltage;
-    callback attribute numberOfPoles;
-    callback attribute endOfLife;
-    callback attribute serviceEntranceRated;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
