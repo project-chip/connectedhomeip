@@ -65,10 +65,10 @@ static constexpr ZephyrConfig::Key kProvisionVersionKey = CONFIG_KEY(NAMESPACE_S
 
 constexpr size_t kDateStringLength = 8; // YYYYMMDD
 
-#ifdef SL_PROVISION_GENERATOR
-constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
-constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
-#endif // SL_PROVISION_GENERATOR
+#if SL_PROVISION_GENERATOR == 0
+[[maybe_unused]]constexpr size_t kSpake2pSaltB64LengthMax     = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
+[[maybe_unused]]constexpr size_t kSpake2pVerifierB64LengthMax = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length);
+#endif // SL_PROVISION_GENERATOR == 0
 
 CHIP_ERROR ReadConfigBin(ZephyrConfig::Key key, MutableByteSpan & buffer)
 {
@@ -94,9 +94,9 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     (void) flash_addr;
     (void) flash_size;
     ReturnErrorOnFailure(ZephyrConfig::Init());
-#ifndef SL_PROVISION_GENERATOR
+#if SL_PROVISION_GENERATOR == 0
     VerifyOrDo(DacPsaKeyExists(), ChipLogError(DeviceLayer, "DAC PSA key id %u missing", kDacPsaKeyId));
-#endif // SL_PROVISION_GENERATOR
+#endif // SL_PROVISION_GENERATOR == 0
     return CHIP_NO_ERROR;
 }
 
@@ -490,7 +490,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 }
 
 // ProvisionStorage functions for Zephyr settings backend, provided by provision libraries for other ProvisionStorage backends.
-#ifndef SL_PROVISION_GENERATOR
+#if SL_PROVISION_GENERATOR == 0
 
 CHIP_ERROR Storage::Set(uint16_t id, const uint8_t * value)
 {
@@ -668,7 +668,7 @@ CHIP_ERROR Storage::GetSpake2pVerifier(MutableByteSpan & outValue, size_t & outS
     return CHIP_NO_ERROR;
 }
 
-#endif // SL_PROVISION_GENERATOR
+#endif // SL_PROVISION_GENERATOR == 0
 
 } // namespace Provision
 } // namespace Silabs

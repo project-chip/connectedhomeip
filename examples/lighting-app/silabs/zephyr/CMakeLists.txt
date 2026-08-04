@@ -102,6 +102,9 @@ if(CONFIG_CHIP_FACTORY_DATA)
     target_include_directories(app PRIVATE
                     ${CHIP_ROOT}/third_party/silabs/matter_support/provision
     )
+    target_compile_definitions(app PRIVATE
+        SL_PROVISION_GENERATOR=0
+    )
 endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
