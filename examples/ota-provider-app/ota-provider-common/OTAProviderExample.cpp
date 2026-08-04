@@ -49,18 +49,6 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-<<<<<<< HEAD
-=======
-namespace {
-OTAProviderExample gOtaProvider;
-}
-
-OTAProviderExample & GetOtaProviderExample()
-{
-    return gOtaProvider;
-}
-
->>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kOtaHeaderMaxSize   = 1024;

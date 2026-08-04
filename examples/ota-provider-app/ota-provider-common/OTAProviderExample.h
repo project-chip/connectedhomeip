@@ -55,14 +55,9 @@ public:
         bool softwareVersionValid;
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
-<<<<<<< HEAD
         char otaURL[OTA_URL_MAX_LEN];
-    } DeviceSoftwareVersionModel;
-=======
-        char otaURL[kOtaUrlMaxLen];
         std::string otaFileDesignator;
     };
->>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 
     //////////// OTAProviderDelegate Implementation ///////////////
     void HandleQueryImage(
@@ -100,22 +95,8 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
-<<<<<<< HEAD
-=======
-    uint16_t GetVendorId() const { return mVendorId; }
-    uint16_t GetProductId() const { return mProductId; }
-    uint16_t GetHardwareVersion() const { return mHardwareVersion; }
-    uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
-    chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
-    {
-        return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
-    }
-    bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
-    const char * GetLocation() const { return mLocation; }
-
     const char * GetFilePathForDesignator(const char * designator) const;
 
->>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,

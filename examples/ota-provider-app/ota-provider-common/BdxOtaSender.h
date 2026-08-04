@@ -31,13 +31,8 @@ public:
     // Initializes BDX transfer-related metadata. Should always be called first.
     CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
-<<<<<<< HEAD
-=======
-    void AbortTransfer();
-
     void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
 
->>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
