@@ -40,77 +40,79 @@ class MatterTestConfig:
     timeout: int | None = None
     endpoint: int | None = 0
     app_pid: int = 0
-<<<<<<< HEAD
+
+
+<< << << < HEAD
     pipe_name: str | None = None
     pipe_name_out: str | None = None
-=======
+== == == =
     pipe_name: typing.Union[str, None] = None
     pipe_name_out: typing.Union[str, None] = None
->>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
-    fail_on_skipped_tests: bool = False
+>>>>>> > 4f652d73ea(Out of band communication ota su(  # 41900))
+    fail_on_skipped_tests: bool=False
 
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: list[int] = field(default_factory=list)
-    setup_passcodes: list[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
+    commissioning_method: Optional[str]=None
+    in_test_commissioning_method: Optional[str]=None
+    discriminators: list[int]=field(default_factory=list)
+    setup_passcodes: list[int]=field(default_factory=list)
+    commissionee_ip_address_just_for_testing: Optional[str]=None
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
+    maximize_cert_chains: bool=True
 
     # Border Agent information for Thread MeshCoP Commissioning
-    thread_ba_host: Optional[str] = None
-    thread_ba_port: Optional[int] = None
+    thread_ba_host: Optional[str]=None
+    thread_ba_port: Optional[int]=None
 
     # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
+    certificate_validity_period=int(timedelta(days=10*365).total_seconds())
 
-    qr_code_content: list[str] = field(default_factory=list)
-    manual_code: list[str] = field(default_factory=list)
+    qr_code_content: list[str]=field(default_factory=list)
+    manual_code: list[str]=field(default_factory=list)
 
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
+    wifi_ssid: Optional[str]=None
+    wifi_passphrase: Optional[str]=None
+    thread_operational_dataset: Optional[bytes]=None
 
-    pics: dict[str, bool] = field(default_factory=dict)
+    pics: dict[str, bool]=field(default_factory=dict)
 
     # Node ID for basic DUT
-    dut_node_ids: list[int] = field(default_factory=list)
+    dut_node_ids: list[int]=field(default_factory=list)
     # Node ID to use for controller/commissioner
-    controller_node_id: int = TestingDefaults.CONTROLLER_NODE_ID
+    controller_node_id: int=TestingDefaults.CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     # By default, we commission with CAT tags specified for RR-1.1
     # so the cert tests can be run without re-commissioning the device
     # for this one test. This can be overwritten from the command line
-    controller_cat_tags: list[int] = field(default_factory=lambda: [0x0001_0001])
+    controller_cat_tags: list[int]=field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
-    fabric_id: int = 1
+    fabric_id: int=1
 
     # "Alpha" by default
-    root_of_trust_index: int = TestingDefaults.TRUST_ROOT_INDEX
+    root_of_trust_index: int=TestingDefaults.TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
+    chip_tool_credentials_path: Optional[pathlib.Path]=None
 
-    trace_to: list[str] = field(default_factory=list)
+    trace_to: list[str]=field(default_factory=list)
 
     # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
+    tc_version_to_simulate: int=None
+    tc_user_response_to_simulate: int=None
     # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
+    dac_revocation_set_path: Optional[pathlib.Path]=None
 
-    legacy: bool = False
+    legacy: bool=False
 
     # When True, skip the background wildcard attribute subscription that is normally
     # started at the beginning of each test.  Prefer ``disable_wildcard_subscription = True``
     # on the test class (see MatterBaseTest) so certification runs do not require this CLI flag.
     # ``--no-wildcard-subscription`` remains for backward compatibility and local overrides.
-    no_wildcard_subscription: bool = False
+    no_wildcard_subscription: bool=False
 
     # Restart flag file for rebooting the DUT during test runs
-    restart_flag_file: Optional[pathlib.Path] = None
+    restart_flag_file: Optional[pathlib.Path]=None
 
     # Debug mode to capture attribute dump at end of test modules
-    debug: bool = False
+    debug: bool=False

@@ -25,7 +25,7 @@
 <<<<<<< HEAD
 #include <lib/support/logging/CHIPLogging.h>
 #include <limits.h>
-=======
+    =======
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <poll.h>
 #include <pthread.h>
@@ -37,17 +37,18 @@
 
 #include <string>
 
-namespace {
+    namespace
+{
 
 <<<<<<< HEAD
-// Can receive at most how much the pipe infra on the platform supports (PIPE_BUF).
-constexpr size_t kChipEventCmdBufSize = PIPE_BUF + 1;
+    // Can receive at most how much the pipe infra on the platform supports (PIPE_BUF).
+    constexpr size_t kChipEventCmdBufSize = PIPE_BUF + 1;
 
 } // namespace
 
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate)
 =======
-CHIP_ERROR NamedPipeCommands::Start(const std::string & path, NamedPipeCommandDelegate * delegate)
+    CHIP_ERROR NamedPipeCommands::Start(const std::string & path, NamedPipeCommandDelegate * delegate)
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -57,10 +58,10 @@ CHIP_ERROR NamedPipeCommands::Start(const std::string & path, NamedPipeCommandDe
 <<<<<<< HEAD
     CHIP_ERROR err = CHIP_NO_ERROR;
 =======
-    mStarted              = true;
-    mDelegate             = delegate;
-    mChipEventFifoPath    = path;
-    mChipEventFifoPathOut = "";
+        mStarted              = true;
+        mDelegate             = delegate;
+        mChipEventFifoPath    = path;
+        mChipEventFifoPathOut = "";
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 
     mDelegate    = delegate;
@@ -180,7 +181,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 <<<<<<< HEAD
         fd = open(mFifoOutPath.c_str(), O_WRONLY | O_NONBLOCK);
 =======
-        fd = open(mChipEventFifoPathOut.c_str(), O_WRONLY | O_NONBLOCK);
+            fd = open(mChipEventFifoPathOut.c_str(), O_WRONLY | O_NONBLOCK);
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
         if (fd >= 0)
         {
@@ -192,7 +193,7 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 <<<<<<< HEAD
             ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mFifoOutPath.c_str(), errno);
 =======
-            ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mChipEventFifoPathOut.c_str(), errno);
+                ChipLogError(NotSpecified, "Failed to open out FIFO '%s': errno=%d", mChipEventFifoPathOut.c_str(), errno);
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
             return;
         }
@@ -221,23 +222,23 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
                      "Failed to write full JSON payload to out pipe: %u written out of %u. Receiver will see truncated message.",
                      static_cast<unsigned>(written), static_cast<unsigned>(payload.size()));
 =======
-            ChipLogError(NotSpecified, "Timed out waiting for reader on out FIFO '%s'", mChipEventFifoPathOut.c_str());
-            return;
+                ChipLogError(NotSpecified, "Timed out waiting for reader on out FIFO '%s'", mChipEventFifoPathOut.c_str());
+                return;
+            }
+
+            usleep(kRetrySleepMs * 1000);
         }
 
-        usleep(kRetrySleepMs * 1000);
-    }
+        ssize_t written = write(fd, json.data(), json.size());
+        if (written < 0 || static_cast<size_t>(written) != json.size())
+        {
+            ChipLogError(DeviceLayer, "Failed to write full JSON to out pipe");
+        }
 
-    ssize_t written = write(fd, json.data(), json.size());
-    if (written < 0 || static_cast<size_t>(written) != json.size())
-    {
-        ChipLogError(DeviceLayer, "Failed to write full JSON to out pipe");
-    }
-
-    written = write(fd, "\n", 1);
-    if (written != 1)
-    {
-        ChipLogError(DeviceLayer, "Failed to write newline to out pipe");
+        written = write(fd, "\n", 1);
+        if (written != 1)
+        {
+            ChipLogError(DeviceLayer, "Failed to write newline to out pipe");
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
     }
 
