@@ -259,7 +259,14 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
         VerifyOrReturnValue(otherFabricNodeCount + newCount <= kMaxCircuitNodes, Status::ResourceExhausted);
 
         // Stage + validate the whole incoming list before mutating state (no partial application).
-        StoredCircuitNode staging[kMaxCircuitNodes];
+        // Heap-allocate the staging buffer (sized to the incoming count) rather than a stack array:
+        // kMaxCircuitNodes StoredCircuitNode entries are ~8 KB, which can overflow the constrained
+        // Matter thread stack on embedded platforms.
+        Platform::ScopedMemoryBuffer<StoredCircuitNode> staging;
+        if (newCount > 0)
+        {
+            VerifyOrReturnValue(staging.Calloc(newCount), CHIP_ERROR_NO_MEMORY);
+        }
         size_t stagingCount = 0;
         auto iter           = list.begin();
         while (iter.Next())
