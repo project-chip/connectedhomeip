@@ -542,8 +542,9 @@ public:
 
         LogErrorOnFailure(operationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kStopped));
 
-        auto * runModeCluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeBaseCluster>(
-            endpointId, chip::app::Clusters::RvcRunMode::Id);
+        auto * runModeCluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::ModeBaseCluster>(
+                endpointId, chip::app::Clusters::RvcRunMode::Id);
         if (runModeCluster)
         {
             runModeCluster->UpdateCurrentMode(0); // Idle
