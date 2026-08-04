@@ -31,11 +31,12 @@ namespace PowerTopology {
 class Instance
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature, FabricTable * aFabricTable = nullptr) :
         mCluster(PowerTopologyCluster::Config{
-            .endpointId = aEndpointId,
-            .delegate   = aDelegate,
-            .features   = aFeature,
+            .endpointId  = aEndpointId,
+            .delegate    = aDelegate,
+            .features    = aFeature,
+            .fabricTable = aFabricTable,
         })
     {}
     ~Instance() { Shutdown(); }
