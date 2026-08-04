@@ -36,8 +36,7 @@ chip_test_suite("tests") {
       "TestIncrementalResolve.cpp",
     ]
 
-    public_deps +=
-        [ "${chip_root}/src/lib/dnssd/wire/tests:support" ]
+    public_deps += [ "${chip_root}/src/lib/dnssd/wire/tests:support" ]
   }
 
   cflags = [ "-Wconversion" ]
