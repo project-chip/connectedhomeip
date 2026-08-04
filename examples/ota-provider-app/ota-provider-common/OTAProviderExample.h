@@ -125,6 +125,7 @@ public:
 
 =======
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
+
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,

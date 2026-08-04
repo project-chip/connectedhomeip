@@ -26,10 +26,11 @@ import queue
 import random
 import select
 import shlex
-<<<<<<< HEAD
 import socket
-=======
->>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
+
+<< << << < HEAD
+== == == =
+>>>>>> > 4f652d73ea(Out of band communication ota su(  # 41900))
 import subprocess
 import textwrap
 import time
@@ -74,15 +75,15 @@ from matter.tlv import uint
 # TODO: Add utilities to keep track of controllers/fabrics
 
 # Type aliases for common patterns to improve readability
-StepNumber = Union[int, str]  # Test step numbers can be integers or strings
-OptionalTimeout = Optional[int]  # Optional timeout values
+StepNumber=Union[int, str]  # Test step numbers can be integers or strings
+OptionalTimeout=Optional[int]  # Optional timeout values
 
-LOGGER = logging.getLogger(__name__)
+LOGGER=logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
-DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+DiscoveryFilterType=ChipDeviceCtrl.DiscoveryFilterType
 
-_SUMMARY_MAX_HEX_CHARS = 128
+_SUMMARY_MAX_HEX_CHARS=128
 
 
 class TestError(Exception):
@@ -99,22 +100,22 @@ def clear_queue(report_queue: queue.Queue):
 
 
 def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
-    created_codes = []
+    created_codes=[]
     for idx, discriminator in enumerate(matter_test_config.discriminators):
         created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
 
-    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    setup_codes=matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
     if not setup_codes:
         return None
     return setup_codes[0]
 
 
-@dataclass
+@ dataclass
 class AttributeValue:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     value: Any
-    timestamp_utc: Optional[datetime] = None
+    timestamp_utc: Optional[datetime]=None
 
 
 class AttributeMatcher:
@@ -126,7 +127,7 @@ class AttributeMatcher:
     """
 
     def __init__(self, description: str):
-        self._description: str = description
+        self._description: str=description
 
     def matches(self, report: AttributeValue) -> bool:
         """Implementers must override this method to return True when an attribute value matches.
@@ -135,17 +136,17 @@ class AttributeMatcher:
         """
         return False
 
-    @property
+    @ property
     def description(self):
         return self._description
 
-    @staticmethod
+    @ staticmethod
     def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> AttributeMatcher:
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
                 super().__init__(description)
-                self._matcher = matcher
+                self._matcher=matcher
 
             def matches(self, report: AttributeValue) -> bool:
                 return self._matcher(report)
@@ -153,28 +154,28 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
-@dataclass
+@ dataclass
 class SetupParameters:
     passcode: int
-    vendor_id: int = 0xFFF1
-    product_id: int = 0x8001
-    discriminator: int = 3840
-    custom_flow: int = 0
-    capabilities: int = 0b0100
-    version: int = 0
+    vendor_id: int=0xFFF1
+    product_id: int=0x8001
+    discriminator: int=3840
+    custom_flow: int=0
+    capabilities: int=0b0100
+    version: int=0
 
-    @property
+    @ property
     def qr_code(self):
         return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                              self.custom_flow, self.capabilities, self.version)
 
-    @property
+    @ property
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
 
 
-@dataclass
+@ dataclass
 class TestCleanupConfig:
     """
     A class to keep track of which cleanup steps should be performed.
@@ -183,21 +184,21 @@ class TestCleanupConfig:
     """
 
     # DUT clean-up items
-    disarm_failsafes: bool = True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
-    reset_acls_to_default: bool = True         # restores ACL on endpoint 0 to the state captured before the test ran
-    close_commissioning_windows: bool = True   # sends RevokeCommissioning on AdministratorCommissioning
-    remove_extra_fabrics: bool = True          # removes all fabrics on the DUT except TH1's via RemoveFabric
-    purge_scenes: bool = True                  # calls RemoveAllScenes per group on every ScenesManagement endpoint
-    purge_groups: bool = True                  # removes all non-IPK group key sets and clears GroupKeyMap
-    purge_group_memberships: bool = True       # calls RemoveAllGroups on every Groups endpoint
-    purge_doorlock: bool = True                # clears all DoorLock credentials and users
-    purge_tls_endpoints: bool = True           # removes all provisioned endpoints via TlsClientManagement
-    unregister_icd_clients: bool = True        # unregisters all entries from IcdManagement.RegisteredClients
+    disarm_failsafes: bool=True              # sends ArmFailSafe(expiryLengthSeconds=0) on GeneralCommissioning
+    reset_acls_to_default: bool=True         # restores ACL on endpoint 0 to the state captured before the test ran
+    close_commissioning_windows: bool=True   # sends RevokeCommissioning on AdministratorCommissioning
+    remove_extra_fabrics: bool=True          # removes all fabrics on the DUT except TH1's via RemoveFabric
+    purge_scenes: bool=True                  # calls RemoveAllScenes per group on every ScenesManagement endpoint
+    purge_groups: bool=True                  # removes all non-IPK group key sets and clears GroupKeyMap
+    purge_group_memberships: bool=True       # calls RemoveAllGroups on every Groups endpoint
+    purge_doorlock: bool=True                # clears all DoorLock credentials and users
+    purge_tls_endpoints: bool=True           # removes all provisioned endpoints via TlsClientManagement
+    unregister_icd_clients: bool=True        # unregisters all entries from IcdManagement.RegisteredClients
 
     # Controller clean-up items
-    shutdown_extra_controllers: bool = True    # shuts down extra controllers and removes their CAs from storage
+    shutdown_extra_controllers: bool=True    # shuts down extra controllers and removes their CAs from storage
 
-    @classmethod
+    @ classmethod
     def disabled(cls) -> TestCleanupConfig:
         """Returns a config with all cleanup steps disabled."""
         return cls(**{f.name: False for f in fields(cls)})
@@ -207,32 +208,32 @@ class MatterBaseTest(base_test.BaseTestClass):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if 'teardown_test' in cls.__dict__:
-            original = cls.__dict__['teardown_test']
+            original=cls.__dict__['teardown_test']
 
             def _wrapped_teardown(self, _original=original):
                 _original(self)
                 MatterBaseTest.teardown_test(self)
 
-            cls.teardown_test = _wrapped_teardown
+            cls.teardown_test=_wrapped_teardown
 
     def __init__(self, *args):
         super().__init__(*args)
 
         # List of accumulated problems across all tests
-        self.problems = []
-        self.is_commissioning = False
-        self.cached_steps: dict[str, Optional[list[TestStep]]] = {}
-        self.cleanup_config = TestCleanupConfig()
-        self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController] = []
-        self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
-        self._original_acl = None
-        self._framework_cleanup_done = False
+        self.problems=[]
+        self.is_commissioning=False
+        self.cached_steps: dict[str, Optional[list[TestStep]]]={}
+        self.cleanup_config=TestCleanupConfig()
+        self._extra_controllers: list[ChipDeviceCtrl.ChipDeviceController]=[]
+        self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority]=[]
+        self._original_acl=None
+        self._framework_cleanup_done=False
         # Set to True by commission_devices() on success; gates the per-test ACL read in
         # setup_test so unit tests (which never commission) incur zero network overhead.
-        self._dut_confirmed_available = False
+        self._dut_confirmed_available=False
         # Prevents double-execution when the override calls super().teardown_test()
         # and __init_subclass__ also calls it afterward.
-        self._teardown_ran = False
+        self._teardown_ran=False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -267,18 +268,18 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # Set a hook on FabricAdmin so every NewController() call during this test automatically
         # populates self._extra_controllers. This is used during cleanup in teardown_class.
-        matter.FabricAdmin.FabricAdmin._new_controller_hook = self._on_new_controller_created
+        matter.FabricAdmin.FabricAdmin._new_controller_hook=self._on_new_controller_created
 
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
-        self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
-        self.current_step_index = 0
-        self.step_start_time = datetime.now(UTC)
-        self.step_skipped = False
+        self.cluster_mapper=ClusterMapper(self.default_controller._Cluster)
+        self.current_step_index=0
+        self.step_start_time=datetime.now(UTC)
+        self.step_skipped=False
         # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
         # Because setup_class can be called before commissioning, this variable is lazy-initialized
         # where the read is deferred until the first guard function call that requires global attributes.
-        self.stored_global_wildcard = None
+        self.stored_global_wildcard=None
 
     def teardown_class(self):
         """Final teardown after all tests: run framework cleanup, log problems, dump attributes.
@@ -296,7 +297,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.event_loop.run_until_complete(self._run_framework_cleanup())
 
         # Clear the hook set in setup_class; self._extra_controllers, if any, is fully populated by now.
-        matter.FabricAdmin.FabricAdmin._new_controller_hook = None
+        matter.FabricAdmin.FabricAdmin._new_controller_hook=None
 
         if len(self.problems) > 0:
             # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
@@ -339,12 +340,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         # opt-in), teardown_class will skip it to avoid running cleanup twice.
         if self._framework_cleanup_done:
             return
-        self._framework_cleanup_done = True
+        self._framework_cleanup_done=True
         await self.async_teardown_test()
 
         # If setup_test could not read the ACL, the DUT was unreachable at test
         # start, skip DUT cleanup to avoid a slow network discovery attempt.
-        dut_reachable = self._original_acl is not None
+        dut_reachable=self._original_acl is not None
         if dut_reachable:
             try:
                 # Lightweight reachability check, confirm the DUT is still alive before attempting cleanup.
@@ -354,7 +355,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 )
             except Exception as e:  # DUT may be unreachable or mid-reboot; skip all DUT cleanup rather than failing the test
                 LOGGER.warning("[CLN] DUT is unreachable, skipping all DUT cleanup: %s", e)
-                dut_reachable = False
+                dut_reachable=False
 
         if dut_reachable:
             await self._populate_wildcard()
@@ -403,9 +404,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             # Track the controller's CA so it can be removed from
             # persistent storage after controller shutdown
-            fa = controller.fabricAdmin
+            fa=controller.fabricAdmin
             if fa is not None:
-                ca = fa.certificateAuthority
+                ca=fa.certificateAuthority
                 if ca not in self._extra_cas:
                     self._extra_cas.append(ca)
 
@@ -424,14 +425,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # Shut down each CA and remove it from the manager's active list and from
         # persistent storage (caList in admin_storage.json) directly.
-        mgr = self.certificate_authority_manager
+        mgr=self.certificate_authority_manager
         for ca in self._extra_cas:
             try:
                 LOGGER.info("[CLN] shutting down CA index %d", ca.caIndex)
                 ca.Shutdown()
                 if ca in mgr._activeCaList:
                     mgr._activeCaList.remove(ca)
-                ca_list = mgr._persistentStorage.GetKey('caList') or {}
+                ca_list=mgr._persistentStorage.GetKey('caList') or {}
                 if str(ca.caIndex) in ca_list:
                     del ca_list[str(ca.caIndex)]
                     mgr._persistentStorage.SetKey('caList', ca_list)
@@ -444,7 +445,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Sends ArmFailSafe(expiryLengthSeconds=0) to disarm any active failsafe on the DUT."""
         LOGGER.info("[CLN] sending ArmFailSafe(0) to disarm any active failsafe")
         try:
-            resp = typing.cast(
+            resp=typing.cast(
                 Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse,
                 await self.send_single_cmd(
                     cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=uint(0)),
@@ -468,7 +469,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             return
         LOGGER.info("[CLN] restoring ACL to pre-test state")
         try:
-            result = await self.default_controller.WriteAttribute(
+            result=await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(0, Clusters.AccessControl.Attributes.Acl(self._original_acl))]
             )
@@ -483,14 +484,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Removes any fabric on the DUT that is not the default controller's fabric."""
         try:
             # Read TH1's fabric index on the DUT via the default controller
-            th1_fabric_index = await self.read_single_attribute_check_success(
+            th1_fabric_index=await self.read_single_attribute_check_success(
                 cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
                 attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex,
                 endpoint=0
             )
 
             # Read all fabrics unfiltered so we see every fabric, not just TH1's
-            fabrics = typing.cast(
+            fabrics=typing.cast(
                 list[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct],
                 await self.read_single_attribute_check_success(
                     cluster=Clusters.OperationalCredentials,  # type: ignore[arg-type]
@@ -504,7 +505,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 "[CLN] could not read fabric list (DUT unreachable, session expired, or attribute read error), skipping fabric removal: %s", e)
             return
 
-        extra_fabric_indices = [f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
+        extra_fabric_indices=[f.fabricIndex for f in fabrics if f.fabricIndex != th1_fabric_index]
 
         if not extra_fabric_indices:
             LOGGER.info("[CLN] no extra fabrics to remove")
@@ -529,7 +530,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         LOGGER.info("[CLN] purging group key sets and key map")
         try:
-            resp = typing.cast(
+            resp=typing.cast(
                 Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse,
                 await self.send_single_cmd(
                     cmd=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
@@ -550,7 +551,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # Clear all group key mappings
         try:
-            result = await self.default_controller.WriteAttribute(
+            result=await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))]
             )
@@ -579,14 +580,14 @@ class MatterBaseTest(base_test.BaseTestClass):
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             try:
-                resp = typing.cast(
+                resp=typing.cast(
                     Clusters.Groups.Commands.GetGroupMembershipResponse,
                     await self.send_single_cmd(
                         cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
                         endpoint=endpoint_id
                     )
                 )
-                group_ids = resp.groupList
+                group_ids=resp.groupList
                 if not group_ids:
                     continue
                 LOGGER.info("[CLN] removing scenes for groups %s on endpoint %d", group_ids, endpoint_id)
@@ -608,12 +609,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
             return
 
-        found_any = False
+        found_any=False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
-            found_any = True
+            found_any=True
             LOGGER.info("[CLN] sending RemoveAllGroups on endpoint %d", endpoint_id)
             try:
                 await self.send_single_cmd(
@@ -632,12 +633,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
             return
 
-        found_any = False
+        found_any=False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.DoorLock):  # type: ignore[arg-type]
                 continue
-            found_any = True
+            found_any=True
             LOGGER.info("[CLN] clearing DoorLock users and credentials on endpoint %d", endpoint_id)
             try:
                 await self.send_single_cmd(
@@ -662,15 +663,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
         TlsClientManagement via ServerList, no extra network read needed.
         """
-        tls_cluster_id = Clusters.TlsClientManagement.id
-        found_any = False
+        tls_cluster_id=Clusters.TlsClientManagement.id
+        found_any=False
         for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
-            server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
+            server_list=clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
             if server_list is None or tls_cluster_id not in server_list:
                 continue
-            found_any = True
+            found_any=True
             try:
-                provisioned = typing.cast(
+                provisioned=typing.cast(
                     list[Clusters.TlsClientManagement.Structs.TLSEndpointStruct],
                     await self.read_single_attribute_check_success(
                         cluster=Clusters.TlsClientManagement,  # type: ignore[arg-type]
@@ -722,7 +723,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
             return
 
-        registered_clients = self.stored_global_wildcard.attributes.get(0, {}).get(
+        registered_clients=self.stored_global_wildcard.attributes.get(0, {}).get(
             Clusters.IcdManagement, {}).get(Clusters.IcdManagement.Attributes.RegisteredClients)
 
         if not registered_clients:
@@ -745,12 +746,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
         if isinstance(value, bytes):
-            hex_value = value.hex()
+            hex_value=value.hex()
             if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
                 return f"0x{hex_value[:_SUMMARY_MAX_HEX_CHARS]}... (truncated, {len(value)} bytes)"
             return f"0x{hex_value}"
         if isinstance(value, list) and len(value) > 8:
-            head = ", ".join(repr(v) for v in value[:5])
+            head=", ".join(repr(v) for v in value[:5])
             return f"[{head}, ...] (len={len(value)})"
         if key == "pics" and isinstance(value, dict):
             return "Please request if needed"
@@ -759,28 +760,28 @@ class MatterBaseTest(base_test.BaseTestClass):
     def _log_execution_parameters_summary(self):
         """Log execution parameters at test end to aid result triage."""
         try:
-            meta = asdict(self.matter_test_config)
+            meta=asdict(self.matter_test_config)
         except Exception as ex:
             LOGGER.warning("Unable to collect execution parameter summary: %s", ex)
             return
 
-        config_fields: dict[str, Any] = {}
+        config_fields: dict[str, Any]={}
         for key, value in meta.items():
             if key == "global_test_params":
                 continue
             if isinstance(value, os.PathLike):
-                value = os.fspath(value)
+                value=os.fspath(value)
             if value in (None, [], {}, ""):
                 continue
-            config_fields[key] = value
+            config_fields[key]=value
 
-        named_args: dict[str, Any] = {}
+        named_args: dict[str, Any]={}
         for key, value in self.matter_test_config.global_test_params.items():
             if key == "meta_config":
                 continue
             if value in (None, [], {}, ""):
                 continue
-            named_args[key] = value
+            named_args[key]=value
 
         LOGGER.info("===== EXECUTION FLAGS SUMMARY BEGIN =====")
 
@@ -795,7 +796,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("  - %s: %s", key, self._format_summary_value(key, named_args[key]))
 
         if self.is_pics_sdk_ci_only:
-            test_name = self.__class__.__name__
+            test_name=self.__class__.__name__
             LOGGER.info("===== PICS_SDK_CI_ONLY is enabled (True) for test '%s'.", test_name)
 
         LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
@@ -812,7 +813,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
                 # Check if we have the dump_wildcard method (from BasicCompositionTests)
                 if hasattr(self, 'dump_wildcard'):
-                    _, txt_str = self.dump_wildcard(None)
+                    _, txt_str=self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
                     self.log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
         except (AttributeError, KeyError, ValueError, TypeError):
@@ -829,7 +830,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             start_tag: A prefix tag to identify the type of data being logged
             dump_string: The data to be logged
         """
-        lines = dump_string.splitlines()
+        lines=dump_string.splitlines()
         LOGGER.info('%sBEGIN (%s lines)====', start_tag, len(lines))
         for line in lines:
             LOGGER.info('%s%s', start_tag, line)
@@ -846,21 +847,21 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Test authors that implement this method should ensure super().setup_test() is called before any custom setup.
         """
-        self.current_step_index = 0
-        self.test_start_time = datetime.now(UTC)
-        self.step_start_time = datetime.now(UTC)
-        self.step_skipped = False
-        self.failed = False
-        self._teardown_ran = False
-        self._framework_cleanup_done = False
-        self.cleanup_config = TestCleanupConfig()
+        self.current_step_index=0
+        self.test_start_time=datetime.now(UTC)
+        self.step_start_time=datetime.now(UTC)
+        self.step_skipped=False
+        self.failed=False
+        self._teardown_ran=False
+        self._framework_cleanup_done=False
+        self.cleanup_config=TestCleanupConfig()
         if self.runner_hook and not self.is_commissioning:
-            test_name = self.current_test_info.name
-            steps = self.get_defined_test_steps(test_name)
-            num_steps = 1 if steps is None else len(steps)
-            filename = inspect.getfile(self.__class__)
-            desc = self.get_test_desc(test_name)
-            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            test_name=self.current_test_info.name
+            steps=self.get_defined_test_steps(test_name)
+            num_steps=1 if steps is None else len(steps)
+            filename=inspect.getfile(self.__class__)
+            desc=self.get_test_desc(test_name)
+            steps_descriptions=[] if steps is None else [step.description for step in steps]
             self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
             # If we don't have defined steps, we're going to start the one and only step now
             # if there are steps defined by the test, rely on the test calling the step() function
@@ -877,7 +878,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
         # on the fabric, an operational read there would send CASE Sigma1 to an
         # uncommissioned device, triggering unexpected DUT behaviour.
-        dut_expected = (
+        dut_expected=(
             not self.is_commissioning
             and (
                 self._dut_confirmed_available
@@ -886,7 +887,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
         if dut_expected:
             try:
-                self._original_acl = self.event_loop.run_until_complete(
+                self._original_acl=self.event_loop.run_until_complete(
                     self.read_single_attribute_check_success(
                         cluster=Clusters.AccessControl,
                         attribute=Clusters.AccessControl.Attributes.Acl,
@@ -894,7 +895,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     )
                 )
             except Exception:
-                self._original_acl = None
+                self._original_acl=None
 
     def teardown_test(self):
         """Per-test teardown called by the Mobly framework after every test_ method.
@@ -911,7 +912,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         explicitly from the override.
         """
         if not self._teardown_ran:
-            self._teardown_ran = True
+            self._teardown_ran=True
             super().teardown_test()
 
     def on_fail(self, record):
@@ -924,19 +925,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             record: TestResultRecord containing failure information.
         """
-        self.failed = True
+        self.failed=True
         if self.runner_hook and not self.is_commissioning:
-            exception = record.termination_signal.exception
+            exception=record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration=(datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
-                step_duration = 0
+                step_duration=0
             try:
-                test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+                test_duration=(datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
-                test_duration = 0
+                test_duration=0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
@@ -963,33 +964,33 @@ class MatterBaseTest(base_test.BaseTestClass):
                     - Returns (probable_error, "Unknown file") if no file information
                         can be extracted from the stack trace
                 """
-                no_stack_trace = ("Stack Trace Unavailable", "")
+                no_stack_trace=("Stack Trace Unavailable", "")
                 if not record.termination_signal.stacktrace:
                     return no_stack_trace
-                trace = record.termination_signal.stacktrace.splitlines()
+                trace=record.termination_signal.stacktrace.splitlines()
                 if not trace:
                     return no_stack_trace
 
                 if isinstance(exception, (signals.TestError, signals.TestFailure)):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
-                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
+                    assert_candidates=[idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
                         return "Unknown error, please see stack trace above", ""
-                    assert_candidate_idx = assert_candidates[-1]
+                    assert_candidate_idx=assert_candidates[-1]
                 else:
                     # Normal assert is on the Last line
-                    assert_candidate_idx = -1
-                probable_error = trace[assert_candidate_idx]
+                    assert_candidate_idx=-1
+                probable_error=trace[assert_candidate_idx]
 
                 # Find the file marker immediately above the probable error
-                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
+                file_candidates=[idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
                 if not file_candidates:
                     return probable_error, "Unknown file"
                 return probable_error.strip(), trace[file_candidates[-1]].strip()
 
-            probable_error, probable_file = extract_error_text()
-            test_steps = self.get_defined_test_steps(self.current_test_info.name)
-            test_step = str(test_steps[self.current_step_index-1]
+            probable_error, probable_file=extract_error_text()
+            test_steps=self.get_defined_test_steps(self.current_test_info.name)
+            test_step=str(test_steps[self.current_step_index-1]
                             ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
             LOGGER.error(textwrap.dedent(f"""
 
@@ -1022,17 +1023,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+            step_duration=(datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration=(datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self.get_defined_test_steps(record.test_name)
+        steps=self.get_defined_test_steps(record.test_name)
         if steps is None:
             # if we don't have a list of steps, assume they were all run
-            all_steps_run = True
+            all_steps_run=True
         else:
-            all_steps_run = len(steps) == self.current_step_index
+            all_steps_run=len(steps) == self.current_step_index
 
         if not all_steps_run:
             # The test is done, but we didn't execute all the steps
@@ -1052,9 +1053,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             record: TestResultRecord containing skip information.
         """
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
-            test_name = self.current_test_info.name
-            filename = inspect.getfile(self.__class__)
+            test_duration=(datetime.now(UTC) - self.test_start_time) / timedelta(microseconds=1)
+            test_name=self.current_test_info.name
+            filename=inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
@@ -1064,51 +1065,51 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     # Override this if the test requires a different default timeout.
     # This value will be overridden if a timeout is supplied on the command line.
-    @property
+    @ property
     def default_timeout(self) -> int:
         """The default timeout in seconds for async operations in a test."""
         return 90
 
-    @property
+    @ property
     def runner_hook(self) -> TestRunnerHooks:
         """Accesses the Test Runner Hooks for external reporting."""
         return global_stash.unstash_globally(self.user_params.get("hooks"))
 
-    @property
+    @ property
     def matter_test_config(self) -> MatterTestConfig:
         """Accesses the global Matter test configuration object."""
         return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
-    @property
+    @ property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         """Accesses the default device controller instance for the test."""
         return global_stash.unstash_globally(self.user_params.get("default_controller"))
 
-    @property
+    @ property
     def matter_stack(self) -> MatterStackState:
         """Accesses the Matter stack state object."""
         return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
-    @property
+    @ property
     def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
         """Accesses the Certificate Authority Manager."""
         return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
-    @property
+    @ property
     def dut_node_id(self) -> int:
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
-    @property
+    @ property
     def first_setup_code(self) -> Optional[str]:
         return get_first_setup_code(self.default_controller, self.matter_test_config)
 
-    @property
+    @ property
     def is_pics_sdk_ci_only(self) -> bool:
         """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
         return self.check_pics('PICS_SDK_CI_ONLY')
 
-    @property
+    @ property
     def default_endpoint(self) -> int:
         return 0
 
@@ -1118,12 +1119,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
-        endpoint = self.matter_test_config.endpoint
+        endpoint=self.matter_test_config.endpoint
         if endpoint is not None:
             return endpoint
         return self.default_endpoint
 
-    def get_wifi_ssid(self, default: str = "") -> str:
+    def get_wifi_ssid(self, default: str="") -> str:
         ''' Get WiFi SSID
 
             Get the WiFi networks name provided with flags
@@ -1131,7 +1132,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
 
-    def get_credentials(self, default: str = "") -> str:
+    def get_credentials(self, default: str="") -> str:
         ''' Get WiFi passphrase
 
             Get the WiFi credentials provided with flags
@@ -1154,7 +1155,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         is assumed fine.
         """
         if not hasattr(self, '_allocated_ports'):
-            self._allocated_ports: set[int] = set()
+            self._allocated_ports: set[int]=set()
 
         def is_port_available(p: int) -> bool:
             import errno
@@ -1184,7 +1185,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         while True:
             # The chosen safe range (35000-45000) naturally avoids well-known bad/conflicting
             # ports like 5353 (mDNS) and 5550-5555 (Matter standard ports).
-            port = random.randint(35000, 45000)
+            port=random.randint(35000, 45000)
             if port in self._allocated_ports:
                 continue
             if is_port_available(port):
@@ -1207,7 +1208,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self.get_defined_test_steps(test)
+        steps=self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
@@ -1221,15 +1222,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         if test in self.cached_steps:
             return self.cached_steps[test]
 
-        steps = None
+        steps=None
         if steps_method := getattr(self, 'steps_' + test.removeprefix('test_'), None):
-            steps = steps_method()
+            steps=steps_method()
         else:
-            test_method = getattr(self, test)
+            test_method=getattr(self, test)
             from matter.testing.step_extractor import extract_steps_from_method
-            steps = extract_steps_from_method(test_method) or None
+            steps=extract_steps_from_method(test_method) or None
 
-        self.cached_steps[test] = steps
+        self.cached_steps[test]=steps
         return steps
 
     def get_restart_flag_file(self) -> Optional[str]:
@@ -1246,7 +1247,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             ex. for test test_TC_TEST_1_1, the pics are in a function called
             pics_TC_TEST_1_1.
         '''
-        pics = self._get_defined_pics(test)
+        pics=self._get_defined_pics(test)
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
@@ -1262,7 +1263,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         if pics_method := getattr(self, 'pics_' + test.removeprefix('test_'), None):
             return pics_method()
-        test_method = getattr(self, test)
+        test_method=getattr(self, test)
         return getattr(test_method, '_pics', None)  # set by @pics
 
     def get_test_desc(self, test: str) -> str:
@@ -1280,7 +1281,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         '''
         if desc_method := getattr(self, 'desc_' + test.removeprefix('test_'), None):
             return desc_method()
-        test_method = getattr(self, test)
+        test_method=getattr(self, test)
         if doc := test_method.__doc__:
             return doc.strip()
         return test
@@ -1291,8 +1292,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     # These methods are used to mark test progress for the test harness and logs, to help with test
     # debugging, issue creation and log analysis by the test labs.
 
-    def step(self, step: typing.Union[int, str], description: str = "", *,
-             is_commissioning: bool = False, expectation: str = ""):
+    def step(self, step: typing.Union[int, str], description: str="", *,
+             is_commissioning: bool=False, expectation: str=""):
         """Execute a test step and manage step progression.
 
         Validates step order, prints step information, and notifies runner hooks.
@@ -1315,30 +1316,30 @@ class MatterBaseTest(base_test.BaseTestClass):
         # description, is_commissioning, and expectation are not used at runtime.
         # They exist so the AST step extractor can read them from source code to
         # build the step list without needing a separate steps_* method.
-        test_name = self.current_test_info.name
-        steps = self.get_test_steps(test_name)
+        test_name=self.current_test_info.name
+        steps=self.get_test_steps(test_name)
 
         # TODO: this might be annoying during dev. Remove? Flag?
         if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
             asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
-        current_step = steps[self.current_step_index]
+        current_step=steps[self.current_step_index]
         self.print_step(step, current_step.description)
 
         if self.runner_hook:
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
+                step_duration=(datetime.now(UTC) - self.step_start_time) / timedelta(microseconds=1)
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
-            name = f'{step} : {current_step.description}'
+            name=f'{step} : {current_step.description}'
             self.runner_hook.step_start(name=name)
 
-        self.step_start_time = datetime.now(tz=UTC)
-        self.current_step_index = self.current_step_index + 1
-        self.step_skipped = False
+        self.step_start_time=datetime.now(tz=UTC)
+        self.current_step_index=self.current_step_index + 1
+        self.step_skipped=False
 
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         """Print test step information to logs.
@@ -1361,12 +1362,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     def mark_current_step_skipped(self):
         """Mark the current step as skipped and log the skip."""
         try:
-            steps = self.get_test_steps(self.current_test_info.name)
+            steps=self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            num = steps[self.current_step_index - 1].test_plan_number
+            num=steps[self.current_step_index - 1].test_plan_number
         except KeyError:
-            num = self.current_step_index
+            num=self.current_step_index
 
         if self.runner_hook:
             # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
@@ -1374,7 +1375,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
         LOGGER.info('**** Skipping: %s', num)
-        self.step_skipped = True
+        self.step_skipped=True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
         """Mark all remaining test steps starting with provided starting step
@@ -1406,30 +1407,30 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Returns nothing on success so the test can go on.
         """
-        steps = self.get_test_steps(self.current_test_info.name)
-        starting_step_idx = None
+        steps=self.get_test_steps(self.current_test_info.name)
+        starting_step_idx=None
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
-                starting_step_idx = idx
+                starting_step_idx=idx
                 break
         asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
-        starting_index: int = typing.cast(int, starting_step_idx)
+        starting_index: int=typing.cast(int, starting_step_idx)
 
-        ending_step_idx = None
+        ending_step_idx=None
         # If ending_step_number is None, we skip all steps until the end of the test
         if ending_step_number is not None:
             for idx, step in enumerate(steps):
                 if step.test_plan_number == ending_step_number:
-                    ending_step_idx = idx
+                    ending_step_idx=idx
                     break
 
             asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
-            ending_index: int = typing.cast(int, ending_step_idx)
+            ending_index: int=typing.cast(int, ending_step_idx)
             asserts.assert_greater(ending_index, starting_index,
                                    "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
-            skipping_steps = steps[starting_index:ending_index+1]
+            skipping_steps=steps[starting_index:ending_index+1]
         else:
-            skipping_steps = steps[starting_index:]
+            skipping_steps=steps[starting_index:]
 
         for step in skipping_steps:
             self.skip_step(step.test_plan_number)
@@ -1469,9 +1470,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
         if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
+            global_wildcard=asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-            self.stored_global_wildcard = await global_wildcard
+            self.stored_global_wildcard=await global_wildcard
 
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
@@ -1487,7 +1488,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        attr_condition=_has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
@@ -1506,7 +1507,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        cmd_condition=_has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
         return cmd_condition
@@ -1525,7 +1526,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        feat_condition=_has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
         return feat_condition
@@ -1543,10 +1544,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             True if commissioning succeeded, False otherwise.
         """
-        dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
-        dut_node_ids: list[int] = self.matter_test_config.dut_node_ids
-        setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
-        commissioning_info: CommissioningInfo = CommissioningInfo(
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController=self.default_controller
+        dut_node_ids: list[int]=self.matter_test_config.dut_node_ids
+        setup_payloads: list[SetupPayloadInfo]=self.get_setup_payload_info()
+        commissioning_info: CommissioningInfo=CommissioningInfo(
             commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
             commissioning_method=self.matter_test_config.commissioning_method,
             thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
@@ -1558,12 +1559,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
+        result=await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
         if result:
-            self._dut_confirmed_available = True
+            self._dut_confirmed_available=True
         return result
 
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, timeout: int=900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
 
         Args:
@@ -1577,13 +1578,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             AssertionError: If opening the commissioning window fails.
         """
-        rnd_discriminator = random.randint(0, 4095)
+        rnd_discriminator=random.randint(0, 4095)
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
+            commissioning_params=await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
 
@@ -1592,7 +1593,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool=True) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -1605,13 +1606,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             The attribute value.
         """
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
-        data = result[endpoint]
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+        data=result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
         Returns:
@@ -1619,39 +1620,39 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         # mypy expects tuple-shaped items here. Some tests crash when attribute requests are wrapped in a single-element tuple here.
         # We pass the plain attribute to avoid the runtime issue; so we ignore that type.
-        read_response = await dev_ctrl.ReadAttribute(node_id, [attribute])  # type: ignore[list-item]
-        attrs = {}
+        read_response=await dev_ctrl.ReadAttribute(node_id, [attribute])  # type: ignore[list-item]
+        attrs={}
         for endpoint in read_response:
-            attr_ret = read_response[endpoint][cluster][attribute]
-            attrs[endpoint] = attr_ret
+            attr_ret=read_response[endpoint][cluster][attribute]
+            attrs[endpoint]=attr_ret
         return attrs
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None, fabric_filtered: bool=True, assert_on_error: bool=True, test_name: str="", payloadCapability: int=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
-        attr_ret = result[endpoint][cluster][attribute]
-        read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
-        desired_type = attribute.attribute_type.Type
-        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
-        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = matchers.is_type(attr_ret, desired_type)
+            endpoint=self.get_endpoint()
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
+        attr_ret=result[endpoint][cluster][attribute]
+        read_err_msg=f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
+        desired_type=attribute.attribute_type.Type
+        type_err_msg=f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        read_ok=attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        type_ok=matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
         else:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+            location=AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
@@ -1664,7 +1665,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def poll_until_attributes_in_range(
             self, cluster: ClusterObjects.Cluster,
             attribute_bounds: list[tuple[type[ClusterObjects.ClusterAttributeDescriptor], int, int]],
-            timeout_sec: int = 1) -> None:
+            timeout_sec: int=1) -> None:
         """Poll attributes until each value falls within [min_value, max_value].
 
         Args:
@@ -1676,42 +1677,42 @@ class MatterBaseTest(base_test.BaseTestClass):
             TimeoutError: If any attribute does not reach its expected range before timeout.
         """
         for attribute, min_value, max_value in attribute_bounds:
-            deadline = time.monotonic() + timeout_sec
-            value = await self.read_single_attribute_check_success(cluster, attribute)
+            deadline=time.monotonic() + timeout_sec
+            value=await self.read_single_attribute_check_success(cluster, attribute)
             while value < min_value or value > max_value:  # type: ignore[operator]
                 if time.monotonic() >= deadline:
                     raise TimeoutError(
                         f"Timeout waiting for {attribute} to be in range [{min_value}, {max_value}], last value: {value}")
                 await asyncio.sleep(0.1)
-                value = await self.read_single_attribute_check_success(cluster, attribute)
+                value=await self.read_single_attribute_check_success(cluster, attribute)
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: type[ClusterObjects.ClusterAttributeDescriptor],
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None,
+            fabric_filtered: bool=True, assert_on_error: bool=True, test_name: str="") -> object:
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
-        attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        error_type_ok = attr_ret is not None and isinstance(
+            endpoint=self.get_endpoint()
+        result=await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        attr_ret=result[endpoint][cluster][attribute]
+        err_msg="Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+        error_type_ok=attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
         if assert_on_error:
             asserts.assert_true(error_type_ok, err_msg)
             asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
         elif not error_type_ok or attr_ret.Reason.status != error:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+            location=AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
             self.record_error(test_name=test_name, location=location, problem=err_msg)
             return None
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int]=None, expect_success: bool=True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1720,12 +1721,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Status code is returned.
         """
-        dev_ctrl = self.default_controller
-        node_id = self.dut_node_id
+        dev_ctrl=self.default_controller
+        node_id=self.dut_node_id
         if endpoint_id is None:
-            endpoint_id = 0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
+            endpoint_id=0 if self.matter_test_config.endpoint is None else self.matter_test_config.endpoint
 
-        write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
+        write_result=await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
         if expect_success:
             asserts.assert_equal(write_result[0].Status, Status.Success,
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
@@ -1733,11 +1734,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def read_from_app_pipe(
         self,
-        app_pipe_out: Optional[str] = None,
-        timeout: float = 2.0,
-        max_bytes: int = 66536,
-        chunk: int = 4096,
-        ip_env_var: Optional[str] = None,
+        app_pipe_out: Optional[str]=None,
+        timeout: float=2.0,
+        max_bytes: int=66536,
+        chunk: int=4096,
+        ip_env_var: Optional[str]=None,
     ) -> Any:
         """
         Read an out-of-band command from a Matter app.
@@ -1751,7 +1752,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             - LINUX_DUT_USER: required when <ip_env_var> is set.
         """
         if app_pipe_out is None:
-            app_pipe_out = self.matter_test_config.pipe_name_out
+            app_pipe_out=self.matter_test_config.pipe_name_out
 
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -1760,7 +1761,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: Optional[str]=os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -1770,40 +1771,40 @@ class MatterBaseTest(base_test.BaseTestClass):
             # and we need explicit timeout handling and a hard size limit for safety. We also
             # preserve any extra bytes (e.g. multiple queued messages) across calls.
             if not hasattr(self, "_app_pipe_out_buf"):
-                self._app_pipe_out_buf = bytearray()
+                self._app_pipe_out_buf=bytearray()
 
-            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            fd=os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
             try:
-                buf: bytearray = self._app_pipe_out_buf
+                buf: bytearray=self._app_pipe_out_buf
 
                 while True:
                     if b"\n" in buf:
-                        line, _, rest = buf.partition(b"\n")
-                        self._app_pipe_out_buf = bytearray(rest)
+                        line, _, rest=buf.partition(b"\n")
+                        self._app_pipe_out_buf=bytearray(rest)
 
-                        line = line.strip()
+                        line=line.strip()
                         if not line:
                             continue
                         return json.loads(line.decode("utf-8"))
 
                     if buf:
                         try:
-                            obj = json.loads(buf.decode("utf-8"))
-                            self._app_pipe_out_buf = bytearray()
+                            obj=json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf=bytearray()
                             return obj
                         except json.JSONDecodeError:
                             pass
 
-                    r, _, _ = select.select([fd], [], [], timeout)
+                    r, _, _=select.select([fd], [], [], timeout)
                     if not r:
                         raise TimeoutError(f"No data within {timeout}")
 
-                    chunk_bytes = os.read(fd, chunk)
+                    chunk_bytes=os.read(fd, chunk)
                     if not chunk_bytes:
                         if buf:
                             try:
-                                obj = json.loads(buf.decode("utf-8"))
-                                self._app_pipe_out_buf = bytearray()
+                                obj=json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf=bytearray()
                                 return obj
                             except json.JSONDecodeError as ex:
                                 raise EOFError(f"Incomplete JSON response: {ex}") from ex
@@ -1817,16 +1818,16 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         LOGGER.info("Using DUT IP address: %s", dut_ip)
 
-        dut_uname = os.getenv("LINUX_DUT_USER")
+        dut_uname=os.getenv("LINUX_DUT_USER")
         asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
         LOGGER.info("Using DUT user name: %s", dut_uname)
 
         # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
-        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
-        out_str = out.decode("utf-8").strip()
+        out=subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str=out.decode("utf-8").strip()
         return json.loads(out_str)
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str]=None, ip_env_var: Optional[str]=None):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -1849,7 +1850,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
         if app_pipe is None:
-            app_pipe = self.matter_test_config.pipe_name
+            app_pipe=self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -1861,9 +1862,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
 
-        command = json.dumps(command_dict)
+        command=json.dumps(command_dict)
 
-        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+        dut_ip: Optional[str]=os.getenv(ip_env_var) if ip_env_var else None
 
         # If no DUT IP is provided, the Matter app is assumed to be local and the command
         # is read directly from the named pipe. If a DUT IP is present, the pipe is read
@@ -1878,18 +1879,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             LOGGER.info("Using DUT IP address: %s", dut_ip)
 
-            dut_uname = os.getenv('LINUX_DUT_USER')
+            dut_uname=os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info("Using DUT user name: %s", dut_uname)
-            command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            command_fixed=shlex.quote(json.dumps(command_dict))
+            cmd="echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            timedRequestTimeoutMs: OptionalTimeout = None,
-            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController]=None, node_id: Optional[int]=None, endpoint: Optional[int]=None,
+            timedRequestTimeoutMs: OptionalTimeout=None,
+            payloadCapability: int=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
 
         Args:
@@ -1904,16 +1905,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             Command response object.
         """
         if dev_ctrl is None:
-            dev_ctrl = self.default_controller
+            dev_ctrl=self.default_controller
         if node_id is None:
-            node_id = self.dut_node_id
+            node_id=self.dut_node_id
         if endpoint is None:
-            endpoint = self.get_endpoint()
+            endpoint=self.get_endpoint()
 
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                           payloadCapability=payloadCapability)
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes]=None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -1925,11 +1926,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes(list(range(16)))
+                enableKey=bytes(list(range(16)))
             else:
-                enableKey = self.matter_test_config.global_test_params['enableKey']
+                enableKey=self.matter_test_config.global_test_params['enableKey']
 
-        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
+        eventTrigger=self._update_legacy_test_event_triggers(eventTrigger)
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
@@ -1942,10 +1943,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def check_test_event_triggers_enabled(self):
         """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
            It will assert and fail the test if not True."""
-        full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
-        cluster = Clusters.Objects.GeneralDiagnostics
+        full_attr=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        cluster=Clusters.Objects.GeneralDiagnostics
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-        test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
+        test_event_enabled=await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
     def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
@@ -1960,19 +1961,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             ValueError: If target endpoint is out of valid range.
         """
-        target_endpoint = 0
+        target_endpoint=0
 
         if self.matter_test_config.legacy:
             LOGGER.info("Legacy test event trigger activated")
         else:
             LOGGER.info("Legacy test event trigger deactivated")
-            target_endpoint = self.get_endpoint()
+            target_endpoint=self.get_endpoint()
 
         if not (0 <= target_endpoint <= 0xFFFF):
             raise ValueError("Target endpoint should be between 0 and 0xFFFF")
 
         # Clean endpoint target
-        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+        eventTrigger=eventTrigger & ~ (0xFFFF << 32)
 
         # Sets endpoint in eventTrigger
         eventTrigger |= (target_endpoint & 0xFFFF) << 32
@@ -1983,7 +1984,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Utility Helpers (Problem Recording, User Input)
     #
 
-    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record an error-level problem during test execution.
 
         Args:
@@ -1994,7 +1995,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
-    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record a warning-level problem during test execution.
 
         Args:
@@ -2005,7 +2006,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
-    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+    def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str=""):
         """Record a note-level problem during test execution.
 
         Args:
@@ -2018,8 +2019,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def wait_for_user_input(self,
                             prompt_msg: str,
-                            prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> Optional[str]:
+                            prompt_msg_placeholder: str="Submit anything to continue",
+                            default_value: str="y") -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
@@ -2034,9 +2035,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         # TODO(#31928): Remove any assumptions of test params for endpoint ID.
 
         # Get the endpoint user param instead of `--endpoint-id` result, if available, temporarily.
-        endpoint_id = self.user_params.get("endpoint", None)
+        endpoint_id=self.user_params.get("endpoint", None)
         if endpoint_id is None or not isinstance(endpoint_id, int):
-            endpoint_id = self.matter_test_config.endpoint
+            endpoint_id=self.matter_test_config.endpoint
 
         if self.runner_hook:
             # TODO(#31928): Add endpoint support to hooks.
@@ -2072,7 +2073,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Only run when TC is being executed in TH
         if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
             # Convert bytes to comma separated hex string
-            hex_string = ', '.join(f'{byte:02x}' for byte in image)
+            hex_string=', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
@@ -2081,7 +2082,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
-                result = input()
+                result=input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
@@ -2092,13 +2093,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Helper to show a prompt and wait for user validation in TH."""
         # Only run when TC is being executed in TH
         if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
-            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method=getattr(self.runner_hook, hook_method_name)
             hook_method(msg=prompt_msg)
 
             LOGGER.info("========= USER PROMPT for %s =========", validation_name)
 
             try:
-                result = input()
+                result=input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError(error_message)
             except EOFError:
@@ -2200,7 +2201,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             None
         """
         # Check if restart flag file is available (indicates test runner supports app restart)
-        restart_flag_file = self.get_restart_flag_file()
+        restart_flag_file=self.get_restart_flag_file()
 
         if not restart_flag_file:
             # No restart flag file: ask user to manually reboot
@@ -2214,7 +2215,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 # Create the restart flag file to signal the test runner
                 # Allow for multiple reboots like SW update tests do using the "restart" mode
-                restart_text = "restart"
+                restart_text="restart"
                 with open(restart_flag_file, "w") as f:
                     f.write(restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
@@ -2230,7 +2231,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error("Failed to reboot app: %s", e)
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
+    async def request_device_factory_reset(self, reset_ctrl: bool=False) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments and also manual
@@ -2246,7 +2247,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             None
         """
         # Check if restart flag file is available (indicates test runner supports app factory reset)
-        restart_flag_file = self.get_restart_flag_file()
+        restart_flag_file=self.get_restart_flag_file()
 
         if not restart_flag_file:
             # No restart flag file: ask user to manually factory reset
@@ -2257,7 +2258,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("Manual device factory reset completed")
 
         else:
-            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
+            restart_flag_text="factory reset" if reset_ctrl else "factory reset app only"
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
@@ -2271,7 +2272,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
 
             except Exception as e:
-                err = f"Failed to {restart_flag_text}: {e}"
+                err=f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
 
@@ -2279,7 +2280,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Wait for the monitor thread to remove the flag file
         # The monitor deletes the flag file AFTER the restart completes, so this ensures
         # the app has fully rebooted and is ready before we continue
-        start_time = time.time()
+        start_time=time.time()
         while os.path.exists(restart_flag_file):
             if time.time() - start_time > timeout_sec:
                 asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
@@ -2304,11 +2305,11 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     Returns:
         The result returned by the awaited `body` function.
     """
-    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    timeout=self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
     return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
-EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+EndpointCheckFunction=typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
@@ -2323,7 +2324,7 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [
+    wildcard=await self.default_controller.Read(self.dut_node_id, [
         (Clusters.Descriptor,),  # single-element tuple needs trailing comma
         Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),

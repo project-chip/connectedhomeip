@@ -19,12 +19,12 @@
 #include "OtaProviderAppCommandDelegate.h"
 <<<<<<< HEAD
 #include <lib/support/CodeUtils.h>
-=======
+    =======
 #include <lib/support/Defer.h>
->>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
+    >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <platform/PlatformManager.h>
 
-using namespace chip;
+    using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;

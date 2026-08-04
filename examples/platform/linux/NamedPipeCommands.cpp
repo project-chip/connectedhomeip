@@ -24,7 +24,7 @@
 #include <lib/support/CodeUtils.h>
 <<<<<<< HEAD
 #include <lib/support/logging/CHIPLogging.h>
-=======
+    =======
 >>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
 #include <poll.h>
 #include <pthread.h>
@@ -36,8 +36,9 @@
 
 #include <string>
 
-namespace {
-constexpr size_t kChipEventCmdBufSize = 256;
+    namespace
+{
+    constexpr size_t kChipEventCmdBufSize = 256;
 } // namespace
 
 <<<<<<< HEAD

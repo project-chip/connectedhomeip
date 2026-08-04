@@ -805,32 +805,34 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
     config.pipe_name_out = args.app_pipe_out
     if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
-<<<<<<< HEAD
+
+
+<< << << < HEAD
         LOGGER.error("Named pipe %r does NOT exist", config.pipe_name_out)
-=======
+== == == =
         LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
->>>>>>> 4f652d73ea (Out of band communication ota su (#41900))
+>>>>>> > 4f652d73ea(Out of band communication ota su(  # 41900))
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
 
-    config.fail_on_skipped_tests = args.fail_on_skipped
+    config.fail_on_skipped_tests=args.fail_on_skipped
 
-    config.legacy = args.use_legacy_test_event_triggers
+    config.legacy=args.use_legacy_test_event_triggers
 
-    config.controller_node_id = args.controller_node_id
-    config.trace_to = args.trace_to
+    config.controller_node_id=args.controller_node_id
+    config.trace_to=args.trace_to
 
-    config.tc_version_to_simulate = args.tc_version_to_simulate
-    config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
-    config.dac_revocation_set_path = args.dac_revocation_set_path
+    config.tc_version_to_simulate=args.tc_version_to_simulate
+    config.tc_user_response_to_simulate=args.tc_user_response_to_simulate
+    config.dac_revocation_set_path=args.dac_revocation_set_path
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
-    config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
+    config.global_test_params["meta_config"]={k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
 
     return config
 
 
 def int_decimal_or_hex(s: str) -> int:
-    val = int(s, 0)
+    val=int(s, 0)
     if val < 0:
         raise ValueError("Negative values not supported")
     return val
@@ -842,9 +844,9 @@ def byte_string_from_hex(s: str) -> bytes:
 
 def str_from_manual_code(s: str) -> str:
     """Enforces legal format for manual codes and removes spaces/dashes."""
-    s = s.replace("-", "").replace(" ", "")
-    regex = r"^([0-9]{11}|[0-9]{21})$"
-    match = re.match(regex, s)
+    s=s.replace("-", "").replace(" ", "")
+    regex=r"^([0-9]{11}|[0-9]{21})$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid manual code format, does not match %s" % regex)
 
@@ -852,22 +854,22 @@ def str_from_manual_code(s: str) -> str:
 
 
 def int_named_arg(s: str) -> tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
-    match = re.match(regex, s)
+    regex=r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid int argument format, does not match %s" % regex)
 
-    name = match.group("name")
+    name=match.group("name")
     if match.group("hex_value"):
-        value = int(match.group("hex_value"), 0)
+        value=int(match.group("hex_value"), 0)
     else:
-        value = int(match.group("decimal_value"), 10)
+        value=int(match.group("decimal_value"), 10)
     return (name, value)
 
 
 def str_named_arg(s: str) -> tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
+    regex=r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid string argument format, does not match %s" % regex)
 
@@ -875,62 +877,62 @@ def str_named_arg(s: str) -> tuple[str, str]:
 
 
 def float_named_arg(s: str) -> tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
+    regex=r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid float argument format, does not match %s" % regex)
 
-    name = match.group("name")
-    value = float(match.group("value"))
+    name=match.group("name")
+    value=float(match.group("value"))
 
     return (name, value)
 
 
 def json_named_arg(s: str) -> tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
+    regex=r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid JSON argument format, does not match %s" % regex)
 
-    name = match.group("name")
-    value = json.loads(match.group("value"))
+    name=match.group("name")
+    value=json.loads(match.group("value"))
 
     return (name, value)
 
 
 def bool_named_arg(s: str) -> tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s, re.IGNORECASE)
+    regex=r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match=re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
-    name = match.group("name")
+    name=match.group("name")
     if match.group("truth_value"):
-        value = match.group("truth_value").lower() == "true"
+        value=match.group("truth_value").lower() == "true"
     else:
-        value = int(match.group("decimal_value")) != 0
+        value=int(match.group("decimal_value")) != 0
 
     return (name, value)
 
 
 def bytes_as_hex_named_arg(s: str) -> tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
-    match = re.match(regex, s)
+    regex=r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    match=re.match(regex, s)
     if not match:
         raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
 
-    name = match.group("name")
-    value_str = match.group("value")
-    value_str = value_str.replace(":", "")
+    name=match.group("name")
+    value_str=match.group("value")
+    value_str=value_str.replace(":", "")
     if len(value_str) % 2 != 0:
         raise ValueError("Byte string argument value needs to be event number of hex chars")
-    value = unhexlify(value_str)
+    value=unhexlify(value_str)
 
     return (name, value)
 
 
 def root_index(s: str) -> int:
-    CHIP_TOOL_COMPATIBILITY = {
+    CHIP_TOOL_COMPATIBILITY={
         "alpha": 1,
         "beta": 2,
         "gamma": 3
@@ -940,16 +942,16 @@ def root_index(s: str) -> int:
         if s.lower() == name:
             return _id
     else:
-        root_index = int(s)
+        root_index=int(s)
         if root_index == 0:
             raise ValueError("Only support root index >= 1")
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[list[str]] = None):
-    parser = argparse.ArgumentParser(description='Matter standalone Python test')
+def parse_matter_test_args(argv: Optional[list[str]]=None):
+    parser=argparse.ArgumentParser(description='Matter standalone Python test')
 
-    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
+    basic_group=parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
 
     basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
                              help='A list of tests in the test class to execute.')
@@ -962,7 +964,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
     basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
-    paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
+    paa_path_default=get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
     basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
@@ -992,7 +994,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")
 
-    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
+    commission_group=parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
@@ -1044,14 +1046,14 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
 
     commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
-    code_group = parser.add_argument_group(title="Setup codes")
+    code_group=parser.add_argument_group(title="Setup codes")
 
     code_group.add_argument('-q', '--qr-code', type=str,
                             metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
     code_group.add_argument('--manual-code', type=str_from_manual_code,
                             metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
 
-    fabric_group = parser.add_argument_group(
+    fabric_group=parser.add_argument_group(
         title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
     fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
                               metavar='FABRIC_ID',
@@ -1066,7 +1068,7 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                               metavar='PATH',
                               help='Path to chip-tool credentials file root')
 
-    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
+    args_group=parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
     args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
     args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
@@ -1081,6 +1083,6 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
     if not argv:
-        argv = sys.argv[1:]
+        argv=sys.argv[1:]
 
     return convert_args_to_matter_config(parser.parse_args(argv))
