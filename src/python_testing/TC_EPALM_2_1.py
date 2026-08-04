@@ -152,7 +152,9 @@ class TC_EPALM_2_1(MatterBaseTest):
                                   'Mask may only set the 7 spec-defined AlarmBitmap bits')
 
         self.step(10, "TH reads Latch attribute (inherited from Alarm Base; optional)")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.Latch):
+        # EPALM disallows the RESET feature, so Latch (which is RESET-gated) is not part of the
+        # cluster and is absent from the generated attribute bindings; skip the step when so.
+        if hasattr(attributes, 'Latch') and await self.attribute_guard(endpoint=endpoint, attribute=attributes.Latch):
             val = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attributes.Latch)
             asserts.assert_true(matter_asserts.is_valid_int_value(val, bit_count=32),
