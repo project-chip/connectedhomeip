@@ -63,11 +63,7 @@ CHIP_ERROR VerifyCommand::Run()
 CHIP_ERROR VerifyCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = CurrentCommissioner().EstablishPASEConnection(mNodeId, mOnboardingPayload, DiscoveryType::kAll);
-
-    return err;
+    return CurrentCommissioner().EstablishPASEConnection(mNodeId, mOnboardingPayload, DiscoveryType::kAll);
 }
 
 chip::Optional<uint16_t> VerifyCommand::FailSafeExpiryTimeoutSecs() const
