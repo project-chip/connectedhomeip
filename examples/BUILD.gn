@@ -30,8 +30,8 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
     tests += [
-      "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-type-parser/tests",
-      "${chip_root}/examples/all-devices-app/all-devices-common/devices/endpoint-id-allocator/tests",
+      "${chip_root}/examples/all-devices-app/posix/app_options/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
     ]
 

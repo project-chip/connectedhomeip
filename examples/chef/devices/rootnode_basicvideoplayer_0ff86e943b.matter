@@ -2043,7 +2043,7 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 2;
+  revision 3;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -2064,6 +2064,13 @@ cluster MediaPlayback = 1286 {
     kEnhancedAudioIntelligibility = 15;
     kEmergency = 16;
     kKaraoke = 17;
+  }
+
+  enum MediaType : enum8 {
+    kGeneric = 0;
+    kTVShow = 1;
+    kMusic = 2;
+    kPodcast = 3;
   }
 
   enum PlaybackStateEnum : enum8 {
@@ -2092,12 +2099,25 @@ cluster MediaPlayback = 1286 {
 
   struct TrackAttributesStruct {
     char_string<32> languageCode = 0;
-    optional nullable char_string displayName = 1;
+    optional nullable CharacteristicEnum characteristics[] = 1;
+    optional nullable long_char_string<256> displayName = 2;
   }
 
   struct TrackStruct {
     char_string<32> id = 0;
     nullable TrackAttributesStruct trackAttributes = 1;
+  }
+
+  struct ContentInfoStruct {
+    MediaType contentType = 0;
+    optional nullable long_char_string<256> title = 1;
+    optional nullable char_string<64> show = 2;
+    optional nullable char_string<64> season = 3;
+    optional nullable char_string<64> episode = 4;
+    optional nullable char_string<64> provider = 5;
+    optional nullable char_string<64> artist = 6;
+    optional nullable char_string<64> album = 7;
+    optional nullable char_string<64> track = 8;
   }
 
   struct PlaybackPositionStruct {
@@ -2107,13 +2127,13 @@ cluster MediaPlayback = 1286 {
 
   info event StateChanged = 0 {
     PlaybackStateEnum currentState = 0;
-    EPOCH_US startTime = 1;
-    INT64U duration = 2;
+    epoch_us startTime = 1;
+    int64u duration = 2;
     PlaybackPositionStruct sampledPosition = 3;
     single playbackSpeed = 4;
-    INT64U seekRangeEnd = 5;
-    INT64U seekRangeStart = 6;
-    optional OCTET_STRING data = 7;
+    int64u seekRangeEnd = 5;
+    int64u seekRangeStart = 6;
+    optional long_octet_string data = 7;
     boolean audioAdvanceUnmuted = 8;
   }
 
@@ -2128,6 +2148,8 @@ cluster MediaPlayback = 1286 {
   readonly attribute optional nullable TrackStruct availableAudioTracks[] = 8;
   readonly attribute optional nullable TrackStruct activeTextTrack = 9;
   readonly attribute optional nullable TrackStruct availableTextTracks[] = 10;
+  provisional readonly attribute nullable int32u availableCommands[] = 11;
+  provisional readonly attribute nullable ContentInfoStruct contentInfo = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2160,41 +2182,41 @@ cluster MediaPlayback = 1286 {
   }
 
   request struct ActivateAudioTrackRequest {
-    CHAR_STRING trackID = 0;
-    INT8U audioOutputIndex = 1;
+    char_string<32> trackID = 0;
+    int8u audioOutputIndex = 1;
   }
 
   request struct ActivateTextTrackRequest {
-    CHAR_STRING trackID = 0;
+    char_string<32> trackID = 0;
   }
 
-  /** Upon receipt, this SHALL play media. */
+  /** This command is used to start playback of the media. */
   command Play(): PlaybackResponse = 0;
-  /** Upon receipt, this SHALL pause media. */
+  /** This command is used to pause playback of the media. */
   command Pause(): PlaybackResponse = 1;
-  /** Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched. */
+  /** This command is used to stop playback of the media. */
   command Stop(): PlaybackResponse = 2;
-  /** Upon receipt, this SHALL Start Over with the current media playback item. */
+  /** This command is used to start playback of the media from the beginning. */
   command StartOver(): PlaybackResponse = 3;
-  /** Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item. */
+  /** This command is used to go back to the previous media playback item. */
   command Previous(): PlaybackResponse = 4;
-  /** Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item. */
+  /** This command is used to go to the next media playback item. */
   command Next(): PlaybackResponse = 5;
-  /** Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
+  /** This command is used to rewind the media. */
   command Rewind(RewindRequest): PlaybackResponse = 6;
-  /** Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
+  /** This command is used to fast forward the media. */
   command FastForward(FastForwardRequest): PlaybackResponse = 7;
-  /** Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows: */
+  /** This command is used to skip forward in the media. */
   command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
-  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
+  /** This command is used to skip backward in the media. */
   command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
-  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
+  /** This command is used to seek to a specific position in the media. */
   command Seek(SeekRequest): PlaybackResponse = 11;
-  /** Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT. */
+  /** This command is used to activate a specific Audio Track for the media being played. */
   command ActivateAudioTrack(ActivateAudioTrackRequest): DefaultSuccess = 12;
-  /** Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT. */
+  /** This command is used to activate a specific Text Track for the media being played. */
   command ActivateTextTrack(ActivateTextTrackRequest): DefaultSuccess = 13;
-  /** If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it. */
+  /** This command is used to deactivate a specific Text Track for the media being played. */
   command DeactivateTextTrack(): DefaultSuccess = 14;
 }
 

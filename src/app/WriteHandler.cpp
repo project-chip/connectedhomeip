@@ -143,8 +143,8 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
 
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
-    // Do not send response on Group Write
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    // Do not send response on Group Write or Write request with SuppressResponse flag set.
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && !mStateFlags.Has(StateBits::kSuppressResponse))
     {
         CHIP_ERROR err = SendWriteResponse(std::move(messageWriter));
         if (err != CHIP_NO_ERROR)
@@ -170,7 +170,14 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // The write transaction will be alive only when the message was handled successfully and there are more chunks.
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
+        const bool suppressResponse = mStateFlags.Has(StateBits::kSuppressResponse);
         Close();
+        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is caught
+        // in InteractionModelEngine.
+        if (suppressResponse)
+        {
+            return Status::Success;
+        }
     }
 
     return status;
@@ -194,7 +201,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
             TEMPORARY_RETURN_IGNORED StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         }
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
@@ -211,7 +221,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     }
     else
     {
-        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
     }
     return err;

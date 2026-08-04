@@ -28,6 +28,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -35,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-from typing import Optional
 
 from mobly import asserts
 
@@ -110,7 +110,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
                                    attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
                                    system_mode: Clusters.Thermostat.Enums.SystemModeEnum,
                                    occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
-                                   endpoint: Optional[int] = None) -> None:
+                                   endpoint: int | None = None) -> None:
 
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         event_data = events_callback.wait_for_event_type_report(cluster.Events.SetpointChange, timeout_sec=timeout)

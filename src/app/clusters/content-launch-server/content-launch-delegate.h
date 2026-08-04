@@ -46,9 +46,25 @@ public:
     virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
 
+    virtual void HandleContentReplicationRequest(CommandResponseHelper<Commands::ContentReplicationResponse::Type> & helper)
+    {
+        Commands::ContentReplicationResponse::Type response;
+        (void) helper.Success(response);
+    }
+
+    virtual void HandlePlayPreset(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, uint16_t presetID)
+    {
+        Commands::LauncherResponse::Type response;
+        response.status = StatusEnum::kURLNotAvailable;
+        (void) helper.Success(response);
+    }
+
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
+
+    virtual bool HandleGetMovable() { return false; }
+    virtual CHIP_ERROR HandleGetPresets(app::AttributeValueEncoder & aEncoder) { return aEncoder.EncodeEmptyList(); }
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;

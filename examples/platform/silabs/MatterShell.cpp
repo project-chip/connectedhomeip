@@ -21,6 +21,7 @@
 #include <cmsis_os2.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
+#include <lib/shell/commands/Help.h>
 #include <sl_cmsis_os2_common.h>
 #ifdef SL_CATALOG_CLI_PRESENT
 #include "sl_cli.h"
@@ -98,6 +99,43 @@ void cmdSilabsInit()
 
 #endif // SL_CATALOG_CLI_PRESENT
 
+#include "sl_memory_manager.h"
+
+namespace MemoryShellCommands {
+
+Engine sShellMemorySubCommands;
+
+CHIP_ERROR MemoryCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        sShellMemorySubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+        return CHIP_NO_ERROR;
+    }
+    return sShellMemorySubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR DisplayHeapUsage([[maybe_unused]] int argc, [[maybe_unused]] char ** argv)
+{
+    streamer_printf(chip::Shell::streamer_get(), "%lu / %lu\r\n", sl_memory_get_used_heap_size(), sl_memory_get_total_heap_size());
+    streamer_printf(chip::Shell::streamer_get(), "High Watermark: %lu\r\n", sl_memory_get_heap_high_watermark());
+    return CHIP_NO_ERROR;
+}
+
+void RegisterCommands()
+{
+    static const Shell::shell_command_t cmds_memory = { &MemoryCommandHandler, "memory",
+                                                        "Dispatch Silabs Memory Manager CLI commands" };
+
+    static const Shell::Command sMemorySubCommands[] = {
+        { &DisplayHeapUsage, "heap", "Display heap usage" },
+    };
+    sShellMemorySubCommands.RegisterCommands(sMemorySubCommands, MATTER_ARRAY_SIZE(sMemorySubCommands));
+    Engine::Root().RegisterCommands(&cmds_memory, 1);
+}
+
+} // namespace MemoryShellCommands
+
 void startShellTask()
 {
     int status = chip::Shell::Engine::Root().Init();
@@ -114,6 +152,7 @@ void startShellTask()
     cmdSilabsInit();
 #endif
 
+    MemoryShellCommands::RegisterCommands();
     shellTaskHandle = osThreadNew(MatterShellTask, nullptr, &kShellTaskAttr);
     VerifyOrDie(shellTaskHandle);
 }

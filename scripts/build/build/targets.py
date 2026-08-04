@@ -53,12 +53,16 @@ _ALL_DEVICES_APP_DEVICES = [
     'device-energy-management',
     'dimmable-light',
     'dimmable-plug-in-unit',
+    'dishwasher',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
     'humidity-sensor',
+    'laundry-dryer',
+    'laundry-washer',
     'light-sensor',
+    'microwave-oven',
     'mounted-dimmable-load-control',
     'mounted-on-off-control',
     'occupancy-sensor',
@@ -71,6 +75,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'proximity-ranger',
     'rain-sensor',
     'refrigerator',
+    'robotic-vacuum-cleaner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
@@ -611,7 +616,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
-    target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="ota", enable_ota=True)
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True)

@@ -339,6 +339,10 @@
 #include <clusters/LowPower/Commands.h>
 #include <clusters/LowPower/Events.h>
 #include <clusters/LowPower/Structs.h>
+#include <clusters/MediaFileManagement/Attributes.h>
+#include <clusters/MediaFileManagement/Commands.h>
+#include <clusters/MediaFileManagement/Events.h>
+#include <clusters/MediaFileManagement/Structs.h>
 #include <clusters/MediaInput/Attributes.h>
 #include <clusters/MediaInput/Commands.h>
 #include <clusters/MediaInput/Events.h>

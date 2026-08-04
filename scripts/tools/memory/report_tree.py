@@ -25,7 +25,8 @@ Use `--limit=size` to truncate the tree.
 
 import os
 import sys
-from typing import Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 import anytree  # type: ignore
 import memdf.collect

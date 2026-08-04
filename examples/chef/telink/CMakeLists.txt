@@ -46,6 +46,8 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/zephyr_ext
 )
 
+target_compile_definitions(app PRIVATE CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
+
 if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
     ${CHEF}/shell_common/globals.cpp

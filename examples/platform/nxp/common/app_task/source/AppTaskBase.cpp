@@ -114,7 +114,7 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #endif
 
@@ -154,7 +154,7 @@ app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
@@ -218,7 +218,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 
-#elif CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#elif CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

@@ -429,7 +429,8 @@ void AppTask::ProcessOnOffBindingCommand(CommandId commandId, const Binding::Tab
     {
         VerifyOrDie(peer_device->ConnectionReady());
         Messaging::ExchangeManager * exchangeMgr = peer_device->GetExchangeManager();
-        const SessionHandle & sessionHandle      = peer_device->GetSecureSession().Value();
+        auto optionalSession                     = peer_device->GetSecureSession();
+        const SessionHandle & sessionHandle      = optionalSession.Value();
 
         switch (commandId)
         {
@@ -785,14 +786,14 @@ void AppTask::SwitchWorkerFunction(intptr_t context)
     }
 }
 
-void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+void AppTask::DMPostAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                             uint8_t * value)
 {
     ClusterId clusterId                      = attributePath.mClusterId;
     [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
     ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == Identify::Id)
+    if (clusterId == Clusters::Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);

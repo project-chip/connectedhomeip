@@ -21,7 +21,6 @@
 
 #include "AirQualitySensorUI.h"
 #include "AppTask.h"
-#include "SensorManager.h"
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include <air-quality-sensor-manager.h>

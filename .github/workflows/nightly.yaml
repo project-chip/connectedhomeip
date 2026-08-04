@@ -338,6 +338,11 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v7
 
+            # The gh-pages Allure history is handled several times over on this
+            # runner (checkout, history copy, deploy clone), so free up disk first.
+            - name: Maximize runner disk
+              uses: ./.github/actions/maximize-runner-disk
+
             - name: Download all JUnit XML results
               uses: actions/download-artifact@v8
               with:
@@ -386,7 +391,9 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: allure-history/allure-report/nightly
                   destination_dir: allure-report/nightly
-                  keep_files: true
+                  # keep_files: false prunes reports beyond keep_reports from the
+                  # branch; scoped to destination_dir, so other subfolders are kept.
+                  keep_files: false
 
             - name: Notify Slack on Failure
               if: failure()

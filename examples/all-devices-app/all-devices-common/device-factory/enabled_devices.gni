@@ -83,6 +83,10 @@ _available_devices = [
     "DIMMABLE_PLUG_IN_UNIT",
   ],
   [
+    "dishwasher",
+    "DISHWASHER",
+  ],
+  [
     "extractor-hood",
     "EXTRACTOR_HOOD",
   ],
@@ -103,8 +107,20 @@ _available_devices = [
     "HUMIDITY_SENSOR",
   ],
   [
+    "laundry-dryer",
+    "LAUNDRY_DRYER",
+  ],
+  [
+    "laundry-washer",
+    "LAUNDRY_WASHER",
+  ],
+  [
     "light-sensor",
     "LIGHT_SENSOR",
+  ],
+  [
+    "microwave-oven",
+    "MICROWAVE_OVEN",
   ],
   [
     "mounted-dimmable-load-control",
@@ -157,6 +173,10 @@ _available_devices = [
   [
     "refrigerator",
     "REFRIGERATOR",
+  ],
+  [
+    "robotic-vacuum-cleaner",
+    "ROBOTIC_VACUUM_CLEANER",
   ],
   [
     "smoke-co-alarm",

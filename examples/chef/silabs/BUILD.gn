@@ -78,7 +78,7 @@ efr32_sdk("sdk") {
 silabs_executable("chef_app") {
   output_name = "matter-silabs-chef-example.out"
   include_dirs = [ "include" ]
-  defines = []
+  defines = [ "CONFIG_CHEF_SAMPLE_NAME=\"${sample_name}\"" ]
 
   sources = [
     "src/AppTask.cpp",
