@@ -62,7 +62,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
             TestStep(5, "TH reads from the DUT the StartUpMode attribute.",
-                "Verify that the DUT response contains an integer from supported_modes_dut or null"),
+                     "Verify that the DUT response contains an integer from supported_modes_dut or null"),
         ]
 
     def pics_TC_TSTATM_1_2(self) -> list[str]:
@@ -85,14 +85,14 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify that the list has at least 2 and at most 255 entries
         # Verify that each ModeOptionsStruct entry has a unique Mode field value
         # Verify that each ModeOptionsStruct entry has a unique Label field value
-        # Verify that each ModeOptionsStruct entry’s ModeTags field has: 
+        # Verify that each ModeOptionsStruct entry’s ModeTags field has:
         #   - at least one entry
         #   - no duplicates in ModeTag list
         #   - the values of the Value fields that are not larger than 16 bits
         #   - for each Value field:
         #       - Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001),
         #         Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006),
-        #         Max(0x0007), Night(0x0008), Day(0x0009)) or a defined derived cluster tag value 
+        #         Max(0x0007), Night(0x0008), Day(0x0009)) or a defined derived cluster tag value
         #         Off(0x4000), Cool(0x4001), Heat(0x4002), EmergencyHeat(0x4003)
         #       - or in the MfgTags (0x8000 to 0xBFFF) range
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
@@ -103,7 +103,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
                            CLUSTER.Enums.ModeTag.kHeat,
                            CLUSTER.Enums.ModeTag.kEmergencyHeat]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
-        # For the SupportedModes attribute: 
+        # For the SupportedModes attribute:
         #   (1) Verify that each entry contains exactly one of Off(0x4000), Cool(0x4001), Heat(0x4002), or Auto(0x0000) mode tag.
         #   (2) Verify that the Off(0x4000) tag appears in only one SupportedModes entry.
         #   (3) If the EmergencyHeat(0x4003) tag is included in a list:
@@ -128,6 +128,7 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # Verify that the DUT response contains an integer from supported_modes_dut or null
         mode = self.cluster.Attributes.StartUpMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
