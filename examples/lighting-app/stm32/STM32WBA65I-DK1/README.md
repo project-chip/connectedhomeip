@@ -1,6 +1,6 @@
 # Matter STM32 Lighting Example over thread
 
-This example demonstrates the Matter Lighting application on stm32wba platform.
+This example demonstrates the Matter Lighting application on stm32 platform.
 
 ---
 
@@ -18,7 +18,7 @@ Please refer
 guides to get started
 
 ```
-./scripts/build/build_examples.py --target stm32-STM32WBA65I-DK1-lighting build
+./scripts/build/build_examples.py --target stm32-$stm32_BOARD-lighting build
 ```
 
 ## Cluster Control

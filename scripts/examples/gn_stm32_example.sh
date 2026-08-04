@@ -28,7 +28,7 @@ echo_blue() {
     echo -e "\033[1;34m$*\033[0m"
 }
 
-if [[ -z "${MATTER_ROOT}" ]]; then
+if [[ -z "$MATTER_ROOT" ]]; then
     echo "Using default path for Matter root"
     CHIP_ROOT="$(dirname "$0")/../.."
 else
@@ -124,7 +124,7 @@ else
     while [ $# -gt 0 ]; do
         case $1 in
             --wifi)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--wifi requires mxchip"
                     exit 1
                 fi
@@ -169,7 +169,7 @@ else
         esac
     done
 
-    if [ -z "$STM32_BOARD" ]; then
+    if [ "$STM32_BOARD" = "" ]; then
         echo "STM32_BOARD not defined"
         exit 1
     fi
@@ -184,7 +184,7 @@ else
     else
         # thread build
         #
-        if [ -z "$optArgs" ]; then
+        if [ "$optArgs" = "" ]; then
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         else
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"

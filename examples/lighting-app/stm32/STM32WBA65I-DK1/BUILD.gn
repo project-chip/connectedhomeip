@@ -24,7 +24,7 @@ assert(current_os == "freertos")
 
 stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WBA65I-DK1"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
-stm32_board_src = "${chip_root}/examples/platform/stm32/common"
+stm32_board_src = "${chip_root}/examples/platform/stm32"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
@@ -103,12 +103,14 @@ stm32_sdk("sdk") {
 }
 
 stm32_executable("lighting_app") {
+  deps = []
+
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Inc",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
-    "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/App",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Inc",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App",
     "include/",
     "${chip_root}/src/include/",
   ]
@@ -128,6 +130,7 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
+    "${stm32_board_src}/STM32WBA65I-DK1/Src/main.c",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
@@ -168,7 +171,7 @@ stm32_executable("lighting_app") {
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
-      "src/ota.cpp",
+      "src/STM32WBA6/ota.cpp",
     ]
   }
 
