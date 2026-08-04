@@ -63,7 +63,6 @@ CHIP_ERROR VerifyCommand::Run()
 CHIP_ERROR VerifyCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = CurrentCommissioner().EstablishPASEConnection(mNodeId, mOnboardingPayload, DiscoveryType::kAll);
@@ -165,8 +164,6 @@ CHIP_ERROR VerifyCommand::ThreadCredentialsNeeded(chip::EndpointId endpoint)
 {
     return CHIP_NO_ERROR;
 }
-
-void VerifyCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) {}
 
 void VerifyCommand::PrintDeviceInformation()
 {

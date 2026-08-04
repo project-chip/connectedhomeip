@@ -33,7 +33,6 @@
 
 class VerifyCommand : public CHIPCommand,
                       public chip::Controller::DevicePairingDelegate,
-                      public chip::Controller::DeviceDiscoveryDelegate,
                       public chip::Credentials::DeviceAttestationDelegate
 {
 public:
@@ -59,9 +58,6 @@ public:
     void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting) override;
     CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
     CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
-
-    /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 
     /////////// DeviceAttestationDelegate /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
