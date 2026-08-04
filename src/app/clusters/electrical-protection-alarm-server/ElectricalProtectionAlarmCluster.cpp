@@ -106,8 +106,9 @@ CHIP_ERROR ElectricalProtectionAlarmCluster::ClearAllAlarms()
 CHIP_ERROR ElectricalProtectionAlarmCluster::SetState(AlarmBitmask newState)
 {
     const uint32_t oldRaw = mState.Raw();
-    // An alarm can only be active if its bit is supported.
-    const uint32_t newRaw = static_cast<uint32_t>(newState.Raw() & mSupported.Raw());
+    // An alarm can only be active if its bit is both supported and enabled by the mask; the Alarm
+    // Base cluster requires State to reflect the Mask, so a masked-out (disabled) alarm stays inactive.
+    const uint32_t newRaw = static_cast<uint32_t>(newState.Raw() & mSupported.Raw() & mMask.Raw());
 
     if (newRaw == oldRaw)
     {

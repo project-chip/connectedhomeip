@@ -186,3 +186,31 @@ TEST_F(TestElectricalProtectionAlarmCluster, UnsupportedAlarmBitsIgnored)
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+
+TEST_F(TestElectricalProtectionAlarmCluster, DisabledAlarmBitsIgnored)
+{
+    // OverVoltage is supported but disabled (masked out); ArcFault is supported and enabled.
+    ElectricalProtectionAlarmCluster::StartupConfiguration config;
+    config.featureMap.Set(Feature::kOverVoltage).Set(Feature::kArcFault);
+    config.supported.Set(AlarmBitmap::kOverVoltageFault).Set(AlarmBitmap::kArcFault);
+    config.mask.Set(AlarmBitmap::kArcFault); // OverVoltage omitted from the mask
+
+    TestServerClusterContext context;
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, config);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // A supported-but-disabled alarm must not transition State to active.
+    BitMask<AlarmBitmap> ov;
+    ov.Set(AlarmBitmap::kOverVoltageFault);
+    ASSERT_EQ(cluster.ActivateAlarms(ov), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.GetState().Raw(), 0u);
+
+    // A supported and enabled alarm still activates (the mask does not over-suppress).
+    BitMask<AlarmBitmap> arc;
+    arc.Set(AlarmBitmap::kArcFault);
+    ASSERT_EQ(cluster.ActivateAlarms(arc), CHIP_NO_ERROR);
+    ASSERT_TRUE(cluster.GetState().Has(AlarmBitmap::kArcFault));
+    ASSERT_FALSE(cluster.GetState().Has(AlarmBitmap::kOverVoltageFault));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
