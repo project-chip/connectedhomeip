@@ -26,6 +26,7 @@
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstddef>
 
@@ -107,7 +108,9 @@ private:
     const BitMask<PowerTopology::Feature> mFeatureFlags;
     FabricTable * mFabricTable;
 
-    StoredCircuitNode mCircuitNodes[kMaxCircuitNodes];
+    // Heap-allocated on Startup only when the CIRC feature is enabled: kMaxCircuitNodes entries are
+    // ~8 KB, too large for an inline member on stack-constrained embedded platforms (and in tests).
+    Platform::ScopedMemoryBuffer<StoredCircuitNode> mCircuitNodes;
     size_t mCircuitNodeCount = 0;
 };
 
