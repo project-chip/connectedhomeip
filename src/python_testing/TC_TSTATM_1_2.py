@@ -36,8 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from modebase_cluster_check import ModeBaseClusterChecks
 from mobly import asserts
+from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
@@ -164,7 +164,8 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
         asserts.assert_less_equal(off_tag_count, 1, "Off tag must appear in at most one SupportedModes entry")
         if heat_with_emergency_heat_exists:
-            asserts.assert_true(heat_without_emergency_heat_exists, "If EmergencyHeat is supported, a Heat-only mode must also exist")
+            asserts.assert_true(heat_without_emergency_heat_exists,
+                                "If EmergencyHeat is supported, a Heat-only mode must also exist")
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
