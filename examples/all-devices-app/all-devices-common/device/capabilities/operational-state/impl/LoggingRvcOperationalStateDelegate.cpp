@@ -52,6 +52,52 @@ CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t
     return CHIP_NO_ERROR;
 }
 
+namespace {
+
+constexpr uint8_t kRunModeCleaning = 1;
+constexpr uint8_t kRunModeMapping  = 2;
+
+} // namespace
+
+void LoggingRvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Pause command received.");
+    mStateBeforePause = mCluster ? mCluster->GetCurrentOperationalState() : 0;
+    LoggingOperationalStateDelegate::HandlePauseStateCallback(err);
+}
+
+void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Resume command received.");
+    if (!mCluster)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        return;
+    }
+
+    uint8_t targetState  = to_underlying(OperationalStateEnum::kRunning);
+    uint8_t currentState = mCluster->GetCurrentOperationalState();
+
+    if (currentState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
+        currentState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
+    {
+        uint8_t runMode = mRunModeCluster ? mRunModeCluster->GetCurrentMode() : 0;
+        if (runMode != kRunModeCleaning && runMode != kRunModeMapping)
+        {
+            err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
+    }
+    else if (currentState == to_underlying(OperationalStateEnum::kPaused) &&
+            mStateBeforePause == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+    {
+        targetState = to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
+    }
+
+    LogErrorOnFailure(mCluster->SetOperationalState(targetState));
+    err.Set(to_underlying(ErrorStateEnum::kNoError));
+}
+
 void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");

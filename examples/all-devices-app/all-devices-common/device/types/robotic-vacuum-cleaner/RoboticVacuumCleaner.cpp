@@ -67,6 +67,7 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
     mRunModeDelegate.SetCluster(&mRunModeCluster.Cluster());
     mRunModeDelegate.SetOperationalStateCluster(&mOperationalStateCluster.Cluster());
     mCleanModeDelegate.SetRunModeCluster(&mRunModeCluster.Cluster());
+    mDelegate.SetRunModeCluster(&mRunModeCluster.Cluster());
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 

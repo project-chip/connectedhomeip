@@ -18,6 +18,7 @@
 #pragma once
 
 #include "LoggingOperationalStateDelegate.h"
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 
 namespace chip::app::Clusters::OperationalState {
 
@@ -27,7 +28,17 @@ public:
     LoggingRvcOperationalStateDelegate() = default;
 
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
+    void HandlePauseStateCallback(GenericOperationalError & err) override;
+    void HandleResumeStateCallback(GenericOperationalError & err) override;
     void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
+
+    // Bound after construction so Resume can tell whether the RVC is mid-task (Cleaning/Mapping)
+    // before allowing it to leave Charging/Docked, mirroring examples/rvc-app's RvcDevice.
+    void SetRunModeCluster(ModeBaseCluster * runModeCluster) { mRunModeCluster = runModeCluster; }
+
+private:
+    ModeBaseCluster * mRunModeCluster = nullptr;
+    uint8_t mStateBeforePause         = 0;
 };
 
 } // namespace chip::app::Clusters::OperationalState
