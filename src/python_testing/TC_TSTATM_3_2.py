@@ -34,19 +34,21 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
+
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.matter_testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, matter_asserts
 from matter.testing.runner import TestStep, default_matter_test_main
-from itertools import count
 
-import logging
 log = logging.getLogger(__name__)
 
 # Auto-generated from test specification: [TC-TSTATM-3.2] Startup Mode functionality with DUT as Server
+
+
 class TC_TSTATM_3_2(MatterBaseTest):
 
     def pics_TC_TSTATM_3_2(self) -> list[str]:
@@ -89,7 +91,7 @@ class TC_TSTATM_3_2(MatterBaseTest):
     async def test_TC_TSTATM_3_2(self):
         self.step(1)
         # Commission DUT to TH (can be skipped if done in a preceding test).
-        # 
+        #
 
         self.step(2)
         # TH reads from the DUT the StartUpMode attribute.
