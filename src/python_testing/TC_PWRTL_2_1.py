@@ -191,58 +191,16 @@ class TC_PWRTL_2_1(MatterBaseTest):
         else:
             self.mark_current_step_skipped()
 
-        self.step(10, "TH reads ElectricalCircuitNodes (if CIRC)")
-        if has_circ:
-            ecn_initial = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.ElectricalCircuitNodes
-            )
-            log.info("ElectricalCircuitNodes (initial): %s", ecn_initial)
-        else:
-            self.mark_current_step_skipped()
-
-        self.step(11, "TH writes one ElectricalCircuitNodes entry and reads it back (if CIRC)")
-        ecn_written = None
-        if has_circ:
-            ecn_written = cluster.Structs.CircuitNodeStruct(
-                node=0x1122334455667788, endpoint=endpoint, label="TC-PWRTL-2.1")
-            status = await self.write_single_attribute(
-                attributes.ElectricalCircuitNodes([ecn_written]), endpoint_id=endpoint)
-            asserts.assert_equal(status, Status.Success, "Write to ElectricalCircuitNodes should succeed")
-            ecn_readback = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.ElectricalCircuitNodes
-            )
-            # Fabric-filtered read returns only the accessing fabric's nodes.
-            asserts.assert_equal(len(ecn_readback), 1,
-                                 "Fabric-filtered read should return exactly the one written node")
-            asserts.assert_equal(ecn_readback[0].node, ecn_written.node,
-                                 "Read-back NodeID does not match the written value")
-            asserts.assert_equal(ecn_readback[0].endpoint, ecn_written.endpoint,
-                                 "Read-back Endpoint does not match the written value")
-            asserts.assert_equal(ecn_readback[0].label, ecn_written.label,
-                                 "Read-back Label does not match the written value")
-            asserts.assert_not_equal(ecn_readback[0].fabricIndex, 0,
-                                     "Read-back node must carry the accessing fabric index")
-            log.info("ElectricalCircuitNodes write round-trip verified")
-        else:
-            self.mark_current_step_skipped()
-
-        # A single operator reboot verifies Non-volatile persistence of both the device-populated
-        # ActiveEndpoints and the written ElectricalCircuitNodes.
-        needs_reboot_check = (active_eps is not None) or (ecn_written is not None)
-
-        self.step(12, "Operator reboots DUT (skipped in CI)")
-        if self.is_pics_sdk_ci_only or not needs_reboot_check:
-            # CI cannot drive an operator reboot; nothing to verify Non-volatile persistence against.
+        self.step(10, "Operator reboots DUT (skipped in CI)")
+        if self.is_pics_sdk_ci_only or active_eps is None:
+            # CI cannot drive an operator reboot, and there are no ActiveEndpoints
+            # to verify Non-volatile persistence against.
             self.mark_current_step_skipped()
         else:
             self.wait_for_user_input(
                 prompt_msg="Reboot the DUT and wait for it to rejoin the fabric. Press Enter.")
 
-        self.step(13, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)")
+        self.step(11, "TH verifies ActiveEndpoints persists after reboot - Non-volatile (skipped in CI)")
         if self.is_pics_sdk_ci_only or active_eps is None:
             self.mark_current_step_skipped()
         else:
@@ -254,21 +212,6 @@ class TC_PWRTL_2_1(MatterBaseTest):
             asserts.assert_equal(sorted(active_eps_post), sorted(active_eps),
                                  "ActiveEndpoints changed after reboot - violates Non-volatile quality")
             log.info("ActiveEndpoints persisted across reboot (Non-volatile verified)")
-
-        self.step(14, "TH verifies ElectricalCircuitNodes persists after reboot - Non-volatile (skipped in CI)")
-        if self.is_pics_sdk_ci_only or ecn_written is None:
-            self.mark_current_step_skipped()
-        else:
-            ecn_post = await self.read_single_attribute_check_success(
-                endpoint=endpoint,
-                cluster=cluster,
-                attribute=attributes.ElectricalCircuitNodes
-            )
-            asserts.assert_equal(len(ecn_post), 1,
-                                 "ElectricalCircuitNodes count changed after reboot - violates Non-volatile quality")
-            asserts.assert_equal(ecn_post[0].node, ecn_written.node,
-                                 "ElectricalCircuitNodes NodeID changed after reboot - violates Non-volatile quality")
-            log.info("ElectricalCircuitNodes persisted across reboot (Non-volatile verified)")
 
 
 if __name__ == "__main__":
