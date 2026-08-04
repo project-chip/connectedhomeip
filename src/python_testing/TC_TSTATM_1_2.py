@@ -37,6 +37,7 @@
 
 
 from modebase_cluster_check import ModeBaseClusterChecks
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
@@ -59,8 +60,10 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     def steps_TC_TSTATM_1_2(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
-            TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
+            TestStep(2, "TH reads from the DUT the SupportedModes attribute.",
+                     "Verify that the DUT response contains a list of ModeOptionsStruct entries Verify that the list has at least 2 and at most 255 entries Verify that each ModeOptionsStruct entry has a unique Mode field value Verify that each ModeOptionsStruct entry has a unique Label field value Verify that each ModeOptionsStruct entry’s ModeTags field has: at least one entry no duplicates in ModeTag list the values of the Value fields that are not larger than 16 bits for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined derived cluster tag value (Off(0x4000), Cool(0x4001), Heat(0x4002), EmergencyHeat(0x4003)) or in the MfgTags (0x8000 to 0xBFFF) range for at least one Value field: Is the mode tag value the common tag value Auto(0x0000) or a derived cluster value (Off(0x4000), Cool(0x4001), Heat(0x4002), EmergencyHeat(0x4003)) For the SupportedModes attribute: (1) Verify that each entry contains exactly one of Off(0x4000), Cool(0x4001), Heat(0x4002), or Auto(0x0000) mode tag. (2) Verify that the Off(0x4000) tag appears in only one SupportedModes entry. (3) If the EmergencyHeat(0x4003) tag is included in a list: (3a) Verify that the Heat(0x4002) tag appears in the same list as the EmergencyHeat(0x4003) tag. (3b) One or more manufacturer tags MAY be included in the same list as the EmergencyHeat(0x4003) tag. (3c) The Heat(0x4002) SHALL appear without the EmergencyHeat(0x4003) tag in a separate list from the list which includes the Heat(0x4002) and EmergencyHeat(0x4003) tags. (4) The Heat(0x4002), Cool(0x4001) and Auto(0x0000) tags MAY appear in a list by themselves or with one or more manufacturer tag. (5) The Heat(0x4002), Cool(0x4001) or Auto(0x0000) SHALL NOT appear in a list together or in a list with any two of these tags. (6) If a manufacturer tag appears in a list, a standard tag SHALL also appear in the same list. (7) Verify that the each ModeTags field contains at most 8 entries. (8) Verify that the each Label field has a length of at most 64. Save the Mode field values as supported_modes_dut"),
+            TestStep(3, "TH reads from the DUT the CurrentMode attribute.",
+                     "Verify that the DUT response contains an integer from supported_modes_dut"),
             TestStep(5, "TH reads from the DUT the StartUpMode attribute.",
                      "Verify that the DUT response contains an integer from supported_modes_dut or null"),
         ]
@@ -117,6 +120,51 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         #       a list with any two of these tags.
         #   (6) If a manufacturer tag appears in a list, a standard tag SHALL also appear in the same list.
         # Save the Mode field values as supported_modes_dut
+        #   (7) Verify that each ModeTags field contains at most 8 entries.
+        #   (8) Verify that each Label field has a length of at most 64.
+
+        off_tag_count = 0
+        heat_with_emergency_heat_exists = False
+        heat_without_emergency_heat_exists = False
+
+        base_tags = [CLUSTER.Enums.ModeTag.kOff, CLUSTER.Enums.ModeTag.kCool,
+                     CLUSTER.Enums.ModeTag.kHeat, CLUSTER.Enums.ModeTag.kAuto]
+
+        for mode in supported_modes:
+            # (7)
+            asserts.assert_less_equal(len(mode.modeTags), 8, "ModeTags field has more than 8 entries")
+            # (8)
+            asserts.assert_less_equal(len(mode.label), 64, "Label field has more than 64 characters")
+
+            tags = [tag.value for tag in mode.modeTags]
+
+            # (1)
+            base_tag_count = sum(1 for tag in tags if tag in base_tags)
+            asserts.assert_equal(base_tag_count, 1, f"Mode {mode.mode} must have exactly one of Off, Cool, Heat, or Auto tags")
+
+            # (2)
+            if CLUSTER.Enums.ModeTag.kOff in tags:
+                off_tag_count += 1
+
+            # (3)
+            if CLUSTER.Enums.ModeTag.kEmergencyHeat in tags:
+                # (3a)
+                asserts.assert_in(CLUSTER.Enums.ModeTag.kHeat, tags, "EmergencyHeat tag must be accompanied by Heat tag")
+                heat_with_emergency_heat_exists = True
+            elif CLUSTER.Enums.ModeTag.kHeat in tags:
+                heat_without_emergency_heat_exists = True
+
+            # (5)
+            asserts.assert_less_equal(sum(1 for tag in tags if tag in [CLUSTER.Enums.ModeTag.kHeat, CLUSTER.Enums.ModeTag.kCool, CLUSTER.Enums.ModeTag.kAuto]), 1,
+                                      "Heat, Cool, and Auto tags must not appear together")
+
+            # (6)
+            if any(0x8000 <= tag <= 0xBFFF for tag in tags):
+                asserts.assert_true(any(tag < 0x8000 for tag in tags), "Manufacturer tag must be accompanied by a standard tag")
+
+        asserts.assert_less_equal(off_tag_count, 1, "Off tag must appear in at most one SupportedModes entry")
+        if heat_with_emergency_heat_exists:
+            asserts.assert_true(heat_without_emergency_heat_exists, "If EmergencyHeat is supported, a Heat-only mode must also exist")
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
