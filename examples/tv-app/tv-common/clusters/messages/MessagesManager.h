@@ -92,10 +92,7 @@ struct CachedMessage
     }
 
     chip::ByteSpan GetMessageId() const { return chip::ByteSpan(mMessageIdBuffer); }
-    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & GetMessageControl() const
-    {
-        return mMessageControl;
-    }
+    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & GetMessageControl() const { return mMessageControl; }
     const chip::app::DataModel::Nullable<uint32_t> & GetStartTime() const { return mStartTime; }
     const chip::app::DataModel::Nullable<uint64_t> & GetDuration() const { return mDuration; }
     MessageState GetState() const { return mState; }

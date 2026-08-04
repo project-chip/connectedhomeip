@@ -131,10 +131,9 @@ CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & m
                                    const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
                                    const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference)
 {
-    Events::MessageComplete::Type event{ .messageID                = messageId,
-                                         .responseID                = responseId,
-                                         .reply                     = reply,
-                                         .futureMessagesPreference = futureMessagesPreference };
+    Events::MessageComplete::Type event{
+        .messageID = messageId, .responseID = responseId, .reply = reply, .futureMessagesPreference = futureMessagesPreference
+    };
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);

@@ -174,7 +174,7 @@ void MessagesManager::ScheduleOrPresentMessage(const uint8_t (&messageIdBuffer)[
     }
 
     uint32_t nowEpochS = 0;
-    CHIP_ERROR err      = System::Clock::GetClock_MatterEpochS(nowEpochS);
+    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(nowEpochS);
     if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         ChipLogProgress(Zcl, "MessagesManager: real time not synced yet, rechecking in %u s", kClockRecheckIntervalSeconds);
@@ -291,19 +291,18 @@ void MessagesManager::CancelMessageTimers(const ByteSpan & messageId)
 
 void MessagesManager::OnMessageTimerExpired(System::Layer * systemLayer, void * context)
 {
-    auto * ctx              = reinterpret_cast<MessageTimerContext *>(context);
-    MessagesManager * self  = ctx->manager;
-    MessageTimerType type   = ctx->type;
+    auto * ctx             = reinterpret_cast<MessageTimerContext *>(context);
+    MessagesManager * self = ctx->manager;
+    MessageTimerType type  = ctx->type;
     uint8_t messageId[kMessageIdLength];
     memcpy(messageId, ctx->messageId, sizeof(messageId));
 
     // Drop our tracking entry for this timer now that it fired; `ctx` must not be
     // dereferenced again after this, since this may be its last owning shared_ptr.
-    self->mTimerContexts.erase(std::remove_if(self->mTimerContexts.begin(), self->mTimerContexts.end(),
-                                              [ctx](const std::shared_ptr<MessageTimerContext> & entry) {
-                                                  return entry.get() == ctx;
-                                              }),
-                               self->mTimerContexts.end());
+    self->mTimerContexts.erase(
+        std::remove_if(self->mTimerContexts.begin(), self->mTimerContexts.end(),
+                       [ctx](const std::shared_ptr<MessageTimerContext> & entry) { return entry.get() == ctx; }),
+        self->mTimerContexts.end());
 
     if (type == MessageTimerType::kPresent)
     {

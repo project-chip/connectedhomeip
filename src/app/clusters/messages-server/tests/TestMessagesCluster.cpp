@@ -383,7 +383,7 @@ TEST_F(TestMessagesCluster, LogMessageCompleteEventFiresWithNullResponse)
     EXPECT_EQ(LogMessageCompleteEvent(kTestEndpointId, ByteSpan(kMessageId), Optional<DataModel::Nullable<uint32_t>>(),
                                       Optional<DataModel::Nullable<CharSpan>>(),
                                       DataModel::Nullable<FutureMessagePreferenceEnum>()),
-             CHIP_NO_ERROR);
+              CHIP_NO_ERROR);
     EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
 }
 
@@ -396,6 +396,6 @@ TEST_F(TestMessagesCluster, LogMessageCompleteEventFiresWithRealResponse)
                                       MakeOptional(DataModel::Nullable<uint32_t>(static_cast<uint32_t>(1))),
                                       MakeOptional(DataModel::Nullable<CharSpan>("Yes"_span)),
                                       DataModel::Nullable<FutureMessagePreferenceEnum>(FutureMessagePreferenceEnum::kAllowed)),
-             CHIP_NO_ERROR);
+              CHIP_NO_ERROR);
     EXPECT_GT(EventManagement::GetInstance().GetLastEventNumber(), before);
 }
