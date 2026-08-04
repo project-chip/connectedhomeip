@@ -168,6 +168,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/electrical-protection-alarm-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/electrical-distribution-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/soil-measurement-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp

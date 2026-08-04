@@ -40,6 +40,7 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/electrical-protection-alarm-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/electrical-distribution-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp

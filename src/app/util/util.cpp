@@ -143,6 +143,7 @@ void MatterCommodityPricePluginServerInitCallback() {}
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
 void MatterElectricalProtectionAlarmPluginServerInitCallback() {}
+void MatterElectricalDistributionPluginServerInitCallback() {}
 void MatterSoilMeasurementPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterIcdManagementPluginServerInitCallback() {}
