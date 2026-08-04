@@ -104,8 +104,7 @@ void VerifyCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommiss
     {
         auto * verifier        = CurrentCommissioner().GetDeviceAttestationVerifier();
         auto * defaultVerifier = static_cast<chip::Credentials::DefaultDACVerifier *>(verifier);
-        const chip::Credentials::AttestationTrustStore * trustStore     = defaultVerifier->GetAttestationTrustStore();
-        const chip::Credentials::AttestationTrustStore * testTrustStore = chip::Credentials::GetTestAttestationTrustStore();
+        const chip::Credentials::AttestationTrustStore * trustStore = defaultVerifier->GetAttestationTrustStore();
 
         uint8_t paaScratchBuf[chip::Credentials::kMaxDERCertLength];
         chip::MutableByteSpan paaDerBuffer(paaScratchBuf);
@@ -114,11 +113,6 @@ void VerifyCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommiss
         if (trustStore != nullptr)
         {
             err = trustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
-        }
-        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            // Use test trust store as fallback.
-            err = testTrustStore->GetProductAttestationAuthorityCert(paiAkid, paaDerBuffer);
         }
         if (err == CHIP_NO_ERROR)
         {
