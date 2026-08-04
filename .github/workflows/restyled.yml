@@ -17,7 +17,7 @@ jobs:
       - uses: restyled-io/actions/setup@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
 
       - id: restyler
-        uses: restyled-io/actions/run@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
+        uses: restyled-io/actions/run@67eaade33e75b529818c2e07c506ad29c2c1d776 # v4
 
       - name: Save restyle patch
         if: ${{ steps.restyler.outputs.git-patch }}
