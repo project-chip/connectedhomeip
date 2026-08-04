@@ -582,6 +582,71 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
     }
 }
 
+// Mirrors IdentificationDeclaration::IdentificationDeclarationTLVTag, which is private.
+// Values are positional starting at 1; see UserDirectedCommissioning.h.
+namespace {
+constexpr uint8_t kTestTargetAppListTag = 9;
+constexpr uint8_t kTestTargetAppTag     = 10;
+constexpr uint8_t kTestAppVendorIdTag   = 11;
+constexpr uint8_t kTestAppProductIdTag  = 12;
+
+// Mirrors IdentificationDeclaration::kMaxTargetAppInfos, which is also private.
+constexpr uint8_t kTestMaxTargetAppInfos = 10;
+} // namespace
+
+// A TargetAppList carrying more entries than the fixed array holds must be capped by
+// ReadPayload rather than stored past the end of mTargetAppInfos.
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppListOverflow)
+{
+    constexpr size_t kHeaderLen = Dnssd::Commission::kInstanceNameMaxLength + 1;
+    // Comfortably more entries than the array holds, while keeping any pre-fix write
+    // inside the object rather than off the end of the stack.
+    constexpr uint16_t kEntries = 14;
+
+    uint8_t payload[kHeaderLen + 512];
+    memset(payload, 0, sizeof(payload));
+    Platform::CopyString(reinterpret_cast<char *>(payload), kHeaderLen, "instance-name");
+
+    TLV::TLVWriter writer;
+    writer.Init(payload + kHeaderLen, sizeof(payload) - kHeaderLen);
+
+    // ReadPayload expects an anonymous structure envelope before any context-tagged element.
+    TLV::TLVType envelopeType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, envelopeType), CHIP_NO_ERROR);
+
+    TLV::TLVType listType;
+    ASSERT_EQ(writer.StartContainer(TLV::ContextTag(kTestTargetAppListTag), TLV::kTLVType_List, listType), CHIP_NO_ERROR);
+    for (uint16_t i = 0; i < kEntries; i++)
+    {
+        TLV::TLVType structType;
+        ASSERT_EQ(writer.StartContainer(TLV::ContextTag(kTestTargetAppTag), TLV::kTLVType_Structure, structType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(kTestAppVendorIdTag), static_cast<uint16_t>(i + 1)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(kTestAppProductIdTag), static_cast<uint16_t>(i + 100)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(structType), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(listType), CHIP_NO_ERROR);
+
+    ASSERT_EQ(writer.EndContainer(envelopeType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    IdentificationDeclaration idOut;
+    idOut.ReadPayload(payload, kHeaderLen + writer.GetLengthWritten());
+
+    // The parser must fill the array to capacity and stop there. Asserting equality rather
+    // than an upper bound also fails if the list was not parsed at all, which would otherwise
+    // satisfy a bound check and skip the verification loop below.
+    EXPECT_EQ(idOut.GetNumTargetAppInfos(), kTestMaxTargetAppInfos);
+
+    // Every entry the parser claims to have stored must be readable and correct.
+    for (uint8_t i = 0; i < idOut.GetNumTargetAppInfos(); i++)
+    {
+        TargetAppInfo info;
+        EXPECT_TRUE(idOut.GetTargetAppInfo(i, info));
+        EXPECT_EQ(info.vendorId, static_cast<uint16_t>(i + 1));
+        EXPECT_EQ(info.productId, static_cast<uint16_t>(i + 100));
+    }
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
