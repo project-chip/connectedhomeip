@@ -89,7 +89,7 @@ void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperat
         }
     }
     else if (currentState == to_underlying(OperationalStateEnum::kPaused) &&
-            mStateBeforePause == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+             mStateBeforePause == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
     {
         targetState = to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
     }
