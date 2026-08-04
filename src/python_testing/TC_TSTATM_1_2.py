@@ -120,13 +120,13 @@ class TC_TSTATM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
         self.step(3)
         # Verify that the CurrentMode attribute has a valid value.
-        mode = self.cluster.Attributes.CurrentMode
+        mode = CLUSTER.Attributes.CurrentMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
         self.step(5)
         # TH reads from the DUT the StartUpMode attribute.
         # Verify that the DUT response contains an integer from supported_modes_dut or null
-        mode = self.cluster.Attributes.StartUpMode
+        mode = CLUSTER.Attributes.StartUpMode
         await self.read_and_check_mode(endpoint=endpoint, mode=mode, supported_modes=supported_modes)
 
 if __name__ == "__main__":

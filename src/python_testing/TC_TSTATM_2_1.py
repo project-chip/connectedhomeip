@@ -23,7 +23,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --app-pipe /tmp/dishm_2_1_fifo
+#       --app-pipe /tmp/tstatm_2_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -33,7 +33,7 @@
 #       --int-arg PIXIT.TSTATM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.TSTATM.MODE_CHANGE_FAIL:2
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/dishm_2_1_fifo
+#       --app-pipe /tmp/tstatm_2_1_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -98,7 +98,7 @@ class TC_TSTATM_2_1(MatterBaseTest):
             "TSTATM.S"
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.DishwasherMode))
+    @run_if_endpoint_matches(has_cluster(Clusters.ThermostatMode))
     async def test_TC_TSTATM_2_1(self):
 
         class CommonCodes(Enum):
@@ -107,7 +107,7 @@ class TC_TSTATM_2_1(MatterBaseTest):
             GENERIC_FAILURE = 0x02
             INVALID_IN_MODE = 0x03
 
-        cluster = Clusters.Objects.DishwasherMode
+        cluster = Clusters.ThermostatMode
         supported_modes_attribute = cluster.Attributes.SupportedModes
         current_mode_attribute = cluster.Attributes.CurrentMode
         endpoint = self.get_endpoint()
@@ -183,7 +183,7 @@ class TC_TSTATM_2_1(MatterBaseTest):
         self.step(5)
         if self.pics_guard(failure_and_manual):
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
+                self.write_to_app_pipe({"Name": "ModeChange", "Device": "Thermostat", "Type": "ToggleFailTransition"})
             else:
                 self.wait_for_user_input(prompt_msg=(
                     f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready"))
@@ -234,7 +234,7 @@ class TC_TSTATM_2_1(MatterBaseTest):
         self.step(9)
         if self.pics_guard(can_manually_control):
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
+                self.write_to_app_pipe({"Name": "ModeChange", "Device": "Thermostat", "Type": "ToggleFailTransition"})
             else:
                 self.wait_for_user_input(
                     prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, and press Enter when ready.")
