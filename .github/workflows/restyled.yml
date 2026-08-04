@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - uses: restyled-io/actions/setup@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
+      - uses: restyled-io/actions/setup@67eaade33e75b529818c2e07c506ad29c2c1d776 # v4
 
       - id: restyler
         uses: restyled-io/actions/run@bce8886781a3a4e9510a248d37a87e64ba143465 # v4
