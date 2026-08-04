@@ -160,6 +160,9 @@ CHIP_ERROR PowerTopologyCluster::Startup(ServerClusterContext & context)
 
     if (mFeatureFlags.Has(Feature::kElectricalCircuit))
     {
+        // Allocate the fabric-scoped node storage on the heap (only for CIRC-enabled instances).
+        VerifyOrReturnError(mCircuitNodes.Calloc(kMaxCircuitNodes), CHIP_ERROR_NO_MEMORY);
+
         // Restore the persisted (non-volatile) ElectricalCircuitNodes list. A missing value is normal
         // on first boot and must not fail startup.
         CHIP_ERROR err = LoadCircuitNodes();
