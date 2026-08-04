@@ -16,11 +16,15 @@
  */
 
 #include "LoggingRvcOperationalStateDelegate.h"
-#include <clusters/RvcOperationalState/Enums.h>
+
+#include <RvcSimulationTopology.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::Clusters::OperationalState {
+
+using namespace chip::examples::rvc_simulation::Topology;
 
 CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
@@ -52,12 +56,32 @@ CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t
     return CHIP_NO_ERROR;
 }
 
-namespace {
+void LoggingRvcOperationalStateDelegate::SetDeviceToIdleState()
+{
+    VerifyOrReturn(mCluster != nullptr);
 
-constexpr uint8_t kRunModeCleaning = 1;
-constexpr uint8_t kRunModeMapping  = 2;
+    if (mCharging)
+    {
+        mDocked = true;
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
+    }
+    else if (mDocked)
+    {
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+    }
+    else
+    {
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+    }
+}
 
-} // namespace
+void LoggingRvcOperationalStateDelegate::UpdateServiceAreaProgressOnExit()
+{
+    if (mServiceAreaDelegate != nullptr)
+    {
+        mServiceAreaDelegate->UpdateProgressOnExit();
+    }
+}
 
 void LoggingRvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
@@ -81,7 +105,7 @@ void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperat
     if (currentState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
         currentState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
     {
-        uint8_t runMode = mRunModeCluster ? mRunModeCluster->GetCurrentMode() : 0;
+        uint8_t runMode = mRunModeCluster ? mRunModeCluster->GetCurrentMode() : kRunModeIdle;
         if (runMode != kRunModeCleaning && runMode != kRunModeMapping)
         {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
@@ -93,19 +117,282 @@ void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperat
     {
         targetState = to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
     }
+    else if (currentState != to_underlying(OperationalStateEnum::kPaused))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
 
-    LogErrorOnFailure(mCluster->SetOperationalState(targetState));
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+    auto error = mCluster->SetOperationalState(targetState);
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(ErrorStateEnum::kNoError)
+                                     : to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
 }
 
 void LoggingRvcOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Go Home command received.");
-    if (mCluster)
+    if (!mCluster || !mRunModeCluster)
     {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        return;
     }
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
+
+    switch (mCluster->GetCurrentOperationalState())
+    {
+    case to_underlying(OperationalStateEnum::kStopped):
+    case to_underlying(OperationalStateEnum::kPaused):
+    case to_underlying(OperationalStateEnum::kRunning): {
+        if (mCluster->GetCurrentOperationalState() == to_underlying(OperationalStateEnum::kStopped) &&
+            mRunModeCluster->GetCurrentMode() != kRunModeIdle)
+        {
+            err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
+
+        mRunModeCluster->UpdateCurrentMode(kRunModeIdle);
+
+        auto error = mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+        err.Set((error == CHIP_NO_ERROR) ? to_underlying(ErrorStateEnum::kNoError)
+                                         : to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        return;
+    }
+    default:
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+}
+
+void LoggingRvcOperationalStateDelegate::HandleCharged()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kCharging))
+    {
+        ChipLogError(Zcl, "'Charged' is only accepted when the device is in the 'Charging' state.");
+        return;
+    }
+
+    mCharging = false;
+
+    if (mRunModeCluster && mRunModeCluster->GetCurrentMode() == kRunModeIdle)
+    {
+        if (mDocked)
+        {
+            LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+        }
+        else
+        {
+            LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+        }
+    }
+    else
+    {
+        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kRunning)));
+    }
+}
+
+void LoggingRvcOperationalStateDelegate::HandleCharging()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
+    {
+        ChipLogError(Zcl, "'Charging' is only accepted when the device is in the 'Docked' state.");
+        return;
+    }
+
+    mCharging = true;
+    LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
+}
+
+void LoggingRvcOperationalStateDelegate::HandleDocked()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kStopped))
+    {
+        ChipLogError(Zcl, "'Docked' is only accepted when the device is in the 'Stopped' state.");
+        return;
+    }
+
+    mDocked = true;
+    LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked)));
+}
+
+void LoggingRvcOperationalStateDelegate::HandleChargerFound()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+    {
+        ChipLogError(Zcl, "'ChargerFound' is only accepted when the device is in the 'SeekingCharger' state.");
+        return;
+    }
+
+    mCharging = true;
+    mDocked   = true;
+    LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging)));
+}
+
+void LoggingRvcOperationalStateDelegate::HandleLowCharge()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kRunning))
+    {
+        ChipLogError(Zcl, "'LowCharge' is only accepted when the device is in the 'Running' state.");
+        return;
+    }
+
+    LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+}
+
+void LoggingRvcOperationalStateDelegate::HandleActivityComplete()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kRunning))
+    {
+        ChipLogError(Zcl, "'ActivityComplete' is only accepted when the device is in the 'Running' state.");
+        return;
+    }
+
+    if (mRunModeCluster)
+    {
+        mRunModeCluster->UpdateCurrentMode(kRunModeIdle);
+    }
+
+    Optional<DataModel::Nullable<uint32_t>> totalTime(DataModel::Nullable<uint32_t>(100));
+    Optional<DataModel::Nullable<uint32_t>> pausedTime(DataModel::Nullable<uint32_t>(10));
+    mCluster->OnOperationCompletionDetected(0, totalTime, pausedTime);
+
+    LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+
+    if (mServiceAreaCluster)
+    {
+        mServiceAreaCluster->SetCurrentArea(DataModel::NullNullable);
+        mServiceAreaCluster->SetEstimatedEndTime(DataModel::NullNullable);
+    }
+    UpdateServiceAreaProgressOnExit();
+}
+
+void LoggingRvcOperationalStateDelegate::HandleAreaComplete()
+{
+    VerifyOrReturn(mServiceAreaDelegate != nullptr);
+
+    bool finished = false;
+    mServiceAreaDelegate->GoToNextArea(ServiceArea::OperationalStatusEnum::kCompleted, finished);
+
+    if (finished)
+    {
+        HandleActivityComplete();
+    }
+}
+
+void LoggingRvcOperationalStateDelegate::HandleClearError()
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    if (mCluster->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kError))
+    {
+        ChipLogError(Zcl, "'ClearError' is only accepted when the device is in the 'Error' state.");
+        return;
+    }
+
+    if (mRunModeCluster)
+    {
+        mRunModeCluster->UpdateCurrentMode(kRunModeIdle);
+    }
+    SetDeviceToIdleState();
+}
+
+void LoggingRvcOperationalStateDelegate::HandleErrorEvent(const std::string & error)
+{
+    VerifyOrReturn(mCluster != nullptr);
+
+    uint8_t errorStateId;
+
+    if (error == "UnableToStartOrResume")
+    {
+        errorStateId = to_underlying(ErrorStateEnum::kUnableToStartOrResume);
+    }
+    else if (error == "UnableToCompleteOperation")
+    {
+        errorStateId = to_underlying(ErrorStateEnum::kUnableToCompleteOperation);
+    }
+    else if (error == "CommandInvalidInState")
+    {
+        errorStateId = to_underlying(ErrorStateEnum::kCommandInvalidInState);
+    }
+    else if (error == "FailedToFindChargingDock")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock);
+    }
+    else if (error == "Stuck")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kStuck);
+    }
+    else if (error == "DustBinMissing")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing);
+    }
+    else if (error == "DustBinFull")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull);
+    }
+    else if (error == "WaterTankEmpty")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty);
+    }
+    else if (error == "WaterTankMissing")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing);
+    }
+    else if (error == "WaterTankLidOpen")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen);
+    }
+    else if (error == "MopCleaningPadMissing")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+    }
+    else if (error == "BatteryLow" || error == "LowBattery")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+    }
+    else if (error == "CannotReachTargetArea")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+    }
+    else if (error == "DirtyWaterTankFull")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+    }
+    else if (error == "DirtyWaterTankMissing")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+    }
+    else if (error == "WheelsJammed")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+    }
+    else if (error == "BrushJammed")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+    }
+    else if (error == "NavigationSensorObscured")
+    {
+        errorStateId = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
+    }
+    else
+    {
+        ChipLogError(Zcl, "Unhandled ErrorEvent 'Error' value: %s", error.c_str());
+        return;
+    }
+
+    OperationalState::Structs::ErrorStateStruct::Type err;
+    err.errorStateID = errorStateId;
+    mCluster->OnOperationalErrorDetected(err);
 }
 
 } // namespace chip::app::Clusters::OperationalState
