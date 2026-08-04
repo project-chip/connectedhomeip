@@ -16,6 +16,7 @@
  */
 
 #include "LoggingRvcRunModeDelegate.h"
+#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -99,6 +100,10 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
             return;
         }
         LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
+        if (mServiceAreaDelegate != nullptr)
+        {
+            mServiceAreaDelegate->SetAttributesAtCleanStart();
+        }
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
 
@@ -111,6 +116,10 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
         }
         LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)));
+        if (mServiceAreaDelegate != nullptr)
+        {
+            mServiceAreaDelegate->UpdateProgressOnExit();
+        }
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);
         return;
 

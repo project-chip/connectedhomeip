@@ -17,20 +17,44 @@
 
 #pragma once
 
+#include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <app/clusters/service-area-server/service-area-delegate.h>
+#include <functional>
 
 namespace chip::app::Clusters::ServiceArea {
 
+// Service Area delegate for the Robotic Vacuum Cleaner device type.
+// Business logic is ported from examples/rvc-app/rvc-common/src/rvc-service-area-delegate.cpp.
 class LoggingServiceAreaDelegate : public Delegate
 {
 public:
     LoggingServiceAreaDelegate() = default;
 
+    CHIP_ERROR Init() override;
+
     bool IsSetSelectedAreasAllowed(MutableCharSpan & statusText) override;
     bool IsValidSelectAreasSet(const Span<const uint32_t> & selectedAreas, SelectAreasStatus & locationStatus,
                                MutableCharSpan & statusText) override;
+    bool HandleSkipArea(uint32_t skippedArea, MutableCharSpan & skipStatusText) override;
     bool IsSupportedAreasChangeAllowed() override;
     bool IsSupportedMapChangeAllowed() override;
+
+    void SetCluster(ServiceAreaCluster * cluster) { mCluster = cluster; }
+    void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
+
+    // Called when cleaning finishes after the last area is skipped/completed.
+    void SetActivityCompleteHandler(std::function<void()> handler) { mActivityCompleteHandler = std::move(handler); }
+
+    void SetMapTopology();
+    void SetAttributesAtCleanStart();
+    void GoToNextArea(OperationalStatusEnum currentAreaOpState, bool & finished);
+    void UpdateProgressOnExit();
+
+private:
+    ServiceAreaCluster * mCluster                                           = nullptr;
+    OperationalState::OperationalStateCluster * mOperationalStateCluster    = nullptr;
+    std::function<void()> mActivityCompleteHandler;
 };
 
 } // namespace chip::app::Clusters::ServiceArea

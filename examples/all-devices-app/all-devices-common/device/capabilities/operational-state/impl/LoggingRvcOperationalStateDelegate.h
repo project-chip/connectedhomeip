@@ -19,6 +19,13 @@
 
 #include "LoggingOperationalStateDelegate.h"
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
+#include <clusters/RvcOperationalState/Enums.h>
+#include <string>
+
+namespace chip::app::Clusters::ServiceArea {
+class LoggingServiceAreaDelegate;
+} // namespace chip::app::Clusters::ServiceArea
 
 namespace chip::app::Clusters::OperationalState {
 
@@ -35,10 +42,36 @@ public:
     // Bound after construction so Resume can tell whether the RVC is mid-task (Cleaning/Mapping)
     // before allowing it to leave Charging/Docked, mirroring examples/rvc-app's RvcDevice.
     void SetRunModeCluster(ModeBaseCluster * runModeCluster) { mRunModeCluster = runModeCluster; }
+    void SetServiceAreaCluster(ServiceArea::ServiceAreaCluster * serviceAreaCluster)
+    {
+        mServiceAreaCluster = serviceAreaCluster;
+    }
+    void SetServiceAreaDelegate(ServiceArea::LoggingServiceAreaDelegate * serviceAreaDelegate)
+    {
+        mServiceAreaDelegate = serviceAreaDelegate;
+    }
+
+    // Named-pipe simulation entry points ported from examples/rvc-app/rvc-common/src/rvc-device.cpp.
+    void HandleCharged();
+    void HandleCharging();
+    void HandleDocked();
+    void HandleChargerFound();
+    void HandleLowCharge();
+    void HandleActivityComplete();
+    void HandleAreaComplete();
+    void HandleClearError();
+    void HandleErrorEvent(const std::string & error);
 
 private:
-    ModeBaseCluster * mRunModeCluster = nullptr;
-    uint8_t mStateBeforePause         = 0;
+    void SetDeviceToIdleState();
+    void UpdateServiceAreaProgressOnExit();
+
+    ModeBaseCluster * mRunModeCluster                               = nullptr;
+    ServiceArea::ServiceAreaCluster * mServiceAreaCluster           = nullptr;
+    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate  = nullptr;
+    uint8_t mStateBeforePause                                       = 0;
+    bool mDocked                                                    = false;
+    bool mCharging                                                  = false;
 };
 
 } // namespace chip::app::Clusters::OperationalState

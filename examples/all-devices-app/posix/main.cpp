@@ -296,11 +296,13 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
                 .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
                     &rvcDevice->OperationalState());
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
-                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->ServiceArea());
+                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(
+                    &rvcDevice->GetServiceAreaCluster());
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->RunMode());
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->CleanMode());
+            gAllDevicesAppCommandDelegate.RegisterRvcDevice(rvcDevice->GetEndpointId(), rvcDevice);
         }
     }
 

@@ -26,6 +26,8 @@
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
+#include <json/json.h>
+#include <string>
 
 namespace chip::app {
 
@@ -39,11 +41,17 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
-    Clusters::ServiceArea::ServiceAreaCluster & ServiceArea() { return mServiceAreaCluster.Cluster(); }
+    Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
     Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
     Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
+    Clusters::OperationalState::LoggingRvcOperationalStateDelegate & OperationalStateDelegate() { return mDelegate; }
+
+    // Named-pipe simulation entry point used by all-devices-app posix/AppCommandDelegate.cpp.
+    void HandleNamedPipeCommand(const Json::Value & json);
 
 private:
+    void HandleReset();
+
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 

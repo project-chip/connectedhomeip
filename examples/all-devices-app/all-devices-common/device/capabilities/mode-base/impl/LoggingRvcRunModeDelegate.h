@@ -20,6 +20,10 @@
 #include <app/clusters/mode-base-server/AppDelegate.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+
+namespace chip::app::Clusters::ServiceArea {
+class LoggingServiceAreaDelegate;
+}
 #include <clusters/RvcRunMode/Enums.h>
 
 namespace chip::app::Clusters::RvcRunMode {
@@ -40,10 +44,15 @@ public:
     // same way examples/rvc-app/rvc-common/src/rvc-device.cpp's RvcDevice does.
     void SetCluster(ModeBaseCluster * cluster) { mCluster = cluster; }
     void SetOperationalStateCluster(OperationalState::OperationalStateCluster * cluster) { mOperationalStateCluster = cluster; }
+    void SetServiceAreaDelegate(ServiceArea::LoggingServiceAreaDelegate * serviceAreaDelegate)
+    {
+        mServiceAreaDelegate = serviceAreaDelegate;
+    }
 
 private:
     ModeBaseCluster * mCluster                                           = nullptr;
     OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
+    ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate       = nullptr;
 };
 
 } // namespace chip::app::Clusters::RvcRunMode
