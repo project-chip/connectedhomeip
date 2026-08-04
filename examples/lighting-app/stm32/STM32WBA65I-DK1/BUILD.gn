@@ -16,9 +16,10 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/stm32_sdk.gni")
 import("${build_root}/config/defaults.gni")
-import("${chip_root}/src/platform/device.gni")
+
 import("${stm32_sdk_build_root}/stm32_executable.gni")
 import("${stm32_sdk_build_root}/stm32_sdk.gni")
+import("${chip_root}/src/platform/device.gni")
 
 assert(current_os == "freertos")
 
@@ -45,7 +46,7 @@ declare_args() {
 
 if (chip_enable_ota_requestor) {
    # OEMiROT Secure_nsclib path
-   oemirot_nsclib_path = "${examples_plat_dir}/common/STM32WBA65I-DK1/oemirot/Secure_nsclib"
+   oemirot_nsclib_path = "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/Secure_nsclib"
 }
 
 
@@ -55,7 +56,7 @@ assert(!(chip_enable_wifi && chip_enable_thread))
 # Prebuild action to preprocess the linker script for OEMiROT
 if (chip_enable_ota_requestor) {
   action("preprocess_linker_script") {
-    script = "${examples_plat_dir}/common/STM32WBA65I-DK1/oemirot/preprocess_ld.py"
+    script = "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/preprocess_ld.py"
 
     ldscript_in = "${examples_plat_dir}/ldscripts/STM32WBA65I-DK1_FLASH_NS.ld.in"
     ldscript_out = "${target_gen_dir}/STM32WBA65I-DK1_FLASH_NS.ld"
@@ -108,7 +109,6 @@ stm32_executable("lighting_app") {
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/Inc",
     "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
     "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App",
     "include/",
@@ -130,7 +130,6 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
-    "${stm32_board_src}/STM32WBA65I-DK1/Src/main.c",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
@@ -171,7 +170,7 @@ stm32_executable("lighting_app") {
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
-      "src/STM32WBA6/ota.cpp",
+      "src/ota.cpp",
     ]
   }
 

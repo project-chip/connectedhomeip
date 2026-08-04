@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   ## PATHS FOR STM32WB BOARD ##
@@ -24,7 +25,7 @@ declare_args() {
   stm32_util = "${chip_root}/third_party/st/STM32CubeWBA/Utilities"
 
   ## Path to OEMiROT NonSecure sources (Core/Src from workspace)
-  oemirot_ns = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/oemirot/Core"
+  oemirot_ns = "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Core"
 
 }
 
@@ -34,11 +35,6 @@ SOURCES = [
   # BOARD APPLICATION SRC(in examples/platform/stm32/STM32WBA65I-DK1/)
   "${stm32_board_src}/Src/app_nvm.c",
   "${stm32_board_src}/Src/app_freertos.c",
-  "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",
-  "${stm32_board_src}/Src/stm32wbaxx_it.c",
-  "${stm32_board_src}/Src/syscalls.c",
-  "${stm32_board_src}/Src/sysmem.c",
-  "${stm32_board_src}/Src/system_stm32wbaxx.c",
   "${stm32_board_src}/Src/stm32_factorydata.c",
 
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
@@ -63,7 +59,7 @@ SOURCES = [
 
 INCLUDE_DIRS = [
   "${stm32_util}",
-  "${stm32_board_src}/Inc",
+  "${stm32_board_src}/Inc_Common",
   "${stm32_board_src}/STM32_WPAN/App",
   "${stm32_util}/trace/adv_trace",
   "${stm32_util}/lpm/tiny_lpm",
