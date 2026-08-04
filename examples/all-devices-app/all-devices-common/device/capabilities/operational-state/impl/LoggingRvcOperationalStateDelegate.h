@@ -26,6 +26,7 @@ class LoggingRvcOperationalStateDelegate : public LoggingOperationalStateDelegat
 public:
     LoggingRvcOperationalStateDelegate() = default;
 
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
     void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
 };
 
