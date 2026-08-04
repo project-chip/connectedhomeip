@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <clusters/RvcCleanMode/Metadata.h>
-#include <clusters/RvcRunMode/Metadata.h>
 #include <RvcSimulationLogic.h>
 #include <RvcSimulationTopology.h>
+#include <clusters/RvcCleanMode/Metadata.h>
+#include <clusters/RvcRunMode/Metadata.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
