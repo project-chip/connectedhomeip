@@ -413,7 +413,7 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
         while (iter.Next())
         {
             auto & id = iter.GetValue();
-            VerifyOrExit(id.size() >= kMessageIdLength,
+            VerifyOrExit(id.size() == kMessageIdLength,
                          ChipLogProgress(Zcl, "emberAfMessagesClusterCancelMessagesRequestCallback message id size check failed");
                          status = Status::ConstraintError);
         }

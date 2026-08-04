@@ -25,11 +25,13 @@
 #include <string>
 #include <vector>
 
+// Completion always coincides with removal from mCachedMessages (see
+// MessagesManager::CompleteMessage), so there's no separate "complete" state to observe --
+// only these two are ever set.
 enum class MessageState : uint8_t
 {
     kQueued,
     kPresented,
-    kComplete,
 };
 
 struct CachedMessageOption
@@ -196,9 +198,9 @@ private:
     // Computes the delay until `messageId`'s StartTime and (re-)schedules the
     // present-timer for it, or presents it immediately if StartTime has already
     // passed (or is null). Also used to recheck once the real time becomes synced.
-    void ScheduleOrPresentMessage(const uint8_t (&messageIdBuffer)[chip::app::Clusters::Messages::kMessageIdLength]);
+    void ScheduleOrPresentMessage(const chip::ByteSpan & messageId);
     void PresentMessage(CachedMessage & message);
-    void CompleteMessage(const uint8_t (&messageIdBuffer)[chip::app::Clusters::Messages::kMessageIdLength]);
+    void CompleteMessage(const chip::ByteSpan & messageId);
 
     void StartMessageTimer(const chip::ByteSpan & messageId, MessageTimerType type, uint32_t delayMs);
     void CancelMessageTimers(const chip::ByteSpan & messageId);

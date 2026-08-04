@@ -69,12 +69,15 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
         }
     }
 
+    // Re-presenting an already-queued MessageID replaces the prior entry (and its pending
+    // timers) instead of silently duplicating it, keeping MessageID usable as a real key.
+    CancelMessageTimers(messageId);
+    mCachedMessages.remove_if([&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
+
     mCachedMessages.push_back(cachedMessage);
     TEMPORARY_RETURN_IGNORED LogMessageQueuedEvent(mEndpointId, messageId);
 
-    uint8_t messageIdBuffer[kMessageIdLength];
-    memcpy(messageIdBuffer, messageId.data(), sizeof(messageIdBuffer));
-    ScheduleOrPresentMessage(messageIdBuffer);
+    ScheduleOrPresentMessage(messageId);
 
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest complete");
     return CHIP_NO_ERROR;
@@ -163,9 +166,8 @@ std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(const Byte
                         [&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
 }
 
-void MessagesManager::ScheduleOrPresentMessage(const uint8_t (&messageIdBuffer)[kMessageIdLength])
+void MessagesManager::ScheduleOrPresentMessage(const ByteSpan & messageId)
 {
-    ByteSpan messageId(messageIdBuffer);
     auto it = FindCachedMessage(messageId);
     if (it == mCachedMessages.end())
     {
@@ -190,7 +192,15 @@ void MessagesManager::ScheduleOrPresentMessage(const uint8_t (&messageIdBuffer)[
     const auto & startTime = it->GetStartTime();
     if (!startTime.IsNull() && startTime.Value() > nowEpochS)
     {
-        uint32_t delaySeconds = startTime.Value() - nowEpochS;
+        // Cap the delay so `delaySeconds * 1000` can't overflow uint32_t (~49.7 days worth of
+        // ms); if StartTime is further out than that, wait the max chunk and let this function
+        // re-run and re-check/reschedule, same as the real-time-not-synced retry above.
+        constexpr uint32_t kMaxSingleTimerDelaySeconds = UINT32_MAX / 1000;
+        uint32_t delaySeconds                          = startTime.Value() - nowEpochS;
+        if (delaySeconds > kMaxSingleTimerDelaySeconds)
+        {
+            delaySeconds = kMaxSingleTimerDelaySeconds;
+        }
         StartMessageTimer(messageId, MessageTimerType::kPresent, delaySeconds * 1000);
         return;
     }
@@ -238,9 +248,8 @@ void MessagesManager::PresentMessage(CachedMessage & message)
     }
 }
 
-void MessagesManager::CompleteMessage(const uint8_t (&messageIdBuffer)[kMessageIdLength])
+void MessagesManager::CompleteMessage(const ByteSpan & messageId)
 {
-    ByteSpan messageId(messageIdBuffer);
     auto it = FindCachedMessage(messageId);
     if (it == mCachedMessages.end())
     {
@@ -294,11 +303,12 @@ void MessagesManager::OnMessageTimerExpired(System::Layer * systemLayer, void * 
     auto * ctx             = reinterpret_cast<MessageTimerContext *>(context);
     MessagesManager * self = ctx->manager;
     MessageTimerType type  = ctx->type;
-    uint8_t messageId[kMessageIdLength];
-    memcpy(messageId, ctx->messageId, sizeof(messageId));
+    // Copied out to a local buffer *before* erasing below, since that erase may drop the last
+    // owning shared_ptr to `ctx` -- it must not be dereferenced again after this point.
+    uint8_t messageIdBuffer[kMessageIdLength];
+    memcpy(messageIdBuffer, ctx->messageId, sizeof(messageIdBuffer));
+    ByteSpan messageId(messageIdBuffer);
 
-    // Drop our tracking entry for this timer now that it fired; `ctx` must not be
-    // dereferenced again after this, since this may be its last owning shared_ptr.
     self->mTimerContexts.erase(
         std::remove_if(self->mTimerContexts.begin(), self->mTimerContexts.end(),
                        [ctx](const std::shared_ptr<MessageTimerContext> & entry) { return entry.get() == ctx; }),
@@ -325,9 +335,7 @@ void MessagesManager::LogCachedMessages() const
     {
         auto messageStruct = entry.GetMessage();
         std::string text(messageStruct.messageText.data(), messageStruct.messageText.size());
-        const char * state = entry.GetState() == MessageState::kQueued
-            ? "Queued"
-            : (entry.GetState() == MessageState::kPresented ? "Presented" : "Complete");
+        const char * state = entry.GetState() == MessageState::kQueued ? "Queued" : "Presented";
         ChipLogProgress(Zcl, "MessagesManager:   [%s] priority=%u \"%s\"", state, to_underlying(messageStruct.priority),
                         text.c_str());
     }
