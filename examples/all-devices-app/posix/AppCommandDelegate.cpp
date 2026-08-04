@@ -622,9 +622,9 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
     static constexpr const char * kRvcNamedPipeCommands[] = {
-        "Reset",         "Charged",        "Charging",       "Docked",         "ChargerFound",  "LowCharge",
-        "ActivityComplete", "AreaComplete", "ClearError",  "EmptyingDustBin", "CleaningMop",   "FillingWaterTank",
-        "UpdatingMaps",  "ErrorEvent",     "AddMap",         "RemoveMap",      "AddArea",       "RemoveArea",
+        "Reset",        "Charged",    "Charging",        "Docked",      "ChargerFound",     "LowCharge",    "ActivityComplete",
+        "AreaComplete", "ClearError", "EmptyingDustBin", "CleaningMop", "FillingWaterTank", "UpdatingMaps", "ErrorEvent",
+        "AddMap",       "RemoveMap",  "AddArea",         "RemoveArea",
     };
     for (const char * commandName : kRvcNamedPipeCommands)
     {

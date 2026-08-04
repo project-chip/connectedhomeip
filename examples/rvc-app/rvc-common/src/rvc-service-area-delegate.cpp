@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <RvcSimulationLogic.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-service-area-delegate.h>
 #include <vector>
 
@@ -36,15 +36,12 @@ void RvcServiceAreaDelegate::SetNoMapTopology()
     GetInstance()->ClearSupportedMaps();
 
     // Area A has name, floor number.
-    auto areaA =
-        AreaStructureWrapper{}
-            .SetAreaId(kAreaIdA)
-            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+    auto areaA = AreaStructureWrapper{}.SetAreaId(kAreaIdA).SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4),
+                                                                            DataModel::Nullable<Globals::AreaTypeTag>());
 
     // Area B has name.
-    auto areaB = AreaStructureWrapper{}
-                     .SetAreaId(kAreaIdB)
-                     .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
+    auto areaB = AreaStructureWrapper{}.SetAreaId(kAreaIdB).SetLocationInfo("My Location B"_span, DataModel::NullNullable,
+                                                                            DataModel::NullNullable);
 
     // Area C has full SemData, no name.
     auto areaC = AreaStructureWrapper{}

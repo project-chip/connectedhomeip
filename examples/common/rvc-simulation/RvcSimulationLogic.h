@@ -51,8 +51,7 @@ void ApplyDefaultMapTopology(ServiceAreaClusterLike & cluster)
     auto areaA = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdA)
                      .SetMapId(Topology::kMapIdXX)
-                     .SetLocationInfo("My Location A"_span, Nullable<int16_t>(4),
-                                      Nullable<Globals::AreaTypeTag>());
+                     .SetLocationInfo("My Location A"_span, Nullable<int16_t>(4), Nullable<Globals::AreaTypeTag>());
 
     auto areaB = AreaStructureWrapper{}
                      .SetAreaId(Topology::kAreaIdB)
