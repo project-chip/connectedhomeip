@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +52,21 @@ class TC_EPALM_2_3(MatterBaseTest):
     @property
     def default_endpoint(self) -> int:
         return 1
+
+    def steps_TC_EPALM_2_3(self) -> list[TestStep]:
+        return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(2, "TH reads the FeatureMap attribute from DUT"),
+            TestStep(3, "TH reads the Supported attribute from DUT"),
+            TestStep(4, "TH verifies ShortCircuit feature/supported consistency"),
+            TestStep(5, "TH verifies OverLoad feature/supported consistency"),
+            TestStep(6, "TH verifies OverVoltage feature/supported consistency"),
+            TestStep(7, "TH verifies SurgeProtection feature/supported consistency"),
+            TestStep(8, "TH verifies ResidualCurrent feature/supported consistency"),
+            TestStep(9, "TH verifies ArcFault feature/supported consistency"),
+            TestStep(10, "TH verifies SelfTest feature/supported consistency"),
+            TestStep(11, "TH verifies no orphan bits in Supported and no Supported bit without its feature"),
+        ]
 
     @pics('EPALM.S')
     @async_test_body
@@ -71,9 +86,9 @@ class TC_EPALM_2_3(MatterBaseTest):
         features = cluster.Bitmaps.Feature
         alarm_bits = cluster.Bitmaps.AlarmBitmap
 
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1)
 
-        self.step(2, "TH reads the FeatureMap attribute from DUT")
+        self.step(2)
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -81,7 +96,7 @@ class TC_EPALM_2_3(MatterBaseTest):
         )
         log.info("FeatureMap: 0x%08X", feature_map)
 
-        self.step(3, "TH reads the Supported attribute from DUT")
+        self.step(3)
         supported_val = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -102,7 +117,7 @@ class TC_EPALM_2_3(MatterBaseTest):
 
         step_num = 4
         for feature_bit, alarm_bit, feature_name in feature_alarm_map:
-            self.step(step_num, f"TH verifies {feature_name} feature/supported consistency")
+            self.step(step_num)
             if feature_map & feature_bit:
                 asserts.assert_true(
                     bool(supported_val & alarm_bit),
@@ -114,7 +129,7 @@ class TC_EPALM_2_3(MatterBaseTest):
                 log.info("Feature %s: not present, skipping", feature_bit.name)
             step_num += 1
 
-        self.step(11, "TH verifies no orphan bits in Supported and no Supported bit without its feature")
+        self.step(11)
         all_alarm_bits = (alarm_bits.kShortCircuitFault | alarm_bits.kOverLoadFault |
                           alarm_bits.kOverVoltageFault | alarm_bits.kVoltageSurgeFault |
                           alarm_bits.kResidualCurrentFault | alarm_bits.kArcFault |
