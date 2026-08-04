@@ -76,8 +76,9 @@ const char * GetClusterTypeName<chip::app::Clusters::ModeBaseCluster>()
     return "chip::app::Clusters::ModeBaseCluster";
 }
 
-chip::app::ServerClusterInterface * AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(
-    const char * typeName, chip::EndpointId endpoint, std::optional<chip::ClusterId> clusterId)
+chip::app::ServerClusterInterface *
+AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint,
+                                                                                 std::optional<chip::ClusterId> clusterId)
 {
     auto it = mClusters.find(typeName);
     if (it == mClusters.end())
