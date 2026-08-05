@@ -20,7 +20,7 @@
 #include <app/server-cluster/ServerClusterContext.h>
 #include <clusters/ElectricalProtectionAlarm/Metadata.h>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::ElectricalProtectionAlarm {
 
 using namespace ElectricalProtectionAlarm::Attributes;
 
@@ -132,4 +132,4 @@ CHIP_ERROR ElectricalProtectionAlarmCluster::SetState(AlarmBitmask newState)
     return CHIP_NO_ERROR;
 }
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::ElectricalProtectionAlarm
