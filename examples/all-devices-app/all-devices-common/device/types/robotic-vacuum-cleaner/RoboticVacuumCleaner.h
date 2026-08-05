@@ -26,8 +26,11 @@
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
 #include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
-#include <json/json.h>
 #include <string>
+
+namespace Json {
+class Value;
+} // namespace Json
 
 namespace chip::app {
 

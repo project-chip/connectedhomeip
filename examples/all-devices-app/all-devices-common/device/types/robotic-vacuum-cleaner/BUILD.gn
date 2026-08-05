@@ -37,7 +37,19 @@ source_set("robotic-vacuum-cleaner") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-    "${chip_root}/third_party/jsoncpp",
     "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
+
+source_set("robotic-vacuum-cleaner-named-pipe") {
+  sources = [ "RoboticVacuumCleanerNamedPipe.cpp" ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+  ]
+
+  public_deps = [
+    ":robotic-vacuum-cleaner",
+    "${chip_root}/third_party/jsoncpp",
   ]
 }
