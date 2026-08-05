@@ -30,7 +30,7 @@ public:
     const FullQName & GetPtr() const { return mPtrName; }
 
 protected:
-    bool WriteData(RecordWriter & out) const override { return out.WriteQName(mPtrName).Fit(); }
+    bool WriteData(RecordWriter & out) const override { return out.PutPtr(mPtrName).Fit(); }
 
 private:
     const FullQName mPtrName;

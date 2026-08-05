@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include <string.h>
-
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/support/Span.h>
 
 namespace mdns {
 namespace Minimal {
@@ -52,26 +51,11 @@ public:
     const char * const * GetEntries() const { return mEntries; }
 
 protected:
-    bool WriteData(RecordWriter & out) const override
-    {
-        for (size_t i = 0; i < mEntryCount; i++)
-        {
-            size_t len = strlen(mEntries[i]);
-            if (len > kMaxTxtRecordLength)
-            {
-                return false;
-            }
-
-            out.Put8(static_cast<uint8_t>(len)).PutString(mEntries[i]);
-        }
-        return out.Fit();
-    }
+    bool WriteData(RecordWriter & out) const override { return out.PutTxt(chip::Span<const char * const>(mEntries, mEntryCount)); }
 
 private:
     const char * const * mEntries;
     const size_t mEntryCount;
-
-    static constexpr size_t kMaxTxtRecordLength = 63;
 };
 
 } // namespace Minimal

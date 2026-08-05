@@ -22,17 +22,7 @@ namespace Minimal {
 
 bool IPResourceRecord::WriteData(RecordWriter & out) const
 {
-    // IP address is already stored in network byte order, hence raw bytes put
-    if (mIPAddress.IsIPv6())
-    {
-        out.Put(BytesRange::BufferWithSize(mIPAddress.Addr, 16));
-    }
-    else
-    {
-        out.Put(BytesRange::BufferWithSize(mIPAddress.Addr + 3, 4));
-    }
-
-    return out.Fit();
+    return out.PutIpAddress(mIPAddress).Fit();
 }
 
 } // namespace Minimal

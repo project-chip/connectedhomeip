@@ -88,7 +88,7 @@ public:
 
     // Maximum length of a single TXT character-string entry.
     // Per DNS-SD TXT Record Size (RFC 6763), it is suggested to keep the length of a single TXT entry small.
-    // While it can be larger than 63, this is the current value used in lib/dnssd/minimal_mdns/records/Txt.h.
+    // While it can be larger than 63, it was the value previously used in lib/dnssd/minimal_mdns/records/Txt.h.
     // TODO : I could not find any reference to why 63 is used. This shall be re-visited during ULD implementation.
     static constexpr size_t kMaxTxtRecordLength = 63;
 

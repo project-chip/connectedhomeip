@@ -40,10 +40,7 @@ public:
     void SetWeight(uint16_t value) { mWeight = value; }
 
 protected:
-    bool WriteData(RecordWriter & out) const override
-    {
-        return out.Put16(mPriority).Put16(mWeight).Put16(mPort).WriteQName(mServerName).Fit();
-    }
+    bool WriteData(RecordWriter & out) const override { return out.PutSrv(mPriority, mWeight, mPort, mServerName).Fit(); }
 
 private:
     FullQName mServerName;

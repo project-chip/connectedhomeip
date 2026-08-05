@@ -41,14 +41,13 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
         .Put32(static_cast<uint32_t>(GetTtl()))   //
         ;
 
-    chip::Encoding::BigEndian::BufferWriter sizeOutput(out.Writer()); // copy to re-output size
-    out.Put16(0);                                                     // dummy, will be replaced later
+    chip::Encoding::BigEndian::BufferWriter sizeOutput = out.ReserveRdlength();
 
     if (!WriteData(out))
     {
         return false;
     }
-    sizeOutput.Put16(static_cast<uint16_t>(out.Writer().Needed() - sizeOutput.Needed() - 2));
+    out.FinishRdlength(sizeOutput);
 
     // This MUST be final and separated out: record count is only updated on success.
     if (out.Fit())
