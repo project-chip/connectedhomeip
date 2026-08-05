@@ -8,7 +8,6 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
-
     - Inspect
       `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
     - Look at the `DeviceFactory` constructor. Every
@@ -25,7 +24,6 @@ To update or validate this list manually, follow these steps:
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
-
     - Locate the device type definition in the Matter Specification (e.g. under
       `device_library/` in the spec repository, or locally generated markdown
       files).
@@ -49,7 +47,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (48 total)
+## Implemented Device Types (49 total)
 
 | #   | Device Type Name               | ID            | Missing Clusters                                                                                                              | Notes                       |
 | --- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -101,8 +99,9 @@ To update or validate this list manually, follow these steps:
 | 46  | Water Freeze Detector          | 65 (0x0041)   |                                                                                                                               |                             |
 | 47  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                               |                             |
 | 48  | Water Valve                    | 66 (0x0042)   |                                                                                                                               |                             |
+| 49  | Window Covering                | 514 (0x0202)  |                                                                                                                               |
 
-## Unimplemented Device Types (56 total)
+## Unimplemented Device Types (55 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                                                            | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -160,5 +159,4 @@ To update or validate this list manually, follow these steps:
 | 52  | Video Doorbell                    | 323 (0x0143)  | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
 | 53  | Video Remote Control              | 42 (0x002A)   | None                                                                                                                                                                                                                                                      | None                                                                                                                                                                                                                                 | Ready           |
 | 54  | Water Heater                      | 1295 (0x050F) | Water Heater Management, Identify [O], Water Heater Mode, Thermostat Mode [O]                                                                                                                                                                             | Thermostat, Demand Response Load Control [O], Thermostat User Interface Configuration [O]                                                                                                                                            | Blocked         |
-| 55  | Window Covering                   | 514 (0x0202)  | Identify, Groups [O]                                                                                                                                                                                                                                      | Window Covering                                                                                                                                                                                                                      | Blocked         |
-| 56  | Window Covering Controller        | 515 (0x0203)  | Identify [O]                                                                                                                                                                                                                                              | None                                                                                                                                                                                                                                 | Ready           |
+| 55  | Window Covering Controller        | 515 (0x0203)  | Identify [O]                                                                                                                                                                                                                                              | None                                                                                                                                                                                                                                 | Ready           |

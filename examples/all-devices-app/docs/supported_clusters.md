@@ -8,13 +8,11 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Specification Catalog**:
-
     - Refer to the master spec cluster sheet:
       `docs/ids_and_codes/spec_clusters.md` (updated automatically).
     - This provides the cluster names, decimal IDs, and hex IDs.
 
 2. **Verify Code-Driven in SDK Status**:
-
     - Search/grep to locate all cluster classes implementing the code-driven
       model. For example, if using ripgrep (`rg`):
       `rg -n "public\s+(chip::app::)?DefaultServerCluster" src/app/` and
@@ -201,6 +199,6 @@ To update or validate this list manually, follow these steps:
 | 155       | WebRTC Transport Requestor                                 | 1364 (0x0554) | Yes                | No                  |                                       |
 | 156       | Wi-Fi Network Diagnostics                                  | 54 (0x0036)   | Yes                | Yes                 |                                       |
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
-| 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
+| 158       | Window Covering                                            | 258 (0x0102)  | Yes                | Yes                 | window-covering                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
 | **Total** | **159**                                                    |               | **104**            | **67**              |                                       |
