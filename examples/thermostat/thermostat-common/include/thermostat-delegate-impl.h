@@ -100,6 +100,7 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
+    bool mActivePresetHandleIsNull = true;
 };
 
 } // namespace Thermostat
