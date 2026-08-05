@@ -180,6 +180,7 @@ CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 {
     mTrackingEnabled = aTrackingEnabled;
     MarkDirty(AvAnalysis::Attributes::TrackingEnabled::Id);
+    LogErrorOnFailure(StoreTrackingEnabled());
     return CHIP_NO_ERROR;
 }
 
@@ -331,6 +332,88 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
 }
 
 /**
+ * Persistence handling helper, stores the current contents of the analysis stream table in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), maxBufferSize);
+    ReturnErrorOnFailure(mStreamTable.Encode(writer));
+
+    auto path = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(buffer.Get(), writer.GetLengthWritten()));
+}
+
+/**
+ * Persistence handling helper, restores the analysis stream table from the KVS. Restored entries restart
+ * from PendingInitiation as sessions do not survive a reboot.
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan bufferSpan(buffer.Get(), maxBufferSize);
+
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: No persisted AnalysisStreams.", mEndpointId);
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+    return mStreamTable.Decode(reader);
+}
+
+/**
+ * Persistence handling helper, stores the TrackingEnabled attribute in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = mTrackingEnabled ? 1 : 0;
+    auto path     = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(&value, sizeof(value)));
+}
+
+/**
+ * Persistence handling helper, restores the TrackingEnabled attribute from the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = 0;
+    MutableByteSpan valueSpan(&value, sizeof(value));
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, valueSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    VerifyOrReturnError(valueSpan.size() == sizeof(value), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    mTrackingEnabled = (value != 0);
+    return CHIP_NO_ERROR;
+}
+
+/**
  * Persistence handling helper, loads all non-volatile attributes from the KVS
  */
 void AvAnalysisServerLogic::LoadPersistentAttributes()
@@ -348,6 +431,17 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
     else
     {
         ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Loaded ActiveAmbientContexts", mEndpointId);
+    }
+
+    if (LoadTrackingEnabled() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load TrackingEnabled from the KVS.", mEndpointId);
+        mTrackingEnabled = false;
+    }
+
+    if (HasFeature(Feature::kRemoteContextDetection) && LoadAnalysisStreams() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load AnalysisStreams from the KVS.", mEndpointId);
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.

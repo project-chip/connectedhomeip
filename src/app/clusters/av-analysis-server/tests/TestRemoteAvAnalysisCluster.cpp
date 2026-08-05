@@ -281,4 +281,63 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteRemoveAnalysisStreamCommandTest)
         FAIL();
     }
 }
+
+TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
+{
+    // Defaults to false, write true
+    bool trackingEnabled = false;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_FALSE(trackingEnabled);
+
+    ASSERT_TRUE(mClusterTester.WriteAttribute(Attributes::TrackingEnabled::Id, true).IsSuccess());
+
+    // Restart the server, the value has quality N and must survive
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_TRUE(trackingEnabled);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
+{
+    AnalysisStreamTable table;
+    ASSERT_EQ(table.Init(3), CHIP_NO_ERROR);
+
+    // Ids come from the camera's VideoStreamAllocate; duplicates and overflow are rejected
+    ASSERT_NE(table.Add(10), nullptr);
+    ASSERT_NE(table.Add(20), nullptr);
+    ASSERT_EQ(table.Add(10), nullptr); // duplicate id
+    ASSERT_NE(table.Add(30), nullptr);
+    ASSERT_EQ(table.Add(40), nullptr); // table full
+    ASSERT_EQ(table.Count(), 3);
+
+    // Give one entry an active session so decode's state reset is observable
+    AnalysisStreamEntry * active = table.Find(20);
+    ASSERT_NE(active, nullptr);
+    active->state            = AnalysisStreamStateEnum::kWebRTCActive;
+    active->webRTCEndpointID = DataModel::MakeNullable<EndpointId>(2);
+
+    uint8_t buffer[AnalysisStreamTable::kEntrySerializedSize * 3 + AnalysisStreamTable::kArraySerializedOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(3), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(restored.Decode(reader), CHIP_NO_ERROR);
+
+    // All ids survive; sessions do not survive a reboot, so state collapses to PendingInitiation
+    ASSERT_EQ(restored.Count(), 3);
+    for (uint16_t id : { uint16_t(10), uint16_t(20), uint16_t(30) })
+    {
+        AnalysisStreamEntry * entry = restored.Find(id);
+        ASSERT_NE(entry, nullptr);
+        ASSERT_EQ(entry->state, AnalysisStreamStateEnum::kPendingInitiation);
+        ASSERT_TRUE(entry->webRTCEndpointID.IsNull());
+        ASSERT_TRUE(entry->pushAVEndpointID.IsNull());
+    }
+}
 } // namespace

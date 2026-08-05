@@ -164,6 +164,10 @@ private:
      */
     CHIP_ERROR StoreActiveAmbientContextTriggers();
     CHIP_ERROR LoadActiveAmbientContextTriggers();
+    CHIP_ERROR StoreAnalysisStreams();
+    CHIP_ERROR LoadAnalysisStreams();
+    CHIP_ERROR StoreTrackingEnabled();
+    CHIP_ERROR LoadTrackingEnabled();
     void LoadPersistentAttributes();
 };
 

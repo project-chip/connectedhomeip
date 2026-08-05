@@ -18,12 +18,15 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
+#include <app/data-model/Decode.h>
 #include <clusters/AvAnalysis/Enums.h>
 #include <clusters/AvAnalysis/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 
@@ -133,6 +136,52 @@ public:
     AnalysisStreamEntry * end() { return mEntries.Get() + mCount; }
     const AnalysisStreamEntry * begin() const { return mEntries.Get(); }
     const AnalysisStreamEntry * end() const { return mEntries.Get() + mCount; }
+
+    // Worst-case TLV size of one persisted entry (id + two endpoint ids + state).
+    static constexpr size_t kEntrySerializedSize =
+        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(EndpointId), sizeof(EndpointId), sizeof(uint8_t));
+
+    // TLV overhead of the enclosing anonymous array container written by Encode().
+    static constexpr size_t kArraySerializedOverhead = 4;
+
+    /**
+     * Writes the in-use entries as an anonymous TLV array of AnalysisStreamStruct.
+     */
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter) const
+    {
+        TLV::TLVType arrayType;
+        ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+        for (const auto & entry : *this)
+        {
+            ReturnErrorOnFailure(entry.ToEncodableStruct().Encode(aWriter, TLV::AnonymousTag()));
+        }
+        return aWriter.EndContainer(arrayType);
+    }
+
+    /**
+     * Replaces the table contents from a TLV array written by Encode(). Restored entries are reset to
+     * PendingInitiation with Null endpoint ids: WebRTC/PushAV sessions do not survive a reboot, only the
+     * stream allocations made on the camera do.
+     */
+    CHIP_ERROR Decode(TLV::TLVReader & aReader)
+    {
+        ReturnErrorOnFailure(aReader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+        TLV::TLVType arrayType;
+        ReturnErrorOnFailure(aReader.EnterContainer(arrayType));
+
+        mCount = 0;
+        CHIP_ERROR err;
+        while ((err = aReader.Next()) == CHIP_NO_ERROR)
+        {
+            Structs::AnalysisStreamStruct::DecodableType decoded;
+            ReturnErrorOnFailure(DataModel::Decode(aReader, decoded));
+            VerifyOrReturnError(Add(decoded.analysisStreamID) != nullptr, CHIP_ERROR_NO_MEMORY);
+        }
+        VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+        ReturnErrorOnFailure(aReader.ExitContainer(arrayType));
+        return CHIP_NO_ERROR;
+    }
 
 private:
     Platform::ScopedMemoryBuffer<AnalysisStreamEntry> mEntries;
