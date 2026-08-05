@@ -21,8 +21,9 @@ source_set("robotic-vacuum-cleaner") {
     "RoboticVacuumCleaner.h",
   ]
 
-  public_configs =
-      [ "${chip_root}/examples/all-devices-app/all-devices-common/device:includes" ]
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+  ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
