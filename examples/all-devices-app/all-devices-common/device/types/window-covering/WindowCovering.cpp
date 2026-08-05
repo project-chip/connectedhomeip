@@ -1,15 +1,28 @@
-#include "WindowCovering.h"
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <device/types/window-covering/WindowCovering.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip::app::Clusters;
+namespace chip {
+namespace app {
 
-namespace chip::app {
-
-WindowCovering::WindowCovering(WindowCoveringDelegate & delegate, TimerDelegate & timerDelegate,
-                               Clusters::IdentifyDelegate & identifyDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
-    mWindowCoveringDelagate(delegate), mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate)
+WindowCovering::WindowCovering(const Context & context) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)), mContext(context)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -21,11 +34,25 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Wire up the mandatory identify delegate
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(this));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mWindowCoveringCluster.Create(endpoint);
+    Clusters::WindowCovering::WindowCoveringCluster::Config config(*this);
+    config.WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
+        Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
+        Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt));
+    mWindowCoveringCluster.Create(endpoint, config);
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
+
+    // Groups is optional (Active, O) per the Window Covering device type, but we implement it
+    // here since it lets the device respond to groupcast commands like other simulated devices.
+    mGroupsCluster.Create(endpoint,
+                          Clusters::GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = nullptr, // Window Covering does not implement Scenes
+                              .identifyIntegration = &mIdentifyCluster.Cluster(),
+                          });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -35,6 +62,11 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 void WindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    if (mGroupsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
+        mGroupsCluster.Destroy();
+    }
     if (mWindowCoveringCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mWindowCoveringCluster.Cluster()));
@@ -47,4 +79,32 @@ void WindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
-} // namespace chip::app
+void WindowCovering::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "WindowCovering: OnIdentifyStart");
+}
+
+void WindowCovering::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "WindowCovering: OnIdentifyStop");
+}
+
+void WindowCovering::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "WindowCovering: OnTriggerEffect");
+}
+
+CHIP_ERROR WindowCovering::HandleMovement(Clusters::WindowCovering::WindowCoveringType type)
+{
+    ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%u", static_cast<unsigned>(type));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WindowCovering::HandleStopMotion()
+{
+    ChipLogProgress(DeviceLayer, "WindowCovering: HandleStopMotion");
+    return CHIP_NO_ERROR;
+}
+
+} // namespace app
+} // namespace chip
