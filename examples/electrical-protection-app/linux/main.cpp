@@ -17,6 +17,8 @@
  */
 #include <AppMain.h>
 #include <PowerTopologyDelegateImpl.h>
+#include <electrical-distribution-stub.h>
+#include <electrical-protection-alarm-stub.h>
 
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Server.h>
@@ -71,10 +73,21 @@ void ApplicationInit()
                                                  BitMask<PowerTopology::Feature>(PowerTopology::Feature::kNodeTopology,
                                                                                  PowerTopology::Feature::kElectricalCircuit),
                                                  &Server::GetInstance().GetFabricTable()) == CHIP_NO_ERROR);
+
+    // Electrical Distribution describes the enclosure's physical characteristics. Like Power
+    // Topology above, its generated Init callback is a no-op and the app owns the instance.
+    VerifyOrDie(ElectricalDistribution::ElectricalDistributionInit(kEnclosureEndpointId) == CHIP_NO_ERROR);
+
+    // Electrical Protection Alarm reports the breaker's safety faults. Same imperative
+    // registration: its generated Init callback is a no-op.
+    VerifyOrDie(ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(kBreakerEndpointId) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
+    ElectricalDistribution::ElectricalDistributionShutdown();
+
     LogErrorOnFailure(PowerTopology::PowerTopologyShutdown(gBreakerPtInstance, gBreakerPtDelegate));
     LogErrorOnFailure(PowerTopology::PowerTopologyShutdown(gEnclosurePtInstance, gEnclosurePtDelegate));
 }

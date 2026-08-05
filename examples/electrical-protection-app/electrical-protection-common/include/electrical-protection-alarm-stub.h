@@ -18,24 +18,21 @@
 
 #pragma once
 
-#include <app/clusters/electrical-distribution-server/CodegenIntegration.h>
+#include <app/clusters/electrical-protection-alarm-server/CodegenIntegration.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
-namespace chip::app::Clusters::ElectricalDistribution {
+namespace chip::app::Clusters::ElectricalProtectionAlarm {
 
-/// Create and register the Electrical Distribution cluster on `endpointId`, publishing this app's
-/// representative fixed values. Call from ApplicationInit().
+/// Create and register the Electrical Protection Alarm cluster on `endpointId`, enabling every
+/// alarm this app supports. Call from ApplicationInit().
 ///
 /// The cluster's generated Init callback is a no-op, so registration is imperative and the app owns
 /// the instance lifetime. This mirrors how the same app initializes Power Topology.
-CHIP_ERROR ElectricalDistributionInit(EndpointId endpointId);
+CHIP_ERROR ElectricalProtectionAlarmInit(EndpointId endpointId);
 
 /// Unregister and destroy the cluster. Call from ApplicationShutdown().
-void ElectricalDistributionShutdown();
+void ElectricalProtectionAlarmShutdown();
 
-/// Update the EndOfLife attribute. Intended for a test-event trigger driving the transitions.
-CHIP_ERROR SetEndOfLife(const Attributes::EndOfLife::TypeInfo::Type & endOfLife);
-
-} // namespace chip::app::Clusters::ElectricalDistribution
+} // namespace chip::app::Clusters::ElectricalProtectionAlarm

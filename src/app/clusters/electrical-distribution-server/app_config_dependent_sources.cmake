@@ -18,4 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/ElectricalDistributionCluster.cpp"
     "${CLUSTER_DIR}/ElectricalDistributionCluster.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

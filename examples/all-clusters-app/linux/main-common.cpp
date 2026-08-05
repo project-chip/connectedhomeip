@@ -39,6 +39,8 @@
 #include "thermostat-delegate-impl.h"
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
+#include <electrical-distribution-stub.h>
+#include <electrical-protection-alarm-stub.h>
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -246,10 +248,17 @@ void ApplicationInit()
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
     TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 4,
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
+
+    // Electrical Distribution's generated Init callback is a no-op, so the app registers it.
+    VerifyOrDie(Clusters::ElectricalDistribution::ElectricalDistributionInit(/* endpoint= */ 1) == CHIP_NO_ERROR);
+    VerifyOrDie(Clusters::ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(/* endpoint= */ 1) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
 {
+    Clusters::ElectricalProtectionAlarm::ElectricalProtectionAlarmShutdown();
+    Clusters::ElectricalDistribution::ElectricalDistributionShutdown();
+
     // These may have been initialised via the emberAfXxxClusterInitCallback methods. We need to destroy them before shutdown.
     Clusters::DishwasherMode::Shutdown();
     Clusters::LaundryWasherMode::Shutdown();

@@ -16,8 +16,11 @@
  *    limitations under the License.
  */
 
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <electrical-distribution-stub.h>
+
+#include <lib/support/CodeUtils.h>
+
+#include <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -27,7 +30,7 @@ using namespace chip::app::Clusters::ElectricalDistribution::Attributes;
 
 namespace {
 
-// all-clusters-app performs no real measurement, so publish representative fixed values.
+// This app performs no real measurement, so publish representative fixed values.
 const ElectricalDistributionCluster::StartupConfiguration kDefaultConfig = {
     .maxContinuousCurrent = DataModel::MakeNullable<int64_t>(100000), // 100 A, in mA
     .maxVoltage           = DataModel::MakeNullable<int64_t>(240000), // 240 V, in mV
@@ -36,44 +39,37 @@ const ElectricalDistributionCluster::StartupConfiguration kDefaultConfig = {
     .serviceEntranceRated = DataModel::MakeNullable(true),
 };
 
-LazyRegisteredServerCluster<ElectricalDistributionCluster> gServer;
-
-constexpr EndpointId kEndpointWithElectricalDistribution = 1;
-
-bool ValidEndpointForElectricalDistribution(EndpointId endpoint)
-{
-    if (endpoint != kEndpointWithElectricalDistribution)
-    {
-        ChipLogError(AppServer, "ElectricalDistribution cluster invalid endpoint");
-        return false;
-    }
-    return true;
-}
+std::unique_ptr<ElectricalDistribution::Instance> gInstance;
 
 } // namespace
 
-void MatterElectricalDistributionClusterInitCallback(EndpointId endpoint)
-{
-    VerifyOrReturn(ValidEndpointForElectricalDistribution(endpoint));
-
-    gServer.Create(endpoint, kDefaultConfig);
-
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
-}
-
-void MatterElectricalDistributionClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType)
-{
-    VerifyOrReturn(ValidEndpointForElectricalDistribution(endpoint));
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
-
-    gServer.Destroy();
-}
-
 namespace chip::app::Clusters::ElectricalDistribution {
+
+CHIP_ERROR ElectricalDistributionInit(EndpointId endpointId)
+{
+    VerifyOrReturnError(gInstance == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    gInstance = std::make_unique<Instance>(endpointId, kDefaultConfig);
+    VerifyOrReturnError(gInstance != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = gInstance->Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        gInstance.reset();
+    }
+    return err;
+}
+
+void ElectricalDistributionShutdown()
+{
+    // ~Instance() unregisters.
+    gInstance.reset();
+}
 
 CHIP_ERROR SetEndOfLife(const Attributes::EndOfLife::TypeInfo::Type & endOfLife)
 {
-    return gServer.Cluster().SetEndOfLife(endOfLife);
+    VerifyOrReturnError(gInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return gInstance->Cluster().SetEndOfLife(endOfLife);
 }
 
 } // namespace chip::app::Clusters::ElectricalDistribution

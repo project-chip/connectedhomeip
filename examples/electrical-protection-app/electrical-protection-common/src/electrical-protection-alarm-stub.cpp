@@ -16,9 +16,12 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/electrical-protection-alarm-server/ElectricalProtectionAlarmCluster.h>
+#include <electrical-protection-alarm-stub.h>
+
 #include <app/clusters/electrical-protection-alarm-server/ElectricalProtectionAlarmTestEventTriggerHandler.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CodeUtils.h>
+
+#include <memory>
 
 using namespace chip;
 using namespace chip::app;
@@ -26,8 +29,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalProtectionAlarm;
 
 namespace {
-
-constexpr EndpointId kEndpointWithElectricalProtectionAlarm = 2;
 
 BitMask<AlarmBitmap> AllSupportedAlarms()
 {
@@ -42,7 +43,7 @@ BitMask<AlarmBitmap> AllSupportedAlarms()
     return bits;
 }
 
-// all-clusters-app enables every EPALM feature so the full alarm surface can be exercised. Rating
+// This app enables every EPALM feature so the full alarm surface can be exercised. Rating
 // attributes are left null (the app performs no real measurement); alarm State starts clear and is
 // driven by the test-event-trigger below.
 ElectricalProtectionAlarmCluster::StartupConfiguration MakeDefaultConfig()
@@ -60,41 +61,39 @@ ElectricalProtectionAlarmCluster::StartupConfiguration MakeDefaultConfig()
     return config;
 }
 
-LazyRegisteredServerCluster<ElectricalProtectionAlarmCluster> gServer;
-
-bool ValidEndpointForElectricalProtectionAlarm(EndpointId endpoint)
-{
-    if (endpoint != kEndpointWithElectricalProtectionAlarm)
-    {
-        ChipLogError(AppServer, "ElectricalProtectionAlarm cluster invalid endpoint");
-        return false;
-    }
-    return true;
-}
+std::unique_ptr<ElectricalProtectionAlarm::Instance> gInstance;
 
 } // namespace
 
-void MatterElectricalProtectionAlarmClusterInitCallback(EndpointId endpoint)
+namespace chip::app::Clusters::ElectricalProtectionAlarm {
+
+CHIP_ERROR ElectricalProtectionAlarmInit(EndpointId endpointId)
 {
-    VerifyOrReturn(ValidEndpointForElectricalProtectionAlarm(endpoint));
+    VerifyOrReturnError(gInstance == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gServer.Create(endpoint, MakeDefaultConfig());
+    gInstance = std::make_unique<Instance>(endpointId, MakeDefaultConfig());
+    VerifyOrReturnError(gInstance != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
+    CHIP_ERROR err = gInstance->Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        gInstance.reset();
+    }
+    return err;
 }
 
-void MatterElectricalProtectionAlarmClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType)
+void ElectricalProtectionAlarmShutdown()
 {
-    VerifyOrReturn(ValidEndpointForElectricalProtectionAlarm(endpoint));
-    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
-
-    gServer.Destroy();
+    // ~Instance() unregisters.
+    gInstance.reset();
 }
+
+} // namespace chip::app::Clusters::ElectricalProtectionAlarm
 
 bool HandleElectricalProtectionAlarmTestEventTrigger(uint64_t eventTrigger)
 {
-    VerifyOrReturnValue(gServer.IsConstructed(), false);
-    auto & cluster = gServer.Cluster();
+    VerifyOrReturnValue(gInstance != nullptr, false);
+    auto & cluster = gInstance->Cluster();
 
     BitMask<AlarmBitmap> bit;
     switch (static_cast<ElectricalProtectionAlarmTrigger>(eventTrigger))
