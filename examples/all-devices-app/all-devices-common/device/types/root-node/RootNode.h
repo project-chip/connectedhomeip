@@ -75,7 +75,7 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
+    Clusters::BasicInformationClusterWithDeviceLocation & BasicInformation() { return mBasicInformationCluster.Cluster(); }
 
 protected:
     Context mContext;

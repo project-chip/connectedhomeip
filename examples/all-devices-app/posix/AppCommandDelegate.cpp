@@ -46,7 +46,7 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationCluster>(
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationClusterWithDeviceLocation>(
                 endpointId);
         if (!cluster)
         {
