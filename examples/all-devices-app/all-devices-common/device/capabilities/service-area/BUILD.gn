@@ -28,7 +28,7 @@ source_set("service-area-delegate") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/common/rvc-simulation:rvc-simulation",
+    "${chip_root}/examples/all-devices-app/all-devices-common/rvc-simulation:rvc-simulation",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/app/clusters/service-area-server",
     "${chip_root}/src/lib/core",

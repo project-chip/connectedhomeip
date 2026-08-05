@@ -30,7 +30,7 @@ source_set("robotic-vacuum-cleaner") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/mode-base:mode-base-delegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/service-area:service-area-delegate",
-    "${chip_root}/examples/common/rvc-simulation:rvc-simulation",
+    "${chip_root}/examples/all-devices-app/all-devices-common/rvc-simulation:rvc-simulation",
     "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/app/clusters/service-area-server",

@@ -23,7 +23,8 @@
 #include <lib/support/Span.h>
 
 namespace chip {
-namespace examples {
+namespace app {
+namespace all_devices {
 namespace rvc_simulation {
 
 inline uint32_t DefaultCurrentAreaId()
@@ -33,16 +34,15 @@ inline uint32_t DefaultCurrentAreaId()
 
 /**
  * Populates SupportedMaps and SupportedAreas with the default topology used by
- * rvc-app certification tests. Works with both ServiceAreaCluster (code-driven)
- * and ServiceArea::Instance (legacy wrapper) because they expose the same API.
+ * all-devices-app robotic vacuum certification tests.
  */
 template <typename ServiceAreaClusterLike>
 void ApplyDefaultMapTopology(ServiceAreaClusterLike & cluster)
 {
-    using namespace app::Clusters;
-    using namespace app::Clusters::ServiceArea;
-    using app::DataModel::Nullable;
-    using app::DataModel::NullNullable;
+    using namespace Clusters;
+    using namespace Clusters::ServiceArea;
+    using DataModel::Nullable;
+    using DataModel::NullNullable;
 
     cluster.ClearSupportedMaps();
     cluster.AddSupportedMap(Topology::kMapIdXX, "My Map XX"_span);
@@ -78,5 +78,6 @@ void ApplyDefaultMapTopology(ServiceAreaClusterLike & cluster)
 }
 
 } // namespace rvc_simulation
-} // namespace examples
+} // namespace all_devices
+} // namespace app
 } // namespace chip

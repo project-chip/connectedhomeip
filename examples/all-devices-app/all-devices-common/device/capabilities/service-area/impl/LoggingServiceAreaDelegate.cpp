@@ -21,8 +21,8 @@
 
 namespace chip::app::Clusters::ServiceArea {
 
-using namespace chip::examples::rvc_simulation;
-using namespace chip::examples::rvc_simulation::Topology;
+using namespace chip::app::all_devices::rvc_simulation;
+using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 namespace {
 
