@@ -367,6 +367,13 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+            // The association has failed, release the PAF channel and send anything queued.
+            PafChannelReleaseAfterAssociation();
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+                []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
+#endif
+
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [this, reason]() { OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason); });
             if (delegate != nullptr)
@@ -547,6 +554,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
         ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface removed: %s", StringOrNullMarker(path));
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        PafChannelReleaseAfterAssociation();
+#endif
     }
 }
 
@@ -864,7 +874,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = false;
+    PafChannelHoldForAssociation();
 #endif
 
     if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
@@ -873,7 +883,10 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add network: %s", err->message);
         mWpaSupplicant.networkPath.reset();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        mPafChannelAvailable = true;
+        // Release and wake the queued sends
+        PafChannelReleaseAfterAssociation();
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+            []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
 #endif
         return CHIP_ERROR_INTERNAL;
     }
@@ -890,6 +903,11 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
                                                              &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to select network: %s", err->message);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        PafChannelReleaseAfterAssociation();
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+            []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
+#endif
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1588,7 +1606,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = true;
+    // A scan on its own leaves the radio free once it completes.  During an association the scan
+    // is only the first phase, so keep channel not available until association completes.
+    // Otherwise PAF frames would be sent while the radio is busy and would be dropped.
+    if (!mPafChannelAssociating)
+    {
+        mPafChannelAvailable = true;
+    }
 #endif
 }
 

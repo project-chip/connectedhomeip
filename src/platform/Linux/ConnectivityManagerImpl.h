@@ -226,6 +226,21 @@ private:
     bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
     bool mPafChannelAvailable = true;
+    // Set while a station association is in progress, during which the radio cannot carry PAF
+    // frames.  Distinguishes that from a plain scan so scan completion, which happens before
+    // authentication has even started, does not release the channel early.
+    bool mPafChannelAssociating = false;
+    void PafChannelHoldForAssociation()
+    {
+        mPafChannelAssociating = true;
+        mPafChannelAvailable   = false;
+    }
+    // Called once the radio is genuinely free / association failed.
+    void PafChannelReleaseAfterAssociation()
+    {
+        mPafChannelAssociating = false;
+        mPafChannelAvailable   = true;
+    }
 #endif
 
     CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);

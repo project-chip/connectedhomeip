@@ -190,6 +190,11 @@ public:
      */
     void FlushPendingAcks();
 
+    /**
+     * Give every connected endpoint a chance to send anything queued.
+     */
+    void DrivePendingSends();
+
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
