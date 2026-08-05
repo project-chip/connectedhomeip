@@ -21,7 +21,7 @@
 #include <clusters/ElectricalDistribution/Attributes.h>
 #include <clusters/ElectricalDistribution/Enums.h>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::ElectricalDistribution {
 
 /// Server for the Electrical Distribution cluster (0x00A2).
 ///
@@ -59,4 +59,4 @@ protected:
     ElectricalDistribution::Attributes::ServiceEntranceRated::TypeInfo::Type mServiceEntranceRated;
 };
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::ElectricalDistribution
