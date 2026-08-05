@@ -24,7 +24,7 @@
 
 #include <lib/support/BitMask.h>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::ElectricalProtectionAlarm {
 
 /// Server for the Electrical Protection Alarm cluster (0x00A3).
 ///
@@ -98,4 +98,4 @@ private:
     ElectricalProtectionAlarm::Attributes::ArcFaultRating::TypeInfo::Type mArcFaultRating;
 };
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::ElectricalProtectionAlarm

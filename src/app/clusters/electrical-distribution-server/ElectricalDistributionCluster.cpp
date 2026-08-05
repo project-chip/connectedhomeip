@@ -19,7 +19,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ElectricalDistribution/Metadata.h>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::ElectricalDistribution {
 
 using namespace ElectricalDistribution::Attributes;
 
@@ -66,4 +66,4 @@ CHIP_ERROR ElectricalDistributionCluster::SetEndOfLife(const EndOfLife::TypeInfo
     return CHIP_NO_ERROR;
 }
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::ElectricalDistribution
