@@ -45,9 +45,8 @@ public:
     const char * GetName() const override { return "IncreaseConfigurationVersion"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster =
-            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationClusterWithDeviceLocation>(
-                endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry()
+                             .GetClusterByEndpoint<chip::app::Clusters::BasicInformationClusterWithDeviceLocation>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "BasicInformationCluster not found on endpoint %d", endpointId);
