@@ -178,6 +178,54 @@ TEST_F(TestColorControlPersistence, StopFreezesAndPersistsCurrentValue)
     a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// The flip side of the test above: a Stop with nothing transitioning has no new value to freeze (a Stop
+// switches no mode either), so it must not write NVM at all. Writing anyway would wear flash on every
+// repeat of a command any client can send at will.
+TEST_F(TestColorControlPersistence, IdleStopDoesNotWriteNvm)
+{
+    {
+        ColorControlCluster a(kEp, HsConfig());
+        Testing::ClusterTester tester(a);
+        ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto & storage = tester.GetTestContext().StorageDelegate();
+
+        // Startup only loads, so the KVS is still empty: any key below could only come from a Stop.
+        ASSERT_EQ(storage.GetNumKeys(), 0u);
+        EXPECT_EQ(a.stopMoveStep(), Status::Success);
+        EXPECT_EQ(a.stopMoveStep(), Status::Success);
+        EXPECT_EQ(a.moveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(a.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+        EXPECT_EQ(storage.GetNumKeys(), 0u);
+
+        // A Stop that does interrupt a transition still persists the value it froze.
+        EXPECT_EQ(a.moveToSaturation(200, 200), Status::Success); // 20 s transition
+        Tick(a, 10000);                                           // halfway
+        EXPECT_EQ(a.stopMoveStep(), Status::Success);
+        EXPECT_GT(storage.GetNumKeys(), 0u);
+
+        a.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+    {
+        // Same for the XY axis, whose Stop is MoveColor with both rates 0.
+        ColorControlCluster a(kEp, XyConfig());
+        Testing::ClusterTester tester(a);
+        ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto & storage = tester.GetTestContext().StorageDelegate();
+
+        ASSERT_EQ(storage.GetNumKeys(), 0u);
+        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
+        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
+        EXPECT_EQ(storage.GetNumKeys(), 0u);
+
+        EXPECT_EQ(a.moveColor(100, 100), Status::Success); // toward the CIE boundary
+        Tick(a, 10000);
+        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
+        EXPECT_GT(storage.GetNumKeys(), 0u);
+
+        a.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
 TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
 {
     ColorControlCluster a(kEp, CtConfig());

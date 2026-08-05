@@ -46,9 +46,22 @@ static constexpr uint8_t MAX_SATURATION_VALUE = 254;
 
 static constexpr uint16_t MAX_INT16U_VALUE = 0xFFFF; // RemainingTime sentinel for indefinite moves
 
+// Largest reportable RemainingTime (§3.2.7.2 constraint max 0xFFFE); 0xFFFF stays reserved for the
+// indefinite-move sentinel above. Mirrors ColorControlCluster::kMaxTransitionTime, which is private.
+static constexpr uint16_t kMaxRemainingTenths = 0xFFFE;
+
 // HueTransition::durationMs sentinel for a MoveHue rate move (no endpoint; runs until StopHueAxis).
 // Safely above any real point-to-point duration (kMaxTransitionTime deciseconds * 100).
 static constexpr uint32_t kIndefiniteHueMoveMs = UINT32_MAX;
+
+// ms → RemainingTime deciseconds, saturating at the attribute's constraint max. Durations are not bounded
+// by kMaxTransitionTime: a rate move covers its whole axis at the commanded rate (up to 65279 units at
+// 1 unit/s ≈ 18 h) and a scene carries a transition time of up to 60000000 ms, either of which overflows
+// uint16 once divided by 100. Every RemainingTime write goes through here.
+constexpr uint16_t RemainingTenthsFromMs(uint32_t durationMs)
+{
+    return static_cast<uint16_t>(std::min<uint32_t>(durationMs / 100, kMaxRemainingTenths));
+}
 
 static constexpr uint8_t MIN_CURRENT_LEVEL = 0x01;
 static constexpr uint8_t MAX_CURRENT_LEVEL = 0xFE;
@@ -524,6 +537,17 @@ void ColorControlCluster::PersistCurrentColor()
     }
 }
 
+// Stop whatever axes mTransition is driving and freeze the value they stopped at (it won't reach OnTick's
+// settle). Persisting is guarded on a driver actually running: a Stop switches no mode, so an idle Stop has
+// nothing new to store and writing anyway would wear flash on every repeat — same guard as OnTick's
+// hadTransition.
+void ColorControlCluster::StopTransitionAndFreeze()
+{
+    VerifyOrReturn(!std::holds_alternative<std::monostate>(mTransition));
+    mTransition = std::monostate{};
+    PersistCurrentColor();
+}
+
 void ColorControlCluster::PersistColorLoop()
 {
     VerifyOrReturn(mContext != nullptr);
@@ -564,7 +588,7 @@ inline uint16_t RemainingTenths(uint64_t startTimeMs, uint32_t durationMs, uint6
     const uint64_t endMs = startTimeMs + durationMs;
     if (now >= endMs)
         return 0;
-    return static_cast<uint16_t>((endMs - now) / 100); // or (… + 99)/100 to round up
+    return RemainingTenthsFromMs(static_cast<uint32_t>(endMs - now)); // or (… + 99)/100 to round up
 }
 bool ColorControlCluster::LoopIsDriving() const
 {
@@ -583,11 +607,19 @@ bool ColorControlCluster::ShouldIgnoreHueCommandNow() const
 }
 
 // RemainingTime store + edge-triggered report (§3.2.7.4): report only when it reaches 0, rises from 0
-// past the 10-tenths threshold, or a fresh command changes it (isNewTransition); intermediate ticks
-// update the value quietly. `report` is computed against the OLD value before SetAttributeValue writes.
+// past the 10-tenths threshold, or a fresh command moves it by MORE than 10 tenths; intermediate ticks
+// update the value quietly. The delta gate on the isNewTransition arm is what keeps a short command
+// (e.g. MoveToHue with TransitionTime 5) from reporting — a sub-second transition never clears it.
+// `report` is computed against the OLD value before SetAttributeValue writes.
 void ColorControlCluster::SetQuietReportRemainingTime(uint16_t newRemainingTime, bool isNewTransition)
 {
-    const bool report = (newRemainingTime == 0) || (mState.remainingTime == 0 && newRemainingTime > 10) || isNewTransition;
+    constexpr uint16_t kReportDelta = 10;
+    const uint16_t previous         = mState.remainingTime;
+    const bool commandDeltaExceeded =
+        (newRemainingTime > previous) ? (newRemainingTime - previous > kReportDelta) : (previous - newRemainingTime > kReportDelta);
+
+    const bool report =
+        (newRemainingTime == 0) || (previous == 0 && newRemainingTime > kReportDelta) || (isNewTransition && commandDeltaExceeded);
     SetAttributeValue(mState.remainingTime, newRemainingTime, RemainingTime::Id,
                       report ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet);
 }
@@ -908,24 +940,25 @@ std::optional<ActionReturnStatus> ColorControlCluster::HandleStopMoveStep(const 
 
 ColorControlCluster::Status ColorControlCluster::stopMoveStep(OptMask optionsMask, OptMask optionsOverride)
 {
-    // StopMoveStep has no effect while a color loop is active — leave it running.
-    if (HasFeature(Feature::kColorLoop) && mColorLoop.active)
-    {
-        return Status::Success;
-    }
-
     // OnOff / Options gating.
     if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
     }
 
-    // Stop the mTransition-driven axes. Deliberately does NOT cancel the tick: an active color loop
-    // is independent and must keep running, so OnTick self-terminates the timer only if nothing else
-    // is driving.
-    mTransition = std::monostate{};
-    SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
-    PersistCurrentColor(); // freeze: persist the value the transition stopped at (it won't reach OnTick's settle)
+    // Stops only the mTransition-driven axes. §3.2.8.1 ("no effect while a color loop is active") needs no
+    // guard here: a color loop is NOT in mTransition — it is driven from mColorLoop plus its wall-clock
+    // anchor by TickColorLoop — so it is structurally untouched and keeps running. Guarding on
+    // mColorLoop.active instead would over-reach: that attribute stays 1 while the loop is dormant (XY / CT
+    // owns the output, or a hue command parked it), and while the loop drives hue the saturation axis can
+    // still carry an independent transition — in both cases there is a real transition that must stop.
+    // Deliberately does NOT cancel the tick: OnTick self-terminates the timer only once nothing is driving.
+    StopTransitionAndFreeze();
+    // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
+    if (!LoopIsDriving())
+    {
+        SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
+    }
     return Status::Success;
 }
 
@@ -1193,16 +1226,22 @@ Status ColorControlCluster::moveToSaturation(uint8_t saturation, uint16_t transi
     VerifyOrReturnValue(saturation <= MAX_SATURATION_VALUE, Status::ConstraintError);
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
 
-    ApplyModeSwitch(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
+    // Saturation is flavor-neutral (uint8_t in both hue/sat modes, and MoveToSaturation has no Enhanced*
+    // twin), so this must not choose a hue representation: asking for legacy unconditionally would truncate
+    // EnhancedCurrentHue to its high byte (§3.2.7.12) and, via LoopIsDriving, silently park a running color
+    // loop. Coming from XY / CT the delegate yields an 8-bit hue either way, so legacy stays correct there.
+    ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
+                        ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
+                        : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     const uint32_t durationMs = transitionTimeDs * 100u;  // deciseconds → ms
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
-                           .startSat    = GetSaturation(), // read AFTER the mode switch
-                           .targetSat   = std::clamp<uint8_t>(saturation, MIN_SATURATION_VALUE, MAX_SATURATION_VALUE),
-                           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-                           .durationMs  = durationMs,
+        .startSat    = GetSaturation(), // read AFTER the mode switch
+        .targetSat   = std::clamp<uint8_t>(saturation, MIN_SATURATION_VALUE, MAX_SATURATION_VALUE),
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = durationMs,
     };
-    SetQuietReportRemainingTime(static_cast<uint16_t>(durationMs / 100), /*isNewTransition=*/true); // finite
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     InvalidateScenes();
     return Status::Success;
@@ -1282,7 +1321,7 @@ void ColorControlCluster::StartXYTransition(const ColorControl::ColorValue & tar
         .durationYMs = timeMs, // one duration → both axes arrive together
         .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
     };
-    SetQuietReportRemainingTime(static_cast<uint16_t>(timeMs / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
 }
 
 void ColorControlCluster::StartColorTemperatureTransition(const ColorControl::ColorValue & target, uint32_t timeMs)
@@ -1297,7 +1336,7 @@ void ColorControlCluster::StartColorTemperatureTransition(const ColorControl::Co
         .startTimeMs  = SystemClock().GetMonotonicMilliseconds64().count(),
         .durationMs   = timeMs,
     };
-    SetQuietReportRemainingTime(static_cast<uint16_t>(timeMs / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
 }
 
 void ColorControlCluster::StartHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue)
@@ -1321,7 +1360,7 @@ void ColorControlCluster::StartHueAndSatTransition(const ColorControl::ColorValu
     next.sat    = SatTransition{ .startSat = hs.saturation, .targetSat = tgt.saturation, .startTimeMs = now, .durationMs = timeMs };
     mTransition = next;
 
-    SetQuietReportRemainingTime(static_cast<uint16_t>(timeMs / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
 }
 
 void ColorControlCluster::StartEnhancedHueAndSatTransition(const ColorControl::ColorValue & target, uint32_t timeMs, bool moveHue)
@@ -1342,14 +1381,19 @@ void ColorControlCluster::StartEnhancedHueAndSatTransition(const ColorControl::C
     next.sat = SatTransition{ .startSat = ehs.saturation, .targetSat = tgt.saturation, .startTimeMs = now, .durationMs = timeMs };
     mTransition = next;
 
-    SetQuietReportRemainingTime(static_cast<uint16_t>(timeMs / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(timeMs), /*isNewTransition=*/true);
 }
 
 CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorModeEnum ColorMode,
                                                  const ColorControl::ColorValue & target, const ColorControl::ColorLoopState & loop,
                                                  uint32_t timeMs)
 {
-    if (loop.active == 1)
+    // A saved active loop takes over the output, so the scene's saved color axes are deliberately not
+    // restored — the loop drives hue itself. Gated on the feature: nothing upstream rejects a scene
+    // carrying ColorLoopActive on an endpoint without ColorLoop support (the per-pair validator only
+    // type-checks, SerializeAdd only checks mode/axis presence), and starting a loop there would switch
+    // the endpoint into enhanced-hue mode and report loop attributes that do not exist on it.
+    if (loop.active == 1 && HasFeature(Feature::kColorLoop))
     {
         mColorLoop.active    = 1;
         mColorLoop.direction = loop.direction;
@@ -1405,17 +1449,22 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     if (moveMode == MoveModeEnum::kStop)
     {
-        // Stop is a stop-semantic (§3.2.8.1): it must NOT stop or disturb an active color loop, so it is a
-        // no-op while one runs — independent of the ignore-while-looping choice, which governs hue *changes*.
-        if (HasFeature(Feature::kColorLoop) && mColorLoop.active)
+        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.5.4): the §3.2.5.2 axis
+        // independence that lets the two overlap governs only MoveMode != Stop. It is scoped to those two
+        // axes though — an XY / CT transition is neither, so it keeps running.
+        // Stop is also a stop-semantic (§3.2.8.1): it must NOT disturb an active color loop. That needs no
+        // guard, because the loop is not in mTransition (TickColorLoop drives it from mColorLoop plus its
+        // wall-clock anchor) and so is structurally untouched here.
+        if (std::holds_alternative<HueSatTransition>(mTransition))
         {
-            return Status::Success;
+            mTransition = std::monostate{};
+            PersistCurrentColor(); // freeze: persist the hue/saturation the movement stopped at
+            // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
+            if (!LoopIsDriving())
+            {
+                SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
+            }
         }
-        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.5.4) — same as StopMoveStep.
-        // The hue/saturation axis independence of §3.2.5.2 governs only MoveMode != Stop.
-        mTransition = std::monostate{};
-        SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
-        PersistCurrentColor(); // freeze: persist the hue the axis stopped at
         return Status::Success;
     }
 
@@ -1431,10 +1480,10 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     auto & hs = EnsureHueSatTransition(); // preserve a running sat axis (§3.2.5.2)
     hs.hue    = HueTransition{
-           .startHue    = GetEnhancedHue(), // 16-bit canonical current
-           .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
+        .startHue    = GetEnhancedHue(), // 16-bit canonical current
+        .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
     };
     SetQuietReportRemainingTime(MAX_INT16U_VALUE, /*isNewTransition=*/true); // indefinite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
@@ -1464,6 +1513,9 @@ Status ColorControlCluster::moveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
     VerifyOrReturnValue(!ShouldIgnoreHueCommandNow(), Status::Success);
 
     VerifyOrReturnValue(dir != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
+    // Both MoveToHue and EnhancedMoveToHue carry a uint16 TransitionTime constrained to max 65534.
+    VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
+
     ApplyModeSwitch(isEnhanced ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
@@ -1480,12 +1532,14 @@ Status ColorControlCluster::moveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
     case DirectionEnum::kDown:
         up = false;
         break;
+    // On an exact half-circle (upArc == 0x8000) both arcs are the same length, and §3.2.8.4.5 resolves
+    // that tie to Up — hence the inclusive comparison on BOTH arms.
     case DirectionEnum::kShortest:
         up = (upArc <= 0x8000);
         break; // up is the shorter arc
     case DirectionEnum::kLongest:
-        up = (upArc > 0x8000);
-        break;
+        up = (upArc >= 0x8000);
+        break; // up is the longer arc
     case DirectionEnum::kUnknownEnumValue:
         return Status::InvalidCommand;
     }
@@ -1524,6 +1578,9 @@ Status ColorControlCluster::stepHue(StepModeEnum stepMode, uint16_t stepSize, ui
 
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
+    // EnhancedStepHue's TransitionTime is a uint16 constrained to max 65534 (legacy StepHue's is a uint8,
+    // so it can never trip this).
+    VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
 
     ApplyModeSwitch(isEnhanced ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
@@ -1556,16 +1613,29 @@ Status ColorControlCluster::moveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     if (moveMode == MoveModeEnum::kStop)
     {
-        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.8.4) — same as StopMoveStep.
-        // The hue/saturation axis independence of §3.2.5.2 governs only MoveMode != Stop.
-        mTransition = std::monostate{};
-        SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like moveHue Stop
-        PersistCurrentColor();                                     // freeze: persist the saturation the axis stopped at
+        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.8.4): the §3.2.5.2 axis
+        // independence that lets the two overlap governs only MoveMode != Stop. Scoped to those two axes
+        // though — an XY / CT transition is neither, so it keeps running. Mirrors moveHue's Stop exactly.
+        if (std::holds_alternative<HueSatTransition>(mTransition))
+        {
+            mTransition = std::monostate{};
+            PersistCurrentColor(); // freeze: persist the hue/saturation the movement stopped at
+            // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
+            if (!LoopIsDriving())
+            {
+                SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
+            }
+        }
         return Status::Success;
     }
     VerifyOrReturnValue(rate != 0, Status::InvalidCommand); // rate 0 + non-stop → InvalidCommand
 
-    ApplyModeSwitch(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation); // basic HS, not enhanced
+    // Saturation is flavor-neutral (uint8_t in both hue/sat modes, no Enhanced* twin), so this must not pick
+    // a hue representation: asking for legacy unconditionally would truncate EnhancedCurrentHue to its high
+    // byte (§3.2.7.12) and, via LoopIsDriving, silently park a running color loop.
+    ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
+                        ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
+                        : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     const uint8_t start       = GetSaturation();
     const uint8_t target      = (moveMode == MoveModeEnum::kUp) ? MAX_SATURATION_VALUE : MIN_SATURATION_VALUE;
@@ -1574,12 +1644,12 @@ Status ColorControlCluster::moveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     auto & hs = EnsureHueSatTransition(); // preserve a running HUE axis (§3.2.5.2)
     hs.sat    = SatTransition{
-           .startSat    = start,
-           .targetSat   = target, // the boundary — bounded, so it stops here
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = durationMs,
+        .startSat    = start,
+        .targetSat   = target, // the boundary — bounded, so it stops here
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = durationMs,
     };
-    SetQuietReportRemainingTime(static_cast<uint16_t>(durationMs / 100), /*isNewTransition=*/true); // finite
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     InvalidateScenes();
     return Status::Success;
@@ -1600,7 +1670,11 @@ Status ColorControlCluster::stepSaturation(StepModeEnum stepMode, uint8_t stepSi
     VerifyOrReturnValue(stepMode != StepModeEnum::kUnknownEnumValue, Status::InvalidCommand);
     VerifyOrReturnValue(stepSize != 0, Status::InvalidCommand);
 
-    ApplyModeSwitch(EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
+    // Flavor-neutral like the other two saturation commands: preserve enhanced hue/sat rather than demoting
+    // it (see moveToSaturation).
+    ApplyModeSwitch(std::holds_alternative<EnhancedHueSatColor>(mColorValue)
+                        ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
+                        : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     const int32_t signedDelta = (stepMode == StepModeEnum::kUp ? +1 : -1) * static_cast<int32_t>(stepSize);
     const uint8_t start       = GetSaturation();
@@ -1619,7 +1693,7 @@ void ColorControlCluster::stopColorLoop()
 {
     if (!mColorLoop.active)
         return;
-    mColorLoop.active = 0;                                  
+    mColorLoop.active = 0;
     NotifyAttributeChanged(ColorLoopActive::Id, AttributeChangeType::kReportable);
 
     // Restore only when enhanced-HS still owns the output; a MoveToColor/MoveToColorTemperature
@@ -1631,7 +1705,6 @@ void ColorControlCluster::stopColorLoop()
     }
     PersistCurrentColor();
 }
-
 
 /**
  * @brief Executes ColorLoop command.
@@ -1849,10 +1922,9 @@ DataModel::ActionReturnStatus ColorControlCluster::WriteAttribute(const DataMode
         // null = "keep previous value on startup"; a concrete value must be a legal mired (<= 0xFEFF).
         VerifyOrReturnError(value.IsNull() || value.Value() <= kMaxColorTemperatureMireds, Status::ConstraintError);
         mCT.startUpColorTemperatureMireds = value;
-        // NVM attribute: persist in the same native-endian storage format Startup() loads (null → sentinel).
-        NumericAttributeTraits<uint16_t>::StorageType storage;
-        DataModel::NullableToStorage(mCT.startUpColorTemperatureMireds, storage);
-        PersistValue(StartUpColorTemperatureMireds::Id, storage);
+        // NVM attribute: the Nullable overload of StoreNativeEndianValue writes the same native-endian
+        // storage format (null → sentinel) that Startup()'s Nullable load reads back.
+        PersistValue(StartUpColorTemperatureMireds::Id, mCT.startUpColorTemperatureMireds);
         NotifyAttributeChanged(request.path.mAttributeId);
         return Status::Success;
     }
@@ -1999,7 +2071,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint> and `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
@@ -2295,9 +2367,8 @@ Status ColorControlCluster::moveColor(int16_t rateX, int16_t rateY, BitMask<Opti
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     if (rateX == 0 && rateY == 0)
     { // both zero → stop XY movement
-        mTransition = std::monostate{};
+        StopTransitionAndFreeze();
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like moveHue Stop
-        PersistCurrentColor();                                     // freeze: persist the XY the movement stopped at
         return Status::Success;
     }
 
@@ -2320,7 +2391,7 @@ Status ColorControlCluster::moveColor(int16_t rateX, int16_t rateY, BitMask<Opti
     };
     // Fresh-command RemainingTime edge report (§3.2.7.4): the slower axis's time-to-boundary in 1/10 s
     // (an idle axis contributed 0 duration, so max() is the moving axis).
-    SetQuietReportRemainingTime(static_cast<uint16_t>(std::max(durX, durY) / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(std::max(durX, durY)), /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     InvalidateScenes();
     return Status::Success;
@@ -2488,7 +2559,7 @@ Status ColorControlCluster::moveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
         .startTimeMs  = SystemClock().GetMonotonicMilliseconds64().count(),
         .durationMs   = durationMs,
     };
-    SetQuietReportRemainingTime(static_cast<uint16_t>(durationMs / 100), /*isNewTransition=*/true);
+    SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     InvalidateScenes();
     return Status::Success;

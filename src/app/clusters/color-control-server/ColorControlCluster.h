@@ -84,7 +84,7 @@ using Transition = std::variant<std::monostate, XYTransition, CTTransition, HueS
 // ---- CTConfig (runtime-writable CT limits) ----
 struct CTConfig
 {
-    uint16_t colorTempPhysicalMinMireds      = 0;
+    uint16_t colorTempPhysicalMinMireds      = 1;
     uint16_t colorTempPhysicalMaxMireds      = 0xFEFF;
     uint16_t coupleColorTempToLevelMinMireds = 0;
     DataModel::Nullable<uint16_t> startUpColorTemperatureMireds{};
@@ -388,6 +388,7 @@ private:
     void PersistValue(chip::AttributeId id, const T & value);
     void PersistCurrentColor(); // EnhancedColorMode + the active mode's stored axes
     void PersistColorLoop();    // ColorLoopActive / ColorLoopDirection / ColorLoopTime
+    void StopTransitionAndFreeze();
 
     static constexpr uint16_t kMaxTransitionTime         = 65534; // Max value as defined by the spec.
     static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec (0xFEFF).

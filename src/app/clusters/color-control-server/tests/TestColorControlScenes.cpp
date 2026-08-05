@@ -172,6 +172,111 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
     EXPECT_EQ(cluster.CurrentY(), 200u);
 }
 
+// A scene's transition time is a uint32 of milliseconds (AddScene constrains it to 60000000), so the
+// RemainingTime it implies does not fit in uint16 deciseconds: it must saturate at the attribute's
+// constraint max (0xFFFE) rather than wrap — 600000 tenths would come back as 10176.
+TEST_F(TestColorControlScenes, ApplySceneSaturatesRemainingTime)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kXy);
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AttributeValuePair pairs[3];
+    pairs[0].attributeID = Attributes::CurrentX::Id;
+    pairs[0].valueUnsigned16.SetValue(100);
+    pairs[1].attributeID = Attributes::CurrentY::Id;
+    pairs[1].valueUnsigned16.SetValue(200);
+    pairs[2].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[2].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kCurrentXAndCurrentY));
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 60000000), CHIP_NO_ERROR);
+
+    uint16_t remainingTime = 0;
+    ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
+    EXPECT_EQ(remainingTime, 0xFFFE);
+}
+
+// A scene may carry ColorLoopActive == 1 on an endpoint that has no ColorLoop feature — nothing upstream
+// rejects the pair (the per-pair validator only type-checks it, and SerializeAdd only checks that the
+// declared mode's companion attributes are present). Restoring it must not start a loop, which would
+// switch the endpoint into enhanced-hue mode and report loop attributes it does not have; the ordinary
+// color restore runs instead.
+TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kXy); // no ColorLoop, no EnhancedHue
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = Attributes::CurrentX::Id;
+    pairs[0].valueUnsigned16.SetValue(100);
+    pairs[1].attributeID = Attributes::CurrentY::Id;
+    pairs[1].valueUnsigned16.SetValue(200);
+    pairs[2].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[2].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kCurrentXAndCurrentY));
+    pairs[3].attributeID = Attributes::ColorLoopActive::Id;
+    pairs[3].valueUnsigned8.SetValue(1);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    // Move the live color away from the scene target so the restore has something to change.
+    EXPECT_EQ(cluster.moveToColor(30000, 40000, 0), Status::Success);
+    Complete(cluster);
+    ASSERT_EQ(cluster.CurrentX(), 30000u);
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    Complete(cluster);
+
+    EXPECT_EQ(cluster.ColorLoopActive(), 0);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kCurrentXAndCurrentY);
+    EXPECT_EQ(cluster.CurrentX(), 100u); // saved color restored rather than discarded by a loop start
+    EXPECT_EQ(cluster.CurrentY(), 200u);
+}
+
+// The counterpart: on an endpoint that does support ColorLoop, a scene saved with ColorLoopActive == 1
+// starts the loop, which takes over the hue axis (so the scene's saved color axes are deliberately not
+// restored — the loop drives hue itself).
+TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
+    config.mColorValue = EnhancedHueSatColor{ .enhancedHue = 0x1000, .saturation = 20 };
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = Attributes::EnhancedCurrentHue::Id;
+    pairs[0].valueUnsigned16.SetValue(0x4000);
+    pairs[1].attributeID = Attributes::CurrentSaturation::Id;
+    pairs[1].valueUnsigned8.SetValue(200);
+    pairs[2].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[2].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation));
+    pairs[3].attributeID = Attributes::ColorLoopActive::Id;
+    pairs[3].valueUnsigned8.SetValue(1);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.ColorLoopActive(), 1);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+}
+
 // SerializeAdd only accepts the decodable form of an EFS, so a Type is TLV-encoded into `backing` and
 // decoded back into `out`. `backing` must outlive every use of `out` — the decoded list iterates over
 // those bytes. Builds an EFS scoped to the ColorControl cluster from the given attribute/value pairs.
