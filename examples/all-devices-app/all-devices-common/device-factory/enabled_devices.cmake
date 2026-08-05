@@ -98,7 +98,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/window-covering/WindowCovering.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
