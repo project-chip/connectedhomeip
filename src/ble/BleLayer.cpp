@@ -438,6 +438,14 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BleLayer::CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj)
+{
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPlatformDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return mPlatformDelegate->CloseConnection(connObj);
+}
+
 // Handle remote central's initiation of CHIP over BLE protocol handshake.
 CHIP_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBufferHandle && pBuf)
 {

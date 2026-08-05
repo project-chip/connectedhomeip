@@ -45,6 +45,12 @@ public:
 
     CHIP_ERROR GetLastPASEError() const { return mPairer->mLastPASEError; }
 
+    size_t GetDiscoveredParametersCount() const { return mPairer->mDiscoveredParameters.size(); }
+    const Controller::SetUpCodePairerParameters & FrontDiscoveredParameters() const
+    {
+        return mPairer->mDiscoveredParameters.front();
+    }
+
     bool HasCurrentPASEParameters() const { return mPairer->mCurrentPASEParameters.HasValue(); }
     void SetCurrentPASEParameters(const Controller::SetUpCodePairerParameters & params)
     {
@@ -52,6 +58,13 @@ public:
     }
 
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    void CallOnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> longDiscriminator)
+    {
+        mPairer->OnDiscoveredDeviceOverBle(connObj, longDiscriminator);
+    }
+#endif
 
     void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
 

@@ -62,8 +62,10 @@ class TestBleLayer : public BleLayer,
 public:
     // Add mOnBleConnectionCompleteCalls and mOnBleConnectionErrorCalls
     // to check if the callbacks are invoked correctly.
-    int mOnBleConnectionCompleteCalls = 0;
-    int mOnBleConnectionErrorCalls    = 0;
+    int mOnBleConnectionCompleteCalls           = 0;
+    int mOnBleConnectionErrorCalls              = 0;
+    int mCloseConnectionCalls                   = 0;
+    BLE_CONNECTION_OBJECT mLastClosedConnection = BLE_CONNECTION_UNINITIALIZED;
 
     static void SetUpTestSuite()
     {
@@ -82,6 +84,8 @@ public:
         // Reset the connection flags before each test.
         mOnBleConnectionCompleteCalls = 0;
         mOnBleConnectionErrorCalls    = 0;
+        mCloseConnectionCalls         = 0;
+        mLastClosedConnection         = BLE_CONNECTION_UNINITIALIZED;
         ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -170,7 +174,12 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT connObj) override
+    {
+        mCloseConnectionCalls++;
+        mLastClosedConnection = connObj;
+        return CHIP_NO_ERROR;
+    }
     uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 0; }
     CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
@@ -408,6 +417,15 @@ TEST_F(TestBleLayer, CloseBleConnection)
     ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
 
     CloseBleConnection(connObj);
+}
+
+TEST_F(TestBleLayer, CloseUnclaimedConnection)
+{
+    const auto connObj = GetConnectionObject();
+
+    EXPECT_EQ(BleLayer::CloseUnclaimedConnection(connObj), CHIP_NO_ERROR);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connObj);
 }
 
 TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)

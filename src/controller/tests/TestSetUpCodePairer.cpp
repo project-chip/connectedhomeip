@@ -25,13 +25,28 @@
 #include <lib/core/CHIPError.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <cstdint>
 #include <memory>
+#include <optional>
+#include <type_traits>
 
 using namespace chip;
 using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
+
+template <typename T>
+static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(uint8_t *)
+{
+    return static_cast<T>(1);
+}
+
+template <typename T>
+static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConnectionObject(uint8_t * storage)
+{
+    return reinterpret_cast<T>(storage);
+}
 
 // DeviceCommissioner is too large to embed in a test fixture (it exceeds
 // the pw_unit_test light backend's static memory pool).  Heap-allocate it
@@ -161,5 +176,25 @@ TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
     // survive to confuse a later ReconfirmRecord check.
     EXPECT_FALSE(Access().HasCurrentPASEParameters());
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
+{
+    Access().SetWaitingForPASE(true);
+
+    uint8_t connectionObjectStorage;
+    BLE_CONNECTION_OBJECT connObj = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionObjectStorage);
+    Access().CallOnDiscoveredDeviceOverBle(connObj, std::optional<uint16_t>{ 3840 });
+
+    ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    const auto & params = Access().FrontDiscoveredParameters();
+    EXPECT_EQ(params.GetPeerAddress().GetTransportType(), Transport::Type::kBle);
+    EXPECT_FALSE(params.HasConnectionObject());
+    EXPECT_FALSE(params.HasDiscoveredObject());
+    ASSERT_TRUE(params.mLongDiscriminator.has_value());
+    EXPECT_EQ(params.mLongDiscriminator, std::optional<uint16_t>{ 3840 });
+}
+#endif
 
 } // namespace
