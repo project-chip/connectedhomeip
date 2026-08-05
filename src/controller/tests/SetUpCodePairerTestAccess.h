@@ -55,6 +55,29 @@ public:
 
     void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
 
+    void SetLastPASETransportWasNfc(bool val) { mPairer->mLastPASETransportWasNfc = val; }
+    bool GetLastPASETransportWasNfc() const { return mPairer->mLastPASETransportWasNfc; }
+
+    void PushDiscoveredParameters(const Controller::SetUpCodePairerParameters & params)
+    {
+        mPairer->mDiscoveredParameters.emplace_back(params);
+    }
+
+    size_t DiscoveredParametersSize() const { return mPairer->mDiscoveredParameters.size(); }
+
+    // Push a setup payload onto the pairer's mSetupPayloads vector.  This is
+    // needed so that ConnectToDiscoveredDevice() can match a queued discovered
+    // parameters entry that has no long discriminator (single-payload fallback).
+    void PushSetupPayload(const SetupPayload & payload) { mPairer->mSetupPayloads.push_back(payload); }
+
+    // Drive the production ConnectToDiscoveredDevice() path. Returns the
+    // production return value (whether a PASE attempt was kicked off).
+    bool CallConnectToDiscoveredDevice() { return mPairer->ConnectToDiscoveredDevice(); }
+
+    void SetPairingDelegate(Controller::DevicePairingDelegate * delegate) { mPairer->mPairingDelegate = delegate; }
+
+    void CallOnStatusUpdate(Controller::DevicePairingDelegate::Status status) { mPairer->OnStatusUpdate(status); }
+
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
 
 private:
