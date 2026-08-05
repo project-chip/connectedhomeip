@@ -1388,7 +1388,6 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
 /**
  * @brief Executes move Hue Command.
  *
- * @param[in] endpoint EndpointId of the recipient Color control cluster.
  * @param[in] moveMode
  * @param[in] rate
  * @param[in] optionsMask
@@ -1397,12 +1396,12 @@ CHIP_ERROR ColorControlCluster::HandleApplyScene(ColorControl::EnhancedColorMode
  * was called by MoveHue command and rate is a uint8 value.
  * @return Status::Success when successful,
  *         Status::InvalidCommand when Rate is 0 or an unknown moveMode is provided
- *         Status::UnsupportedEndpoint when the provided endpoint doesn't correspond with a hue transition state,
  */
 Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, BitMask<OptionsBitmap> optionsMask,
                                     BitMask<OptionsBitmap> optionsOverride)
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnValue(moveMode != MoveModeEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     if (moveMode == MoveModeEnum::kStop)
     {
@@ -1412,13 +1411,9 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
         {
             return Status::Success;
         }
-        // Stop the hue axis; a running saturation axis is independent (§3.2.5.2) and survives.
-        if (auto * hsx = std::get_if<HueSatTransition>(&mTransition))
-        {
-            hsx->hue.reset();
-            if (!hsx->sat)
-                mTransition = std::monostate{};
-        }
+        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.5.4) — same as StopMoveStep.
+        // The hue/saturation axis independence of §3.2.5.2 governs only MoveMode != Stop.
+        mTransition = std::monostate{};
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false);
         PersistCurrentColor(); // freeze: persist the hue the axis stopped at
         return Status::Success;
@@ -1449,9 +1444,7 @@ Status ColorControlCluster::moveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
 /**
  * @brief Executes move to hue command.
- *
- * @param[in] endpoint EndpointId of the recipient Color control cluster.
- * @param[in] hue
+ * * @param[in] hue
  * @param[in] moveDirection
  * @param[in] transitionTime
  * @param[in] optionsMask
@@ -1563,13 +1556,9 @@ Status ColorControlCluster::moveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     if (moveMode == MoveModeEnum::kStop)
     {
-        // Stop the saturation axis; a running hue axis is independent (§3.2.5.2) and survives.
-        if (auto * hsx = std::get_if<HueSatTransition>(&mTransition))
-        {
-            hsx->sat.reset();
-            if (!hsx->hue)
-                mTransition = std::monostate{};
-        }
+        // Stop halts any ongoing hue *and* saturation transition (§3.2.8.8.4) — same as StopMoveStep.
+        // The hue/saturation axis independence of §3.2.5.2 governs only MoveMode != Stop.
+        mTransition = std::monostate{};
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like moveHue Stop
         PersistCurrentColor();                                     // freeze: persist the saturation the axis stopped at
         return Status::Success;
@@ -1630,14 +1619,19 @@ void ColorControlCluster::stopColorLoop()
 {
     if (!mColorLoop.active)
         return;
-    mColorLoop.active                                      = 0;
-    std::get<EnhancedHueSatColor>(mColorValue).enhancedHue = mColorLoop.storedEnhancedHue; // restore
+    mColorLoop.active = 0;                                  
     NotifyAttributeChanged(ColorLoopActive::Id, AttributeChangeType::kReportable);
-    NotifyAttributeChanged(EnhancedCurrentHue::Id, AttributeChangeType::kReportable);
-    // Deactivate restored EnhancedCurrentHue → persist the settled color (loop attrs persisted by the caller).
+
+    // Restore only when enhanced-HS still owns the output; a MoveToColor/MoveToColorTemperature
+    // can leave the loop active-but-dormant with XY/CT owning mColorValue (§3.2.8.1).
+    if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
+    {
+        ehs->enhancedHue = mColorLoop.storedEnhancedHue;
+        NotifyAttributeChanged(EnhancedCurrentHue::Id, AttributeChangeType::kReportable);
+    }
     PersistCurrentColor();
-    // tick self-terminates once no axis/loop is active
 }
+
 
 /**
  * @brief Executes ColorLoop command.

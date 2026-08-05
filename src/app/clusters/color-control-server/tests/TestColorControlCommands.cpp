@@ -205,6 +205,49 @@ TEST_F(TestColorControlCommands, MoveHueRateThenStop)
     EXPECT_EQ(c.moveHue(MoveModeEnum::kStop, 0, false), Status::Success);
     Tick(c, 1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
+
+    // An undefined MoveMode must not be treated as Down: it is rejected before any transition starts,
+    // so the hue axis stays frozen rather than beginning an indefinite move.
+    EXPECT_EQ(c.moveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::InvalidCommand);
+    EXPECT_EQ(c.moveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::InvalidCommand);
+    Tick(c, 1000);
+    EXPECT_EQ(c.EnhancedHue(), frozen);
+}
+
+// The Stop rows of MoveHue (§3.2.8.5.4) and MoveSaturation (§3.2.8.8.4) both stop "any ongoing hue
+// and/or saturation transition", so either Stop halts BOTH axes — the §3.2.5.2 axis independence that
+// lets a hue move and a saturation move overlap applies only to MoveMode != Stop.
+TEST_F(TestColorControlCommands, MoveStopHaltsBothAxes)
+{
+    {
+        ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00, sat 20
+        EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success); // overlaps the hue move
+        Tick(c, 1000);
+        const uint16_t frozenHue = c.EnhancedHue();
+        const uint8_t frozenSat  = c.Saturation();
+        EXPECT_LT(frozenSat, kMaxSat); // still en route to the max bound
+
+        // MoveHue(Stop) must freeze the saturation axis too.
+        EXPECT_EQ(c.moveHue(MoveModeEnum::kStop, 0, false), Status::Success);
+        Complete(c);
+        EXPECT_EQ(c.EnhancedHue(), frozenHue);
+        EXPECT_EQ(c.Saturation(), frozenSat);
+    }
+    {
+        ColorControlCluster c(kEp, HsConfig());
+        EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success);
+        Tick(c, 1000);
+        const uint16_t frozenHue = c.EnhancedHue();
+        const uint8_t frozenSat  = c.Saturation();
+
+        // ...and symmetrically, MoveSaturation(Stop) must freeze the hue axis.
+        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+        Complete(c);
+        EXPECT_EQ(c.EnhancedHue(), frozenHue);
+        EXPECT_EQ(c.Saturation(), frozenSat);
+    }
 }
 
 TEST_F(TestColorControlCommands, EnhancedMoveHueRate)
