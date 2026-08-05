@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/support/CodeUtils.h>
 
 namespace testing {
