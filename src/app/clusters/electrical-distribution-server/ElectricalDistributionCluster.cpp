@@ -17,6 +17,7 @@
 #include "ElectricalDistributionCluster.h"
 
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/ElectricalDistribution/EnumsCheck.h>
 #include <clusters/ElectricalDistribution/Metadata.h>
 
 namespace chip::app::Clusters {
@@ -62,6 +63,13 @@ CHIP_ERROR ElectricalDistributionCluster::Attributes(const ConcreteClusterPath &
 
 CHIP_ERROR ElectricalDistributionCluster::SetEndOfLife(const EndOfLife::TypeInfo::Type & endOfLife)
 {
+    // EndOfLife is nullable, so null is a legal value. A non-null value must name a known enum
+    // member: kUnknownEnumValue is the decode sentinel for values this build does not recognise,
+    // and storing it would let an out-of-spec value be transmitted on a subsequent read.
+    VerifyOrReturnError(endOfLife.IsNull() ||
+                            EnsureKnownEnumValue(endOfLife.Value()) != ElectricalDistribution::EndOfLifeEnum::kUnknownEnumValue,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
     SetAttributeValue(mEndOfLife, endOfLife, EndOfLife::Id);
     return CHIP_NO_ERROR;
 }

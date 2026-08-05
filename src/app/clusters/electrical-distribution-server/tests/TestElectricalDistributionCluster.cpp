@@ -136,4 +136,27 @@ TEST_F(TestElectricalDistributionCluster, SetEndOfLife)
     endOfLife = DataModel::MakeNullable(EndOfLifeEnum::kExpired);
     ASSERT_EQ(electricalDistribution.SetEndOfLife(endOfLife), CHIP_NO_ERROR);
     ASSERT_EQ(electricalDistribution.GetEndOfLife(), endOfLife);
+
+    // Null is a legal value: the attribute is nullable.
+    endOfLife = DataModel::NullNullable;
+    ASSERT_EQ(electricalDistribution.SetEndOfLife(endOfLife), CHIP_NO_ERROR);
+    ASSERT_TRUE(electricalDistribution.GetEndOfLife().IsNull());
+}
+
+TEST_F(TestElectricalDistributionCluster, SetEndOfLifeRejectsUnknownValue)
+{
+    EndOfLife::TypeInfo::Type known = DataModel::MakeNullable(EndOfLifeEnum::kDegraded);
+    ASSERT_EQ(electricalDistribution.SetEndOfLife(known), CHIP_NO_ERROR);
+
+    // kUnknownEnumValue is the decode sentinel and must never be stored, or a later read would
+    // transmit an out-of-spec value.
+    EndOfLife::TypeInfo::Type unknown = DataModel::MakeNullable(EndOfLifeEnum::kUnknownEnumValue);
+    ASSERT_EQ(electricalDistribution.SetEndOfLife(unknown), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Any value outside the defined range is rejected the same way.
+    EndOfLife::TypeInfo::Type outOfRange = DataModel::MakeNullable(static_cast<EndOfLifeEnum>(0xFE));
+    ASSERT_EQ(electricalDistribution.SetEndOfLife(outOfRange), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // A rejected write leaves the previous value untouched.
+    ASSERT_EQ(electricalDistribution.GetEndOfLife(), known);
 }
