@@ -249,7 +249,7 @@ void ApplicationInit()
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
 
     // Electrical Protection Alarm's generated Init callback is a no-op, so the app registers it.
-    VerifyOrDie(Clusters::ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(/* endpoint= */ 1) == CHIP_NO_ERROR);
+    VerifyOrDie(Clusters::ElectricalProtectionAlarm::ElectricalProtectionAlarmInit(/* endpointId= */ 1) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
