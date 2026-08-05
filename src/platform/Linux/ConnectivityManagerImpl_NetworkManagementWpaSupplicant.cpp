@@ -400,6 +400,13 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "completed") == 0)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        // The link is up, but NAN typically needs a few hundred milliseconds more before it can
+        // carry frames, hold the channel until it is seen working or the bounding timer expires.
+        PafChannelAwaitNanRecovery();
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() { ArmNanRecoveryTimer(); });
+#endif
+
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
@@ -1069,6 +1076,40 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void ConnectivityManagerImpl::HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context)
+{
+    auto * self = static_cast<ConnectivityManagerImpl *>(context);
+    VerifyOrReturn(self->mPafChannelAwaitingNan);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: no NAN activity after association; releasing the transport anyway");
+    self->PafChannelReleaseAfterAssociation();
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends();
+}
+
+void ConnectivityManagerImpl::PafChannelNoteNanActivity()
+{
+    VerifyOrReturn(mPafChannelAwaitingNan);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN active again after association; releasing the transport");
+    PafChannelReleaseAfterAssociation();
+
+    // Called from a NAN D-Bus signal on the glib thread, so the sends cannot be driven here.
+    LogErrorOnFailure(
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); }));
+}
+
+void ConnectivityManagerImpl::ArmNanRecoveryTimer()
+{
+    VerifyOrReturn(mPafChannelAwaitingNan);
+
+    // StartTimer() cancels any timer already registered for this handler and context, so arming
+    // more than once per association just restarts the bound.
+    LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS), HandleNanRecoveryTimeout, this));
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
     // Iterate on the network interface to see if we already have beed assigned addresses.
@@ -1609,7 +1650,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     // A scan on its own leaves the radio free once it completes.  During an association the scan
     // is only the first phase, so keep channel not available until association completes.
     // Otherwise PAF frames would be sent while the radio is busy and would be dropped.
-    if (!mPafChannelAssociating)
+    if (!mPafChannelAssociating && !mPafChannelAwaitingNan)
     {
         mPafChannelAvailable = true;
     }

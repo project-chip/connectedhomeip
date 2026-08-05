@@ -230,17 +230,33 @@ private:
     // frames.  Distinguishes that from a plain scan so scan completion, which happens before
     // authentication has even started, does not release the channel early.
     bool mPafChannelAssociating = false;
+    // Set once the station link is up but NAN has not yet started carrying traffic.
+    bool mPafChannelAwaitingNan = false;
     void PafChannelHoldForAssociation()
     {
         mPafChannelAssociating = true;
+        mPafChannelAwaitingNan = false;
+        mPafChannelAvailable   = false;
+    }
+    // The station link is up.  Keep holding the channel until NAN is observed working, or the
+    // recovery timeout expires.
+    void PafChannelAwaitNanRecovery()
+    {
+        mPafChannelAssociating = false;
+        mPafChannelAwaitingNan = true;
         mPafChannelAvailable   = false;
     }
     // Called once the radio is genuinely free / association failed.
     void PafChannelReleaseAfterAssociation()
     {
         mPafChannelAssociating = false;
+        mPafChannelAwaitingNan = false;
         mPafChannelAvailable   = true;
     }
+    // Evidence from the NAN layer that the radio is carrying PAF traffic again.
+    void PafChannelNoteNanActivity();
+    void ArmNanRecoveryTimer();
+    static void HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context);
 #endif
 
     CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);

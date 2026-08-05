@@ -253,6 +253,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
 void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
 {
     ChipLogProgress(Controller, "WiFi-PAF: OnReplied");
+    // Seeing a peer again is the first evidence that NAN survived a station association.
+    PafChannelNoteNanActivity();
     uint32_t publish_id;
     uint32_t peer_subscribe_id;
     uint8_t peer_addr[kMACAddressLength];
@@ -349,6 +351,9 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
 {
+    // An inbound frame proves the NAN path is usable, so it counts as recovery evidence too.
+    PafChannelNoteNanActivity();
+
     if (g_variant_n_children(obj) == 0)
     {
         return;
