@@ -436,7 +436,7 @@ public:
         return Status::Success;
     }
 
-    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override
+    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> /* targetedEndpoints */) override
     {
         onDelayReportCalledTimes++;
         mLastDelayReport = aDelay;

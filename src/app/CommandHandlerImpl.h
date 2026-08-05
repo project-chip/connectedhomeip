@@ -30,6 +30,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Scoped.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -513,7 +514,7 @@ private:
     bool mGoneAsync = false;
 
     static constexpr size_t kMaxTargetedEndpoints = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
-    uint8_t mNumTargetedEndpoints                 = 0;
+    uint16_t mNumTargetedEndpoints                = 0;
     EndpointId mTargetedEndpoints[kMaxTargetedEndpoints];
     void RecordTargetedEndpoint(EndpointId endpointId);
 };

@@ -86,6 +86,7 @@ bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandle
 
 void SynchronizedReportSchedulerImpl::RescheduleAllReports()
 {
+    VerifyOrReturn(mNodesPool.Allocated());
     Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     Timeout timeout = Milliseconds32(0);
     CHIP_ERROR err  = CalculateNextReportTimeout(timeout, nullptr, now);

@@ -74,7 +74,11 @@ void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const
         {
             System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
             System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
-            node->SetDeferralEndTimestamp(now + effectiveDelay);
+            const Timestamp newDeferralEnd        = now + effectiveDelay;
+            if (newDeferralEnd > node->GetMinTimestamp())
+            {
+                node->SetDeferralEndTimestamp(newDeferralEnd);
+            }
         }
         return Loop::Continue;
     });
