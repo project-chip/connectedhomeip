@@ -289,7 +289,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
     }
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
-        .RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(
+        .RegisterClusterInstance<chip::app::Clusters::BasicInformationClusterWithDeviceLocation>(
             &devices.RootNode().GetRootNode().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
