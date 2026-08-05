@@ -24,7 +24,7 @@
 
 namespace chip::app::Clusters::OperationalState {
 
-using namespace chip::examples::rvc_simulation::Topology;
+using namespace chip::app::all_devices::rvc_simulation::Topology;
 
 CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {

@@ -20,11 +20,11 @@
 #include <cstdint>
 
 namespace chip {
-namespace examples {
+namespace app {
+namespace all_devices {
 namespace rvc_simulation {
 
-// Topology identifiers shared by rvc-app and all-devices-app so the same
-// certification tests can drive either application via named-pipe commands.
+// Topology identifiers used by all-devices-app robotic vacuum certification tests.
 namespace Topology {
 
 constexpr uint32_t kMapIdXX = 3;
@@ -44,5 +44,6 @@ constexpr uint8_t kCleanModeQuick = 0;
 } // namespace Topology
 
 } // namespace rvc_simulation
-} // namespace examples
+} // namespace all_devices
+} // namespace app
 } // namespace chip
