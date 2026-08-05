@@ -40,16 +40,3 @@ source_set("robotic-vacuum-cleaner") {
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
 }
-
-source_set("robotic-vacuum-cleaner-named-pipe") {
-  sources = [ "RoboticVacuumCleanerNamedPipe.cpp" ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
-  ]
-
-  public_deps = [
-    ":robotic-vacuum-cleaner",
-    "${chip_root}/third_party/jsoncpp",
-  ]
-}
