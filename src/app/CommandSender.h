@@ -674,13 +674,13 @@ private:
     uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
-    State mState                = State::Idle;
-    bool mSuppressResponse      = false;
-    bool mTimedRequest          = false;
-    bool mBufferAllocated       = false;
-    bool mBatchCommandsEnabled  = false;
-    bool mUseExtendableCallback = false;
-    bool mAllowLargePayload     = false;
+    State mState                                                          = State::Idle;
+    bool mSuppressResponse                                                = false;
+    bool mTimedRequest                                                    = false;
+    bool mBufferAllocated                                                 = false;
+    bool mBatchCommandsEnabled                                            = false;
+    bool mUseExtendableCallback                                           = false;
+    bool mAllowLargePayload                                               = false;
     std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData = std::nullopt;
 };
 
