@@ -406,7 +406,7 @@ class PRContext:
                 # 2. The check suite has been queued/pending for longer than `STALE_SUITE_TIMEOUT`.
                 if (
                     app_name in IGNORED_STALE_SUITE_APPS
-                     and age > STALE_SUITE_TIMEOUT
+                    and age > STALE_SUITE_TIMEOUT
                 ):
                     log.info(
                         "PR #%d HEAD commit %s check suite '%s' (%s) is pending but ignored (queued for %s > %s threshold)",
