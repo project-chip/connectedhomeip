@@ -249,7 +249,7 @@ void ApplicationInit()
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
 
     // Electrical Distribution's generated Init callback is a no-op, so the app registers it.
-    VerifyOrDie(Clusters::ElectricalDistribution::ElectricalDistributionInit(/* endpoint= */ 1) == CHIP_NO_ERROR);
+    VerifyOrDie(Clusters::ElectricalDistribution::ElectricalDistributionInit(/* endpointId= */ 1) == CHIP_NO_ERROR);
 }
 
 void ApplicationShutdown()
