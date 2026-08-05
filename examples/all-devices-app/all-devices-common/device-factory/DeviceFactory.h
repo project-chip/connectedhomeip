@@ -31,7 +31,6 @@
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
-#include <device/types/window-covering/impl/LoggingWindowCovering.h
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
@@ -63,6 +62,7 @@
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/water-valve/WaterValve.h>
+#include <device/types/window-covering/WindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -591,7 +591,10 @@ private:
         {
             RegisterCreator("window-covering", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingMySensorDevice>(mContext->timerDelegate);
+                return std::make_unique<WindowCovering>(WindowCovering::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
             });
         }
 
