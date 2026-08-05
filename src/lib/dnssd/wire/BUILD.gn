@@ -12,37 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
-
-source_set("support") {
-  sources = [ "QNameStrings.h" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
-  ]
-}
-
-chip_test_suite("tests") {
-  output_name = "libMinimalMdnsCoreTests"
-
-  test_sources = [
-    "TestFlatAllocatedQName.cpp",
-    "TestHeapQName.cpp",
-    "TestQName.cpp",
-    "TestQNameString.cpp",
-    "TestRecordWriter.cpp",
+static_library("wire") {
+  sources = [
+    "BytesRange.h",
+    "Constants.h",
+    "DnsHeader.h",
+    "FlatAllocatedQName.h",
+    "HeapQName.h",
+    "QName.cpp",
+    "QName.h",
+    "QNameString.cpp",
+    "QNameString.h",
+    "RecordWriter.cpp",
+    "RecordWriter.h",
   ]
 
-  cflags = [ "-Wconversion" ]
-
   public_deps = [
-    ":support",
+    "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+    "${chip_root}/src/lib/support:span",
+    "${chip_root}/src/platform",
   ]
 }

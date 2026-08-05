@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/ScopedMemoryBuffer.h>
