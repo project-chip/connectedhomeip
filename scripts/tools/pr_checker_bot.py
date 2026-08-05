@@ -48,9 +48,9 @@ ELIGIBILITY_COMMENT_MARKER = "<!-- pr-checker-bot-eligibility-marker -->"
 MERGEABLE_RETRY_LIMIT = 3
 MERGEABLE_BACKOFF_FACTOR = 5
 
-# Timeout after which uncompleted check suites from known non-critical external apps
-# on Dependabot PRs are considered stale/indefinitely queued.
-DEPENDABOT_STALE_SUITE_TIMEOUT = timedelta(hours=6)
+# Timeout after which uncompleted check suites from known non-critical external apps (IGNORED_STALE_SUITE_APPS)
+# on PRs are considered stale/indefinitely queued.
+STALE_SUITE_TIMEOUT = timedelta(hours=6)
 
 # Third-party integrations / GitHub apps that register check suites on all PRs but
 # never complete or execute builds for Dependabot PRs
@@ -60,6 +60,7 @@ IGNORED_STALE_SUITE_APPS = {
     "Testspace.com",
     "SonarQubeCloud",
     "BuildJet",
+    "Mergify",
 }
 
 
@@ -403,15 +404,14 @@ class PRContext:
                     created_at = created_at.replace(tzinfo=UTC)
 
                 age = now - created_at
-                # Some external integrations automatically create a CheckSuite on every commit but never trigger or complete
-                # builds for Dependabot PRs. To prevent Dependabot PRs from hanging, we ignore uncompleted check suites ONLY IF:
-                # 1. The PR is authored by Dependabot
-                # 2. The check suite belongs to a known external app in `IGNORED_STALE_SUITE_APPS`.
-                # 3. The check suite has been queued/pending for longer than `DEPENDABOT_STALE_SUITE_TIMEOUT`.
+                # Some external integrations automatically create a CheckSuite for every commit but never start or complete it
+                # on certain PRs. For example, Mergify can registers a check that remains queued indefinitely without ever running.
+                # To prevent otherwise merge-ready PRs from requiring manual intervention, we ignore incomplete check suites only if:
+                # 1. The check suite belongs to a known external app in `IGNORED_STALE_SUITE_APPS`.
+                # 2. The check suite has been queued/pending for longer than `STALE_SUITE_TIMEOUT`.
                 if (
-                    self.is_dependabot
-                    and app_name in IGNORED_STALE_SUITE_APPS
-                    and age > DEPENDABOT_STALE_SUITE_TIMEOUT
+                    app_name in IGNORED_STALE_SUITE_APPS
+                    and age > STALE_SUITE_TIMEOUT
                 ):
                     log.info(
                         "PR #%d HEAD commit %s check suite '%s' (%s) is pending but ignored (queued for %s > %s threshold)",
@@ -420,7 +420,7 @@ class PRContext:
                         suite.id,
                         app_name,
                         age,
-                        DEPENDABOT_STALE_SUITE_TIMEOUT,
+                        STALE_SUITE_TIMEOUT,
                     )
                     continue
 
