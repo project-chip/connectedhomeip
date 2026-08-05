@@ -31,14 +31,14 @@
 #endif
 
 extern "C" {
-#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <btble_lib_api.h>
 #else
 #include <ble_lib_api.h>
 #endif
 }
 
-#include <bluetooth/addr.h>
+#include <addr.h>
 #include <hci_driver.h>
 
 #include "BLEManagerImpl.h"
@@ -120,14 +120,15 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-    ReturnErrorOnFailure(InitRandomStaticAddress());
-#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BFLB
     btble_controller_init(configMAX_PRIORITIES - 1);
 #else
     ble_controller_init(configMAX_PRIORITIES - 1);
 #endif
     hci_driver_init();
     bt_enable(NULL);
+
+    ReturnErrorOnFailure(InitRandomStaticAddress());
 
     memset(&mConnCallbacks, 0, sizeof(mConnCallbacks));
     mConnCallbacks.connected    = HandleConnect;

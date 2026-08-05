@@ -130,8 +130,6 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
                           uint16_t & targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> & targetSoC,
                           DataModel::Nullable<int64_t> & targetAddedEnergy_mWh, bool bAllowTargetsInPast)
 {
-    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
-
     uint16_t minTimeToTarget_m = 24 * 60; // 24 hours
     bool bFound                = false;
 

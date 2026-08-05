@@ -12,26 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("clusters") {
+  # Note: Cluster with external dependencies must be included conditionally
+  # on a per-cluster chip_enable_* argument declared in lib.gni.
   public_deps = [
     # keep-sorted: start
     "access-control-server",
     "actions-server",
     "administrator-commissioning-server",
     "air-quality-server",
+    "ambient-context-sensing-server",
     "basic-information",
+    "bindings",
     "boolean-state-configuration-server",
     "boolean-state-server",
     "bridged-device-basic-information-server",
     "camera-av-settings-user-level-management-server",
+    "camera-av-stream-management-server",
     "chime-server",
     "closure-control-server",
     "closure-dimension-server",
     "commissioner-control-server",
     "concentration-measurement-server",
     "descriptor",
+    "device-energy-management-server",
+    "diagnostic-logs-server",
+    "dynamic-lighting-server",
+    "electrical-energy-measurement-server",
+    "electrical-power-measurement-server",
+    "energy-evse-server",
+    "ethernet-network-diagnostics-server",
+    "fan-control-server",
+    "fixed-label-server",
     "flow-measurement-server",
     "general-commissioning-server",
     "general-diagnostics-server",
@@ -39,60 +54,61 @@ source_set("clusters") {
     "groupcast",
     "groups-server",
     "humidistat-server",
+    "icd-management-server",
     "identify-server",
     "illuminance-measurement-server",
+    "laundry-washer-controls-server",
     "level-control",
+    "localization-configuration-server",
+    "media-file-management-server",
     "microwave-oven-control-server",
+    "mode-base-server",
     "network-commissioning",
     "network-identity-management-server",
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "operational-state-server",
+    "ota-provider",
+    "power-source-server",
+    "power-topology-server",
     "pressure-measurement-server",
     "proximity-ranging-server",
-    "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
     "scenes-server",
+    "service-area-server",
+    "smoke-co-alarm-server",
     "software-diagnostics-server",
     "soil-measurement-server",
+    "switch-server",
     "temperature-control-server",
     "temperature-measurement-server",
     "thread-border-router-management-server",
     "thread-network-diagnostics-server",
     "thread-network-directory-server",
+    "time-format-localization-server",
+    "time-synchronization-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
+    "unit-localization-server",
+    "user-label-server",
+    "valve-configuration-and-control-server",
+    "water-heater-management-server",
     "webrtc-transport-provider-server",
+    "webrtc-transport-requestor-server",
     "wifi-network-diagnostics-server",
     "wifi-network-management-server",
+    "zone-management-server",
 
     # keep-sorted: end
   ]
 
-  if (chip_device_platform == "ameba") {
-    # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
-    # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
-    #
-    # This results in errors in libraries used by these clusters, like:
-    #
-    # INFO    In file included from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib_rtl8721d.h:25,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib.h:39,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/network/include/lwipopts.h:17,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/opt.h:51,
-    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/errno.h:40,
-    # INFO                     from ../../../config/ameba/third_party/connectedhomeip/third_party/uriparser/repo/src/UriMemory.c:56:
-    # INFO    /__w/connectedhomeip/connectedhomeip/.environment/cipd/packages/arm/arm-none-eabi/include/ctype.h:14:5: error: expected identifier or '(' before 'int'
-    # INFO       14 | int isalpha (int __c);
-    # INFO          |     ^~~~~~~
-    # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
-    # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
-    public_deps -= [ "push-av-stream-transport-server" ]
-  }
+  # Separate enable/disable for things that have third_party dependendencies
+  # (give a choice if these dependencies are available or licenses are acceptable)
 
-  if (chip_device_platform == "darwin") {
-    # Darwin does not include the uriparser submodule, which is required by
-    # push-av-stream-transport-server.
-    public_deps -= [ "push-av-stream-transport-server" ]
+  if (chip_enable_push_av_stream_transport) {
+    # depends on third_party/uriparser
+    public_deps += [ "push-av-stream-transport-server" ]
   }
 }

@@ -28,12 +28,47 @@ add_definitions(-DMBEDTLS_X509_REMOVE_INFO )
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/silabs)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+if(CONFIG_OPENTHREAD AND TARGET ot-config AND TARGET zephyr_interface)
+    get_target_property(OT_CONFIG_DEFS ot-config INTERFACE_COMPILE_DEFINITIONS)
+    if(OT_CONFIG_DEFS)
+        list(FILTER OT_CONFIG_DEFS EXCLUDE REGEX "TARGET_PROPERTY:zephyr_interface,INTERFACE_COMPILE_DEFINITIONS")
+    else()
+        set(OT_CONFIG_DEFS "")
+    endif()
+    get_target_property(ZEPHYR_INTERFACE_DEFS zephyr_interface INTERFACE_COMPILE_DEFINITIONS)
+    if(ZEPHYR_INTERFACE_DEFS)
+        list(FILTER ZEPHYR_INTERFACE_DEFS EXCLUDE REGEX "COMPILE_LANGUAGE:CXX")
+    else()
+        set(ZEPHYR_INTERFACE_DEFS "")
+    endif()
+    set_target_properties(ot-config PROPERTIES
+        INTERFACE_COMPILE_DEFINITIONS "${OT_CONFIG_DEFS};${ZEPHYR_INTERFACE_DEFS}")
+endif()
+
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    foreach(_mbedtls_lib mbedtls mbedx509 tfpsacrypto builtin p256-m pqcp extras platform utilities)
+        if(TARGET ${_mbedtls_lib})
+            target_compile_options(${_mbedtls_lib} PRIVATE -Wno-documentation -Wno-c99-extensions)
+        endif()
+    endforeach()
+    
+    if(CONFIG_OPENTHREAD)
+        foreach(_ot_lib openthread-ftd openthread-mtd openthread-radio openthread-cli-ftd openthread-cli-mtd)
+            if(TARGET ${_ot_lib})
+                target_compile_options(${_ot_lib} PRIVATE -Wno-c99-extensions)
+            endif()
+        endforeach()
+    endif()
+endif()
+
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
 # and chip::Optional.  Make it nonfatal.
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
-target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 target_compile_options(app PRIVATE -Werror -Wno-error=format)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
+endif()
 
 project(matter-zephyr-light)
 
@@ -59,15 +94,14 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/DataModelCallbacks.cpp
 )
 
-# TODO Implement OTA support
 if(CONFIG_CHIP_OTA_REQUESTOR)
-    # target_sources(app PRIVATE
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
-    # )
-    # target_include_directories(app PRIVATE
-    #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/include/
-    # )
+    target_sources(app PRIVATE
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
+    )
+    target_include_directories(app PRIVATE
+                    ${ZEPHYR_PLATFORM_COMMON}/ota_requestor/include/
+    )
 endif()
 
 if(CONFIG_CHIP_WIFI)
@@ -93,3 +127,5 @@ if(CONFIG_CHIP_LIB_SHELL)
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
     )
 endif()
+
+include(${CHIP_ROOT}/config/silabs/app/zephyr-post-build.cmake)

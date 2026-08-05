@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -178,7 +177,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         self.step("2b")
         if not is_latching_supported:
@@ -189,16 +188,16 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-        log.info(f"LatchControlModes: {latch_control_modes}")
+        log.info("LatchControlModes: %s", latch_control_modes)
 
         self.step("2d")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_latch: bool = None
         if overall_current_state is NullValue:
             current_latch = NullValue
         else:
             current_latch = overall_current_state.latch
-        log.info(f"CurrentLatch: {current_latch}")
+        log.info("CurrentLatch: %s", current_latch)
 
         self.step("2e")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)

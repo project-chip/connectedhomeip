@@ -65,13 +65,11 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 #if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
     // When using LwIP for OpenThread, we should set the RendezvousNetworkInterface to prevent no route error when
     // sending DNS Announcement message.
-    PlatformMgr().LockChipStack();
     RunOnTCPIP([this]() {
         esp_netif_t * openthread_netif = esp_openthread_get_netif();
         chip::Inet::InterfaceId interface(netif_get_by_index(esp_netif_get_netif_impl_index(openthread_netif)));
         GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
     });
-    PlatformMgr().UnlockChipStack();
 #endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
     return CHIP_NO_ERROR;
 }

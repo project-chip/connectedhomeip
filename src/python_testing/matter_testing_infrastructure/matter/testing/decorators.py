@@ -23,9 +23,10 @@ and endpoint matching.
 
 import asyncio
 import logging
+from collections.abc import Callable
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from mobly import asserts
 
@@ -254,16 +255,20 @@ def _async_runner(body, test_instance, *args, **kwargs):
 
 
 def async_test_body(body):
-    """Decorator required to be applied whenever a `test_*` method is `async def`.
+    """Decorator required to be applied whenever a `test_*` or `teardown_test` method is `async def`.
 
     Since Mobly doesn't support asyncio directly, and the test methods are called
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
-    """
 
+    For teardown_test overrides: MatterBaseTest.__init_subclass__ wraps every
+    teardown_test override so the base always runs after the override completes,
+    regardless of whether the override is async or sync, or whether it calls super().
+    """
     @wraps(body)
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
         return _async_runner(body, self, *args, **kwargs)
+
     return async_runner
 
 
@@ -315,7 +320,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
                 old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
                 LOGGER.info(
-                    f'Running test on endpoint {self.matter_test_config.endpoint}')
+                    'Running test on endpoint %s', self.matter_test_config.endpoint)
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
                 self.event_loop.run_until_complete(asyncio.wait_for(
@@ -365,7 +370,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 asserts.skip('Endpoint does not match test requirements')
                 return
             LOGGER.info(
-                f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
+                'Running test on endpoint %s', test_instance.matter_test_config.endpoint)
             timeout = getattr(test_instance.matter_test_config,
                               'timeout', None) or test_instance.default_timeout
             test_instance.event_loop.run_until_complete(asyncio.wait_for(

@@ -17,7 +17,7 @@
  */
 #include "AppConfig.h"
 #ifdef ENABLE_CHIP_SHELL
-#include "MatterShell.h" // nogncheck
+#include "shell/MatterShell.h" // nogncheck
 #endif
 #include <cmsis_os2.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -96,7 +96,7 @@ extern "C" {
 
 #define HELPER4(x) HELPER3(x)
 
-// On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
+// On MG24 boards VCOM runs on the EUSART device
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
@@ -155,6 +155,7 @@ typedef struct
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
 #define UART_MAX_QUEUE_SIZE 125
 #else
+static constexpr uint32_t kUartTxCompleteFlag = 1;
 #if CHIP_DETAIL_LOGGING
 #define UART_MAX_QUEUE_SIZE 60
 #else
@@ -166,7 +167,6 @@ typedef struct
 
 #define SILABS_TRUNCATED_TERMINATOR "....."
 
-static constexpr uint32_t kUartTxCompleteFlag = 1;
 static osThreadId_t sUartTaskHandle;
 constexpr uint32_t kUartTaskSize = 1024;
 static uint8_t uartStack[kUartTaskSize];
@@ -494,7 +494,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     // Pigweed Logger is already thread safe.
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
     return BufLength;
-#endif
+#else
 
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, Buf, BufLength);
@@ -507,6 +507,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     }
 
     return UART_CONSOLE_ERR;
+#endif // PW_RPC_ENABLED
 }
 
 /**
@@ -680,23 +681,9 @@ void uartSendBytes(uint8_t * data, uint16_t length)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
-#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
-    sl_wfx_host_pre_uart_transfer();
-#endif // SL_UARTCTRL_MUX
-
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
-    // WF200 SPI IRQ
-    UARTDRV_ForceTransmit(vcom_handle, data, length);
-#else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, data, length, UART_tx_callback);
     osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
-#endif /* EFR32MG24 && WF200_WIFI */
-
-#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
-    sl_wfx_host_post_uart_transfer();
-#endif // SL_UARTCTRL_MUX
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);

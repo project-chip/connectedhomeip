@@ -46,6 +46,8 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/zephyr_ext
 )
 
+target_compile_definitions(app PRIVATE CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
+
 if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
     ${CHEF}/shell_common/globals.cpp
@@ -71,6 +73,7 @@ target_sources(app PRIVATE
     ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+    ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c
     ${CHEF}/common/stubs.cpp
 )
 
@@ -87,3 +90,8 @@ endif()
 if (CONFIG_CHIP_PW_RPC)
   include(${TELINK_COMMON}/Rpc.cmake)
 endif(CONFIG_CHIP_PW_RPC)
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
+endif()

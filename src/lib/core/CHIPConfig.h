@@ -39,6 +39,8 @@
 #include <core/CHIPBuildConfig.h>
 #endif
 
+#include <cstddef>
+
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
@@ -1049,9 +1051,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
  *
  * @brief The maximum alignment of the lambda which can be post into system event queue.
+ *
+ * @note For those platforms in which memory is not constrained,
+ * express the default as an alignment rather than a size, using
+ * alignof. The alignment that, by definition, covers every
+ * fundamental scalar a closure can capture, including `long
+ * double`. Otherwise, default to pointer alignment.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
-#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#if (defined(__linux__) && __linux__) || (defined(__MACH__) && __MACH__)
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(std::max_align_t))
+#else
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(void *))
+#endif
 #endif
 
 /**
@@ -1358,19 +1370,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
-
-/**
- * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
- * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
- * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
- * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
- * The cost of this compatibity mode is twice as many decryption steps per received group message.
- *
- * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
- */
-#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 /**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS

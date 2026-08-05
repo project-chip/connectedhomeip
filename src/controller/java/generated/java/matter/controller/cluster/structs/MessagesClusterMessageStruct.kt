@@ -32,6 +32,8 @@ class MessagesClusterMessageStruct(
   val duration: ULong?,
   val messageText: String,
   val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>,
+  val languageCode: Optional<String>,
+  val messageURI: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageStruct {\n")
@@ -42,6 +44,8 @@ class MessagesClusterMessageStruct(
     append("\tduration : $duration\n")
     append("\tmessageText : $messageText\n")
     append("\tresponses : $responses\n")
+    append("\tlanguageCode : $languageCode\n")
+    append("\tmessageURI : $messageURI\n")
     append("}\n")
   }
 
@@ -70,6 +74,14 @@ class MessagesClusterMessageStruct(
         }
         endArray()
       }
+      if (languageCode.isPresent) {
+        val optlanguageCode = languageCode.get()
+        put(ContextSpecificTag(TAG_LANGUAGE_CODE), optlanguageCode)
+      }
+      if (messageURI.isPresent) {
+        val optmessageURI = messageURI.get()
+        put(ContextSpecificTag(TAG_MESSAGE_URI), optmessageURI)
+      }
       endStructure()
     }
   }
@@ -82,6 +94,8 @@ class MessagesClusterMessageStruct(
     private const val TAG_DURATION = 4
     private const val TAG_MESSAGE_TEXT = 5
     private const val TAG_RESPONSES = 6
+    private const val TAG_LANGUAGE_CODE = 7
+    private const val TAG_MESSAGE_URI = 8
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageStruct {
       tlvReader.enterStructure(tlvTag)
@@ -117,6 +131,18 @@ class MessagesClusterMessageStruct(
         } else {
           Optional.empty()
         }
+      val languageCode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LANGUAGE_CODE))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LANGUAGE_CODE)))
+        } else {
+          Optional.empty()
+        }
+      val messageURI =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_URI))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_MESSAGE_URI)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -128,6 +154,8 @@ class MessagesClusterMessageStruct(
         duration,
         messageText,
         responses,
+        languageCode,
+        messageURI,
       )
     }
   }

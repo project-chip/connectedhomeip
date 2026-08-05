@@ -22,6 +22,7 @@
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <lib/core/TLVReader.h>
 
 namespace chip {
 namespace rpc {
@@ -43,12 +44,21 @@ public:
      *
      * Returns:
      *   - `std::nullopt` if the `path` was not handled by this Interceptor.
-     *     Interceptor MUST NOT have attepted to decode `decoder`.
+     *     Interceptor MUST NOT have attempted to decode `decoder`.
      *   - A `::pw::Status` value that is considered the FINAL result of the
      *     write (i.e. write handled) either with success or failure.
      */
     virtual std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & path,
-                                              chip::app::AttributeValueDecoder & decoder) = 0;
+                                              chip::app::AttributeValueDecoder & decoder)
+    {
+        return std::nullopt;
+    }
+
+    virtual std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & path,
+                                              const chip::TLV::TLVReader & reader)
+    {
+        return std::nullopt;
+    }
 };
 
 } // namespace rpc

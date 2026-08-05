@@ -177,8 +177,8 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     }
     if (transportOptions.containerOptions.CMAFContainerOptions.HasValue())
     {
-        mClipInfo.mTrackName         = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.data(),
-                                                   transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.size());
+        mClipInfo.mTrackName = std::string(transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.Value().data(),
+                                           transportOptions.containerOptions.CMAFContainerOptions.Value().trackName.Value().size());
         mClipInfo.mChunkDurationMs   = transportOptions.containerOptions.CMAFContainerOptions.Value().chunkDuration;
         mClipInfo.mSegmentDurationMs = transportOptions.containerOptions.CMAFContainerOptions.Value().segmentDuration;
     }

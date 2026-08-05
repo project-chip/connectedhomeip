@@ -57,7 +57,7 @@ GroupcastCluster::~GroupcastCluster()
     // Shutdown() to ensure proper cleanup if the cluster was started.
     if (mContext != nullptr)
     {
-        Shutdown(ClusterShutdownType::kPermanentRemove);
+        GroupcastCluster::Shutdown(ClusterShutdownType::kPermanentRemove);
     }
 }
 
@@ -545,6 +545,15 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
     Status err                 = Status::Success;
 
     endpoints.count = 0;
+
+    // The Endpoints field is constrained to "1 to 20" per the spec; reject an oversized request.
+    if (data.endpoints.HasValue())
+    {
+        size_t endpoint_count = 0;
+        VerifyOrReturnError(data.endpoints.Value().ComputeSize(&endpoint_count) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(endpoint_count <= kMaxCommandEndpoints, Status::ConstraintError);
+    }
+
     if (kUndefinedGroupId == data.groupID)
     {
         // Apply changes to all groups
@@ -762,7 +771,7 @@ Status GroupcastCluster::RemoveGroupEndpoint(FabricIndex fabricIndex, GroupId gr
     {
         found = (endpoints->entries[i] == endpoint_id);
     }
-    if (!found)
+    if (!found && endpoints->count < kMaxMembershipEndpoints)
     {
         endpoints->entries[endpoints->count++] = endpoint_id;
     }

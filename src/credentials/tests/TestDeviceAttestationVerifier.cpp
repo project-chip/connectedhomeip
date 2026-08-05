@@ -229,3 +229,20 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainNoDelegate)
     verifier.CheckForRevokedDACChain(attestationInfo, &callback);
     EXPECT_EQ(result, AttestationVerificationResult::kSuccess);
 }
+
+// VerifyAttestationInformation must not crash when given a null completion callback.
+TEST_F(TestDeviceAttestationVerifier, VerifyAttestationInformationNullCompletionCallback)
+{
+    static uint8_t dummyCert[1]       = { 0x00 };
+    static const ByteSpan certSpans[] = { ByteSpan(dummyCert) };
+    ArrayAttestationTrustStore trustStore(certSpans, 1);
+    DefaultDACVerifier verifier(&trustStore);
+
+    // Empty buffers fail the first precondition and route to the exit handler; the danger being
+    // exercised is that handler dereferencing the (null) completion callback.
+    DeviceAttestationVerifier::AttestationInfo invalidInfo(ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                           VendorId(0x1234), 0x5678);
+
+    // Must return without dereferencing the null callback (previously a null-pointer crash).
+    verifier.VerifyAttestationInformation(invalidInfo, nullptr);
+}

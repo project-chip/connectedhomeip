@@ -72,7 +72,7 @@ LocalizationConfigurationCluster::LocalizationConfigurationCluster(DeviceLayer::
     {
         char tempBuf[kActiveLocaleMaxLength];
         MutableCharSpan validLocale(tempBuf);
-        if (GetDefaultLocale(validLocale))
+        if (LocalizationConfigurationCluster::GetDefaultLocale(validLocale))
         {
             status = SetActiveLocale(validLocale);
             if (status != Protocols::InteractionModel::Status::Success)

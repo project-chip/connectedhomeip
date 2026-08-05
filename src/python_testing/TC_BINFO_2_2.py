@@ -115,7 +115,7 @@ class TC_BINFO_2_2(MatterBaseTest):
             attribute=attributes.SoftwareVersion,
             endpoint=0
         )
-        log.info(f"SoftwareVersion: {software_version_from_attribute}")
+        log.info("SoftwareVersion: %s", software_version_from_attribute)
 
         # *** STEP 2 ***
         # TH reads the StartUp event from the DUT.
@@ -126,7 +126,7 @@ class TC_BINFO_2_2(MatterBaseTest):
             nodeId=self.dut_node_id,
             events=[(0, events.StartUp, 0)]
         )
-        log.info(f"StartUp events found: {len(startup_events)}")
+        log.info("StartUp events found: %s", len(startup_events))
 
         if not startup_events:
             # Reboot DUT
@@ -138,7 +138,7 @@ class TC_BINFO_2_2(MatterBaseTest):
                 nodeId=self.dut_node_id,
                 events=[(0, events.StartUp, 0)]
             )
-            log.info(f"StartUp events found after reboot: {len(startup_events)}")
+            log.info("StartUp events found after reboot: %s", len(startup_events))
 
         # Verify that the StartUp event is present
         asserts.assert_true(startup_events, "StartUp event not present before or after reboot.")

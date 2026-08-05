@@ -249,13 +249,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.Zones
         )
-        log.info(f"aZones: {aZones}")
+        log.info("aZones: %s", aZones)
 
         self.step(9)
         aMaxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.MaxZones
         )
-        log.info(f"aMaxZones: {aMaxZones}")
+        log.info("aMaxZones: %s", aMaxZones)
 
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -263,7 +263,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
                 endpoint=0, cluster=tlscluster, attribute=tlscluster.Attributes.ProvisionedEndpoints
             )
-            log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
+            log.info("aProvisionedEndpoints: %s", aProvisionedEndpoints)
 
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):

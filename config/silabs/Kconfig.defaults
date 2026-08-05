@@ -77,6 +77,10 @@ config OPENTHREAD_PANID
 config OPENTHREAD_NETWORK_NAME
 	default "Silabs-test"    
 
+choice CHIP_CRYPTO
+    default CHIP_CRYPTO_PSA
+endchoice
+
 config PM
     default y
 config SILABS_SISDK_POWER_MANAGER

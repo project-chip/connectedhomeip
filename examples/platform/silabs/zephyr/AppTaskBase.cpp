@@ -281,7 +281,7 @@ CHIP_ERROR chip::Zephyr::App::AppTaskBase::Init()
     VerifyOrDie(PlatformMgr().ScheduleWork(InitServer, 0) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
-    sNetworkCommissioningInstance.Init();
+    ReturnErrorOnFailure(sNetworkCommissioningInstance.Init());
 #ifdef ENABLE_CHIP_SHELL
     Shell::SetWiFiDriver(chip::Zephyr::App::GetAppTask().GetWifiDriverInstance());
 #endif

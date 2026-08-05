@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -113,7 +114,7 @@ class TC_IDM_1_2(IDMBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                log.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
+                log.info('Sending %s command to unsupported cluster %s on endpoint %s', name, cluster, i)
                 try:
                     await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
@@ -134,7 +135,7 @@ class TC_IDM_1_2(IDMBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                log.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
+                log.info('Checking cluster %s (%s) on ep %s for supported commands', cluster, cid, i)
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue

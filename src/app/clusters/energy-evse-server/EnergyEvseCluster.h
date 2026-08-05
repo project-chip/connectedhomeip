@@ -77,6 +77,11 @@ public:
         mDelegate.SetEndpointId(config.endpointId);
     }
 
+    // mVehicleID spans into this object's own mVehicleIDBuffer, so a copy would alias the source's.
+    // Forbid copying explicitly (closes the still-open copy ctor; assign is already implicitly deleted).
+    EnergyEvseCluster(const EnergyEvseCluster &)             = delete;
+    EnergyEvseCluster & operator=(const EnergyEvseCluster &) = delete;
+
     const BitFlags<EnergyEvse::Feature> & Features() const { return mFeatureFlags; }
     const BitFlags<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
     const BitFlags<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }

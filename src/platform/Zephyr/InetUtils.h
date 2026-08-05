@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 #if defined(CONFIG_ZEPHYR_VERSION_3_3)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
                                          EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
@@ -76,7 +76,7 @@ class EventHandler(BaseHandler):
         elif attrs['priority'] == 'critical':
             priority = EventPriority.CRITICAL
         else:
-            raise Exception("Unknown event priority: %s" % attrs['priority'])
+            raise Exception(f"Unknown event priority: {attrs['priority']}")
 
         self._event = Event(
             priority=priority,
@@ -87,6 +87,9 @@ class EventHandler(BaseHandler):
 
         if attrs.get('isFabricSensitive', "false").lower() == 'true':
             self._event.qualities |= EventQuality.FABRIC_SENSITIVE
+
+        if attrs.get('optional', "false").lower() == 'true':
+            self._event.qualities |= EventQuality.OPTIONAL
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
@@ -136,7 +139,7 @@ class AttributeHandler(BaseHandler):
             # Modifier not currently used: fabric scoped exists on the structure itself.
             if 'modifier' in attrs:
                 if attrs['modifier'] != 'fabric-scoped':
-                    raise Exception("UNKNOWN MODIFIER: %s" % attrs['modifier'])
+                    raise Exception(f"UNKNOWN MODIFIER: {attrs['modifier']}")
 
             if ('role' in attrs) or ('privilege' in attrs):
                 role = AttrsToAccessPrivilege(attrs)
@@ -428,6 +431,9 @@ class CommandHandler(BaseHandler):
             if attrs.get('mustUseTimedInvoke', 'false') == 'true':
                 self._command.qualities |= CommandQuality.TIMED_INVOKE
 
+            if attrs.get('optional', 'false').lower() == 'true':
+                self._command.qualities |= CommandQuality.OPTIONAL
+
         else:
             self._struct.tag = StructTag.RESPONSE
             self._struct.code = ParseInt(attrs['code'])
@@ -458,7 +464,7 @@ class CommandHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
             if attrs['op'] != 'invoke':
-                raise Exception('Unknown access for %r' % self._struct)
+                raise Exception(f'Unknown access for {self._struct!r}')
 
             if self._command:
                 self._command.invokeacl = AttrsToAccessPrivilege(attrs)
@@ -522,7 +528,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
 class ClusterHandler(BaseHandler):
     """Handles /configurator/cluster elements."""
 
-    def __init__(self, context: Context, idl: Optional[Idl]):
+    def __init__(self, context: Context, idl: Idl | None):
         super().__init__(context)
         self._cluster = Cluster(
             name="NAME-MISSING",

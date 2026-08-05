@@ -210,7 +210,7 @@ bool UnixEpochToChipEpochMicros(uint64_t unixEpochTimeMicros, uint64_t & outChip
  */
 inline uint64_t SecondsToMilliseconds(uint32_t seconds)
 {
-    return (seconds * kMillisecondsPerSecond);
+    return (static_cast<uint64_t>(seconds) * kMillisecondsPerSecond);
 }
 
 // For backwards-compatibility of public API.
