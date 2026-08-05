@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 name: 39.2.2. [TC-WNCV-2.2] ConfigStatus attribute [DUT as Server]
 
 CI:
