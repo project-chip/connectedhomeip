@@ -23,6 +23,7 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
+#include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -53,10 +54,12 @@ public:
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set. Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      */
     AvAnalysisServerLogic(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                           const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                          DataModel::Nullable<uint8_t> aMaxZones);
+                          DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0);
     ~AvAnalysisServerLogic();
 
     void SetDelegate(AvAnalysisDelegate * delegate)
@@ -77,11 +80,11 @@ public:
     // Definitions of class variables that represent the Cluster attributes
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> mSupportedAmbientContexts;
     std::vector<AvAnalysis::AmbientContextStorage> mActiveAmbientContextTriggers;
-    uint8_t mMaxAnalysisStreamCount     = 0;
-    uint8_t mCurrentAnalysisStreamCount = 0;
-    std::vector<AvAnalysis::Structs::AnalysisStreamStruct::Type> mAnalysisStreams;
-    bool mTrackingEnabled = false;
+    uint8_t mMaxAnalysisStreamCount = 0;
+    bool mTrackingEnabled           = false;
     DataModel::Nullable<uint8_t> mMaxZones;
+
+    uint8_t GetCurrentAnalysisStreamCount() const { return mStreamTable.Count(); }
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
@@ -105,7 +108,6 @@ public:
     CHIP_ERROR ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder);
 
     // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
     CHIP_ERROR SetTrackingEnabled(bool aTrackingEnabled);
 
     // Command handlers
@@ -131,6 +133,9 @@ public:
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+
+    // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
+    AvAnalysis::AnalysisStreamTable mStreamTable;
 
     MarkDirtyCallback mMarkDirtyCallback;
 

@@ -65,7 +65,7 @@ DataModel::ActionReturnStatus AvAnalysisCluster::ReadAttribute(const DataModel::
     case Attributes::MaxAnalysisStreamCount::Id:
         return aEncoder.Encode(mLogic.mMaxAnalysisStreamCount);
     case Attributes::CurrentAnalysisStreamCount::Id:
-        return aEncoder.Encode(mLogic.mCurrentAnalysisStreamCount);
+        return aEncoder.Encode(mLogic.GetCurrentAnalysisStreamCount());
     case Attributes::AnalysisStreams::Id:
         return mLogic.ReadAndEncodeAnalysisStreams(aEncoder);
     case Attributes::TrackingEnabled::Id:
@@ -92,11 +92,6 @@ DataModel::ActionReturnStatus AvAnalysisCluster::WriteAttribute(const DataModel:
         // Unknown attribute
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-}
-
-CHIP_ERROR AvAnalysisCluster::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
-{
-    return mLogic.SetMaxAnalysisStreamCount(aMaxAnalysisStreamCount);
 }
 
 std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(const DataModel::InvokeRequest & request,

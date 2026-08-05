@@ -71,7 +71,7 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
 
     TestRemoteAvAnalysisCluster() :
         mServer(kTestEndpointId, chip::BitFlags<Feature>(Feature::kRemoteContextDetection, Feature::kPerZoneContextDetection),
-                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones)),
+                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones), kTestMaxAnalysisStreams),
         mClusterTester(mServer)
     {}
 
@@ -80,7 +80,6 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
         mServer.SetDelegate(&mMockDelegate);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.SetMaxAnalysisStreamCount(kTestMaxAnalysisStreams), CHIP_NO_ERROR);
     }
 
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }

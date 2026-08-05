@@ -120,14 +120,16 @@ public:
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      *
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     AvAnalysisCluster(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                       const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                      DataModel::Nullable<uint8_t> aMaxZones) :
+                      DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0) :
         DefaultServerCluster({ aEndpointId, AvAnalysis::Id }),
-        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones)
+        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones, aMaxAnalysisStreamCount)
     {}
 
     AvAnalysisServerLogic & GetLogic() { return mLogic; }
@@ -169,9 +171,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-    // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
 
 private:
     AvAnalysisServerLogic mLogic;

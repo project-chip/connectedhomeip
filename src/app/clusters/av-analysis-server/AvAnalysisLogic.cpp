@@ -43,9 +43,10 @@ namespace Clusters {
 AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-    DataModel::Nullable<uint8_t> aMaxZones) :
+    DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxZones(aMaxZones)
+    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
+    mMaxZones(aMaxZones)
 {}
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic() {}
@@ -65,6 +66,18 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
     // If we don't have PerZoneSensivity then mMaxZones has to be Null
     VerifyOrReturnError(!(HasFeature(Feature::kPerZoneContextDetection) ^ !mMaxZones.IsNull()), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "AvAnalysis: If Per Zone Sensitivity is set, Zones must be present, and vice versa"));
+
+    // With Remote Context Detection the MaxAnalysisStreamCount fixed attribute has to be non-zero, and backing
+    // storage for the AnalysisStreams attribute is needed.
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(mMaxAnalysisStreamCount > 0, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "AvAnalysis: MaxAnalysisStreamCount must be non-zero with Remote Detection"));
+        if (mStreamTable.Capacity() == 0)
+        {
+            ReturnErrorOnFailure(mStreamTable.Init(mMaxAnalysisStreamCount));
+        }
+    }
 
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
@@ -153,9 +166,9 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeActiveAmbientContextTriggers(Attr
 CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & analysisStream : mAnalysisStreams)
+        for (const auto & analysisStream : mStreamTable)
         {
-            ReturnErrorOnFailure(encoder.Encode(analysisStream));
+            ReturnErrorOnFailure(encoder.Encode(analysisStream.ToEncodableStruct()));
         }
 
         return CHIP_NO_ERROR;
@@ -163,13 +176,6 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEnc
 }
 
 // Attribute mutators
-CHIP_ERROR AvAnalysisServerLogic::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
-{
-    VerifyOrReturnError(HasFeature(Feature::kRemoteContextDetection), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    mMaxAnalysisStreamCount = aMaxAnalysisStreamCount;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 {
     mTrackingEnabled = aTrackingEnabled;
