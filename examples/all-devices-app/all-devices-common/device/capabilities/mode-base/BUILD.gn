@@ -23,8 +23,9 @@ source_set("mode-base-delegate") {
     "impl/LoggingRvcRunModeDelegate.h",
   ]
 
-  public_configs =
-      [ "${chip_root}/examples/all-devices-app/all-devices-common/device:includes" ]
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+  ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/service-area:service-area-delegate",
