@@ -910,6 +910,13 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // On a device that shares one radio between Wi-Fi PAF and the station link,
+    // association leaves the radio unable to carry PAF frames for several
+    // seconds. Flush any pending PAFTP acknowledgement now before association.
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+#endif
+
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
@@ -965,6 +972,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
 {
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+#endif
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);

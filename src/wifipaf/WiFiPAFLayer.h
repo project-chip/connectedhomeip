@@ -184,6 +184,12 @@ public:
                                                   OnSubscribeErrorFunct OnSubscribeErrFunc = nullptr);
     void OnEndPointConnectComplete(WiFiPAFEndPoint * endPoint, CHIP_ERROR err);
 
+    /**
+     *  Send any pending stand-alone PAFTP acknowledgement on every connected
+     *  endpoint.
+     */
+    void FlushPendingAcks();
+
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
