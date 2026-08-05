@@ -23,8 +23,9 @@ source_set("service-area-delegate") {
     "impl/LoggingServiceAreaStorageDelegate.h",
   ]
 
-  public_configs =
-      [ "${chip_root}/examples/all-devices-app/all-devices-common/device:includes" ]
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+  ]
 
   public_deps = [
     "${chip_root}/examples/common/rvc-simulation:rvc-simulation",
