@@ -19,7 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 
 namespace {
 

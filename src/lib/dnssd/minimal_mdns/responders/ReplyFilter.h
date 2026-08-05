@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/core/Constants.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/Constants.h>
+#include <lib/dnssd/wire/QName.h>
 
 namespace mdns {
 namespace Minimal {
