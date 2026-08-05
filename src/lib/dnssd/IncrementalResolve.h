@@ -20,7 +20,7 @@
 #include <lib/dnssd/Types.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Variant.h>
 

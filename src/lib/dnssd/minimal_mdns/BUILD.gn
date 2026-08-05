@@ -160,8 +160,8 @@ static_library("minimal_mdns") {
     ":config",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
+    "${chip_root}/src/lib/dnssd/wire",
     "${chip_root}/src/platform",
   ]
 
