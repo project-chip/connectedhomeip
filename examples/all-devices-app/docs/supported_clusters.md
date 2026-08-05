@@ -8,13 +8,11 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Specification Catalog**:
-
     - Refer to the master spec cluster sheet:
       `docs/ids_and_codes/spec_clusters.md` (updated automatically).
     - This provides the cluster names, decimal IDs, and hex IDs.
 
 2. **Verify Code-Driven in SDK Status**:
-
     - Search/grep to locate all cluster classes implementing the code-driven
       model. For example, if using ripgrep (`rg`):
       `rg -n "public\s+(chip::app::)?DefaultServerCluster" src/app/` and
