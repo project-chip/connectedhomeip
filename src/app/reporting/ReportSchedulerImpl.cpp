@@ -70,15 +70,14 @@ void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const
 {
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
     mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
-        if (targetedEndpoints.empty() || node->PathListsContainAnyEndpoint(targetedEndpoints))
+        VerifyOrReturnValue(node->PathListsContainAnyEndpoint(targetedEndpoints), Loop::Continue);
+
+        System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
+        System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
+        const Timestamp newDeferralEnd        = now + effectiveDelay;
+        if (newDeferralEnd > node->GetMinTimestamp())
         {
-            System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
-            System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
-            const Timestamp newDeferralEnd        = now + effectiveDelay;
-            if (newDeferralEnd > node->GetMinTimestamp())
-            {
-                node->SetDeferralEndTimestamp(newDeferralEnd);
-            }
+            node->SetDeferralEndTimestamp(newDeferralEnd);
         }
         return Loop::Continue;
     });

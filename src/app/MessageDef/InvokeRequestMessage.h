@@ -81,7 +81,9 @@ public:
      */
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
 
-    /// @brief Gets the DelayReportData from the TLV structure if present.
+    /**
+     * @brief Gets the DelayReportData from the TLV structure if present.
+     */
     CHIP_ERROR GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const;
 };
 

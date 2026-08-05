@@ -235,15 +235,15 @@ public:
      * @brief Checks if any attribute or event path in the handler's path lists targets any of the given endpoints
      *        (or includes a wildcard endpoint).
      *
-     * @param targetedEndpoints Span of endpoint IDs to check against.
-     * @return true if any path matches one of targetedEndpoints or has a wildcard endpoint ID.
-     *         false if targetedEndpoints is empty or no paths match.
+     * @param targetedEndpoints Span of endpoint IDs to check against. If empty, returns true (global deferral).
+     * @return true if targetedEndpoints is empty, or if any path matches one of targetedEndpoints or has a wildcard endpoint ID.
+     *         false if no paths match.
      */
     bool PathListsContainAnyEndpoint(Span<const EndpointId> targetedEndpoints) const
     {
         if (targetedEndpoints.empty())
         {
-            return false;
+            return true;
         }
         for (auto * path = mpAttributePathList; path != nullptr; path = path->mpNext)
         {
