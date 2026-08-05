@@ -16,6 +16,8 @@
  */
 #include "RecordWriter.h"
 
+#include <cstring>
+
 namespace mdns {
 namespace Minimal {
 
@@ -121,6 +123,55 @@ RecordWriter & RecordWriter::WriteQName(const SerializedQNameIterator & qname)
         RememberWrittenQnameOffset(qNameWriteStart);
     }
     return *this;
+}
+
+chip::Encoding::BigEndian::BufferWriter RecordWriter::ReserveRdlength()
+{
+    // Copy the current writer so its position marks where the length must go,
+    // then emit a placeholder that FinishRdlength() will overwrite.
+    chip::Encoding::BigEndian::BufferWriter rdlengthPosition(*mOutput);
+    mOutput->Put16(0);
+    return rdlengthPosition;
+}
+
+void RecordWriter::FinishRdlength(chip::Encoding::BigEndian::BufferWriter & rdlengthPosition)
+{
+    // Bytes written after the 2-byte length field are the record data length.
+    rdlengthPosition.Put16(static_cast<uint16_t>(mOutput->Needed() - rdlengthPosition.Needed() - 2));
+}
+
+RecordWriter & RecordWriter::PutSrv(uint16_t priority, uint16_t weight, uint16_t port, const FullQName & server)
+{
+    return Put16(priority).Put16(weight).Put16(port).WriteQName(server);
+}
+
+RecordWriter & RecordWriter::PutPtr(const FullQName & name)
+{
+    return WriteQName(name);
+}
+
+RecordWriter & RecordWriter::PutIpAddress(const chip::Inet::IPAddress & address)
+{
+    // Address bytes are already stored in network byte order.
+    if (address.IsIPv6())
+    {
+        return Put(BytesRange::BufferWithSize(address.Addr, 16));
+    }
+    return Put(BytesRange::BufferWithSize(address.Addr + 3, 4));
+}
+
+bool RecordWriter::PutTxt(chip::Span<const char * const> entries)
+{
+    for (const char * entry : entries)
+    {
+        size_t len = strlen(entry);
+        if (len > kMaxTxtRecordLength)
+        {
+            return false;
+        }
+        Put8(static_cast<uint8_t>(len)).PutString(entry);
+    }
+    return Fit();
 }
 
 void RecordWriter::RememberWrittenQnameOffset(size_t offset)

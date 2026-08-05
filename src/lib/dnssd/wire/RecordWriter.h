@@ -16,9 +16,11 @@
  */
 #pragma once
 
+#include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/wire/QName.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/Span.h>
 
 #include <optional>
 
@@ -83,6 +85,73 @@ public:
         mOutput->Put(range.Start(), range.Size());
         return *this;
     }
+
+    // Maximum length of a single TXT character-string entry.
+    // Per DNS-SD TXT Record Size (RFC 6763), it is suggested to keep the length of a single TXT entry small.
+    // While it can be larger than 63, this is the current value used in lib/dnssd/minimal_mdns/records/Txt.h.
+    // TODO : I could not find any reference to why 63 is used. This shall be re-visited during ULD implementation.
+    static constexpr size_t kMaxTxtRecordLength = 63;
+
+    /**
+     * @brief Writes a placeholder 16-bit RDLENGTH field.
+     *
+     * @return A BufferWriter positioned at the reserved RDLENGTH. After the record
+     *         data has been written, pass this value to FinishRdlength() to
+     *         backpatch the actual data length.
+     */
+    chip::Encoding::BigEndian::BufferWriter ReserveRdlength();
+
+    /**
+     * @brief Backpatches the RDLENGTH reserved by ReserveRdlength().
+     *
+     * Writes the number of bytes written to the underlying output since the
+     * reservation into the previously reserved 16-bit length field.
+     *
+     * @param[in,out] rdlengthPosition BufferWriter returned by ReserveRdlength().
+     */
+    void FinishRdlength(chip::Encoding::BigEndian::BufferWriter & rdlengthPosition);
+
+    /**
+     * @brief Writes SRV record data (priority, weight, port, target name).
+     *
+     * The target name is subject to qname compression.
+     *
+     * @param[in] priority SRV priority field.
+     * @param[in] weight   SRV weight field.
+     * @param[in] port     SRV port field.
+     * @param[in] server   Target host name.
+     *
+     * @return Reference to this writer for chaining.
+     */
+    RecordWriter & PutSrv(uint16_t priority, uint16_t weight, uint16_t port, const FullQName & server);
+
+    /**
+     * @brief Writes PTR record data (a single target name).
+     *
+     * The target name may be qname-compressed.
+     *
+     * @param[in] name Target name.
+     *
+     * @return Reference to this writer for chaining.
+     */
+    RecordWriter & PutPtr(const FullQName & name);
+
+    /**
+     * @brief Writes A or AAAA record data for the given address.
+     *
+     * Emits 4 (IPv4) or 16 (IPv6) address bytes in network byte order, selected
+     * by the address family.
+     *
+     * @param[in] address IP address to encode.
+     *
+     * @return Reference to this writer for chaining.
+     */
+    RecordWriter & PutIpAddress(const chip::Inet::IPAddress & address);
+
+    /// Writes TXT record data as a sequence of length-prefixed character-strings.
+    /// Returns false (writing nothing further) if any entry exceeds
+    /// kMaxTxtRecordLength.
+    bool PutTxt(chip::Span<const char * const> entries);
 
     inline bool Fit() const { return mOutput->Fit(); }
 

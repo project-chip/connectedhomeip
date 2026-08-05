@@ -18,6 +18,9 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <cstring>
+
+#include <inet/IPAddress.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/wire/RecordWriter.h>
 
@@ -161,6 +164,169 @@ TEST(TestRecordWriter, TonsOfReferences)
 
     EXPECT_TRUE(output.Fit());
     EXPECT_EQ(output.Needed(), 423u);
+}
+
+TEST(TestRecordWriter, PutSrv)
+{
+    const QNamePart kTarget[] = { "myserver", "local" };
+
+    uint8_t dataBuffer[128];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.PutSrv(1, 2, 3, FullQName(kTarget));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        0, 1,                                   // priority
+        0, 2,                                   // weight
+        0, 3,                                   // port
+        8, 'm', 'y', 's', 'e', 'r', 'v', 'e', 'r',
+        5, 'l', 'o', 'c', 'a', 'l',
+        0,
+    };
+    // clang-format on
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, PutPtr)
+{
+    const QNamePart kName[] = { "ptr", "target" };
+
+    uint8_t dataBuffer[128];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.PutPtr(FullQName(kName));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        3, 'p', 't', 'r',
+        6, 't', 'a', 'r', 'g', 'e', 't',
+        0,
+    };
+    // clang-format on
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, PutIpAddressV4)
+{
+    chip::Inet::IPAddress addr;
+    ASSERT_TRUE(chip::Inet::IPAddress::FromString("10.20.30.40", addr));
+
+    uint8_t dataBuffer[32];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.PutIpAddress(addr);
+
+    const uint8_t expectedOutput[] = { 10, 20, 30, 40 };
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, PutIpAddressV6)
+{
+    chip::Inet::IPAddress addr;
+    ASSERT_TRUE(chip::Inet::IPAddress::FromString("fe80::1", addr));
+
+    uint8_t dataBuffer[32];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.PutIpAddress(addr);
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        0xfe, 0x80, 0, 0, 0, 0, 0, 0,
+        0,    0,    0, 0, 0, 0, 0, 1,
+    };
+    // clang-format on
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, PutTxt)
+{
+    const char * kEntries[] = { "a=b", "flag" };
+
+    uint8_t dataBuffer[128];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    EXPECT_TRUE(writer.PutTxt(chip::Span<const char * const>(kEntries)));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        3, 'a', '=', 'b',
+        4, 'f', 'l', 'a', 'g',
+    };
+    // clang-format on
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, PutTxtRejectsOverlongEntry)
+{
+    // Try to write a TXT entry that is one octet over kMaxTxtRecordLength.
+    char kLong[RecordWriter::kMaxTxtRecordLength + 2];
+    memset(kLong, 'a', RecordWriter::kMaxTxtRecordLength + 1);
+    kLong[RecordWriter::kMaxTxtRecordLength + 1] = '\0';
+    ASSERT_EQ(strlen(kLong), RecordWriter::kMaxTxtRecordLength + 1);
+    const char * kEntries[] = { kLong };
+
+    uint8_t dataBuffer[128];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    EXPECT_FALSE(writer.PutTxt(chip::Span<const char * const>(kEntries)));
+}
+
+TEST(TestRecordWriter, ReserveAndFinishRdlength)
+{
+    uint8_t dataBuffer[64];
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    auto rdlength = writer.ReserveRdlength();
+    writer.Put16(0xABCD).Put8(0x42); // 3 bytes of record data
+    writer.FinishRdlength(rdlength);
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        0, 3,               // backpatched RDLENGTH == 3
+        0xAB, 0xCD, 0x42,   // record data
+    };
+    // clang-format on
+
+    EXPECT_TRUE(output.Fit());
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
+TEST(TestRecordWriter, BufferTooSmall)
+{
+    const QNamePart kTarget[] = { "myserver", "local" };
+
+    uint8_t dataBuffer[4]; // far too small for an SRV record
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.PutSrv(1, 2, 3, FullQName(kTarget));
+
+    EXPECT_FALSE(output.Fit());
 }
 
 } // namespace
