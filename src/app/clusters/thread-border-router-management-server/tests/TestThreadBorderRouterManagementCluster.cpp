@@ -222,7 +222,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeSupporte
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    uint32_t featureMap;
+    uint32_t featureMap = 0;
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
     EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kPANChange));
 }
@@ -238,7 +238,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFeatureMap_PanChangeNotSuppo
     chip::Testing::ClusterTester tester(localCluster);
     EXPECT_EQ(localCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    uint32_t featureMap;
+    uint32_t featureMap = 0;
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap).IsSuccess());
     EXPECT_EQ(featureMap, 0u);
 

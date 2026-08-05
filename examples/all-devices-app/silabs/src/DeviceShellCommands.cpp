@@ -20,7 +20,7 @@
 
 #include <app/server/Server.h>
 #include <cstring>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <lib/shell/streamer.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>

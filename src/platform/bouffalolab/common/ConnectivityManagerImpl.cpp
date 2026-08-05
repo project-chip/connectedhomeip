@@ -39,7 +39,7 @@
 #if CHIP_DEVICE_LAYER_TARGET_BL702
 #include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
 #endif
@@ -51,6 +51,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+extern "C" {
+#include <pm_manager.h>
+}
 #endif
 
 using namespace ::chip;
@@ -186,6 +192,11 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
 
 void ConnectivityManagerImpl::OnWiFiStationConnected()
 {
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+    ChipLogProgress(NotSpecified, "[LP] WiFi connected, enter STA PS");
+    pm_enter_lp_perparation();
+#endif
+
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;

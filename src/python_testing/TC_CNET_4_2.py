@@ -107,11 +107,11 @@ class TC_CNET_4_2(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        log.info(f"Networks by endpoint: {networks_dict}")
+        log.info("Networks by endpoint: %s", networks_dict)
         connected_network_count = {}
         for ep in networks_dict:
             connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
-        log.info(f"Connected networks count by endpoint: {connected_network_count}")
+        log.info("Connected networks count by endpoint: %s", connected_network_count)
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
 
@@ -169,7 +169,7 @@ class TC_CNET_4_2(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
         matching_networks_count = sum(x.networkID == last_network_id for x in networks)
-        log.info(f"last network id: {last_network_id}")
+        log.info("last network id: %s", last_network_id)
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
         asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
@@ -188,7 +188,7 @@ class TC_CNET_4_2(MatterBaseTest):
         supported_thread_features = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedThreadFeatures)
-        log.info(f"Supported thread features: {supported_thread_features}")
+        log.info("Supported thread features: %s", supported_thread_features)
         asserts.assert_in(supported_thread_features, support_thread_features_expected_values, "SupportedThreadFeatures")
 
         self.step(12)

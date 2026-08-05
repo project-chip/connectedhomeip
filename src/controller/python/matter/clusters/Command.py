@@ -22,7 +22,6 @@ import logging
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
@@ -46,7 +45,7 @@ class CommandPath:
 class InvokeRequestInfo:
     EndpointId: int
     Command: ClusterCommand
-    ResponseType: Optional[type] = None
+    ResponseType: type | None = None
 
 
 @dataclass
@@ -171,7 +170,8 @@ class AsyncBatchCommandsTransaction:
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception | None):
         if self._future.done():
-            logger.exception(f"Received another error. Only expecting one error. imError:{imError}, chipError {chipError}")
+            # We need to eagerly stringify as specified in PyChipError docstring.
+            logger.exception("Received another error. Only expecting one error. imError:%s, chipError %s", imError, str(chipError))
             return
         if chipError != 0:
             exception = chipError.to_exception()
@@ -271,9 +271,9 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
 
 
 async def SendCommand(future: Future, eventLoop, responseType: type[ClusterCommand] | None,
-                      device, commandPath: CommandPath, payload: ClusterCommand,
-                      timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None,
-                      busyWaitMs: Union[None, int] = None, suppressResponse: Union[None, bool] = None, allowLargePayload: Union[None, bool] = None) -> PyChipError:
+                      device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: None | int = None,
+                      interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None, suppressResponse: None | bool = None,
+                      allowLargePayload: None | bool = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -308,7 +308,7 @@ async def SendCommand(future: Future, eventLoop, responseType: type[ClusterComma
         ))
 
 
-def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int],
+def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTimeoutMs: int | None,
                               responseTypes: list[type[ClusterCommand] | None], suppressTimedRequestMessage: bool = False) -> list[PyInvokeRequestData]:
     numberOfCommands = len(commands)
     pyBatchCommandsDataArrayType = PyInvokeRequestData * numberOfCommands
@@ -336,8 +336,8 @@ def _BuildPyInvokeRequestData(commands: list[InvokeRequestInfo], timedRequestTim
 
 
 async def SendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
-                            timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None,
-                            busyWaitMs: Optional[int] = None, suppressResponse: Optional[bool] = None) -> PyChipError:
+                            timedRequestTimeoutMs: int | None = None, interactionTimeoutMs: int | None = None,
+                            busyWaitMs: int | None = None, suppressResponse: bool | None = None) -> PyChipError:
     ''' Initiates an InvokeInteraction with the batch commands provided.
 
     Arguments:
@@ -382,9 +382,9 @@ async def SendBatchCommands(future: Future, eventLoop, device, commands: list[In
 
 
 def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: list[InvokeRequestInfo],
-                              timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
-                              suppressResponse: Optional[bool] = None, remoteMaxPathsPerInvoke: Optional[int] = None,
-                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[list[int]] = None) -> PyChipError:
+                              timedRequestTimeoutMs: int | None = None, interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
+                              suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
+                              suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None) -> PyChipError:
     ''' ONLY TO BE USED FOR TEST: Send batch commands using various overrides.
     '''
     if suppressTimedRequestMessage and timedRequestTimeoutMs is not None:
@@ -424,7 +424,7 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: list[
     )
 
 
-def SendGroupCommand(groupId: int, devCtrl: c_void_p, payload: ClusterCommand, busyWaitMs: Union[None, int] = None) -> PyChipError:
+def SendGroupCommand(groupId: int, devCtrl: c_void_p, payload: ClusterCommand, busyWaitMs: None | int = None) -> PyChipError:
     ''' Send a cluster-object encapsulated group command to a device and does the following:
             - None (on a successful response containing no data)
             - Raises an exception if any errors are encountered.

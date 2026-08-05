@@ -30,6 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -41,6 +42,8 @@ using namespace chip::Crypto;
 using Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
+
+static constexpr System::Clock::Seconds32 kImportAdminSecretMaxClockSkew(60); // per Matter spec
 
 NetworkIdentityManagementCluster::NetworkIdentityManagementCluster(EndpointId endpoint, NetworkIdentityStorage & storage,
                                                                    Crypto::NetworkIdentityKeystore & keystore,
@@ -86,9 +89,9 @@ DataModel::ActionReturnStatus NetworkIdentityManagementCluster::ReadActiveNetwor
 {
     using NetworkIdentityFlags = NetworkIdentityStorage::NetworkIdentityFlags;
     return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-        constexpr BitFlags<NetworkIdentityFlags> flags(NetworkIdentityFlags::kPopulateIdentifier,
-                                                       NetworkIdentityFlags::kPopulateCreatedTimestamp,
-                                                       NetworkIdentityFlags::kPopulateClientCount);
+        constexpr BitFlags<NetworkIdentityFlags> flags(
+            NetworkIdentityFlags::kPopulateIdentityType, NetworkIdentityFlags::kPopulateIdentifier,
+            NetworkIdentityFlags::kPopulateCreatedTimestamp, NetworkIdentityFlags::kPopulateClientCount);
         NetworkIdentityStorage::NetworkIdentityIterator::AutoReleasing iterator(
             mStorage.IterateNetworkIdentities(flags, MutableByteSpan()));
         VerifyOrReturnError(iterator.IsValid(), CHIP_ERROR_INTERNAL);
@@ -255,6 +258,23 @@ NetworkIdentityManagementCluster::HandleImportAdminSecret(const DataModel::Invok
         VerifyOrReturnValue(newSecretData.created > oldSecretInfo.createdTimestamp, Status::DynamicConstraintError);
     }
 
+    // If we have a trusted real-time clock, reject a NASS whose timestamp is more than 1 minute in the future.
+    uint32_t currentTime;
+    if ((err = System::Clock::GetClock_MatterEpochS(currentTime)) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnValue(newSecretData.created <= System::Clock::Seconds32(currentTime) + kImportAdminSecretMaxClockSkew,
+                            Status::DynamicConstraintError);
+    }
+    else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
+    {
+        ChipLogProgress(Zcl, "ImportAdminSecret: Skipping check for future NASS timestamp, real-time clock is not synchronized");
+    }
+    else
+    {
+        ChipLogFailure(err, Zcl, "ImportAdminSecret: Failed to read real-time clock");
+        return err;
+    }
+
     // Find retirable (non-current, zero-client) Network Identities so we can work out
     // if there will be enough capacity (including retirements) before making any changes.
     uint16_t networkIdentityCount;
@@ -399,10 +419,11 @@ NetworkIdentityManagementCluster::HandleQueryIdentity(const DataModel::InvokeReq
     QueryIdentity::DecodableType commandData;
     VerifyOrReturnError(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-    // Exactly one of the three optional fields must be present
+    // Exactly one of the optional fields must be present
     int fieldCount =                                  //
         commandData.networkIdentityIndex.HasValue() + //
         commandData.networkIdentityType.HasValue() +  //
+        commandData.clientIndex.HasValue() +          //
         commandData.identifier.HasValue();
     VerifyOrReturnValue(fieldCount == 1, Status::InvalidCommand);
 
@@ -423,6 +444,12 @@ NetworkIdentityManagementCluster::HandleQueryIdentity(const DataModel::InvokeReq
         VerifyOrReturnValue(commandData.networkIdentityType.Value() == IdentityTypeEnum::kEcdsa, Status::ConstraintError);
         NetworkIdentityStorage::NetworkIdentityEntry entry;
         err = mStorage.FindCurrentNetworkIdentity(commandData.networkIdentityType.Value(), entry, kPopulateNetworkIdentity, buffer);
+        identity = entry.compactIdentity; // points into identityBuf
+    }
+    else if (commandData.clientIndex.HasValue())
+    {
+        NetworkIdentityStorage::ClientEntry entry;
+        err      = mStorage.FindClient(commandData.clientIndex.Value(), entry, kPopulateClientIdentity, buffer);
         identity = entry.compactIdentity; // points into identityBuf
     }
     else if (commandData.identifier.HasValue())
@@ -457,7 +484,8 @@ DataModel::ActionReturnStatus NetworkIdentityManagementCluster::ReadClients(Attr
 {
     using ClientFlags = NetworkIdentityStorage::ClientFlags;
     return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-        constexpr BitFlags<ClientFlags> flags(ClientFlags::kPopulateIdentifier, ClientFlags::kPopulateNetworkIdentityIndex);
+        constexpr BitFlags<ClientFlags> flags(ClientFlags::kPopulateIdentityType, ClientFlags::kPopulateIdentifier,
+                                              ClientFlags::kPopulateNetworkIdentityIndex);
         NetworkIdentityStorage::ClientIterator::AutoReleasing iterator(mStorage.IterateClients(flags, MutableByteSpan()));
         VerifyOrReturnError(iterator.IsValid(), CHIP_ERROR_INTERNAL);
 
@@ -465,8 +493,9 @@ DataModel::ActionReturnStatus NetworkIdentityManagementCluster::ReadClients(Attr
         while (iterator.Next(entry))
         {
             Structs::ClientStruct::Type item;
-            item.clientIndex      = entry.index;
-            item.clientIdentifier = entry.identifier;
+            item.clientIndex        = entry.index;
+            item.clientIdentifier   = entry.identifier;
+            item.clientIdentityType = entry.identityType;
             if (entry.networkIdentityIndex != NetworkIdentityStorage::kNullNetworkIdentityIndex)
             {
                 item.networkIdentityIndex.SetNonNull(entry.networkIdentityIndex);
@@ -515,6 +544,7 @@ NetworkIdentityManagementCluster::HandleAddClient(const DataModel::InvokeRequest
     // Build the ClientInfo for storage. Use ClientEntry so the convenience overload
     // populates index and lets us directly pass it on to the authenticator.
     NetworkIdentityStorage::ClientEntry entry;
+    entry.identityType    = IdentityTypeEnum::kEcdsa; // will be derived from clientIdentity if/when there are multiple types
     entry.identifier      = identifier;
     entry.compactIdentity = commandData.clientIdentity;
 

@@ -295,13 +295,12 @@ class EEVSEBaseTestHelper:
                              f"Fault event faultStateCurrentState was {event_data.faultStateCurrentState}, expected {current_fault}")
 
     def log_get_targets_response(self, get_targets_response):
-        log.info(f" Rx'd: {get_targets_response}")
+        log.info(" Rx'd: %s", get_targets_response)
         for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
-            log.info(
-                f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
+            log.info("   [%s] DayOfWeekForSequence: %02x", index, entry.dayOfWeekForSequence)
             for sub_index, sub_entry in enumerate(entry.chargingTargets):
-                log.info(
-                    f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
+                log.info("    - [%s] TargetTime: %s TargetSoC: %s AddedEnergy: %s",
+                         sub_index, sub_entry.targetTimeMinutesPastMidnight, sub_entry.targetSoC, sub_entry.addedEnergy)
 
     def convert_epoch_s_to_time(self, epoch_s, tz=UTC):
         delta_from_epoch = timedelta(seconds=epoch_s)
@@ -330,10 +329,8 @@ class EEVSEBaseTestHelper:
         # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
         target_time = target_time.astimezone(UTC)
 
-        log.info(
-            f"minutesPastMidnight = {minutes_past_midnight} => "
-            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
-            f" Expected target_time = {target_time}")
+        log.info("minutesPastMidnight = %s => %s:%s Expected target_time = %s",
+                 minutes_past_midnight, int(minutes_past_midnight / 60), int(minutes_past_midnight % 60), target_time)
 
         # Matter Epoch is 1st Jan 2000
         matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=UTC)

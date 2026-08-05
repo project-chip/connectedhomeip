@@ -919,15 +919,19 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                             params.GetPeerAddress().GetRemoteId());
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
-            const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
-            VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
-                                ChipLogError(Controller, "Error, Long discriminator is required"));
+            auto setupDiscriminator                             = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), ChipLogError(Controller, "WiFi-PAF: Missing setup discriminator");
+                         err = CHIP_ERROR_INVALID_ARGUMENT);
+            const SetupDiscriminator connDiscriminator(setupDiscriminator.value());
+            VerifyOrExit(!connDiscriminator.IsShortDiscriminator(),
+                         ChipLogError(Controller, "Error, Long discriminator is required");
+                         err = CHIP_ERROR_INVALID_ARGUMENT);
             uint16_t discriminator              = connDiscriminator.GetLongValue();
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            ReturnErrorOnFailure(
-                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            SuccessOrExit(err = DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo,
+                                                                                           sessionInfo));
             ExitNow(err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
                                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
         }
@@ -1530,11 +1534,14 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
 void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // On any failed check, log and return: this response says nothing about the stage actually in progress.
+    VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "RegisterClientResponse received with null context"));
+    VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration,
+                   ChipLogError(Controller, "RegisterClientResponse received in incorrect stage '%s'",
+                                StageToString(commissioner->mCommissioningStage)));
+    VerifyOrReturn(commissioner->mDeviceBeingCommissioned != nullptr,
+                   ChipLogError(Controller, "RegisterClientResponse received while no device is being commissioned"));
 
     if (commissioner->mPairingDelegate != nullptr)
     {
@@ -1542,29 +1549,31 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
             ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()), data.ICDCounter);
     }
 
-exit:
+    // All checks passed: the kICDRegistration stage is complete.
     CommissioningDelegate::CommissioningReport report;
-    commissioner->CommissioningStageComplete(err, report);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 void DeviceCommissioner::OnICDManagementStayActiveResponse(
     void * context, const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // On any failed check, log and return: this response says nothing about the stage actually in progress.
+    VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "StayActiveResponse received with null context"));
+    VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive,
+                   ChipLogError(Controller, "StayActiveResponse received in incorrect stage '%s'",
+                                StageToString(commissioner->mCommissioningStage)));
+    VerifyOrReturn(commissioner->mDeviceBeingCommissioned != nullptr,
+                   ChipLogError(Controller, "StayActiveResponse received while no device is being commissioned"));
 
     if (commissioner->mPairingDelegate != nullptr)
     {
         commissioner->mPairingDelegate->OnICDStayActiveComplete(
-
             ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()),
             data.promisedActiveDuration);
     }
 
-exit:
+    // All checks passed: the kICDSendStayActive stage is complete.
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }

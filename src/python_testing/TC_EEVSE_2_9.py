@@ -107,7 +107,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             uid is not NullValue and len(uid) <= 10,
             f"RFID event received with UID: {uid}")
 
-        log.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
+        log.info("RFID event received with UID: %s (hex)", bytes(uid).hex())
 
 
 if __name__ == "__main__":

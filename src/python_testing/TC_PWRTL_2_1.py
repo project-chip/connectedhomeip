@@ -80,7 +80,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             cluster=cluster,
             attribute=attributes.FeatureMap
         )
-        log.info(f"FeatureMap: 0x{feature_map:08X}")
+        log.info("FeatureMap: 0x%08X", feature_map)
 
         self.step(3, "TH validates O.a conformance (exactly one of NODE/TREE/SET); DYPF implies SET")
         has_node = bool(feature_map & features.kNodeTopology)
@@ -93,12 +93,11 @@ class TC_PWRTL_2_1(MatterBaseTest):
         if has_dypf:
             asserts.assert_true(has_set,
                                 "DynamicPowerFlow (DYPF) requires SetTopology")
-        log.info(f"Topology: NODE={has_node}, TREE={has_tree}, SET={has_set}, "
-                 f"DYPF={has_dypf}")
+        log.info("Topology: NODE=%s, TREE=%s, SET=%s, DYPF=%s", has_node, has_tree, has_set, has_dypf)
 
         self.step(4, "TH validates CIRC bit and reserved bits 5..31")
         has_circ = bool(feature_map & features.kElectricalCircuit)
-        log.info(f"ElectricalCircuit (CIRC): {has_circ}")
+        log.info("ElectricalCircuit (CIRC): %s", has_circ)
         KNOWN_BITS_MASK = (features.kNodeTopology | features.kTreeTopology |
                            features.kSetTopology | features.kDynamicPowerFlow |
                            features.kElectricalCircuit)
@@ -112,7 +111,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             cluster=cluster,
             attribute=attributes.AttributeList
         )
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
         avail_ep_id = attributes.AvailableEndpoints.attribute_id
         active_ep_id = attributes.ActiveEndpoints.attribute_id
 
@@ -143,7 +142,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 cluster=cluster,
                 attribute=attributes.AvailableEndpoints
             )
-            log.info(f"AvailableEndpoints: {avail_eps}")
+            log.info("AvailableEndpoints: %s", avail_eps)
         else:
             log.info("AvailableEndpoints not in AttributeList (SET feature not set)")
             self.mark_current_step_skipped()
@@ -156,7 +155,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
                 cluster=cluster,
                 attribute=attributes.ActiveEndpoints
             )
-            log.info(f"ActiveEndpoints: {active_eps}")
+            log.info("ActiveEndpoints: %s", active_eps)
         else:
             log.info("ActiveEndpoints not in AttributeList (DYPF feature not set)")
             self.mark_current_step_skipped()

@@ -26,7 +26,7 @@
 #include <string.h>
 
 #ifdef PW_RPC_ENABLED
-#include "PigweedLogger.h"
+#include "pigweed_rpc/PigweedLogger.h"
 #endif
 
 // RTT Buffer size and name
@@ -56,7 +56,7 @@
 #ifndef LOG_RTT_BUFFER_SIZE
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
-
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
 #include "uart.h"
 #endif
@@ -66,7 +66,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 #endif
-
+#endif // SILABS_LOG_ENABLED
 using namespace chip::Logging::Platform;
 
 #if SILABS_LOG_ENABLED
@@ -314,6 +314,63 @@ extern "C" void LwIPLog(const char * aFormat, ...)
     va_end(v);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT) &&                                                                                       \
+    (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+#include "zcl-debug-print.h"
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+#include "uart.h"
+#endif // defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log_level, bool newLine, const char * formatString,
+                                                     va_list ap)
+{
+#if SILABS_LOG_ENABLED
+    if (area == SL_ZIGBEE_AF_PRINT_CORE || area == 0x00)
+    {
+        LogCategory category = kLog_Silabs;
+        switch (log_level)
+        {
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_CRASH:
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_ERROR:
+            category = kLog_Error;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_WARN:
+            category = kLog_Warning;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_INFO:
+            category = kLog_Progress;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_DEBUG:
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_NONE:
+        default:
+            category = kLog_Detail;
+            break;
+        }
+        // For core logs, we want to route them through the CHIP logging system so that they are timestamped and categorized
+        // appropriately.
+        chip::Logging::Platform::HandleLog(reinterpret_cast<const char *>(kLogZigbeeModule), category, formatString, ap);
+    }
+#endif
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+    if (area == SL_ZIGBEE_AF_PRINT_CLI)
+    {
+
+        char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        int chWritten = vsnprintf(buffer, sizeof(buffer), formatString, ap);
+        if (chWritten < 0)
+        {
+            uartConsoleWrite("ZB CLI response too large", sizeof("ZB CLI response too large"));
+        }
+        else
+        {
+            uartConsoleWrite(const_cast<char *>(buffer), chWritten);
+        }
+    }
+#endif
+}
+#endif // defined(SL_COMPONENT_CATALOG_PRESENT) && (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) ||
+       // defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+
 /**
  * Platform logging function for OpenThread
  */

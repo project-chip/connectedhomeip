@@ -24,7 +24,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from mobly import asserts
 
@@ -39,6 +39,7 @@ from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id
+from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.spec_parsing import ConstraintReference, Constraints
 from matter.tlv import uint
 
@@ -61,7 +62,7 @@ class WritableAttributeInfo:
     attribute: type[ClusterObjects.ClusterAttributeDescriptor]
     cluster_class: type[ClusterObjects.Cluster]
     datatype: str
-    constraints: Optional[Constraints]
+    constraints: Constraints | None
 
 
 @dataclass
@@ -249,12 +250,12 @@ class IDMBaseTest(BasicCompositionTests):
 
     async def find_timed_write_attribute(
         self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
+    ) -> tuple[int | None, type[ClusterObjects.ClusterAttributeDescriptor] | None]:
         """
         Find an attribute that requires timed write on the actual device
         Uses the wildcard read data that's already in endpoints_data
         """
-        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+        log.info("Searching for timed write attributes across %s endpoints", len(endpoints_data))
         for endpoint_id, endpoint in endpoints_data.items():
             for cluster_type, cluster_data in endpoint.items():
                 cluster_id = cluster_type.id
@@ -271,8 +272,8 @@ class IDMBaseTest(BasicCompositionTests):
                             issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
                         # Check if this attribute requires timed write using the must_use_timed_write class property
                         if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
+                            log.info("Found timed write attribute: %s in cluster %s on endpoint %s",
+                                     attr_type.__name__, cluster_type.__name__, endpoint_id)
                             return endpoint_id, attr_type
         log.warning("No timed write attributes found on device")
         return None, None
@@ -300,10 +301,9 @@ class IDMBaseTest(BasicCompositionTests):
         if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
             sub_attrs = sub.GetAttributes()
 
-        asserts.assert_true(ep in sub_attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in sub_attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in sub_attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in sub_attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in sub_attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in sub_attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.
@@ -408,7 +408,7 @@ class IDMBaseTest(BasicCompositionTests):
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
-    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> Optional[int]:
+    async def resolve_dynamic_constraint(self, cluster_class, endpoint_id: int, ref: ConstraintReference) -> int | None:
         """Resolve a dynamic constraint reference by reading the attribute value."""
         ref_attr = getattr(cluster_class.Attributes, ref.attribute, None)
         if not ref_attr:
@@ -510,16 +510,16 @@ class IDMBaseTest(BasicCompositionTests):
             )
 
             if new_value == test_value:
-                log.error(f"FAIL: {attr_info.cluster_name}.{attr_info.attribute_name} "
-                          f"was set to invalid value {test_value} despite CONSTRAINT_ERROR")
+                log.error("FAIL: %s.%s was set to invalid value %s despite CONSTRAINT_ERROR", attr_info.cluster_name,
+                          attr_info.attribute_name, test_value)
                 return False
 
-            log.info(f"PASS: {attr_info.cluster_name}.{attr_info.attribute_name} "
-                     f"constraint properly enforced (original={original_value}, rejected={test_value})")
+            log.info("PASS: %s.%s constraint properly enforced (original=%s, rejected=%s)", attr_info.cluster_name,
+                     attr_info.attribute_name, original_value, test_value)
             return True
 
-        log.error(f"FAIL: {attr_info.cluster_name}.{attr_info.attribute_name} "
-                  f"got {result_status} instead of CONSTRAINT_ERROR for value {test_value}")
+        log.error("FAIL: %s.%s got %s instead of CONSTRAINT_ERROR for value %s", attr_info.cluster_name, attr_info.attribute_name,
+                  result_status, test_value)
         return False
 
     def checkable_attributes(self, cluster_id, cluster, xml_cluster) -> list[uint]:
@@ -697,7 +697,7 @@ class IDMBaseTest(BasicCompositionTests):
                 error=Status.UnsupportedCluster)
             asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                 msg=f"Unexpected success reading invalid cluster on endpoint {endpoint_id}")
-            log.info(f"Confirmed unsupported cluster {unsupported_cluster_id} returns error on endpoint {endpoint_id}")
+            log.info("Confirmed unsupported cluster %s returns error on endpoint %s", unsupported_cluster_id, endpoint_id)
 
     async def read_unsupported_attribute(self):
         """Attempt to read an unsupported attribute from a supported cluster on any endpoint.
@@ -719,7 +719,7 @@ class IDMBaseTest(BasicCompositionTests):
                 if unsupported:
                     unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
                     log.info(
-                        f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
+                        "Testing unsupported attribute: endpoint=%s, cluster=%s, attribute=%s", endpoint_id, cluster_type, unsupported_attr)
                     # Only request this single attribute
                     result = await self.read_single_attribute_expect_error(
                         endpoint=endpoint_id,
@@ -729,7 +729,7 @@ class IDMBaseTest(BasicCompositionTests):
                     )
                     asserts.assert_true(isinstance(result.Reason, InteractionModelError),
                                         msg="Unexpected success reading invalid attribute")
-                    log.info(f"Confirmed unsupported attribute {unsupported_attr} returns error on endpoint {endpoint_id}")
+                    log.info("Confirmed unsupported attribute %s returns error on endpoint %s", unsupported_attr, endpoint_id)
                     return
 
         # If we get here, we got problems as there should always be at least one unsupported attribute
@@ -776,7 +776,7 @@ class IDMBaseTest(BasicCompositionTests):
         self,
         endpoint_id: int,
         attr_class: type[ClusterObjects.ClusterAttributeDescriptor],
-    ) -> Optional[Status]:
+    ) -> Status | None:
         """
         Attempts to write `attr_class` on `endpoint_id` using a small set
         of dummy values. Returns the resulting Status, or None if no value
@@ -922,7 +922,7 @@ class IDMBaseTest(BasicCompositionTests):
                 asserts.assert_equal(first_attr_value, current_attr_value,
                                      f"Read {i} returned different value than first read")
 
-        log.info(f"Successfully completed {repeat_count} consistent reads of {attribute}")
+        log.info("Successfully completed %s consistent reads of %s", repeat_count, attribute)
         return results
 
     async def read_data_version_filter(self, endpoint, cluster, attribute, test_value=None):
@@ -1016,7 +1016,7 @@ class IDMBaseTest(BasicCompositionTests):
             await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-            log.info(f"Granted TH2 View access to only cluster {cluster_id}")
+            log.info("Granted TH2 View access to only cluster %s", cluster_id)
 
             # Use TH2 to read ALL attributes from ALL clusters at the endpoint
             read_request = await TH2.Read(
@@ -1029,7 +1029,7 @@ class IDMBaseTest(BasicCompositionTests):
 
             # Verify only the allowed cluster is returned
             returned_clusters = list(read_request.attributes[endpoint].keys())
-            log.info(f"Clusters returned with limited access (TH2): {[c.id for c in returned_clusters]}")
+            log.info("Clusters returned with limited access (TH2): %s", [c.id for c in returned_clusters])
 
             # The allowed cluster should be present
             allowed_cluster_obj = None
@@ -1055,7 +1055,7 @@ class IDMBaseTest(BasicCompositionTests):
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
                 log.info("Restored original ACL")
             except Exception as e:
-                log.error(f"Failed to restore original ACL: {e}")
+                log.error("Failed to restore original ACL: %s", e)
 
             # Removes TH2 controller
             TH2.Shutdown()
@@ -1167,18 +1167,7 @@ class IDMBaseTest(BasicCompositionTests):
 
     def get_mrp_retransmission_timeout_sec(self, dev_ctrl: ChipDeviceCtrl) -> float:
         """Compute worst-case MRP retransmission time (s) using negotiated intervals; fall back conservatively."""
-        session_params = dev_ctrl.GetRemoteSessionParameters(self.dut_node_id)
-        # Default local MRP intervals from ReliableMessageProtocolConfig.h for Linux controller builds:
-        # idle=500ms, active=300ms.
-        negotiated_idle_interval_ms = session_params.sessionIdleInterval if session_params else 500
-        negotiated_active_interval_ms = session_params.sessionActiveInterval if session_params else 300
-
-        # Defaults: 500ms idle (IP) / 2000ms (Thread) / 4000ms (fallback).
-        base_interval_ms = max(negotiated_idle_interval_ms, negotiated_active_interval_ms, 4000)
-
-        # interval * (1 + 1.6 + 1.6^2 + 1.6^3) * jitter (1.25) * margin (1.1) ms to s
-        backoff_sum = 1 + 1.6 + 2.56 + 4.096
-        return base_interval_ms * backoff_sum * 1.375 / 1000.0
+        return compute_mrp_retransmission_timeout_sec(dev_ctrl, self.dut_node_id)
 
     def get_writable_attributes_for_cluster(self, cluster_id: uint, cluster_data: dict) -> list[uint]:
         """Get list of writable attribute IDs for a cluster.
@@ -1211,6 +1200,16 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
+                continue
+
+            # Skip attributes carrying the Changes Omitted (C) or Quieter Reporting (Q)
+            # spec quality. The server is not required to emit a subscription report for
+            # every change to these (C suppresses change reporting entirely; Q reports
+            # less often than the reporting interval), so writing to them and asserting a
+            # report arrives produces false failures in steps 8/10/11. _cq_excluded_attr_ids
+            # (built once in MatterBaseTest from the data-model XML quality flags, unioned
+            # with the transitional allowlist) is the canonical exclusion set.
+            if (cluster_id, attribute_id) in self._cq_excluded_attr_ids:
                 continue
 
             xml_attr = xml_cluster.attributes[attribute_id]
@@ -1270,7 +1269,7 @@ class IDMBaseTest(BasicCompositionTests):
 
                 cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
                 writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
-                log.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
+                log.info('Writable attributes for cluster %s: %s', cluster_id, writable_attr_ids)
 
                 if not writable_attr_ids:
                     continue
@@ -1295,9 +1294,18 @@ class IDMBaseTest(BasicCompositionTests):
                         Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
                         # Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
                         Clusters.BasicInformation.Attributes.Location,
+                        # Thermostat spec (cluster 0x0201, revision 8) requires the server to silently
+                        # ignore writes to ControlSequenceOfOperation for Zigbee back-compat. The write
+                        # returns Success but the value never changes, so no subscription report is emitted.
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1121-controlsequenceofoperation-attribute
+                        Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
+                        # MinSetpointDeadBand is optionally writable, but any writes SHALL be silently
+                        # ignored per spec (backwards compatibility).
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
+                        Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
-                        log.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
+                        log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)
                         continue
 
                     # Get current value from priming data
@@ -1321,8 +1329,7 @@ class IDMBaseTest(BasicCompositionTests):
                         # List attribute - toggle between empty and non-empty to ensure actual change
                         if len(cached_val) == 0:
                             # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
-                            log.info(
-                                f"{test_step}: Skipping {attribute.__name__} - empty list")
+                            log.info("%s: Skipping %s - empty list", test_step, attribute.__name__)
                             continue
                         # Non-empty list -> write empty list (safe change)
                         new_val = []
@@ -1345,28 +1352,33 @@ class IDMBaseTest(BasicCompositionTests):
                     else:
                         # For other types, skip to avoid writing same value
                         # Writing the same value should NOT trigger a report
-                        log.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                        log.info("%s: Skipping %s - unsupported type for change", test_step, attribute.__name__)
                         continue
 
                     # Write the attribute
-                    log.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
+                    log.info("%s: Writing %s on EP%s: %s -> %s", test_step, attribute.__name__, endpoint_id, cached_val, new_val)
                     resp = await self.default_controller.WriteAttribute(
                         nodeId=self.dut_node_id,
                         attributes=[(endpoint_id, attribute(new_val))]
                     )
 
                     if resp[0].Status == Status.Success:
+                        readback = await self.read_single_attribute_check_success(
+                            endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
+                        )
+
                         changed_count += 1
                         log.info(
-                            f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
+                            "%s: [%d] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
+                            test_step, changed_count, attribute.__name__, attribute_id,
+                            endpoint_id, cluster_id, cached_val, readback)
 
-                        # Track this change for verification
                         changed_attributes.append(ChangedAttribute(
                             endpoint=endpoint_id,
                             cluster=cluster_class,
                             attribute=attribute,
                             old_value=cached_val,
-                            new_value=new_val
+                            new_value=readback
                         ))
 
                     elif resp[0].Status == Status.UnsupportedAccess:
@@ -1375,13 +1387,17 @@ class IDMBaseTest(BasicCompositionTests):
                     else:
                         # Other errors are acceptable per TC_AccessChecker pattern
                         # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                        log.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                        log.info("%s: Write to %s returned %s", test_step, attribute.__name__, resp[0].Status)
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
         count = 0
         last_report_count = len(handler.get_all_reported_attributes())
-        max_wait_time = 30
+        # DUT can batch a backlog of reports for unexpectedly long stretches
+        # (~30s seen in CI on all-clusters-app) after a burst of writes. Cap
+        # generously; the loop exits early via the changed_count check on
+        # healthy runs.
+        max_wait_time = 60
         while count < max_wait_time:
             await asyncio.sleep(1)
             count += 1
@@ -1392,7 +1408,7 @@ class IDMBaseTest(BasicCompositionTests):
             elif current_reports == changed_count:
                 break
             else:
-                log.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
+                log.debug("%s: %ss elapsed, %s unique attributes reported (no change)", test_step, count, current_reports)
 
         # Verify that we received reports for all the changed attributes we wrote to
         verified_count = 0
@@ -1407,16 +1423,16 @@ class IDMBaseTest(BasicCompositionTests):
             if handler.was_attribute_reported(ep, cluster, attr):
                 verified_count += 1
                 reports_count = handler.get_attribute_report_count(ep, cluster, attr)
-                log.info(f"Reports count for {cluster.__name__} on endpoint {ep}: {reports_count}")
+                log.info("Reports count for %s on endpoint %s: %s", cluster.__name__, ep, reports_count)
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
 
-        log.info(
-            f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+        log.info("%s: Verified %s/%s attribute change reports received",
+                 test_step, verified_count, len(changed_attributes))
 
         # Report summary of all attributes that received reports
         all_reported = handler.get_all_reported_attributes()
-        log.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
+        log.info("%s: Total unique attributes with reports: %s", test_step, len(all_reported))
 
         asserts.assert_less_equal(
             len(missing_reports), 0,
@@ -1425,24 +1441,21 @@ class IDMBaseTest(BasicCompositionTests):
             verified_count, 0,
             f"{test_step}: No change reports verified, expected {changed_count} reports")
 
-        # Revert the attributes to their original values
-        if changed_attributes:
-            for change in changed_attributes:
-                ep = change.endpoint
-                attr = change.attribute
-                old_value = change.old_value
+        # Revert the attributes to their original values so later steps see the device
+        # in the same state we found it. Log (don't fail) on a revert that the DUT rejects;
+        # the verification above has already passed and we don't want cleanup noise to
+        # mask the real test outcome.
+        for change in changed_attributes:
+            ep = change.endpoint
+            attr = change.attribute
+            old_value = change.old_value
 
-                resp = await self.default_controller.WriteAttribute(
-                    nodeId=self.dut_node_id,
-                    attributes=[(ep, attr(old_value))]
-                )
-                if resp[0].Status == Status.Success:
-                    revert_success = True
-                    break
-
-                asserts.assert_equal(
-                    revert_success, True,
-                    f"Failed to revert {attr.__name__} on endpoint {ep}: {resp[0].Status}"
-                )
+            resp = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(ep, attr(old_value))]
+            )
+            if resp[0].Status != Status.Success:
+                log.warning("%s: Failed to revert %s on endpoint %s to %s: %s",
+                            test_step, attr.__name__, ep, old_value, resp[0].Status)
 
         return verified_count

@@ -73,8 +73,7 @@ class TestManually(CHIPVirtualHome):
     def wait_for_interrupt(self):
         self.logger.info("Finished setting up environment.")
         for device in self.non_ap_devices:
-            self.logger.info("Device: {} (Type: {}, Container: {})".format(
-                device["type"], device["type"], device["id"][:10]))
+            self.logger.info("Device: %s (Type: %s, Container: %s)", device["type"], device["type"], device["id"][:10])
         self.logger.info("Press Ctrl-C to stop the test.")
         self.logger.info("Container will be cleaned when the test finished.")
         try:

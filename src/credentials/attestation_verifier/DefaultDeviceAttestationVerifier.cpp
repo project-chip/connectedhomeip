@@ -432,6 +432,9 @@ const char * CertificationTypeAsString(CertificationType certificationType)
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
+    // The exit handler below dereferences onCompletion unconditionally; reject null here.
+    VerifyOrReturn(onCompletion != nullptr);
+
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
     Platform::ScopedMemoryBuffer<uint8_t> paaCert;
@@ -441,8 +444,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     AttestationCertVidPid paaVidPid;
 
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
-                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() &&
-                     !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
+                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() && !info.attestationNonceBuffer.empty(),
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,

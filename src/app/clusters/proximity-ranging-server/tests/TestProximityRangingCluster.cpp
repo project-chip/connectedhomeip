@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
+#include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -25,6 +27,7 @@
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Events.h>
 #include <clusters/ProximityRanging/Metadata.h>
+#include <lib/support/TimerDelegateMock.h>
 
 #include <vector>
 
@@ -42,65 +45,114 @@ using chip::Testing::TestServerClusterContext;
 
 constexpr EndpointId kTestEndpointId = 1;
 
-class MockProximityRangingDriver : public ProximityRangingDriver
+class MockRangingAdapter : public RangingAdapter
 {
 public:
-    CHIP_ERROR Init(Callback & callback) override
+    explicit MockRangingAdapter(RangingTechEnum technology) : mTechnology(technology) {}
+
+    RangingTechEnum GetTechnology() const override { return mTechnology; }
+
+    Structs::RangingCapabilitiesStruct::Type GetCapabilities() const override
     {
-        mCallback = &callback;
-        return mInitError;
-    }
-    void Shutdown() override { mShutdownCalled = true; }
-    ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request) override
-    {
-        mLastStartSessionId = sessionId;
-        return mStartRangingResult;
-    }
-    CHIP_ERROR HandleStopRanging(uint8_t sessionId) override
-    {
-        mLastStopSessionId = sessionId;
-        return mStopRangingError;
-    }
-    CHIP_ERROR GetRangingCapabilities(AttributeValueEncoder & encoder) override
-    {
-        return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
-            Structs::RangingCapabilitiesStruct::Type cap;
-            cap.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
-            return listEncoder.Encode(cap);
-        });
+        Structs::RangingCapabilitiesStruct::Type cap;
+        cap.technology = mTechnology;
+        return cap;
     }
 
-    CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & sessionIds) override
+    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
     {
-        VerifyOrReturnError(mGetActiveSessionIdsError == CHIP_NO_ERROR, mGetActiveSessionIdsError);
-        size_t count = std::min(mActiveSessionIds.size(), sessionIds.size());
-        if (count == 0)
+        mLastPrepareSessionId = sessionId;
+        mLastPrepareParams    = params;
+        mPrepareCalls++;
+        if (mPrepareResult == ResultCodeEnum::kAccepted)
         {
-            sessionIds = Span<uint8_t>();
-            return CHIP_NO_ERROR;
+            mPreparedIds.push_back(sessionId);
         }
-        memcpy(sessionIds.data(), mActiveSessionIds.data(), count);
-        sessionIds.reduce_size(count);
+        return mPrepareResult;
+    }
+
+    CHIP_ERROR StartSession(uint8_t sessionId) override
+    {
+        mLastStartSessionId = sessionId;
+        mStartCalls++;
+        for (auto id : mPreparedIds)
+        {
+            if (id == sessionId)
+            {
+                return mStartError;
+            }
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    CHIP_ERROR StopSession(uint8_t sessionId) override
+    {
+        mLastStopSessionId = sessionId;
+        VerifyOrReturnError(mStopError == CHIP_NO_ERROR, mStopError);
+        for (auto it = mPreparedIds.begin(); it != mPreparedIds.end(); ++it)
+        {
+            if (*it == sessionId)
+            {
+                mPreparedIds.erase(it);
+                if (mCallback != nullptr)
+                {
+                    mCallback->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
+                }
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    void StopAllSessions() override
+    {
+        while (!mPreparedIds.empty())
+        {
+            uint8_t id = mPreparedIds.back();
+            mPreparedIds.pop_back();
+            if (mCallback != nullptr)
+            {
+                mCallback->OnRangingSessionStopped(id, RangingSessionStatusEnum::kSessionEndTimeReached);
+            }
+        }
+    }
+
+    CHIP_ERROR GetActiveSessionIds(Span<uint8_t> & out) override
+    {
+        VerifyOrReturnError(out.size() >= mPreparedIds.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        for (size_t i = 0; i < mPreparedIds.size(); i++)
+        {
+            out[i] = mPreparedIds[i];
+        }
+        out.reduce_size(mPreparedIds.size());
         return CHIP_NO_ERROR;
     }
-    size_t GetNumActiveSessionIds() override { return mActiveSessionIds.size(); }
-    std::optional<BleRbcConfig> GetBleRbcConfig() override { return mBleRbcConfig; }
+
+    std::optional<uint64_t> GetDeviceId() override { return mDeviceId; }
     std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override { return mWiFiUsdConfig; }
     std::optional<BltcsConfig> GetBltcsConfig() override { return mBltcsConfig; }
 
+    Callback * GetCallback() const { return mCallback; }
+
     // Test control
-    CHIP_ERROR mInitError                = CHIP_NO_ERROR;
-    bool mShutdownCalled                 = false;
-    ResultCodeEnum mStartRangingResult   = ResultCodeEnum::kAccepted;
-    CHIP_ERROR mStopRangingError         = CHIP_NO_ERROR;
-    CHIP_ERROR mGetActiveSessionIdsError = CHIP_NO_ERROR;
-    std::vector<uint8_t> mActiveSessionIds;
-    uint8_t mLastStartSessionId = 0;
-    uint8_t mLastStopSessionId  = 0;
-    std::optional<BleRbcConfig> mBleRbcConfig;
+    ResultCodeEnum mPrepareResult = ResultCodeEnum::kAccepted;
+    CHIP_ERROR mStartError        = CHIP_NO_ERROR;
+    CHIP_ERROR mStopError         = CHIP_NO_ERROR;
+    uint8_t mLastPrepareSessionId = 0;
+    uint8_t mLastStartSessionId   = 0;
+    uint8_t mLastStopSessionId    = 0;
+    int mPrepareCalls             = 0;
+    int mStartCalls               = 0;
+    StartSessionParams mLastPrepareParams{};
+    /// Sessions for which PrepareSession returned kAccepted and StopSession
+    /// has not yet been invoked.
+    std::vector<uint8_t> mPreparedIds;
+    std::optional<uint64_t> mDeviceId;
     std::optional<WiFiUsdConfig> mWiFiUsdConfig;
     std::optional<BltcsConfig> mBltcsConfig;
-    Callback * mCallback = nullptr;
+
+private:
+    RangingTechEnum mTechnology;
 };
 
 struct TestProximityRangingCluster : public ::testing::Test
@@ -111,7 +163,8 @@ struct TestProximityRangingCluster : public ::testing::Test
 
 TEST_F(TestProximityRangingCluster, TestAttributeListMandatoryOnly)
 {
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
+    TimerDelegateMock timer;
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -122,9 +175,10 @@ TEST_F(TestProximityRangingCluster, TestAttributeListMandatoryOnly)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithAllFeatures)
 {
+    TimerDelegateMock timer;
     ProximityRangingCluster cluster(
         kTestEndpointId,
-        ProximityRangingCluster::Config().WithFeatures(
+        ProximityRangingCluster::Config(timer).WithFeatures(
             BitMask<Feature>{ Feature::kWiFiUsdProximityDetection, Feature::kBleBeaconRssi, Feature::kBluetoothChannelSounding }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
@@ -141,8 +195,9 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithAllFeatures)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithBleBeaconRssi)
 {
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
+    TimerDelegateMock timer;
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -154,8 +209,10 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithBleBeaconRssi)
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithBluetoothChannelSounding)
 {
+    TimerDelegateMock timer;
     ProximityRangingCluster cluster(
-        kTestEndpointId, ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kBluetoothChannelSounding }));
+        kTestEndpointId,
+        ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kBluetoothChannelSounding }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -169,8 +226,10 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithBluetoothChannelSoundin
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithWiFiUSDProximityDetection)
 {
+    TimerDelegateMock timer;
     ProximityRangingCluster cluster(
-        kTestEndpointId, ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
+        kTestEndpointId,
+        ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -182,8 +241,9 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithWiFiUSDProximityDetecti
 
 TEST_F(TestProximityRangingCluster, TestAttributeListWithUWBRanging)
 {
+    TimerDelegateMock timer;
     ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kUwbRanging }));
+                                    ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kUwbRanging }));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -195,13 +255,12 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithUWBRanging)
 TEST_F(TestProximityRangingCluster, TestFeatureMapMultipleFeatures)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
     ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(
+                                    ProximityRangingCluster::Config(timer).WithFeatures(
                                         BitMask<Feature>{ Feature::kBleBeaconRssi, Feature::kBluetoothChannelSounding,
                                                           Feature::kWiFiUsdProximityDetection, Feature::kUwbRanging }));
-    cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -217,12 +276,12 @@ TEST_F(TestProximityRangingCluster, TestFeatureMapMultipleFeatures)
 TEST_F(TestProximityRangingCluster, TestReadAttributeNotInFeatureMap)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    // Only WiFi feature enabled — BLEDeviceID should not be readable
+    // Only WiFi feature enabled - BLEDeviceID should not be readable
     ProximityRangingCluster cluster(
-        kTestEndpointId, ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
-    cluster.SetDriver(&driver);
+        kTestEndpointId,
+        ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -234,7 +293,8 @@ TEST_F(TestProximityRangingCluster, TestReadAttributeNotInFeatureMap)
 
 TEST_F(TestProximityRangingCluster, TestAcceptedCommands)
 {
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
+    TimerDelegateMock timer;
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
 
     ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
@@ -245,53 +305,32 @@ TEST_F(TestProximityRangingCluster, TestAcceptedCommands)
 
 TEST_F(TestProximityRangingCluster, TestGeneratedCommands)
 {
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
+    TimerDelegateMock timer;
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
 
     ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::StartRangingResponse::Id }));
-}
-
-TEST_F(TestProximityRangingCluster, TestStartupWithoutDriver)
-{
-    TestServerClusterContext context;
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INCORRECT_STATE);
-}
-
-TEST_F(TestProximityRangingCluster, TestStartupDriverInitFailure)
-{
-    TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mInitError = CHIP_ERROR_INTERNAL;
-
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INTERNAL);
 }
 
 TEST_F(TestProximityRangingCluster, TestStartupShutdownLifecycle)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    EXPECT_FALSE(driver.mShutdownCalled);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    EXPECT_TRUE(driver.mShutdownCalled);
+    // Re-Startup must succeed after Shutdown; the driver should accept a new callback.
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestProximityRangingCluster, TestReadFeatureMap)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -305,10 +344,9 @@ TEST_F(TestProximityRangingCluster, TestReadFeatureMap)
 TEST_F(TestProximityRangingCluster, TestReadClusterRevision)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -322,10 +360,12 @@ TEST_F(TestProximityRangingCluster, TestReadClusterRevision)
 TEST_F(TestProximityRangingCluster, TestReadRangingCapabilities)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster{ kTestEndpointId,
+                                     ProximityRangingCluster::Config(timer).WithAdapters(Span<RangingAdapter * const>(adapters)) };
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -343,10 +383,9 @@ TEST_F(TestProximityRangingCluster, TestReadRangingCapabilities)
 TEST_F(TestProximityRangingCluster, TestReadSessionIdListEmpty)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -361,42 +400,18 @@ TEST_F(TestProximityRangingCluster, TestReadSessionIdListEmpty)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestReadSessionIdListNonEmpty)
-{
-    TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mActiveSessionIds = { 5, 10, 15 };
-
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ClusterTester tester(cluster);
-
-    Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::SessionIDList::Id, sessionList), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionList.IsNull());
-
-    auto iter = sessionList.Value().begin();
-    ASSERT_TRUE(iter.Next());
-    EXPECT_EQ(iter.GetValue(), 5);
-    ASSERT_TRUE(iter.Next());
-    EXPECT_EQ(iter.GetValue(), 10);
-    ASSERT_TRUE(iter.Next());
-    EXPECT_EQ(iter.GetValue(), 15);
-    EXPECT_FALSE(iter.Next());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdSupported)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mBleRbcConfig = BleRbcConfig{ 0x1234 };
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    bleAdapter.mDeviceId        = 0x1234;
+    RangingAdapter * adapters[] = { &bleAdapter };
 
     ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
-    cluster.SetDriver(&driver);
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -407,14 +422,14 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdSupported)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdUnsupported)
+TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdNoAdapterRegistered)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
-    cluster.SetDriver(&driver);
+    // Feature claimed but no BLE adapter registered → driver returns nullopt → cluster surfaces UnsupportedAttribute.
+    ProximityRangingCluster cluster(
+        kTestEndpointId, ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi }));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -427,14 +442,17 @@ TEST_F(TestProximityRangingCluster, TestReadBleDeviceIdUnsupported)
 TEST_F(TestProximityRangingCluster, TestReadWiFiDevIKSupported)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
+    MockRangingAdapter wifiAdapter(RangingTechEnum::kWiFiRoundTripTimeRanging);
     WiFiUsdConfig wifiConfig{};
     memset(wifiConfig.deviceIdentityKey, 0xAB, sizeof(wifiConfig.deviceIdentityKey));
-    driver.mWiFiUsdConfig = wifiConfig;
+    wifiAdapter.mWiFiUsdConfig  = wifiConfig;
+    RangingAdapter * adapters[] = { &wifiAdapter };
 
-    ProximityRangingCluster cluster(
-        kTestEndpointId, ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection }));
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -446,15 +464,15 @@ TEST_F(TestProximityRangingCluster, TestReadWiFiDevIKSupported)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestReadOptionalAttributeUnsupportedByDriver)
+TEST_F(TestProximityRangingCluster, TestReadOptionalAttributeNoAdapter)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
 
+    // Features claimed but no adapter registered → all driver-backed reads return UnsupportedAttribute.
     ProximityRangingCluster cluster(kTestEndpointId,
-                                    ProximityRangingCluster::Config().WithFeatures(BitMask<Feature>{
+                                    ProximityRangingCluster::Config(timer).WithFeatures(BitMask<Feature>{
                                         Feature::kWiFiUsdProximityDetection, Feature::kBluetoothChannelSounding }));
-    cluster.SetDriver(&driver);
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -469,28 +487,48 @@ TEST_F(TestProximityRangingCluster, TestReadOptionalAttributeUnsupportedByDriver
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Build a minimal valid StartRangingRequest for BLE Beacon RSSI ranging, used by tests
+// that exercise paths after preflight validation succeeds.
+static Commands::StartRangingRequest::Type MakeValidBleBeaconRequest()
+{
+    Commands::StartRangingRequest::Type request;
+    request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
+    Structs::BLERangingDeviceRoleConfigStruct::Type role;
+    role.role            = RangingRoleEnum::kBLEScanningRole;
+    role.peerBLEDeviceID = 0xABCD'1234'5678'9ABC;
+    request.BLERangingDeviceRoleConfig.SetValue(role);
+    request.trigger.startTime = 0;
+    request.trigger.endTime   = 60;
+    return request;
+}
+
 TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mStartRangingResult = ResultCodeEnum::kAccepted;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    Commands::StartRangingRequest::Type request;
-    request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
+    auto request = MakeValidBleBeaconRequest();
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     if (result.response.has_value())
     {
-        auto & response = result.response.value();
+        auto & response = *result.response;
         EXPECT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
         EXPECT_FALSE(response.sessionID.IsNull());
         EXPECT_NE(response.sessionID.Value(), 0);
+        // startTime == 0 → driver invokes Prepare and Start synchronously.
+        EXPECT_EQ(bleAdapter.mPrepareCalls, 1);
+        EXPECT_EQ(bleAdapter.mStartCalls, 1);
     }
     else
     {
@@ -500,25 +538,28 @@ TEST_F(TestProximityRangingCluster, TestStartRangingAccepted)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestStartRangingRejected)
+TEST_F(TestProximityRangingCluster, TestStartRangingAdapterRejects)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mStartRangingResult = ResultCodeEnum::kRejectedInfeasibleRanging;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    bleAdapter.mPrepareResult   = ResultCodeEnum::kRejectedInfeasibleRanging;
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    Commands::StartRangingRequest::Type request;
-    request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
+    auto request = MakeValidBleBeaconRequest();
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+        EXPECT_EQ(result.response->resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
     }
     else
     {
@@ -528,34 +569,183 @@ TEST_F(TestProximityRangingCluster, TestStartRangingRejected)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
+TEST_F(TestProximityRangingCluster, TestStartRangingTechnologyNotInFeatureMap)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    // GenerateSessionId() short-circuits when numSessions == 0, so at least one
-    // active session is needed to reach the GetActiveSessionIds error path.
-    driver.mActiveSessionIds         = { 1 };
-    driver.mGetActiveSessionIdsError = CHIP_ERROR_INTERNAL;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    // Only BLE Beacon RSSI is enabled - request BLT Channel Sounding to trigger preflight.
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
+    Commands::StartRangingRequest::Type request;
+    request.technology = RangingTechEnum::kBluetoothChannelSounding;
+    Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type role;
+    role.role = RangingRoleEnum::kBLTInitiatorRole;
+    request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_TRUE(response.sessionID.IsNull());
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingMissingMatchingRoleConfig)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Technology is supported, but BLERangingDeviceRoleConfig is missing.
     Commands::StartRangingRequest::Type request;
     request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
-    if (result.response.has_value())
-    {
-        EXPECT_EQ(result.response.value().resultCode, ResultCodeEnum::kBusySessionCapacityReached);
-        EXPECT_TRUE(result.response.value().sessionID.IsNull());
-    }
-    else
-    {
-        FAIL();
-    }
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_TRUE(response.sessionID.IsNull());
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingMismatchedRoleConfig)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    MockRangingAdapter bltAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    RangingAdapter * adapters[] = { &bleAdapter, &bltAdapter };
+
+    ProximityRangingCluster cluster(
+        kTestEndpointId,
+        ProximityRangingCluster::Config(timer)
+            .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi, Feature::kBluetoothChannelSounding })
+            .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Technology=BLE Beacon RSSI but only the BLT config is set - inconsistent.
+    Commands::StartRangingRequest::Type request;
+    request.technology = RangingTechEnum::kBLEBeaconRSSIRanging;
+    Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type role;
+    role.role = RangingRoleEnum::kBLTInitiatorRole;
+    request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_TRUE(response.sessionID.IsNull());
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+    EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingTriggerEndTimeNotAfterStart)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request              = MakeValidBleBeaconRequest();
+    request.trigger.startTime = 10;
+    request.trigger.endTime   = 10;
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingTriggerIntervalZero)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    request.trigger.rangingInstanceInterval.SetValue(0);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRangingTriggers);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceGreaterThanMax)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    Structs::ReportingConditionStruct::Type rc;
+    rc.minDistanceCondition.SetValue(500);
+    rc.maxDistanceCondition.SetValue(100);
+    request.reportingCondition.SetValue(rc);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -563,20 +753,32 @@ TEST_F(TestProximityRangingCluster, TestStartRangingCapacityExhausted)
 TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mStopRangingError = CHIP_NO_ERROR;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
+    // First start a session so there's something to stop.
+    {
+        auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+        ASSERT_TRUE(startResult.IsSuccess());
+        ASSERT_TRUE(startResult.response.has_value());
+        auto & startResponse = *startResult.response;
+        EXPECT_EQ(startResponse.resultCode, ResultCodeEnum::kAccepted);
+    }
+
     Commands::StopRangingRequest::Type stopReq;
-    stopReq.sessionID = 1;
+    stopReq.sessionID = bleAdapter.mLastStartSessionId;
 
     auto result = tester.Invoke(stopReq);
     EXPECT_TRUE(result.IsSuccess());
-    EXPECT_EQ(driver.mLastStopSessionId, 1);
+    EXPECT_EQ(bleAdapter.mLastStopSessionId, stopReq.sessionID);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -584,11 +786,9 @@ TEST_F(TestProximityRangingCluster, TestStopRangingSuccess)
 TEST_F(TestProximityRangingCluster, TestStopRangingNotFound)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mStopRangingError = CHIP_ERROR_NOT_FOUND;
+    TimerDelegateMock timer;
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config(timer) };
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -609,47 +809,35 @@ TEST_F(TestProximityRangingCluster, TestStopRangingNotFound)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestProximityRangingCluster, TestStopRangingFailure)
-{
-    TestServerClusterContext context;
-    MockProximityRangingDriver driver;
-    driver.mStopRangingError = CHIP_ERROR_INTERNAL;
-
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ClusterTester tester(cluster);
-
-    Commands::StopRangingRequest::Type stopReq;
-    stopReq.sessionID = 1;
-
-    auto result = tester.Invoke(stopReq);
-    EXPECT_FALSE(result.IsSuccess());
-    if (result.GetStatusCode().has_value())
-    {
-        EXPECT_EQ(result.GetStatusCode().value().GetStatus(), Protocols::InteractionModel::Status::Failure);
-    }
-    else
-    {
-        FAIL();
-    }
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Drive a StartRangingRequest end-to-end to register a session inside the
+    // cluster's owned driver; capture the session ID assigned by the cluster.
+    auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+    ASSERT_TRUE(startResult.IsSuccess());
+    ASSERT_TRUE(startResult.response.has_value());
+    ASSERT_EQ(startResult.response->resultCode, ResultCodeEnum::kAccepted);
+    ASSERT_FALSE(startResult.response->sessionID.IsNull());
+    const uint8_t sessionId = startResult.response->sessionID.Value();
 
     Structs::RangingMeasurementDataStruct::Type measurement;
     measurement.distance.SetNonNull(static_cast<uint16_t>(500));
 
-    driver.mCallback->OnMeasurementData(42, measurement);
+    // Adapter fires measurement → cluster's driver routes to cluster → cluster generates event.
+    ASSERT_NE(bleAdapter.GetCallback(), nullptr);
+    bleAdapter.GetCallback()->OnMeasurementData(sessionId, measurement);
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
 
@@ -662,7 +850,7 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
     {
         FAIL();
     }
-    EXPECT_EQ(decodedEvent.sessionID, 42);
+    EXPECT_EQ(decodedEvent.sessionID, sessionId);
     EXPECT_FALSE(decodedEvent.rangingResultData.distance.IsNull());
     EXPECT_EQ(decodedEvent.rangingResultData.distance.Value(), 500);
 
@@ -672,27 +860,336 @@ TEST_F(TestProximityRangingCluster, TestOnMeasurementDataEvent)
 TEST_F(TestProximityRangingCluster, TestOnSessionStoppedEvent)
 {
     TestServerClusterContext context;
-    MockProximityRangingDriver driver;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
 
-    ProximityRangingCluster cluster{ kTestEndpointId, ProximityRangingCluster::Config() };
-    cluster.SetDriver(&driver);
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
 
-    driver.mCallback->OnSessionStopped(7, RangingSessionStatusEnum::kSessionEndTimeReached);
+    // Drive StartRangingRequest end-to-end; capture the assigned session ID.
+    auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+    ASSERT_TRUE(startResult.IsSuccess());
+    ASSERT_TRUE(startResult.response.has_value());
+    ASSERT_EQ(startResult.response->resultCode, ResultCodeEnum::kAccepted);
+    ASSERT_FALSE(startResult.response->sessionID.IsNull());
+    const uint8_t sessionId = startResult.response->sessionID.Value();
+
+    // Forward a measurement so the driver's peerFound flips true; otherwise
+    // the driver remaps kSessionEndTimeReached to kPeerNotFound at stop time.
+    ASSERT_NE(bleAdapter.GetCallback(), nullptr);
+    Structs::RangingMeasurementDataStruct::Type measurement;
+    measurement.distance.SetNonNull(static_cast<uint16_t>(100));
+    bleAdapter.GetCallback()->OnMeasurementData(sessionId, measurement);
+
+    bleAdapter.GetCallback()->OnRangingSessionStopped(sessionId, RangingSessionStatusEnum::kSessionEndTimeReached);
+
+    // First event is the RangingResult from OnMeasurementData; skip past it
+    // to assert on the RangingSessionStatus event.
+    auto first = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(first.has_value());
 
     auto eventInfo = context.EventsGenerator().GetNextEvent();
 
     Events::RangingSessionStatus::DecodableType decodedEvent;
     if (eventInfo.has_value())
     {
-        EXPECT_EQ(eventInfo.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     }
     else
     {
         FAIL();
     }
-    EXPECT_EQ(decodedEvent.sessionID, 7);
+    EXPECT_EQ(decodedEvent.sessionID, sessionId);
     EXPECT_EQ(decodedEvent.status, RangingSessionStatusEnum::kSessionEndTimeReached);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Driver-only behaviors (Init/Shutdown lifecycle, GetActiveSessionIds buffer
+// errors, GetWiFiUsdConfig technology-branch lookup, mid-session shutdown
+// teardown) are exercised in TestProximityRangingDriver.cpp where the driver
+// is the unit under test. The cluster tests below verify that the cluster
+// correctly forwards cluster-level paths only.
+
+TEST_F(TestProximityRangingCluster, TestDriverDropsStaleAdapterCallbacks)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster{ kTestEndpointId,
+                                     ProximityRangingCluster::Config(timer).WithAdapters(Span<RangingAdapter * const>(adapters)) };
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ASSERT_NE(bleAdapter.GetCallback(), nullptr);
+
+    // No session has ID 99 — both stale paths must short-circuit and emit no event.
+    Structs::RangingMeasurementDataStruct::Type measurement;
+    measurement.distance.SetNonNull(static_cast<uint16_t>(123));
+    bleAdapter.GetCallback()->OnMeasurementData(99, measurement);
+    bleAdapter.GetCallback()->OnRangingSessionStopped(99, RangingSessionStatusEnum::kSessionEndTimeReached);
+
+    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// --- Cluster-level coverage: read paths and validation branches not yet exercised.
+
+TEST_F(TestProximityRangingCluster, TestReadSessionIdListNonEmpty)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto startResult = tester.Invoke(MakeValidBleBeaconRequest());
+    ASSERT_TRUE(startResult.IsSuccess());
+    ASSERT_TRUE(startResult.response.has_value());
+    auto & response = *startResult.response;
+    ASSERT_EQ(response.resultCode, ResultCodeEnum::kAccepted);
+
+    Attributes::SessionIDList::TypeInfo::DecodableType sessionList;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::SessionIDList::Id, sessionList), CHIP_NO_ERROR);
+    ASSERT_FALSE(sessionList.IsNull());
+
+    size_t count = 0;
+    EXPECT_EQ(sessionList.Value().ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 1u);
+
+    auto iter = sessionList.Value().begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue(), bleAdapter.mLastStartSessionId);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestReadBltcsAttributesSupported)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bltAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    BltcsConfig bltcs{};
+    memset(bltcs.deviceIdentityKey, 0xC3, sizeof(bltcs.deviceIdentityKey));
+    bltcs.securityLevel         = BLTCSSecurityLevelEnum::kBLTCSSecurityLevelThree;
+    bltcs.modeCapability        = BLTCSModeEnum::kBoth;
+    bltAdapter.mBltcsConfig     = bltcs;
+    RangingAdapter * adapters[] = { &bltAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBluetoothChannelSounding })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    ByteSpan key;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::BLTDevIK::Id, key), CHIP_NO_ERROR);
+    ASSERT_EQ(key.size(), sizeof(bltcs.deviceIdentityKey));
+    EXPECT_EQ(key.data()[0], 0xC3);
+
+    BLTCSSecurityLevelEnum level = BLTCSSecurityLevelEnum::kUnknownEnumValue;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::BLTCSSecurityLevel::Id, level), CHIP_NO_ERROR);
+    EXPECT_EQ(level, BLTCSSecurityLevelEnum::kBLTCSSecurityLevelThree);
+
+    BLTCSModeEnum mode = BLTCSModeEnum::kUnknownEnumValue;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::BLTCSModeCapability::Id, mode), CHIP_NO_ERROR);
+    EXPECT_EQ(mode, BLTCSModeEnum::kBoth);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBleRole)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request                                    = MakeValidBleBeaconRequest();
+    request.BLERangingDeviceRoleConfig.Value().role = RangingRoleEnum::kWiFiPublisherRole; // wrong role family
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingInvalidWiFiRole)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter wifiAdapter(RangingTechEnum::kWiFiRoundTripTimeRanging);
+    RangingAdapter * adapters[] = { &wifiAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kWiFiUsdProximityDetection })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::StartRangingRequest::Type request;
+    request.technology        = RangingTechEnum::kWiFiRoundTripTimeRanging;
+    request.trigger.startTime = 0;
+    request.trigger.endTime   = 60;
+    Structs::WiFiRangingDeviceRoleConfigStruct::Type role;
+    role.role = RangingRoleEnum::kBLEScanningRole; // wrong role family
+    request.wiFiRangingDeviceRoleConfig.SetValue(role);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(wifiAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingInvalidBltRole)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bltAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    RangingAdapter * adapters[] = { &bltAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBluetoothChannelSounding })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::StartRangingRequest::Type request;
+    request.technology        = RangingTechEnum::kBluetoothChannelSounding;
+    request.trigger.startTime = 0;
+    request.trigger.endTime   = 60;
+    Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type role;
+    role.role = RangingRoleEnum::kBLEBeaconRole; // wrong role family
+    request.BLTChannelSoundingDeviceRoleConfig.SetValue(role);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingExtraRoleConfigPresent)
+{
+    // BLE Beacon RSSI tech with both BLE and BLT role configs set: the cross-tech
+    // exclusivity guard in ValidateStartRangingRequest must reject.
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    MockRangingAdapter bltAdapter(RangingTechEnum::kBluetoothChannelSounding);
+    RangingAdapter * adapters[] = { &bleAdapter, &bltAdapter };
+
+    ProximityRangingCluster cluster(
+        kTestEndpointId,
+        ProximityRangingCluster::Config(timer)
+            .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi, Feature::kBluetoothChannelSounding })
+            .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type extraRole;
+    extraRole.role = RangingRoleEnum::kBLTInitiatorRole;
+    request.BLTChannelSoundingDeviceRoleConfig.SetValue(extraRole);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+    EXPECT_EQ(bltAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingReportingMinDistanceZero)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    Structs::ReportingConditionStruct::Type rc;
+    rc.minDistanceCondition.SetValue(0);
+    request.reportingCondition.SetValue(rc);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestProximityRangingCluster, TestStartRangingReportingMaxDistanceZero)
+{
+    TestServerClusterContext context;
+    TimerDelegateMock timer;
+    MockRangingAdapter bleAdapter(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &bleAdapter };
+
+    ProximityRangingCluster cluster(kTestEndpointId,
+                                    ProximityRangingCluster::Config(timer)
+                                        .WithFeatures(BitMask<Feature>{ Feature::kBleBeaconRssi })
+                                        .WithAdapters(Span<RangingAdapter * const>(adapters)));
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    auto request = MakeValidBleBeaconRequest();
+    Structs::ReportingConditionStruct::Type rc;
+    rc.maxDistanceCondition.SetValue(0);
+    request.reportingCondition.SetValue(rc);
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    auto & response = *result.response;
+    EXPECT_EQ(response.resultCode, ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(bleAdapter.mPrepareCalls, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

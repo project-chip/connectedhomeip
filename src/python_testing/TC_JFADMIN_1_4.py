@@ -110,7 +110,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     ):
         if commissioning_timeout is None:
             commissioning_timeout = self.ojcw_timeout_baseline
-        log.info(f"Setting commissioning timeout to {commissioning_timeout}s")
+        log.info("Setting commissioning timeout to %ss", commissioning_timeout)
         cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
             commissioningTimeout=commissioning_timeout,
             PAKEPasscodeVerifier=pake_passcode_verifier,
@@ -152,7 +152,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
         )
 
     async def sleep(self, duration_sec):
-        log.info(f"Sleeping for {duration_sec} seconds...")
+        log.info("Sleeping for %s seconds...", duration_sec)
         await asyncio.sleep(duration_sec)
 
     async def sleep_until_ojcw_expires(self):

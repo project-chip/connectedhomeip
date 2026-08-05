@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,7 +93,7 @@ void DeviceEnergyManagementMode::Shutdown()
     gDeviceEnergyManagementModeDelegate.reset();
 }
 
-void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
@@ -102,7 +102,7 @@ void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpo
     TEMPORARY_RETURN_IGNORED gDeviceEnergyManagementModeInstance->Init();
 }
 
-void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gDeviceEnergyManagementModeInstance)
     {

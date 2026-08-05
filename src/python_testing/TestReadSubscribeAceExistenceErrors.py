@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import copy
-from typing import Union
 
 from mobly import asserts  # type: ignore
 
@@ -87,7 +86,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.write_acl(self.TH1, self.dut_acl_original)
 
     @staticmethod
-    def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
+    def verify_attribute_exists(res: Clusters.Attribute.SubscriptionTransaction | dict,
                                 cluster:  type[Clusters.ClusterObjects.Cluster],
                                 attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
                                 ep: int = ROOT_NODE_ENDPOINT_ID):
@@ -101,10 +100,9 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         else:
             attrs = res
 
-        asserts.assert_true(ep in attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     @staticmethod
     def assert_event_exists(res, cluster, event, ep=ROOT_NODE_ENDPOINT_ID):
@@ -119,7 +117,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                 and isinstance(e.Data, event)
                 for e in res_events
             ),
-            "Must have read back event %s at endpoint %s" % (event.__name__, ep)
+            f"Must have read back event {event.__name__} at endpoint {ep}"
         )
 
     @staticmethod
@@ -133,6 +131,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
 
         self.print_step("precondition", "Commissioning - already done")
 
@@ -188,17 +187,12 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
             subject=self.TH2_nodeid
         )
 
-        read_step1b = await self.TH2.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[AttrViewPrivilegePath],
-        )
-
-        # Verify Valid Attribute was read
-        self.verify_attribute_exists(
-            res=read_step1b,
+        # read_single_attribute_check_success asserts existence and validates against subscription cache.
+        await self.read_single_attribute_check_success(
             cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.VendorID
-        )
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            dev_ctrl=self.TH2,
+            endpoint=ROOT_NODE_ENDPOINT_ID)
 
         ####################### Step2: Attribute does not exist; View privilege required to read. ######################################################
         #

@@ -16,6 +16,7 @@ Property 2: Non-casting cluster error handling
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
@@ -24,7 +25,7 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 SLIM_ATTR_DECODER = os.path.join(
     REPO_ROOT,
     "examples",

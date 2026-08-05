@@ -207,7 +207,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             return response.videoStreamID
 
         except Exception as e:
-            log.error(f"Failed to allocate video stream. {e}")
+            log.error("Failed to allocate video stream. %s", e)
             return None
 
 

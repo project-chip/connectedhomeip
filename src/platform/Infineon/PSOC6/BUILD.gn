@@ -82,6 +82,7 @@ static_library("PSOC6") {
 }
 
 source_set("logging") {
+  defines = [ "PSOC6_LOG_ENABLED=1" ]
   deps = [
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",

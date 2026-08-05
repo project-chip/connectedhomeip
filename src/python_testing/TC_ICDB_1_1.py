@@ -129,9 +129,9 @@ class TC_ICDB_1_1(ICDBaseTest):
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
-        log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
+        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
+        log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
 
         # *** STEP 3 ***
         # TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>,
@@ -148,7 +148,7 @@ class TC_ICDB_1_1(ICDBaseTest):
             asserts.assert_fail(f"Unexpected error returned when registering client: {e}, command: {cmd}")
 
         icd_counter_at_registration = response.ICDCounter
-        log.info(f"RegisterClient response ICDCounter: {icd_counter_at_registration}")
+        log.info("RegisterClient response ICDCounter: %s", icd_counter_at_registration)
 
         # *** STEP 4 ***
         # Wait for a full active-to-idle-to-active ICD transition cycle. TH reads the ICDCounter and ActiveModeThreshold attributes.
@@ -159,14 +159,14 @@ class TC_ICDB_1_1(ICDBaseTest):
 
         # Verify the ICDCounter value increased.
         current_icd_counter = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        log.info(f"ICDCounter after idle cycle: {current_icd_counter} (was {icd_counter_at_registration})")
+        log.info("ICDCounter after idle cycle: %s (was %s)", current_icd_counter, icd_counter_at_registration)
         asserts.assert_greater(current_icd_counter, icd_counter_at_registration,
                                f"ICDCounter should have incremented after idle cycle. Previous: {icd_counter_at_registration}, Current: {current_icd_counter}")
 
         # Verify the ActiveModeThreshold value is unchanged.
         current_active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
         log.info(
-            f"ActiveModeThreshold after idle cycle: {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
+            "ActiveModeThreshold after idle cycle: %sms (expected %sms)", current_active_mode_threshold_ms, active_mode_threshold_ms)
         asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
                              f"ActiveModeThreshold value must be unchanged but changed after idle cycle. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
 

@@ -176,7 +176,7 @@ class TC_ICDB_2_3(ICDBaseTest):
             key=th1_checkin_key,
             clientType=ClientTypeEnum.kPermanent,
         ))
-        log.info(f"TH1 RegisterClient SUCCESS for checkInNodeID={th1_check_in_node_id}")
+        log.info("TH1 RegisterClient SUCCESS for checkInNodeID=%s", th1_check_in_node_id)
 
         # TH1 reads RegisteredClients to verify registration
         th1_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
@@ -203,7 +203,7 @@ class TC_ICDB_2_3(ICDBaseTest):
             key=th2_checkin_key,
             clientType=ClientTypeEnum.kPermanent,
         ), controller=self.th2, node_id=self.th2_dut_node_id)
-        log.info(f"TH2 RegisterClient SUCCESS for checkInNodeID={th2_check_in_node_id}")
+        log.info("TH2 RegisterClient SUCCESS for checkInNodeID=%s", th2_check_in_node_id)
 
         # TH2 reads RegisteredClients to verify registration
         th2_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients, controller=self.th2, node_id=self.th2_dut_node_id)
@@ -225,9 +225,9 @@ class TC_ICDB_2_3(ICDBaseTest):
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         icd_counter_initial = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
-        log.info(f"ICDCounter initial: {icd_counter_initial}")
+        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
+        log.info("ICDCounter initial: %s", icd_counter_initial)
 
         # *** STEP 4 ***
         # Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.

@@ -131,10 +131,10 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
-        log.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        log.info("SupportedIngestMethods: %s", aSupportedIngestMethods)
 
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
-        log.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
+        log.info("SupportedContainerFormats: %s", aSupportedContainerFormats)
 
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()

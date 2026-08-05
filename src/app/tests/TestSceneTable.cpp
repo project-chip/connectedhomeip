@@ -1468,6 +1468,34 @@ TEST_F(TestSceneTable, TestRemoveScenes)
     EXPECT_EQ(entryCount, 0u);
 }
 
+// A position index beyond the fabric's capacity must be rejected gracefully rather than
+// indexing the fixed-size entry map out of bounds. Before FindByIndex bounded its index,
+// removing at an out-of-range position on a populated fabric read entry_map[index] past the
+// end of the array (ASan: stack-buffer-overflow read).
+TEST_F(TestSceneTable, TestRemoveSceneAtOutOfRangePosition)
+{
+    SceneTableImpl * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
+    ASSERT_NE(nullptr, sceneTable);
+
+    ResetSceneTable(sceneTable);
+
+    // The fabric must have stored data for RemoveTableEntryAtPosition to reach FindByIndex,
+    // so add one scene before probing the out-of-range position.
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene1));
+
+    // 0x7FFF is far past both the fabric capacity and the fixed entry_map size; removal at an
+    // absent position is a no-op that must return CHIP_NO_ERROR without any out-of-bounds access.
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sceneTable->RemoveSceneTableEntryAtPosition(kTestEndpoint1, kFabric1, static_cast<scenes::SceneIndex>(0x7FFF)));
+
+    // The existing scene is untouched by the rejected out-of-range removal.
+    uint8_t entryCount = 0;
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 1u);
+
+    ResetSceneTable(sceneTable);
+}
+
 TEST_F(TestSceneTable, TestFabricScenes)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);

@@ -891,8 +891,8 @@ TEST_F(TestGroupDataProvider, TestKeySetCacheAndSyncRemap)
     // 2. Read the saved TLV from storage
     auto keyName = DefaultStorageKeyAllocator::FabricKeyset(kFabric1, kKeysetId1);
 
-    uint8_t tlvBuffer[128];
-    uint16_t tlvLength = sizeof(tlvBuffer);
+    uint8_t tlvBuffer[128] = {};
+    uint16_t tlvLength     = sizeof(tlvBuffer);
     EXPECT_EQ(sDelegate.SyncGetKeyValue(keyName.KeyName(), tlvBuffer, tlvLength), CHIP_NO_ERROR);
 
     // 3. Sanity check and patch the policy to CacheAndSync (1) in-place.

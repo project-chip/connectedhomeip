@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import logging
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -79,7 +79,7 @@ class Esp32App(Enum):
             return 'examples/ota-provider-app'
         if self == Esp32App.TESTS:
             return 'src/test_driver'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     @property
     def AppNamePrefix(self):
@@ -111,7 +111,7 @@ class Esp32App(Enum):
             return 'chip-ota-provider-app'
         if self == Esp32App.TESTS:
             return None
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self, is_all_devices_selective):
         if not self.AppNamePrefix:
@@ -146,7 +146,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
 
     rpc = "_rpc" if enable_rpcs else ""
     if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit or board == Esp32Board.P4FunctionEV:
-        return 'sdkconfig{}.defaults'.format(rpc)
+        return f'sdkconfig{rpc}.defaults'
     if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
         # just compile for the same devices as aDevKitC
@@ -157,8 +157,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
             Esp32App.OTA_REQUESTOR,
         }
         if app in specific_apps:
-            return 'sdkconfig_m5stack{}.defaults'.format(rpc)
-        return 'sdkconfig{}.defaults'.format(rpc)
+            return f'sdkconfig_m5stack{rpc}.defaults'
+        return f'sdkconfig{rpc}.defaults'
     raise Exception('Unknown board type')
 
 
@@ -190,7 +190,7 @@ class Esp32Builder(Builder):
     def _IdfEnvExecute(self, cmd, title=None):
         # Run activate.sh after export.sh to ensure using the chip environment.
         self._Execute(
-            ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; %s' % cmd],
+            ['bash', '-c', f'source $IDF_PATH/export.sh; source scripts/activate.sh; {cmd}'],
             title=title)
 
     @property
@@ -202,7 +202,7 @@ class Esp32Builder(Builder):
         return 'esp32'
 
     @property
-    def TargetFileName(self) -> Optional[str]:
+    def TargetFileName(self) -> str | None:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
         if self.board == Esp32Board.P4FunctionEV:
@@ -218,83 +218,89 @@ class Esp32Builder(Builder):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        defaults = os.path.join(self.ExamplePath, DefaultsFileName(
-            self.board, self.app, self.enable_rpcs))
+        example_lock = self.output_dir_lock.lock_dir(
+            os.path.join(self.root, self.ExamplePath)) if self.output_dir_lock else contextlib.nullcontext()
+        with example_lock:
+            defaults = os.path.join(self.ExamplePath, DefaultsFileName(
+                self.board, self.app, self.enable_rpcs))
 
-        if not self._runner.dry_run and not os.path.exists(defaults):
-            raise Exception('SDK defaults file missing: %s' % defaults)
+            if not self._runner.dry_run and not os.path.exists(defaults):
+                raise Exception(f'SDK defaults file missing: {defaults}')
 
-        defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
+            defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
-        self._Execute(['mkdir', '-p', self.output_dir],
-                      title='Generating ' + self.identifier)
-        self._Execute(['cp', defaults, defaults_out])
-        self._Execute(
-            ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
-
-        if self.TargetFileName is not None:
-            target_defaults = os.path.join(self.ExamplePath, self.TargetFileName)
-            if os.path.exists(target_defaults):
-                self._Execute(['cp', target_defaults, os.path.join(self.output_dir, self.TargetFileName)])
-
-        if not self.enable_ipv4:
+            self._Execute(['mkdir', '-p', self.output_dir],
+                          title='Generating ' + self.identifier)
+            self._Execute(['cp', defaults, defaults_out])
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+                ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+
+            if self.TargetFileName is not None:
+                target_defaults = os.path.join(self.ExamplePath, self.TargetFileName)
+                if os.path.exists(target_defaults):
+                    self._Execute(['cp', target_defaults, os.path.join(self.output_dir, self.TargetFileName)])
+
+            if not self.enable_ipv4:
+                self._Execute(
+                    ['bash', '-c', f'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>{shlex.quote(defaults_out)}'])
+                self._Execute(
+                    ['bash', '-c', f'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>{shlex.quote(defaults_out)}'])
+
+            if self.enable_insights_trace:
+                insights_flag = 'y'
+            else:
+                insights_flag = 'n'
+
+            # pre-requisite
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
+                ['bash',
+                 '-c',
+                 f'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED={insights_flag}\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS={insights_flag}\\n" '
+                 f'>>{shlex.quote(defaults_out)}'])
 
-        if self.enable_insights_trace:
-            insights_flag = 'y'
-        else:
-            insights_flag = 'n'
+            cmake_flags = []
 
-        # pre-requisite
-        self._Execute(
-            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+            if self.options.pregen_dir:
+                cmake_flags.append(
+                    f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
-        cmake_flags = []
+            if self.all_devices_enabled_devices:
+                cmake_flags.append(
+                    f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
 
-        if self.options.pregen_dir:
-            cmake_flags.append(
-                f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+            cmake_args = ['-C', self.ExamplePath, '-B',
+                          shlex.quote(self.output_dir)] + cmake_flags
 
-        if self.all_devices_enabled_devices:
-            cmake_flags.append(
-                f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
+            cmake_args = " ".join(cmake_args)
+            defaults = shlex.quote(defaults_out)
+            target = shlex.quote(self.TargetName)
 
-        cmake_args = ['-C', self.ExamplePath, '-B',
-                      shlex.quote(self.output_dir)] + cmake_flags
+            cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} -DIDF_TARGET={target} reconfigure"
 
-        cmake_args = " ".join(cmake_args)
-        defaults = shlex.quote(defaults_out)
-        target = shlex.quote(self.TargetName)
-
-        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} -DIDF_TARGET={target} reconfigure"
-
-        # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
-        self._IdfEnvExecute(cmd)
+            # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
+            self._IdfEnvExecute(cmd)
 
     @lock_output_dir
     def _build(self):
         log.info('Compiling Esp32 at %s', self.output_dir)
 
-        # Unfortunately sdkconfig is sticky and needs reset on every build
-        self._Execute(
-            ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
+        example_lock = self.output_dir_lock.lock_dir(
+            os.path.join(self.root, self.ExamplePath)) if self.output_dir_lock else contextlib.nullcontext()
+        with example_lock:
+            # Unfortunately sdkconfig is sticky and needs reset on every build
+            self._Execute(
+                ['rm', '-f', os.path.join(self.ExamplePath, 'sdkconfig')])
 
-        defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
+            defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
-        # "ninja -C" is insufficient because sdkconfig changes on every 'config' and results
-        # in a full reconfiguration with default values
-        #
-        # This does a regen + reconfigure.
-        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} build".format(
-            defaults=shlex.quote(defaults_out),
-            example_path=self.ExamplePath,
-            out=shlex.quote(self.output_dir)
-        )
+            # "ninja -C" is insufficient because sdkconfig changes on every 'config' and results
+            # in a full reconfiguration with default values
+            #
+            # This does a regen + reconfigure.
+            cmd = (f"\nexport SDKCONFIG_DEFAULTS={shlex.quote(defaults_out)}\nidf.py -C {self.ExamplePath} "
+                   f"-B {shlex.quote(self.output_dir)} build")
 
-        self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
+            self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
     def _AllDevicesOutputName(self):
         """Return the binary base name produced by the all-devices-app build."""
