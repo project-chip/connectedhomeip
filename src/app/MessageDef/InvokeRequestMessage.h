@@ -61,38 +61,27 @@ public:
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     /**
-     *  @brief Get SuppressResponse. Next() must be called before accessing them.
+     *  @brief Gets SuppressResponse from the TLV structure if present.
      *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
-     *  @brief Get TimedRequest. Next() must be called before accessing them.
+     *  @brief Gets TimedRequest from the TLV structure if present.
      *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetTimedRequest(bool * const apTimedRequest) const;
 
     /**
-     *  @brief Get a parser for an InvokeRequests.
+     *  @brief Gets the InvokeRequests from the TLV structure if present.
      *
-     *  @param [in] apInvokeRequests    A pointer to the invoke request list parser.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
+     *  @return #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
 
-    /**
-     *  @brief Get DelayReportData parameters.
-     *
-     *  @param [out] aDelayReportData    A reference to the std::optional of delay report data structure to write to.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
+    /// @brief Gets the DelayReportData from the TLV structure if present.
     CHIP_ERROR GetDelayReportData(std::optional<DelayReportData> & aDelayReportData) const;
 };
 

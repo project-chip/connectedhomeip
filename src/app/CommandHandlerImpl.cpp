@@ -1094,23 +1094,22 @@ void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
     }
     else
     {
-        ChipLogDetail(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
-                      static_cast<unsigned int>(kMaxTargetedEndpoints));
+        ChipLogError(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
+                     static_cast<unsigned int>(kMaxTargetedEndpoints));
     }
 }
 
 void CommandHandlerImpl::TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData)
 {
-    if (mpCallback != nullptr)
+    VerifyOrReturn(mpCallback != nullptr);
+
+    uint32_t delayMs = aDelayReportData.delayMinMs;
+    if (aDelayReportData.delayJitterWindowMs > 0)
     {
-        uint32_t delayMs = aDelayReportData.delayMinMs;
-        if (aDelayReportData.delayJitterWindowMs > 0)
-        {
-            delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
-        }
-        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
-                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
+        delayMs += (chip::Crypto::GetRandU32() % aDelayReportData.delayJitterWindowMs);
     }
+    mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
+                              Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
 }
 
 } // namespace app

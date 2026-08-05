@@ -155,9 +155,9 @@ public:
         Timestamp GetMaxTimestamp() const { return mMaxTimestamp > mDeferralEndTimestamp ? mMaxTimestamp : mDeferralEndTimestamp; }
 
         void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }
-        bool IsInterestedInEndpoints(Span<const EndpointId> targetedEndpoints) const
+        bool PathListsContainAnyEndpoint(Span<const EndpointId> targetedEndpoints) const
         {
-            return mReadHandler->IsInterestedInEndpoints(targetedEndpoints);
+            return mReadHandler->PathListsContainAnyEndpoint(targetedEndpoints);
         }
 
     private:

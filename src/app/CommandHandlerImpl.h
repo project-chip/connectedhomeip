@@ -498,10 +498,9 @@ private:
     State mState = State::Idle;
     State mBackupState;
     ScopedChangeOnly<bool> mInternalCallToAddResponseData{ false };
-    bool mSuppressResponse = false;
-    bool mTimedRequest     = false;
-    bool mGroupRequest     = false;
-
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
+    bool mGroupRequest                     = false;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
     // TODO(#32486): We should introduce breaking change where calls to add CommandData
