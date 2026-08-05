@@ -19,8 +19,6 @@
 # Parallel to all-devices-common/device-factory/enabled_devices.gni for the GN build.
 #
 # Callers must define ALL_DEVICES_COMMON_DIR before including this file.
-# Callers must also define CHIP_ROOT before including this file when RVC
-# device support is compiled (header-only rvc-simulation helpers).
 #
 # Exports:
 #   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
@@ -266,7 +264,7 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
 
-# Header-only helpers shared by rvc-app and all-devices-app (RvcSimulationLogic.h, etc.).
+# Header-only helpers for all-devices-app robotic vacuum simulation.
 set(ALL_DEVICES_EXTRA_INCLUDE_DIRS
-    "${CHIP_ROOT}/examples/common/rvc-simulation"
+    "${ALL_DEVICES_COMMON_DIR}/rvc-simulation"
 )

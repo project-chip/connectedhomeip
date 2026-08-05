@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <RvcSimulationLogic.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-service-area-delegate.h>
 #include <vector>
@@ -23,12 +22,45 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ServiceArea;
-using namespace chip::examples::rvc_simulation;
-using namespace chip::examples::rvc_simulation::Topology;
 
 void RvcServiceAreaDelegate::SetMapTopology()
 {
-    ApplyDefaultMapTopology(*GetInstance());
+    GetInstance()->ClearSupportedMaps();
+
+    GetInstance()->AddSupportedMap(supportedMapId_XX, "My Map XX"_span);
+    GetInstance()->AddSupportedMap(supportedMapId_YY, "My Map YY"_span);
+
+    // Area A has name, floor number, uses map XX
+    auto areaA =
+        AreaStructureWrapper{}
+            .SetAreaId(supportedAreaID_A)
+            .SetMapId(supportedMapId_XX)
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
+
+    // Area B has name, uses map XX
+    auto areaB = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_B)
+                     .SetMapId(supportedMapId_XX)
+                     .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
+
+    // Area C has full SemData, no name, Map YY
+    auto areaC = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_C)
+                     .SetMapId(supportedMapId_YY)
+                     .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
+
+    // Area D has null values for all landmark fields, Map YY
+    auto areaD = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_D)
+                     .SetMapId(supportedMapId_YY)
+                     .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
+                     .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
+
+    GetInstance()->AddSupportedArea(areaA);
+    GetInstance()->AddSupportedArea(areaB);
+    GetInstance()->AddSupportedArea(areaC);
+    GetInstance()->AddSupportedArea(areaD);
 }
 
 void RvcServiceAreaDelegate::SetNoMapTopology()
@@ -36,22 +68,25 @@ void RvcServiceAreaDelegate::SetNoMapTopology()
     GetInstance()->ClearSupportedMaps();
 
     // Area A has name, floor number.
-    auto areaA = AreaStructureWrapper{}.SetAreaId(kAreaIdA).SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4),
-                                                                            DataModel::Nullable<Globals::AreaTypeTag>());
+    auto areaA =
+        AreaStructureWrapper{}
+            .SetAreaId(supportedAreaID_A)
+            .SetLocationInfo("My Location A"_span, DataModel::Nullable<int16_t>(4), DataModel::Nullable<Globals::AreaTypeTag>());
 
     // Area B has name.
-    auto areaB = AreaStructureWrapper{}.SetAreaId(kAreaIdB).SetLocationInfo("My Location B"_span, DataModel::NullNullable,
-                                                                            DataModel::NullNullable);
+    auto areaB = AreaStructureWrapper{}
+                     .SetAreaId(supportedAreaID_B)
+                     .SetLocationInfo("My Location B"_span, DataModel::NullNullable, DataModel::NullNullable);
 
     // Area C has full SemData, no name.
     auto areaC = AreaStructureWrapper{}
-                     .SetAreaId(kAreaIdC)
+                     .SetAreaId(supportedAreaID_C)
                      .SetLocationInfo(""_span, -1, Globals::AreaTypeTag::kPlayRoom)
                      .SetLandmarkInfo(Globals::LandmarkTag::kBackDoor, Globals::RelativePositionTag::kNextTo);
 
     // Area D has null values for all landmark fields.
     auto areaD = AreaStructureWrapper{}
-                     .SetAreaId(kAreaIdD)
+                     .SetAreaId(supportedAreaID_D)
                      .SetLocationInfo("My Location D"_span, DataModel::NullNullable, DataModel::NullNullable)
                      .SetLandmarkInfo(Globals::LandmarkTag::kCouch, Globals::RelativePositionTag::kNextTo);
 
@@ -65,7 +100,7 @@ CHIP_ERROR RvcServiceAreaDelegate::Init()
 {
     SetMapTopology();
 
-    GetInstance()->SetCurrentArea(DefaultCurrentAreaId());
+    GetInstance()->SetCurrentArea(supportedAreaID_C);
 
     return CHIP_NO_ERROR;
 }

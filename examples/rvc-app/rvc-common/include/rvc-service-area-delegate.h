@@ -47,6 +47,16 @@ private:
     RvcDevice * mIsSupportedMapChangeAllowedDeviceInstance;
     IsChangeAllowedSimpleCallback mIsSupportedMapChangeAllowedCallback;
 
+    // hardcoded values for SUPPORTED MAPS.
+    const uint32_t supportedMapId_XX = 3;
+    const uint32_t supportedMapId_YY = 245;
+
+    // hardcoded values for SUPPORTED AREAS.
+    const uint32_t supportedAreaID_A = 7;
+    const uint32_t supportedAreaID_B = 1234567;
+    const uint32_t supportedAreaID_C = 10050;
+    const uint32_t supportedAreaID_D = 0x88888888;
+
 public:
     /**
      * Set the SupportedMaps and SupportedAreas where the SupportedMaps is not null.
