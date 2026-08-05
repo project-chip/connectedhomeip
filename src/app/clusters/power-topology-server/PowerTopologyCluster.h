@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/power-topology-server/PowerTopologyCircuitNodeStorage.h>
 #include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/PowerTopology/AttributeIds.h>
@@ -26,7 +27,6 @@
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
-#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstddef>
 
@@ -36,9 +36,10 @@ class PowerTopologyCluster : public DefaultServerCluster, private FabricTable::D
 {
 
 public:
-    // Spec constraints for the ElectricalCircuitNodes attribute (CIRC feature).
-    static constexpr size_t kMaxCircuitNodes    = 50;  // list max
-    static constexpr size_t kMaxNodeLabelLength = 128; // Label constraint
+    // Spec constraints for the ElectricalCircuitNodes attribute (CIRC feature). Defined by the
+    // storage interface, since it is the storage that has to honour them.
+    static constexpr size_t kMaxCircuitNodes    = CircuitNodeStorage::kMaxCircuitNodes;
+    static constexpr size_t kMaxNodeLabelLength = CircuitNodeStorage::kMaxNodeLabelLength;
 
     struct Config
     {
@@ -51,11 +52,14 @@ public:
         // ElectricalCircuitNodes entries on fabric removal. When null (e.g. no CIRC, or unit tests
         // that do not exercise fabric removal) the cluster does not register a fabric delegate.
         FabricTable * fabricTable = nullptr;
+        // Required when the CIRC feature is enabled: holds the ElectricalCircuitNodes entries. The
+        // cluster does not own or allocate this; see CircuitNodeStorage for why it is injected.
+        CircuitNodeStorage * circuitNodeStorage = nullptr;
     };
 
     PowerTopologyCluster(const Config & config) :
         DefaultServerCluster({ config.endpointId, PowerTopology::Id }), mDelegate(config.delegate), mFeatureFlags(config.features),
-        mFabricTable(config.fabricTable)
+        mFabricTable(config.fabricTable), mCircuitNodeStorage(config.circuitNodeStorage)
     {}
 
     const BitFlags<PowerTopology::Feature> & Features() const { return mFeatureFlags; }
@@ -77,29 +81,11 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    // In-cluster storage for a single ElectricalCircuitNodes entry. The generated CircuitNodeStruct
-    // carries a CharSpan Label; we own the backing bytes here so the span stays valid across encoding.
-    struct StoredCircuitNode
-    {
-        NodeId node = kUndefinedNodeId;
-        Optional<EndpointId> endpoint;
-        bool hasLabel = false;
-        char label[kMaxNodeLabelLength];
-        size_t labelLength      = 0;
-        FabricIndex fabricIndex = kUndefinedFabricIndex;
-
-        Structs::CircuitNodeStruct::Type AsStruct() const;
-    };
-
     // ElectricalCircuitNodes (CIRC): fabric-scoped, writable, non-volatile list.
     DataModel::ActionReturnStatus WriteElectricalCircuitNodes(const DataModel::WriteAttributeRequest & request,
                                                               AttributeValueDecoder & decoder);
     bool DecodeCircuitNode(const Structs::CircuitNodeStruct::DecodableType & decoded, FabricIndex fabricIndex,
-                           StoredCircuitNode & out) const;
-    size_t CountNodesForFabric(FabricIndex fabricIndex) const;
-    void RemoveNodesForFabric(FabricIndex fabricIndex);
-    CHIP_ERROR LoadCircuitNodes();
-    CHIP_ERROR SaveCircuitNodes();
+                           CircuitNodeStorage::Node & out) const;
 
     // FabricTable::Delegate: purge a removed fabric's ElectricalCircuitNodes entries (fabric-scoped data).
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
@@ -108,10 +94,9 @@ private:
     const BitMask<PowerTopology::Feature> mFeatureFlags;
     FabricTable * mFabricTable;
 
-    // Heap-allocated on Startup only when the CIRC feature is enabled: kMaxCircuitNodes entries are
-    // ~8 KB, too large for an inline member on stack-constrained embedded platforms (and in tests).
-    Platform::ScopedMemoryBuffer<StoredCircuitNode> mCircuitNodes;
-    size_t mCircuitNodeCount = 0;
+    // Not owned. Non-null whenever the CIRC feature is enabled (checked at Startup). The cluster
+    // performs no allocation of its own for ElectricalCircuitNodes.
+    CircuitNodeStorage * mCircuitNodeStorage;
 };
 
 } // namespace chip::app::Clusters::PowerTopology

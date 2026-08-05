@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <app/clusters/power-topology-server/DefaultPowerTopologyCircuitNodeStorage.h>
 #include <app/clusters/power-topology-server/PowerTopologyCluster.h>
 #include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 
@@ -31,20 +32,42 @@ namespace PowerTopology {
 class Instance
 {
 public:
+    /// Uses DefaultCircuitNodeStorage for the ElectricalCircuitNodes attribute, so an application
+    /// enabling the ElectricalCircuit feature gets persistence with no extra work. An application
+    /// that cannot allocate, or that wants its own persistence, should use the overload below.
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature, FabricTable * aFabricTable = nullptr) :
         mCluster(PowerTopologyCluster::Config{
-            .endpointId  = aEndpointId,
-            .delegate    = aDelegate,
-            .features    = aFeature,
-            .fabricTable = aFabricTable,
+            .endpointId         = aEndpointId,
+            .delegate           = aDelegate,
+            .features           = aFeature,
+            .fabricTable        = aFabricTable,
+            .circuitNodeStorage = &mDefaultCircuitNodeStorage,
         })
     {}
+
+    /// Uses application-provided storage for ElectricalCircuitNodes. `aCircuitNodeStorage` must
+    /// outlive this Instance.
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature, CircuitNodeStorage & aCircuitNodeStorage,
+             FabricTable * aFabricTable = nullptr) :
+        mCluster(PowerTopologyCluster::Config{
+            .endpointId         = aEndpointId,
+            .delegate           = aDelegate,
+            .features           = aFeature,
+            .fabricTable        = aFabricTable,
+            .circuitNodeStorage = &aCircuitNodeStorage,
+        })
+    {}
+
     ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
 
 private:
+    // Only used by the first constructor; harmless (and unallocated) otherwise, since
+    // DefaultCircuitNodeStorage allocates nothing until Init() and the cluster only calls Init()
+    // when the ElectricalCircuit feature is enabled.
+    DefaultCircuitNodeStorage mDefaultCircuitNodeStorage;
     RegisteredServerCluster<PowerTopologyCluster> mCluster;
 };
 
