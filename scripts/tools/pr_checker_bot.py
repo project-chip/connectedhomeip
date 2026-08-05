@@ -400,8 +400,9 @@ class PRContext:
                     created_at = created_at.replace(tzinfo=UTC)
 
                 age = now - created_at
-                # Some external integrations automatically create a CheckSuite on every commit but never trigger or complete
-                # builds for PRs. To prevent PRs from hanging, we ignore uncompleted check suites ONLY IF:
+                # Some external integrations automatically create a CheckSuite for every commit but never start or complete it
+                # on certain PRs. For example, Mergify can registers a check that remains queued indefinitely without ever running.
+                # To prevent otherwise merge-ready PRs from requiring manual intervention, we ignore incomplete check suites only if:
                 # 1. The check suite belongs to a known external app in `IGNORED_STALE_SUITE_APPS`.
                 # 2. The check suite has been queued/pending for longer than `STALE_SUITE_TIMEOUT`.
                 if (
