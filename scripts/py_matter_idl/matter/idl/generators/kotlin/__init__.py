@@ -71,8 +71,8 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> str | None:
         return 'String'
     if isinstance(actual, BasicInteger):
         if actual.is_signed:
-            return "Int{}s".format(actual.power_of_two_bits)
-        return "Int{}u".format(actual.power_of_two_bits)
+            return f"Int{actual.power_of_two_bits}s"
+        return f"Int{actual.power_of_two_bits}u"
     if isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'Boolean'
@@ -157,9 +157,9 @@ def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+        return f'Delegated{GlobalNameToJavaName(global_name)}AttributeCallback'
 
-    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
+    return f'Delegated{context.cluster.name}Cluster{upfirst(attr.definition.name)}AttributeCallback'
 
 
 def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -170,9 +170,9 @@ def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+        return f'ChipClusters.{GlobalNameToJavaName(global_name)}AttributeCallback'
 
-    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, upfirst(attr.definition.name))
+    return f'ChipClusters.{context.cluster.name}Cluster.{upfirst(attr.definition.name)}AttributeCallback'
 
 
 def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
@@ -188,24 +188,21 @@ def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return 'CHIP{}AttributeCallback'.format(upfirst(global_name))
+        return f'CHIP{upfirst(global_name)}AttributeCallback'
 
-    return 'CHIP{}{}AttributeCallback'.format(
-        upfirst(context.cluster.name),
-        upfirst(attr.definition.name)
-    )
+    return f'CHIP{upfirst(context.cluster.name)}{upfirst(attr.definition.name)}AttributeCallback'
 
 
 def CommandCallbackName(command: Command, cluster: Cluster):
     if command.output_param.lower() == 'defaultsuccess':
         return 'DefaultSuccess'
-    return '{}Cluster{}'.format(cluster.name, command.output_param)
+    return f'{cluster.name}Cluster{command.output_param}'
 
 
 def JavaCommandCallbackName(command: Command):
     if command.output_param.lower() == 'defaultsuccess':
         return 'DefaultCluster'
-    return '{}'.format(command.output_param)
+    return f'{command.output_param}'
 
 
 def IsCommandNotDefaultCallback(command: Command) -> bool:
@@ -220,9 +217,9 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return '{}'.format(GlobalNameToJavaName(global_name))
+        return f'{GlobalNameToJavaName(global_name)}'
 
-    return '{}Attribute'.format(upfirst(attr.definition.name))
+    return f'{upfirst(attr.definition.name)}Attribute'
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
@@ -291,7 +288,7 @@ def NamedFilter(choices: list, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
-    raise Exception("No item named %s in %r" % (name, choices))
+    raise Exception(f"No item named {name} in {choices!r}")
 
 
 def ToBoxedJavaType(field: Field):
@@ -404,13 +401,13 @@ class EncodableValue:
     def get_underlying_struct(self):
         s = self.context.find_struct(self.data_type.name)
         if not s:
-            raise Exception("Struct %s not found" % self.data_type.name)
+            raise Exception(f"Struct {self.data_type.name} not found")
         return s
 
     def get_underlying_enum(self):
         e = self.context.find_enum(self.data_type.name)
         if not e:
-            raise Exception("Enum %s not found" % self.data_type.name)
+            raise Exception(f"Enum {self.data_type.name} not found")
         return e
 
     @property
@@ -467,7 +464,7 @@ class EncodableValue:
     @property
     def unboxed_java_signature(self):
         if self.is_optional or self.is_list:
-            raise Exception("Not a basic type: %r" % self)
+            raise Exception(f"Not a basic type: {self!r}")
 
         t = ParseDataType(self.data_type, self.context)
 
@@ -483,7 +480,7 @@ class EncodableValue:
             if t.byte_count >= 3:
                 return "J"
             return "I"
-        raise Exception("Not a basic type: %r" % self)
+        raise Exception(f"Not a basic type: {self!r}")
 
     @property
     def boxed_java_signature(self):
@@ -520,7 +517,7 @@ class EncodableValue:
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
             return "Ljava/lang/Integer;"
-        return "Lchip/controller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+        return f"Lchip/controller/ChipStructs${self.context.cluster.name}Cluster{self.data_type.name};"
 
 
 def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:

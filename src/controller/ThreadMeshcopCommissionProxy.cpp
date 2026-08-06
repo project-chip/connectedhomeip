@@ -20,7 +20,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/TxtFields.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h> // nogncheck
+#include <lib/dnssd/wire/QNameString.h> // nogncheck
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
