@@ -20,6 +20,7 @@
 
 #include <app/clusters/av-analysis-server/AvAnalysisLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/core/ScopedNodeId.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
@@ -45,31 +46,6 @@ public:
      * the destructor, it shall not be invoked as part of the destructor.
      */
     virtual void ShutdownApp() = 0;
-
-    /**
-     * Delegate command handlers
-     */
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() = 0;
-
-    /**
-     *
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() = 0;
 
     /**
      * Delegate command helpers
@@ -144,6 +120,8 @@ public:
             delegate->SetServer(this);
         }
     }
+
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mLogic.SetCameraClient(aCameraClient); }
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 

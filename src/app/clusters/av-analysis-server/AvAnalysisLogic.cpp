@@ -96,6 +96,10 @@ bool AvAnalysisServerLogic::HasFeature(Feature aFeature) const
     return mFeatures.Has(aFeature);
 }
 
+void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVideoStreamId) {}
+
+void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId) {}
+
 CHIP_ERROR
 AvAnalysisServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {

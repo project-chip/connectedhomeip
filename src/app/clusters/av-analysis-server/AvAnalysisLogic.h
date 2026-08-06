@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
@@ -43,7 +44,7 @@ class AvAnalysisDelegate;
 // Callback type for notifying attribute changes
 using MarkDirtyCallback = std::function<void(AttributeId)>;
 
-class AvAnalysisServerLogic
+class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback
 {
 public:
     /**
@@ -72,6 +73,15 @@ public:
     }
 
     void SetMarkDirtyCallback(MarkDirtyCallback callback) { mMarkDirtyCallback = std::move(callback); }
+
+    /**
+     * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
+     * streams on the camera (not used with LocalContextDetection).
+     */
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
+
+    void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+    void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aAnalysisStreamId) override;
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -132,6 +142,7 @@ public:
 
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
+    AvAnalysisCameraClient * mCameraClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
 
     // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.

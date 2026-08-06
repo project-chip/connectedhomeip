@@ -26,14 +26,6 @@ class MockAvAnalysisDelegate : public AvAnalysisDelegate
 public:
     void ShutdownApp() override {}
 
-    Protocols::InteractionModel::Status EstablishAnalysisStream() override { return Protocols::InteractionModel::Status::Success; }
-
-    Protocols::InteractionModel::Status ActivateAnalysisStream() override { return Protocols::InteractionModel::Status::Success; }
-
-    Protocols::InteractionModel::Status DeactivateAnalysisStream() override { return Protocols::InteractionModel::Status::Success; }
-
-    Protocols::InteractionModel::Status RemoveAnalysisStream() override { return Protocols::InteractionModel::Status::Success; }
-
     CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) override { return CHIP_NO_ERROR; }
 
     bool CanAddContextTriggers() override { return true; }

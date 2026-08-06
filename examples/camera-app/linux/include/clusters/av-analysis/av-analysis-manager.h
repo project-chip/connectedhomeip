@@ -38,26 +38,6 @@ public:
     virtual void ShutdownApp() override;
 
     /**
-     * Delegate command handlers
-     */
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() override;
-
-    /**
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() override;
-
-    /**
      * Delegate command assists
      */
 
