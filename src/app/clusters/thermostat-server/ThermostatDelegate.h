@@ -36,7 +36,7 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
-    virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) = 0;
+    virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints)                                     = 0;
     virtual Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) = 0;
 };
 
