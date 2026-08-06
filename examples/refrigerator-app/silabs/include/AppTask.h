@@ -121,8 +121,9 @@ public:
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
 
     /** @brief Supplies the SupportedModes tags for @p modeIndex. */
-    CHIP_ERROR GetModeTagsByIndex(
-        uint8_t modeIndex, chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags) override;
+    CHIP_ERROR
+    GetModeTagsByIndex(uint8_t modeIndex,
+                       chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags) override;
 
 protected:
     /**

@@ -129,11 +129,11 @@ const Clusters::detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
     Clusters::detail::Structs::ModeOptionStruct::Type{
         .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(kModeTagsNormal) },
     Clusters::detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Cool"_span,
-                                             .mode     = ModeRapidCool,
-                                             .modeTags = DataModel::List<const ModeTagStructType>(kModeTagsRapidCool) },
+                                                       .mode     = ModeRapidCool,
+                                                       .modeTags = DataModel::List<const ModeTagStructType>(kModeTagsRapidCool) },
     Clusters::detail::Structs::ModeOptionStruct::Type{ .label    = "Rapid Freeze"_span,
-                                             .mode     = ModeRapidFreeze,
-                                             .modeTags = DataModel::List<const ModeTagStructType>(kModeTagsRapidFreeze) },
+                                                       .mode     = ModeRapidFreeze,
+                                                       .modeTags = DataModel::List<const ModeTagStructType>(kModeTagsRapidFreeze) },
 };
 
 int8_t ConvertToPrintableTemp(int16_t temperature)
@@ -237,8 +237,8 @@ CHIP_ERROR AppTask::InitRefrigerator()
     ReturnErrorOnFailure(SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId));
 
     // set TagList
-    ReturnErrorOnFailure(
-        SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList)));
+    ReturnErrorOnFailure(SetTagList(kColdCabinetEndpointId,
+                                    Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList)));
     ReturnErrorOnFailure(
         SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList)));
 

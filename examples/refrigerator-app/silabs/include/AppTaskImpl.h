@@ -62,7 +62,8 @@ public:
     // ModeBase::Delegate hooks. Override matching *Impl() in Derived to customize cabinet mode behavior.
     CHIP_ERROR Init() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, CabinetModeInitImpl); }
 
-    void HandleChangeToMode(uint8_t newMode, chip::app::Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
+    void HandleChangeToMode(uint8_t newMode,
+                            chip::app::Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
     {
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, HandleChangeToModeImpl, newMode, response);
     }
@@ -77,8 +78,9 @@ public:
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, GetModeValueByIndexImpl, modeIndex, value);
     }
 
-    CHIP_ERROR GetModeTagsByIndex(
-        uint8_t modeIndex, chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags) override
+    CHIP_ERROR
+    GetModeTagsByIndex(uint8_t modeIndex,
+                       chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags) override
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, GetModeTagsByIndexImpl, modeIndex, tags);
     }
@@ -120,8 +122,8 @@ private:
         return AppTask::GetModeValueByIndex(modeIndex, value);
     }
 
-    CHIP_ERROR GetModeTagsByIndexImpl(
-        uint8_t modeIndex, chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags)
+    CHIP_ERROR GetModeTagsByIndexImpl(uint8_t modeIndex,
+                                      chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags)
     {
         return AppTask::GetModeTagsByIndex(modeIndex, tags);
     }
