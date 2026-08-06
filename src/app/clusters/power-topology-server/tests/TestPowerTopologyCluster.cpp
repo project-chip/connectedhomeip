@@ -64,7 +64,15 @@ Structs::CircuitNodeStruct::Type MakeCircuitNode(NodeId node, Optional<EndpointI
 // Besides keeping the tests independent of attribute storage, this is the worked example of what a
 // memory-constrained platform would supply instead of DefaultCircuitNodeStorage: it holds a plain
 // C array and reports its real limit through Capacity().
-class FixedCircuitNodeStorage : public CircuitNodeStorage
+//
+// The capacity is a template parameter, and deliberately far below the spec maximum of 50: these
+// instances live on the stack, and 50 entries is roughly 8 KB, which exceeds the stack budget
+// enforced on constrained platforms (-Werror=stack-usage= on Zephyr native_posix). That is the same
+// pressure a real constrained implementation is under, so it is fitting that the double feels it
+// too. No test stores more than four entries; the resource-exhaustion test writes well past any
+// capacity, so it exercises the limit whatever it is set to.
+template <size_t kTestCapacity = 8>
+class FixedCircuitNodeStorageT : public CircuitNodeStorage
 {
 public:
     size_t Capacity() const override { return kCapacity; }
@@ -112,7 +120,7 @@ public:
     }
 
 private:
-    static constexpr size_t kCapacity = CircuitNodeStorage::kMaxCircuitNodes;
+    static constexpr size_t kCapacity = kTestCapacity;
 
     void Erase(FabricIndex fabricIndex)
     {
@@ -134,6 +142,8 @@ private:
     Node mNodes[kCapacity];
     size_t mCount = 0;
 };
+
+using FixedCircuitNodeStorage = FixedCircuitNodeStorageT<>;
 
 struct TestPowerTopologyCluster : public ::testing::Test
 {
