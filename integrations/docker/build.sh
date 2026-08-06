@@ -40,9 +40,6 @@ else
     DOCKER_VOLUME_PATH=/var/lib/docker/
 fi
 
-# Build for the architecture of the host, unless told otherwise. Inferring this
-# from the OS is wrong in both directions: an Intel Mac would target arm64, and a
-# Linux arm64 host (such as a GitHub ubuntu-24.04-arm runner) would target amd64.
 if [[ -z $DOCKER_BUILD_PLATFORM ]]; then
     case "$(uname -m)" in
         arm64 | aarch64) DOCKER_BUILD_PLATFORM="linux/arm64" ;;
