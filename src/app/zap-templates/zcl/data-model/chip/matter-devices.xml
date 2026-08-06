@@ -1193,7 +1193,7 @@ limitations under the License.
         <typeName>Chime</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0146</deviceId>
-        <revision editable="false">1</revision>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>

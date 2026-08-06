@@ -222,7 +222,7 @@ constexpr DeviceTypeId kSnapshotCameraDeviceTypeId  = 0x00000145;
 constexpr uint8_t kSnapshotCameraDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kChimeDeviceTypeId  = 0x00000146;
-constexpr uint8_t kChimeDeviceTypeRevision = 1;
+constexpr uint8_t kChimeDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kCameraControllerDeviceTypeId  = 0x00000147;
 constexpr uint8_t kCameraControllerDeviceTypeRevision = 1;
