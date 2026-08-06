@@ -2,6 +2,7 @@ name: Build Certification Image v2
 on:
   workflow_call:
   workflow_dispatch:
+  push:
 
 jobs:
   check-or-create-arm64-build-container:
@@ -30,7 +31,7 @@ jobs:
         uses: tyriis/docker-image-tag-exists@v3.0.0
         with:
           registry: ghcr.io
-          repository: project-chip/chip-build-arm64
+          repository: greens/chip-build-arm64
           tag: ${{ steps.checksum.outputs.checksum }}
       - name: Set up Docker Buildx
         if: steps.check-image.outputs.tag != 'found'
@@ -39,7 +40,7 @@ jobs:
         if: steps.check-image.outputs.tag != 'found'
         uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
         with:
-            name: project-chip/chip-build-arm64
+            name: greens/chip-build-arm64
             tags: ${{ steps.checksum.outputs.checksum }}
             dockerfile: ./integrations/docker/images/base/chip-build/Dockerfile
             username: ${{ github.actor }}
@@ -70,7 +71,7 @@ jobs:
         target: ${{ fromJSON(needs.load-targets-as-output.outputs.targets) }}
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/greens/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -141,7 +142,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     needs: check-or-create-arm64-build-container
     container:
-      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/greens/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -169,15 +170,16 @@ jobs:
           mkdir -p python_testing/scripts/sdk
           mkdir -p python_testing/data_model
           mkdir mock_server
-          mv ./src/python_testing ./python_testing/scripts/sdk
-          mv ./data_model ./python_testing/data_model
-          pip install --break-system-packages -r ./python_testing/scripts/sdk/requirements.txt \
-              && rm ./python_testing/scripts/sdk/requirements.txt
-          pip install --break-system-packages -r ./apps/push_av_server/requirements.txt \
-              && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < ./apps/push_av_server/hypercorn.patch
-          pip install --break-system-packages -r ./python_testing/scripts/sdk/requirements.nfc.txt \
-              && rm ./python_testing/scripts/sdk/requirements.nfc.txt
-          mv ./integrations/mock_server ./mock_server
+          mv src/python_testing python_testing/scripts/sdk
+          mv data_model python_testing/data_model
+          mv src/tools/push_av_server apps/push_av_server
+          pip install --break-system-packages -r python_testing/scripts/sdk/requirements.txt \
+              && rm python_testing/scripts/sdk/requirements.txt
+          pip install --break-system-packages -r apps/push_av_server/requirements.txt \
+              && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < apps/push_av_server/hypercorn.patch
+          pip install --break-system-packages -r python_testing/scripts/sdk/requirements.nfc.txt \
+              && rm python_testing/scripts/sdk/requirements.nfc.txt
+          mv integrations/mock_server ./mock_server
       - name: Build Python wheels
         shell: bash
         working-directory: ./out
