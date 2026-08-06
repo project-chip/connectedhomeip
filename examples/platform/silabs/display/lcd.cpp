@@ -30,10 +30,6 @@
 #include "sl_memlcd.h"
 #endif
 
-#ifdef QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-
 #include "sl_board_control.h"
 
 #define LCD_SIZE 128
@@ -42,10 +38,12 @@
 #define QR_CODE_BORDER_SIZE 0
 #define SL_BOARD_ENABLE_DISPLAY_PIN 0
 
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
+#include "qrcodegen.h"
+
 static uint8_t qrCode[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
 static uint8_t workBuffer[qrcodegen_BUFFER_LEN_FOR_VERSION(QR_CODE_VERSION)];
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 
 CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
 {
@@ -224,7 +222,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
     case StatusScreen:
         WriteStatus();
         break;
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     case QRCodeScreen:
         WriteQRCode();
         break;
@@ -237,7 +235,7 @@ void SilabsLCD::SetScreen(Screen_e screen)
 
 void SilabsLCD::CycleScreens(void)
 {
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
     if (mCurrentScreen < QRCodeScreen)
 #else
     if (mCurrentScreen < StatusScreen)
@@ -258,7 +256,7 @@ void SilabsLCD::SetStatus(DisplayStatus_t & status)
     mStatus = status;
 }
 
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 void SilabsLCD::WriteQRCode()
 {
     if (!qrcodegen_encodeText((const char *) mQRCodeBuffer, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
@@ -318,4 +316,4 @@ void SilabsLCD::LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
         }
     }
 }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED

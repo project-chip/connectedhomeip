@@ -21,7 +21,7 @@
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
 

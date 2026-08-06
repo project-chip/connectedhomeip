@@ -36,6 +36,7 @@ source_set("tv-common-sources") {
   deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/app/clusters/media-file-management-server",
     "${chip_root}/src/lib",
   ]
   public_configs = [ ":config" ]
@@ -58,6 +59,8 @@ source_set("tv-common-sources") {
     "clusters/keypad-input/KeypadInputManager.h",
     "clusters/low-power/LowPowerManager.cpp",
     "clusters/low-power/LowPowerManager.h",
+    "clusters/media-file-management/MediaFileManagementManager.cpp",
+    "clusters/media-file-management/MediaFileManagementManager.h",
     "clusters/media-input/MediaInputManager.cpp",
     "clusters/media-input/MediaInputManager.h",
     "clusters/media-playback/MediaPlaybackManager.cpp",

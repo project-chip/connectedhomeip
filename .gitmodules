@@ -56,7 +56,7 @@
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
-	branch  = matter_1_6_se05x
+	branch  = matter_1_6_se05x_psa
 	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
@@ -251,6 +251,11 @@
 	path = third_party/st/STM32CubeWB
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
 	branch = v1.18.0
+	platforms = stm32
+[submodule "third_party/st/STM32CubeWBA"]
+	path = third_party/st/STM32CubeWBA
+	url = https://github.com/STMicroelectronics/STM32CubeWBA.git
+	branch = v1.9.0
 	platforms = stm32
 [submodule "third_party/infineon/trustm/optiga-trust-m"]
 	path = third_party/infineon/trustm/optiga-trust-m

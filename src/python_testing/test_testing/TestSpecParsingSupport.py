@@ -22,7 +22,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
@@ -263,8 +263,7 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 """
 
 
-class TestSpecParsingSupport(MatterBaseTest):
-    requires_dut = False
+class TestSpecParsingSupport(CertificationUnitTestNoDevice):
 
     def setup_class(self):
         super().setup_class()
@@ -569,6 +568,33 @@ class TestSpecParsingSupport(MatterBaseTest):
             "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
         asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                               "Atomic request found in thermostat generated command list for 1.3")
+
+    def test_is_scene_attribute(self):
+        # Each case is (attribute XML, expected scene flag).
+        cases = [
+            ('<attribute><quality scene="true"/></attribute>', True),
+            # Case-insensitive parsing of the attribute value.
+            ('<attribute><quality scene="TRUE"/></attribute>', True),
+            ('<attribute><quality scene="false"/></attribute>', False),
+            # scene attribute absent from the quality element defaults to False.
+            ('<attribute><quality nullable="true"/></attribute>', False),
+            # No quality element at all defaults to False.
+            ('<attribute/>', False),
+        ]
+        for attribute_xml, expected in cases:
+            element = ElementTree.fromstring(attribute_xml)
+            asserts.assert_equal(ClusterParser._is_scene_attribute(element), expected,
+                                 f"Unexpected scene quality parsed from '{attribute_xml}'")
+
+    def test_scene_attribute_end_to_end(self):
+        # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
+        # other attributes carry scene="false".
+        xml_cluster = parse_cluster(BASE_CLUSTER_XML_STR)
+        asserts.assert_true(xml_cluster.attributes[0x0001].scene,
+                            "CurrentMode should carry the Scene (S) quality")
+        for attribute_id in (0x0000, 0x0002, 0x0003):
+            asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
+                                 f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
 
 
 if __name__ == "__main__":

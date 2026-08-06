@@ -9755,6 +9755,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             Messages(0L),
             ActiveMessageIDs(1L),
+            SupportedLanguageCodes(2L),
+            SupportedMimeTypes(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -9782,7 +9784,8 @@ public class ClusterIDMapping {
         public enum Event {
             MessageQueued(0L),
             MessagePresented(1L),
-            MessageComplete(2L),;
+            MessageComplete(2L),
+            MessageNotPresented(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9822,7 +9825,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),LanguageCode(7),MessageURI(8),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;
@@ -13234,17 +13237,20 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Mode(0L),
-            SystemState(1L),
-            UserSetpoint(2L),
-            MinSetpoint(3L),
-            MaxSetpoint(4L),
-            Step(5L),
-            TargetSetpoint(6L),
-            MistType(7L),
-            Continuous(8L),
-            Sleep(9L),
-            Optimal(10L),
+            SupportedModes(0L),
+            Mode(1L),
+            SystemState(2L),
+            UserSetpoint(3L),
+            MinSetpoint(4L),
+            MaxSetpoint(5L),
+            Step(6L),
+            TargetSetpoint(7L),
+            MistType(8L),
+            Continuous(9L),
+            Sleep(10L),
+            Optimal(11L),
+            CondPumpEnabled(12L),
+            CondRunCount(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -17632,6 +17638,8 @@ public class ClusterIDMapping {
             AvailableAudioTracks(8L),
             ActiveTextTrack(9L),
             AvailableTextTracks(10L),
+            AvailableCommands(11L),
+            ContentInfo(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18223,6 +18231,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             AcceptHeader(0L),
             SupportedStreamingProtocols(1L),
+            Movable(2L),
+            Presets(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18247,7 +18257,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            ContentReplication(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -18269,7 +18280,9 @@ public class ClusterIDMapping {
 
         public enum Command {
             LaunchContent(0L),
-            LaunchURL(1L),;
+            LaunchURL(1L),
+            ContentReplicationRequest(3L),
+            PlayPreset(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18287,7 +18300,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),;
+        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),ContentAppVendorID(5),ContentAppProductID(6),;
                     private final int id;
                     LaunchContentCommandField(int id) {
                         this.id = id;
@@ -18304,7 +18317,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),;
+                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),PlaybackPreferences(3),ContentType(4),ContentHeaders(5),OffsetMillisecs(6),QueueType(7),NextUrl(8),;
                     private final int id;
                     LaunchURLCommandField(int id) {
                         this.id = id;
@@ -18315,6 +18328,23 @@ public class ClusterIDMapping {
                     }
                     public static LaunchURLCommandField value(int id) throws NoSuchFieldError {
                         for (LaunchURLCommandField field : LaunchURLCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PlayPresetCommandField {PresetID(0),;
+                    private final int id;
+                    PlayPresetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PlayPresetCommandField value(int id) throws NoSuchFieldError {
+                        for (PlayPresetCommandField field : PlayPresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -18757,6 +18787,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
+            OAuthLoggedIn(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18805,7 +18836,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetSetupPIN(0L),
             Login(2L),
-            Logout(3L),;
+            Logout(3L),
+            GetDeviceAuthURI(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;
