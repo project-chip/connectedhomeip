@@ -140,6 +140,11 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             asserts.fail(
                 "Test timeout parameter must be defined and  greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
 
+        # On CI the provider_app_pipe  and provider_app_pipe_out argumetns are required, if should fail if None or Empty
+        # before starting the test to dont allow it to fail until step 2.
+        if self.is_pics_sdk_ci_only and (not self.provider_app_pipe or not self.provider_app_pipe_out):
+            asserts.fail("Missing argument provider_app_pipe or provider_app_pipe_out. Specify using --string-arg provider_app_pipe:<path> and --string-arg provider_app_pipe_out:<path>")
+
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
