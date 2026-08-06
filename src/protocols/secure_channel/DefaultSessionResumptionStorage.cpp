@@ -100,10 +100,11 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
     }
 
     ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
-    ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
     index.mNodes[index.mSize++] = node;
     ReturnErrorOnFailure(SaveIndex(index));
+
+    ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
     return CHIP_NO_ERROR;
 }
