@@ -47,7 +47,7 @@ config CHIP_TASK_PRIORITY
 	default 5
 
 config CHIP_TASK_STACK_SIZE
-	default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
+	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 10240
 
 config MAX_EVENT_QUEUE_SIZE
