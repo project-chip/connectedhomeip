@@ -226,9 +226,13 @@ CHIP_ERROR AppTask::Init()
 
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+#endif
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#endif
 #ifdef CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
