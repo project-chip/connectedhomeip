@@ -19,3 +19,11 @@ GroupKeyManagement:
     # test expects to 4.
     # TODO Can be removed once 1.6.1  datamodel is generated and checked in to datamodel/1.6.1/
     revision: 4
+
+BasicInformation:
+    # The DeviceLocation attribute is planned to be added in 1.7, so currently it's marked as provisional in the spec.
+    # SDK PR: https://github.com/project-chip/connectedhomeip/pull/71442
+    DeviceLocation:
+        write_access: administer
+        read_access: RW
+
