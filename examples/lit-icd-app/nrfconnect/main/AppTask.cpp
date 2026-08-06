@@ -369,13 +369,14 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 {
     if (sIsSitModeRequested)
     {
-        (void)PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+        (void) PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
         sIsSitModeRequested = false;
     }
     else
     {
-        (void)PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
-                                   0);
+        (void) PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
         sIsSitModeRequested = true;
     }
 }
@@ -384,7 +385,7 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 void AppTask::IcdUatEventHandler(const AppEvent &)
 {
     // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
-    (void)PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+    (void) PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 }
 
 void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
@@ -557,7 +558,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            (void)NFCOnboardingPayloadMgr().StopTagEmulation();
+            (void) NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
