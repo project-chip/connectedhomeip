@@ -1542,6 +1542,26 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     EXPECT_TRUE(signatures_match);
 }
 
+TEST_F(TestChipCryptoPAL, TestECDH_RemotePublicKeyNotOnCurve)
+{
+    HeapChecker heapChecker;
+    Test_P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDH));
+
+    // Correct length and SEC1 uncompressed-point marker, but (0, 0) is not on P-256, so decoding the
+    // remote key fails. Exercises the failure path of remote key decoding, which must release
+    // everything it allocated and publish no secret.
+    static constexpr uint8_t kPointNotOnCurve[kP256_PublicKey_Length] = { 0x04 };
+    P256PublicKey invalid_remote_public_key(kPointNotOnCurve);
+
+    P256ECDHDerivedSecret out_secret;
+    ASSERT_EQ(out_secret.Length(), 0u);
+
+    CHIP_ERROR err = keypair.ECDH_derive_secret(invalid_remote_public_key, out_secret);
+    EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(out_secret.Length(), 0u);
+}
+
 #if CHIP_CRYPTO_OPENSSL
 TEST_F(TestChipCryptoPAL, TestAddEntropySources)
 {
