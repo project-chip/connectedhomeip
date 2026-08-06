@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <lib/dnssd/minimal_mdns/Logging.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
+#include <lib/dnssd/wire/QNameString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
