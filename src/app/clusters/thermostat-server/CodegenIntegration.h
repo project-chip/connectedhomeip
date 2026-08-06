@@ -98,8 +98,8 @@ public:
     }
 };
 
-template <typename Cluster>
-void ServerInit(EndpointId endpointId)
+template <typename Cluster, typename DelegateT>
+void ServerInit(EndpointId endpointId, DelegateT * delegate)
 {
     IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
 
@@ -113,6 +113,11 @@ void ServerInit(EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+    auto cluster = integrationDelegate.FindClusterOnEndpoint(endpointId);
+    if (cluster != nullptr)
+    {
+        cluster->SetDelegate(delegate);
+    }
 }
 
 template <typename Cluster>
@@ -135,13 +140,6 @@ ClusterT * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
     return integrationDelegate.FindClusterOnEndpoint(endpointId);
-}
-
-template <typename ClusterT, typename DelegateT>
-Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, DelegateT * delegate)
-{
-    IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
-    return integrationDelegate.SetDelegate(endpoint, delegate);
 }
 
 } // namespace chip::app::Clusters::Thermostat

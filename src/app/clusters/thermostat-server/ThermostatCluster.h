@@ -159,7 +159,7 @@ public:
 
     AtomicWriteSession & GetAtomicWriteSession() { return mAtomicWriteSession; }
     const AtomicWriteSession & GetAtomicWriteSession() const { return mAtomicWriteSession; }
-    Setpoints & GetSetpoints() { return mSetpoints; }
+    Setpoints GetSetpoints();
 
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
@@ -195,7 +195,8 @@ protected:
                                                        SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
+    DataModel::ActionReturnStatus ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder);
+
     Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
 
