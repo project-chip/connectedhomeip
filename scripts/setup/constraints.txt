@@ -292,3 +292,8 @@ setuptools==68.0.0
 # Higher versions depend on proto-plus, which break
 # nanopb code generation (due to name conflict of the 'proto' module)
 google-api-core==2.17.0
+
+# googleapis-common-protos 1.75.1 raised its requirement from protobuf>=4.25.8
+# to protobuf>=6.33.5, which cannot be satisfied together with the protobuf
+# pinned above, so the pigweed build venv fails to resolve.
+googleapis-common-protos<1.75.1
