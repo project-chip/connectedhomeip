@@ -5217,19 +5217,17 @@ provisional cluster Humidistat = 517 {
   revision 1;
 
   enum ModeEnum : enum8 {
-    kOff = 0;
-    kHumidifier = 1;
-    kDehumidifier = 2;
-    kAuto = 3;
-    kFanOnly = 4;
+    kHumidifier = 0;
+    kDehumidifier = 1;
+    kAuto = 2;
+    kFanOnly = 3;
   }
 
   enum SystemStateEnum : enum8 {
-    kOff = 0;
-    kHumidifying = 1;
-    kDehumidifying = 2;
-    kFan = 3;
-    kIdle = 4;
+    kHumidifying = 0;
+    kDehumidifying = 1;
+    kFan = 2;
+    kIdle = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -5242,6 +5240,7 @@ provisional cluster Humidistat = 517 {
     kOptimal = 0x40;
     kWarmMist = 0x80;
     kColdMist = 0x100;
+    kCondPump = 0x200;
   }
 
   bitmap MistTypeBitmap : bitmap8 {
@@ -5249,17 +5248,20 @@ provisional cluster Humidistat = 517 {
     kMistWarm = 0x2;
   }
 
-  readonly attribute ModeEnum mode = 0;
-  readonly attribute SystemStateEnum systemState = 1;
-  readonly attribute optional percent userSetpoint = 2;
-  readonly attribute optional percent minSetpoint = 3;
-  readonly attribute optional percent maxSetpoint = 4;
-  readonly attribute optional percent step = 5;
-  readonly attribute optional percent targetSetpoint = 6;
-  readonly attribute optional MistTypeBitmap mistType = 7;
-  readonly attribute optional boolean continuous = 8;
-  readonly attribute optional boolean sleep = 9;
-  readonly attribute optional boolean optimal = 10;
+  readonly attribute ModeEnum supportedModes[] = 0;
+  attribute ModeEnum mode = 1;
+  readonly attribute SystemStateEnum systemState = 2;
+  attribute optional percent userSetpoint = 3;
+  readonly attribute optional percent minSetpoint = 4;
+  readonly attribute optional percent maxSetpoint = 5;
+  readonly attribute optional percent step = 6;
+  readonly attribute optional percent targetSetpoint = 7;
+  attribute optional nullable MistTypeBitmap mistType = 8;
+  attribute optional boolean continuous = 9;
+  attribute optional boolean sleep = 10;
+  attribute optional boolean optimal = 11;
+  attribute optional boolean condPumpEnabled = 12;
+  readonly attribute optional int16u condRunCount = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8443,21 +8445,24 @@ endpoint 1 {
   }
 
   server cluster Humidistat {
+    callback attribute supportedModes;
     ram      attribute mode default = 0;
-    ram      attribute systemState default = 0;
+    ram      attribute systemState default = 3;
     ram      attribute userSetpoint default = 40;
-    ram      attribute minSetpoint default = 40;
+    ram      attribute minSetpoint default = 30;
     ram      attribute maxSetpoint default = 60;
     ram      attribute step default = 5;
-    ram      attribute targetSetpoint default = 0;
-    ram      attribute mistType default = 0;
+    ram      attribute targetSetpoint default = 40;
+    ram      attribute mistType default = 1;
     ram      attribute continuous default = 0;
     ram      attribute sleep default = 0;
     ram      attribute optimal default = 0;
+    ram      attribute condPumpEnabled default = 0;
+    ram      attribute condRunCount default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 511;
+    ram      attribute featureMap default = 1023;
     callback attribute clusterRevision default = 1;
 
     handle command SetSettings;

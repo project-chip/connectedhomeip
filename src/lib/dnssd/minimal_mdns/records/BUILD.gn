@@ -28,7 +28,7 @@ static_library("records") {
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+    "${chip_root}/src/lib/dnssd/wire",
     "${chip_root}/src/platform",
   ]
 
