@@ -105,13 +105,18 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
                                                                                        CommandHandler * handler)
 {
     using namespace Commands;
+
+    // The peer node-id is needed by the delegate to bootstrap the out-of-band
+    // BDX file transfers that back the sharing commands.
+    const ScopedNodeId peer(request.subjectDescriptor.subject, request.subjectDescriptor.fabricIndex);
+
     switch (request.path.mCommandId)
     {
     case AddFile::Id: {
         AddFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
         AddFileResponse::Type response;
-        Status status = mDelegate.HandleAddFile(req.name, req.size, req.mimeType, req.imageUri, response);
+        Status status = mDelegate.HandleAddFile(peer, req.name, req.size, req.mimeType, req.imageUri, response);
         VerifyOrReturnValue(status == Status::Success, status);
         handler->AddResponse(request.path, response);
         return std::nullopt;
@@ -124,13 +129,13 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
     case RequestSharedFiles::Id: {
         RequestSharedFiles::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
-        return mDelegate.HandleRequestSharedFiles(req.clientName, req.requestID, req.supportedMimeTypes);
+        return mDelegate.HandleRequestSharedFiles(peer, req.clientName, req.requestID, req.supportedMimeTypes);
     }
     case GetSharedFile::Id: {
         GetSharedFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
         GetSharedFileResponse::Type response;
-        Status status = mDelegate.HandleGetSharedFile(req.responseID, response);
+        Status status = mDelegate.HandleGetSharedFile(peer, req.responseID, response);
         VerifyOrReturnValue(status == Status::Success, status);
         handler->AddResponse(request.path, response);
         return std::nullopt;
@@ -138,7 +143,7 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
     case OfferFile::Id: {
         OfferFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
-        return mDelegate.HandleOfferFile(req.clientName, req.name, req.size, req.mimeType, req.imageUri);
+        return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageUri);
     }
     default:
         return Status::UnsupportedCommand;
