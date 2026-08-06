@@ -389,7 +389,7 @@ void ClosureManager::HandleScheduledPanelStep(intptr_t expectedAction)
     AppManagerInstance().HandlePanelStepAction(instance.mCurrentActionEndpointId);
 }
 
-void ClosureManager::HandleClosureActionComplete(Action_t action)
+void ClosureManager::HandleClosureActionCompleteDefault(Action_t action)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -681,7 +681,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     return Status::Success;
 }
 
-void ClosureManager::HandleClosureMotionAction()
+void ClosureManager::HandleClosureMotionActionDefault()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -911,7 +911,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     return Status::Success;
 }
 
-void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
+void ClosureManager::HandlePanelSetTargetActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -987,7 +987,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     AppManagerInstance().HandleClosureActionComplete(Action_t::SET_TARGET_ACTION);
 }
 
-void ClosureManager::HandleClosureUnlatchAction()
+void ClosureManager::HandleClosureUnlatchActionDefault()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1052,7 +1052,7 @@ void ClosureManager::HandleClosureUnlatchAction()
     AppManagerInstance().HandleClosureMotionAction();
 }
 
-void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
+void ClosureManager::HandlePanelUnlatchActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1161,7 +1161,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     return Status::Success;
 }
 
-void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
+void ClosureManager::HandlePanelStepActionDefault(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -1251,9 +1251,9 @@ ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointByI
     }
 }
 
-bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,
-                                          const GenericDimensionStateStruct & targetState,
-                                          DataModel::Nullable<Percent100ths> & nextPosition)
+bool ClosureManager::GetPanelNextPositionDefault(const GenericDimensionStateStruct & currentState,
+                                                 const GenericDimensionStateStruct & targetState,
+                                                 DataModel::Nullable<Percent100ths> & nextPosition)
 {
     VerifyOrReturnValue(targetState.position.HasValue() && !targetState.position.Value().IsNull(), false,
                         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));

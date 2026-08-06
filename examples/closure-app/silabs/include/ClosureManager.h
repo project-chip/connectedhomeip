@@ -222,7 +222,7 @@ protected:
      *
      * @param action The action that has completed, used to notify relevant endpoints.
      */
-    void HandleClosureActionComplete(Action_t action);
+    void HandleClosureActionCompleteDefault(Action_t action);
 
     /**
      * @brief Handles the motion action for closure endpoint.
@@ -231,7 +231,7 @@ protected:
      * to the next position towards their target positions and calls HandleClosureActionComplete if both endpoints
      * have reached their target positions.
      */
-    void HandleClosureMotionAction();
+    void HandleClosureMotionActionDefault();
 
     /**
      * @brief Handles the unlatch action for closure endpoint.
@@ -239,7 +239,7 @@ protected:
      * This method performs the unlatch action for closure endpoint if needed and updates the latch of endpoints 2 and 3
      * and calls HandleClosureMotionAction to continue the motion action.
      */
-    void HandleClosureUnlatchAction();
+    void HandleClosureUnlatchActionDefault();
 
     /**
      * @brief Calculates the next position for a panel based on the closure panel state.
@@ -254,9 +254,9 @@ protected:
      * @return true if the next position was updated and movement is required; false if no update is needed
      *         or if either the current or target position is not set.
      */
-    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
-                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
-                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
+    bool GetPanelNextPositionDefault(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                                     const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                                     chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     /**
      * @brief Handles the SetTarget motion action for a panel endpoint.
@@ -266,7 +266,7 @@ protected:
      *
      * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
      */
-    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+    void HandlePanelSetTargetActionDefault(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the unlatch action for a closure panel.
@@ -277,7 +277,7 @@ protected:
      *
      * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
      */
-    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+    void HandlePanelUnlatchActionDefault(chip::EndpointId endpointId);
 
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
@@ -287,7 +287,7 @@ protected:
      *
      * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
      */
-    void HandlePanelStepAction(chip::EndpointId endpointId);
+    void HandlePanelStepActionDefault(chip::EndpointId endpointId);
 
     // State, endpoints, and helpers available to CustomerAppManager *Impl() overrides.
     static constexpr chip::EndpointId kClosureEndpoint1      = 1;

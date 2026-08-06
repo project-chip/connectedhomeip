@@ -154,22 +154,28 @@ private:
         return ClosureManager::OnStepCommand(direction, numberOfSteps, speed, endpointId);
     }
 
-    void HandleClosureActionCompleteImpl(Action_t action) { ClosureManager::HandleClosureActionComplete(action); }
+    void HandleClosureActionCompleteImpl(Action_t action) { ClosureManager::HandleClosureActionCompleteDefault(action); }
 
-    void HandleClosureMotionActionImpl() { ClosureManager::HandleClosureMotionAction(); }
+    void HandleClosureMotionActionImpl() { ClosureManager::HandleClosureMotionActionDefault(); }
 
-    void HandleClosureUnlatchActionImpl() { ClosureManager::HandleClosureUnlatchAction(); }
+    void HandleClosureUnlatchActionImpl() { ClosureManager::HandleClosureUnlatchActionDefault(); }
 
     bool GetPanelNextPositionImpl(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
                                   const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
                                   chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition)
     {
-        return ClosureManager::GetPanelNextPosition(currentState, targetState, nextPosition);
+        return ClosureManager::GetPanelNextPositionDefault(currentState, targetState, nextPosition);
     }
 
-    void HandlePanelSetTargetActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelSetTargetAction(endpointId); }
+    void HandlePanelSetTargetActionImpl(chip::EndpointId endpointId)
+    {
+        ClosureManager::HandlePanelSetTargetActionDefault(endpointId);
+    }
 
-    void HandlePanelUnlatchActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelUnlatchAction(endpointId); }
+    void HandlePanelUnlatchActionImpl(chip::EndpointId endpointId)
+    {
+        ClosureManager::HandlePanelUnlatchActionDefault(endpointId);
+    }
 
-    void HandlePanelStepActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelStepAction(endpointId); }
+    void HandlePanelStepActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelStepActionDefault(endpointId); }
 };
