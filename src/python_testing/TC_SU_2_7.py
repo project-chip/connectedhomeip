@@ -367,7 +367,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                        "Cluster": "OtaSoftwareUpdateRequestor", "Endpoint": self.get_endpoint()}
             self.write_to_app_pipe(command)
             response_data = self.read_from_app_pipe()
-            requestor_can_consent = response_data['Payload']['RequestorCanConsent']
+            if response_data.get('Name') == "ConsentResponse":
+                requestor_can_consent = response_data['Payload']['RequestorCanConsent']
+            else:
+                asserts.fail("Requestor Error: Response was not from named pipe QueryRequestorCanConsent")
         else:
             # Ask the use if the Requestor Can Consent the software update
             user_response = self.wait_for_user_input(prompt_msg="Does the DUT (Requestor) support RequestorCanConsent? Enter 'y' or 'n'",
@@ -419,6 +422,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             state_transition_event_handler.cancel()
             self.terminate_provider()
             await self.request_device_reboot()
+        else:
+            logger.info("Requestor can not consent.")
+            self.mark_current_step_skipped()
 
         self.step(5)
         self.start_provider(

@@ -21,12 +21,10 @@
 #include "NamedPipeCommands.h"
 
 #include <json/json.h>
-// #include <ota-Requestor-common/OTARequestorExample.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #include <string>
 
-// OTARequestorExample & GetOtaRequestorExample();
 
 class OtaRequestorAppCommandDelegate : public NamedPipeCommandDelegate
 {
@@ -41,7 +39,7 @@ private:
 
 /// This class is a helper that parses and validates incoming JSON commands received over the out-of-band channel.
 /// It is separated from OtaRequestorAppCommandDelegate to:
-///  - Keep JSON parsing and command dispach logic isolated from OTA logic
+///  - Keep JSON parsing and command dispatch logic isolated from OTA logic
 ///  - Allow early validation and reporting
 ///  - Extracts generic command fields and delegates the actual OTA operations to OtaRequestorAppCommandDelegate
 class OtaRequestorAppCommandHandler
