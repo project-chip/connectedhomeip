@@ -81,7 +81,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
         if max_continuous_current is not Clusters.Types.NullValue:
             asserts.assert_greater_equal(max_continuous_current, 1,
                                          "MaxContinuousCurrent must be >= 1 mA")
-        log.info(f"MaxContinuousCurrent: {max_continuous_current} mA")
+        log.info("MaxContinuousCurrent: %s mA", max_continuous_current)
 
         self.step(3, "TH reads MaxVoltage (voltage-mV, min 1)")
         max_voltage = await self.read_single_attribute_check_success(
@@ -93,7 +93,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
         if max_voltage is not Clusters.Types.NullValue:
             asserts.assert_greater_equal(max_voltage, 1,
                                          "MaxVoltage must be >= 1 mV")
-        log.info(f"MaxVoltage: {max_voltage} mV")
+        log.info("MaxVoltage: %s mV", max_voltage)
 
         self.step(4, "TH reads NumberOfPoles (uint16, 1-4)")
         number_of_poles = await self.read_single_attribute_check_success(
@@ -107,7 +107,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
                                          "NumberOfPoles must be >= 1")
             asserts.assert_less_equal(number_of_poles, 4,
                                       "NumberOfPoles must be <= 4")
-        log.info(f"NumberOfPoles: {number_of_poles}")
+        log.info("NumberOfPoles: %s", number_of_poles)
 
         self.step(5, "TH reads EndOfLife (EndOfLifeEnum)")
         end_of_life = await self.read_single_attribute_check_success(
@@ -121,7 +121,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
                             if e != cluster.Enums.EndOfLifeEnum.kUnknownEnumValue]
             asserts.assert_in(end_of_life, valid_values,
                               f"EndOfLife must be a valid EndOfLifeEnum value, got {end_of_life}")
-        log.info(f"EndOfLife: {end_of_life}")
+        log.info("EndOfLife: %s", end_of_life)
 
         self.step(6, "TH reads ServiceEntranceRated (bool)")
         service_entrance_rated = await self.read_single_attribute_check_success(
@@ -134,7 +134,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
         if service_entrance_rated is not Clusters.Types.NullValue:
             asserts.assert_true(isinstance(service_entrance_rated, bool),
                                 "ServiceEntranceRated must be bool")
-        log.info(f"ServiceEntranceRated: {service_entrance_rated}")
+        log.info("ServiceEntranceRated: %s", service_entrance_rated)
 
         self.step(7, "TH attempts write to MaxContinuousCurrent - expect UNSUPPORTED_WRITE")
         status = await self.write_single_attribute(
