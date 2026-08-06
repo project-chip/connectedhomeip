@@ -85,7 +85,6 @@ public:
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
 private:
-
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
 
