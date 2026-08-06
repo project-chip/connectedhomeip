@@ -1080,7 +1080,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 void ConnectivityManagerImpl::HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context)
 {
     auto * self = static_cast<ConnectivityManagerImpl *>(context);
-    VerifyOrReturn(self->mPafChannelAwaitingNan);
+    VerifyOrReturn(self->mPafChannelState == PafChannelState::kAwaitingNan);
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: no NAN activity after association; releasing the transport anyway");
     self->PafChannelReleaseAfterAssociation();
@@ -1089,7 +1089,7 @@ void ConnectivityManagerImpl::HandleNanRecoveryTimeout(chip::System::Layer * lay
 
 void ConnectivityManagerImpl::PafChannelNoteNanActivity()
 {
-    VerifyOrReturn(mPafChannelAwaitingNan);
+    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN active again after association; releasing the transport");
     PafChannelReleaseAfterAssociation();
@@ -1101,7 +1101,7 @@ void ConnectivityManagerImpl::PafChannelNoteNanActivity()
 
 void ConnectivityManagerImpl::ArmNanRecoveryTimer()
 {
-    VerifyOrReturn(mPafChannelAwaitingNan);
+    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
 
     // StartTimer() cancels any timer already registered for this handler and context, so arming
     // more than once per association just restarts the bound.
@@ -1645,16 +1645,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to schedule scan completion: %" CHIP_ERROR_FORMAT,
                      err.Format());
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    // A scan on its own leaves the radio free once it completes.  During an association the scan
-    // is only the first phase, so keep channel not available until association completes.
-    // Otherwise PAF frames would be sent while the radio is busy and would be dropped.
-    if (!mPafChannelAssociating && !mPafChannelAwaitingNan)
-    {
-        mPafChannelAvailable = true;
-    }
-#endif
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()

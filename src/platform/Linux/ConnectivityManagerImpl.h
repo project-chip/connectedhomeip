@@ -59,6 +59,16 @@
 namespace chip {
 namespace DeviceLayer {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+// Records when the radio can carry Wi-Fi PAF frames
+enum class PafChannelState : uint8_t
+{
+    kAvailable,   // The radio is free and PAF frames may be sent
+    kAssociating, // Association in progress, radio cannot carry PAF frames
+    kAwaitingNan, // STA link up but NAN not yet ready
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
  */
@@ -223,36 +233,13 @@ private:
     uint16_t mApFreq;
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
-    bool mPafChannelAvailable = true;
-    // Set while a station association is in progress, during which the radio cannot carry PAF
-    // frames.  Distinguishes that from a plain scan so scan completion, which happens before
-    // authentication has even started, does not release the channel early.
-    bool mPafChannelAssociating = false;
-    // Set once the station link is up but NAN has not yet started carrying traffic.
-    bool mPafChannelAwaitingNan = false;
-    void PafChannelHoldForAssociation()
-    {
-        mPafChannelAssociating = true;
-        mPafChannelAwaitingNan = false;
-        mPafChannelAvailable   = false;
-    }
-    // The station link is up.  Keep holding the channel until NAN is observed working, or the
-    // recovery timeout expires.
-    void PafChannelAwaitNanRecovery()
-    {
-        mPafChannelAssociating = false;
-        mPafChannelAwaitingNan = true;
-        mPafChannelAvailable   = false;
-    }
+    bool _WiFiPAFResourceAvailable() { return mPafChannelState == PafChannelState::kAvailable; };
+    PafChannelState mPafChannelState = PafChannelState::kAvailable;
+    void PafChannelHoldForAssociation() { mPafChannelState = PafChannelState::kAssociating; }
+    void PafChannelAwaitNanRecovery() { mPafChannelState = PafChannelState::kAwaitingNan; }
     // Called once the radio is genuinely free / association failed.
-    void PafChannelReleaseAfterAssociation()
-    {
-        mPafChannelAssociating = false;
-        mPafChannelAwaitingNan = false;
-        mPafChannelAvailable   = true;
-    }
+    void PafChannelReleaseAfterAssociation() { mPafChannelState = PafChannelState::kAvailable; }
     // Evidence from the NAN layer that the radio is carrying PAF traffic again.
     void PafChannelNoteNanActivity();
     void ArmNanRecoveryTimer();
