@@ -9,13 +9,14 @@
 import argparse
 import subprocess
 import sys
-import os
+
 
 def main():
     parser = argparse.ArgumentParser(description='Preprocess linker script with GCC preprocessor')
     parser.add_argument('--input', required=True, help='Input linker script with preprocessor directives')
     parser.add_argument('--output', required=True, help='Output preprocessed linker script')
-    parser.add_argument('--include-dir', action='append', dest='include_dirs', default=[], help='Include directory (can be repeated)')
+    parser.add_argument('--include-dir', action='append', dest='include_dirs',
+                        default=[], help='Include directory (can be repeated)')
     parser.add_argument('--define', action='append', dest='defines', default=[], help='Preprocessor define (can be repeated)')
     args = parser.parse_args()
 
@@ -50,6 +51,7 @@ def main():
     except FileNotFoundError:
         print("Error: arm-none-eabi-gcc not found. Make sure ARM GCC toolchain is in PATH.", file=sys.stderr)
         return 1
+
 
 if __name__ == '__main__':
     sys.exit(main())
