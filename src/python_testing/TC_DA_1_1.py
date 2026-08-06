@@ -135,6 +135,10 @@ class TC_DA_1_1(MatterBaseTest):
             product_id=product_id
         )
 
+        # Use the tester-provided setup code (QR or manual) verbatim when one exists,
+        # so PASE discovery filters exactly as that code dictates.
+        setup_code = setupPayloadInfo[0].setup_code or setup_params.qr_code
+
         # Setup
         root_node_id = 0
         self.discriminator = random.randint(0, 4095)
@@ -188,7 +192,7 @@ class TC_DA_1_1(MatterBaseTest):
         # TH2 opens a PASE session with the DUT
         self.step(4)
         pase_node_id = self.dut_node_id + 1
-        await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
+        await th2.FindOrEstablishPASESession(setupCode=setup_code, nodeId=pase_node_id)
 
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
