@@ -2951,6 +2951,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id: Target node ID, defaults to dut_node_id.
             endpoint: Target endpoint, defaults to configured endpoint.
             timedRequestTimeoutMs: Timeout for timed requests in milliseconds.
+            interactionTimeoutMs: Overall interaction timeout in milliseconds. Defaults to an SDK-computed timeout.
             payloadCapability: Transport payload capability setting.
 
         Returns:
