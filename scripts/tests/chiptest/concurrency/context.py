@@ -19,11 +19,12 @@ import stat
 import sys
 import tempfile
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from contextlib import contextmanager
 from multiprocessing.context import SpawnContext
 from pathlib import Path
 from types import TracebackType
-from typing import Iterator, Literal, Self
+from typing import Literal, Self
 
 from python_path import PythonPath
 
@@ -31,6 +32,14 @@ with PythonPath("../../../../src/python_testing/matter_testing_infrastructure", 
     from matter.testing.concurrency.context import TerminablePopen, TerminableResource, TerminableThread
 
 log = logging.getLogger(__name__)
+
+if sys.platform == "linux":
+    # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
+    # we remount it to worker-specific scratchpad.
+    SYNC_MANAGER_PATH = "/run/python_pool_manager.sock"
+else:
+    # Other platforms will fall back to their default.
+    SYNC_MANAGER_PATH = None
 
 
 class StartStopContextMixin(ABC):

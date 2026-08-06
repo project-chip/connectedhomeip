@@ -34,9 +34,9 @@ source_set("linux") {
 
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",

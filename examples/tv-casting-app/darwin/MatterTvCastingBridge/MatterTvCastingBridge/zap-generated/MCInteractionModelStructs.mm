@@ -55,6 +55,8 @@
 
         _languageCode = @"";
 
+        _characteristics = nil;
+
         _displayName = nil;
     }
     return self;
@@ -65,6 +67,7 @@
     auto other = [[MCMediaPlaybackClusterTrackAttributesStruct alloc] init];
 
     other.languageCode = self.languageCode;
+    other.characteristics = self.characteristics;
     other.displayName = self.displayName;
 
     return other;
@@ -102,6 +105,45 @@
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; trackAttributes:%@; >", NSStringFromClass([self class]), _id, _trackAttributes];
+    return descriptionString;
+}
+@end
+
+@implementation MCMediaPlaybackClusterContentInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _contentType = @(0);
+        _title = nil;
+        _show = nil;
+        _season = nil;
+        _episode = nil;
+        _provider = nil;
+        _artist = nil;
+        _album = nil;
+        _track = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCMediaPlaybackClusterContentInfoStruct alloc] init];
+    other.contentType = self.contentType;
+    other.title = self.title;
+    other.show = self.show;
+    other.season = self.season;
+    other.episode = self.episode;
+    other.provider = self.provider;
+    other.artist = self.artist;
+    other.album = self.album;
+    other.track = self.track;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentType:%@; title:%@; >", NSStringFromClass([self class]), _contentType, _title];
     return descriptionString;
 }
 @end
@@ -636,6 +678,37 @@
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; presetName:%@; >", NSStringFromClass([self class]), _presetID, _presetName];
+    return descriptionString;
+}
+@end
+
+@implementation MCMediaFileManagementClusterFileDescriptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _fileID = @(0);
+        _name = @"";
+        _size = @(0);
+        _mimeType = @"";
+        _imageUri = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCMediaFileManagementClusterFileDescriptionStruct alloc] init];
+    other.fileID = self.fileID;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageUri = self.imageUri;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
     return descriptionString;
 }
 @end

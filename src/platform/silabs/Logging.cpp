@@ -26,7 +26,7 @@
 #include <string.h>
 
 #ifdef PW_RPC_ENABLED
-#include "PigweedLogger.h"
+#include "pigweed_rpc/PigweedLogger.h"
 #endif
 
 // RTT Buffer size and name
@@ -56,7 +56,7 @@
 #ifndef LOG_RTT_BUFFER_SIZE
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
-
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
 #include "uart.h"
 #endif
@@ -66,7 +66,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 #endif
-
+#endif // SILABS_LOG_ENABLED
 using namespace chip::Logging::Platform;
 
 #if SILABS_LOG_ENABLED
