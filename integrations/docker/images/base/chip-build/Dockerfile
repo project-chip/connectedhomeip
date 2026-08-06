@@ -200,8 +200,3 @@ RUN set -x \
     libgirepository1.0-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
-
-
-# Some things that save space
-# Protoc goes from 108M to 4.6M
-RUN strip /usr/local/bin/protoc*
