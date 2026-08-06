@@ -26,4 +26,3 @@ BasicInformation:
     DeviceLocation:
         write_access: administer
         read_access: RW
-
