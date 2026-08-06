@@ -25,7 +25,6 @@
 
 #include <string>
 
-
 class OtaRequestorAppCommandDelegate : public NamedPipeCommandDelegate
 {
 public:
