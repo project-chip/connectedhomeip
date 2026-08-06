@@ -319,6 +319,23 @@ class TC_COMPRO_2_4(COMPROBaseTest):
 
             ed = self._ed_fixture_for_transport(transport_bit, params, ed_extra_args_fallback)
 
+            # Clear any Wi-Fi credential the ED stored while commissioning on a
+            # previous transport, and restart its wpa_supplicant, so this
+            # iteration starts with an unassociated radio.
+            #
+            # Done at the top of every iteration rather than at the end, so a
+            # failure inside the loop body cannot leave the next iteration
+            # running against a dirty radio.
+            await self.renew_ed_environment(
+                ed,
+                manual_prompt=(
+                    f"[Transport {iteration_index + 1}/{len(transports_to_test)}: {transport_label}] "
+                    "Run ~/script/renew-comee_env.sh on the End Device to clear its stored "
+                    "Wi-Fi credentials and restart wpa_supplicant, so it starts this "
+                    "iteration unassociated. Press Enter when done."
+                ),
+            )
+
             # -- Step 4 work: ensure ED commissionable for this transport --
             await self.ensure_ed_commissionable(
                 ed,

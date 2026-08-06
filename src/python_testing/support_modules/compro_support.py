@@ -167,6 +167,14 @@ ED mode needs:
   (``agetty --autologin``) with ``enable_uart=1`` / ``console=ttyS0,115200`` so
   ``serial_console.py`` can log in, and pyserial installed in the Python that runs
   the tests.
+* **ED — Wi-Fi-PAF environment renewal:** ``renew-comee_env.sh`` plus its companion
+  ``wpa_supplicant-def_comee.conf``, in ``~/script`` on the ED (the script copies
+  the .conf by relative path, so it must run from there).
+  Both come from the CSA "Wi-Fi PAF Commissioning Test Guide" archive, alongside
+  ``config_paf_env.sh`` for the one-time comee/comer setup.  Invoked by
+  ``EDFixture.renew_environment``, which needs passwordless sudo for it (the
+  script sudoes internally): without a sudoers drop-in the SSH run fails outright
+  and the serial run stalls on the password prompt until it times out.
 * **ED — Wi-Fi-PAF hardware:** if the ED uses a separate Wi-Fi-PAF radio, whatever
   init your hardware needs to bring the NAN interface up before the test.
 
@@ -689,6 +697,32 @@ class EDFixture:
             logger.warning("Could not clear eth0 block on %s: %s",
                            self._ssh_host, exc)
 
+    async def renew_environment(self):
+        """Reset the ED's Wi-Fi/NAN environment via ``~/script/renew-comee_env.sh``.
+
+        The script (CSA-supplied, see "Helper scripts" above) restores a pristine
+        ``wpa_supplicant.conf`` and restarts wpa_supplicant, so the ED returns
+        unassociated.  The CSA guide requires this before every test on
+        wpa_supplicant 2.11 or later.  It also clears ``/tmp/chip*`` — the Linux
+        ini files, not this fixture's ``--KVS`` file, which ``_start_remote``
+        deletes on every start.
+
+        In SSH mode the ED must be reachable over a *wired* address: the restart
+        drops the Wi-Fi link, taking the SSH channel with it if ``ed_ssh_host`` is
+        the ED's Wi-Fi/ULA address.
+
+        Must run while the ED app is stopped — restarting wpa_supplicant breaks
+        the app's D-Bus connection to it.  No-op for a local ED.
+        """
+        if not self._remote:
+            logger.info("ED fixture is local — skipping Wi-Fi/NAN environment renewal")
+            return
+        logger.info("Renewing ED Wi-Fi/NAN environment on %s", self._remote_desc)
+        # renew-comee_env.sh copies wpa_supplicant-def_comee.conf by *relative*
+        # path, so it only works when run from ~/script.
+        output = await self._exec("cd ~/script && ./renew-comee_env.sh")
+        logger.debug("ED environment renewal output: %s", output.strip())
+
     async def _exec(self, remote_cmd: str) -> str:
         """Run a command on the ED over whichever channel is configured."""
         if self._serial_port:
@@ -908,6 +942,31 @@ class COMPROBaseTest(MatterBaseTest):
             prompt = manual_prompt or (
                 "Ensure the End Device (ED) is NOT commissionable (not advertising), "
                 "then press Enter to continue."
+            )
+            self.wait_for_user_input(prompt)
+
+    async def renew_ed_environment(
+        self,
+        ed: EDFixture | None,
+        manual_prompt: str | None = None,
+    ):
+        """Reset the ED's Wi-Fi/NAN environment (automated or manual).
+
+        Clears any Wi-Fi credential the ED stored during an earlier commissioning
+        iteration and restarts wpa_supplicant, so the next iteration starts with
+        an unassociated radio.  See ``EDFixture.renew_environment``.
+
+        When ``ed`` is None (no ed_app_path provided) the operator is prompted via
+        ``wait_for_user_input``.  Pass ``manual_prompt`` to override the default
+        prompt text with something more specific to the calling test.
+        """
+        if ed is not None:
+            await ed.renew_environment()
+        else:
+            prompt = manual_prompt or (
+                "Run ~/script/renew-comee_env.sh on the End Device (ED) to clear its "
+                "stored Wi-Fi credentials and restart wpa_supplicant, then press Enter "
+                "to continue."
             )
             self.wait_for_user_input(prompt)
 
