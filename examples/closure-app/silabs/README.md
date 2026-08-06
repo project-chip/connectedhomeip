@@ -40,9 +40,9 @@ The SiWx917 device can be commissioned over Bluetooth Low Energy where the
 device and the Chip controller will exchange security information with the
 Rendez-vous procedure.
 
-The closure example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs platform.
+The closure example is intended to serve both as a means to explore the workings
+of Matter as well as a template for creating real products based on the Silicon
+Labs platform.
 
 Unlike the lighting example (single CRTP chain on `AppTask`), this app keeps a
 separate `ClosureManager` for closure domain logic and a second CRTP chain for
@@ -54,15 +54,17 @@ for closure-specific `CustomerAppManager` customization.
 
 ## Extending Base App Implementation
 
-See [Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
+See
+[Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
 for `CustomerAppTask` customization, CRTP `*Impl()` hooks, and data model
 callback routing. Per-example AppTask API references:
-[`include/AppTaskImpl.h`](include/AppTaskImpl.h), [`src/AppTask.cpp`](src/AppTask.cpp).
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h),
+[`src/AppTask.cpp`](src/AppTask.cpp).
 
-| Concern | Base | CRTP hook layer | Customer leaf |
-| ------- | ---- | --------------- | ------------- |
-| Lifecycle / UI / buttons / DM callbacks | `AppTask` | [`AppTaskImpl`](include/AppTaskImpl.h) | [`CustomerAppTask`](../../platform/silabs/customer/CustomerAppTask.h) |
-| Closure domain logic (motion, latch, panels) | `ClosureManager` | [`ClosureManagerImpl`](include/ClosureManagerImpl.h) | [`CustomerAppManager`](include/customer/CustomerAppManager.h) |
+| Concern                                      | Base             | CRTP hook layer                                      | Customer leaf                                                         |
+| -------------------------------------------- | ---------------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
+| Lifecycle / UI / buttons / DM callbacks      | `AppTask`        | [`AppTaskImpl`](include/AppTaskImpl.h)               | [`CustomerAppTask`](../../platform/silabs/customer/CustomerAppTask.h) |
+| Closure domain logic (motion, latch, panels) | `ClosureManager` | [`ClosureManagerImpl`](include/ClosureManagerImpl.h) | [`CustomerAppManager`](include/customer/CustomerAppManager.h)         |
 
 ### CustomerAppManager
 
@@ -101,8 +103,8 @@ In addition to the general data model callback routing described in
 [Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md#datamodelcallbacks-and-customerapptask),
 this app forwards closure-specific cluster attribute-changed callbacks
 (`MatterClosureControlClusterServerAttributeChangedCallback`,
-`MatterClosureDimensionClusterServerAttributeChangedCallback`) from `AppTask.cpp`
-to `DMClosureControlClusterAttributeChangedCallback` /
+`MatterClosureDimensionClusterServerAttributeChangedCallback`) from
+`AppTask.cpp` to `DMClosureControlClusterAttributeChangedCallback` /
 `DMClosureDimensionClusterAttributeChangedCallback`, customized via the matching
 `*Impl()` hooks on `CustomerAppTask`.
 

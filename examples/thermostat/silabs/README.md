@@ -58,12 +58,14 @@ Silicon Labs platform.
 
 ## Extending Base App Implementation
 
-See [Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
-for how to customize application behavior using `CustomerAppTask` and CRTP `*Impl()` hooks.
+See
+[Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
+for how to customize application behavior using `CustomerAppTask` and CRTP
+`*Impl()` hooks.
 
-Per-example override API references: [`include/AppTaskImpl.h`](include/AppTaskImpl.h),
+Per-example override API references:
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h),
 [`src/AppTask.cpp`](src/AppTask.cpp).
-
 
 ## Building
 
