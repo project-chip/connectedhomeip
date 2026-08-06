@@ -172,10 +172,7 @@ private:
         ClosureManager::HandlePanelSetTargetActionDefault(endpointId);
     }
 
-    void HandlePanelUnlatchActionImpl(chip::EndpointId endpointId)
-    {
-        ClosureManager::HandlePanelUnlatchActionDefault(endpointId);
-    }
+    void HandlePanelUnlatchActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelUnlatchActionDefault(endpointId); }
 
     void HandlePanelStepActionImpl(chip::EndpointId endpointId) { ClosureManager::HandlePanelStepActionDefault(endpointId); }
 };
