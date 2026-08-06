@@ -236,14 +236,24 @@ private:
     // The resource checking is needed right before sending data packets that they are initialized and connected.
     bool _WiFiPAFResourceAvailable() { return mPafChannelState == PafChannelState::kAvailable; };
     PafChannelState mPafChannelState = PafChannelState::kAvailable;
-    void PafChannelHoldForAssociation() { mPafChannelState = PafChannelState::kAssociating; }
-    void PafChannelAwaitNanRecovery() { mPafChannelState = PafChannelState::kAwaitingNan; }
-    // Called once the radio is genuinely free / association failed.
-    void PafChannelReleaseAfterAssociation() { mPafChannelState = PafChannelState::kAvailable; }
+    // Association hooks, called from the wpa_supplicant state machine.  Defined in
+    // ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp; no-ops below when PAF is disabled so the
+    // call sites need no #if.
+    void PafChannelFlushBeforeAssociation();
+    void PafChannelHoldForAssociation();
+    void PafChannelOnAssociationFailed();
+    void PafChannelOnLinkUp();
+    void PafChannelOnInterfaceRemoved();
     // Evidence from the NAN layer that the radio is carrying PAF traffic again.
     void PafChannelNoteNanActivity();
     void ArmNanRecoveryTimer();
     static void HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context);
+#else
+    void PafChannelFlushBeforeAssociation() {}
+    void PafChannelHoldForAssociation() {}
+    void PafChannelOnAssociationFailed() {}
+    void PafChannelOnLinkUp() {}
+    void PafChannelOnInterfaceRemoved() {}
 #endif
 
     CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);

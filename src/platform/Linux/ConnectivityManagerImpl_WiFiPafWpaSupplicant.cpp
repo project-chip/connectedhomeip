@@ -657,6 +657,70 @@ void ConnectivityManagerImpl::PostWpaInterfaceProxyReady()
         this);
 }
 
+void ConnectivityManagerImpl::PafChannelFlushBeforeAssociation()
+{
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
+}
+
+void ConnectivityManagerImpl::PafChannelHoldForAssociation()
+{
+    mPafChannelState = PafChannelState::kAssociating;
+}
+
+void ConnectivityManagerImpl::PafChannelOnAssociationFailed()
+{
+    // PAF does not need the station link, so wake the queued sends rather than waiting on the
+    // endpoint's resource-wait timer.
+    mPafChannelState = PafChannelState::kAvailable;
+    LogErrorOnFailure(
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); }));
+}
+
+void ConnectivityManagerImpl::PafChannelOnLinkUp()
+{
+    // NAN needs a few hundred milliseconds more than the link, so hold until it is seen working.
+    mPafChannelState = PafChannelState::kAwaitingNan;
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this]() { ArmNanRecoveryTimer(); }));
+}
+
+void ConnectivityManagerImpl::PafChannelOnInterfaceRemoved()
+{
+    // Without the interface a PAF send cannot succeed; the resource-wait timer discovers that.
+    mPafChannelState = PafChannelState::kAvailable;
+}
+
+void ConnectivityManagerImpl::HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context)
+{
+    auto * self = static_cast<ConnectivityManagerImpl *>(context);
+    VerifyOrReturn(self->mPafChannelState == PafChannelState::kAwaitingNan);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: no NAN activity after association; releasing the transport anyway");
+    self->mPafChannelState = PafChannelState::kAvailable;
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends();
+}
+
+void ConnectivityManagerImpl::PafChannelNoteNanActivity()
+{
+    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
+
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN active again after association; releasing the transport");
+    mPafChannelState = PafChannelState::kAvailable;
+
+    // Called from a NAN D-Bus signal on the glib thread, so the sends cannot be driven here.
+    LogErrorOnFailure(
+        DeviceLayer::SystemLayer().ScheduleLambda([]() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); }));
+}
+
+void ConnectivityManagerImpl::ArmNanRecoveryTimer()
+{
+    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
+
+    // StartTimer() cancels any timer already registered for this handler and context, so arming
+    // more than once per association just restarts it.
+    LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS), HandleNanRecoveryTimeout, this));
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 } // namespace DeviceLayer

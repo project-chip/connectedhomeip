@@ -367,12 +367,12 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-            // The association has failed, release the PAF channel and send anything queued.
-            PafChannelReleaseAfterAssociation();
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
-#endif
+            // The association has failed, so release the PAF channel and send anything queued.
+            // Keep this inside the mAssociationStarted check: _ConnectWiFiNetworkAsync() blocks
+            // PAF and then calls disconnect() before associating, which also lands in this
+            // 'disconnected' branch.  Unblocking PAF for that deliberate disconnect would let
+            // frames out mid-association.
+            PafChannelOnAssociationFailed();
 
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [this, reason]() { OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason); });
@@ -400,12 +400,9 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "completed") == 0)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         // The link is up, but NAN typically needs a few hundred milliseconds more before it can
         // carry frames, hold the channel until it is seen working or the bounding timer expires.
-        PafChannelAwaitNanRecovery();
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() { ArmNanRecoveryTimer(); });
-#endif
+        PafChannelOnLinkUp();
 
         if (mAssociationStarted)
         {
@@ -561,9 +558,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
         ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface removed: %s", StringOrNullMarker(path));
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        PafChannelReleaseAfterAssociation();
-#endif
+        PafChannelOnInterfaceRemoved();
     }
 }
 
@@ -880,21 +875,14 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         }
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     PafChannelHoldForAssociation();
-#endif
 
     if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
                                                           &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add network: %s", err->message);
         mWpaSupplicant.networkPath.reset();
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        // Release and wake the queued sends
-        PafChannelReleaseAfterAssociation();
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-            []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
-#endif
+        PafChannelOnAssociationFailed();
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -910,11 +898,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
                                                              &err.GetReceiver()))
     {
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to select network: %s", err->message);
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        PafChannelReleaseAfterAssociation();
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-            []() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); });
-#endif
+        PafChannelOnAssociationFailed();
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -935,12 +919,10 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     // On a device that shares one radio between Wi-Fi PAF and the station link,
     // association leaves the radio unable to carry PAF frames for several
     // seconds. Flush any pending PAFTP acknowledgement now before association.
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
-#endif
+    PafChannelFlushBeforeAssociation();
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -998,9 +980,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 {
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
-#endif
+    PafChannelFlushBeforeAssociation();
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
@@ -1075,40 +1055,6 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     return _ConnectWiFiNetworkAsync(args, connectCallback);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-void ConnectivityManagerImpl::HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context)
-{
-    auto * self = static_cast<ConnectivityManagerImpl *>(context);
-    VerifyOrReturn(self->mPafChannelState == PafChannelState::kAwaitingNan);
-
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: no NAN activity after association; releasing the transport anyway");
-    self->PafChannelReleaseAfterAssociation();
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends();
-}
-
-void ConnectivityManagerImpl::PafChannelNoteNanActivity()
-{
-    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
-
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN active again after association; releasing the transport");
-    PafChannelReleaseAfterAssociation();
-
-    // Called from a NAN D-Bus signal on the glib thread, so the sends cannot be driven here.
-    LogErrorOnFailure(
-        DeviceLayer::SystemLayer().ScheduleLambda([]() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); }));
-}
-
-void ConnectivityManagerImpl::ArmNanRecoveryTimer()
-{
-    VerifyOrReturn(mPafChannelState == PafChannelState::kAwaitingNan);
-
-    // StartTimer() cancels any timer already registered for this handler and context, so arming
-    // more than once per association just restarts the bound.
-    LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFIPAF_NAN_RECOVERY_TIMEOUT_MS), HandleNanRecoveryTimeout, this));
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
@@ -1645,6 +1591,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to schedule scan completion: %" CHIP_ERROR_FORMAT,
                      err.Format());
     }
+
+    // No Wi-Fi PAF action here: a completed scan says nothing about whether the radio can carry
+    // PAF frames -- during an association the scan is only the first phase.
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
