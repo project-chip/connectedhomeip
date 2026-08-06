@@ -173,7 +173,12 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    err = sThreadNetworkDriver.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("sThreadNetworkDriver.Init() failed");
+        return err;
+    }
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_OPENTHREAD
@@ -272,7 +277,12 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    err = PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("PlatformMgr().AddEventHandler() failed");
+    }
+
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
@@ -359,12 +369,12 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 {
     if (sIsSitModeRequested)
     {
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+        (void)PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
         sIsSitModeRequested = false;
     }
     else
     {
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
+        (void)PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
                                    0);
         sIsSitModeRequested = true;
     }
@@ -374,7 +384,7 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
 void AppTask::IcdUatEventHandler(const AppEvent &)
 {
     // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
-    PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+    (void)PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 }
 
 void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
@@ -547,7 +557,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            (void)NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
