@@ -29,7 +29,7 @@ namespace chip::app::Clusters::ElectricalDistribution {
 /// representative fixed values. Call from ApplicationInit().
 ///
 /// The cluster's generated Init callback is a no-op, so registration is imperative and the app owns
-/// the instance lifetime. This mirrors how the same app initializes Power Topology.
+/// the instance lifetime.
 CHIP_ERROR ElectricalDistributionInit(EndpointId endpointId);
 
 /// Unregister and destroy the cluster. Call from ApplicationShutdown().
