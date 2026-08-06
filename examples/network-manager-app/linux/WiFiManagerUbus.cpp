@@ -33,7 +33,7 @@ using namespace chip::ubus;
 #else
 #define ChipWifiDebug(...)
 #endif
-#error COMPILATION CHECK
+
 namespace chip {
 
 static constexpr int kInvokeTimeout = 2000;
