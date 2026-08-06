@@ -128,11 +128,14 @@ CHIP_ERROR PowerTopologyCluster::Startup(ServerClusterContext & context)
                                          "Config::circuitNodeStorage to be set"));
         ReturnErrorOnFailure(mCircuitNodeStorage->Init(context.attributeStorage, mPath.mEndpointId));
 
-        // Register for fabric removal so a removed fabric's fabric-scoped nodes are purged.
-        if (mFabricTable != nullptr)
-        {
-            ReturnErrorOnFailure(mFabricTable->AddFabricDelegate(this));
-        }
+        // ElectricalCircuitNodes is fabric-scoped, so a removed fabric's entries must be purged.
+        // Without the fabric table there is no OnFabricRemoved callback and they would leak, so
+        // this is a hard requirement rather than a best effort.
+        VerifyOrReturnError(mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Zcl,
+                                         "Power Topology Cluster: the ElectricalCircuit feature requires "
+                                         "Config::fabricTable to be set"));
+        ReturnErrorOnFailure(mFabricTable->AddFabricDelegate(this));
     }
     return CHIP_NO_ERROR;
 }
@@ -232,6 +235,10 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
         auto iter           = list.begin();
         while (iter.Next())
         {
+            // ComputeSize() sized the buffer, so the iterator should not outrun it, and when
+            // newCount is 0 the buffer was never allocated. Do not rely on the decoder agreeing
+            // with itself for memory safety.
+            VerifyOrReturnValue(stagingCount < newCount, Status::ConstraintError);
             VerifyOrReturnValue(DecodeCircuitNode(iter.GetValue(), fabricIndex, staging[stagingCount]), Status::ConstraintError);
             stagingCount++;
         }

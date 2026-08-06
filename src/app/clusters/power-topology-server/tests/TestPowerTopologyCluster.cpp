@@ -230,6 +230,26 @@ TEST_F(TestPowerTopologyCluster, OnlyDynamicPowerFlowFeatureTest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// ElectricalCircuitNodes is fabric-scoped, so the ElectricalCircuit feature needs the fabric table
+// to hear about fabric removal. A missing one must fail startup rather than silently skip the
+// registration and leak a removed fabric's nodes.
+TEST_F(TestPowerTopologyCluster, ElectricalCircuitWithoutFabricTableTest)
+{
+    chip::Testing::TestServerClusterContext context;
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorageNoFabric;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .circuitNodeStorage = &circuitStorageNoFabric,
+    });
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_ERROR_INCORRECT_STATE);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
 {
     chip::Testing::TestServerClusterContext context;
@@ -472,12 +492,14 @@ TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesGatedByCircFeatureTest)
 
     {
         chip::Testing::TestServerClusterContext context;
+        chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
         BitMask<Feature> circOnly(Feature::kElectricalCircuit);
         FixedCircuitNodeStorage circuitStorage1;
         PowerTopologyCluster cluster(PowerTopologyCluster::Config{
             .endpointId         = kTestEndpointId,
             .delegate           = dummyDelegate,
             .features           = circOnly,
+            .fabricTable        = &fabricHelper.GetFabricTable(),
             .circuitNodeStorage = &circuitStorage1,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -493,6 +515,7 @@ TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesGatedByCircFeatureTest)
 TEST_F(TestPowerTopologyCluster, ReadElectricalCircuitNodesEmptyTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage2;
     MockPowerTopologyDelegate dummyDelegate;
@@ -501,6 +524,7 @@ TEST_F(TestPowerTopologyCluster, ReadElectricalCircuitNodesEmptyTest)
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage2,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -521,6 +545,7 @@ TEST_F(TestPowerTopologyCluster, ReadElectricalCircuitNodesEmptyTest)
 TEST_F(TestPowerTopologyCluster, WriteAndReadElectricalCircuitNodesReplaceAllTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage3;
     MockPowerTopologyDelegate dummyDelegate;
@@ -529,6 +554,7 @@ TEST_F(TestPowerTopologyCluster, WriteAndReadElectricalCircuitNodesReplaceAllTes
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage3,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -572,6 +598,7 @@ TEST_F(TestPowerTopologyCluster, WriteAndReadElectricalCircuitNodesReplaceAllTes
 TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesAppendItemTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage4;
     MockPowerTopologyDelegate dummyDelegate;
@@ -580,6 +607,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesAppendItemTest)
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage4,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -614,6 +642,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesAppendItemTest)
 TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesFabricIsolationTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage5;
     MockPowerTopologyDelegate dummyDelegate;
@@ -622,6 +651,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesFabricIsolationTest)
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage5,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -687,6 +717,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesFabricIsolationTest)
 TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesPersistAcrossRestartTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage6;
     MockPowerTopologyDelegate dummyDelegate;
@@ -702,6 +733,7 @@ TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesPersistAcrossRestartTest)
             .endpointId         = kTestEndpointId,
             .delegate           = dummyDelegate,
             .features           = features,
+            .fabricTable        = &fabricHelper.GetFabricTable(),
             .circuitNodeStorage = &circuitStorage6,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -719,6 +751,7 @@ TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesPersistAcrossRestartTest)
             .endpointId         = kTestEndpointId,
             .delegate           = dummyDelegate,
             .features           = features,
+            .fabricTable        = &fabricHelper.GetFabricTable(),
             .circuitNodeStorage = &circuitStorage6,
         });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -806,6 +839,7 @@ TEST_F(TestPowerTopologyCluster, ElectricalCircuitNodesPurgedOnFabricRemovalTest
 TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesLabelTooLongTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage8;
     MockPowerTopologyDelegate dummyDelegate;
@@ -814,6 +848,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesLabelTooLongTest)
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage8,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -842,6 +877,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesLabelTooLongTest)
 TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesResourceExhaustedTest)
 {
     chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
     BitMask<Feature> features(Feature::kElectricalCircuit);
     FixedCircuitNodeStorage circuitStorage9;
     MockPowerTopologyDelegate dummyDelegate;
@@ -850,6 +886,7 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesResourceExhaustedTes
         .endpointId         = kTestEndpointId,
         .delegate           = dummyDelegate,
         .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
         .circuitNodeStorage = &circuitStorage9,
     });
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
