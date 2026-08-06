@@ -25,9 +25,7 @@
 namespace chip {
 namespace app {
 
-class WindowCovering : public SingleEndpoint,
-                       public Clusters::IdentifyDelegate,
-                       public Clusters::WindowCovering::WindowCoveringDelegate
+class WindowCovering : public SingleEndpoint
 {
 public:
     struct Context
@@ -36,9 +34,11 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    explicit WindowCovering(const Context & context);
+    WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate, Clusters::IdentifyDelegate & identifyDelegate,
+                   const Context & context);
     ~WindowCovering() override = default;
 
+    // DeviceInterface pure virtual lifecycle hooks
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -48,17 +48,9 @@ public:
     Clusters::WindowCovering::WindowCoveringCluster & WindowCoveringCluster() { return mWindowCoveringCluster.Cluster(); }
     Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
-    // IdentifyDelegate implementation
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override { return true; }
-
-    // WindowCoveringDelegate implementation
-    CHIP_ERROR HandleMovement(Clusters::WindowCovering::WindowCoveringType type) override;
-    CHIP_ERROR HandleStopMotion() override;
-
 private:
+    Clusters::WindowCovering::WindowCoveringDelegate & mWindowCoveringDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
     const Context mContext;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

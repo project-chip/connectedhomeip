@@ -19,6 +19,8 @@ source_set("window-covering") {
   sources = [
     "WindowCovering.cpp",
     "WindowCovering.h",
+    "impl/LoggingWindowCovering.cpp",
+    "impl/LoggingWindowCovering.h",
   ]
 
   public_deps = [

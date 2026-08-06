@@ -21,8 +21,10 @@
 namespace chip {
 namespace app {
 
-WindowCovering::WindowCovering(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)), mContext(context)
+WindowCovering::WindowCovering(Clusters::WindowCovering::WindowCoveringDelegate & delegate,
+                               Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCovering, 1)),
+    mWindowCoveringDelegate(delegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
 CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -34,10 +36,12 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Wire up the mandatory identify delegate
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(this));
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    Clusters::WindowCovering::WindowCoveringCluster::Config config(*this);
+    // The WindowCoveringDelegate is mandatory and must be supplied at construction time.
+    mWindowCoveringDelegate.SetEndpoint(endpoint);
+    Clusters::WindowCovering::WindowCoveringCluster::Config config(mWindowCoveringDelegate);
     config.WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
         Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
         Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt));
@@ -77,33 +81,6 @@ void WindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
-}
-
-void WindowCovering::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "WindowCovering: OnIdentifyStart");
-}
-
-void WindowCovering::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "WindowCovering: OnIdentifyStop");
-}
-
-void WindowCovering::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "WindowCovering: OnTriggerEffect");
-}
-
-CHIP_ERROR WindowCovering::HandleMovement(Clusters::WindowCovering::WindowCoveringType type)
-{
-    ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%u", static_cast<unsigned>(type));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WindowCovering::HandleStopMotion()
-{
-    ChipLogProgress(DeviceLayer, "WindowCovering: HandleStopMotion");
-    return CHIP_NO_ERROR;
 }
 
 } // namespace app
