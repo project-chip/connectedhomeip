@@ -215,6 +215,7 @@ TEST(TestRecordWriter, PutPtr)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 TEST(TestRecordWriter, PutIpAddressV4)
 {
     chip::Inet::IPAddress addr;
@@ -232,6 +233,7 @@ TEST(TestRecordWriter, PutIpAddressV4)
     EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
+#endif
 
 TEST(TestRecordWriter, PutIpAddressV6)
 {
