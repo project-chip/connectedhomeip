@@ -63,6 +63,7 @@ if (wifi_soc) {
     include_dirs = [
       "${chip_root}/src/platform/silabs/SiWx917",
       "${silabs_project_dir}/include",
+      "${silabs_project_dir}/config",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
@@ -86,6 +87,7 @@ if (wifi_soc) {
     include_dirs = [
       "${chip_root}/src/platform/silabs/efr32",
       "${silabs_project_dir}/include",
+      "${silabs_project_dir}/config",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
@@ -115,6 +117,7 @@ silabs_executable("air_quality_sensor_app") {
   output_name = "matter-silabs-air-quality-sensor-example.out"
   include_dirs = [
     "include",
+    "config",
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include",
   ]
   defines = []

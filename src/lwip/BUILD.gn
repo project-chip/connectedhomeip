@@ -193,7 +193,15 @@ if (current_os == "zephyr" || current_os == "mbed") {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
+<<<<<<< HEAD
     if (lwip_platform != "standalone" && lwip_platform != "mbed") {
+=======
+    if (lwip_platform == "silabs") {
+      include_dirs += [ "${lwip_platform}/config" ]
+    }
+
+    if (lwip_platform != "standalone") {
+>>>>>>> cad0b20667 ([Silabs] Moving the configuration files out of the include list (#73433))
       include_dirs += [ "freertos" ]
     }
   }
@@ -202,8 +210,13 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public = [
       "${lwip_platform}/arch/cc.h",
       "${lwip_platform}/arch/perf.h",
-      "${lwip_platform}/lwipopts.h",
     ]
+
+    if (lwip_platform == "silabs") {
+      public += [ "${lwip_platform}/config/lwipopts.h" ]
+    } else {
+      public += [ "${lwip_platform}/lwipopts.h" ]
+    }
 
     sources = []
 
