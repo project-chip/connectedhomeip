@@ -30,5 +30,7 @@
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 112 // 0x0070 = 112 = Matter Refrigerator
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Refrigerator"
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0517 // Electrical Distribution Enclosure
+// Must fit chip::Dnssd::kKeyDeviceNameMaxLength (32) so the commissionable "DN"
+// TXT key is advertised; the full device type name would be 33 characters.
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Electrical Protection"

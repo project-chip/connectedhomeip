@@ -1,25 +1,39 @@
-# CHIP Linux Refrigerator Example
+# CHIP Linux Electrical Protection Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Refrigerator Example on Raspberry Pi. This doc is
-tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
-for Raspberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of CHIP on Linux for the Matter 1.7 electrical
+protection device types. The app presents an Electrical Distribution Enclosure
+containing a single Electrical Circuit Breaker, and demonstrates the three new
+electrical clusters those device types use.
 
-To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
-**EVK**, see the associated
-[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
-details.
+The document will describe how to build and run the CHIP Linux Electrical
+Protection Example on Raspberry Pi. This doc is tested on **Ubuntu for Raspberry
+Pi Server 20.04 LTS (aarch64)** and **Ubuntu for Raspberry Pi Desktop 20.10
+(aarch64)**
 
 <hr>
 
--   [CHIP Linux Refrigerator Example](#chip-linux-refrigerator-example)
+-   [CHIP Linux Electrical Protection Example](#chip-linux-electrical-protection-example)
+    -   [Device composition](#device-composition)
     -   [Building](#building)
     -   [Commandline arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC Console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
 
 <hr>
+
+## Device composition
+
+The app builds a composed device using the tree pattern:
+
+-   **Endpoint 0**: Root Node.
+-   **Endpoint 1**: Electrical Distribution Enclosure (0x0517), hosting
+    Descriptor, Power Topology (`TREE` feature), and Electrical Distribution.
+-   **Endpoint 2**: Electrical Circuit Breaker (0x0516), a tree child of
+    endpoint 1, hosting Descriptor (with a Common Number semantic tag), Power
+    Topology (`NODE` and `CIRC` features), User Label, On/Off (`OFFONLY`
+    feature), and Electrical Protection Alarm.
+
+The Electrical Distribution, Electrical Protection Alarm, and Power Topology
+`CIRC` elements are provisional in Matter 1.7.
 
 ## Building
 
@@ -29,7 +43,7 @@ details.
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/linux
+          $ cd ~/connectedhomeip/examples/electrical-protection-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -37,16 +51,8 @@ details.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/linux
+          $ cd ~/connectedhomeip/examples/electrical-protection-app/linux
           $ rm -rf out/
-
--   Build the example with pigweed RPC
-
-          $ cd ~/connectedhomeip/examples/refrigerator-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
 
 ## Commandline arguments
 
@@ -92,35 +98,12 @@ details.
             as described in
             [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-    -   Run Linux Refrigerator Example App
+    -   Run Linux Electrical Protection Example App
 
-              $ cd ~/connectedhomeip/examples/refrigerator-app/linux
-              $ sudo out/debug/chip-refrigerator-app --ble-controller [bluetooth device number]
+              $ cd ~/connectedhomeip/examples/electrical-protection-app/linux
+              $ sudo out/debug/chip-electrical-protection-app --ble-controller [bluetooth device number]
               # In this example, the device we want to use is hci1
-              $ sudo out/debug/chip-refrigerator-app --ble-controller 1
+              $ sudo out/debug/chip-electrical-protection-app --ble-controller 1
 
     -   Test the device using ChipDeviceController on your laptop / workstation
         etc.
-
-## Running RPC Console
-
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
-
--   To use the chip-rpc console after it has been installed run:
-    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
-
-## Device Tracing
-
-Device tracing is available to analyze the device performance. To turn on
-tracing, build with RPC enabled. See [Building with RPC enabled](#building).
-
-Obtain tracing json file.
-
-```
-    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
-     -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
-```
