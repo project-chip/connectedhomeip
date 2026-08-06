@@ -16,12 +16,10 @@
 
 #pragma once
 
-#include "PresetStructWithOwnedMembers.h"
-#include "ThermostatClusterOccupancy.h"
-#include "ThermostatClusterPresets.h"
-#include "ThermostatClusterSuggestions.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include "Setpoints.h"
 
 namespace chip {
 namespace app {
@@ -38,10 +36,8 @@ public:
     Delegate()          = default;
     virtual ~Delegate() = default;
 
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-
-protected:
-    EndpointId mEndpointId = 0;
+    virtual Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) = 0;
+    virtual Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) = 0;
 };
 
 } // namespace Thermostat

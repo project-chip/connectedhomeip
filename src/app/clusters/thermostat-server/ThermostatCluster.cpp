@@ -71,9 +71,6 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat:
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
-    AttributePersistence persistence(context.attributeStorage);
-    LoadSetpoints(mSetpoints, persistence);
-
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(this));
     return CHIP_NO_ERROR;
@@ -414,6 +411,18 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     default:
         return false;
     }
+}
+
+Setpoints ThermostatCluster::GetSetpoints() { 
+    Setpoints setpoints;
+    setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
+    setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
+    setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
+    setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
+    if (mDelegate != nullptr) {
+        mDelegate->LoadSetpoints(setpoints);
+    }
+    return setpoints;
 }
 
 } // namespace Thermostat

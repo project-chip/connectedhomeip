@@ -32,10 +32,10 @@ template <typename... Delegates>
 class ThermostatClusterWithFeatures : public ThermostatCluster
 {
 public:
-    static constexpr bool kHasCoreDelegate = (std::is_same_v<Thermostat::Delegate, Delegates> || ...);
-    static constexpr bool kHasPresets      = (std::is_same_v<ThermostatPresets::Delegate, Delegates> || ...);
-    static constexpr bool kHasSuggestions  = (std::is_same_v<ThermostatSuggestions::Delegate, Delegates> || ...);
-    static constexpr bool kHasOccupancy    = (std::is_same_v<ThermostatOccupancy::Delegate, Delegates> || ...);
+
+    static constexpr bool kHasPresets     = (std::is_base_of_v<ThermostatPresets::Delegate, Delegates> || ...);
+    static constexpr bool kHasSuggestions = (std::is_base_of_v<ThermostatSuggestions::Delegate, Delegates> || ...);
+    static constexpr bool kHasOccupancy   = (std::is_base_of_v<ThermostatOccupancy::Delegate, Delegates> || ...);
 
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
                                   const OptionalAttributes & optionalAttributes) :
@@ -238,7 +238,7 @@ private:
     [[no_unique_address]] std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
 };
 
-using DefaultThermostatCluster = ThermostatClusterWithFeatures<Thermostat::Delegate, ThermostatPresets::Delegate,
+using DefaultThermostatCluster = ThermostatClusterWithFeatures<ThermostatPresets::Delegate,
                                                                ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
 
 } // namespace Thermostat

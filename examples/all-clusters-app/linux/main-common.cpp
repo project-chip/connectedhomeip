@@ -185,6 +185,9 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
+static EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -208,9 +211,9 @@ void ApplicationInit()
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
-    Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
-                                             chip::app::Clusters::Thermostat::ThermostatDelegate>(
-        chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster,
+                                     Clusters::Thermostat::ThermostatDelegate>(gThermostatEndpoint, &gThermostatDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
@@ -269,6 +272,9 @@ void ApplicationShutdown()
     Clusters::RvcOperationalState::Shutdown();
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
+
+    Clusters::Thermostat::ServerShutdown<Clusters::Thermostat::DefaultThermostatCluster>(
+        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
@@ -340,15 +346,4 @@ Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clust
 
     // Finally we just do not support external attributes in all-clusters at this point
     return Status::Failure;
-}
-
-void MatterThermostatClusterInitCallback(EndpointId endpointId)
-{
-    chip::app::Clusters::Thermostat::ServerInit<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId);
-}
-
-void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
-{
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId,
-                                                                                                               clusterShutdownType);
 }

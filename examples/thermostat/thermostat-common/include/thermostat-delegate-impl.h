@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+
 #include <app/clusters/thermostat-server/PresetStructWithOwnedMembers.h>
 #include <app/clusters/thermostat-server/ThermostatClusterOccupancy.h>
 #include <app/clusters/thermostat-server/ThermostatClusterPresets.h>
@@ -44,12 +47,11 @@ class ThermostatDelegate : public Delegate,
                            public ThermostatOccupancy::Delegate
 {
 public:
-    static inline ThermostatDelegate & GetInstance() { return sInstance; }
-
-    ThermostatDelegate();
+    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr);
     ~ThermostatDelegate() override;
 
-    void SetEndpointId(EndpointId endpoint) { mEndpointId = endpoint; }
+    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override;
+    Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;
 
     // ThermostatOccupancy::Delegate methods
     BitMask<OccupancyBitmap> GetOccupancy() override;
@@ -83,9 +85,9 @@ public:
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
 private:
-    static ThermostatDelegate sInstance;
 
-    EndpointId mEndpointId = 0;
+    EndpointId mEndpointId;
+    AttributePersistenceProvider * mProvider = nullptr;
 
     // Occupancy state
     BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };
