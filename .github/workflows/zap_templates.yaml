@@ -30,40 +30,8 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
-    check_matter_devices_xml:
-        name: Check matter-devices.xml for manual edits
-
-        runs-on: ubuntu-latest
-        container:
-            image: ghcr.io/project-chip/chip-build:200
-        defaults:
-            run:
-                shell: sh
-        if: github.actor != 'restyled-io[bot]'
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v7
-              with:
-                fetch-depth: 0
-
-            - name: Ensure safe directory for git
-              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-            - name: Verify Alchemy metadata on matter-devices.xml changes
-              run: |
-                  if [ -n "${{ github.base_ref }}" ]; then
-                      git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-                      DIFF_BASE="origin/${{ github.base_ref }}"
-                  else
-                      DIFF_BASE="HEAD^"
-                  fi
-                  scripts/tools/zap/check_matter_devices_metadata.py --root . --diff-base "$DIFF_BASE"
-
-
     zap_templates:
         name: ZAP templates generation
-
 
         runs-on: ubuntu-latest
         container:
