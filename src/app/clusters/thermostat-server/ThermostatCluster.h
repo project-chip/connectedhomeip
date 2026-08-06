@@ -161,7 +161,8 @@ protected:
                                                        SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-    DataModel::ActionReturnStatus ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder);
+    DataModel::ActionReturnStatus ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request,
+                                                        AttributeValueEncoder & encoder);
 
     Protocols::InteractionModel::Status SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint);
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);

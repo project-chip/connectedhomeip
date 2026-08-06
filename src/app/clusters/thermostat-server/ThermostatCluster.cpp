@@ -413,13 +413,15 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     }
 }
 
-Setpoints ThermostatCluster::GetSetpoints() { 
+Setpoints ThermostatCluster::GetSetpoints()
+{
     Setpoints setpoints;
     setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
     setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
     setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
     setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
-    if (mDelegate != nullptr) {
+    if (mDelegate != nullptr)
+    {
         mDelegate->LoadSetpoints(setpoints);
     }
     return setpoints;

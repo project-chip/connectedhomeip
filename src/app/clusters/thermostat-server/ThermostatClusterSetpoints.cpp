@@ -44,9 +44,8 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-
 DataModel::ActionReturnStatus ThermostatCluster::ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request,
-                                                               AttributeValueEncoder & encoder)
+                                                                       AttributeValueEncoder & encoder)
 {
     auto setpoints = GetSetpoints();
     switch (request.path.mAttributeId)
@@ -137,7 +136,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadSetpointAttribute(const Dat
     }
 }
 
-
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
                                                                       temperature value, SetpointAttributes & changedAttributes)
 {
@@ -196,7 +194,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
     int16_t amount = static_cast<int16_t>(commandData.amount * 10);
 
     Setpoints currentSetpoints = GetSetpoints();
-    Setpoints setpoints = currentSetpoints;
+    Setpoints setpoints        = currentSetpoints;
 
     OccupancyBitmap isOccupied = (!setpoints.occupancySupported || mOccupancy.Has(OccupancyBitmap::kOccupied))
         ? OccupancyBitmap::kOccupied
@@ -252,7 +250,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
 {
     VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
     VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
-    
+
     auto status = mDelegate->SaveSetpoint(oldSetpoint, newSetpoint);
     if (status != Status::Success)
     {

@@ -154,11 +154,9 @@ Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints 
     }
 
     return Status::Success;
-
 }
 
-Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpoint & oldSetpoint,
-                                                                    const Setpoint & newSetpoint)
+Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint)
 {
     AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, Status::Failure);
