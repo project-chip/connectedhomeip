@@ -25,10 +25,9 @@ declare_args() {
   stm32_util = "${chip_root}/third_party/st/STM32CubeWBA/Utilities"
 
   ## Path to OEMiROT NonSecure sources (Core/Src from workspace)
-  oemirot_ns = "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Core"
-
+  oemirot_ns =
+      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Core"
 }
-
 
 # Common sources (used by both standard and OEMiROT builds)
 SOURCES = [
@@ -74,37 +73,33 @@ INCLUDE_DIRS = [
 
 # Select sources based on OEMiROT flag
 if (chip_enable_ota_requestor) {
-SOURCES += [
-  "${oemirot_ns}/Src/main.c",
-  "${oemirot_ns}/Src/stm32wbaxx_hal_msp.c",
-  "${oemirot_ns}/Src/stm32wbaxx_it.c",
-  "${oemirot_ns}/Src/syscalls.c",
-  "${oemirot_ns}/Src/sysmem.c",
-  "${oemirot_ns}/Src/system_stm32wbaxx.c",
-  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_eeprom.c",
-  "${stm32_wb_bsp}/Components/m95p32/m95p32.c",
-]
+  SOURCES += [
+    "${oemirot_ns}/Src/main.c",
+    "${oemirot_ns}/Src/stm32wbaxx_hal_msp.c",
+    "${oemirot_ns}/Src/stm32wbaxx_it.c",
+    "${oemirot_ns}/Src/syscalls.c",
+    "${oemirot_ns}/Src/sysmem.c",
+    "${oemirot_ns}/Src/system_stm32wbaxx.c",
+    "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_eeprom.c",
+    "${stm32_wb_bsp}/Components/m95p32/m95p32.c",
+  ]
 
-INCLUDE_DIRS += [
-  "${oemirot_ns}/Inc",
-  "${stm32_wb_bsp}/Components/m95p32",
-]
-
+  INCLUDE_DIRS += [
+    "${oemirot_ns}/Inc",
+    "${stm32_wb_bsp}/Components/m95p32",
+  ]
 } else {
-SOURCES += [
-  "${stm32_board_src}/Src/main.c",
-  "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",
-  "${stm32_board_src}/Src/stm32wbaxx_it.c",
-  "${stm32_board_src}/Src/syscalls.c",
-  "${stm32_board_src}/Src/sysmem.c",
-  "${stm32_board_src}/Src/system_stm32wbaxx.c",
-]
+  SOURCES += [
+    "${stm32_board_src}/Src/main.c",
+    "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",
+    "${stm32_board_src}/Src/stm32wbaxx_it.c",
+    "${stm32_board_src}/Src/syscalls.c",
+    "${stm32_board_src}/Src/sysmem.c",
+    "${stm32_board_src}/Src/system_stm32wbaxx.c",
+  ]
 
-INCLUDE_DIRS += [
-   "${stm32_board_src}/Inc_no_oemirot",
-]
+  INCLUDE_DIRS += [ "${stm32_board_src}/Inc_no_oemirot" ]
 }
-
 
 DEFINES = []
 
