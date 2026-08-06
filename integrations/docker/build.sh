@@ -125,10 +125,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# go find and build any CHIP images this image is "FROM"
-awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
-    dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "${ORIG_ARGS[@]}")
+# go find and build any CHIP images this image is "FROM".
+# Images are referenced as ghcr.io/project-chip/<name>:<tag>, and the parent may
+# live in any stage directory, so resolve it by name under images/ rather than
+# assuming it is a sibling.
+IMAGES_ROOT="$(git rev-parse --show-toplevel)/integrations/docker/images"
+awk '/^FROM .*project-chip\// {sub(/.*project-chip\//, ""); sub(/:.*/, ""); print}' Dockerfile |
+    sort -u | while read -r dep; do
+    dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
+    [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
+    (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
 done
 
 if [ "$SKIP_BUILD" = false ]; then
