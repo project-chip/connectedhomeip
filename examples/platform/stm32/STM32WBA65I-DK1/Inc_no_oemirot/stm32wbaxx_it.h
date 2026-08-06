@@ -17,11 +17,11 @@
  *    limitations under the License.
  */
 /**
-  ******************************************************************************
-  * @file    stm32wbaxx_it.h
-  * @brief   This file contains the headers of the interrupt handlers.
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    stm32wbaxx_it.h
+ * @brief   This file contains the headers of the interrupt handlers.
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/

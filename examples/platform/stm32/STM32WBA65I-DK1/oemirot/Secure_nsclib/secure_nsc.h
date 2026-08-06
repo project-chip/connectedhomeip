@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 /**
-  ******************************************************************************
-  * @file    secure_nsc.h
-  * @author  MCD Application Team
-  * @brief   Header for secure non-secure callable APIs list
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    secure_nsc.h
+ * @author  MCD Application Team
+ * @brief   Header for secure non-secure callable APIs list
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef SECURE_NSC_H
@@ -32,18 +32,18 @@
 
 /* Exported types ------------------------------------------------------------*/
 /**
-  * @brief  non-secure callback ID enumeration definition
-  */
+ * @brief  non-secure callback ID enumeration definition
+ */
 typedef enum
 {
-  SECURE_FAULT_CB_ID     = 0x00U, /*!< System secure fault callback ID */
-  GTZC_ERROR_CB_ID       = 0x01U  /*!< GTZC secure error callback ID */
+    SECURE_FAULT_CB_ID = 0x00U, /*!< System secure fault callback ID */
+    GTZC_ERROR_CB_ID   = 0x01U  /*!< GTZC secure error callback ID */
 } SECURE_CallbackIDTypeDef;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void SECURE_RegisterCallback(SECURE_CallbackIDTypeDef CallbackId, void *func);
+void SECURE_RegisterCallback(SECURE_CallbackIDTypeDef CallbackId, void * func);
 void SECURE_ConfirmSecureAppImage(void);
 void SECURE_ConfirmSecureDataImage(void);
 #endif /* SECURE_NSC_H */

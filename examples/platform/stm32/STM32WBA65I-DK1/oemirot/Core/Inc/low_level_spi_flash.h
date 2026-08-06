@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 /**
-  ******************************************************************************
-  * @file    low_level_spi_flash.h
-  * @author  MCD Application Team
-  * @brief   This file contains device definition for low_level_spi_flash driver
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    low_level_spi_flash.h
+ * @author  MCD Application Team
+ * @brief   This file contains device definition for low_level_spi_flash driver
+ ******************************************************************************
+ */
 #ifndef __LOW_LEVEL_SPI_FLASH_H
 #define __LOW_LEVEL_SPI_FLASH_H
 
@@ -30,28 +30,32 @@ extern "C" {
 #endif
 #include "stm32_hal.h"
 
-#define WIP_Pos     0U
-#define WIP_Msk     (1U << WIP_Pos)
-#define WEL_Pos     1U
-#define WEL_Msk     (1U << WEL_Pos)
+#define WIP_Pos 0U
+#define WIP_Msk (1U << WIP_Pos)
+#define WEL_Pos 1U
+#define WEL_Msk (1U << WEL_Pos)
 
-typedef enum {READY = 0, NOT_READY = !READY} ReadyStatus;
+typedef enum
+{
+    READY     = 0,
+    NOT_READY = !READY
+} ReadyStatus;
 
 struct spi_flash_range
 {
-  uint32_t base;
-  uint32_t limit;
+    uint32_t base;
+    uint32_t limit;
 };
 struct spi_flash_vect
 {
-  uint32_t nb;
-  struct spi_flash_range *range;
+    uint32_t nb;
+    struct spi_flash_range * range;
 };
 struct low_level_spi_device
 {
-  struct spi_flash_vect erase;
-  struct spi_flash_vect write;
-  uint32_t read_error;
+    struct spi_flash_vect erase;
+    struct spi_flash_vect write;
+    uint32_t read_error;
 };
 
 extern struct low_level_spi_device SPI_FLASH0_DEV;

@@ -17,12 +17,12 @@
  *    limitations under the License.
  */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -34,22 +34,22 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32wbaxx_hal.h"
-#include "app_conf.h"
-#include "app_entry.h"
 #include "app_common.h"
+#include "app_conf.h"
 #include "app_debug.h"
+#include "app_entry.h"
+#include "stm32wbaxx_hal.h"
 
-#include "stm32wbaxx_ll_icache.h"
-#include "stm32wbaxx_ll_tim.h"
 #include "stm32wbaxx_ll_bus.h"
 #include "stm32wbaxx_ll_cortex.h"
+#include "stm32wbaxx_ll_dma.h"
+#include "stm32wbaxx_ll_gpio.h"
+#include "stm32wbaxx_ll_icache.h"
+#include "stm32wbaxx_ll_pwr.h"
 #include "stm32wbaxx_ll_rcc.h"
 #include "stm32wbaxx_ll_system.h"
+#include "stm32wbaxx_ll_tim.h"
 #include "stm32wbaxx_ll_utils.h"
-#include "stm32wbaxx_ll_pwr.h"
-#include "stm32wbaxx_ll_gpio.h"
-#include "stm32wbaxx_ll_dma.h"
 
 #include "stm32wbaxx_ll_exti.h"
 

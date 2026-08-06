@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 /**
-  ******************************************************************************
-  * @file    m95p32_conf.h
-  * @author  MCD Application Team
-  * @brief   M95P32 memory configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to m95p32_conf.h
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    m95p32_conf.h
+ * @author  MCD Application Team
+ * @brief   M95P32 memory configuration template file.
+ *          This file should be copied to the application folder and renamed
+ *          to m95p32_conf.h
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef M95P32_CONF_H
@@ -37,15 +37,15 @@ extern "C" {
 #include "stm32wbaxx_hal.h"
 
 /** @addtogroup BSP
-  * @{
-  */
+ * @{
+ */
 /* Uncomment one of the lines according the way to use the component */
 /*#define USE_QUADSPI*/
 #define USE_SPI
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 #ifdef __cplusplus
 }
