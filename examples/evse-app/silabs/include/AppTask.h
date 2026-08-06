@@ -68,12 +68,12 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-        /**
+    /**
      * @brief Processes energy management button actions posted from ButtonEventHandler.
      *
      * @param aEvent button event being processed
      */
-     static void EnergyManagementActionEventHandler(AppEvent * aEvent);
+    static void EnergyManagementActionEventHandler(AppEvent * aEvent);
 
 protected:
     /**

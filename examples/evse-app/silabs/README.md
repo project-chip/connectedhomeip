@@ -4,33 +4,33 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
-- [Matter EFR32 EVSE Example](#matter-efr32-evse-example)
-  - [Introduction](#introduction)
-  - [Extending Base App Implementation](#extending-base-app-implementation)
-    -   [CustomerAppTask](#customerapptask)
-    -   [How to Override APIs](#how-to-override-apis)
-    -   [DataModelCallbacks and CustomerAppTask](#datamodelcallbacks-and-customerapptask)
-    -   [Sample Implementation](#sample-implementation)
-    -   [Override API Reference](#override-api-reference)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-    - [SEGGER RTT](#segger-rtt)
-    - [Console Log](#console-log)
-      - [Configuring the VCOM](#configuring-the-vcom)
-    - [Using the console](#using-the-console)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-  - [Running RPC console](#running-rpc-console)
-  - [Device Tracing](#device-tracing)
-  - [Memory settings](#memory-settings)
-  - [OTA Software Update](#ota-software-update)
-  - [Group Communication (Multicast)](#group-communication-multicast)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter EFR32 EVSE Example](#matter-efr32-evse-example)
+    -   [Introduction](#introduction)
+    -   [Extending Base App Implementation](#extending-base-app-implementation)
+        -   [CustomerAppTask](#customerapptask)
+        -   [How to Override APIs](#how-to-override-apis)
+        -   [DataModelCallbacks and CustomerAppTask](#datamodelcallbacks-and-customerapptask)
+        -   [Sample Implementation](#sample-implementation)
+        -   [Override API Reference](#override-api-reference)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [Running RPC console](#running-rpc-console)
+    -   [Device Tracing](#device-tracing)
+    -   [Memory settings](#memory-settings)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Group Communication (Multicast)](#group-communication-multicast)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -209,19 +209,19 @@ the reference for overridable methods and app configuration.
 
 ### Energy Management Hardware Integration
 
-The CRTP `CustomerAppTask` pattern covers AppTask behavior. Energy management hardware
-integration (Power and Energy Measurement, Power Topology, and
-activating/deactivating the charging hardware in response to cluster commands) is not 
-currently routed through CRTP. Work is planned to route this functionality through the
-CRTP `CustomerAppTask` interface in the future.
+The CRTP `CustomerAppTask` pattern covers AppTask behavior. Energy management
+hardware integration (Power and Energy Measurement, Power Topology, and
+activating/deactivating the charging hardware in response to cluster commands)
+is not currently routed through CRTP. Work is planned to route this
+functionality through the CRTP `CustomerAppTask` interface in the future.
 
 Until that follow up work is complete, manufacturers who need to connect real
-energy management hardware must edit the following shared delegate implementations
-directly:
+energy management hardware must edit the following shared delegate
+implementations directly:
 
-- [`examples/energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp) 
-- [`examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp)
-- [`examples/energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp)
+-   [`examples/energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp)
+-   [`examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp)
+-   [`examples/energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp)
 
 ## Building
 
