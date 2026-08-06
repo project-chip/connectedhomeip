@@ -71,39 +71,23 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case LocalTemperatureCalibration::Id:
         return encoder.Encode(mLocalTemperatureCalibration);
     case OccupiedHeatingSetpoint::Id:
-        return encoder.Encode(mSetpoints.occupiedRange.heating.Temperature());
     case OccupiedCoolingSetpoint::Id:
-        return encoder.Encode(mSetpoints.occupiedRange.cooling.Temperature());
     case UnoccupiedHeatingSetpoint::Id:
-        return encoder.Encode(mSetpoints.unoccupiedRange.heating.Temperature());
     case UnoccupiedCoolingSetpoint::Id:
-        return encoder.Encode(mSetpoints.unoccupiedRange.cooling.Temperature());
     case AbsMinHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.minimum.Temperature());
     case AbsMaxHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.maximum.Temperature());
     case AbsMinCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.minimum.Temperature());
     case AbsMaxCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.maximum.Temperature());
     case MinHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userHeatLimits.minimum.Temperature());
     case MaxHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userHeatLimits.maximum.Temperature());
     case MinCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userCoolLimits.minimum.Temperature());
     case MaxCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userCoolLimits.maximum.Temperature());
-    case MinSetpointDeadBand::Id: {
-        auto deadband = static_cast<int8_t>(mSetpoints.deadBand / 10);
-        return encoder.Encode(deadband);
-    }
-    case TemperatureSetpointHold::Id: {
+    case MinSetpointDeadBand::Id:
+        return ReadSetpointAttribute(request, encoder);
+    case TemperatureSetpointHold::Id:
         return encoder.Encode(mTemperatureSetpointHold);
-    }
-    case TemperatureSetpointHoldDuration::Id: {
+    case TemperatureSetpointHoldDuration::Id:
         return encoder.Encode(mTemperatureSetpointHoldDuration);
-    }
     case ThermostatRunningState::Id:
         // TODO: implement thermostat running state
         return Status::UnsupportedAttribute;
@@ -120,6 +104,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ActiveScheduleHandle::Id:
         // TODO: implement active schedule handle
         return Status::UnsupportedAttribute;
+||||||| parent of 5217deb1c7d (Move setpoint loading/saving to core delegate)
+    }
+=======
+>>>>>>> 5217deb1c7d (Move setpoint loading/saving to core delegate)
     case Schedules::Id: {
         // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });

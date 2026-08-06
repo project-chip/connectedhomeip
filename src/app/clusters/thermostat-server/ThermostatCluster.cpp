@@ -64,8 +64,6 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
                                       mSetpointHoldExpiryTimestamp, mDefaultValues.setpointHoldExpiryTimestamp);
 
-    LoadSetpoints(mSetpoints, persistence);
-
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mFabricTable.AddFabricDelegate(this));
     return CHIP_NO_ERROR;
@@ -448,6 +446,18 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     default:
         return false;
     }
+}
+
+Setpoints ThermostatCluster::GetSetpoints() { 
+    Setpoints setpoints;
+    setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
+    setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
+    setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
+    setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
+    if (mDelegate != nullptr) {
+        mDelegate->LoadSetpoints(setpoints);
+    }
+    return setpoints;
 }
 
 } // namespace Thermostat

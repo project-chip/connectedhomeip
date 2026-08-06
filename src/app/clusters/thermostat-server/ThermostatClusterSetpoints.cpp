@@ -37,6 +37,100 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+
+DataModel::ActionReturnStatus ThermostatCluster::ReadSetpointAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & encoder)
+{
+    auto setpoints = GetSetpoints();
+    switch (request.path.mAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        if (!setpoints.heatSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.occupiedRange.heating.Temperature());
+    case OccupiedCoolingSetpoint::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.occupiedRange.cooling.Temperature());
+    case UnoccupiedHeatingSetpoint::Id:
+        if (!setpoints.heatSupported || !setpoints.occupancySupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.unoccupiedRange.heating.Temperature());
+    case UnoccupiedCoolingSetpoint::Id:
+        if (!setpoints.coolSupported || !setpoints.occupancySupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.unoccupiedRange.cooling.Temperature());
+    case AbsMinHeatSetpointLimit::Id:
+        if (!setpoints.heatSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.absoluteHeatLimits.minimum.Temperature());
+    case AbsMaxHeatSetpointLimit::Id:
+        if (!setpoints.heatSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.absoluteHeatLimits.maximum.Temperature());
+    case AbsMinCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.absoluteCoolLimits.minimum.Temperature());
+    case AbsMaxCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.absoluteCoolLimits.maximum.Temperature());
+    case MinHeatSetpointLimit::Id:
+        if (!setpoints.heatSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.userHeatLimits.minimum.Temperature());
+    case MaxHeatSetpointLimit::Id:
+        if (!setpoints.heatSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.userHeatLimits.maximum.Temperature());
+    case MinCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.userCoolLimits.minimum.Temperature());
+    case MaxCoolSetpointLimit::Id:
+        if (!setpoints.coolSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        return encoder.Encode(setpoints.userCoolLimits.maximum.Temperature());
+    case MinSetpointDeadBand::Id: {
+        if (!setpoints.autoSupported)
+        {
+            return Status::UnsupportedAttribute;
+        }
+        auto deadband = static_cast<int8_t>(setpoints.deadBand / 10);
+        return encoder.Encode(deadband);
+    }
+    default:
+        ChipLogError(Zcl, "Unsupported Setpoint Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
+        return Status::UnsupportedAttribute;
+    }
+}
+
+
 DataModel::ActionReturnStatus ThermostatCluster::HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId,
                                                                       temperature value, SetpointAttributes & changedAttributes)
 {
@@ -94,7 +188,8 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
     auto & mode    = commandData.mode;
     int16_t amount = static_cast<int16_t>(commandData.amount * 10);
 
-    Setpoints setpoints = mSetpoints;
+    Setpoints currentSetpoints = GetSetpoints();
+    Setpoints setpoints = currentSetpoints;
 
     OccupancyBitmap isOccupied = (!setpoints.occupancySupported || mOccupancy.Has(OccupancyBitmap::kOccupied))
         ? OccupancyBitmap::kOccupied
@@ -143,135 +238,18 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
     {
         return status;
     }
-    status = SaveSetpoints(setpoints, changedAttributes);
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        mSetpoints = setpoints;
-    }
-
-    return status;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence)
-{
-    auto endpoint                = mPath.mEndpointId;
-    setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
-    setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
-    setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
-    setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
-    setpoints.eventsSupported    = mFeatures.Has(Feature::kEvents);
-
-    if (setpoints.autoSupported)
-    {
-        int8_t deadBand;
-        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand,
-                                          static_cast<int8_t>(kDefaultDeadBand / 10));
-        setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
-    }
-
-    int16_t absMinHeatLimit;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinHeatSetpointLimit::Id }, absMinHeatLimit,
-                                      static_cast<int16_t>(mDefaultValues.absMinHeatSetpointLimit));
-    setpoints.absoluteHeatLimits.minimum.SetTemperature(absMinHeatLimit);
-
-    int16_t absMaxHeatLimit;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxHeatSetpointLimit::Id }, absMaxHeatLimit,
-                                      static_cast<int16_t>(mDefaultValues.absMaxHeatSetpointLimit));
-    setpoints.absoluteHeatLimits.maximum.SetTemperature(absMaxHeatLimit);
-
-    int16_t absMinCoolLimit;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinCoolSetpointLimit::Id }, absMinCoolLimit,
-                                      static_cast<int16_t>(mDefaultValues.absMinCoolSetpointLimit));
-    setpoints.absoluteCoolLimits.minimum.SetTemperature(absMinCoolLimit);
-
-    int16_t absMaxCoolLimit;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxCoolSetpointLimit::Id }, absMaxCoolLimit,
-                                      static_cast<int16_t>(mDefaultValues.absMaxCoolSetpointLimit));
-    setpoints.absoluteCoolLimits.maximum.SetTemperature(absMaxCoolLimit);
-
-    if (setpoints.heatSupported)
-    {
-        int16_t minHeatLimit;
-        if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinHeatSetpointLimit::Id }, minHeatLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userHeatLimits.minimum.SetTemperature(minHeatLimit);
-        }
-        else
-        {
-            setpoints.userHeatLimits.minimum = mDefaultValues.minHeatSetpointLimit;
-        }
-        int16_t maxHeatLimit;
-        if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id }, maxHeatLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userHeatLimits.maximum.SetTemperature(maxHeatLimit);
-        }
-        else
-        {
-            setpoints.userHeatLimits.maximum = mDefaultValues.maxHeatSetpointLimit;
-        }
-    }
-    if (setpoints.coolSupported)
-    {
-        int16_t minCoolLimit;
-        if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinCoolSetpointLimit::Id }, minCoolLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userCoolLimits.minimum.SetTemperature(minCoolLimit);
-        }
-        else
-        {
-            setpoints.userCoolLimits.minimum = mDefaultValues.minCoolSetpointLimit;
-        }
-        int16_t maxCoolLimit;
-        if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id }, maxCoolLimit,
-                                              static_cast<int16_t>(0)))
-        {
-            setpoints.userCoolLimits.maximum.SetTemperature(maxCoolLimit);
-        }
-        else
-        {
-            setpoints.userCoolLimits.maximum = mDefaultValues.maxCoolSetpointLimit;
-        }
-    }
-
-    int16_t occupiedCooling;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id }, occupiedCooling,
-                                      static_cast<int16_t>(mDefaultValues.occupiedCoolingSetpoint));
-    setpoints.occupiedRange.cooling.SetTemperature(occupiedCooling);
-
-    int16_t occupiedHeating;
-    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id }, occupiedHeating,
-                                      static_cast<int16_t>(mDefaultValues.occupiedHeatingSetpoint));
-    setpoints.occupiedRange.heating.SetTemperature(occupiedHeating);
-
-    if (setpoints.occupancySupported)
-    {
-        int16_t unoccupiedCooling;
-        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, unoccupiedCooling,
-                                          static_cast<int16_t>(mDefaultValues.unoccupiedCoolingSetpoint));
-        setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
-
-        int16_t unoccupiedHeating;
-        persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, unoccupiedHeating,
-                                          static_cast<int16_t>(mDefaultValues.unoccupiedHeatingSetpoint));
-        setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
-    }
-
-    return Status::Success;
+    return SaveSetpoints(setpoints, changedAttributes);
 }
 
 Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & oldSetpoint, Setpoint & newSetpoint)
 {
     VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
     VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
-    temperature newTemp = newSetpoint.Temperature();
-    AttributePersistence persistence(mContext->attributeStorage);
-    auto status = persistence.StoreNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, oldSetpoint.AttributeId() }, newTemp);
-    if (status != CHIP_NO_ERROR)
+    
+    auto status = mDelegate->SaveSetpoint(oldSetpoint, newSetpoint);
+    if (status != Status::Success)
     {
-        return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
+        return status;
     }
     if (mFeatures.Has(Feature::kEvents))
     {
@@ -288,30 +266,31 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
     {
         return Status::ConstraintError;
     }
+    Setpoints currentSetpoints = GetSetpoints();
 
     Status status = Status::Success;
     if (setpoints.heatSupported)
     {
         if (changedAttributes.Has(MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())
         {
-            status = SaveSetpoint(mSetpoints.userHeatLimits.minimum, setpoints.userHeatLimits.minimum);
+            status = SaveSetpoint(currentSetpoints.userHeatLimits.minimum, setpoints.userHeatLimits.minimum);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(MaxHeatSetpointLimit::Id) && setpoints.userHeatLimits.maximum.HasTemperature())
         {
-            status = SaveSetpoint(mSetpoints.userHeatLimits.maximum, setpoints.userHeatLimits.maximum);
+            status = SaveSetpoint(currentSetpoints.userHeatLimits.maximum, setpoints.userHeatLimits.maximum);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(OccupiedHeatingSetpoint::Id))
         {
-            status = SaveSetpoint(mSetpoints.occupiedRange.heating, setpoints.occupiedRange.heating);
+            status = SaveSetpoint(currentSetpoints.occupiedRange.heating, setpoints.occupiedRange.heating);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (setpoints.occupancySupported)
         {
             if (changedAttributes.Has(UnoccupiedHeatingSetpoint::Id))
             {
-                status = SaveSetpoint(mSetpoints.unoccupiedRange.heating, setpoints.unoccupiedRange.heating);
+                status = SaveSetpoint(currentSetpoints.unoccupiedRange.heating, setpoints.unoccupiedRange.heating);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
         }
@@ -320,24 +299,24 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
     {
         if (changedAttributes.Has(MinCoolSetpointLimit::Id) && setpoints.userCoolLimits.minimum.HasTemperature())
         {
-            status = SaveSetpoint(mSetpoints.userCoolLimits.minimum, setpoints.userCoolLimits.minimum);
+            status = SaveSetpoint(currentSetpoints.userCoolLimits.minimum, setpoints.userCoolLimits.minimum);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(MaxCoolSetpointLimit::Id) && setpoints.userCoolLimits.maximum.HasTemperature())
         {
-            status = SaveSetpoint(mSetpoints.userCoolLimits.maximum, setpoints.userCoolLimits.maximum);
+            status = SaveSetpoint(currentSetpoints.userCoolLimits.maximum, setpoints.userCoolLimits.maximum);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (changedAttributes.Has(OccupiedCoolingSetpoint::Id))
         {
-            status = SaveSetpoint(mSetpoints.occupiedRange.cooling, setpoints.occupiedRange.cooling);
+            status = SaveSetpoint(currentSetpoints.occupiedRange.cooling, setpoints.occupiedRange.cooling);
             VerifyOrReturnValue(status == Status::Success, status);
         }
         if (setpoints.occupancySupported)
         {
             if (changedAttributes.Has(UnoccupiedCoolingSetpoint::Id))
             {
-                status = SaveSetpoint(mSetpoints.unoccupiedRange.cooling, setpoints.unoccupiedRange.cooling);
+                status = SaveSetpoint(currentSetpoints.unoccupiedRange.cooling, setpoints.unoccupiedRange.cooling);
                 VerifyOrReturnValue(status == Status::Success, status);
             }
         }
@@ -347,7 +326,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
 
 DataModel::ActionReturnStatus ThermostatCluster::ChangeSetpointAttribute(const AttributeId attributeId, temperature temp)
 {
-    Setpoints setpoints = mSetpoints;
+    Setpoints setpoints = GetSetpoints();
     SetpointAttributes changedAttributes;
 
     auto status = HandleSetpointChange(setpoints, attributeId, temp, changedAttributes);
@@ -356,6 +335,20 @@ DataModel::ActionReturnStatus ThermostatCluster::ChangeSetpointAttribute(const A
         status = SaveSetpoints(setpoints, changedAttributes);
     }
     return status;
+}
+
+Setpoints ThermostatCluster::GetSetpoints()
+{
+    Setpoints setpoints;
+    setpoints.autoSupported      = mFeatures.Has(Feature::kAutoMode);
+    setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
+    setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
+    setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
+    if (mDelegate != nullptr)
+    {
+        mDelegate->LoadSetpoints(setpoints);
+    }
+    return setpoints;
 }
 
 } // namespace Thermostat

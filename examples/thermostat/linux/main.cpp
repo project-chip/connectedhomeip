@@ -28,7 +28,6 @@
 
 using namespace chip;
 using namespace chip::app;
-// using namespace chip::app::Clusters;
 
 void OnIdentifyStart(Identify *)
 {
@@ -72,33 +71,26 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
+static EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+
 void ApplicationInit()
 {
-    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
-                                                                          chip::app::Clusters::Thermostat::ThermostatDelegate>(
-            chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-        status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    ChipLogProgress(Zcl, "Thermostat application init");
+
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
+        gThermostatEndpoint, &gThermostatDelegate);
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(
+        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+}
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-void MatterThermostatClusterInitCallback(EndpointId endpointId)
-{
-    chip::app::Clusters::Thermostat::ServerInit<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId);
-}
-
-void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
-{
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(endpointId,
-                                                                                                               clusterShutdownType);
 }
