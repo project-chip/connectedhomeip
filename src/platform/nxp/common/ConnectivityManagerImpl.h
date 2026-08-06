@@ -148,6 +148,10 @@ private:
     void UpdateInternetConnectivityState(void);
 #endif
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    void UpdateLwipDefaultNetIf();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;

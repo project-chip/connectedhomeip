@@ -22,11 +22,11 @@ from thread_meshcop_testing import (assert_common_diagnostic_fields, discriminat
                                     get_setup_code)
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 
-class TC_SC_TC_3_1(MatterBaseTest):
+class TC_SC_TC_3_1(MatterTestCommissioner):
 
     @async_test_body
     async def test_TC_SC_TC_3_1(self):
