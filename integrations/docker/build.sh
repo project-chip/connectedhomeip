@@ -36,11 +36,24 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 if [[ $OSTYPE == 'darwin'* ]]; then
     DOCKER_VOLUME_PATH=~/Library/Containers/com.docker.docker/Data/vms/0/
-    TARGET_PLATFORM_TYPE="linux/arm64"
 else
     DOCKER_VOLUME_PATH=/var/lib/docker/
-    TARGET_PLATFORM_TYPE="linux/amd64"
 fi
+
+# Build for the architecture of the host, unless told otherwise. Inferring this
+# from the OS is wrong in both directions: an Intel Mac would target arm64, and a
+# Linux arm64 host (such as a GitHub ubuntu-24.04-arm runner) would target amd64.
+if [[ -z $DOCKER_BUILD_PLATFORM ]]; then
+    case "$(uname -m)" in
+        arm64 | aarch64) DOCKER_BUILD_PLATFORM="linux/arm64" ;;
+        x86_64 | amd64) DOCKER_BUILD_PLATFORM="linux/amd64" ;;
+        *)
+            echo "$me: *** ERROR: unsupported host architecture: $(uname -m)"
+            exit 1
+            ;;
+    esac
+fi
+TARGET_PLATFORM_TYPE="$DOCKER_BUILD_PLATFORM"
 
 [[ ${*/--help//} != "${*}" ]] && {
     set +x

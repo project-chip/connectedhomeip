@@ -64,6 +64,33 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Build-only, on a native arm64 runner. This verifies the base image still
+    # builds for linux/arm64; it deliberately does not tag or push, because how a
+    # multi-arch image should be published is a separate decision.
+    build_images_base_arm64:
+        name: Build Docker CHIP Build images - base (arm64)
+        runs-on: ubuntu-24.04-arm
+        if: github.actor != 'restyled-io[bot]'
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - ""
+                    - "-minimal"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Build images using project bash script
+              run: |
+                  cd integrations/docker/images/base/chip-build${{ matrix.img }}
+                  ./build.sh
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     # NOTE: docker images builds are disabled for all beyond base image because
     #       underlying image builds fail either due to size restrictions (we only
     #       have a few GB in github: 14GB for everything) or dependencies which
