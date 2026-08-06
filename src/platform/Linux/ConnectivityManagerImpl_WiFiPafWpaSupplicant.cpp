@@ -658,17 +658,17 @@ void ConnectivityManagerImpl::PostWpaInterfaceProxyReady()
         this);
 }
 
-void ConnectivityManagerImpl::PafChannelFlushBeforeAssociation()
+void ConnectivityManagerImpl::OnAssociationRequested()
 {
     WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().FlushPendingAcks();
 }
 
-void ConnectivityManagerImpl::PafChannelHoldForAssociation()
+void ConnectivityManagerImpl::OnAssociationStarting()
 {
     mPafChannelState = PafChannelState::kAssociating;
 }
 
-void ConnectivityManagerImpl::PafChannelOnAssociationFailed()
+void ConnectivityManagerImpl::OnAssociationFailed()
 {
     // PAF does not need the station link, so wake the queued sends rather than waiting on the
     // endpoint's resource-wait timer.
@@ -677,14 +677,14 @@ void ConnectivityManagerImpl::PafChannelOnAssociationFailed()
         DeviceLayer::SystemLayer().ScheduleLambda([]() { WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().DrivePendingSends(); }));
 }
 
-void ConnectivityManagerImpl::PafChannelOnLinkUp()
+void ConnectivityManagerImpl::OnAssociationCompleted()
 {
     // NAN needs a few hundred milliseconds more than the link, so hold until it is seen working.
     mPafChannelState = PafChannelState::kAwaitingNan;
     LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this]() { ArmNanRecoveryTimer(); }));
 }
 
-void ConnectivityManagerImpl::PafChannelOnInterfaceRemoved()
+void ConnectivityManagerImpl::OnInterfaceRemoved()
 {
     // Without the interface a PAF send cannot succeed; the resource-wait timer discovers that.
     mPafChannelState = PafChannelState::kAvailable;
