@@ -73,7 +73,7 @@
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
-#include <device/types/window-covering/WindowCovering.h>
+#include <device/types/window-covering/impl/LoggingWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -874,7 +874,7 @@ private:
         {
             RegisterCreator("window-covering", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<WindowCovering>(WindowCovering::Context{
+                return std::make_unique<LoggingWindowCovering>(WindowCovering::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .timerDelegate     = mContext->timerDelegate,
                 });
