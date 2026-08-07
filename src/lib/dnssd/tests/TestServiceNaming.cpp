@@ -270,6 +270,25 @@ TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
     EXPECT_STREQ(buffer, "001122334455");
 }
 
+TEST(TestServiceNaming, TestMakeServiceTypeNameSubtypeCapacity)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+    filter.type = DiscoveryFilterType::kCommissioningMode;
+
+    // "_CM" (3) + "._sub._matterc" (14) + terminator = 18. The suffix on its own fits in fewer
+    // bytes than the whole name does, so the final check has to account for the subtype already
+    // in the buffer rather than comparing the suffix length against the full destination size.
+    constexpr size_t kRequired = 18;
+    for (size_t tooSmall = 1; tooSmall < kRequired; tooSmall++)
+    {
+        EXPECT_EQ(MakeServiceTypeName(buffer, tooSmall, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_NO_MEMORY);
+    }
+
+    EXPECT_EQ(MakeServiceTypeName(buffer, kRequired, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
+    EXPECT_STREQ(buffer, "_CM._sub._matterc");
+}
+
 TEST(TestServiceNaming, TestZeroLengthDestination)
 {
     char buffer[64];
