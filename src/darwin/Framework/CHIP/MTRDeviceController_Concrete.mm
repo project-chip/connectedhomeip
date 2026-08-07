@@ -92,6 +92,19 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
 
+// Upper bound, in seconds, on how long the Thread getSessionForNode: path keeps a
+// MTRDeviceConnectivityMonitor alive while waiting for DNS-SD to resolve a node. Long enough that
+// a node briefly off-mesh can still resolve and have its work item enqueued; short enough that a
+// node that never returns does not leak its monitor for the lifetime of a daemon. See
+// -_armConnectivityMonitorForNodeID:enqueueWorkItemOnce: for how the bound is enforced.
+static constexpr int64_t kSecondsToWaitForConnectivityMonitorWatchdog = 60;
+
+#ifdef DEBUG
+// Test-only override (see -unitTestSetConnectivityMonitorWatchdogInterval:) so tests can run the
+// watchdog in well under a second instead of the production 60s. Unused in release builds.
+static NSTimeInterval sUnitTestConnectivityMonitorWatchdogIntervalOverride = 0;
+#endif
+
 @interface MTRDeviceController_Concrete ()
 
 // MTRDeviceController ivar internal access
@@ -106,6 +119,13 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic, readonly, nullable) MTRDeviceControllerFactory * factory;
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+
+#ifdef DEBUG
+// The most recent MTRDeviceConnectivityMonitor created by -_armConnectivityMonitorForNodeID:....
+// Held weakly so that observing it does not perturb the lifetime under test; tests use this to
+// assert that the production path's monitor deallocates once the watchdog releases it.
+@property (nonatomic, weak, nullable) MTRDeviceConnectivityMonitor * unitTestLastConnectivityMonitor;
+#endif
 @property (nonatomic, readonly, nullable) MTRCommissionableBrowser * commissionableBrowser;
 @property (nonatomic, readonly, nullable) MTRAttestationTrustStoreBridge * attestationTrustStoreBridge;
 @property (nonatomic, readonly, nullable) NSMutableArray<MTRServerEndpoint *> * serverEndpoints;
@@ -146,6 +166,18 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+    // Strong references to connectivity monitors whose lifetime is currently bounded by a watchdog
+    // (see -_armConnectivityMonitorForNodeID:enqueueWorkItemOnce:). The watchdog removes its monitor
+    // when it fires; controller shutdown removes all of them. This is what actually bounds the
+    // monitor's lifetime, and removing here is what lets it deallocate. Guarded by
+    // _deviceConnectivityMonitorLock.
+    NSMutableSet<MTRDeviceConnectivityMonitor *> * _watchdoggedDeviceConnectivityMonitors;
+#ifdef DEBUG
+    // When set per-call by -unitTestForceThreadGetSessionForNode:, -definitelyUsesThreadForDevice:
+    // returns YES so a test can drive the production Thread getSessionForNode: path without a real
+    // subscribing Thread device.
+    BOOL _unitTestForceThreadForGetSessionForNode;
+#endif
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -483,14 +515,17 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
     [self stopBrowseForCommissionables];
 
-    // Calling stopMonitoring breaks the retain cycle of the monitor handler holding
-    // the monitor object, allowing the monitor object to dealloc and clean up.
+    // Stop any connectivity monitors still alive at controller shutdown and release the strong
+    // references held by their watchdogs, so the monitors deallocate promptly rather than lingering
+    // until each pending watchdog fires. -stopMonitoring is idempotent, so a later watchdog firing
+    // is a harmless no-op.
     {
         std::lock_guard lock(_deviceConnectivityMonitorLock);
         for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
             [deviceConnectivityMonitor stopMonitoring];
         }
         [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
+        [_watchdoggedDeviceConnectivityMonitors removeAllObjects];
     }
 
     [_factory controllerShuttingDown:self];
@@ -783,6 +818,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         }
 
         _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
+        _watchdoggedDeviceConnectivityMonitors = [NSMutableSet set];
 
         commissionerInitialized = YES;
 
@@ -1519,6 +1555,50 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
     return deviceAttributeCounts;
 }
+
+// DEBUG-only test seams for the connectivity-monitor lifetime fix. These exist because the
+// production entry point (-getSessionForNode:) only takes the monitored Thread path for a node
+// backed by a real subscribing MTRDevice, which a unit test cannot stand up cheaply, and the
+// production watchdog interval is 60s. They let a test drive the exact production path with a
+// short watchdog and observe (weakly, so as not to perturb the lifetime under test) the monitor
+// the production code created. They compile out entirely in release builds.
+
+// Overrides the watchdog interval (seconds). Pass 0 to restore production behavior.
+- (void)unitTestSetConnectivityMonitorWatchdogInterval:(NSTimeInterval)interval
+{
+    sUnitTestConnectivityMonitorWatchdogIntervalOverride = interval;
+}
+
+// Calls the production -getSessionForNode: but forces the Thread branch for nodeID. The Thread-vs-
+// direct decision is made synchronously inside -getSessionForNode:, so the forcing flag only needs
+// to be live for the duration of this call; it is scoped per-call so it cannot leak across calls.
+// For an unreachable node the completion never fires (the deliberate throttle), so tests observe
+// the monitor's lifetime via -unitTestLastConnectivityMonitor rather than a completion.
+- (void)unitTestForceThreadGetSessionForNode:(uint64_t)nodeID
+{
+    [self unitTestForceThreadGetSessionForNode:nodeID completion:^(BOOL success) {}];
+}
+
+// As above, but surfaces whether the caller completion fired (success = a non-error session was
+// delivered). For an unreachable node it must never fire on this path: the work item is enqueued
+// only when DNS-SD resolves, and once the watchdog tears the monitor down nothing can resolve it,
+// so a test can assert post-watchdog that the throttle held (completion never fired). The reported
+// flag collapses any repeat invocations into a single observed result.
+- (void)unitTestForceThreadGetSessionForNode:(uint64_t)nodeID completion:(void (^)(BOOL success))completion
+{
+    __block BOOL reported = NO;
+    _unitTestForceThreadForGetSessionForNode = YES;
+    [self getSessionForNode:nodeID
+                 parameters:0
+                 completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+                     if (!reported) {
+                         reported = YES;
+                         completion(error == nil);
+                     }
+                 }];
+    _unitTestForceThreadForGetSessionForNode = NO;
+}
 #endif
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
@@ -1702,6 +1782,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID
 {
+#ifdef DEBUG
+    if (_unitTestForceThreadForGetSessionForNode) {
+        return YES;
+    }
+#endif
     if (!chip::IsOperationalNodeId(nodeID)) {
         return NO;
     }
@@ -1761,33 +1846,117 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
         }];
 
-        // The monitor would call the handler when resolve returns a usable address. The monitor
-        // handler block retains the monitor object itself, forming a retain cycle. The cycle is
-        // broken when stopMonitoring is called.
-        MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
-        BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
-            // Ensure the work item is queued only once, since this handler could be called multiple times in a row
-            if (workItem) {
-                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
-                workItem = nil;
-                [deviceConnectivityMonitor stopMonitoring];
+        // Enqueue the CASE work item at most once. Read/written only on _chipWorkQueue (the DNS-SD
+        // handler runs there), so the nil-check guard is sufficient. self is captured weakly so the
+        // monitor (which retains this block) cannot pin the controller alive.
+        mtr_weakify(self);
+        void (^enqueueWorkItemOnce)(NSString *) = ^(NSString * reason) {
+            mtr_strongify(self);
+            if (!self || !workItem) {
+                return;
             }
-        } queue:_chipWorkQueue];
+            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX%@", nodeID, reason];
+            workItem = nil;
+        };
 
-        if (monitorStarted) {
-            // Add the monitor object to the weak set, so that the above retain cycle can be broken
-            // when the controller shuts down.
-            std::lock_guard lock(_deviceConnectivityMonitorLock);
-            [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
-        } else {
+        if (![self _armConnectivityMonitorForNodeID:nodeID enqueueWorkItemOnce:enqueueWorkItemOnce]) {
             // DNS-SD monitoring failed to start - proceed with immediate connection attempt
             // (This is unlikely, but needed so that the workItem block always executes.)
             MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
-            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+            enqueueWorkItemOnce(@" (no DNS-SD)");
         }
     } else {
         [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
     }
+}
+
+// Creates and starts a MTRDeviceConnectivityMonitor for nodeID and bounds its lifetime with a
+// watchdog. Returns YES if monitoring started, NO otherwise (caller must then drive the work item).
+//
+// The leak: the DNS-SD handler used to capture the monitor by strong name, forming a monitor<->handler
+// retain cycle broken only when -stopMonitoring ran from inside the handler. For an unreachable node
+// the handler never fires, so on a long-running daemon (which never tears down its controller, so the
+// shutdown-time weak-set cleanup never runs) the monitor leaked for the life of the process, once per
+// getSessionForNode: call.
+//
+// The fix: capture the monitor *weakly* everywhere (handler and watchdog), and hold the single
+// strong reference in _watchdoggedDeviceConnectivityMonitors. A dispatch_after watchdog removes that
+// strong reference (and stops the monitor) after the watchdog interval; controller shutdown removes
+// it too. Either way the monitor's lifetime is bounded and it deallocates once the strong reference
+// is removed. This does not change the original completion semantics: the work item is still enqueued
+// only when DNS-SD resolves, so a node that never resolves still generates no CASE attempt (the
+// deliberate Thread-traffic throttle is preserved).
+//
+// One narrow semantic delta is worth calling out: a Thread node that DNS-SD resolves *after* the
+// watchdog has already fired (i.e. more than the watchdog interval, 60s, after this call) no longer
+// has its CASE work item enqueued from this path, because the monitor has been torn down. For an
+// unreachable node this matches pre-fix behavior exactly (upstream never fired the completion either,
+// since the handler never ran). For the slow-resolve window (resolve between 60s and controller
+// shutdown) it is a deliberate trade-off and is safe: this path is only a Thread-traffic throttling
+// optimization, not the recovery mechanism. Recovery for a node that comes back late is driven
+// independently by the device-level MTRDevice _connectivityMonitor and the per-device resubscription
+// timer, neither of which is bounded by this watchdog. Bounding the monitor here at 60s trades an
+// unbounded per-call leak on a long-running daemon for the loss of a throttling optimization in a
+// rare, already-degraded (node off-mesh for >60s) case.
+- (BOOL)_armConnectivityMonitorForNodeID:(chip::NodeId)nodeID
+                     enqueueWorkItemOnce:(void (^)(NSString * reason))enqueueWorkItemOnce
+{
+    MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
+#ifdef DEBUG
+    self.unitTestLastConnectivityMonitor = deviceConnectivityMonitor;
+#endif
+    __weak MTRDeviceConnectivityMonitor * weakMonitor = deviceConnectivityMonitor;
+    mtr_weakify(self);
+    BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
+        // Idempotent: the handler can fire repeatedly, and enqueueWorkItemOnce only enqueues once.
+        enqueueWorkItemOnce(@"");
+        // Happy path: the node resolved, so stop the monitor and release our strong reference to it
+        // immediately rather than letting it linger until the watchdog fires (matching the original
+        // upstream behavior of freeing the monitor as soon as it resolved). The watchdog remains
+        // armed and will harmlessly no-op once the monitor is gone.
+        MTRDeviceConnectivityMonitor * strongMonitor = weakMonitor;
+        [strongMonitor stopMonitoring];
+        mtr_strongify(self);
+        if (self && strongMonitor) {
+            std::lock_guard lock(self->_deviceConnectivityMonitorLock);
+            [self->_watchdoggedDeviceConnectivityMonitors removeObject:strongMonitor];
+        }
+    } queue:_chipWorkQueue];
+
+    if (!monitorStarted) {
+        return NO;
+    }
+
+    // Hold the only strong reference to the monitor here. The weak set lets shutdown stop it; the
+    // strong set lets shutdown (and the watchdog) release it.
+    {
+        std::lock_guard lock(_deviceConnectivityMonitorLock);
+        [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+        [_watchdoggedDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+    }
+
+    // Watchdog: after the interval, stop the monitor and drop the strong reference so it deallocates.
+    // Captures the monitor weakly (the strong set owns it) so that if shutdown already released it,
+    // this is a harmless no-op.
+#ifdef DEBUG
+    NSTimeInterval watchdogInterval = (sUnitTestConnectivityMonitorWatchdogIntervalOverride > 0)
+        ? sUnitTestConnectivityMonitorWatchdogIntervalOverride
+        : (NSTimeInterval) kSecondsToWaitForConnectivityMonitorWatchdog;
+#else
+    NSTimeInterval watchdogInterval = (NSTimeInterval) kSecondsToWaitForConnectivityMonitorWatchdog;
+#endif
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (watchdogInterval * NSEC_PER_SEC)), _chipWorkQueue, ^{
+        @autoreleasepool {
+            mtr_strongify(self);
+            MTRDeviceConnectivityMonitor * strongMonitor = weakMonitor;
+            [strongMonitor stopMonitoring];
+            if (self && strongMonitor) {
+                std::lock_guard lock(self->_deviceConnectivityMonitorLock);
+                [self->_watchdoggedDeviceConnectivityMonitors removeObject:strongMonitor];
+            }
+        }
+    });
+    return YES;
 }
 
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
