@@ -312,7 +312,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
-    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    mGroupsProvider->SetGroupcastEnabled(initParams.groupcastEnabledOverride.value_or(CHIP_CONFIG_ENABLE_GROUPCAST));
+#endif
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
