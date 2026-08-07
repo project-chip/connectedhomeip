@@ -6168,6 +6168,148 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onReachable = nil;
 }
 
+// Regression test for #72721: on coldstart two subscription-setup
+// triggers fire a fraction of a second apart -- a "Controller resumed"-style
+// setup (here: -setDelegate:queue:) immediately followed by an SPI client
+// "device may be reachable" indication (-_deviceMayBeReachable) that arrives
+// while the first setup is still establishing CASE. The correct behavior is
+// that exactly ONE Matter subscription (one SubscribeRequest / one ReadClient)
+// ends up established against the node, NOT two.
+//
+// The bug (introduced by project-chip/connectedhomeip#72255, reverted by
+// #72721 / internal PR #7955) was in the C++ CASESessionManager::ReleaseSession:
+// while a setup IsEstablishingSession() the release was turned into a NO-OP, so
+// _deviceMayBeReachable's ReleaseSession(peerScopeId) did NOT cancel the
+// in-flight CASE attempt #1. _deviceMayBeReachable then re-issued a second
+// attempt, and when CASE went active BOTH completions fired -- producing two
+// ReadClients and two SubscribeRequests (~311us apart in the field capture),
+// accumulating across wake cycles. After the revert, ReleaseSession again
+// actually cancels the in-flight setup, so only the re-issued attempt completes
+// and exactly one subscription results.
+//
+// This test asserts the observable outcome only: the number of ReadClients the
+// device creates (each ReadClient == one SubscribeRequest on the wire), counted
+// via the onReadClientCreated hook. It does NOT assert anything about whether
+// _resetSubscription is called -- _deviceMayBeReachable still resets and
+// re-issues on the fixed tree; the fix lives in the C++ ReleaseSession, and the
+// only correct, fix-agnostic invariant is "one subscription, not two".
+//
+// Fail-before / pass-after: on a tree with #72255 present, ReleaseSession is a
+// no-op during establishment, so the CASE attempt that was in flight when
+// _deviceMayBeReachable fired is not torn down; it completes alongside the
+// re-issued attempt and a SECOND ReadClient is created -> readClientCreatedCount
+// becomes 2 and the final XCTAssertEqual(..., 1) fails. On the post-revert tree
+// the in-flight attempt is cancelled, so only one ReadClient is ever created and
+// the assertion passes.
+- (void)test047b_ColdstartDoubleTriggerYieldsSingleSubscription
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    // Bring up a reachable node so that CASE can actually complete; the bug only
+    // manifests when the in-flight CASE attempt is able to go active alongside
+    // the re-issued one.
+    [self startCommissionedAppWithName:@"all-clusters"
+                             arguments:@[]
+                            controller:controller
+                               payload:kOnboardingPayload2
+                                nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Commissioning above left an established CASE session to the node. If that
+    // session is still cached, the subscription setup below reuses it synchronously
+    // and ReadClient #1 is created before the second trigger's Matter-queue block can
+    // run -- yielding two ReadClients on BOTH the buggy and fixed trees, so the test
+    // cannot distinguish them. Release the cached session first (no delegate is set
+    // yet, so _resetSubscription / _ensureSubscriptionForExistingDelegates are no-ops
+    // and only ReleaseSession has effect), then drain the Matter queue so the release
+    // has completed. setDelegate: below then performs a real asynchronous CASE, giving
+    // the second trigger an actual in-flight attempt to cancel.
+    [device _deviceMayBeReachable];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    // Count ReadClients created. Each ReadClient corresponds to exactly one
+    // SubscribeRequest sent to the node, so this is a faithful count of the
+    // number of concurrent subscriptions the coldstart sequence produces. Use a
+    // standalone lock object (not the delegate) for synchronization so the
+    // handler block does not retain the delegate.
+    NSObject * countLock = [[NSObject alloc] init];
+    __block NSUInteger readClientCreatedCount = 0;
+    delegate.onReadClientCreated = ^{
+        @synchronized(countLock) {
+            readClientCreatedCount++;
+        }
+    };
+
+    // Fire the second trigger (_deviceMayBeReachable) exactly once, the first
+    // time we observe the device enter the Subscribing state -- i.e. while the
+    // first setup's CASE attempt is in flight. This reproduces the coldstart
+    // double-trigger window. Guard with a flag so we only do it once (the device
+    // re-enters Subscribing internally during the re-issue).
+    __block BOOL firedSecondTrigger = NO;
+    XCTestExpectation * secondTriggerFired = [self expectationWithDescription:@"_deviceMayBeReachable fired during in-flight CASE"];
+    __weak __auto_type weakDevice = device;
+    delegate.onInternalStateChanged = ^{
+        __strong __auto_type strongDevice = weakDevice;
+        if (strongDevice == nil) {
+            return;
+        }
+        if ([strongDevice _getInternalState] == MTRInternalDeviceStateSubscribing && !firedSecondTrigger) {
+            firedSecondTrigger = YES;
+            // The SPI "device may be reachable" indication, arriving mid-CASE.
+            // On the buggy tree this leaves attempt #1 in flight (ReleaseSession
+            // no-op) and re-issues attempt #2 -> two ReadClients. On the fixed
+            // tree attempt #1 is cancelled -> one ReadClient.
+            [strongDevice _deviceMayBeReachable];
+            [secondTriggerFired fulfill];
+        }
+    };
+
+    // First trigger ("Controller resumed"-style): setting the delegate kicks off
+    // the initial subscription setup and transitions to Subscribing.
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ secondTriggerFired ] timeout:60];
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+
+    delegate.onInternalStateChanged = nil;
+    delegate.onReachable = nil;
+
+    // Drain the Matter queue and the device queue so any ReadClient creation
+    // from either CASE completion has been counted before we assert. Drain in a
+    // loop because the two completions (and the re-issue) can ping-pong between
+    // the queues.
+    for (int i = 0; i < 3; ++i) {
+        [controller syncRunOnWorkQueue:^{
+            ;
+        } error:nil];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+    }
+
+    // The coldstart double-trigger must yield exactly ONE subscription. Before
+    // the revert this is 2 (the in-flight attempt was not cancelled); after the
+    // revert it is 1.
+    @synchronized(countLock) {
+        XCTAssertEqual(readClientCreatedCount, 1u,
+            @"coldstart double-trigger (controllerResumed + _deviceMayBeReachable mid-CASE) created %lu ReadClients/SubscribeRequests; exactly one subscription is expected (#72721)",
+            (unsigned long) readClientCreatedCount);
+    }
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+}
+
 - (void)test048_MTRDeviceResubscribeOnSubscriptionPool
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
