@@ -125,12 +125,9 @@ public:
         return Capture(std::move(data));
     }
 
-    size_t SendCount() const { return mSendCount; }
-
 private:
     CHIP_ERROR Capture(chip::System::PacketBufferHandle && data)
     {
-        mSendCount++;
         if (data.IsNull())
         {
             return CHIP_NO_ERROR;
@@ -150,19 +147,23 @@ private:
         void OnQuery(const QueryData & data) override { (void) data.GetType(); }
         void OnResource(ResourceType type, const ResourceData & data) override { (void) data.GetType(); }
     };
-
-    size_t mSendCount = 0;
 };
 
 // A realistic advertisement for the query to match against: the operational and
 // commissionable service names, an instance, a host and a TXT set.
 struct Advertisement
 {
-    uint8_t dnsSdStorage[64];
-    uint8_t serviceStorage[64];
-    uint8_t instanceStorage[64];
-    uint8_t hostStorage[64];
-    uint8_t txtStorage[64];
+    // FlatAllocatedQName::Build lays out a QNamePart pointer array followed by the
+    // NUL-terminated labels, so each buffer must hold
+    // sum(sizeof(QNamePart) + strlen(label) + 1) and must be aligned for
+    // QNamePart. On a 64-bit build the largest of the names below needs 68 bytes.
+    static constexpr size_t kQNameStorage = 128;
+
+    alignas(QNamePart) uint8_t dnsSdStorage[kQNameStorage];
+    alignas(QNamePart) uint8_t serviceStorage[kQNameStorage];
+    alignas(QNamePart) uint8_t instanceStorage[kQNameStorage];
+    alignas(QNamePart) uint8_t hostStorage[kQNameStorage];
+    alignas(QNamePart) uint8_t txtStorage[kQNameStorage];
 
     FullQName dnsSd;
     FullQName service;
@@ -193,6 +194,15 @@ struct Advertisement
         srvRecord(instance, host, kPort), txtRecord(instance, txt), ptrResponder(service, instance), srvResponder(srvRecord),
         txtResponder(txtRecord), ipv4Responder(host), ipv6Responder(host)
     {
+        // Tripwire for a later edit that lengthens a label past the sizing above.
+        // ASSERT_* cannot be used here: it expands to a return, which a
+        // constructor may not do.
+        VerifyOrDie(FlatAllocatedQName::RequiredStorageSize("_services", "_dns-sd", "_udp", "local") <= kQNameStorage);
+        VerifyOrDie(FlatAllocatedQName::RequiredStorageSize("_matter", "_tcp", "local") <= kQNameStorage);
+        VerifyOrDie(FlatAllocatedQName::RequiredStorageSize("C5038835313B8B98", "_matter", "_tcp", "local") <= kQNameStorage);
+        VerifyOrDie(FlatAllocatedQName::RequiredStorageSize("B75AFB458ECD", "local") <= kQNameStorage);
+        VerifyOrDie(FlatAllocatedQName::RequiredStorageSize("SII=23", "SAI=321", "T=1") <= kQNameStorage);
+
         queryResponder.Init();
         queryResponder.AddResponder(&ptrResponder).SetReportAdditional(instance).SetReportInServiceListing(true);
         queryResponder.AddResponder(&srvResponder).SetReportAdditional(host);
@@ -271,9 +281,7 @@ std::vector<std::vector<uint8_t>> QuerySeeds()
 class RespondingDelegate : public ParserDelegate
 {
 public:
-    RespondingDelegate(ResponseSender & sender, const Inet::IPPacketInfo & source, BytesRange packet) :
-        mSender(sender), mSource(source), mPacket(packet)
-    {}
+    RespondingDelegate(ResponseSender & sender, const Inet::IPPacketInfo & source) : mSender(sender), mSource(source) {}
 
     void OnHeader(ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
 
@@ -294,7 +302,6 @@ public:
 private:
     ResponseSender & mSender;
     const Inet::IPPacketInfo & mSource;
-    BytesRange mPacket;
     uint16_t mMessageId = 0;
     unsigned mQueries   = 0;
 };
@@ -320,7 +327,7 @@ void RespondToQueryNoCorruption(const std::vector<uint8_t> & queryPacket)
     source.DestPort = 5353;
 
     const BytesRange packet(queryPacket.data(), queryPacket.data() + queryPacket.size());
-    RespondingDelegate delegate(sender, source, packet);
+    RespondingDelegate delegate(sender, source);
     (void) ParsePacket(packet, &delegate);
 }
 

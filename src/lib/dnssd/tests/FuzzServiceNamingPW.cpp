@@ -31,9 +31,8 @@
  *      comfortable case.
  *
  *      Oracles beyond no-crash under ASan/UBSan:
- *        - every builder either fails or leaves a NUL within the buffer it was
- *          given, and never writes at all when it reports failure into a
- *          zero-length buffer;
+ *        - every builder either reports failure, or leaves a NUL strictly inside
+ *          the destination it was given;
  *        - a name that ExtractIdFromInstanceName accepts round-trips: rebuilding
  *          it with MakeInstanceName and extracting again yields the same PeerId.
  */
