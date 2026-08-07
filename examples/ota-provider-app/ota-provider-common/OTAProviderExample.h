@@ -118,7 +118,10 @@ public:
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
+    bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
     const char * GetLocation() const { return mLocation; }
+    bool GetStartOffsetBitSet() const { return mBdxOtaSender.GetLastReceiveInitStartOffsetBitSet(); }
+    uint32_t GetStartOffset() const { return mBdxOtaSender.GetLastReceiveInitStartOffset(); }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
