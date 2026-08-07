@@ -77,11 +77,12 @@ attribute/command element names, not an element name itself):
 GroupKeyManagement:
     revision: 4
 ```
+
 ### Provisional Elements
 
 Some specification features are developed ahead of the baseline data model
-release. These "in-progress" or "provisional" elements may be implemented in
-the SDK but not yet included in the checked-in XML baseline.
+release. These "in-progress" or "provisional" elements may be implemented in the
+SDK but not yet included in the checked-in XML baseline.
 
 To reference a provisional element in the errata overlay without triggering
 validation errors, set `is_provisional: true` on that element:
@@ -141,3 +142,4 @@ follow these steps to extend the engine core:
 2. Add your Cluster and Element override.
 3. Include a comment referencing the Specification Pull Request, Issue, or SDK
    Pull Request explaining why the adaptation is necessary.
+```
