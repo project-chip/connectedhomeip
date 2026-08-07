@@ -28,9 +28,16 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <mbedtls/version.h>
+
+// mbedtls/ecp.h (mbedtls_ecp_* symbols) is only used by the legacy non-PSA path
+// and became private in mbedTLS 4.1.0, so include it only before 4.1.0.
+#if (MBEDTLS_VERSION_NUMBER < 0x04010000)
+#include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04010000)
+
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
