@@ -20,6 +20,8 @@ int __wrap__write(int file, char * ptr, int len)
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include <errno.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/times.h>
 
@@ -111,3 +113,67 @@ void __wrap__wlan_printf(int skip, int level, const char * fmt, ...)
 }
 
 /****************************************************************************/
+
+extern int __io_getchar(void) __attribute__((weak));
+int _read(int file, char * ptr, int len)
+{
+    if (!__io_getchar)
+    {
+        return 0;
+    }
+
+    int DataIdx = 0;
+    for (; DataIdx < len; DataIdx++)
+    {
+        int c = __io_getchar();
+        if (c < 0)
+        {
+            if (DataIdx == 0)
+            {
+                return -1;
+            }
+            break;
+        }
+        *ptr++ = (char) c;
+    }
+
+    return DataIdx;
+}
+
+int _close(int file)
+{
+    return -1;
+}
+
+int _fstat(int file, struct stat * st)
+{
+    st->st_mode = S_IFCHR;
+    return 0;
+}
+
+int _isatty(int file)
+{
+    return 1;
+}
+
+int _lseek(int file, int ptr, int dir)
+{
+    return 0;
+}
+
+int _open(const char * name, int flags, int mode)
+{
+    return -1;
+}
+
+int _getpid(void)
+{
+    errno = ENOTSUP;
+    return -1;
+}
+
+int _kill(int pid, int sig)
+{
+    errno = ENOTSUP;
+    return -1;
+}

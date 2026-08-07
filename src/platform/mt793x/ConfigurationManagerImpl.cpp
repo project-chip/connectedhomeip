@@ -58,7 +58,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<MT793XConfig>::Init();
     SuccessOrExit(err);
     // TODO: Initialize the global GroupKeyStore object here (#1626)
-    IncreaseBootCount();
+    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
 
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
@@ -84,7 +84,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -97,7 +97,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     uint32_t bootCount = 0;
     if (MT793XConfig::ConfigValueExists(MT793XConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        TEMPORARY_RETURN_IGNORED GetRebootCount(bootCount);
     }
     return MT793XConfig::WriteConfigValue(MT793XConfig::kConfigKey_BootCount, bootCount + 1);
 }
@@ -238,7 +238,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-    PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");

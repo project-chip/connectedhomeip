@@ -215,7 +215,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     /* TODO */
 #endif
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
 
     *netifpp = ifp;
