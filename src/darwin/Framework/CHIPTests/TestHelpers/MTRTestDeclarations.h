@@ -72,6 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
+@property (nonatomic, assign) BOOL unitTestSuppressGetSessionConnectivityMonitorFire;
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 @end
