@@ -39,11 +39,23 @@ follow-up changes that add the breaker endpoint and its clusters.
 
           $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
--   Build the example application:
+-   Check out the repository and its submodules:
+
+          $ cd ~
+          $ git clone git@github.com:project-chip/connectedhomeip.git
+          $ cd connectedhomeip
+          $ ./scripts/checkout_submodules.py --platform linux --recursive
+
+    Alternatively you can check out all submodules and resync with:
+
+          $ git submodule sync --recursive; git submodule update --init --recursive
+
+-   Activate at the top level, then build the example application:
+
+          $ cd ~/connectedhomeip
+          $ source ./scripts/activate.sh
 
           $ cd ~/connectedhomeip/examples/electrical-protection-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
           $ ninja -C out/debug
 
