@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -78,9 +78,6 @@ public:
 
 private:
     static DishwasherAlarmServer instance;
-
-    void SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive, BitMask<AlarmMap> becameInactive,
-                         BitMask<AlarmMap> newState, BitMask<AlarmMap> mask);
 };
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);

@@ -629,6 +629,7 @@
             "SupportedTemperatureLevels",
             "ClusterRevision"
         ],
+        "Dishwasher Alarm": ["FeatureMap", "ClusterRevision"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
@@ -646,6 +647,7 @@
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Refrigerator Alarm": ["FeatureMap", "ClusterRevision"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
