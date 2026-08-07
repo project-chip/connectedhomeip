@@ -194,6 +194,11 @@ void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mg
 void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 #endif
 {
+    if (iface != Instance().mNetIf)
+    {
+        return; // should only handle events originating from Wi-Fi interface if there are multiple interfaces available
+    }
+
     if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
     {
         IPv6AddressChangeHandler(cb->info);
@@ -646,6 +651,35 @@ void WiFiManager::IPv6AddressChangeHandler(const void * data)
         {
             ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
         }
+
+        UpdateIpv6InternetConnectivityState();
+    }
+}
+
+void WiFiManager::UpdateIpv6InternetConnectivityState()
+{
+    net_if * iface = Instance().mNetIf;
+    VerifyOrReturn(iface != nullptr);
+
+    struct net_if * found  = iface;
+    const bool hasRoutable = (net_if_ipv6_get_global_addr(NET_ADDR_PREFERRED, &found) != nullptr);
+
+    // Report only on transition so we emit Established/Lost exactly once.
+    if (hasRoutable == Instance().mHasRoutableIPv6Address)
+    {
+        return;
+    }
+    Instance().mHasRoutableIPv6Address = hasRoutable;
+
+    ChipDeviceEvent event{};
+    event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+    event.InternetConnectivityChange.IPv6 = hasRoutable ? kConnectivity_Established : kConnectivity_Lost;
+
+    CHIP_ERROR err = PlatformMgr().PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
