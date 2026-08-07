@@ -107,6 +107,7 @@ public:
 
     CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase);
     CHIP_ERROR SetOperationalState(uint8_t aOpState);
+    CHIP_ERROR SetOperationalState(OperationalStateEnum aOpState) { return SetOperationalState(to_underlying(aOpState)); }
 
     DataModel::Nullable<uint8_t> GetCurrentPhase() const { return mCurrentPhase; }
     uint8_t GetCurrentOperationalState() const { return mOperationalState; }

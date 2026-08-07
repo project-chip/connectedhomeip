@@ -89,6 +89,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/LevelControl" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/LocalizationConfiguration" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/LowPower" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/MediaFileManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/MediaInput" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/MediaPlayback" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Messages" + invoker.target,

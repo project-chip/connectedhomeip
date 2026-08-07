@@ -35,43 +35,55 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // External triggers — entry points that pass context into AppTask. Optional override: *Impl().
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
     CHIP_ERROR InitThermostat() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitThermostatImpl); }
 
+    // Initializes the temperature sensor driver.
     CHIP_ERROR InitSensor() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitSensorImpl); }
+
+    // Reads the current temperature from sensor hardware.
     CHIP_ERROR GetTemperature(int16_t & temperature)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, GetTemperatureImpl, temperature);
     }
 
+    // Platform button callback, posts an AppEvent to the AppTask queue for processing.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // AppTask-thread event handlers (queued events, timers, data model). Optional override: *Impl().
+    // Periodic timer callback, posts a temperature update event to the AppTask queue.
     static void SensorTimerEventHandler(void * arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, SensorTimerEventHandlerImpl, arg);
     }
 
+    // AppTask thread handler, reads the sensor and updates Thermostat::LocalTemperature.
     static void TemperatureUpdateEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, TemperatureUpdateEventHandlerImpl, aEvent);
     }
 
+    // Matter stack callback after a server attribute change, logs Thermostat attributes and refreshes the UI.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMPostAttributeChangeCallbackImpl, attributePath, type, size, value);
     }
 
+    // Matter data model hook when the Thermostat cluster is initialized on an endpoint.
+    void DMThermostatClusterInit(chip::EndpointId endpoint)
+    {
+        CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMThermostatClusterInitImpl, endpoint);
+    }
+
 private:
     friend Derived;
 
-    /** Default implementations — override in Derived to customize. */
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
@@ -92,4 +104,6 @@ private:
     {
         AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
     }
+
+    void DMThermostatClusterInitImpl(chip::EndpointId endpoint) { AppTask::DMThermostatClusterInit(endpoint); }
 };

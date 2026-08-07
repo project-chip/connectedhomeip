@@ -26,6 +26,18 @@
 
 namespace chip::app::Clusters::ModeBase {
 
+/**
+ * A ModeBaseCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenModeBaseCluster : public ModeBaseCluster
+{
+public:
+    using ModeBaseCluster::ModeBaseCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
+
 class Instance : public IntrusiveListNodeBase<>
 {
 public:
@@ -128,11 +140,11 @@ private:
     Delegate * mDelegate{};
     ConcreteClusterPath mClusterPath{};
     BitMask<ModeBase::Feature> mFeature{};
-    ModeBaseCluster::OptionalAttributeSet mOptionalAttributeSet{};
+    CodegenModeBaseCluster::OptionalAttributeSet mOptionalAttributeSet{};
     bool mFailTransition = false;
 
     // The Code Driven ModeBase cluster instance (lazy-initialized)
-    chip::app::LazyRegisteredServerCluster<ModeBaseCluster> mCluster;
+    chip::app::LazyRegisteredServerCluster<CodegenModeBaseCluster> mCluster;
 
     void RegisterThisInstance();
     void UnregisterThisInstance();

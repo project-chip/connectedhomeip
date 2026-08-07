@@ -99,6 +99,7 @@
 #include <clusters/LevelControl/EventIds.h>
 #include <clusters/LocalizationConfiguration/EventIds.h>
 #include <clusters/LowPower/EventIds.h>
+#include <clusters/MediaFileManagement/EventIds.h>
 #include <clusters/MediaInput/EventIds.h>
 #include <clusters/MediaPlayback/EventIds.h>
 #include <clusters/Messages/EventIds.h>
