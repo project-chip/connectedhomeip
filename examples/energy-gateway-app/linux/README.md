@@ -38,26 +38,37 @@ details.
 
 -   Install tool chain
 
-    ```bash
-    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
-    ```
+                $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
--   Build the example application:
+-   Clone the repo (this assumes you are checking the code out in home folder)
 
-    ```bash
-    cd ~/connectedhomeip/examples/energy-gateway-app/linux
-    git submodule update --init
-    source third_party/connectedhomeip/scripts/activate.sh
-    gn gen out/debug
-    ninja -C out/debug
-    ```
+                $ cd ~
+                $ git clone git@github.com:project-chip/connectedhomeip.git
+
+-   Ensure your repo is up to date with submodules fetched
+
+                $ cd connectedhomeip
+                $ ./scripts/checkout_submodules.py --platform linux --recursive
+
+                # Alternatively you can check out all submodules and resync with:
+                $ git submodule sync --recursive; git submodule update --init --recursive
+
+
+-   Activate your shell (do this every time you open the new terminal window)
+
+                $ cd ~/connectedhomeip
+                $ source ./scripts/activate.sh
+
+-   Build the example application (in the activated shell - see above):
+
+                $ cd ~/connectedhomeip/examples/energy-gateway-app/linux
+                $ gn gen out/debug
+                $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-    ```bash
-    cd ~/connectedhomeip/examples/energy-gateway-app/linux
-    rm -rf out
-    ```
+                $ cd ~/connectedhomeip/examples/energy-gateway-app/linux
+                $ rm -rf out/
 
 ## Commandline arguments
 
