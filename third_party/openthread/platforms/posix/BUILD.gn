@@ -1,0 +1,133 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#
+# Builds OpenThread's POSIX platform so a CHIP Linux example drives a real
+# 802.15.4 RCP over spinel (e.g. spinel+hdlc+uart:///dev/ttyACM0) with no
+# otbr / ot-daemon. Device role, not a border-router daemon.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+
+_posix = "${openthread_root}/src/posix/platform"
+
+config("posix_config") {
+  include_dirs = [
+    "${openthread_root}/examples/platforms",
+    "${openthread_root}/src",
+    "${openthread_root}/src/core",
+    "${_posix}",
+    "${_posix}/include",
+    "${openthread_root}/third_party/mbedtls/repo/include",
+  ]
+
+  # The OT core config header is chosen with the openthread_project_core_config_file
+  # gn arg (shared core_config), so the core lib and this platform lib agree on it;
+  # it is deliberately not pinned to OPENTHREAD_CONFIG_FILE here.
+  defines = [
+    "OPENTHREAD_FTD=1",
+    "OPENTHREAD_MTD=0",
+    "OPENTHREAD_RADIO=0",
+    "OPENTHREAD_POSIX=1",
+
+    # Device, not a BR daemon. With DAEMON=0 the shared core config header
+    # (openthread-core-posix-config.h) leaves the platform netif and UDP off
+    # (OPENTHREAD_CONFIG_PLATFORM_{NETIF,UDP}_ENABLE are only turned on when
+    # DAEMON=1), so OT's own IPv6/UDP stack carries the CHIP inet endpoints —
+    # no host tun netif, no root, no wpan0.
+    "OPENTHREAD_POSIX_CONFIG_DAEMON_ENABLE=0",
+    "OPENTHREAD_POSIX_CONFIG_SPINEL_HDLC_INTERFACE_ENABLE=1",
+    "OPENTHREAD_POSIX_CONFIG_SPINEL_SPI_INTERFACE_ENABLE=0",
+    "OPENTHREAD_POSIX_CONFIG_INSTALL_EXTERNAL_ROUTES_ENABLE=0",
+  ]
+}
+
+static_library("posix") {
+  # Full source set mirrors the upstream openthread-posix CMake target; the
+  # daemon/netif/BR sources self-disable via their internal config guards.
+  sources = [
+    "${_posix}/alarm.cpp",
+    "${_posix}/backtrace.cpp",
+    "${_posix}/ble.cpp",
+    "${_posix}/config_file.cpp",
+    "${_posix}/configuration.cpp",
+    "${_posix}/daemon.cpp",
+    "${_posix}/dhcp6_pd_socket.cpp",
+    "${_posix}/entropy.cpp",
+    "${_posix}/firewall.cpp",
+    "${_posix}/hdlc_interface.cpp",
+    "${_posix}/infra_if.cpp",
+    "${_posix}/logging.cpp",
+    "${_posix}/mainloop.cpp",
+    "${_posix}/mdns_socket.cpp",
+    "${_posix}/memory.cpp",
+    "${_posix}/misc.cpp",
+    "${_posix}/multicast_routing.cpp",
+    "${_posix}/netif.cpp",
+    "${_posix}/power.cpp",
+    "${_posix}/radio.cpp",
+    "${_posix}/radio_url.cpp",
+    "${_posix}/rcp_caps_diag.cpp",
+    "${_posix}/resolver.cpp",
+    "${_posix}/settings.cpp",
+    "${_posix}/settings_file.cpp",
+    "${_posix}/spi_interface.cpp",
+    "${_posix}/spinel_manager.cpp",
+    "${_posix}/system.cpp",
+    "${_posix}/tmp_storage.cpp",
+    "${_posix}/trel.cpp",
+    "${_posix}/udp.cpp",
+    "${_posix}/utils.cpp",
+    "${_posix}/virtual_time.cpp",
+
+    # hdlc + url have no standalone gn target (url has none at all; hdlc's does
+    # not carry the FTD core config we need here), so compile them into the host
+    # posix lib directly — the same thing the nxp RCP-host gn platform does.
+    "${openthread_root}/src/lib/hdlc/hdlc.cpp",
+    "${openthread_root}/src/lib/url/url.cpp",
+  ]
+
+  public_configs = [
+    ":posix_config",
+    "..:libopenthread-platform_config",
+  ]
+
+  # Provides otSysInit/otSysProcessDrivers (system.cpp) + copied openthread-system.h.
+  public_deps = [ "..:libopenthread-platform" ]
+
+  # Posix sources include OpenThread-internal headers (lib/platform/exit_code.h,
+  # lib/spinel/*.hpp, ...) whose providing targets are visibility-restricted to the
+  # openthread repo and are linked here transitively through the spinel-rcp group's
+  # private deps. gn's include check can't see through that, so disable it for this
+  # third-party wrapper (same approach other CHIP third-party wrappers take).
+  check_includes = false
+
+  deps = [
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "..:libopenthread-platform-utils",
+
+    # Host-side spinel driver (radio_spinel + spinel codec). Use the top-level
+    # GROUP, not src/lib/spinel:libopenthread-spinel-rcp directly: the group
+    # keeps the target's OPENTHREAD_RADIO=1 public_config from leaking onto this
+    # FTD host lib (it sits in the group's private deps), while still linking the
+    # spinel symbols. Matches how nxp's RCP-host gn platform pulls spinel in.
+    "${openthread_root}:libopenthread-spinel-rcp",
+  ]
+
+  # rt is Linux-only and util is unavailable on Android (see the posix platform's
+  # own CMakeLists: `util` is gated off NDK, `rt` gated on Linux).
+  if (current_os == "linux") {
+    libs = [
+      "util",
+      "rt",
+    ]
+  }
+}
