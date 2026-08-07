@@ -90,6 +90,33 @@ void MemoryAllocatorShutdown()
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+
+CHIP_MALLOC_WRAPPER_BEGIN
+
+void * MemoryAllocTyped(size_t size, malloc_type_id_t typeId)
+{
+    VERIFY_INITIALIZED();
+    return malloc_type_malloc(size, typeId);
+}
+
+void * MemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId)
+{
+    VERIFY_INITIALIZED();
+    return malloc_type_calloc(num, size, typeId);
+}
+
+void * MemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId)
+{
+    VERIFY_INITIALIZED();
+    VERIFY_POINTER(p);
+    return malloc_type_realloc(p, size, typeId);
+}
+
+CHIP_MALLOC_WRAPPER_END
+
+#else
+
 void * MemoryAlloc(size_t size)
 {
     VERIFY_INITIALIZED();
@@ -108,6 +135,8 @@ void * MemoryRealloc(void * p, size_t size)
     VERIFY_POINTER(p);
     return realloc(p, size);
 }
+
+#endif
 
 void MemoryFree(void * p)
 {
