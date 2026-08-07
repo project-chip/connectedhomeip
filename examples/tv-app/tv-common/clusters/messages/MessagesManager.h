@@ -61,7 +61,8 @@ struct CachedMessage
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
         mDuration(message.mDuration), mMessageText(message.mMessageText), mLanguageCode(message.mLanguageCode),
-        mMessageUri(message.mMessageUri), mOptions(message.mOptions), mState(message.mState)
+        mMessageUri(message.mMessageUri), mOptions(message.mOptions), mState(message.mState),
+        mFabricIndex(message.mFabricIndex)
     {
         memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
 
@@ -77,10 +78,10 @@ struct CachedMessage
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
                   const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText, std::string languageCode,
-                  std::string messageUri) :
+                  std::string messageUri, chip::FabricIndex fabricIndex) :
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
-        mLanguageCode(languageCode), mMessageUri(messageUri)
+        mLanguageCode(languageCode), mMessageUri(messageUri), mFabricIndex(fabricIndex)
     {
         memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
     }
@@ -99,6 +100,7 @@ struct CachedMessage
     const chip::app::DataModel::Nullable<uint64_t> & GetDuration() const { return mDuration; }
     MessageState GetState() const { return mState; }
     void SetState(MessageState state) { mState = state; }
+    chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage() const
     {
@@ -141,6 +143,7 @@ protected:
     std::vector<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> mResponseOptions;
     std::list<CachedMessageOption> mOptions;
     MessageState mState = MessageState::kQueued;
+    chip::FabricIndex mFabricIndex;
 };
 
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
@@ -157,7 +160,8 @@ public:
         const chip::Optional<
             chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
             responses,
-        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri) override;
+        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri,
+        chip::FabricIndex fabricIndex) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
@@ -176,6 +180,10 @@ public:
     // Not part of the Delegate contract. Read-only introspection for the `messages
     // list` shell command.
     void LogCachedMessages() const;
+
+    // Not part of the Delegate contract. Backs the `messages do-not-disturb` shell command.
+    bool GetDoNotDisturb() const { return mDoNotDisturb; }
+    void SetDoNotDisturb(bool enabled) { mDoNotDisturb = enabled; }
 
 private:
     enum class MessageTimerType : uint8_t
@@ -200,6 +208,7 @@ private:
     // passed (or is null). Also used to recheck once the real time becomes synced.
     void ScheduleOrPresentMessage(chip::ByteSpan messageId);
     void PresentMessage(CachedMessage & message);
+    void PresentOrSuppressMessage(std::list<CachedMessage>::iterator it);
     void CompleteMessage(chip::ByteSpan messageId);
 
     void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);
@@ -207,6 +216,7 @@ private:
     static void OnMessageTimerExpired(chip::System::Layer * systemLayer, void * context);
 
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
+    bool mDoNotDisturb           = false;
     std::list<CachedMessage> mCachedMessages;
     std::vector<std::shared_ptr<MessageTimerContext>> mTimerContexts;
 };

@@ -44,7 +44,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & languageCode,
-    const Optional<CharSpan> & messageUri)
+    const Optional<CharSpan> & messageUri, FabricIndex fabricIndex)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
@@ -54,7 +54,8 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             ? std::string(languageCode.Value().data(), languageCode.Value().size())
             : std::string(),
         (messageUri.HasValue() && !messageUri.Value().empty()) ? std::string(messageUri.Value().data(), messageUri.Value().size())
-                                                               : std::string());
+                                                               : std::string(),
+        fabricIndex);
     if (responses.HasValue())
     {
         auto iter = responses.Value().begin();
@@ -178,7 +179,7 @@ void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
     const auto & startTime = it->GetStartTime();
     if (startTime.IsNull())
     {
-        PresentMessage(*it);
+        PresentOrSuppressMessage(it);
         return;
     }
 
@@ -207,6 +208,17 @@ void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
         return;
     }
 
+    PresentOrSuppressMessage(it);
+}
+
+void MessagesManager::PresentOrSuppressMessage(std::list<CachedMessage>::iterator it)
+{
+    if (mDoNotDisturb)
+    {
+        LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
+        mCachedMessages.erase(it);
+        return;
+    }
     PresentMessage(*it);
 }
 
@@ -334,6 +346,7 @@ void MessagesManager::OnMessageTimerExpired(System::Layer * systemLayer, void * 
 
 void MessagesManager::LogCachedMessages() const
 {
+    ChipLogProgress(Zcl, "MessagesManager: do-not-disturb=%s", mDoNotDisturb ? "on" : "off");
     if (mCachedMessages.empty())
     {
         ChipLogProgress(Zcl, "MessagesManager: no cached messages");

@@ -40,7 +40,8 @@ public:
         const chip::Optional<
             chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
             responses,
-        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri) override;
+        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri,
+        chip::FabricIndex fabricIndex) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes

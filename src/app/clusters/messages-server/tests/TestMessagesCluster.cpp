@@ -49,7 +49,7 @@ public:
     HandlePresentMessagesRequest(const ByteSpan &, const MessagePriorityEnum &, const chip::BitMask<MessageControlBitmap> &,
                                  const DataModel::Nullable<uint32_t> &, const DataModel::Nullable<uint64_t> &, const CharSpan &,
                                  const chip::Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::Type>> &,
-                                 const chip::Optional<CharSpan> &, const chip::Optional<CharSpan> &) override
+                                 const chip::Optional<CharSpan> &, const chip::Optional<CharSpan> &, chip::FabricIndex) override
     {
         return CHIP_NO_ERROR;
     }

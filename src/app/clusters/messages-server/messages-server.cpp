@@ -87,15 +87,19 @@ bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
     return (featureMap & chip::to_underlying(feature));
 }
 
-CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue)
+CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue,
+                                       chip::FabricIndex fabricIndex)
 {
-    Events::MessageNotPresented::Type event{ .messageID = messageId, .removedFromQueue = removedFromQueue };
+    Events::MessageNotPresented::Type event{ .messageID        = messageId,
+                                             .removedFromQueue = removedFromQueue,
+                                             .fabricIndex      = fabricIndex };
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "LogMessageNotPresentedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+        ChipLogError(Zcl, "LogMessageNotPresentedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                    err.Format(), endpoint);
     }
     return err;
 }
@@ -381,7 +385,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     }
 
     err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses,
-                                                 languageCode, messageUri);
+                                                 languageCode, messageUri, commandObj->GetAccessingFabricIndex());
 
 exit:
     if (err != CHIP_NO_ERROR)

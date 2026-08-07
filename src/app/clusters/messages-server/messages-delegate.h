@@ -49,7 +49,8 @@ public:
         const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
         const chip::Optional<DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
             responses,
-        const chip::Optional<CharSpan> & languageCode, const chip::Optional<CharSpan> & messageUri)             = 0;
+        const chip::Optional<CharSpan> & languageCode, const chip::Optional<CharSpan> & messageUri,
+        chip::FabricIndex fabricIndex)                                                                          = 0;
     virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;
 
     // Attributes
@@ -66,7 +67,8 @@ public:
 };
 
 // Logs a MessageNotPresented event for the given endpoint.
-CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue);
+CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue,
+                                       chip::FabricIndex fabricIndex);
 
 // Logs a MessageQueued event for the given endpoint.
 CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId);
