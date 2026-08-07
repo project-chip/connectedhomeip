@@ -59,10 +59,8 @@ class TC_ELDIST_2_1(MatterBaseTest):
     async def test_TC_ELDIST_2_1(self):
         """[TC-ELDIST-2.1] Attributes with Server as DUT
 
-        Verify the non-global attributes of the Electrical Distribution Cluster
-        server: MaxContinuousCurrent, MaxVoltage, NumberOfPoles, EndOfLife,
-        ServiceEntranceRated. Every attribute is Nullable (X), so null is a
-        spec-valid response to each read.
+        This test case verifies the non-global attributes of the Electrical
+        Distribution Cluster server.
         """
         endpoint = self.get_endpoint()
         cluster = Clusters.ElectricalDistribution
