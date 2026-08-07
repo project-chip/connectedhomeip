@@ -41,6 +41,11 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                                                                AttributeValueEncoder & encoder)
 {
     bool localTemperatureNotExposedSupported = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "ThermostatDelegate is null");
+        return Status::Failure;
+    }
 
     switch (request.path.mAttributeId)
     {
@@ -53,23 +58,23 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mLocalTemperature);
+        return encoder.Encode(GetLocalTemperature());
     case SystemMode::Id:
-        return encoder.Encode(mSystemMode);
+        return encoder.Encode(GetSystemMode());
     case ThermostatRunningMode::Id:
-        return encoder.Encode(mRunningMode);
+        return encoder.Encode(GetRunningMode());
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
-            BitMask<RemoteSensingBitmap> valueRemoteSensing = mRemoteSensing;
+            BitMask<RemoteSensingBitmap> valueRemoteSensing = mDelegate->GetRemoteSensing();
             valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
             return encoder.Encode(valueRemoteSensing);
         }
-        break;
+        return encoder.Encode(mDelegate->GetRemoteSensing());
     case ControlSequenceOfOperation::Id:
-        return encoder.Encode(mControlSequenceOfOperation);
+        return encoder.Encode(mDelegate->GetControlSequenceOfOperation());
     case LocalTemperatureCalibration::Id:
-        return encoder.Encode(mLocalTemperatureCalibration);
+        return encoder.Encode(mDelegate->GetLocalTemperatureCalibration());
     case OccupiedHeatingSetpoint::Id:
     case OccupiedCoolingSetpoint::Id:
     case UnoccupiedHeatingSetpoint::Id:
@@ -85,15 +90,15 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case MinSetpointDeadBand::Id:
         return ReadSetpointAttribute(request, encoder);
     case TemperatureSetpointHold::Id:
-        return encoder.Encode(mTemperatureSetpointHold);
+        return encoder.Encode(mDelegate->GetTemperatureSetpointHold());
     case TemperatureSetpointHoldDuration::Id:
-        return encoder.Encode(mTemperatureSetpointHoldDuration);
+        return encoder.Encode(mDelegate->GetTemperatureSetpointHoldDuration());
     case Schedules::Id: {
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
     case SetpointHoldExpiryTimestamp::Id: {
-        ReturnErrorOnFailure(encoder.Encode(mSetpointHoldExpiryTimestamp));
+        return encoder.Encode(mDelegate->GetSetpointHoldExpiryTimestamp());
     }
     break;
     default:

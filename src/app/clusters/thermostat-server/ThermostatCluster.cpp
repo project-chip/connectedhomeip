@@ -51,20 +51,6 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat:
     DefaultServerCluster({ endpointId, Thermostat::Id }),
     mFeatures(features), mOptionalAttributes(optionalAttributes)
 {
-    auto hasHeating = mFeatures.Has(Feature::kHeating);
-    auto hasCooling = mFeatures.Has(Feature::kCooling);
-    if (hasHeating && hasCooling)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    }
-    else if (hasHeating)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kHeatingOnly;
-    }
-    else if (hasCooling)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
-    }
     mAtomicWriteSession.SetDelegate(this);
 }
 
@@ -155,15 +141,48 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(Thermostat::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
+
+void ThermostatCluster::SetDelegate(Thermostat::Delegate * delegate) {
+    mDelegate = delegate;
+    auto hasHeating = mFeatures.Has(Feature::kHeating);
+    auto hasCooling = mFeatures.Has(Feature::kCooling);
+    if (hasHeating && hasCooling)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kCoolingAndHeating);
+    }
+    else if (hasHeating)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
+    }
+    else if (hasCooling)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kCoolingOnly);
+    }
+}
+
+ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation() const {
+    return mDelegate->GetControlSequenceOfOperation();
+}
+
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
-    SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation,
-                      app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::Id);
+    if (mDelegate->SetControlSequenceOfOperation(controlSequenceOfOperation))
+    {
+        NotifyAttributeChanged(ControlSequenceOfOperation::Id);
+    }
     return Status::Success;
+}
+
+SystemModeEnum ThermostatCluster::GetSystemMode() const
+{
+    return mDelegate->GetSystemMode();
 }
 
 Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
 {
+    if (mDelegate == nullptr) {
+        return Status::InvalidInState;
+    }
     switch (systemMode)
     {
     case SystemModeEnum::kOff:
@@ -196,25 +215,64 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         return Status::InvalidValue;
     }
 
-    SetAttributeValue(mSystemMode, systemMode, app::Clusters::Thermostat::Attributes::SystemMode::Id);
+    if (mDelegate->SetSystemMode(systemMode))
+    {
+        NotifyAttributeChanged(SystemMode::Id);
+    }
     return Status::Success;
 }
 
-Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature)
+DataModel::Nullable<temperature> ThermostatCluster::GetLocalTemperature() const
 {
-    SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id);
+    return mDelegate->GetLocalTemperature();
+}
+
+Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature)
+{
+    if (mDelegate->SetLocalTemperature(localTemperature))
+    {
+        NotifyAttributeChanged(LocalTemperature::Id);
+    }
     return Status::Success;
+}
+
+int8_t ThermostatCluster::GetLocalTemperatureCalibration() const
+{
+    return mDelegate->GetLocalTemperatureCalibration();
+}
+
+Status ThermostatCluster::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
+{
+    if (mDelegate->SetLocalTemperatureCalibration(localTemperatureCalibration))
+    {
+        NotifyAttributeChanged(LocalTemperatureCalibration::Id);
+    }
+    return Status::Success;
+}
+
+ThermostatRunningModeEnum ThermostatCluster::GetRunningMode() const {
+    return mDelegate->GetRunningMode();
 }
 
 Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
-    SetAttributeValue(mRunningMode, runningMode, app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id);
+    if (mDelegate->SetRunningMode(runningMode))
+    {
+        NotifyAttributeChanged(ThermostatRunningMode::Id);
+    }
     return Status::Success;
+}
+
+BitMask<RelayStateBitmap> ThermostatCluster::GetRunningState() const {
+    return mDelegate->GetRunningState();
 }
 
 Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState)
 {
-    SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id);
+    if (mDelegate->SetRunningState(runningState))
+    {
+        NotifyAttributeChanged(ThermostatRunningState::Id);
+    }
     return Status::Success;
 }
 

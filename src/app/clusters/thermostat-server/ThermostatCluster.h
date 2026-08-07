@@ -96,7 +96,7 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     EndpointId Endpoint() { return mPath.mEndpointId; }
-    void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
+    void SetDelegate(Thermostat::Delegate * delegate);
     Thermostat::Delegate * GetDelegate() const { return mDelegate; }
 
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
@@ -109,20 +109,23 @@ public:
 
     void OnAtomicWriteTimeout();
 
-    SystemModeEnum GetSystemMode() const { return mSystemMode; }
+    SystemModeEnum GetSystemMode() const;
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode);
 
-    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const { return mControlSequenceOfOperation; }
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const;
     Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation);
 
-    ThermostatRunningModeEnum GetRunningMode() const { return mRunningMode; }
+    ThermostatRunningModeEnum GetRunningMode() const;
     Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode);
 
-    BitMask<RelayStateBitmap> GetRunningState() const { return mRunningState; }
+    BitMask<RelayStateBitmap> GetRunningState() const;
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
 
-    DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
-    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
+    DataModel::Nullable<temperature> GetLocalTemperature() const;
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> localTemperature);
+
+    int8_t GetLocalTemperatureCalibration() const;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t localTemperatureCalibration);
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
     DataModel::ActionReturnStatus SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
@@ -138,22 +141,8 @@ public:
 
 protected:
     OptionalAttributes mOptionalAttributes;
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
     Thermostat::Delegate * mDelegate                           = nullptr;
     AtomicWriteSession mAtomicWriteSession;
-
-    BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
-    BitMask<OccupancyBitmap> mOccupancy         = BitMask<OccupancyBitmap>(0);
-
-    SystemModeEnum mSystemMode                     = SystemModeEnum::kOff;
-    ThermostatRunningModeEnum mRunningMode         = ThermostatRunningModeEnum::kOff;
-    BitMask<RelayStateBitmap> mRunningState        = BitMask<RelayStateBitmap>(0);
-    DataModel::Nullable<int16_t> mLocalTemperature = DataModel::Nullable<int16_t>();
-    int8_t mLocalTemperatureCalibration            = 0;
-
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
-    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
-    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);

@@ -74,20 +74,16 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             {
                 return Status::ConstraintError;
             }
-            auto remoteSensing = valueRemoteSensing.Raw();
-            AttributePersistence persistence(mContext->attributeStorage);
-            auto result =
-                persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing);
-            if (result != CHIP_NO_ERROR)
+            if (mDelegate->SetRemoteSensing(valueRemoteSensing))
             {
-                return result;
+                NotifyAttributeChanged(RemoteSensing::Id);
+                return Status::Success;
             }
-            mRemoteSensing = valueRemoteSensing;
-            return Status::Success;
         }
         return Status::Success;
     }
     case ControlSequenceOfOperation::Id:
+        // Per spec, writes to this attribute are ignored, but success is always returned for backwards compatibility reasons
         return Status::Success;
     case SystemMode::Id: {
         SystemModeEnum requestedSystemMode;
@@ -97,14 +93,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             ChipLogError(Zcl, "Invalid value for SystemMode: %d", to_underlying(requestedSystemMode));
             return Status::InvalidValue;
         }
-        auto status = SetSystemMode(requestedSystemMode);
-        if (status != Status::Success)
-        {
-            return status;
-        }
-        AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, SystemMode::Id },
-                                                  requestedSystemMode);
+        return SetSystemMode(requestedSystemMode);
     }
     case TemperatureSetpointHold::Id: {
         TemperatureSetpointHoldEnum requestedTemperatureSetpointHold;
@@ -114,7 +103,10 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
             ChipLogError(Zcl, "Invalid value for TemperatureSetpointHold: %d", to_underlying(requestedTemperatureSetpointHold));
             return Status::InvalidValue;
         }
-        SetAttributeValue(mTemperatureSetpointHold, requestedTemperatureSetpointHold, TemperatureSetpointHold::Id);
+        if (mDelegate->SetTemperatureSetpointHold(requestedTemperatureSetpointHold))
+        {
+            NotifyAttributeChanged(TemperatureSetpointHold::Id);
+        }
         return Status::Success;
     }
     case TemperatureSetpointHoldDuration::Id: {
@@ -124,8 +116,10 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         {
             return Status::InvalidValue;
         }
-        SetAttributeValue(mTemperatureSetpointHoldDuration, requestedTemperatureSetpointHoldDuration,
-                          TemperatureSetpointHoldDuration::Id);
+        if (mDelegate->SetTemperatureSetpointHoldDuration(requestedTemperatureSetpointHoldDuration))
+        {
+            NotifyAttributeChanged(TemperatureSetpointHoldDuration::Id);
+        }
         return Status::Success;
     }
     default:
@@ -146,7 +140,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
                      ChipLogValueMEI(attributeId));
         return Status::InvalidInState;
     }
-    return NotifyAttributeChangedIfSuccess(attributeId, WriteNonAtomicAttribute(request, decoder));
+    return WriteNonAtomicAttribute(request, decoder);
 }
 
 } // namespace Thermostat
