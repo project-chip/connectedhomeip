@@ -64,6 +64,156 @@ ThermostatDelegate::~ThermostatDelegate()
     CancelExpirationTimer();
 }
 
+SystemModeEnum ThermostatDelegate::GetSystemMode() const
+{
+    return mSystemMode;
+}
+
+bool ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode)
+{
+    if (mSystemMode == systemMode)
+    {
+        return false;
+    }
+    mSystemMode = systemMode;
+    return true;
+}
+
+ThermostatRunningModeEnum ThermostatDelegate::GetRunningMode() const
+{
+    return mRunningMode;
+}
+
+bool ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode)
+{
+    if (mRunningMode == runningMode)
+    {
+        return false;
+    }
+    mRunningMode = runningMode;
+    return true;
+}
+
+BitMask<RelayStateBitmap> ThermostatDelegate::GetRunningState() const
+{
+    return mRunningState;
+}
+
+bool ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState)
+{
+    if (mRunningState == runningState)
+    {
+        return false;
+    }
+    mRunningState = runningState;
+    return true;
+}
+
+ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
+{
+    return mControlSequenceOfOperation;
+}
+
+bool ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
+{
+    if (mControlSequenceOfOperation == controlSequenceOfOperation)
+    {
+        return false;
+    }
+    mControlSequenceOfOperation = controlSequenceOfOperation;
+    return true;
+}
+
+DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
+{
+    return mLocalTemperature;
+}
+
+bool ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature)
+{
+    if (mLocalTemperature == localTemperature)
+    {
+        return false;
+    }
+    mLocalTemperature = localTemperature;
+    return true;
+}
+
+int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
+{
+    return mLocalTemperatureCalibration;
+}
+
+bool ThermostatDelegate::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
+{
+    if (mLocalTemperatureCalibration == localTemperatureCalibration)
+    {
+        return false;
+    }
+    mLocalTemperatureCalibration = localTemperatureCalibration;
+    return true;
+}
+
+BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const {
+    return mRemoteSensing;
+}
+
+bool ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing) {
+    if (mRemoteSensing == remoteSensing)
+    {
+        return false;
+    }
+    auto remoteSensingValue = remoteSensing.Raw();
+    AttributePersistence persistence(*mProvider);
+    CHIP_ERROR result =
+        persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
+    if (result != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    mRemoteSensing = remoteSensing;
+    return true;
+}
+
+TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const {
+    return mTemperatureSetpointHold;
+}
+
+bool ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold) {
+    if (mTemperatureSetpointHold == temperatureSetpointHold)
+    {
+        return false;
+    }
+    mTemperatureSetpointHold = temperatureSetpointHold;
+    return true;
+}
+
+DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const {
+    return mTemperatureSetpointHoldDuration;
+}
+
+bool ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration) {
+    if (mTemperatureSetpointHoldDuration == temperatureSetpointHoldDuration)
+    {
+        return false;
+    }
+    mTemperatureSetpointHoldDuration = temperatureSetpointHoldDuration;
+    return true;
+}
+
+DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const {
+    return mSetpointHoldExpiryTimestamp;
+}
+
+bool ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp) {
+    if (mSetpointHoldExpiryTimestamp == setpointHoldExpiryTimestamp)
+    {
+        return false;
+    }
+    mSetpointHoldExpiryTimestamp = setpointHoldExpiryTimestamp;
+    return true;
+}
+
 Protocols::InteractionModel::Status ThermostatDelegate::LoadSetpoints(Setpoints & setpoints)
 {
     ChipLogDetail(Zcl, "Loading setpoints");
