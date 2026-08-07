@@ -39,6 +39,14 @@ jobs:
         name: Build Docker CHIP Build images - base
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            packages: write
+        env:
+            # Publish on an explicit dispatch, or automatically once a change to
+            # integrations/docker/ has landed on master. Pull requests and pushes
+            # to other branches build only.
+            PUBLISH: ${{ inputs.push_images == true || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
         strategy:
             fail-fast: false
             matrix:
@@ -48,13 +56,18 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: env.PUBLISH == 'true'
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: env.PUBLISH == 'true'
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: env.PUBLISH != 'true'
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
