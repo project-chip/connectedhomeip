@@ -33,6 +33,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#include "MockAvAnalysisDelegate.h"
+
 namespace {
 
 using namespace chip;
@@ -75,33 +77,6 @@ const std::vector<uint16_t> testZoneIDList = { static_cast<uint16_t>(0x01), stat
 const std::vector<uint16_t> testZoneIDDisableList = { static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04) };
 
 const std::vector<uint16_t> testZoneIDRemainingList = { static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02) };
-
-// Minimal mock delegate for testing
-class MockAvAnalysisDelegate : public AvAnalysisDelegate
-{
-public:
-    void ShutdownApp() {}
-
-    Protocols::InteractionModel::Status EnableContextTriggers() { return Status::Success; }
-
-    Protocols::InteractionModel::Status DisableContextTriggers() { return Status::Success; }
-
-    Protocols::InteractionModel::Status EstablishAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status ActivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status DeactivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
-
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
-
-    bool CanAddContextTriggers() { return true; }
-
-    void ActiveAmbientContextTriggersUpdated() {}
-
-    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
-};
 
 struct TestLocalAvAnalysisCluster : public ::testing::Test
 {

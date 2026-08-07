@@ -20,6 +20,7 @@
 
 #include <app/clusters/av-analysis-server/AvAnalysisLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/core/ScopedNodeId.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
@@ -27,8 +28,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
-constexpr uint8_t kMaxSpeakerLevel = 254;
 
 class AvAnalysisCluster;
 
@@ -47,31 +46,6 @@ public:
      * the destructor, it shall not be invoked as part of the destructor.
      */
     virtual void ShutdownApp() = 0;
-
-    /**
-     * Delegate command handlers
-     */
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status EstablishAnalysisStream() = 0;
-
-    /**
-     *
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status ActivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status DeactivateAnalysisStream() = 0;
-
-    /**
-     * Placeholder method for when the remote context detection feature functionality is implemented.
-     */
-    virtual Protocols::InteractionModel::Status RemoveAnalysisStream() = 0;
 
     /**
      * Delegate command helpers
@@ -122,14 +96,16 @@ public:
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      *
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     AvAnalysisCluster(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                       const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                      DataModel::Nullable<uint8_t> aMaxZones) :
+                      DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0) :
         DefaultServerCluster({ aEndpointId, AvAnalysis::Id }),
-        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones)
+        mLogic(aEndpointId, aFeatures, aSupportedAmbientContexts, aMaxZones, aMaxAnalysisStreamCount)
     {}
 
     AvAnalysisServerLogic & GetLogic() { return mLogic; }
@@ -144,6 +120,8 @@ public:
             delegate->SetServer(this);
         }
     }
+
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mLogic.SetCameraClient(aCameraClient); }
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
@@ -170,10 +148,9 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
     AvAnalysisServerLogic mLogic;

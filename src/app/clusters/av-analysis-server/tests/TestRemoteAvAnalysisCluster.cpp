@@ -33,6 +33,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#include "MockAvAnalysisDelegate.h"
+
 namespace {
 
 using namespace chip;
@@ -62,28 +64,6 @@ const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> t
 };
 
 // Minimal mock delegate for testing
-class MockAvAnalysisDelegate : public AvAnalysisDelegate
-{
-public:
-    void ShutdownApp() {}
-
-    Protocols::InteractionModel::Status EstablishAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status ActivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status DeactivateAnalysisStream() { return Status::Success; }
-
-    Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
-
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
-
-    bool CanAddContextTriggers() { return true; }
-
-    void ActiveAmbientContextTriggersUpdated() {}
-
-    CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
-};
-
 struct TestRemoteAvAnalysisCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -91,21 +71,67 @@ struct TestRemoteAvAnalysisCluster : public ::testing::Test
 
     TestRemoteAvAnalysisCluster() :
         mServer(kTestEndpointId, chip::BitFlags<Feature>(Feature::kRemoteContextDetection, Feature::kPerZoneContextDetection),
-                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones)),
+                testAmbientContexts, DataModel::MakeNullable(kTestMaxZones), kTestMaxAnalysisStreams),
         mClusterTester(mServer)
     {}
+
+    // Records camera interactions started by the command handlers; tests complete them by
+    // invoking the recorded Callback, simulating the camera's response.
+    class FakeCameraClient : public AvAnalysisCameraClient
+    {
+    public:
+        int mAllocationRequests   = 0;
+        int mDeallocationRequests = 0;
+        ScopedNodeId mLastCamera;
+        uint16_t mLastStreamId   = 0;
+        Callback * mLastCallback = nullptr;
+
+        CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback) override
+        {
+            mAllocationRequests++;
+            mLastCamera   = aCameraNode;
+            mLastCallback = &aCallback;
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
+                                                  Callback & aCallback) override
+        {
+            mDeallocationRequests++;
+            mLastCamera   = aCameraNode;
+            mLastStreamId = aAnalysisStreamId;
+            mLastCallback = &aCallback;
+            return CHIP_NO_ERROR;
+        }
+    };
 
     void SetUp() override
     {
         mServer.SetDelegate(&mMockDelegate);
+        mServer.SetCameraClient(&mFakeCameraClient);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
-        EXPECT_EQ(mServer.SetMaxAnalysisStreamCount(kTestMaxAnalysisStreams), CHIP_NO_ERROR);
     }
 
     void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
+    // Sends EstablishAnalysisStream for the given camera node and completes the camera allocation
+    // with the given status/stream id; returns the mock handler carrying response or status.
+    void EstablishStream(Testing::MockCommandHandler & commandHandler, NodeId aCameraNodeId, Status aCameraStatus,
+                         uint16_t aVideoStreamId)
+    {
+        ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+        Commands::EstablishAnalysisStream::DecodableType commandData;
+        commandData.nodeID = aCameraNodeId;
+
+        auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+        ASSERT_FALSE(response.has_value()); // Response is pending on the camera interaction
+        ASSERT_NE(mFakeCameraClient.mLastCallback, nullptr);
+        mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(aCameraStatus, aVideoStreamId);
+    }
+
     MockAvAnalysisDelegate mMockDelegate;
+    FakeCameraClient mFakeCameraClient;
     AvAnalysisCluster mServer;
     ClusterTester mClusterTester;
 };
@@ -223,24 +249,114 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDisableContextTriggersCommandTest)
     }
 }
 
-TEST_F(TestRemoteAvAnalysisCluster, ExecuteEstablishAnalysisStreamCommandTest)
+TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamSuccess)
+{
+    constexpr NodeId kCameraNodeId = 0x1234;
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    EstablishStream(commandHandler, kCameraNodeId, Status::Success, 42);
+
+    // The camera was asked to allocate, scoped to the invoking client's fabric
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 1);
+    ASSERT_EQ(mFakeCameraClient.mLastCamera, ScopedNodeId(kCameraNodeId, 1));
+
+    // EstablishAnalysisStreamResponse carries the camera-assigned stream id
+    ASSERT_TRUE(commandHandler.HasResponse());
+    ASSERT_EQ(commandHandler.GetResponseCommandId(), Commands::EstablishAnalysisStreamResponse::Id);
+    Commands::EstablishAnalysisStreamResponse::DecodableType response;
+    ASSERT_EQ(commandHandler.DecodeResponse(response), CHIP_NO_ERROR);
+    ASSERT_EQ(response.analysisStreamID, 42);
+
+    // The stream is tracked in PendingInitiation
+    uint8_t currentCount = 0;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 1);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamID, 42);
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kPendingInitiation);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamPropagatesCameraFailure)
 {
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
-    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+
+    EstablishStream(commandHandler, 0x1234, Status::ResourceExhausted, 0);
+
+    ASSERT_FALSE(commandHandler.HasResponse());
+    ASSERT_TRUE(commandHandler.HasStatus());
+    ASSERT_EQ(commandHandler.GetLastStatus().status.GetStatus(), Status::ResourceExhausted);
+
+    uint8_t currentCount = 0xFF;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamBusyWhileAllocationPending)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
     Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
 
-    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, kCommandPath, commandData);
+    Testing::MockCommandHandler firstHandler;
+    firstHandler.SetFabricIndex(1);
+    auto firstResponse = mServer.GetLogic().HandleEstablishAnalysisStream(firstHandler, path, commandData);
+    ASSERT_FALSE(firstResponse.has_value()); // Pending on the camera
 
-    // The response should contain an ActionReturnStatus
-    if (response.has_value())
+    // A second camera-bound command while the first is pending is answered with Busy
+    Testing::MockCommandHandler secondHandler;
+    secondHandler.SetFabricIndex(1);
+    auto secondResponse = mServer.GetLogic().HandleEstablishAnalysisStream(secondHandler, path, commandData);
+    ASSERT_TRUE(secondResponse.has_value());
+    ASSERT_TRUE(secondResponse.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 1);
+
+    // Completing the first command frees the pending slot
+    mFakeCameraClient.mLastCallback->OnVideoStreamAllocated(Status::Success, 7);
+    ASSERT_TRUE(firstHandler.HasResponse());
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamExhaustsAtCapacity)
+{
+    // Fill the table to MaxAnalysisStreamCount via established streams
+    for (uint16_t id = 1; id <= kTestMaxAnalysisStreams; id++)
     {
-        ASSERT_TRUE(response.value().IsSuccess());
+        Testing::MockCommandHandler commandHandler;
+        commandHandler.SetFabricIndex(1);
+        EstablishStream(commandHandler, 0x1234, Status::Success, id);
+        ASSERT_TRUE(commandHandler.HasResponse());
     }
-    else
-    {
-        FAIL();
-    }
+
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_TRUE(response.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::ResourceExhausted));
+    ASSERT_EQ(mFakeCameraClient.mAllocationRequests, kTestMaxAnalysisStreams);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamWithoutCameraClientFails)
+{
+    mServer.SetCameraClient(nullptr);
+
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EstablishAnalysisStream::Id };
+    Commands::EstablishAnalysisStream::DecodableType commandData;
+    commandData.nodeID = 0x1234;
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_FALSE(response.value().IsSuccess());
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
@@ -283,23 +399,173 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
     }
 }
 
-TEST_F(TestRemoteAvAnalysisCluster, ExecuteRemoveAnalysisStreamCommandTest)
+TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamSuccess)
 {
+    constexpr NodeId kCameraNodeId = 0x1234;
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, kCameraNodeId, Status::Success, 42);
+
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 42;
+    Testing::MockCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
+    ASSERT_FALSE(response.has_value()); // Pending on the camera
+
+    // The deallocation goes to the camera the stream was established on
+    ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 1);
+    ASSERT_EQ(mFakeCameraClient.mLastCamera, ScopedNodeId(kCameraNodeId, 1));
+    ASSERT_EQ(mFakeCameraClient.mLastStreamId, 42);
+
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
+
+    ASSERT_TRUE(removeHandler.HasStatus());
+    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Success);
+
+    // The stream is gone
+    uint8_t currentCount = 0xFF;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamUnknownIdIsNotFound)
+{
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 77; // never established
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
-    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value());
+    ASSERT_TRUE(response.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
+    ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 0);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamPropagatesCameraFailure)
+{
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, 0x1234, Status::Success, 42);
+
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
     Commands::RemoveAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 42;
+    Testing::MockCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
 
-    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
 
-    // The response should contain an ActionReturnStatus
-    if (response.has_value())
+    // The camera's status is returned and the stream entry is kept
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Failure, 42);
+
+    ASSERT_EQ(removeHandler.GetLastStatus().status.GetStatus(), Status::Failure);
+
+    uint8_t currentCount = 0;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 1);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamsPersistAcrossRestart)
+{
+    constexpr NodeId kCameraNodeId = 0x1234;
+    Testing::MockCommandHandler establishHandler;
+    establishHandler.SetFabricIndex(1);
+    EstablishStream(establishHandler, kCameraNodeId, Status::Success, 42);
+
+    // Restart the server against the same storage; AnalysisStreams has quality N
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    uint8_t currentCount = 0;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::CurrentAnalysisStreamCount::Id, currentCount), CHIP_NO_ERROR);
+    ASSERT_EQ(currentCount, 1);
+
+    Attributes::AnalysisStreams::TypeInfo::DecodableType streams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AnalysisStreams::Id, streams), CHIP_NO_ERROR);
+    auto iter = streams.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().analysisStreamID, 42);
+    ASSERT_EQ(iter.GetValue().analysisStreamState, AnalysisStreamStateEnum::kPendingInitiation);
+
+    // The restored stream is still bound to its camera: removing it deallocates on that camera
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::RemoveAnalysisStream::Id };
+    Commands::RemoveAnalysisStream::DecodableType commandData;
+    commandData.analysisStreamID = 42;
+    Testing::MockCommandHandler removeHandler;
+    removeHandler.SetFabricIndex(1);
+    auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
+    ASSERT_FALSE(response.has_value());
+    ASSERT_EQ(mFakeCameraClient.mLastCamera, ScopedNodeId(kCameraNodeId, 1));
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
+{
+    // Defaults to false, write true
+    bool trackingEnabled = false;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_FALSE(trackingEnabled);
+
+    ASSERT_TRUE(mClusterTester.WriteAttribute(Attributes::TrackingEnabled::Id, true).IsSuccess());
+
+    // Restart the server, the value has quality N and must survive
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TrackingEnabled::Id, trackingEnabled), CHIP_NO_ERROR);
+    ASSERT_TRUE(trackingEnabled);
+}
+
+TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamTableEncodeDecodeTest)
+{
+    AnalysisStreamTable table;
+    ASSERT_EQ(table.Init(3), CHIP_NO_ERROR);
+
+    // Ids come from the camera's VideoStreamAllocate; duplicates and overflow are rejected
+    ASSERT_NE(table.Add(10), nullptr);
+    ASSERT_NE(table.Add(20), nullptr);
+    ASSERT_EQ(table.Add(10), nullptr); // duplicate id
+    ASSERT_NE(table.Add(30), nullptr);
+    ASSERT_EQ(table.Add(40), nullptr); // table full
+    ASSERT_EQ(table.Count(), 3);
+
+    // Record the camera association on every entry; give one an active session so decode's state
+    // reset is observable
+    const ScopedNodeId kCamera(0xABCD, 1);
+    for (auto & entry : table)
     {
-        ASSERT_TRUE(response.value().IsSuccess());
+        entry.cameraNode = kCamera;
     }
-    else
+    AnalysisStreamEntry * active = table.Find(20);
+    ASSERT_NE(active, nullptr);
+    active->state            = AnalysisStreamStateEnum::kWebRTCActive;
+    active->webRTCEndpointID = DataModel::MakeNullable<EndpointId>(2);
+
+    uint8_t buffer[AnalysisStreamTable::kEntrySerializedSize * 3 + AnalysisStreamTable::kArraySerializedOverhead];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+    ASSERT_EQ(table.Encode(writer), CHIP_NO_ERROR);
+
+    AnalysisStreamTable restored;
+    ASSERT_EQ(restored.Init(3), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(restored.Decode(reader), CHIP_NO_ERROR);
+
+    // All ids survive; sessions do not survive a reboot, so state collapses to PendingInitiation
+    ASSERT_EQ(restored.Count(), 3);
+    for (uint16_t id : { uint16_t(10), uint16_t(20), uint16_t(30) })
     {
-        FAIL();
+        AnalysisStreamEntry * entry = restored.Find(id);
+        ASSERT_NE(entry, nullptr);
+        ASSERT_EQ(entry->state, AnalysisStreamStateEnum::kPendingInitiation);
+        ASSERT_TRUE(entry->webRTCEndpointID.IsNull());
+        ASSERT_TRUE(entry->pushAVEndpointID.IsNull());
+        ASSERT_EQ(entry->cameraNode, kCamera); // The camera association must survive reboot
     }
 }
 } // namespace

@@ -21,8 +21,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
+#include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -42,7 +44,7 @@ class AvAnalysisDelegate;
 // Callback type for notifying attribute changes
 using MarkDirtyCallback = std::function<void(AttributeId)>;
 
-class AvAnalysisServerLogic
+class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback
 {
 public:
     /**
@@ -53,10 +55,12 @@ public:
      * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set. Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      */
     AvAnalysisServerLogic(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                           const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                          DataModel::Nullable<uint8_t> aMaxZones);
+                          DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0);
     ~AvAnalysisServerLogic();
 
     void SetDelegate(AvAnalysisDelegate * delegate)
@@ -70,6 +74,15 @@ public:
 
     void SetMarkDirtyCallback(MarkDirtyCallback callback) { mMarkDirtyCallback = std::move(callback); }
 
+    /**
+     * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
+     * streams on the camera (not used with LocalContextDetection).
+     */
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
+
+    void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+    void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aAnalysisStreamId) override;
+
     EndpointId mEndpointId = kInvalidEndpointId;
 
     BitFlags<AvAnalysis::Feature> mFeatures;
@@ -77,11 +90,11 @@ public:
     // Definitions of class variables that represent the Cluster attributes
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> mSupportedAmbientContexts;
     std::vector<AvAnalysis::AmbientContextStorage> mActiveAmbientContextTriggers;
-    uint8_t mMaxAnalysisStreamCount     = 0;
-    uint8_t mCurrentAnalysisStreamCount = 0;
-    std::vector<AvAnalysis::Structs::AnalysisStreamStruct::Type> mAnalysisStreams;
-    bool mTrackingEnabled = false;
+    uint8_t mMaxAnalysisStreamCount = 0;
+    bool mTrackingEnabled           = false;
     DataModel::Nullable<uint8_t> mMaxZones;
+
+    uint8_t GetCurrentAnalysisStreamCount() const { return mStreamTable.Count(); }
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
@@ -96,6 +109,9 @@ public:
     // Returns the commands accepted depending on the Feature Flags that are set
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
+    // Returns the commands generated depending on the Feature Flags that are set
+    CHIP_ERROR GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder);
+
     // Returns supported depending on the Feature Flags that are set
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
@@ -105,7 +121,6 @@ public:
     CHIP_ERROR ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder);
 
     // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
     CHIP_ERROR SetTrackingEnabled(bool aTrackingEnabled);
 
     // Command handlers
@@ -130,7 +145,21 @@ public:
 
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
+    AvAnalysisCameraClient * mCameraClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+
+    // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
+    AvAnalysis::AnalysisStreamTable mStreamTable;
+
+    // The command whose response is pending on a camera interaction
+    CommandHandler::Handle mPendingCommandHandle;
+    ConcreteCommandPath mPendingCommandPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    ScopedNodeId mPendingCameraNode;
+
+    /**
+     * Applies a state transition to a stream entry and reports the AnalysisStreams attribute change.
+     */
+    void SetStreamState(AvAnalysis::AnalysisStreamEntry & aEntry, AvAnalysis::AnalysisStreamStateEnum aState);
 
     MarkDirtyCallback mMarkDirtyCallback;
 
@@ -159,6 +188,10 @@ private:
      */
     CHIP_ERROR StoreActiveAmbientContextTriggers();
     CHIP_ERROR LoadActiveAmbientContextTriggers();
+    CHIP_ERROR StoreAnalysisStreams();
+    CHIP_ERROR LoadAnalysisStreams();
+    CHIP_ERROR StoreTrackingEnabled();
+    CHIP_ERROR LoadTrackingEnabled();
     void LoadPersistentAttributes();
 };
 

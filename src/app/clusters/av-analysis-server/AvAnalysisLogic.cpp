@@ -43,9 +43,10 @@ namespace Clusters {
 AvAnalysisServerLogic::AvAnalysisServerLogic(
     EndpointId aEndpointId, BitFlags<Feature> aFeatures,
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-    DataModel::Nullable<uint8_t> aMaxZones) :
+    DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxZones(aMaxZones)
+    mFeatures(aFeatures), mSupportedAmbientContexts(aSupportedAmbientContexts), mMaxAnalysisStreamCount(aMaxAnalysisStreamCount),
+    mMaxZones(aMaxZones)
 {}
 
 AvAnalysisServerLogic::~AvAnalysisServerLogic() {}
@@ -66,18 +67,97 @@ CHIP_ERROR AvAnalysisServerLogic::Startup(AttributePersistenceProvider & aAttrib
     VerifyOrReturnError(!(HasFeature(Feature::kPerZoneContextDetection) ^ !mMaxZones.IsNull()), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "AvAnalysis: If Per Zone Sensitivity is set, Zones must be present, and vice versa"));
 
+    // With Remote Context Detection the MaxAnalysisStreamCount fixed attribute has to be non-zero, and backing
+    // storage for the AnalysisStreams attribute is needed.
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        VerifyOrReturnError(mMaxAnalysisStreamCount > 0, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "AvAnalysis: MaxAnalysisStreamCount must be non-zero with Remote Detection"));
+        if (mStreamTable.Capacity() == 0)
+        {
+            ReturnErrorOnFailure(mStreamTable.Init(mMaxAnalysisStreamCount));
+        }
+    }
+
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
 
 void AvAnalysisServerLogic::Shutdown()
 {
-    mDelegate->ShutdownApp();
+    // Release any command still waiting on a camera interaction; its exchange dies with the server.
+    mPendingCommandHandle = CommandHandler::Handle();
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->ShutdownApp();
+    }
 }
 
 bool AvAnalysisServerLogic::HasFeature(Feature aFeature) const
 {
     return mFeatures.Has(aFeature);
+}
+
+void AvAnalysisServerLogic::SetStreamState(AnalysisStreamEntry & aEntry, AnalysisStreamStateEnum aState)
+{
+    VerifyOrReturn(aEntry.state != aState);
+    aEntry.state = aState;
+    MarkDirty(Attributes::AnalysisStreams::Id);
+}
+
+void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVideoStreamId)
+{
+    auto handleRef = std::move(mPendingCommandHandle);
+    auto * handler = handleRef.Get();
+    VerifyOrReturn(handler != nullptr);
+
+    // a non-SUCCESS camera response is propagated as the command status, no side-effects.
+    if (aStatus != Status::Success)
+    {
+        handler->AddStatus(mPendingCommandPath, aStatus);
+        return;
+    }
+
+    AnalysisStreamEntry * entry = mStreamTable.Add(aVideoStreamId);
+    if (entry == nullptr)
+    {
+        // Full or the camera returned an id that already exists.
+        handler->AddStatus(mPendingCommandPath, Status::ResourceExhausted);
+        return;
+    }
+    entry->cameraNode = mPendingCameraNode;
+
+    MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+    MarkDirty(Attributes::AnalysisStreams::Id);
+    LogErrorOnFailure(StoreAnalysisStreams());
+
+    Commands::EstablishAnalysisStreamResponse::Type response;
+    response.analysisStreamID = aVideoStreamId;
+    handler->AddResponse(mPendingCommandPath, response);
+}
+
+void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId)
+{
+    auto handleRef = std::move(mPendingCommandHandle);
+    auto * handler = handleRef.Get();
+    VerifyOrReturn(handler != nullptr);
+
+    // A non-SUCCESS camera response is propagated as the command status.
+    if (aStatus != Status::Success)
+    {
+        handler->AddStatus(mPendingCommandPath, aStatus);
+        return;
+    }
+
+    if (mStreamTable.Remove(aAnalysisStreamId))
+    {
+        MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+        MarkDirty(Attributes::AnalysisStreams::Id);
+        LogErrorOnFailure(StoreAnalysisStreams());
+    }
+
+    handler->AddStatus(mPendingCommandPath, Status::Success);
 }
 
 CHIP_ERROR
@@ -92,6 +172,16 @@ AvAnalysisServerLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::Accepte
         ReturnErrorOnFailure(builder.AppendElements({ Commands::ActivateAnalysisStream::kMetadataEntry }));
         ReturnErrorOnFailure(builder.AppendElements({ Commands::DeactivateAnalysisStream::kMetadataEntry }));
         ReturnErrorOnFailure(builder.AppendElements({ Commands::RemoveAnalysisStream::kMetadataEntry }));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    if (HasFeature(Feature::kRemoteContextDetection))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::EstablishAnalysisStreamResponse::Id }));
     }
 
     return CHIP_NO_ERROR;
@@ -150,9 +240,9 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeActiveAmbientContextTriggers(Attr
 CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & analysisStream : mAnalysisStreams)
+        for (const auto & analysisStream : mStreamTable)
         {
-            ReturnErrorOnFailure(encoder.Encode(analysisStream));
+            ReturnErrorOnFailure(encoder.Encode(analysisStream.ToEncodableStruct()));
         }
 
         return CHIP_NO_ERROR;
@@ -160,17 +250,11 @@ CHIP_ERROR AvAnalysisServerLogic::ReadAndEncodeAnalysisStreams(AttributeValueEnc
 }
 
 // Attribute mutators
-CHIP_ERROR AvAnalysisServerLogic::SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount)
-{
-    VerifyOrReturnError(HasFeature(Feature::kRemoteContextDetection), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    mMaxAnalysisStreamCount = aMaxAnalysisStreamCount;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AvAnalysisServerLogic::SetTrackingEnabled(bool aTrackingEnabled)
 {
     mTrackingEnabled = aTrackingEnabled;
     MarkDirty(AvAnalysis::Attributes::TrackingEnabled::Id);
+    LogErrorOnFailure(StoreTrackingEnabled());
     return CHIP_NO_ERROR;
 }
 
@@ -322,6 +406,88 @@ CHIP_ERROR AvAnalysisServerLogic::LoadActiveAmbientContextTriggers()
 }
 
 /**
+ * Persistence handling helper, stores the current contents of the analysis stream table in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), maxBufferSize);
+    ReturnErrorOnFailure(mStreamTable.Encode(writer));
+
+    auto path = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(buffer.Get(), writer.GetLengthWritten()));
+}
+
+/**
+ * Persistence handling helper, restores the analysis stream table from the KVS. Restored entries restart
+ * from PendingInitiation as sessions do not survive a reboot.
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadAnalysisStreams()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    size_t maxBufferSize =
+        AnalysisStreamTable::kEntrySerializedSize * mStreamTable.Capacity() + AnalysisStreamTable::kArraySerializedOverhead;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Alloc(maxBufferSize), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan bufferSpan(buffer.Get(), maxBufferSize);
+
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::AnalysisStreams::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: No persisted AnalysisStreams.", mEndpointId);
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+    return mStreamTable.Decode(reader);
+}
+
+/**
+ * Persistence handling helper, stores the TrackingEnabled attribute in the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::StoreTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = mTrackingEnabled ? 1 : 0;
+    auto path     = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    return mAttributePersistenceProvider->WriteValue(path, ByteSpan(&value, sizeof(value)));
+}
+
+/**
+ * Persistence handling helper, restores the TrackingEnabled attribute from the KVS
+ */
+CHIP_ERROR AvAnalysisServerLogic::LoadTrackingEnabled()
+{
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t value = 0;
+    MutableByteSpan valueSpan(&value, sizeof(value));
+    auto path      = ConcreteAttributePath(mEndpointId, AvAnalysis::Id, Attributes::TrackingEnabled::Id);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, valueSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    VerifyOrReturnError(valueSpan.size() == sizeof(value), CHIP_ERROR_INVALID_TLV_ELEMENT);
+    mTrackingEnabled = (value != 0);
+    return CHIP_NO_ERROR;
+}
+
+/**
  * Persistence handling helper, loads all non-volatile attributes from the KVS
  */
 void AvAnalysisServerLogic::LoadPersistentAttributes()
@@ -341,8 +507,22 @@ void AvAnalysisServerLogic::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Loaded ActiveAmbientContexts", mEndpointId);
     }
 
+    if (LoadTrackingEnabled() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load TrackingEnabled from the KVS.", mEndpointId);
+        mTrackingEnabled = false;
+    }
+
+    if (HasFeature(Feature::kRemoteContextDetection) && LoadAnalysisStreams() != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "AvAnalysis[ep=%d]: Unable to load AnalysisStreams from the KVS.", mEndpointId);
+    }
+
     // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    if (mDelegate != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    }
 }
 
 /**
@@ -675,14 +855,38 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstablishAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::EstablishAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    // Spec 11.9.8: CurrentAnalysisStreamCount == MaxAnalysisStreamCount -> RESOURCE_EXHAUSTED
+    VerifyOrReturnValue(!mStreamTable.IsFull(), Status::ResourceExhausted);
+
+    // Without a camera client no camera interaction can be started
+    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(mPendingCommandHandle.Get() == nullptr, Status::Busy);
+
+    // The camera SHALL be on the same fabric as the Analysis Node: reach it on the invoking client's fabric
+    ScopedNodeId cameraNode(commandData.nodeID, handler.GetAccessingFabricIndex());
+
+    mPendingCommandHandle = CommandHandler::Handle(&handler);
+    mPendingCommandPath   = commandPath;
+    mPendingCameraNode    = cameraNode;
+    handler.FlushAcksRightAwayOnSlowCommand();
+
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamAllocation(cameraNode, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream allocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mPendingCommandHandle = CommandHandler::Handle();
+        return Status::Failure;
+    }
+
+    // Response is produced in OnVideoStreamAllocated once the camera answers
+    return std::nullopt;
 }
 
 /**
@@ -705,14 +909,36 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeacti
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                   const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // only a stream in PendingInitiation may be removed
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
+
+    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(mPendingCommandHandle.Get() == nullptr, Status::Busy);
+
+    mPendingCommandHandle = CommandHandler::Handle(&handler);
+    mPendingCommandPath   = commandPath;
+    handler.FlushAcksRightAwayOnSlowCommand();
+
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mPendingCommandHandle = CommandHandler::Handle();
+        return Status::Failure;
+    }
+
+    // Response is produced in OnVideoStreamDeallocated once the camera answers
+    return std::nullopt;
 }
 
 /**
