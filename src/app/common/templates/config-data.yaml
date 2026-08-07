@@ -83,7 +83,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Energy Preference
     - Laundry Dryer Controls
-    - Mode Select
     - Pump Configuration and Control
     - Thermostat
     - Thermostat User Interface Configuration
@@ -139,6 +138,7 @@ CodeDrivenClusters:
     - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
+    - Mode Select
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor

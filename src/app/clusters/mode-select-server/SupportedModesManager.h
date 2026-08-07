@@ -79,6 +79,14 @@ public:
     virtual Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                                     const ModeOptionStructType ** dataPtr) const = 0;
 
+    /**
+     * Returns the Description attribute value for the given endpoint.
+     * The returned CharSpan must remain valid for the lifetime of the cluster.
+     * Implementors should return a static or otherwise permanently-valid string.
+     * Default returns an empty span (no description configured).
+     */
+    virtual chip::CharSpan getDescription(EndpointId endpointId) const { return chip::CharSpan(); }
+
     virtual ~SupportedModesManager() {}
 };
 
