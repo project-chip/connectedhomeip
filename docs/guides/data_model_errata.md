@@ -78,81 +78,21 @@ GroupKeyManagement:
     revision: 4
 ```
 
-### Provisional Elements
+#### How it works
 
-Some specification features are developed ahead of the baseline data model
-release. These "in-progress" or "provisional" elements may be implemented in the
-SDK but not yet included in the checked-in XML baseline.
+The conformance check (`device_conformance_tests.py`) compares the device's
+reported `ClusterRevision` attribute (`0xFFFD`) against the _reference_ revision
+from the `<cluster revision="...">` XML property, parsed into
+`XmlCluster.revision`. This revision is parsed as cluster property, not an
+attribute, so it can't be targeted by an attribute name (it isn't in
+`attribute_map`).
 
-To reference a provisional element in the errata overlay without triggering
-validation errors, set `is_provisional: true` on that element.
+The `revision` keys allows the errata engine to parses the value as an integer
+and writes it directly to `XmlCluster.revision`, so the test compares against
+the overridden reference instead of the stale baseline.
 
-#### Provisional Attributes (Not in Baseline XML)
-
-When a new attribute is added to a cluster in an in-progress specification release
-but doesn't exist in the baseline XML, you must provide the attribute ID in hex
-format (`0x00`-`0xFFFF`). The errata engine will:
-
-1. Create an `XmlAttribute` object with `PROVISIONAL` conformance
-2. Inject it into the cluster's attribute map
-3. Allow the device to expose it without failing conformance tests
-
-**Mandatory fields for provisional attributes:**
-- `is_provisional: true`
-- `attribute_id: <hex>` (required; e.g., `0x17`, `0xFF`)
-
-**Optional fields:**
-- `read_access` (e.g., `RV`, `view`)
-- `write_access` (e.g., `administer`, `manage`, `none`)
-
-**Example:**
-
-```yaml
-BasicInformation:
-    DeviceLocation: # Not in baseline 1.6 XML; planned for 1.7
-        is_provisional: true
-        attribute_id: 0x17  # REQUIRED: Must be hex format
-        write_access: administer
-        read_access: RV
-```
-
-**Validation rules:**
-- `attribute_id` **must be provided** when `is_provisional` is `true`
-- `attribute_id` must be a **hexadecimal number** with `0x` prefix (e.g., `0x17`, not `23`)
-- `attribute_id` must be in valid range: `0x00` to `0xFFFF`
-- Failure to provide a valid `attribute_id` for a provisional attribute will result in an error
-
-#### Provisional Elements (Existing in Baseline)
-
-For provisional elements that already exist in the baseline XML (such as attributes
-on provisional clusters or clusters with provisional features), you can simply
-set `is_provisional: true` without an `attribute_id`:
-
-```yaml
-SomeCluster:
-    SomeProvisionalElement:
-        is_provisional: true
-        read_access: RV
-```
-
-In this case, the errata engine will:
-1. Locate the existing element in the baseline XML
-2. Apply the specified access overrides
-3. Mark it as provisional in conformance checking
-
-#### How Provisional Conformance Works
-
-The conformance check (`device_conformance_tests.py`) evaluates each element's
-conformance decision. When an element has `PROVISIONAL` conformance:
-
-- The element is allowed to be present on the device
-- The conformance test will pass even if the element is not in the baseline XML
-- The device's actual implementation is validated against the provisional spec definition
-
-This enables:
-- Early implementation of "next" specification features
-- Parallel development of SDK and specification
-- Gradual transitions between specification versions
+Use this when a cluster revision is bumped in a "next" spec release (or SDK PR)
+ahead of the checked-in baseline XML.
 
 ## Extending Engine Capabilities (Supporting New Errata Overrides)
 
@@ -163,26 +103,20 @@ follow these steps to extend the engine core:
 1. **Locate the Engine Core**: Open
    `src/python_testing/matter_testing_infrastructure/matter/testing/data_model_errata.py`.
 2. **Modify Element Resolution**:
-   - For existing target types (like Attributes or Commands), locate their
-     corresponding helper functions (e.g., `_apply_attribute_errata` or
-     `_apply_command_errata`).
-   - Add a new check for your intended override key (e.g.,
-     `if 'conformance' in overrides:`).
-   - Parse the YAML value and directly mutate the target object field (e.g.,
-     `target_attribute.conformance = ...`).
+    - For existing target types (like Attributes or Commands), locate their
+      corresponding helper functions (e.g., `_apply_attribute_errata` or
+      `_apply_command_errata`).
+    - Add a new check for your intended override key (e.g.,
+      `if 'conformance' in overrides:`).
+    - Parse the YAML value and directly mutate the target object field (e.g.,
+      `target_attribute.conformance = ...`).
 3. **Support New Target Element Types**:
-   - If extending support to target completely new AST structures (such as
-     `events` or `structs`), insert an additional lookup branch in
-     `_apply_element_errata` (e.g., resolving against a sanitized event map).
-   - Retrieve the target object from `target_cluster.events` and apply the
-     intended alterations.
-4. **Support New Attribute ID Formats**:
-   - If adding new element types that require IDs (similar to provisional
-     attributes), extend `_parse_and_validate_attribute_id()` to handle the
-     new format requirements.
-   - Ensure validation includes type checking, format validation, and range
-     bounds checking.
-5. **Unit Test Verification**: Always append a formal test method in
+    - If extending support to target completely new AST structures (such as
+      `events` or `structs`), insert an additional lookup branch in
+      `_apply_element_errata` (e.g., resolving against a sanitized event map).
+    - Retrieve the target object from `target_cluster.events` and apply the
+      intended alterations.
+4. **Unit Test Verification**: Always append a formal test method in
    `test_data_model_errata.py` verifying your new override key functions
    correctly and reports invalid inputs.
 
@@ -192,53 +126,3 @@ follow these steps to extend the engine core:
 2. Add your Cluster and Element override.
 3. Include a comment referencing the Specification Pull Request, Issue, or SDK
    Pull Request explaining why the adaptation is necessary.
-
-### Example: Adding a Provisional Attribute
-
-```yaml
-BasicInformation:
-    # New DeviceLocation attribute being added in spec version 1.7.
-    # SDK PR: https://github.com/project-chip/connectedhomeip/pull/71442
-    DeviceLocation:
-        is_provisional: true
-        attribute_id: 0x17  # Attribute ID from the specification
-        write_access: administer
-        read_access: RV
-```
-
-### Example: Updating an Access Override
-
-```yaml
-AmbientContextSensing:
-    # Fix spec typo where attribute was specified as RW instead of RV.
-    # Reconciles against future spec PR #43327
-    SimultaneousDetectionLimit:
-        write_access: none
-```
-
-### Example: Bumping Cluster Revision
-
-```yaml
-GroupKeyManagement:
-    # Cluster revision bumped to 4 in Matter 1.6.1 (Add "C" quality to GroupKeyMap attribute).
-    # The baseline 1.6 XML lists revision 3, so override the reference revision.
-    # TODO: Can be removed once 1.6.1 datamodel is generated and checked in.
-    revision: 4
-```
-
-## Troubleshooting Errata Errors
-
-If the errata engine reports errors during test execution, check:
-
-1. **Unknown Cluster Name**: Ensure the cluster name uses clean PascalCase
-   (e.g., `BasicInformation`, not `Basic Information` or `basic-information`)
-2. **Unknown Element**: Verify the attribute/command name matches exactly in the
-   specification (case-sensitive after sanitization)
-3. **Missing attribute_id for Provisional Attribute**: All provisional attributes
-   must include `attribute_id: 0x##` in hex format
-4. **Invalid attribute_id Format**: Ensure the attribute ID starts with `0x`
-   (e.g., `0x17`, not `23` or `17`)
-5. **attribute_id Out of Range**: Ensure the attribute ID is between `0x00` and
-   `0xFFFF`
-6. **Invalid Access Code**: Use one of: `RV`, `RO`, `RM`, `RA`, `view`, `operate`,
-   `manage`, `administer`, or `none`
