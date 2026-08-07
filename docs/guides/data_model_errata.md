@@ -89,7 +89,7 @@ validation errors, set `is_provisional: true` on that element:
 
 ```yaml
 BasicInformation:
-    DeviceLocation:  # Not in baseline 1.6 XML; planned for 1.7
+    DeviceLocation: # Not in baseline 1.6 XML; planned for 1.7
         is_provisional: true
         write_access: administer
         read_access: RV
@@ -143,4 +143,7 @@ follow these steps to extend the engine core:
 2. Add your Cluster and Element override.
 3. Include a comment referencing the Specification Pull Request, Issue, or SDK
    Pull Request explaining why the adaptation is necessary.
+
+```
+
 ```
