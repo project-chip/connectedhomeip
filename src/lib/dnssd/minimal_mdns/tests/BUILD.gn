@@ -62,4 +62,30 @@ if (pw_enable_fuzz_test_targets) {
       "${chip_root}/src/platform/logging:default",
     ]
   }
+
+  chip_pw_fuzz_target("fuzz-minmdns-query-responder-pw") {
+    test_source = [ "FuzzQueryResponderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
+      "${chip_root}/src/lib/dnssd/wire",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-minmdns-qname-pw") {
+    test_source = [ "FuzzMdnsQNamePW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-minmdns-record-data-pw") {
+    test_source = [ "FuzzMdnsRecordDataPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
 }
