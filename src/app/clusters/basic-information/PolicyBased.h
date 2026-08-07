@@ -531,8 +531,9 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     return listBuilder.Append(Span(mandatoryAttributes),
-     Policy::kHasDeviceLocation ? Span(optionalAttributesWithDeviceLocation) : Span(optionalAttributesNoDeviceLocation),
-     mPolicy.GetOptionalAttributes());
+                              Policy::kHasDeviceLocation ? Span(optionalAttributesWithDeviceLocation)
+                                                         : Span(optionalAttributesNoDeviceLocation),
+                              mPolicy.GetOptionalAttributes());
 }
 
 } // namespace chip::app::Clusters::BasicInformation
