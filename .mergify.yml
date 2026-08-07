@@ -139,6 +139,7 @@ pull_request_rules:
     - name: Auto-merge clean backport PRs
       conditions:
           - or:
+                - label="backport-v1.7-branch"
                 - label="backport-v1.6.1-branch"
                 - label="backport-v1.6-branch"
                 - label="backport-v1.5-branch"
