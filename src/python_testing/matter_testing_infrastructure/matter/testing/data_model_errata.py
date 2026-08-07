@@ -238,7 +238,7 @@ def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
 
         if not _has_no_separators(cluster_name):
             problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
-                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean [...]
+                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean sanitized names (e.g. 'OnOff', 'AmbientContextSensing')."))
             continue
 
         target_cluster_id = next((k for k, c in clusters.items() if _sanitize_name(c.name) == cluster_name.lower()), None)
