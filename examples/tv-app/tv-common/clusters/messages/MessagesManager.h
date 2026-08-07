@@ -61,8 +61,7 @@ struct CachedMessage
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
         mDuration(message.mDuration), mMessageText(message.mMessageText), mLanguageCode(message.mLanguageCode),
-        mMessageUri(message.mMessageUri), mOptions(message.mOptions), mState(message.mState),
-        mFabricIndex(message.mFabricIndex)
+        mMessageUri(message.mMessageUri), mOptions(message.mOptions), mState(message.mState), mFabricIndex(message.mFabricIndex)
     {
         memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
 
@@ -152,16 +151,16 @@ public:
     ~MessagesManager() override;
 
     // Commands
-    CHIP_ERROR HandlePresentMessagesRequest(
-        const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
-        const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint64_t> & duration,
-        const chip::CharSpan & messageText,
-        const chip::Optional<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses,
-        const chip::Optional<chip::CharSpan> & languageCode, const chip::Optional<chip::CharSpan> & messageUri,
-        chip::FabricIndex fabricIndex) override;
+    CHIP_ERROR
+    HandlePresentMessagesRequest(const chip::ByteSpan & messageId,
+                                 const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+                                 const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
+                                 const chip::app::DataModel::Nullable<uint32_t> & startTime,
+                                 const chip::app::DataModel::Nullable<uint64_t> & duration, const chip::CharSpan & messageText,
+                                 const chip::Optional<chip::app::DataModel::DecodableList<
+                                     chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> & responses,
+                                 const chip::Optional<chip::CharSpan> & languageCode,
+                                 const chip::Optional<chip::CharSpan> & messageUri, chip::FabricIndex fabricIndex) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes

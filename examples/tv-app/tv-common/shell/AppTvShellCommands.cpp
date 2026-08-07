@@ -473,8 +473,7 @@ static CHIP_ERROR MessagesHandler(int argc, char ** argv)
     {
         streamer_printf(sout, "  help                       Usage: messages <subcommand>\r\n");
         streamer_printf(sout, "  list                       List cached messages and their state. Usage: messages list\r\n");
-        streamer_printf(sout,
-                        "  do-not-disturb [on|off]    Get or set do-not-disturb. Usage: messages do-not-disturb on\r\n");
+        streamer_printf(sout, "  do-not-disturb [on|off]    Get or set do-not-disturb. Usage: messages do-not-disturb on\r\n");
         streamer_printf(sout, "\r\n");
         return CHIP_NO_ERROR;
     }

@@ -188,7 +188,7 @@ void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "MessagesManager: could not read current time (%" CHIP_ERROR_FORMAT "), rechecking in %u s",
-                         err.Format(), kClockRecheckIntervalSeconds);
+                        err.Format(), kClockRecheckIntervalSeconds);
         StartMessageTimer(messageId, MessageTimerType::kPresent, kClockRecheckIntervalSeconds * 1000);
         return;
     }
