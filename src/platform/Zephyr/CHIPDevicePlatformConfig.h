@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "autoconf.h"
+#include <zephyr/autoconf.h>
 
 // ==================== Platform Adaptations ====================
 
@@ -46,13 +46,13 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
-// Check if Zephyr app use NET_L2_OPENTHREAD
+// Check if Zephyr app uses OpenThread
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#ifdef CONFIG_OPENTHREAD
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
 #else
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
-#endif // CONFIG_NET_L2_OPENTHREAD
+#endif // CONFIG_OPENTHREAD
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 // Check if Zephyr app use BT
