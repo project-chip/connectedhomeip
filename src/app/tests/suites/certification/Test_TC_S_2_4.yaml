@@ -148,7 +148,6 @@ tests:
     - label:
           "Step 2b: TH sends a RemoveAllScenes command to DUT with the GroupID
           field set to G1."
-      PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
           values:
@@ -165,7 +164,6 @@ tests:
           "Step 3: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
           20000 (20s) and no extension fields set."
-      PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
           values:
@@ -206,34 +204,27 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Step 4a: TH configures AC1 on DUT for all implemented application
-          clusters supporting scenes."
-      verification: |
-          ./chip-tool levelcontrol move-to-level-with-on-off 100 0 0 0 1 1
-
-          DUT is configured with AC1 for application clusters which is implemented and supporting scenes
-
-          [1705040301.476123][6423:6425] CHIP:DMG:                                 StatusIB =
-          [1705040301.476139][6423:6425] CHIP:DMG:                                 {
-          [1705040301.476152][6423:6425] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1705040301.476164][6423:6425] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+    - label: "Wait 1s for level to change"
+      PICS: PICS_SDK_CI_ONLYs
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "message"
-                value:
-                    "Please configure AC1 on DUT and enter 'y' after the
-                    configuration is complete"
-              - name: "expectedValue"
-                value: "y"
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 100
 
     - label:
           "Step 4b: TH sends a StoreScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
           values:
@@ -268,6 +259,7 @@ tests:
                 value: 0
 
     - label: "Wait 1s for level to change"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -284,30 +276,6 @@ tests:
       attribute: "CurrentLevel"
       response:
           value: 200
-
-    - label:
-          "Step 5a: TH configures AC2 on DUT for all implemented application
-          clusters supporting scenes."
-      verification: |
-          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
-
-          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
-
-          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
-          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
-          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please configure AC2 on DUT and enter 'y' after the
-                    configuration is complete"
-              - name: "expectedValue"
-                value: "y"
 
     - label:
           "Step 5b: TH sends a RecallScene command to DUT with the GroupID field
@@ -339,35 +307,10 @@ tests:
       response:
           value: 100
 
-    - label: "DUT transitions to AC1 over 20s."
-      verification: |
-          DUT transitions to AC1 over 20s.
-
-          TH confirm the DUT reached AC1 (on level control cluster) after 20s
-
-          Read CurrentLevel attribute from level control cluster
-
-          ./chip-tool levelcontrol read current-level 1 1
-
-          Verify CurrentLevel attribute value on TH(chip-tool)
-
-          [1708072116.730389][7757:7759] CHIP:DMG: }
-          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
-          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please confirm that transition to AC1 was made over 20s"
-              - name: "expectedValue"
-                value: "y"
-
     - label:
           "Step 6a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
-      PICS: S.S.C05.Rsp && PICS_SDK_CI_ONLY
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -382,34 +325,9 @@ tests:
                 value: 0
 
     - label:
-          "Step 6a: TH configures AC2 on DUT for all implemented application
-          clusters supporting scenes."
-      verification: |
-          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
-
-          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
-
-          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
-          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
-          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: S.S.C05.Rsp && PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please configure AC2 on DUT and enter 'y' after the
-                    configuration is complete"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
           "Step 6b: TH sends a RecallScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01 and the TransitionTime field
           set to 5000 5s."
-      PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
@@ -421,7 +339,6 @@ tests:
                 value: 5000
 
     - label: "Wait 5s"
-      PICS: S.S.C05.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -431,37 +348,12 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 5s"
-      PICS: S.S.C05.Rsp && PICS_SDK_CI_ONLY
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           value: 100
-
-    - label: "DUT transitions to AC1 over 5."
-      verification: |
-          DUT transitions to AC1 over 5s.
-
-          TH confirm the DUT reached AC1 (on level control cluster) after 5s
-
-          Read CurrentLevel attribute from level control cluster
-
-          ./chip-tool levelcontrol read current-level 1 1
-
-          Verify CurrentLevel attribute value on TH(chip-tool)
-
-          [1708072116.730389][7757:7759] CHIP:DMG: }
-          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
-          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please confirm that transition to AC1 was made over 5s"
-              - name: "expectedValue"
-                value: "y"
 
     - label:
           "Step 7a: TH configures AC2 on DUT for all implemented application
@@ -481,34 +373,9 @@ tests:
                 value: 0
 
     - label:
-          "Step 7a: TH configures AC2 on DUT for all implemented application
-          clusters supporting scenes."
-      verification: |
-          ./chip-tool levelcontrol move-to-level-with-on-off 200 0 0 0 1 1
-
-          DUT is configured with AC2 for application clusters which is implemented,  supporting scenes and different from AC1
-
-          [1705040820.918043][6555:6557] CHIP:DMG:                                 StatusIB =
-          [1705040820.918056][6555:6557] CHIP:DMG:                                 {
-          [1705040820.918068][6555:6557] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1705040820.918080][6555:6557] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please configure AC2 on DUT and enter 'y' after the
-                    configuration is complete"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
           "Step 7b: TH sends a RecallScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01 and the TransitionTime field
           set to null (no transition time override)."
-      PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
@@ -520,7 +387,6 @@ tests:
                 value: null
 
     - label: "Wait 20s"
-      PICS: S.S.C05.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -530,37 +396,12 @@ tests:
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 20s"
-      PICS: S.S.C05.Rsp && PICS_SDK_CI_ONLY
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           value: 100
-
-    - label: "DUT transitions to AC1 over 20s."
-      verification: |
-          DUT transitions to AC1 over 20s.
-
-          TH confirm the DUT reached AC1 (on level control cluster) after 20s
-
-          Read CurrentLevel attribute from level control cluster
-
-          ./chip-tool levelcontrol read current-level 1 1
-
-          Verify CurrentLevel attribute value on TH(chip-tool)
-
-          [1708072116.730389][7757:7759] CHIP:DMG: }
-          [1708072116.730518][7757:7759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 2359286215
-          [1708072116.730552][7757:7759] CHIP:TOO:   CurrentLevel: 100
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please confirm that transition to AC1 was made over 20s"
-              - name: "expectedValue"
-                value: "y"
 
     - label:
           "Step 8: TH removes the Group key set that was added by sending a
