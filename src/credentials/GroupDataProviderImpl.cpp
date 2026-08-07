@@ -761,7 +761,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
-        // TODO(#21614): Enforce maximum number of 3 keys in a keyset
+        // Only kEpochKeysMax keys are read into operational_keys below, so a larger count would
+        // leave consumers indexing past the end of the array.
+        VerifyOrReturnError(keys_count <= KeySet::kEpochKeysMax, CHIP_ERROR_INTERNAL);
         {
             // operational_keys
             ReturnErrorOnFailure(reader.Next(TagGroupCredentials()));
@@ -2030,7 +2032,7 @@ size_t GroupDataProviderImpl::GroupSessionIteratorImpl::Count()
             {
                 break;
             }
-            for (uint16_t k = 0; k < keyset.keys_count; ++k)
+            for (uint16_t k = 0; k < keyset.keys_count && k < KeySet::kEpochKeysMax; ++k)
             {
                 if (keyset.operational_keys[k].hash == mSessionId)
                 {
