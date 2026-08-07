@@ -169,7 +169,7 @@
         {
             "label": "Connect to device (Tizen)",
             "type": "shell",
-            "command": "sdb",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
             "args": ["connect", "${input:tizenTargetDeviceAddress}"],
             "problemMatcher": [],
             "runOptions": {
@@ -179,12 +179,12 @@
         {
             "label": "Install LightingApp (Tizen)",
             "type": "shell",
-            "command": "sdb",
+            "command": "${env:TIZEN_SDK_ROOT}/tools/sdb",
             "args": [
                 "-s",
                 "${input:tizenTargetDeviceAddressSdb}",
                 "install",
-                "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
+                "${workspaceFolder}/out/tizen-arm-light/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"
             ],
             "problemMatcher": [],
             "runOptions": {
@@ -351,7 +351,7 @@
             "type": "command",
             "command": "shellCommand.execute",
             "args": {
-                "command": "sdb devices | grep -v 'List of devices attached' |awk '{print $1 \"|\" $1, $3, \"(\" $2 \")\"}'",
+                "command": "${env:TIZEN_SDK_ROOT}/tools/sdb devices | grep -v 'List of devices attached' |awk '{print $1 \"|\" $1, $3, \"(\" $2 \")\"}'",
                 "fieldSeparator": "|",
                 "description": "Select target device"
             }
