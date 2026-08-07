@@ -25,4 +25,4 @@ BasicInformation:
     # SDK PR: https://github.com/project-chip/connectedhomeip/pull/71442
     DeviceLocation:
         write_access: administer
-        read_access: RW
+        read_access: RV
