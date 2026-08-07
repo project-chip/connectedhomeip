@@ -171,16 +171,16 @@ jobs:
           mkdir -p python_testing/data_model
           mkdir -p apps/push_av_server
           mkdir mock_server
-          mv src/python_testing python_testing/scripts/sdk
-          mv data_model python_testing/data_model
-          mv src/tools/push_av_server apps/push_av_server
+          cp -r src/python_testing/* python_testing/scripts/sdk
+          cp -r data_model/* python_testing/data_model
+          cp -r src/tools/push_av_server/* apps/push_av_server
+          cp -r integrations/mock_server mock_server
           pip install --break-system-packages -r python_testing/scripts/sdk/requirements.txt \
               && rm python_testing/scripts/sdk/requirements.txt
           pip install --break-system-packages -r apps/push_av_server/requirements.txt \
               && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < apps/push_av_server/hypercorn.patch
           pip install --break-system-packages -r python_testing/scripts/sdk/requirements.nfc.txt \
               && rm python_testing/scripts/sdk/requirements.nfc.txt
-          mv integrations/mock_server ./mock_server
       - name: Build Python wheels
         shell: bash
         working-directory: ./out
