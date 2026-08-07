@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "laundry-dryer-controls-delegate.h",
-  "laundry-dryer-controls-server.cpp",
-  "laundry-dryer-controls-server.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]
