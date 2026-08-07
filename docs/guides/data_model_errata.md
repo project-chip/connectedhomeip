@@ -77,6 +77,21 @@ attribute/command element names, not an element name itself):
 GroupKeyManagement:
     revision: 4
 ```
+### Provisional Elements
+
+Some specification features are developed ahead of the baseline data model
+release. These "in-progress" or "provisional" elements may be implemented in
+the SDK but not yet included in the checked-in XML baseline.
+
+To reference a provisional element in the errata overlay without triggering
+validation errors, set `is_provisional: true` on that element:
+
+```yaml
+BasicInformation:
+    DeviceLocation:  # Not in baseline 1.6 XML; planned for 1.7
+        is_provisional: true
+        write_access: administer
+        read_access: RV
 
 #### How it works
 

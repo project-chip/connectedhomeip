@@ -41,6 +41,11 @@ AccessControlEntryPrivilegeEnum = Clusters.AccessControl.Enums.AccessControlEntr
 # compares against this reference.
 CLUSTER_REVISION_KEY = 'revision'
 
+# Reserved key under an attribute/command entry that marks it as provisional.
+# Provisional elements are expected to not exist in the baseline XML and will not
+# generate errors if they cannot be found in the AST.
+PROVISIONAL_KEY = 'is_provisional'
+
 
 def parse_errata_access(val: str) -> int:
     """Parses a human-readable access string into an AccessControlEntryPrivilegeEnum value."""
@@ -175,8 +180,11 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
     if not _has_no_separators(element_name):
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
-                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean sanitized names."))
+                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use [...]
         return
+
+    # Check if this element is marked as provisional and skip if attribute doesn't exist
+    is_provisional = overrides.get(PROVISIONAL_KEY, False)
 
     san_elem = element_name.lower()
     context = f"{cluster_name}::{element_name}"
@@ -199,6 +207,11 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
                                           severity=ProblemSeverity.ERROR, problem=f"Command ID {cmd_id} for '{context}' missing in accepted/generated AST lists."))
             return
         _apply_command_errata(target_cmd, overrides, cluster_id, cmd_id, context, problems)
+        return
+
+    # Allow provisional elements to not exist in the baseline XML
+    if is_provisional:
+        LOGGER.info(f"Provisional element '{context}' not found in baseline XML (expected for in-progress spec additions).")
         return
 
     problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
@@ -225,7 +238,7 @@ def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
 
         if not _has_no_separators(cluster_name):
             problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
-                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean sanitized names (e.g. 'OnOff', 'AmbientContextSensing')."))
+                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean [...]
             continue
 
         target_cluster_id = next((k for k, c in clusters.items() if _sanitize_name(c.name) == cluster_name.lower()), None)
