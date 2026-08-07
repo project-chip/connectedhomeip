@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 
 import matter
 from matter.ChipStack import ChipStack
-from matter.storage import PersistentStorage, PersistentStorageJSON
+from matter.storage import PersistentStorage, PersistentStorageINI, PersistentStorageJSON
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -45,26 +45,30 @@ class MatterStackState:
     def __init__(self, config: 'MatterTestConfig'):
         self._config = config
 
+        persistent_storage = None
         if not hasattr(builtins, "chipStack"):
             matter.native.Init(bluetoothAdapter=config.ble_controller)
-            if config.storage_path is None:
-                raise ValueError("Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path))
+            if config.chip_tool_common_storage_path is not None and config.chip_tool_fabric_storage_path is not None:
+                persistent_storage = PersistentStorageINI(
+                    config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path)
+            else:
+                persistent_storage = PersistentStorageJSON(config.storage_path)
             self._we_initialized_the_stack = True
         else:
-            self._init_stack(already_initialized=True)
             self._we_initialized_the_stack = False
 
-    def _init_stack(self, already_initialized: bool, **kwargs):
+        self._init_stack(already_initialized=not self._we_initialized_the_stack, persistent_storage=persistent_storage)
+
+    def _init_stack(self, already_initialized: bool, persistent_storage: PersistentStorage | None = None):
         if already_initialized:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!", self._config.storage_path
+                "specified storage will be ignored!"
             )
             # TODO: Warn that storage will not follow what we set in config
-        else:
-            self._chip_stack = ChipStack(**kwargs)
+        elif persistent_storage:
+            self._chip_stack = ChipStack(persistent_storage)
             builtins.chipStack = self._chip_stack
 
         matter.logging.RedirectToPythonLogging()
