@@ -139,7 +139,25 @@ void AvAnalysisServerLogic::OnVideoStreamAllocated(Status aStatus, uint16_t aVid
 
 void AvAnalysisServerLogic::OnVideoStreamDeallocated(Status aStatus, uint16_t aAnalysisStreamId)
 {
-    // Completion of RemoveAnalysisStream: implemented together with the command handler.
+    auto handleRef = std::move(mPendingCommandHandle);
+    auto * handler = handleRef.Get();
+    VerifyOrReturn(handler != nullptr);
+
+    // A non-SUCCESS camera response is propagated as the command status.
+    if (aStatus != Status::Success)
+    {
+        handler->AddStatus(mPendingCommandPath, aStatus);
+        return;
+    }
+
+    if (mStreamTable.Remove(aAnalysisStreamId))
+    {
+        MarkDirty(Attributes::CurrentAnalysisStreamCount::Id);
+        MarkDirty(Attributes::AnalysisStreams::Id);
+        LogErrorOnFailure(StoreAnalysisStreams());
+    }
+
+    handler->AddStatus(mPendingCommandPath, Status::Success);
 }
 
 CHIP_ERROR
@@ -891,14 +909,36 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeacti
     return Status::Success;
 }
 
-/**
- * Placeholder method for when the functionality for remote context detection is implemented
- */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                   const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    AnalysisStreamEntry * entry = mStreamTable.Find(commandData.analysisStreamID);
+    VerifyOrReturnValue(entry != nullptr, Status::NotFound);
+
+    // only a stream in PendingInitiation may be removed
+    VerifyOrReturnValue(entry->state == AnalysisStreamStateEnum::kPendingInitiation, Status::InvalidInState);
+
+    VerifyOrReturnValue(mCameraClient != nullptr, Status::Failure,
+                        ChipLogError(Zcl, "AvAnalysis[ep=%d]: no camera client configured", mEndpointId));
+
+    // One camera-bound command at a time; the response of this one depends on the camera's answer
+    VerifyOrReturnValue(mPendingCommandHandle.Get() == nullptr, Status::Busy);
+
+    mPendingCommandHandle = CommandHandler::Handle(&handler);
+    mPendingCommandPath   = commandPath;
+    handler.FlushAcksRightAwayOnSlowCommand();
+
+    CHIP_ERROR err = mCameraClient->RequestVideoStreamDeallocation(entry->cameraNode, commandData.analysisStreamID, *this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "AvAnalysis[ep=%d]: failed to start stream deallocation: %" CHIP_ERROR_FORMAT, mEndpointId, err.Format());
+        mPendingCommandHandle = CommandHandler::Handle();
+        return Status::Failure;
+    }
+
+    // Response is produced in OnVideoStreamDeallocated once the camera answers
+    return std::nullopt;
 }
 
 /**
