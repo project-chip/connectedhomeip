@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Declarations for internal methods
 
 @class MTRCASESessionResumptionInfo;
+@class MTRCommissioningOperation;
+@class MTRCommissioningParameters;
 
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
@@ -54,6 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
+- (BOOL)commission:(MTRCommissioningOperation *)commissioning
+    withCommissioningID:(NSNumber *)commissioningID
+    commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                  error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @end

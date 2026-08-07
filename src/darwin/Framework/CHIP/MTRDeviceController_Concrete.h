@@ -256,6 +256,44 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
 
 /**
+ * Outcome of a -stopCommissioningAtomically:forCommissioningID: call.
+ *
+ * Disambiguates the two failure modes of -stopCommissioning:forCommissioningID:
+ * (which collapses both to NO) so the post-PASE watchdog fire path can
+ * decide whether to escalate a CHIP_ERROR_TIMEOUT to the client.
+ */
+typedef NS_ENUM(NSInteger, MTRStopCommissioningOutcome) {
+    /// We were the current commissioning and StopPairing succeeded (or no
+    /// StopPairing was needed because we had not yet reached the C++ layer).
+    MTRStopCommissioningOutcomeStopped,
+    /// Another MTRCommissioningOperation has already taken our slot on the
+    /// controller (currentCommissioning != self).  Caller must NOT dispatch
+    /// a terminal error in this case -- the wedge has already been resolved
+    /// by the replacement and a timeout dispatched here would tear down the
+    /// unrelated successor's delegate state.
+    MTRStopCommissioningOutcomeReplaced,
+    /// We were the current commissioning but StopPairing failed at the CHIP
+    /// layer (e.g. the commissionee fail-safe expired before the watchdog
+    /// fired).  Caller MUST still surface a terminal error so the client can
+    /// settle back to "no commissioning in flight".
+    MTRStopCommissioningOutcomeFailedStillCurrent,
+};
+
+/**
+ * Atomic variant of -stopCommissioning:forCommissioningID: that distinguishes
+ * the "replaced" and "failed-but-still-current" outcomes from the success
+ * outcome.  The replaced-vs-current check and the StopPairing call are
+ * performed under the same controller lock, eliminating the TOCTOU window
+ * between an external check of currentCommissioning and the subsequent stop.
+ *
+ * Used by the post-PASE watchdog fire path to suppress a spurious
+ * CHIP_ERROR_TIMEOUT when the operation slot has already been taken by a
+ * successor.
+ */
+- (MTRStopCommissioningOutcome)stopCommissioningAtomically:(MTRCommissioningOperation *)commissioning
+                                        forCommissioningID:(NSNumber *)commissioningID;
+
+/**
  * Notification that a commissioning operation is done.
  */
 - (void)commissioningDone:(MTRCommissioningOperation *)commissioning;
