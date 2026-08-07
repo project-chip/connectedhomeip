@@ -33,10 +33,10 @@ details.
 
                 $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
--   Clone the repo (this assumes you are checking the code out in home folder)
+-   Clone the repo (this assumes you are checking the code out in your home folder)
 
                 $ cd ~
-                $ git clone git@github.com:project-chip/connectedhomeip.git
+                $ git clone https://github.com/project-chip/connectedhomeip.git
 
 -   Ensure your repo is up to date with submodules fetched
 
