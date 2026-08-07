@@ -18,6 +18,9 @@
 
 set -e
 
+# Allow unlimited core dump size
+ulimit -c unlimited
+
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
@@ -25,14 +28,53 @@ dlogutil CHIP &
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5
 
+# Create dump directory (may not exist if emu hasn't created it yet)
+mkdir -p /mnt/chip/dump
+
+# Restore the core_pattern configuration file on exit
+if [ -f /proc/sys/kernel/core_pattern ]; then
+    ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null)
+    trap 'echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+else
+    trap 'rm -f /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+fi
+
+# Try to apply the custom pattern needed for the test execution
+echo "/mnt/chip/dump/core.%e.%p.%t" >/proc/sys/kernel/core_pattern 2>/dev/null
+
 # Install lighting Matter app
 pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*/out/org.tizen.matter.*.tpk
 # Launch lighting Matter app
 app_launcher -s org.tizen.matter.example.lighting
 
+# Helper function to run test and handle crashes
+run_test_with_crash_handling() {
+    TEST_NAME="$1"
+    shift
+
+    echo "RUN: $TEST_NAME"
+    RV=0
+    "$@" || RV=$?
+
+    if [ "$RV" -ne 0 ]; then
+        echo "DONE: FAIL (exit code: $RV)"
+
+        # Raw core dumps are created instantly in /mnt/chip/dump/
+        # No need to wait - they're already on shared filesystem
+        if [ "$RV" -gt 128 ]; then
+            echo "Core dump was created while running test '$TEST_NAME'."
+            echo "Look for files matching: /mnt/chip/dump/core.*"
+        fi
+    else
+        echo "DONE: SUCCESS"
+    fi
+
+    return "$RV"
+}
+
 # TEST: pair app using network commissioning
-/mnt/chip/chip-tool pairing onnetwork 1 20202021
+run_test_with_crash_handling "pairing" /mnt/chip/chip-tool pairing onnetwork 1 20202021
 # TEST: turn on light
-/mnt/chip/chip-tool onoff on 1 1
+run_test_with_crash_handling "on" /mnt/chip/chip-tool onoff on 1 1
 # TEST: turn off light
-/mnt/chip/chip-tool onoff off 1 1
+run_test_with_crash_handling "off" /mnt/chip/chip-tool onoff off 1 1
