@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -101,9 +101,20 @@ struct Delegate
      * @return the number of balance structs in the list.
      */
     virtual size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint) = 0;
-};
 
-void SetDelegate(Delegate * aDelegate);
-Delegate * GetDelegate();
+    /**
+     * Callback invoked when the CurrentEnergyBalance attribute is changed on endpoint `aEndpoint`.
+     * @note Do not call SetCurrentEnergyBalance() on the cluster on the same endpoint from this callback to avoid possible infinite
+     * recursion.
+     */
+    virtual void OnCurrentEnergyBalanceChanged(chip::EndpointId aEndpoint, uint8_t currentEnergyBalance) {}
+
+    /**
+     * Callback invoked when the CurrentLowPowerModeSensitivity attribute is changed on endpoint `aEndpoint`.
+     * @note Do not call SetCurrentLowPowerModeSensitivity() on the cluster on the same endpoint from this callback to avoid
+     * possible infinite recursion.
+     */
+    virtual void OnCurrentLowPowerModeSensitivityChanged(chip::EndpointId aEndpoint, uint8_t currentLowPowerModeSensitivity) {}
+};
 
 } // namespace chip::app::Clusters::EnergyPreference
