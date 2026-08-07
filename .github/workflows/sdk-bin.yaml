@@ -267,13 +267,13 @@ jobs:
         env:
           COMMITHASH: ${{ github.sha }}
         with:
-            name: connectedhomeip/chip-cert-bins
+            name: greens/chip-cert-bins
             tags: ${{ github.sha }}
             dockerfile: ./integrations/docker/images/chip-cert-bins/Dockerfile-ci
-            username: ${{ secrets.CHIP_CERT_BINS_REGISTRY_USER }}
-            password: ${{ secrets.CHIP_CERT_BINS_REGISTRY_TOKEN }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
             buildargs: COMMITHASH
-            registry: docker.io
+            registry: ghcr.io
       - name: Notify Slack on Failure
         if: failure()
         uses: ./.github/actions/notify-slack-failure
