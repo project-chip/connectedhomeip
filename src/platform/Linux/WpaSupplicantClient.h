@@ -250,6 +250,7 @@ private:
     void OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartOnGLib();
+    CHIP_ERROR ResetOnGLib();
 
 protected:
     struct GDBusWpaSupplicant

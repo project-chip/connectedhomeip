@@ -221,6 +221,21 @@ public:
      */
     virtual void StartWiFiManagement(void) = 0;
 
+    /**
+     *  @brief
+     *    Stop Wi-Fi management.
+     *
+     *  Stop the Wi-Fi management infrastructure for the device. This
+     *  may include terminating any event subscriptions, detaching
+     *  from or stopping an external network manager, and releasing
+     *  associated resources.
+     *
+     *  @sa IsWiFiManagementStarted
+     *  @sa StartWiFiManagement
+     *
+     */
+    virtual void StopWiFiManagement(void) = 0;
+
     // Wi-Fi Station Control Plane Management
 
     // Introspection

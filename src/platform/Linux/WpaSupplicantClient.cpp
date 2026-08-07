@@ -192,11 +192,20 @@ void WpaSupplicantClient::Shutdown() noexcept
     mConnectivityManagerImpl = nullptr;
 }
 
-void WpaSupplicantClient::Reset() noexcept
+CHIP_ERROR WpaSupplicantClient::ResetOnGLib(void)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     mWpaSupplicant.Reset();
+
+    return CHIP_NO_ERROR;
+}
+
+void WpaSupplicantClient::Reset() noexcept
+{
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](WpaSupplicantClient * self) { return self->ResetOnGLib(); }, this);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to stop Wi-Fi management"));
 }
 
 bool WpaSupplicantClient::IsStarted() const noexcept
