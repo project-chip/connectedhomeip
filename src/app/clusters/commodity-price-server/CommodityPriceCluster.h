@@ -28,6 +28,16 @@ namespace app {
 namespace Clusters {
 namespace CommodityPrice {
 
+/// Commands that this cluster supports only if the application opts into them.
+///
+/// Both CommodityPrice commands are optionally conformant. GetDetailedForecastRequest is
+/// additionally gated on the Forecasting (FORE) feature.
+enum class OptionalCommands : uint32_t
+{
+    kSupportsGetDetailedPriceRequest    = 0x1,
+    kSupportsGetDetailedForecastRequest = 0x2
+};
+
 class CommodityPriceCluster : public DefaultServerCluster
 {
 public:
@@ -35,12 +45,23 @@ public:
      * Creates a CommodityPrice cluster instance.
      * @param endpointId The endpoint on which this cluster exists.
      * @param features The FeatureMap value for this instance.
+     * @param optionalCommands The optionally conformant commands this instance supports.
      */
-    CommodityPriceCluster(EndpointId endpointId, BitMask<Feature> features) :
-        DefaultServerCluster({ endpointId, CommodityPrice::Id }), mFeatures(features)
+    CommodityPriceCluster(EndpointId endpointId, BitMask<Feature> features, BitMask<OptionalCommands> optionalCommands) :
+        DefaultServerCluster({ endpointId, CommodityPrice::Id }), mFeatures(features), mOptionalCommands(optionalCommands)
     {}
 
     bool HasFeature(Feature feature) const { return mFeatures.Has(feature); }
+
+    /// GetDetailedPriceRequest and its mandatory GetDetailedPriceResponse are supported together.
+    bool SupportsDetailedPrice() const { return mOptionalCommands.Has(OptionalCommands::kSupportsGetDetailedPriceRequest); }
+
+    /// GetDetailedForecastRequest is optionally conformant only when FORE is supported. Its
+    /// GetDetailedForecastResponse is mandatory whenever the request is supported.
+    bool SupportsDetailedForecast() const
+    {
+        return HasFeature(Feature::kForecasting) && mOptionalCommands.Has(OptionalCommands::kSupportsGetDetailedForecastRequest);
+    }
 
     /**
      * @brief ServerClusterInterface methods.
@@ -63,6 +84,7 @@ public:
 
 private:
     const BitMask<Feature> mFeatures;
+    const BitMask<OptionalCommands> mOptionalCommands;
 };
 
 } // namespace CommodityPrice

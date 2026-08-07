@@ -47,14 +47,37 @@ CHIP_ERROR CommodityPriceCluster::Attributes(const ConcreteClusterPath & path,
 CHIP_ERROR CommodityPriceCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    // TODO: append GetDetailedPriceRequest plus GetDetailedForecastRequest when the Forecasting feature is set.
-    return DefaultServerCluster::AcceptedCommands(path, builder);
+    using namespace Commands;
+
+    if (SupportsDetailedPrice())
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ GetDetailedPriceRequest::kMetadataEntry }));
+    }
+
+    if (SupportsDetailedForecast())
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ GetDetailedForecastRequest::kMetadataEntry }));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommodityPriceCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    // TODO: append GetDetailedPriceResponse plus GetDetailedForecastResponse when the Forecasting feature is set.
-    return DefaultServerCluster::GeneratedCommands(path, builder);
+    using namespace Commands;
+
+    // Each response is mandatory whenever its request is supported.
+    if (SupportsDetailedPrice())
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ GetDetailedPriceResponse::Id }));
+    }
+
+    if (SupportsDetailedForecast())
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ GetDetailedForecastResponse::Id }));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus CommodityPriceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
