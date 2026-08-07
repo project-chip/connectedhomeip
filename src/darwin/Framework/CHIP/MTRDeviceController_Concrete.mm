@@ -1375,6 +1375,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 self, commissioning);
             self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue,
                 CHIP_ERROR_CANCELLED);
+            // OnCommissioningComplete now records the result and waits for a
+            // subsequent OnCommissioningSuccess / OnCommissioningFailure call
+            // to drain the pending record to the delegate. The C++ side is not
+            // going to make either call when StopPairing is invoked outside an
+            // active commissioning, so synthesize a CompletionStatus-less
+            // failure here to flush the record through to the delegate;
+            // otherwise the cancellation would never reach the client.
+            self->_deviceControllerDelegateBridge->OnCommissioningFailure(chip::PeerId(),
+                chip::Controller::CompletionStatus());
         }
         return ok;
     };

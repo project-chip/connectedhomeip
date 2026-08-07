@@ -32,6 +32,14 @@ MTR_TESTABLE
 + (NSError *)errorForCHIPIntegerCode:(uint32_t)code;
 + (uint32_t)errorToCHIPIntegerCode:(NSError * _Nullable)error;
 
+// For tests only.  Equivalent to errorForCHIPIntegerCode: but, when
+// hasNetworkCommissioningStatus is YES, also threads the supplied
+// NetworkCommissioning cluster status byte into the resulting NSError's
+// userInfo under MTRErrorNetworkCommissioningStatusKey.
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)code
+       hasNetworkCommissioningStatus:(BOOL)hasNetworkCommissioningStatus
+          networkCommissioningStatus:(uint8_t)networkCommissioningStatus;
+
 @end
 
 NS_ASSUME_NONNULL_END
