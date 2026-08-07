@@ -59,7 +59,7 @@ CustomerAppManager & AppManagerInstance()
     return CustomerAppManager::GetInstance();
 }
 
-#ifdef SL_MATTER_DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 // AppEvent handler for kEventType_UpdateUI; pass nullptr to refresh from AppInit.
 void UpdateClosureUI(AppEvent * aEvent)
 {
@@ -155,7 +155,7 @@ void UpdateClosureUI(AppEvent * aEvent)
         AppInstance().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
     }
 }
-#endif // SL_MATTER_DISPLAY_ENABLED
+#endif /* SL_MATTER_DISPLAY_ENABLED */
 } // namespace
 
 void MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
@@ -178,7 +178,7 @@ CHIP_ERROR AppTask::AppInit()
 #if SL_MATTER_DISPLAY_ENABLED
     LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
     GetLCD().SetCustomUI(ClosureUI::DrawUI);
-#endif
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     // Initialization of Closure Manager and endpoints of closure and closurepanel.
     AppManagerInstance().Init();
