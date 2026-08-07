@@ -147,6 +147,36 @@ QNameHolder MakeHostName(const std::string & host)
     return holder;
 }
 
+// A record whose payload is supplied verbatim. TxtResourceRecord always emits
+// well-formed length-prefixed entries, so it cannot produce a TXT body that
+// ParseTxtRecord rejects; this can.
+class RawResourceRecord : public ResourceRecord
+{
+public:
+    RawResourceRecord(QType type, const FullQName & name, const uint8_t * data, size_t dataLen) :
+        ResourceRecord(type, name), mData(data), mDataLen(dataLen)
+    {}
+
+protected:
+    bool WriteData(RecordWriter & out) const override
+    {
+        out.Put(BytesRange(mData, mData + mDataLen));
+        return out.Fit();
+    }
+
+private:
+    const uint8_t * mData;
+    const size_t mDataLen;
+};
+
+// Distinct interface ids so the resolver's "addresses arrived on more than one
+// interface" handling is reachable. Fuzz targets build for host linux/mac only,
+// where the platform interface type is integral.
+Inet::InterfaceId MakeInterfaceId(unsigned n)
+{
+    return Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(n));
+}
+
 // Serializes a ResourceRecord to wire bytes and re-parses it into a
 // ResourceData, exactly as the network receive path does. Owns the byte
 // buffer so the parsed ResourceData / QName iterators remain valid.
@@ -204,7 +234,8 @@ constexpr unsigned kMaxIpRecordsPerInput = CommonResolutionData::kMaxIPAddresses
 // Drive the full IncrementalResolver lifecycle from fuzzer-controlled inputs.
 void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instance, const std::string & host, uint16_t port,
                                    uint64_t ttl, const std::vector<std::string> & txtEntries, uint8_t ipRecordCount,
-                                   const std::array<uint8_t, 16> & ipBytes, uint8_t addressing, bool addPtr)
+                                   const std::array<uint8_t, 16> & ipBytes, uint8_t addressing, bool addPtr,
+                                   const std::vector<uint8_t> & rawTxtPayload, uint8_t interfaceSel)
 {
     EnsureInitialized();
 
@@ -274,6 +305,20 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         }
     }
 
+    // ---- Feed a TXT record whose body is raw fuzzer bytes ----
+    // Addressed to the record name so it passes the name check and reaches
+    // OnTxtRecord, where a body that is not well-formed length-prefixed entries
+    // drives the parse-rejection path.
+    if (!rawTxtPayload.empty())
+    {
+        RawResourceRecord rawTxtBuilder(QType::TXT, serviceName.Full(), rawTxtPayload.data(), rawTxtPayload.size());
+        WireRecord rawTxtWire;
+        if (rawTxtWire.Build(rawTxtBuilder))
+        {
+            (void) resolver.OnRecord(interface, rawTxtWire.Resource(), rawTxtWire.Packet());
+        }
+    }
+
     // ---- Feed a PTR record ----
     // PTR is not one of the types the resolver consumes, so this drives the
     // ignored-record arm of the OnRecord type switch.
@@ -300,11 +345,26 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         Inet::IPAddress addr;
         memcpy(addr.Addr, bytes.data(), sizeof(addr.Addr));
 
+        // Interface handling: keep the unset id, use one real id throughout, or
+        // switch ids partway so addresses arrive on two different interfaces.
+        Inet::InterfaceId ipInterface = interface;
+        switch (interfaceSel % 3)
+        {
+        case 1:
+            ipInterface = MakeInterfaceId(1);
+            break;
+        case 2:
+            ipInterface = MakeInterfaceId(n == 0 ? 1 : 2);
+            break;
+        default:
+            break;
+        }
+
         IPResourceRecord ipBuilder(misaddressIp ? serviceName.Full() : hostName.Full(), addr);
         WireRecord ipWire;
         if (ipWire.Build(ipBuilder))
         {
-            (void) resolver.OnRecord(interface, ipWire.Resource(), ipWire.Packet());
+            (void) resolver.OnRecord(ipInterface, ipWire.Resource(), ipWire.Packet());
         }
     }
 
@@ -391,6 +451,34 @@ std::vector<std::vector<std::string>> TxtSeeds()
     };
 }
 
+// Raw TXT record bodies. A TXT body is a run of length-prefixed "key=value"
+// strings that must land exactly on the end of the record; these cover both
+// bodies that satisfy that and bodies that do not, so the parser's accept and
+// reject paths are both driven.
+std::vector<std::vector<uint8_t>> RawTxtSeeds()
+{
+    return {
+        // Well formed, consumes the body exactly.
+        { 0x04, 'D', '=', '8', '0' },
+        { 0x05, 'S', 'I', 'I', '=', '5' },
+        { 0x03, 'T', '=', '1', 0x04, 'C', 'M', '=', '2' },
+        // Zero-length entries (the empty-key forms).
+        { 0x00 },
+        { 0x00, 0x00, 0x00 },
+        // A key with no '=' and a bare '=' value.
+        { 0x02, 'a', 'b' },
+        { 0x01, '=' },
+        // Length prefix runs past the end of the body.
+        { 0x10, 'a' },
+        { 0xFF },
+        { 0x7F, 'x', 'y' },
+        // First entry fits, second overruns.
+        { 0x02, 'a', 'b', 0x03, 'c' },
+        // Entries overshoot the end by one byte.
+        { 0x02, 'a', 'b', 0x02, 'c' },
+    };
+}
+
 FUZZ_TEST(MdnsResolverPW, ResolverLifecycleNoCorruption)
     .WithDomains(
         /* flavorSel  */ Arbitrary<uint8_t>(),
@@ -410,6 +498,10 @@ FUZZ_TEST(MdnsResolverPW, ResolverLifecycleNoCorruption)
         // Bit pairs select whether the TXT / IP records are addressed to the
         // wrong name; see the derivation in the fuzz function.
         /* addressing    */ Arbitrary<uint8_t>(),
-        /* addPtr        */ Arbitrary<bool>());
+        /* addPtr        */ Arbitrary<bool>(),
+        // Raw TXT bodies, seeded with both well-formed and malformed
+        // length-prefixed forms so the TXT parse-rejection path is reachable.
+        /* rawTxtPayload */ Arbitrary<std::vector<uint8_t>>().WithSeeds(RawTxtSeeds()).WithMaxSize(256),
+        /* interfaceSel  */ Arbitrary<uint8_t>());
 
 } // namespace
