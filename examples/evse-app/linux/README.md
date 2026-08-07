@@ -62,7 +62,6 @@ details.
                 $ cd ~/connectedhomeip/examples/evse-app/linux
                 $ rm -rf out/
 
-
 ## Commandline arguments
 
 -   `--wifi`
