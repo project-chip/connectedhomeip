@@ -46,7 +46,6 @@ details.
                 # Alternatively you can check out all submodules and resync with:
                 $ git submodule sync --recursive; git submodule update --init --recursive
 
-
 -   Activate your shell (do this every time you open the new terminal window)
 
                 $ cd ~/connectedhomeip
