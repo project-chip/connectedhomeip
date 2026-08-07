@@ -1276,7 +1276,7 @@ Status ColorControlCluster::moveToSaturation(uint8_t saturation, uint16_t transi
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
                            .startSat    = GetSaturation(), // read AFTER the mode switch
-                           .targetSat   = std::clamp<uint8_t>(saturation, MIN_SATURATION_VALUE, MAX_SATURATION_VALUE),
+                           .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
                            .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
                            .durationMs  = durationMs,
     };
