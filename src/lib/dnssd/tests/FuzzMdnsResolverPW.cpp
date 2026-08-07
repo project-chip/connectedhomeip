@@ -59,6 +59,7 @@
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
+#include <lib/dnssd/minimal_mdns/records/Ptr.h>
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
@@ -195,14 +196,25 @@ void CheckCommissionBuffersInBounds(const CommissionNodeData & data)
     ASSERT_LT(strnlen(data.pairingInstruction, sizeof(data.pairingInstruction)), sizeof(data.pairingInstruction));
 }
 
+// Number of A/AAAA records a single input may feed. CommonResolutionData holds
+// kMaxIPAddresses of them, so allowing more than that lets the accumulation run
+// past the end of the array and exercise the full/refusal path.
+constexpr unsigned kMaxIpRecordsPerInput = CommonResolutionData::kMaxIPAddresses + 3;
+
 // Drive the full IncrementalResolver lifecycle from fuzzer-controlled inputs.
 void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instance, const std::string & host, uint16_t port,
-                                   uint64_t ttl, const std::vector<std::string> & txtEntries, bool addIp,
-                                   const std::array<uint8_t, 16> & ipBytes)
+                                   uint64_t ttl, const std::vector<std::string> & txtEntries, uint8_t ipRecordCount,
+                                   const std::array<uint8_t, 16> & ipBytes, uint8_t addressing, bool addPtr)
 {
     EnsureInitialized();
 
     const ServiceFlavor flavor = static_cast<ServiceFlavor>(flavorSel % 3);
+
+    // Send a record to the wrong name on roughly one input in four. A 50/50 split
+    // starves the correctly-addressed path, which is the one that reaches the TXT
+    // and IP handling behind the name check.
+    const bool misaddressTxt = (addressing & 0x03) == 0;
+    const bool misaddressIp  = (addressing & 0x0C) == 0;
 
     // ---- Build + parse the SRV record (the first record the lifecycle needs) ----
     QNameHolder serviceName = MakeServiceName(flavor, instance);
@@ -232,8 +244,9 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
     const Inet::InterfaceId interface = Inet::InterfaceId::Null();
 
     // ---- Feed a TXT record carrying the fuzzer's key=value pairs ----
-    // TXT must be addressed to the *record* name (the service name), not the
-    // host name, for OnTxtRecord to accept it.
+    // A TXT is only consumed when addressed to the record (service) name;
+    // misaddressTxt sends it to the host name instead so the name-mismatch
+    // rejection in OnRecord is exercised as well.
     {
         std::vector<const char *> entryPtrs;
         entryPtrs.reserve(txtEntries.size());
@@ -252,7 +265,7 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
 
         if (!tooLong && !entryPtrs.empty())
         {
-            TxtResourceRecord txtBuilder(serviceName.Full(), entryPtrs.data(), entryPtrs.size());
+            TxtResourceRecord txtBuilder(misaddressTxt ? hostName.Full() : serviceName.Full(), entryPtrs.data(), entryPtrs.size());
             WireRecord txtWire;
             if (txtWire.Build(txtBuilder))
             {
@@ -261,19 +274,43 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         }
     }
 
-    // ---- Feed an A/AAAA record for the host so the resolver can complete ----
-    if (addIp)
+    // ---- Feed a PTR record ----
+    // PTR is not one of the types the resolver consumes, so this drives the
+    // ignored-record arm of the OnRecord type switch.
+    if (addPtr)
     {
-        Inet::IPAddress addr;
-        memcpy(addr.Addr, ipBytes.data(), sizeof(addr.Addr));
+        PtrResourceRecord ptrBuilder(serviceName.Full(), hostName.Full());
+        WireRecord ptrWire;
+        if (ptrWire.Build(ptrBuilder))
+        {
+            (void) resolver.OnRecord(interface, ptrWire.Resource(), ptrWire.Packet());
+        }
+    }
 
-        IPResourceRecord ipBuilder(hostName.Full(), addr);
+    // ---- Feed A/AAAA records for the host so the resolver can complete ----
+    // Each record gets a distinct address so they accumulate; feeding more than
+    // kMaxIPAddresses reaches the point where the resolver stops accepting them.
+    // misaddressIp addresses them to the service name instead of the host name,
+    // exercising the name-mismatch rejection.
+    for (unsigned n = 0; n < ipRecordCount % (kMaxIpRecordsPerInput + 1); ++n)
+    {
+        std::array<uint8_t, 16> bytes = ipBytes;
+        bytes[15]                     = static_cast<uint8_t>(bytes[15] ^ n);
+
+        Inet::IPAddress addr;
+        memcpy(addr.Addr, bytes.data(), sizeof(addr.Addr));
+
+        IPResourceRecord ipBuilder(misaddressIp ? serviceName.Full() : hostName.Full(), addr);
         WireRecord ipWire;
         if (ipWire.Build(ipBuilder))
         {
             (void) resolver.OnRecord(interface, ipWire.Resource(), ipWire.Packet());
         }
     }
+
+    // Whatever arrived, the resolver must be able to report what it still needs
+    // without tripping over the partially populated state.
+    (void) resolver.GetMissingRequiredInformation();
 
     // ---- Take whatever was accumulated and validate the fill-sink buffers ----
     if (resolver.IsActiveOperationalParse())
@@ -366,7 +403,13 @@ FUZZ_TEST(MdnsResolverPW, ResolverLifecycleNoCorruption)
         // building, so oversize entries exercise that skip path rather than
         // being rejected as invalid seeds.
         /* txtEntries */ VectorOf(Arbitrary<std::string>().WithMaxSize(256)).WithSeeds(TxtSeeds()).WithMaxSize(16),
-        /* addIp      */ Arbitrary<bool>(),
-        /* ipBytes    */ Arbitrary<std::array<uint8_t, 16>>());
+        // Number of A/AAAA records fed; taken modulo kMaxIpRecordsPerInput + 1 so
+        // some inputs overrun the resolver's address array.
+        /* ipRecordCount */ Arbitrary<uint8_t>(),
+        /* ipBytes       */ Arbitrary<std::array<uint8_t, 16>>(),
+        // Bit pairs select whether the TXT / IP records are addressed to the
+        // wrong name; see the derivation in the fuzz function.
+        /* addressing    */ Arbitrary<uint8_t>(),
+        /* addPtr        */ Arbitrary<bool>());
 
 } // namespace
