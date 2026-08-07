@@ -25,8 +25,10 @@ from typing import Any
 import yaml
 
 import matter.clusters as Clusters
+from matter.testing.conformance import Provisional
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, ProblemNotice,
                                             ProblemSeverity, UnknownProblemLocation)
+from matter.testing.spec_parsing import XmlAttribute
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
@@ -45,6 +47,11 @@ CLUSTER_REVISION_KEY = 'revision'
 # Provisional elements are expected to not exist in the baseline XML and will not
 # generate errors if they cannot be found in the AST.
 PROVISIONAL_KEY = 'is_provisional'
+
+# Reserved key under a provisional attribute entry that specifies its attribute ID.
+# Required for provisional attributes that don't exist in the baseline XML.
+# Must be a hex number (e.g., 0x17 or 0x00).
+ATTRIBUTE_ID_KEY = 'attribute_id'
 
 
 def parse_errata_access(val: str) -> int:
@@ -169,6 +176,43 @@ def _apply_cluster_revision_errata(target_cluster: Any, cluster_id: int, value: 
                                       severity=ProblemSeverity.ERROR, problem=f"Invalid revision override on '{cluster_name}': {value!r} is not an integer."))
 
 
+def _parse_and_validate_attribute_id(attr_id_value: Any, context: str, cluster_id: int, problems: list[ProblemNotice]) -> uint | None:
+    """Parses and validates an attribute ID value from errata.
+    
+    Attribute IDs must be hex numbers (e.g., 0x17, 0x00, 0xFF).
+    Returns the parsed uint value, or None if validation fails.
+    """
+    if not isinstance(attr_id_value, (int, str)):
+        problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                      severity=ProblemSeverity.ERROR, problem=f"Invalid type for {ATTRIBUTE_ID_KEY} on '{context}': expected int or string (hex), got {type(attr_id_value).__name__}"))
+        return None
+    
+    try:
+        # If it's an int, convert directly
+        if isinstance(attr_id_value, int):
+            attr_id_uint = uint(attr_id_value)
+        else:
+            # If it's a string, parse it as hex (base 0 supports 0x prefix)
+            attr_id_str = str(attr_id_value).strip()
+            if not attr_id_str.startswith(('0x', '0X')):
+                problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                              severity=ProblemSeverity.ERROR, problem=f"Invalid {ATTRIBUTE_ID_KEY} format on '{context}': must be a hex number (e.g., 0x17), got '{attr_id_str}'"))
+                return None
+            attr_id_uint = uint(int(attr_id_str, 16))
+        
+        # Validate the attribute ID is in a reasonable range (0x00-0xFFFF for standard attributes)
+        if attr_id_uint > 0xFFFF:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                          severity=ProblemSeverity.ERROR, problem=f"Invalid {ATTRIBUTE_ID_KEY} on '{context}': attribute ID 0x{attr_id_uint:X} exceeds maximum value 0xFFFF"))
+            return None
+        
+        return attr_id_uint
+    except (ValueError, TypeError) as e:
+        problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                      severity=ProblemSeverity.ERROR, problem=f"Failed to parse {ATTRIBUTE_ID_KEY} on '{context}': {e}"))
+        return None
+
+
 def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: str, overrides: Any, cluster_name: str,
                           sanitized_attr_map: Mapping[str, int], sanitized_cmd_map: Mapping[str, int],
                           problems: list[ProblemNotice]) -> None:
@@ -180,7 +224,7 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
     if not _has_no_separators(element_name):
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
-                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean sanitized names."))
+                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean PascalCase without spaces or special characters."))
         return
 
     # Check if this element is marked as provisional.
@@ -230,7 +274,36 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
     # Allow provisional elements to not exist in the baseline XML
     if is_provisional:
-        LOGGER.info("Provisional element '%s' not found in baseline XML (expected for in-progress spec additions).", context)
+        # For provisional attributes, attribute_id is REQUIRED
+        if ATTRIBUTE_ID_KEY not in overrides:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                          severity=ProblemSeverity.ERROR, problem=f"Provisional attribute '{context}' MUST include '{ATTRIBUTE_ID_KEY}' key (e.g., {ATTRIBUTE_ID_KEY}: 0x17)"))
+            return
+
+        # Parse and validate the attribute ID
+        provisional_attr_id = _parse_and_validate_attribute_id(overrides[ATTRIBUTE_ID_KEY], context, cluster_id, problems)
+        if provisional_attr_id is None:
+            return
+
+        # Create a provisional XmlAttribute with PROVISIONAL conformance
+        provisional_attr = XmlAttribute(
+            name=element_name,
+            datatype="unknown",  # Datatype will be determined by device
+            conformance=Provisional(),  # Mark as PROVISIONAL conformance
+            read_access=AccessControlEntryPrivilegeEnum.kView,
+            write_access=AccessControlEntryPrivilegeEnum.kUnknownEnumValue,
+            write_optional=False
+        )
+
+        # Apply access overrides to the provisional attribute
+        _apply_attribute_errata(provisional_attr, overrides, cluster_id, provisional_attr_id, context, problems)
+
+        # Inject the provisional attribute into the cluster
+        target_cluster.attributes[provisional_attr_id] = provisional_attr
+        target_cluster.attribute_map[element_name] = provisional_attr_id
+
+        LOGGER.info("Injected provisional attribute '%s' (0x%02X) with PROVISIONAL conformance into cluster '%s'",
+                    element_name, provisional_attr_id, cluster_name)
         return
 
     problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
@@ -257,7 +330,7 @@ def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
 
         if not _has_no_separators(cluster_name):
             problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
-                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean sanitized names (e.g. 'OnOff', 'AmbientContextSensing')."))
+                                          severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Cluster name '{cluster_name}' in errata violates Matter SDK PascalCase conventions. Please use clean PascalCase without spaces or special characters."))
             continue
 
         target_cluster_id = next((k for k, c in clusters.items() if _sanitize_name(c.name) == cluster_name.lower()), None)
