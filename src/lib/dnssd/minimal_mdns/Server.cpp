@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <utility>
 
-#include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
+#include <lib/dnssd/wire/DnsHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace mdns {
