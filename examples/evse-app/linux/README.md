@@ -43,8 +43,8 @@ details.
                 $ cd connectedhomeip
                 $ ./scripts/checkout_submodules.py --platform linux --recursive
 
-                # Alternatively you can check out all submodules and resync with:
-                $ git submodule sync --recursive; git submodule update --init --recursive
+                # Alternatively you can check out all submodules and re-sync with:
+                $ git submodule sync --recursive && git submodule update --init --recursive
 
 -   Activate your shell (do this every time you open the new terminal window)
 
@@ -62,11 +62,6 @@ details.
                 $ cd ~/connectedhomeip/examples/evse-app/linux
                 $ rm -rf out/
 
--   Build the example with pigweed RPC
-
-                $ cd ~/connectedhomeip/examples/evse-app/linux
-                $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-                $ ninja -C out/debug
 
 ## Commandline arguments
 
