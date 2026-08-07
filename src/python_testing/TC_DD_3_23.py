@@ -38,7 +38,10 @@ class TC_DD_3_23(MatterTestCommissioner):
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
-            TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
+            TestStep(2, "Validate the NFC bit in payload and Perform the commissioning"),
+            TestStep(3, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
+            TestStep(4, "DUT is powered OFF."),
+            TestStep(5, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
         ]
 
     def setup_test(self):
@@ -113,6 +116,27 @@ class TC_DD_3_23(MatterTestCommissioner):
 
         asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
+
+        # Step 3: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(3)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        commissioning_success = await self.commission_ntl_devices(payload)
+        asserts.assert_false(
+            commissioning_success,
+            "Device Commissioning using nfc transport has succeeded when it should have failed"
+        )
+
+        self.step(4)
+        self.wait_for_user_input(prompt_msg="Power OFF the device")
+
+        # Step 5: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(5)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        commissioning_success = await self.commission_ntl_devices(payload)
+        asserts.assert_false(
+            commissioning_success,
+            "Device Commissioning using nfc transport has succeeded when it should have failed"
+        )
 
 
 if __name__ == "__main__":
