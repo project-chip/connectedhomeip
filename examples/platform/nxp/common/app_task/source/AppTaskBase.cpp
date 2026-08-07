@@ -54,7 +54,7 @@
 #include "binding-handler.h"
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
@@ -141,7 +141,7 @@ using namespace ::chip::app::Clusters;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
 #endif
@@ -178,7 +178,7 @@ app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
                          .WithDelegate(&sIdentifyDelegate));
 #endif
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
 void LockOpenThreadTask(void)
 {
     chip::NXP::App::GetAppTask().AppMatter_DisallowDeviceToSleep();
@@ -230,7 +230,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
@@ -325,7 +325,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     err = AppMatter_Register();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error during APP features registration"));
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -419,7 +419,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         goto exit;
     }
 
-#if CONFIG_NET_L2_OPENTHREAD
+#if CONFIG_OPENTHREAD
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
     if (err != CHIP_NO_ERROR)
