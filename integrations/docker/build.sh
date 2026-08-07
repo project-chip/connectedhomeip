@@ -134,7 +134,16 @@ awk '/^FROM .*project-chip\// {sub(/.*project-chip\//, ""); sub(/:.*/, ""); prin
     sort -u | while read -r dep; do
     dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
     [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
-    (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
+    # Only build the parent if it is not already present. Without this, a
+    # build-all run rebuilds the base image once per dependent image, and any
+    # --no-cache is forwarded into each of those rebuilds.
+    # $VERSION is what the parent will be tagged with too: every image reads the
+    # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
+    if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present, not rebuilding"
+    else
+        (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
+    fi
 done
 
 if [ "$SKIP_BUILD" = false ]; then
