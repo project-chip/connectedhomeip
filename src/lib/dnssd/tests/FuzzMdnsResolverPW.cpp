@@ -67,6 +67,7 @@
 #include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 namespace {
 
@@ -92,7 +93,17 @@ enum class ServiceFlavor : uint8_t
     kOperational,    // <instance>._matter._tcp.local
     kCommissionable, // <instance>._matterc._udp.local
     kCommissioner,   // <instance>._matterd._udp.local
+    kOther,          // <instance>._http._tcp.local -- not a Matter service
 };
+// A name that is not a Matter service is rejected during initialization, so the
+// resolver stops before any of the TXT or address handling. Those inputs are
+// worth having but must stay a small share, hence the weighting here rather than
+// an even split across the flavors.
+ServiceFlavor PickServiceFlavor(uint8_t sel)
+{
+    const uint8_t bucket = sel % 16;
+    return bucket == 15 ? ServiceFlavor::kOther : static_cast<ServiceFlavor>(bucket % 3);
+}
 
 // Holds the QName-part strings stably so the QNamePart (const char *) array we
 // hand to FullQName stays valid for the record's lifetime.
@@ -133,6 +144,10 @@ QNameHolder MakeServiceName(ServiceFlavor flavor, const std::string & instance)
     case ServiceFlavor::kCommissioner:
         holder.storage.push_back("_matterd");
         holder.storage.push_back("_udp");
+        break;
+    case ServiceFlavor::kOther:
+        holder.storage.push_back("_http");
+        holder.storage.push_back("_tcp");
         break;
     }
     holder.storage.push_back("local");
@@ -239,13 +254,18 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
 {
     EnsureInitialized();
 
-    const ServiceFlavor flavor = static_cast<ServiceFlavor>(flavorSel % 3);
+    const ServiceFlavor flavor = PickServiceFlavor(flavorSel);
 
     // Send a record to the wrong name on roughly one input in four. A 50/50 split
     // starves the correctly-addressed path, which is the one that reaches the TXT
     // and IP handling behind the name check.
     const bool misaddressTxt = (addressing & 0x03) == 0;
     const bool misaddressIp  = (addressing & 0x0C) == 0;
+    // Remaining bits select the less common record sequences.
+    const bool refeedSrv       = (addressing & 0x10) != 0;
+    const bool recordAfterTake = (addressing & 0x20) != 0;
+    const bool useIPv4         = (addressing & 0x40) != 0;
+    const bool malformedIpBody = (addressing & 0x80) != 0;
 
     // ---- Build + parse the SRV record (the first record the lifecycle needs) ----
     QNameHolder serviceName = MakeServiceName(flavor, instance);
@@ -265,6 +285,11 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
     }
 
     IncrementalResolver resolver;
+
+    // Queried before any SRV has been accepted, so the "no service data yet"
+    // answer is produced as well as the post-SRV one further down.
+    (void) resolver.GetMissingRequiredInformation();
+
     CHIP_ERROR err = resolver.InitializeParsing(srvWire.Resource().GetName(), ttl, srv);
     if (err != CHIP_NO_ERROR || !resolver.IsActive())
     {
@@ -319,6 +344,27 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         }
     }
 
+    // ---- Re-feed the SRV record as additional data ----
+    // SRV is consumed when the resolver is initialized; one arriving later in the
+    // same packet takes the already-handled path instead.
+    if (refeedSrv)
+    {
+        (void) resolver.OnRecord(interface, srvWire.Resource(), srvWire.Packet());
+    }
+
+    // ---- Feed an address record whose body is the wrong length ----
+    // IPResourceRecord always writes a correctly sized address, so a body the
+    // address parser rejects has to be supplied directly.
+    if (malformedIpBody)
+    {
+        RawResourceRecord shortAddr(QType::AAAA, hostName.Full(), ipBytes.data(), 3);
+        WireRecord shortAddrWire;
+        if (shortAddrWire.Build(shortAddr))
+        {
+            (void) resolver.OnRecord(interface, shortAddrWire.Resource(), shortAddrWire.Packet());
+        }
+    }
+
     // ---- Feed a PTR record ----
     // PTR is not one of the types the resolver consumes, so this drives the
     // ignored-record arm of the OnRecord type switch.
@@ -342,8 +388,23 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         std::array<uint8_t, 16> bytes = ipBytes;
         bytes[15]                     = static_cast<uint8_t>(bytes[15] ^ n);
 
+        // IPResourceRecord emits an AAAA record for an IPv6 address and an A
+        // record for an IPv4 one, so the address family chooses which arm of the
+        // resolver's type switch is taken.
         Inet::IPAddress addr;
-        memcpy(addr.Addr, bytes.data(), sizeof(addr.Addr));
+        if (useIPv4)
+        {
+            StringBuilder<16> dotted;
+            dotted.AddFormat("%u.%u.%u.%u", bytes[0], bytes[1], bytes[2], bytes[3]);
+            if (!Inet::IPAddress::FromString(dotted.c_str(), addr))
+            {
+                continue;
+            }
+        }
+        else
+        {
+            memcpy(addr.Addr, bytes.data(), sizeof(addr.Addr));
+        }
 
         // Interface handling: keep the unset id, use one real id throughout, or
         // switch ids partway so addresses arrive on two different interfaces.
@@ -388,6 +449,13 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
         {
             CheckCommissionBuffersInBounds(nodeData.Get<CommissionNodeData>());
         }
+    }
+
+    // A record arriving after the resolver has handed its data over must be
+    // dropped rather than written into the released state.
+    if (recordAfterTake)
+    {
+        (void) resolver.OnRecord(interface, srvWire.Resource(), srvWire.Packet());
     }
 }
 
