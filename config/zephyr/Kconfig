@@ -99,6 +99,9 @@ config CHIP_CRYPTO_PSA
 	imply PSA_WANT_ALG_HMAC
 	imply PSA_WANT_ALG_ECDSA
 
+config CHIP_WIFI_PAF
+	imply WIFI_NM_WPA_SUPPLICANT_NAN if WIFI_NM_WPA_SUPPLICANT
+
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool "Erase NVS flash pages on factory reset"
 	depends on SETTINGS_NVS || SETTINGS_ZMS

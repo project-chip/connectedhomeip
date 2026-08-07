@@ -189,6 +189,7 @@ config INIT_STACKS
 	default y
 
 config NET_MGMT_EVENT_STACK_SIZE
+	default 2048 if CHIP_WIFI_PAF
 	default 1024
 
 config NET_MGMT_EVENT_QUEUE_SIZE
