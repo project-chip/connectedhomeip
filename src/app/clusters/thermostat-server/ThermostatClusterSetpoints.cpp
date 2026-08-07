@@ -196,9 +196,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SetpointRaiseLower(const Comman
     Setpoints currentSetpoints = GetSetpoints();
     Setpoints setpoints        = currentSetpoints;
 
-    OccupancyBitmap isOccupied = IsOccupied()
-        ? OccupancyBitmap::kOccupied
-        : OccupancyBitmap(0);
+    OccupancyBitmap isOccupied = IsOccupied() ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
 
     auto & range = setpoints.GetRange(isOccupied);
 

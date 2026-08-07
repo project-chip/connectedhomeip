@@ -141,7 +141,7 @@ public:
 
 protected:
     OptionalAttributes mOptionalAttributes;
-    Thermostat::Delegate * mDelegate                           = nullptr;
+    Thermostat::Delegate * mDelegate = nullptr;
     AtomicWriteSession mAtomicWriteSession;
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,

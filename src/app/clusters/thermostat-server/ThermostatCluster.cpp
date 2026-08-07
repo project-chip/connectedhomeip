@@ -141,9 +141,9 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(Thermostat::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-
-void ThermostatCluster::SetDelegate(Thermostat::Delegate * delegate) {
-    mDelegate = delegate;
+void ThermostatCluster::SetDelegate(Thermostat::Delegate * delegate)
+{
+    mDelegate       = delegate;
     auto hasHeating = mFeatures.Has(Feature::kHeating);
     auto hasCooling = mFeatures.Has(Feature::kCooling);
     if (hasHeating && hasCooling)
@@ -160,7 +160,8 @@ void ThermostatCluster::SetDelegate(Thermostat::Delegate * delegate) {
     }
 }
 
-ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation() const {
+ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation() const
+{
     return mDelegate->GetControlSequenceOfOperation();
 }
 
@@ -180,7 +181,8 @@ SystemModeEnum ThermostatCluster::GetSystemMode() const
 
 Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
 {
-    if (mDelegate == nullptr) {
+    if (mDelegate == nullptr)
+    {
         return Status::InvalidInState;
     }
     switch (systemMode)
@@ -250,7 +252,8 @@ Status ThermostatCluster::SetLocalTemperatureCalibration(int8_t localTemperature
     return Status::Success;
 }
 
-ThermostatRunningModeEnum ThermostatCluster::GetRunningMode() const {
+ThermostatRunningModeEnum ThermostatCluster::GetRunningMode() const
+{
     return mDelegate->GetRunningMode();
 }
 
@@ -263,7 +266,8 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
     return Status::Success;
 }
 
-BitMask<RelayStateBitmap> ThermostatCluster::GetRunningState() const {
+BitMask<RelayStateBitmap> ThermostatCluster::GetRunningState() const
+{
     return mDelegate->GetRunningState();
 }
 

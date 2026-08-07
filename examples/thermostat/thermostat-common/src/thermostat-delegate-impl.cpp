@@ -154,19 +154,20 @@ bool ThermostatDelegate::SetLocalTemperatureCalibration(int8_t localTemperatureC
     return true;
 }
 
-BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const {
+BitMask<RemoteSensingBitmap> ThermostatDelegate::GetRemoteSensing() const
+{
     return mRemoteSensing;
 }
 
-bool ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing) {
+bool ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing)
+{
     if (mRemoteSensing == remoteSensing)
     {
         return false;
     }
     auto remoteSensingValue = remoteSensing.Raw();
     AttributePersistence persistence(*mProvider);
-    CHIP_ERROR result =
-        persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensingValue);
     if (result != CHIP_NO_ERROR)
     {
         return false;
@@ -175,11 +176,13 @@ bool ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSen
     return true;
 }
 
-TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const {
+TemperatureSetpointHoldEnum ThermostatDelegate::GetTemperatureSetpointHold() const
+{
     return mTemperatureSetpointHold;
 }
 
-bool ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold) {
+bool ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold)
+{
     if (mTemperatureSetpointHold == temperatureSetpointHold)
     {
         return false;
@@ -188,11 +191,13 @@ bool ThermostatDelegate::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum 
     return true;
 }
 
-DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const {
+DataModel::Nullable<uint16_t> ThermostatDelegate::GetTemperatureSetpointHoldDuration() const
+{
     return mTemperatureSetpointHoldDuration;
 }
 
-bool ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration) {
+bool ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration)
+{
     if (mTemperatureSetpointHoldDuration == temperatureSetpointHoldDuration)
     {
         return false;
@@ -201,11 +206,13 @@ bool ThermostatDelegate::SetTemperatureSetpointHoldDuration(DataModel::Nullable<
     return true;
 }
 
-DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const {
+DataModel::Nullable<uint32_t> ThermostatDelegate::GetSetpointHoldExpiryTimestamp() const
+{
     return mSetpointHoldExpiryTimestamp;
 }
 
-bool ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp) {
+bool ThermostatDelegate::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp)
+{
     if (mSetpointHoldExpiryTimestamp == setpointHoldExpiryTimestamp)
     {
         return false;
