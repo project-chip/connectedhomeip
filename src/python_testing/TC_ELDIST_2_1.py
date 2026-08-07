@@ -40,7 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -61,8 +61,8 @@ class TC_ELDIST_2_1(MatterBaseTest):
 
         Verify the non-global attributes of the Electrical Distribution Cluster
         server: MaxContinuousCurrent, MaxVoltage, NumberOfPoles, EndOfLife,
-        ServiceEntranceRated. All attributes carry Fixed-by-manufacturer (X)
-        quality.
+        ServiceEntranceRated. Every attribute is Nullable (X), so null is a
+        spec-valid response to each read.
         """
         endpoint = self.get_endpoint()
         cluster = Clusters.ElectricalDistribution
@@ -70,79 +70,70 @@ class TC_ELDIST_2_1(MatterBaseTest):
 
         self.step(1, "Commissioning, already done", is_commissioning=True)
 
-        self.step(2, "TH reads MaxContinuousCurrent (amperage-mA, min 1)")
+        self.step(2, "TH reads from the DUT the MaxContinuousCurrent attribute.",
+                  expectation="Verify that the DUT response contains a value of type `amperage-mA` (int64) "
+                              "satisfying the constraint `min 1`, OR `null` (attribute is Nullable).")
         max_continuous_current = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.MaxContinuousCurrent
         )
-        asserts.assert_is_not_none(max_continuous_current,
-                                   "MaxContinuousCurrent should not be None")
         if max_continuous_current is not Clusters.Types.NullValue:
+            matter_asserts.assert_valid_int64(max_continuous_current, "MaxContinuousCurrent")
             asserts.assert_greater_equal(max_continuous_current, 1,
                                          "MaxContinuousCurrent must be >= 1 mA")
         log.info("MaxContinuousCurrent: %s mA", max_continuous_current)
 
-        self.step(3, "TH reads MaxVoltage (voltage-mV, min 1)")
+        self.step(3, "TH reads from the DUT the MaxVoltage attribute.",
+                  expectation="Verify that the DUT response contains a value of type `voltage-mV` (int64) "
+                              "satisfying the constraint `min 1`, OR `null` (attribute is Nullable).")
         max_voltage = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.MaxVoltage
         )
-        asserts.assert_is_not_none(max_voltage, "MaxVoltage should not be None")
         if max_voltage is not Clusters.Types.NullValue:
+            matter_asserts.assert_valid_int64(max_voltage, "MaxVoltage")
             asserts.assert_greater_equal(max_voltage, 1,
                                          "MaxVoltage must be >= 1 mV")
         log.info("MaxVoltage: %s mV", max_voltage)
 
-        self.step(4, "TH reads NumberOfPoles (uint16, 1-4)")
+        self.step(4, "TH reads from the DUT the NumberOfPoles attribute.",
+                  expectation="Verify that the DUT response contains a `uint16` value within the inclusive "
+                              "range 1 to 4, OR `null` (attribute is Nullable).")
         number_of_poles = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.NumberOfPoles
         )
-        asserts.assert_is_not_none(number_of_poles, "NumberOfPoles should not be None")
         if number_of_poles is not Clusters.Types.NullValue:
-            asserts.assert_greater_equal(number_of_poles, 1,
-                                         "NumberOfPoles must be >= 1")
-            asserts.assert_less_equal(number_of_poles, 4,
-                                      "NumberOfPoles must be <= 4")
+            matter_asserts.assert_int_in_range(number_of_poles, 1, 4, "NumberOfPoles")
         log.info("NumberOfPoles: %s", number_of_poles)
 
-        self.step(5, "TH reads EndOfLife (EndOfLifeEnum)")
+        self.step(5, "TH reads from the DUT the EndOfLife attribute.",
+                  expectation="Verify that the DUT response contains a valid `EndOfLifeEnum` value "
+                              "(one of: 0=None, 1=Damaged, 2=Degraded, 3=Expired), OR `null` "
+                              "(attribute is Nullable).")
         end_of_life = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.EndOfLife
         )
-        asserts.assert_is_not_none(end_of_life, "EndOfLife should not be None")
         if end_of_life is not Clusters.Types.NullValue:
-            valid_values = [e.value for e in cluster.Enums.EndOfLifeEnum
-                            if e != cluster.Enums.EndOfLifeEnum.kUnknownEnumValue]
-            asserts.assert_in(end_of_life, valid_values,
-                              f"EndOfLife must be a valid EndOfLifeEnum value, got {end_of_life}")
+            matter_asserts.assert_valid_enum(end_of_life, "EndOfLife", cluster.Enums.EndOfLifeEnum)
         log.info("EndOfLife: %s", end_of_life)
 
-        self.step(6, "TH reads ServiceEntranceRated (bool)")
+        self.step(6, "TH reads from the DUT the ServiceEntranceRated attribute.",
+                  expectation="Verify that the DUT response contains a `bool` value (true or false), "
+                              "OR `null` (attribute is Nullable).")
         service_entrance_rated = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.ServiceEntranceRated
         )
-        asserts.assert_is_not_none(service_entrance_rated,
-                                   "ServiceEntranceRated should not be None")
         if service_entrance_rated is not Clusters.Types.NullValue:
-            asserts.assert_true(isinstance(service_entrance_rated, bool),
-                                "ServiceEntranceRated must be bool")
+            matter_asserts.assert_valid_bool(service_entrance_rated, "ServiceEntranceRated")
         log.info("ServiceEntranceRated: %s", service_entrance_rated)
-
-        self.step(7, "TH attempts write to MaxContinuousCurrent - expect UNSUPPORTED_WRITE")
-        status = await self.write_single_attribute(
-            attribute_value=attributes.MaxContinuousCurrent(50000),
-            endpoint_id=endpoint,
-            expect_success=False)
-        asserts.assert_equal(status, Status.UnsupportedWrite,
-                             "Write to MaxContinuousCurrent should return UNSUPPORTED_WRITE")
 
 
 if __name__ == "__main__":
