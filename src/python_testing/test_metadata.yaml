@@ -1,6 +1,31 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_ESALM_2_1.py
+      reason:
+          Electrical Alarm (0x00A1) server is not yet implemented in any example
+          app, so the script cannot exercise the DUT. Remove this entry once the
+          Electrical Alarm server is integrated into a real example app.
+    - name: TC_ESALM_2_2.py
+      reason:
+          Electrical Alarm (0x00A1) server is not yet implemented in any example
+          app, so the script cannot exercise the DUT. Remove this entry once the
+          Electrical Alarm server is integrated into a real example app.
+    - name: TC_ESALM_2_3.py
+      reason:
+          Electrical Alarm (0x00A1) server is not yet implemented in any example
+          app, so the script cannot exercise the DUT. Remove this entry once the
+          Electrical Alarm server is integrated into a real example app.
+    - name: TC_ESALM_2_4.py
+      reason:
+          Electrical Alarm (0x00A1) server is not yet implemented in any example
+          app, so the script cannot exercise the DUT. Remove this entry once the
+          Electrical Alarm server is integrated into a real example app.
+    - name: TC_ESALM_3_1.py
+      reason:
+          Electrical Alarm (0x00A1) server is not yet implemented in any example
+          app, so the script cannot exercise the DUT. Remove this entry once the
+          Electrical Alarm server is integrated into a real example app.
     - name: TC_DD_3_23.py
       reason:
           NFC-Thread hardware setup needed for running this test-case and CI
