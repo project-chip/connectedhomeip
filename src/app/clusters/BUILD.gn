@@ -43,6 +43,7 @@ source_set("clusters") {
     "dynamic-lighting-server",
     "electrical-energy-measurement-server",
     "electrical-power-measurement-server",
+    "electrical-protection-alarm-server",
     "energy-evse-server",
     "ethernet-network-diagnostics-server",
     "fan-control-server",
