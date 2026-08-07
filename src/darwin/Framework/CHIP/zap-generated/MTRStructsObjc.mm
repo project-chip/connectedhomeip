@@ -12486,6 +12486,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPushAVStreamTransportClusterHLSEncryptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _kid = [NSData data];
+
+        _baseKey = [NSData data];
+
+        _schemeURI = [NSData data];
+
+        _ratchetBits = @(0);
+
+        _ratchetTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterHLSEncryptionStruct alloc] init];
+
+    other.kid = self.kid;
+    other.baseKey = self.baseKey;
+    other.schemeURI = self.schemeURI;
+    other.ratchetBits = self.ratchetBits;
+    other.ratchetTime = self.ratchetTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: kid:%@; baseKey:%@; schemeURI:%@; ratchetBits:%@; ratchetTime:%@; >", NSStringFromClass([self class]), [_kid base64EncodedStringWithOptions:0], [_baseKey base64EncodedStringWithOptions:0], [_schemeURI base64EncodedStringWithOptions:0], _ratchetBits, _ratchetTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRPushAVStreamTransportClusterCMAFContainerOptionsStruct
 - (instancetype)init
 {
@@ -12502,6 +12541,8 @@ NS_ASSUME_NONNULL_BEGIN
         _trackName = nil;
 
         _metadataEnabled = nil;
+
+        _hlsEncryption = nil;
     }
     return self;
 }
@@ -12516,13 +12557,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sessionGroup = self.sessionGroup;
     other.trackName = self.trackName;
     other.metadataEnabled = self.metadataEnabled;
+    other.hlsEncryption = self.hlsEncryption;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cmafInterface:%@; segmentDuration:%@; chunkDuration:%@; sessionGroup:%@; trackName:%@; metadataEnabled:%@; >", NSStringFromClass([self class]), _cmafInterface, _segmentDuration, _chunkDuration, _sessionGroup, _trackName, _metadataEnabled];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cmafInterface:%@; segmentDuration:%@; chunkDuration:%@; sessionGroup:%@; trackName:%@; metadataEnabled:%@; hlsEncryption:%@; >", NSStringFromClass([self class]), _cmafInterface, _segmentDuration, _chunkDuration, _sessionGroup, _trackName, _metadataEnabled, _hlsEncryption];
     return descriptionString;
 }
 

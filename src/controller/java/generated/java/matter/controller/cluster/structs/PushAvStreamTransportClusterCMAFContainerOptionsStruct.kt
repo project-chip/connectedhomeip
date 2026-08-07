@@ -30,6 +30,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val sessionGroup: Optional<UByte>,
   val trackName: Optional<String>,
   val metadataEnabled: Optional<Boolean>,
+  val HLSEncryption: Optional<PushAvStreamTransportClusterHLSEncryptionStruct>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
@@ -39,6 +40,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     append("\tsessionGroup : $sessionGroup\n")
     append("\ttrackName : $trackName\n")
     append("\tmetadataEnabled : $metadataEnabled\n")
+    append("\tHLSEncryption : $HLSEncryption\n")
     append("}\n")
   }
 
@@ -60,6 +62,10 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         val optmetadataEnabled = metadataEnabled.get()
         put(ContextSpecificTag(TAG_METADATA_ENABLED), optmetadataEnabled)
       }
+      if (HLSEncryption.isPresent) {
+        val optHLSEncryption = HLSEncryption.get()
+        optHLSEncryption.toTlv(ContextSpecificTag(TAG_HLS_ENCRYPTION), this)
+      }
       endStructure()
     }
   }
@@ -71,6 +77,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     private const val TAG_SESSION_GROUP = 3
     private const val TAG_TRACK_NAME = 4
     private const val TAG_METADATA_ENABLED = 7
+    private const val TAG_HLS_ENCRYPTION = 8
 
     fun fromTlv(
       tlvTag: Tag,
@@ -98,6 +105,17 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         } else {
           Optional.empty()
         }
+      val HLSEncryption =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_HLS_ENCRYPTION))) {
+          Optional.of(
+            PushAvStreamTransportClusterHLSEncryptionStruct.fromTlv(
+              ContextSpecificTag(TAG_HLS_ENCRYPTION),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -108,6 +126,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
         sessionGroup,
         trackName,
         metadataEnabled,
+        HLSEncryption,
       )
     }
   }

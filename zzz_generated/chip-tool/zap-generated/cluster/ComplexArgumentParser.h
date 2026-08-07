@@ -1064,6 +1064,12 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request,
                         Json::Value & value);
 

@@ -20647,6 +20647,112 @@ public static class PushAvStreamTransportClusterTransportTriggerOptionsStruct {
     return output.toString();
   }
 }
+public static class PushAvStreamTransportClusterHLSEncryptionStruct {
+  public byte[] kid;
+  public byte[] baseKey;
+  public byte[] schemeURI;
+  public Integer ratchetBits;
+  public Optional<Integer> ratchetTime;
+  private static final long KID_ID = 0L;
+  private static final long BASE_KEY_ID = 1L;
+  private static final long SCHEME_URI_ID = 2L;
+  private static final long RATCHET_BITS_ID = 3L;
+  private static final long RATCHET_TIME_ID = 4L;
+
+  public PushAvStreamTransportClusterHLSEncryptionStruct(
+    byte[] kid,
+    byte[] baseKey,
+    byte[] schemeURI,
+    Integer ratchetBits,
+    Optional<Integer> ratchetTime
+  ) {
+    this.kid = kid;
+    this.baseKey = baseKey;
+    this.schemeURI = schemeURI;
+    this.ratchetBits = ratchetBits;
+    this.ratchetTime = ratchetTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(KID_ID, new ByteArrayType(kid)));
+    values.add(new StructElement(BASE_KEY_ID, new ByteArrayType(baseKey)));
+    values.add(new StructElement(SCHEME_URI_ID, new ByteArrayType(schemeURI)));
+    values.add(new StructElement(RATCHET_BITS_ID, new UIntType(ratchetBits)));
+    values.add(new StructElement(RATCHET_TIME_ID, ratchetTime.<BaseTLVType>map((nonOptionalratchetTime) -> new UIntType(nonOptionalratchetTime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static PushAvStreamTransportClusterHLSEncryptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] kid = null;
+    byte[] baseKey = null;
+    byte[] schemeURI = null;
+    Integer ratchetBits = null;
+    Optional<Integer> ratchetTime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == KID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          kid = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == BASE_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          baseKey = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == SCHEME_URI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          schemeURI = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == RATCHET_BITS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetBits = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RATCHET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ratchetTime = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new PushAvStreamTransportClusterHLSEncryptionStruct(
+      kid,
+      baseKey,
+      schemeURI,
+      ratchetBits,
+      ratchetTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PushAvStreamTransportClusterHLSEncryptionStruct {\n");
+    output.append("\tkid: ");
+    output.append(Arrays.toString(kid));
+    output.append("\n");
+    output.append("\tbaseKey: ");
+    output.append(Arrays.toString(baseKey));
+    output.append("\n");
+    output.append("\tschemeURI: ");
+    output.append(Arrays.toString(schemeURI));
+    output.append("\n");
+    output.append("\tratchetBits: ");
+    output.append(ratchetBits);
+    output.append("\n");
+    output.append("\tratchetTime: ");
+    output.append(ratchetTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Integer CMAFInterface;
   public Integer segmentDuration;
@@ -20654,12 +20760,14 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
   public Optional<Integer> sessionGroup;
   public Optional<String> trackName;
   public Optional<Boolean> metadataEnabled;
+  public Optional<ChipStructs.PushAvStreamTransportClusterHLSEncryptionStruct> HLSEncryption;
   private static final long CMAF_INTERFACE_ID = 0L;
   private static final long SEGMENT_DURATION_ID = 1L;
   private static final long CHUNK_DURATION_ID = 2L;
   private static final long SESSION_GROUP_ID = 3L;
   private static final long TRACK_NAME_ID = 4L;
   private static final long METADATA_ENABLED_ID = 7L;
+  private static final long HLS_ENCRYPTION_ID = 8L;
 
   public PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     Integer CMAFInterface,
@@ -20667,7 +20775,8 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Integer chunkDuration,
     Optional<Integer> sessionGroup,
     Optional<String> trackName,
-    Optional<Boolean> metadataEnabled
+    Optional<Boolean> metadataEnabled,
+    Optional<ChipStructs.PushAvStreamTransportClusterHLSEncryptionStruct> HLSEncryption
   ) {
     this.CMAFInterface = CMAFInterface;
     this.segmentDuration = segmentDuration;
@@ -20675,6 +20784,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     this.sessionGroup = sessionGroup;
     this.trackName = trackName;
     this.metadataEnabled = metadataEnabled;
+    this.HLSEncryption = HLSEncryption;
   }
 
   public StructType encodeTlv() {
@@ -20685,6 +20795,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     values.add(new StructElement(SESSION_GROUP_ID, sessionGroup.<BaseTLVType>map((nonOptionalsessionGroup) -> new UIntType(nonOptionalsessionGroup)).orElse(new EmptyType())));
     values.add(new StructElement(TRACK_NAME_ID, trackName.<BaseTLVType>map((nonOptionaltrackName) -> new StringType(nonOptionaltrackName)).orElse(new EmptyType())));
     values.add(new StructElement(METADATA_ENABLED_ID, metadataEnabled.<BaseTLVType>map((nonOptionalmetadataEnabled) -> new BooleanType(nonOptionalmetadataEnabled)).orElse(new EmptyType())));
+    values.add(new StructElement(HLS_ENCRYPTION_ID, HLSEncryption.<BaseTLVType>map((nonOptionalHLSEncryption) -> nonOptionalHLSEncryption.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -20699,6 +20810,7 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     Optional<Integer> sessionGroup = Optional.empty();
     Optional<String> trackName = Optional.empty();
     Optional<Boolean> metadataEnabled = Optional.empty();
+    Optional<ChipStructs.PushAvStreamTransportClusterHLSEncryptionStruct> HLSEncryption = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CMAF_INTERFACE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -20730,6 +20842,11 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
           BooleanType castingValue = element.value(BooleanType.class);
           metadataEnabled = Optional.of(castingValue.value(Boolean.class));
         }
+      } else if (element.contextTagNum() == HLS_ENCRYPTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          HLSEncryption = Optional.of(ChipStructs.PushAvStreamTransportClusterHLSEncryptionStruct.decodeTlv(castingValue));
+        }
       }
     }
     return new PushAvStreamTransportClusterCMAFContainerOptionsStruct(
@@ -20738,7 +20855,8 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       chunkDuration,
       sessionGroup,
       trackName,
-      metadataEnabled
+      metadataEnabled,
+      HLSEncryption
     );
   }
 
@@ -20763,6 +20881,9 @@ public static class PushAvStreamTransportClusterCMAFContainerOptionsStruct {
     output.append("\n");
     output.append("\tmetadataEnabled: ");
     output.append(metadataEnabled);
+    output.append("\n");
+    output.append("\tHLSEncryption: ");
+    output.append(HLSEncryption);
     output.append("\n");
     output.append("}\n");
     return output.toString();

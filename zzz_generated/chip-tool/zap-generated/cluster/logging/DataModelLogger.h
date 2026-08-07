@@ -650,6 +650,9 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::DecodableType & value);
 
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::DecodableType & value);
+
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::DecodableType & value);

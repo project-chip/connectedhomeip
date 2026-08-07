@@ -172,6 +172,35 @@ public:
 };
 
 } // namespace TransportTriggerOptionsStruct
+namespace HLSEncryptionStruct {
+enum class Fields : uint8_t
+{
+    kKid         = 0,
+    kBaseKey     = 1,
+    kSchemeURI   = 2,
+    kRatchetBits = 3,
+    kRatchetTime = 4,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan kid;
+    chip::ByteSpan baseKey;
+    chip::ByteSpan schemeURI;
+    uint8_t ratchetBits = static_cast<uint8_t>(0);
+    Optional<uint8_t> ratchetTime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace HLSEncryptionStruct
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
@@ -181,6 +210,7 @@ enum class Fields : uint8_t
     kSessionGroup    = 3,
     kTrackName       = 4,
     kMetadataEnabled = 7,
+    kHLSEncryption   = 8,
 };
 
 struct Type
@@ -192,6 +222,7 @@ public:
     Optional<uint8_t> sessionGroup;
     Optional<chip::CharSpan> trackName;
     Optional<bool> metadataEnabled;
+    Optional<Structs::HLSEncryptionStruct::Type> HLSEncryption;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

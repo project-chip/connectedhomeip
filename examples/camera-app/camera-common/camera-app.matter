@@ -2562,7 +2562,7 @@ cluster ZoneManagement = 1360 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 3;
+  revision 5;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -2647,6 +2647,14 @@ cluster PushAvStreamTransport = 1365 {
     optional int16u maxPreRollLen = 4;
   }
 
+  struct HLSEncryptionStruct {
+    octet_string<8> kid = 0;
+    octet_string<32> baseKey = 1;
+    octet_string<16> schemeURI = 2;
+    int8u ratchetBits = 3;
+    optional int8u ratchetTime = 4;
+  }
+
   struct CMAFContainerOptionsStruct {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
@@ -2654,6 +2662,7 @@ cluster PushAvStreamTransport = 1365 {
     optional int8u sessionGroup = 3;
     optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
+    optional HLSEncryptionStruct HLSEncryption = 8;
   }
 
   struct ContainerOptionsStruct {
@@ -2703,6 +2712,7 @@ cluster PushAvStreamTransport = 1365 {
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
   readonly attribute TransportConfigurationStruct currentConnections[] = 1;
+  provisional readonly attribute optional nullable int8u maxZones = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2746,6 +2756,12 @@ cluster PushAvStreamTransport = 1365 {
     TransportConfigurationStruct transportConfigurations[] = 0;
   }
 
+  request struct UpdateMotionZoneOptionsRequest {
+    int16u connectionID = 0;
+    nullable TransportZoneOptionsStruct motionZones[] = 1;
+    optional nullable int8u motionSensitivity = 2;
+  }
+
   /** This command SHALL allocate a transport and return a PushTransportConnectionID. */
   fabric command access(invoke: manage) AllocatePushTransport(AllocatePushTransportRequest): AllocatePushTransportResponse = 0;
   /** This command SHALL be generated to request the Node deallocates the specified transport. */
@@ -2758,6 +2774,8 @@ cluster PushAvStreamTransport = 1365 {
   fabric command ManuallyTriggerTransport(ManuallyTriggerTransportRequest): DefaultSuccess = 5;
   /** This command SHALL return the Transport Configuration for the specified push transport or all allocated transports for the fabric if null. */
   fabric command FindTransport(FindTransportRequest): FindTransportResponse = 6;
+  /** This command is used to selectively modify the motion zones and sensitivity values of the trigger options for a specified push transport. */
+  fabric command UpdateMotionZoneOptions(UpdateMotionZoneOptionsRequest): DefaultSuccess = 8;
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */

@@ -9572,6 +9572,59 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.maxPreRollLen);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("HLSEncryptionStruct.kid", "kid", value.isMember("kid")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("HLSEncryptionStruct.baseKey", "baseKey", value.isMember("baseKey")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("HLSEncryptionStruct.schemeURI", "schemeURI", value.isMember("schemeURI")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("HLSEncryptionStruct.ratchetBits", "ratchetBits", value.isMember("ratchetBits")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "kid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.kid, value["kid"]));
+    valueCopy.removeMember("kid");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "baseKey");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.baseKey, value["baseKey"]));
+    valueCopy.removeMember("baseKey");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "schemeURI");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.schemeURI, value["schemeURI"]));
+    valueCopy.removeMember("schemeURI");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ratchetBits");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ratchetBits, value["ratchetBits"]));
+    valueCopy.removeMember("ratchetBits");
+
+    if (value.isMember("ratchetTime"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ratchetTime");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ratchetTime, value["ratchetTime"]));
+    }
+    valueCopy.removeMember("ratchetTime");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::HLSEncryptionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.kid);
+    ComplexArgumentParser::Finalize(request.baseKey);
+    ComplexArgumentParser::Finalize(request.schemeURI);
+    ComplexArgumentParser::Finalize(request.ratchetBits);
+    ComplexArgumentParser::Finalize(request.ratchetTime);
+}
+
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request,
@@ -9623,6 +9676,13 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("metadataEnabled");
 
+    if (value.isMember("HLSEncryption"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "HLSEncryption");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.HLSEncryption, value["HLSEncryption"]));
+    }
+    valueCopy.removeMember("HLSEncryption");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -9635,6 +9695,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.sessionGroup);
     ComplexArgumentParser::Finalize(request.trackName);
     ComplexArgumentParser::Finalize(request.metadataEnabled);
+    ComplexArgumentParser::Finalize(request.HLSEncryption);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
