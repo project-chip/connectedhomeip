@@ -57,7 +57,7 @@ extern "C" {
 #ifdef SL_CATALOG_KERNEL_PRESENT
 extern osMutexId_t si91x_prints_mutex;
 #endif // SL_CATALOG_KERNEL_PRESENT
-#else // For EFR32
+#else  // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
 #include "em_usart.h"
