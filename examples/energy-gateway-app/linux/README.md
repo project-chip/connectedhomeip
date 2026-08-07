@@ -50,7 +50,7 @@ details.
                 $ cd connectedhomeip
                 $ ./scripts/checkout_submodules.py --platform linux --recursive
 
-                # Alternatively you can check out all submodules and resync with:
+                # Alternatively you can check out all submodules and re-sync with:
                 $ git submodule sync --recursive; git submodule update --init --recursive
 
 -   Activate your shell (do this every time you open the new terminal window)
