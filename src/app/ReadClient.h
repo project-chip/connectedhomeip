@@ -230,8 +230,25 @@ public:
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
         /**
-         * This function is invoked when constructing a read/subscribeRequest that does not have data
-         * version filters specified, to give the callback a chance to provide some.
+         * This function is invoked when constructing a read/subscribeRequest, to give the
+         * callback a chance to encode any in-RAM data version filters it has cached.
+         *
+         * The callback may run even when the caller also supplied a non-empty
+         * ReadPrepareParams::mpDataVersionFilterList: the ReadClient invokes the callback
+         * first to encode in-RAM filters, then appends any caller-supplied (e.g. persisted)
+         * filters that did not yet hit the wire MTU. Implementations should not assume the
+         * caller-supplied list is empty.
+         *
+         * Migration note: prior to this change, this callback was only invoked when no
+         * caller-supplied DataVersionFilter list was present. As of this change it is always
+         * invoked when constructing a read/subscribeRequest with cluster paths, regardless of
+         * whether the caller supplied mpDataVersionFilterList. The ReadClient initializes
+         * aEncodedDataVersionList to false before the call and may append additional
+         * caller-supplied filters after the callback returns; implementations should therefore
+         * treat aEncodedDataVersionList as an output flag — set it to true if at least one
+         * filter was encoded, otherwise leave it false. Callbacks must not flip an already-true
+         * value back to false (that would lose the signal that the appended caller-supplied
+         * filters depend on).
          *
          * This function is expected to encode as many complete data version filters as will fit into
          * the buffer, rolling back any partially-encoded filters if it runs out of space, and set the
@@ -252,7 +269,15 @@ public:
         /**
          * Get highest received event number.
          * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
-         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
+         * and return CHIP_NO_ERROR.
+         *
+         * As of the resubscribe-event-number fix, this callback is always invoked when building
+         * a request that includes event paths, even if ReadPrepareParams::mEventNumber is already
+         * set, so the ReadClient can blend the result with the caller-supplied value (taking the
+         * max). An error return will fail the entire read interaction UNLESS the caller has also
+         * supplied ReadPrepareParams::mEventNumber, in which case the error is logged and the
+         * caller value is used as a fallback. This avoids regressing callers that have a
+         * persisted progress value but whose callback may transiently fail.
          *
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
