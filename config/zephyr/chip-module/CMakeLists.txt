@@ -74,6 +74,13 @@ if(CONFIG_CHIP)
         if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
             zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
         endif()
+
+        # Put the NXP accel header (Kconfig.defaults TF_PSA_CRYPTO_USER_CONFIG_FILE)
+        # on the include path so tf-psa-crypto can find it. SGI-PKC gate keeps
+        # non-NXP targets unaffected.
+        if(CONFIG_PSA_CRYPTO_DRIVER_SGI_PKC)
+            zephyr_include_directories(${CHIP_ROOT}/config/nxp/chip-module)
+        endif()
     endif()
 
     

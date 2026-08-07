@@ -661,7 +661,12 @@ config MBEDTLS_HEAP_SIZE
 	default 15360
 
 config MBEDTLS_CTR_DRBG_C
+	default n if SOC_MCXW70AC
 	default y
+
+config MBEDTLS_HMAC_DRBG_C
+	default y if SOC_MCXW70AC
+	default n
 
 config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 	default y
@@ -688,6 +693,12 @@ config SECURE_STORAGE
 # validated one-shot single-part API instead (mirrors the NXP FreeRTOS default).
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 	default y if PSA_CRYPTO_DRIVER_SGI_PKC
+
+# Point tf-psa-crypto at the MCXW70 accel header so the SW builtins duplicated by
+# the SGI-PKC HW driver are dropped from the image (Flash/RAM saving).
+config TF_PSA_CRYPTO_USER_CONFIG_FILE
+	default "nxp_mcxw70_psa_crypto_config.h" if PSA_CRYPTO_DRIVER_SGI_PKC
+
 
 endif # CHIP_CRYPTO_PSA
 
