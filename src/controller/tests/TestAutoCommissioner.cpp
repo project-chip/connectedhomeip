@@ -252,6 +252,7 @@ const std::vector<StageTransition> kStagePairs = {
     { kThreadNetworkSetup, kFailsafeBeforeThreadEnable },
     { kFailsafeBeforeWiFiEnable, kWiFiNetworkEnable },
     { kFailsafeBeforeThreadEnable, kThreadNetworkEnable },
+    { kInitialPhaseComplete, kEvictPreviousCaseSessions },
     { kEvictPreviousCaseSessions, kFindOperationalForStayActive },
     { kFindOperationalForStayActive, kICDSendStayActive },
     { kICDSendStayActive, kFindOperationalForCommissioningComplete },
