@@ -130,7 +130,15 @@ done
 # live in any stage directory, so resolve it by name under images/ rather than
 # assuming it is a sibling.
 IMAGES_ROOT="$(git rev-parse --show-toplevel)/integrations/docker/images"
-awk '/^FROM .*project-chip\// {sub(/.*project-chip\//, ""); sub(/:.*/, ""); print}' Dockerfile |
+# Take the image token ($2) so a trailing "AS <alias>" is excluded by
+# construction rather than by the tag strip happening to swallow it, and cut at
+# ":" or "@" so both tagged and digest references reduce to the image name.
+awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
+        ref = $2
+        sub(/.*project-chip\//, "", ref)
+        sub(/[:@].*/, "", ref)
+        print ref
+     }' Dockerfile |
     sort -u | while read -r dep; do
     dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
     [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
