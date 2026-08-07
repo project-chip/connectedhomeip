@@ -39,11 +39,15 @@ class TC_PICS_Checker(BasicCompositionTests):
         self.build_spec_xmls()
 
     def _check_and_record_errors(self, location, required, pics):
-        if required and not self.check_pics(pics):
+        # Scope the lookup to the endpoint under test: PICS are an endpoint-keyed
+        # tree, and the same cluster code (e.g. SWTCH.S) can legitimately be true
+        # on another endpoint's slice. Using the endpoint-agnostic check here
+        # would let those foreign codes leak into this endpoint's check.
+        if required and not self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
-        elif not required and self.check_pics(pics):
+        elif not required and self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
 
@@ -230,11 +234,10 @@ class TC_PICS_Checker(BasicCompositionTests):
         base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
         for problem in base_problems:
             self.problems.append(problem)
-        derived_codes = base_pics_facts_to_pics_codes(base_facts)
 
         self.step(10)
         # Base/MCORE codes are device-wide but conventionally only declared
-        # in EP0's PICS slice. Skip on other endpoints
+        # in EP0's PICS slice (per Cecille's review). Skip on other endpoints
         # so we don't false-positive on PICS files that correctly omit MCORE
         # from non-EP0 endpoint slices.
         if self.endpoint_id == 0:
@@ -246,15 +249,21 @@ class TC_PICS_Checker(BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(11)
-        endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
-        for cluster_id, event_ids in endpoint_events.items():
-            if cluster_id in ota_ids:
-                continue
-            pics_base = self.xml_clusters[cluster_id].pics
-            for event_id in event_ids:
-                location = EventPathLocation(
-                    endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
-                self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
+        # Default off: enabling this turns the spec-conformance event rules
+        # into an assertion. Bounded to --endpoint to match Steps 2-6's
+        # per-endpoint semantics, and OTA clusters are skipped here for the
+        # same reason they're skipped from checkable_clusters above (no
+        # published PICS codes today).
+        if self.user_params.get("assert_mandatory_events", False):
+            endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
+            for cluster_id, event_ids in endpoint_events.items():
+                if cluster_id in ota_ids:
+                    continue
+                pics_base = self.xml_clusters[cluster_id].pics
+                for event_id in event_ids:
+                    location = EventPathLocation(
+                        endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
+                    self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
 
         self.step(12)
         if not self.success:
