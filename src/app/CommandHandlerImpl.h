@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include <app/CommandHandler.h>
 
 #include <app/CommandHandlerExchangeInterface.h>
@@ -28,6 +30,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Scoped.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -76,6 +79,8 @@ public:
          */
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
+
+        virtual void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) {}
     };
 
     struct InvokeResponseParameters
@@ -458,6 +463,8 @@ private:
 
     void InvalidateHandles();
 
+    void TriggerDelayReport(const InvokeRequestMessage::DelayReportData & aDelayReportData);
+
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
     /**
@@ -504,6 +511,11 @@ private:
     // incoming invoke.  After this point, our session could go away at any
     // time.
     bool mGoneAsync = false;
+
+    static constexpr size_t kMaxTargetedEndpoints = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    uint16_t mNumTargetedEndpoints                = 0;
+    EndpointId mTargetedEndpoints[kMaxTargetedEndpoints];
+    void RecordTargetedEndpoint(EndpointId endpointId);
 };
 } // namespace app
 } // namespace chip
