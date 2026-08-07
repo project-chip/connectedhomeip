@@ -51,7 +51,7 @@ static constexpr uint16_t kDefault24GHzFreq = CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEF
 struct PAFPublishSSI
 {
     uint8_t DevOpCode;
-    uint16_t DevInfo;      // Discriminator
+    uint16_t DevInfo; // Discriminator
     uint16_t ProductId;
     uint16_t VendorId;
 } __packed;
@@ -71,10 +71,10 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::InitWiFiPAF()
     }
 
     // Initialize state
-    mApFreq = 0;
+    mApFreq           = 0;
     mCurrentPublishId = 0;
-    mPublishActive = false;
-    mPeerRegistered = false;
+    mPublishActive    = false;
+    mPeerRegistered   = false;
 
     // Register NAN event callbacks
     net_mgmt_init_event_callback(&mNanMgmtClbk, NanMgmtEventHandler, kNanManagementEvents);
@@ -122,11 +122,12 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFPublish(ConnectivityManager::
     TEMPORARY_RETURN_IGNORED DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vid);
     ssi.VendorId = vid;
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: Publishing with discriminator=%u, VID=0x%04X, PID=0x%04X", ssi.DevInfo, ssi.VendorId, ssi.ProductId);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: Publishing with discriminator=%u, VID=0x%04X, PID=0x%04X", ssi.DevInfo, ssi.VendorId,
+                    ssi.ProductId);
 
     // Prepare NAN publish parameters
     wifi_nan_params params = {};
-    params.op = WIFI_NAN_OP_PUBLISH;
+    params.op              = WIFI_NAN_OP_PUBLISH;
 
     // Service name
     static_assert(sizeof(kMatterNanServiceName) <= sizeof(params.publish.service_name), "Service name too long");
@@ -147,14 +148,13 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFPublish(ConnectivityManager::
     if (args.freq_list_len > 0 && args.freq_list != nullptr)
     {
         constexpr size_t kMaxFreqEntries = 10;
-        size_t copyLen = std::min(static_cast<size_t>(args.freq_list_len), kMaxFreqEntries);
+        size_t copyLen                   = std::min(static_cast<size_t>(args.freq_list_len), kMaxFreqEntries);
 
-        char * dst      = params.publish.freq_list;
+        char * dst       = params.publish.freq_list;
         size_t remaining = sizeof(params.publish.freq_list);
         for (size_t i = 0; i < copyLen && remaining > 1; i++)
         {
-            int written = snprintf(dst, remaining, "%u%s",
-                                   args.freq_list[i], (i < copyLen - 1) ? "," : "");
+            int written = snprintf(dst, remaining, "%u%s", args.freq_list[i], (i < copyLen - 1) ? "," : "");
             if (written < 0 || static_cast<size_t>(written) >= remaining)
                 break;
             dst += written;
@@ -168,8 +168,8 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFPublish(ConnectivityManager::
 
     // Publish flags
     params.publish.unsolicited = true;
-    params.publish.solicited = true;
-    params.publish.fsd = true;
+    params.publish.solicited   = true;
+    params.publish.fsd         = true;
 
     // Call Zephyr NAN API
     int ret = net_mgmt(NET_REQUEST_WIFI_NAN, mWiFiIface, &params, sizeof(params));
@@ -181,13 +181,13 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFPublish(ConnectivityManager::
 
     // Parse publish ID from response
     params.resp[sizeof(params.resp) - 1] = '\0';
-    uint32_t publishId = 0;
+    uint32_t publishId                   = 0;
     if (sscanf(params.resp, "%u", &publishId) == 1)
     {
         k_mutex_lock(&mNanMutex, K_FOREVER);
         mCurrentPublishId = publishId;
-        mPublishActive = true;
-        mPeerRegistered = false; // Reset for new publish
+        mPublishActive    = true;
+        mPeerRegistered   = false; // Reset for new publish
         k_mutex_unlock(&mNanMutex);
 
         args.publish_id = publishId;
@@ -196,11 +196,11 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFPublish(ConnectivityManager::
 
         // Register session with PAF layer
         WiFiPAF::WiFiPAFSession sessionInfo = {};
-        sessionInfo.role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
-        sessionInfo.id = publishId;
+        sessionInfo.role                    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
+        sessionInfo.id                      = publishId;
 
         WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-        err = pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+        err                              = pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "WiFi-PAF: Failed to register PAF session: %" CHIP_ERROR_FORMAT, err.Format());
@@ -232,8 +232,8 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFCancelPublish(uint32_t Publis
     k_mutex_unlock(&mNanMutex);
 
     wifi_nan_params params = {};
-    params.op = WIFI_NAN_OP_CANCEL_PUBLISH;
-    params.cancel_id = static_cast<uint8_t>(PublishId);
+    params.op              = WIFI_NAN_OP_CANCEL_PUBLISH;
+    params.cancel_id       = static_cast<uint8_t>(PublishId);
 
     int ret = net_mgmt(NET_REQUEST_WIFI_NAN, mWiFiIface, &params, sizeof(params));
     if (ret != 0)
@@ -244,16 +244,16 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFCancelPublish(uint32_t Publis
 
     // Clean up state
     k_mutex_lock(&mNanMutex, K_FOREVER);
-    mPublishActive = false;
+    mPublishActive    = false;
     mCurrentPublishId = 0;
-    mPeerRegistered = false;
+    mPeerRegistered   = false;
     k_mutex_unlock(&mNanMutex);
 
     // Remove session from PAF layer
     WiFiPAF::WiFiPAFSession sessionInfo = {};
-    sessionInfo.id = PublishId;
-    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    CHIP_ERROR err = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+    sessionInfo.id                      = PublishId;
+    WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    CHIP_ERROR err                      = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: Failed to remove PAF session: %" CHIP_ERROR_FORMAT, err.Format());
@@ -281,9 +281,11 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFCancelIncompleteSubscribe()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo,
+                                                        System::PacketBufferHandle && msgBuf)
 {
-    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "WiFi-PAF: Invalid packet buffer"));
+    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "WiFi-PAF: Invalid packet buffer"));
     ChipLogProgress(DeviceLayer, "WiFi-PAF: Sending PAF frame, length=%u", static_cast<unsigned>(msgBuf->DataLength()));
 
     // Ensure outgoing message fits in a single contiguous packet buffer, as currently required by the
@@ -291,11 +293,12 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFSend(const WiFiPAF::WiFiPAFSe
     if (msgBuf->HasChainedBuffer())
     {
         msgBuf->CompactHead();
-        VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_BUFFER_TOO_SMALL, ChipLogError(DeviceLayer, "WiFi-PAF: Message too large to compact"));
+        VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_BUFFER_TOO_SMALL,
+                            ChipLogError(DeviceLayer, "WiFi-PAF: Message too large to compact"));
     }
 
     wifi_nan_params params = {};
-    params.op = WIFI_NAN_OP_TRANSMIT;
+    params.op              = WIFI_NAN_OP_TRANSMIT;
     // Set handle (publish/subscribe ID)
     params.transmit.handle = static_cast<uint8_t>(TxInfo.id);
     // Set peer instance ID
@@ -306,7 +309,7 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFSend(const WiFiPAF::WiFiPAFSe
     memcpy(params.transmit.peer_addr, TxInfo.peer_addr, sizeof(TxInfo.peer_addr));
 
     // Set SSI payload (pointer to PacketBuffer data; net_mgmt is synchronous so lifetime is safe)
-    size_t dataLen = msgBuf->DataLength();
+    size_t dataLen          = msgBuf->DataLength();
     params.transmit.ssi     = msgBuf->Start();
     params.transmit.ssi_len = dataLen;
 
@@ -319,7 +322,7 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFSend(const WiFiPAF::WiFiPAFSe
 
     // Post write done event
     ChipDeviceEvent event = {};
-    event.Type = DeviceEventType::kCHIPoWiFiPAFWriteDone;
+    event.Type            = DeviceEventType::kCHIPoWiFiPAFWriteDone;
     memcpy(&event.CHIPoWiFiPAFReceived.SessionInfo, &TxInfo, sizeof(WiFiPAF::WiFiPAFSession));
     event.CHIPoWiFiPAFReceived.result = true; // Indicate success
     PlatformMgr().PostEventOrDie(&event);
@@ -336,18 +339,18 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_WiFiPAFShutdown(uint32_t id, WiFiPAF
 
     switch (role)
     {
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
-            err = _WiFiPAFCancelPublish(id);
-            break;
+    case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
+        err = _WiFiPAFCancelPublish(id);
+        break;
 
-        case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
-            ChipLogProgress(DeviceLayer, "WiFi-PAF: Subscriber role is not supported, no action taken");
-            break;
+    case WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber:
+        ChipLogProgress(DeviceLayer, "WiFi-PAF: Subscriber role is not supported, no action taken");
+        break;
 
-        default:
-            ChipLogError(DeviceLayer, "WiFi-PAF: Unknown role: %d", static_cast<int>(role));
-            err = CHIP_ERROR_INVALID_ARGUMENT;
-            break;
+    default:
+        ChipLogError(DeviceLayer, "WiFi-PAF: Unknown role: %d", static_cast<int>(role));
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
     }
 
     return err;
@@ -363,8 +366,7 @@ void ConnectivityManagerImplWiFiPAF::OnNanReplied(const wifi_nan_replied_event *
     if (event->publish_id != mCurrentPublishId)
     {
         k_mutex_unlock(&mNanMutex);
-        ChipLogError(DeviceLayer, "WiFi-PAF: Publish ID mismatch! Expected %u, got %u",
-                     mCurrentPublishId, event->publish_id);
+        ChipLogError(DeviceLayer, "WiFi-PAF: Publish ID mismatch! Expected %u, got %u", mCurrentPublishId, event->publish_id);
         return;
     }
 
@@ -378,19 +380,19 @@ void ConnectivityManagerImplWiFiPAF::OnNanReplied(const wifi_nan_replied_event *
 
     k_mutex_unlock(&mNanMutex);
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN replied - publish_id=%u, subscribe_id=%u",
-                    event->publish_id, event->subscribe_id);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN replied - publish_id=%u, subscribe_id=%u", event->publish_id, event->subscribe_id);
 
     // Free dynamically allocated ssi (not used by Matter layer)
-    if (event->ssi) {
+    if (event->ssi)
+    {
         k_free(event->ssi);
     }
 
     // Populate session info
     WiFiPAF::WiFiPAFSession sessionInfo = {};
-    sessionInfo.role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
-    sessionInfo.id = event->publish_id;
-    sessionInfo.peer_id = event->subscribe_id;
+    sessionInfo.role                    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
+    sessionInfo.id                      = event->publish_id;
+    sessionInfo.peer_id                 = event->subscribe_id;
     static_assert(sizeof(sessionInfo.peer_addr) >= sizeof(event->peer_addr), "Peer address buffer mismatch");
     memcpy(sessionInfo.peer_addr, event->peer_addr, sizeof(event->peer_addr));
 
@@ -399,7 +401,7 @@ void ConnectivityManagerImplWiFiPAF::OnNanReplied(const wifi_nan_replied_event *
 
     CHIP_ERROR schedErr = DeviceLayer::SystemLayer().ScheduleLambda([this, sess]() {
         // Update PAF layer's persistent session
-        WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFLayer & pafLayer   = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
         WiFiPAF::WiFiPAFSession * pPafInfo = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccSessionId, *sess);
 
         if (pPafInfo == nullptr)
@@ -432,8 +434,7 @@ void ConnectivityManagerImplWiFiPAF::OnNanReplied(const wifi_nan_replied_event *
         CHIP_ERROR initErr = pafLayer.HandleTransportConnectionInitiated(*sess);
         if (initErr != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "WiFi-PAF: HandleTransportConnectionInitiated failed: %" CHIP_ERROR_FORMAT,
-                         initErr.Format());
+            ChipLogError(DeviceLayer, "WiFi-PAF: HandleTransportConnectionInitiated failed: %" CHIP_ERROR_FORMAT, initErr.Format());
             // Rollback on failure
             k_mutex_lock(&mNanMutex, K_FOREVER);
             mPeerRegistered = false;
@@ -464,31 +465,30 @@ void ConnectivityManagerImplWiFiPAF::OnNanReceive(const wifi_nan_receive_event *
     k_mutex_lock(&mNanMutex, K_FOREVER);
     bool isActiveSession = (mPublishActive && event->id == mCurrentPublishId);
     k_mutex_unlock(&mNanMutex);
-    VerifyOrReturn(isActiveSession,
-                   ChipLogProgress(DeviceLayer, "WiFi-PAF: Ignoring event for inactive session %u", event->id));
+    VerifyOrReturn(isActiveSession, ChipLogProgress(DeviceLayer, "WiFi-PAF: Ignoring event for inactive session %u", event->id));
 
     VerifyOrReturn(event->ssi != nullptr && event->ssi_len > 0,
                    ChipLogError(DeviceLayer, "WiFi-PAF: OnNanReceive: null or empty SSI"));
 
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN receive - id=%u, peer_id=%u, len=%u",
-                    event->id, event->peer_instance_id, static_cast<unsigned>(event->ssi_len));
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN receive - id=%u, peer_id=%u, len=%u", event->id, event->peer_instance_id,
+                    static_cast<unsigned>(event->ssi_len));
 
     // Populate session info
     WiFiPAF::WiFiPAFSession sessionInfo = {};
-    sessionInfo.id = event->id;
-    sessionInfo.peer_id = event->peer_instance_id;
+    sessionInfo.id                      = event->id;
+    sessionInfo.peer_id                 = event->peer_instance_id;
     static_assert(sizeof(sessionInfo.peer_addr) >= sizeof(event->peer_addr), "Peer address buffer mismatch");
     memcpy(sessionInfo.peer_addr, event->peer_addr, sizeof(event->peer_addr));
 
     // Create packet buffer (copies data), then free the dynamically allocated ssi
-    uint8_t * ssi_to_free = event->ssi;
+    uint8_t * ssi_to_free          = event->ssi;
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(event->ssi, event->ssi_len);
     k_free(ssi_to_free);
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "WiFi-PAF: Failed to allocate packet buffer"));
 
     // Post Matter event
     ChipDeviceEvent matterEvent = {};
-    matterEvent.Type = DeviceEventType::kCHIPoWiFiPAFReceived;
+    matterEvent.Type            = DeviceEventType::kCHIPoWiFiPAFReceived;
     memcpy(&matterEvent.CHIPoWiFiPAFReceived.SessionInfo, &sessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
     matterEvent.CHIPoWiFiPAFReceived.Data = std::move(buf).UnsafeRelease();
     PlatformMgr().PostEventOrDie(&matterEvent);
@@ -497,24 +497,23 @@ void ConnectivityManagerImplWiFiPAF::OnNanReceive(const wifi_nan_receive_event *
 void ConnectivityManagerImplWiFiPAF::OnNanPublishTerminated(const wifi_nan_terminated_event * event)
 {
     VerifyOrReturn(event != nullptr, ChipLogError(DeviceLayer, "WiFi-PAF: OnNanPublishTerminated: null event"));
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN publish terminated - publish_id=%u, reason=%s",
-                    event->id, event->reason);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: NAN publish terminated - publish_id=%u, reason=%s", event->id, event->reason);
 
     // Clean up state
     if (event->id == mCurrentPublishId)
     {
         k_mutex_lock(&mNanMutex, K_FOREVER);
         mCurrentPublishId = 0;
-        mPublishActive = false;
-        mPeerRegistered = false;
+        mPublishActive    = false;
+        mPeerRegistered   = false;
         k_mutex_unlock(&mNanMutex);
     }
 
     // Remove session from PAF layer
     WiFiPAF::WiFiPAFSession sessionInfo = {};
-    sessionInfo.id = event->id;
-    WiFiPAF::WiFiPAFLayer & pafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    CHIP_ERROR err = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
+    sessionInfo.id                      = event->id;
+    WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    CHIP_ERROR err                      = pafLayer.RmPafSession(WiFiPAF::PafInfoAccess::kAccSessionId, sessionInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: Failed to remove PAF session: %" CHIP_ERROR_FORMAT, err.Format());
@@ -522,7 +521,7 @@ void ConnectivityManagerImplWiFiPAF::OnNanPublishTerminated(const wifi_nan_termi
 
     // Post Matter event
     ChipDeviceEvent matterEvent = {};
-    matterEvent.Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect;
+    matterEvent.Type            = DeviceEventType::kCHIPoWiFiPAFCancelConnect;
     PlatformMgr().PostEventOrDie(&matterEvent);
 }
 
@@ -548,39 +547,36 @@ void ConnectivityManagerImplWiFiPAF::NanMgmtEventHandler(net_mgmt_event_callback
 
     switch (mgmtEvent)
     {
-        case NET_EVENT_WIFI_NAN_REPLIED:
+    case NET_EVENT_WIFI_NAN_REPLIED: {
+        const wifi_nan_replied_event * event = static_cast<const wifi_nan_replied_event *>(cb->info);
+        if (event != nullptr)
         {
-            const wifi_nan_replied_event * event = static_cast<const wifi_nan_replied_event *>(cb->info);
-            if (event != nullptr)
-            {
-                self.OnNanReplied(event);
-            }
-            break;
+            self.OnNanReplied(event);
         }
+        break;
+    }
 
-        case NET_EVENT_WIFI_NAN_RECEIVE:
+    case NET_EVENT_WIFI_NAN_RECEIVE: {
+        const wifi_nan_receive_event * event = static_cast<const wifi_nan_receive_event *>(cb->info);
+        if (event != nullptr)
         {
-            const wifi_nan_receive_event * event = static_cast<const wifi_nan_receive_event *>(cb->info);
-            if (event != nullptr)
-            {
-                self.OnNanReceive(event);
-            }
-            break;
+            self.OnNanReceive(event);
         }
+        break;
+    }
 
-        case NET_EVENT_WIFI_NAN_PUBLISH_TERMINATED:
+    case NET_EVENT_WIFI_NAN_PUBLISH_TERMINATED: {
+        const wifi_nan_terminated_event * event = static_cast<const wifi_nan_terminated_event *>(cb->info);
+        if (event != nullptr)
         {
-            const wifi_nan_terminated_event * event = static_cast<const wifi_nan_terminated_event *>(cb->info);
-            if (event != nullptr)
-            {
-                self.OnNanPublishTerminated(event);
-            }
-            break;
+            self.OnNanPublishTerminated(event);
         }
+        break;
+    }
 
-        default:
-            ChipLogError(DeviceLayer, "WiFi-PAF: Unexpected NAN event: 0x" ChipLogFormatX64, ChipLogValueX64(mgmtEvent));
-            break;
+    default:
+        ChipLogError(DeviceLayer, "WiFi-PAF: Unexpected NAN event: 0x" ChipLogFormatX64, ChipLogValueX64(mgmtEvent));
+        break;
     }
 }
 
@@ -590,8 +586,7 @@ void ConnectivityManagerImplWiFiPAF::OnWiFiPAFPlatformEvent(const ChipDeviceEven
 
     switch (event->Type)
     {
-    case DeviceEventType::kCHIPoWiFiPAFReceived:
-    {
+    case DeviceEventType::kCHIPoWiFiPAFReceived: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFReceived");
         WiFiPAF::WiFiPAFSession rxInfo;
         memcpy(&rxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
@@ -599,8 +594,7 @@ void ConnectivityManagerImplWiFiPAF::OnWiFiPAFPlatformEvent(const ChipDeviceEven
         break;
     }
 
-    case DeviceEventType::kCHIPoWiFiPAFWriteDone:
-    {
+    case DeviceEventType::kCHIPoWiFiPAFWriteDone: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
         WiFiPAF::WiFiPAFSession txInfo;
         memcpy(&txInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
@@ -608,8 +602,7 @@ void ConnectivityManagerImplWiFiPAF::OnWiFiPAFPlatformEvent(const ChipDeviceEven
         break;
     }
 
-    case DeviceEventType::kCHIPoWiFiPAFCancelConnect:
-    {
+    case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFCancelConnect");
         // Connection was canceled or terminated
         // The PAF layer and NAN callbacks will handle cleanup
@@ -651,8 +644,7 @@ CHIP_ERROR ConnectivityManagerImplWiFiPAF::_SetWiFiPAFAdvertisingEnabled(bool en
         return res;
     }
     // Cancel publish; publishId must be valid
-    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId),
-                        CHIP_ERROR_INCORRECT_STATE,
+    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "WiFi-PAF: _SetWiFiPAFAdvertisingEnabled: invalid publishId=%u", publishId));
     CHIP_ERROR err = _WiFiPAFCancelPublish(publishId);
     if (err == CHIP_NO_ERROR)
