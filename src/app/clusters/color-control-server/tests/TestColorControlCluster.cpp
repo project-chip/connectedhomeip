@@ -81,19 +81,19 @@ TEST_F(TestColorControlCluster, ColorTemperatureCommandBoundaries)
     ColorControlCluster cluster(kTestEndpointId, MakeConfig(delegate));
 
     // MoveToColorTemperature: mireds and transition-time upper bounds.
-    EXPECT_EQ(cluster.moveToColorTemp(kMaxColorTempMireds + 1, 0), Status::ConstraintError);
-    EXPECT_EQ(cluster.moveToColorTemp(200, kMaxTransitionTime + 1), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveToColorTemp(kMaxColorTempMireds + 1, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveToColorTemp(200, kMaxTransitionTime + 1), Status::ConstraintError);
 
     // MoveColorTemperature: field-mireds bounds, and rate==0 on a non-stop move is invalid.
-    EXPECT_EQ(cluster.moveColorTemp(MoveModeEnum::kUp, 10, kMaxColorTempMireds + 1, 0), Status::ConstraintError);
-    EXPECT_EQ(cluster.moveColorTemp(MoveModeEnum::kUp, 10, 0, kMaxColorTempMireds + 1), Status::ConstraintError);
-    EXPECT_EQ(cluster.moveColorTemp(MoveModeEnum::kUp, 0, 0, 0), Status::InvalidCommand);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 10, kMaxColorTempMireds + 1, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 10, 0, kMaxColorTempMireds + 1), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 0, 0, 0), Status::InvalidCommand);
     // Stop is always accepted and starts no transition.
-    EXPECT_EQ(cluster.moveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
 
     // StepColorTemperature: field-mireds and transition-time bounds.
-    EXPECT_EQ(cluster.stepColorTemp(StepModeEnum::kUp, 10, kMaxTransitionTime + 1, 0, 0), Status::ConstraintError);
-    EXPECT_EQ(cluster.stepColorTemp(StepModeEnum::kUp, 10, 0, kMaxColorTempMireds + 1, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.StepColorTemp(StepModeEnum::kUp, 10, kMaxTransitionTime + 1, 0, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.StepColorTemp(StepModeEnum::kUp, 10, 0, kMaxColorTempMireds + 1, 0), Status::ConstraintError);
 }
 
 TEST_F(TestColorControlCluster, MoveToColorBoundaries)
@@ -101,10 +101,10 @@ TEST_F(TestColorControlCluster, MoveToColorBoundaries)
     ColorControlCluster cluster(kTestEndpointId, MakeConfig(delegate));
 
     // CurrentX / CurrentY above the CIE max (65279) are rejected.
-    EXPECT_EQ(cluster.moveToColor(kMaxCieXy + 1, 100, 0), Status::ConstraintError);
-    EXPECT_EQ(cluster.moveToColor(100, kMaxCieXy + 1, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveToColor(kMaxCieXy + 1, 100, 0), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveToColor(100, kMaxCieXy + 1, 0), Status::ConstraintError);
     // Transition time above the max is rejected.
-    EXPECT_EQ(cluster.moveToColor(100, 100, kMaxTransitionTime + 1), Status::ConstraintError);
+    EXPECT_EQ(cluster.MoveToColor(100, 100, kMaxTransitionTime + 1), Status::ConstraintError);
 }
 
 } // namespace

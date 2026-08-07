@@ -128,14 +128,14 @@ TEST_F(TestColorControlPersistence, ColorTemperatureSurvivesReboot)
 {
     // Default config value is 250, but the persisted 350 must win after reboot.
     ExpectStateSurvivesReboot(
-        CtConfig(), [](ColorControlCluster & c) { return c.moveToColorTemp(350, 10); },
+        CtConfig(), [](ColorControlCluster & c) { return c.MoveToColorTemp(350, 10); },
         EnhancedColorModeEnum::kColorTemperatureMireds, [](ColorControlCluster & b) { EXPECT_EQ(b.ColorTempMireds(), 350u); });
 }
 
 TEST_F(TestColorControlPersistence, XyColorSurvivesReboot)
 {
     ExpectStateSurvivesReboot(
-        XyConfig(), [](ColorControlCluster & c) { return c.moveToColor(30000, 40000, 10); },
+        XyConfig(), [](ColorControlCluster & c) { return c.MoveToColor(30000, 40000, 10); },
         EnhancedColorModeEnum::kCurrentXAndCurrentY,
         [](ColorControlCluster & b) {
             EXPECT_EQ(b.CurrentX(), 30000u);
@@ -146,12 +146,68 @@ TEST_F(TestColorControlPersistence, XyColorSurvivesReboot)
 TEST_F(TestColorControlPersistence, HueSaturationSurvivesReboot)
 {
     ExpectStateSurvivesReboot(
-        HsConfig(), [](ColorControlCluster & c) { return c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false); },
+        HsConfig(), [](ColorControlCluster & c) { return c.MoveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false); },
         EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation,
         [](ColorControlCluster & b) {
             EXPECT_EQ(b.EnhancedHue(), static_cast<uint16_t>(100 << 8)); // CurrentHue == 100
             EXPECT_EQ(b.Saturation(), 200u);
         });
+}
+
+// First boot has nothing in storage, so EnhancedColorMode falls back to a mode the feature map actually
+// supports. An HS-only or CT-only endpoint carries no CurrentX/CurrentY attributes, so a fixed
+// kCurrentXAndCurrentY seed would report a mode that endpoint cannot serve.
+TEST_F(TestColorControlPersistence, FirstBootModeFollowsFeatureMap)
+{
+    auto expectFirstBootMode = [](const ColorControlCluster::Config & config, EnhancedColorModeEnum expected) {
+        ColorControlCluster c(kEp, config);
+        Testing::ClusterTester tester(c); // fresh storage — nothing was ever persisted
+        ASSERT_EQ(c.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        EXPECT_EQ(c.GetEnhancedColorMode(), expected);
+        c.Shutdown(ClusterShutdownType::kClusterShutdown);
+    };
+
+    expectFirstBootMode(HsConfig(), EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
+    expectFirstBootMode(XyConfig(), EnhancedColorModeEnum::kCurrentXAndCurrentY);
+    expectFirstBootMode(CtConfig(), EnhancedColorModeEnum::kColorTemperatureMireds);
+}
+
+// The stored mode is last session's runtime state, while mColorValue at Startup is the constructor's
+// configured color — a reboot re-seeds RAM from the config, it does not carry the old value over. The two
+// diverge for every device that changed mode before rebooting, so restoring must not assume the configured
+// color is of the stored mode's alternative.
+TEST_F(TestColorControlPersistence, StoredModeOutranksConfiguredColorAlternative)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
+    config.mColorValue                         = HueSatColor{ .hue = 10, .saturation = 20 }; // boots in HS
+    config.ctConfig.colorTempPhysicalMinMireds = 100;
+    config.ctConfig.colorTempPhysicalMaxMireds = 400;
+
+    ExpectStateSurvivesReboot(
+        config, [](ColorControlCluster & c) { return c.MoveToColorTemp(350, 10); }, EnhancedColorModeEnum::kColorTemperatureMireds,
+        [](ColorControlCluster & b) {
+            EXPECT_EQ(b.ColorTempMireds(), 350u); // CT wins over the configured HueSatColor
+        });
+}
+
+// With nothing stored, each axis keeps the color the application handed to the constructor rather than
+// falling back to the attribute's own default.
+TEST_F(TestColorControlPersistence, FirstBootKeepsConfiguredColor)
+{
+    ColorControlCluster hs(kEp, HsConfig()); // HueSatColor{ .hue = 10, .saturation = 20 }
+    Testing::ClusterTester hsTester(hs);
+    ASSERT_EQ(hs.Startup(hsTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(hs.CurrentHue(), 10u);
+    EXPECT_EQ(hs.Saturation(), 20u);
+    hs.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    ColorControlCluster xy(kEp, XyConfig()); // XYColor{ .x = 1000, .y = 2000 }
+    Testing::ClusterTester xyTester(xy);
+    ASSERT_EQ(xy.Startup(xyTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(xy.CurrentX(), 1000u);
+    EXPECT_EQ(xy.CurrentY(), 2000u);
+    xy.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A Stop mid-transition freezes the color at its current value; that frozen value must persist even
@@ -162,13 +218,13 @@ TEST_F(TestColorControlPersistence, StopFreezesAndPersistsCurrentValue)
     Testing::ClusterTester tester(a);
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(a.moveToColorTemp(400, 200), Status::Success); // 20 s transition
+    EXPECT_EQ(a.MoveToColorTemp(400, 200), Status::Success); // 20 s transition
     Tick(a, 10000);                                          // halfway
     const uint16_t frozen = a.ColorTempMireds();
     EXPECT_GT(frozen, 250u);
     EXPECT_LT(frozen, 400u);
 
-    EXPECT_EQ(a.moveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success); // freeze + persist
+    EXPECT_EQ(a.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success); // freeze + persist
 
     ColorControlCluster b(kEp, CtConfig());
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -191,16 +247,16 @@ TEST_F(TestColorControlPersistence, IdleStopDoesNotWriteNvm)
 
         // Startup only loads, so the KVS is still empty: any key below could only come from a Stop.
         ASSERT_EQ(storage.GetNumKeys(), 0u);
-        EXPECT_EQ(a.stopMoveStep(), Status::Success);
-        EXPECT_EQ(a.stopMoveStep(), Status::Success);
-        EXPECT_EQ(a.moveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
-        EXPECT_EQ(a.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+        EXPECT_EQ(a.StopMoveStep(), Status::Success);
+        EXPECT_EQ(a.StopMoveStep(), Status::Success);
+        EXPECT_EQ(a.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(a.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
         EXPECT_EQ(storage.GetNumKeys(), 0u);
 
         // A Stop that does interrupt a transition still persists the value it froze.
-        EXPECT_EQ(a.moveToSaturation(200, 200), Status::Success); // 20 s transition
+        EXPECT_EQ(a.MoveToSaturation(200, 200), Status::Success); // 20 s transition
         Tick(a, 10000);                                           // halfway
-        EXPECT_EQ(a.stopMoveStep(), Status::Success);
+        EXPECT_EQ(a.StopMoveStep(), Status::Success);
         EXPECT_GT(storage.GetNumKeys(), 0u);
 
         a.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -213,13 +269,13 @@ TEST_F(TestColorControlPersistence, IdleStopDoesNotWriteNvm)
         auto & storage = tester.GetTestContext().StorageDelegate();
 
         ASSERT_EQ(storage.GetNumKeys(), 0u);
-        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
-        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
+        EXPECT_EQ(a.MoveColor(0, 0), Status::Success);
+        EXPECT_EQ(a.MoveColor(0, 0), Status::Success);
         EXPECT_EQ(storage.GetNumKeys(), 0u);
 
-        EXPECT_EQ(a.moveColor(100, 100), Status::Success); // toward the CIE boundary
+        EXPECT_EQ(a.MoveColor(100, 100), Status::Success); // toward the CIE boundary
         Tick(a, 10000);
-        EXPECT_EQ(a.moveColor(0, 0), Status::Success);
+        EXPECT_EQ(a.MoveColor(0, 0), Status::Success);
         EXPECT_GT(storage.GetNumKeys(), 0u);
 
         a.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -257,7 +313,7 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
     const BitMask<UpdateFlagsBitmap> flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                                                  .Set(UpdateFlagsBitmap::kUpdateDirection)
                                                  .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(a.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
+    EXPECT_EQ(a.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
                              /*timeSec=*/30, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(a.ColorLoopActive(), 1);
@@ -288,7 +344,7 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     ColorControlCluster a(kEp, LoopConfig());
     Testing::ClusterTester tester(a);
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_EQ(a.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
+    EXPECT_EQ(a.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
                              ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 0, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);

@@ -119,44 +119,44 @@ struct TestColorControlCommands : public ::testing::Test
 TEST_F(TestColorControlCommands, MoveToSaturation)
 {
     ColorControlCluster c(kEp, HsConfig());
-    EXPECT_EQ(c.moveToSaturation(200, 10), Status::Success);
+    EXPECT_EQ(c.MoveToSaturation(200, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), 200);
 
     // Out-of-range saturation rejected (max is 254).
-    EXPECT_EQ(c.moveToSaturation(255, 10), Status::ConstraintError);
+    EXPECT_EQ(c.MoveToSaturation(255, 10), Status::ConstraintError);
 }
 
 TEST_F(TestColorControlCommands, MoveSaturation)
 {
     ColorControlCluster c(kEp, HsConfig()); // start sat 20
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success);
+    EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), kMaxSat); // moves to the max bound
 
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kDown, 50), Status::Success);
+    EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kDown, 50), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), 0); // moves to the min bound
 
     // rate 0 on a non-stop move is invalid (InvalidCommand, matching MoveColorTemperature); Stop is accepted.
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 0), Status::InvalidCommand);
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+    EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 0), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
 }
 
 TEST_F(TestColorControlCommands, StepSaturation)
 {
     ColorControlCluster c(kEp, HsConfig()); // start sat 20
-    EXPECT_EQ(c.stepSaturation(StepModeEnum::kUp, 100, 10), Status::Success);
+    EXPECT_EQ(c.StepSaturation(StepModeEnum::kUp, 100, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), 120); // 20 + 100
 
     // Step up beyond max clamps to 254.
-    EXPECT_EQ(c.stepSaturation(StepModeEnum::kUp, 250, 10), Status::Success);
+    EXPECT_EQ(c.StepSaturation(StepModeEnum::kUp, 250, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), kMaxSat);
 
     // A step size of 0 is rejected.
-    EXPECT_EQ(c.stepSaturation(StepModeEnum::kUp, 0, 10), Status::InvalidCommand);
+    EXPECT_EQ(c.StepSaturation(StepModeEnum::kUp, 0, 10), Status::InvalidCommand);
 }
 
 // A saturation-only command must not disturb the hue representation: MoveToSaturation has no Enhanced*
@@ -171,19 +171,19 @@ TEST_F(TestColorControlCommands, SaturationCommandsPreserveEnhancedHue)
     ColorControlCluster c(kEp, config);
     ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
 
-    EXPECT_EQ(c.moveToSaturation(200, 10), Status::Success);
+    EXPECT_EQ(c.MoveToSaturation(200, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), 200);
     EXPECT_EQ(c.EnhancedHue(), 0x1234); // hue untouched, at full 16-bit precision
     EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
 
     // The other two saturation commands share the same flavor-neutrality.
-    EXPECT_EQ(c.stepSaturation(StepModeEnum::kDown, 50, 10), Status::Success);
+    EXPECT_EQ(c.StepSaturation(StepModeEnum::kDown, 50, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), 150);
     EXPECT_EQ(c.EnhancedHue(), 0x1234);
 
-    EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success);
+    EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
     Complete(c);
     EXPECT_EQ(c.Saturation(), kMaxSat);
     EXPECT_EQ(c.EnhancedHue(), 0x1234);
@@ -195,18 +195,18 @@ TEST_F(TestColorControlCommands, SaturationCommandsPreserveEnhancedHue)
 TEST_F(TestColorControlCommands, MoveToHue)
 {
     ColorControlCluster c(kEp, HsConfig()); // start hue 10 (enhanced 0x0A00)
-    EXPECT_EQ(c.moveToHue(100, DirectionEnum::kShortest, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kShortest, 10, /*isEnhanced=*/false), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8)); // CurrentHue == 100
 
     // Unknown direction rejected.
-    EXPECT_EQ(c.moveToHue(100, DirectionEnum::kUnknownEnumValue, 10, false), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kUnknownEnumValue, 10, false), Status::InvalidCommand);
 }
 
 TEST_F(TestColorControlCommands, EnhancedMoveToHue)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
-    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), 0x8000); // full 16-bit target applied
 }
@@ -222,7 +222,7 @@ TEST_F(TestColorControlCommands, MoveToHueHalfCircleTieGoesUp)
     {
         ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
         ASSERT_EQ(c.EnhancedHue(), kStart);
-        EXPECT_EQ(c.moveToHue(kTarget, dir, 200, /*isEnhanced=*/true), Status::Success); // 20 s transition
+        EXPECT_EQ(c.MoveToHue(kTarget, dir, 200, /*isEnhanced=*/true), Status::Success); // 20 s transition
 
         Tick(c, 10000);                     // halfway
         EXPECT_EQ(c.EnhancedHue(), 0x5000); // up: kStart + 0x4000 (going down would read 0xD000 here)
@@ -234,33 +234,33 @@ TEST_F(TestColorControlCommands, MoveToHueHalfCircleTieGoesUp)
 TEST_F(TestColorControlCommands, StepHue)
 {
     ColorControlCluster c(kEp, HsConfig()); // start enhancedHue 0x0A00
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 20, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 20, 10, /*isEnhanced=*/false), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x0A00 + (20 << 8))); // += 20 in the high byte
 
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUnknownEnumValue, 20, 10, false), Status::InvalidCommand);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUnknownEnumValue, 20, 10, false), Status::InvalidCommand);
     // A step size of 0 is rejected.
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 0, 10, false), Status::InvalidCommand);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 0, 10, false), Status::InvalidCommand);
 }
 
 TEST_F(TestColorControlCommands, MoveHueRateThenStop)
 {
     ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00
     // Rate move: 10 (8-bit) -> 10<<8 = 2560 hue-units/sec up. Indefinite (no end).
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
     Tick(c, 1000); // one second
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x0A00 + 2560));
 
     // Stop freezes the hue axis where it is.
     const uint16_t frozen = c.EnhancedHue();
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kStop, 0, false), Status::Success);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kStop, 0, false), Status::Success);
     Tick(c, 1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
 
     // An undefined MoveMode must not be treated as Down: it is rejected before any transition starts,
     // so the hue axis stays frozen rather than beginning an indefinite move.
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::InvalidCommand);
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/false), Status::InvalidCommand);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUnknownEnumValue, 10, /*isEnhanced=*/true), Status::InvalidCommand);
     Tick(c, 1000);
     EXPECT_EQ(c.EnhancedHue(), frozen);
 }
@@ -272,29 +272,29 @@ TEST_F(TestColorControlCommands, MoveStopHaltsBothAxes)
 {
     {
         ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00, sat 20
-        EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
-        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success); // overlaps the hue move
+        EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success); // overlaps the hue move
         Tick(c, 1000);
         const uint16_t frozenHue = c.EnhancedHue();
         const uint8_t frozenSat  = c.Saturation();
         EXPECT_LT(frozenSat, kMaxSat); // still en route to the max bound
 
         // MoveHue(Stop) must freeze the saturation axis too.
-        EXPECT_EQ(c.moveHue(MoveModeEnum::kStop, 0, false), Status::Success);
+        EXPECT_EQ(c.MoveHue(MoveModeEnum::kStop, 0, false), Status::Success);
         Complete(c);
         EXPECT_EQ(c.EnhancedHue(), frozenHue);
         EXPECT_EQ(c.Saturation(), frozenSat);
     }
     {
         ColorControlCluster c(kEp, HsConfig());
-        EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
-        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success);
+        EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
+        EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
         Tick(c, 1000);
         const uint16_t frozenHue = c.EnhancedHue();
         const uint8_t frozenSat  = c.Saturation();
 
         // ...and symmetrically, MoveSaturation(Stop) must freeze the hue axis.
-        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+        EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
         Complete(c);
         EXPECT_EQ(c.EnhancedHue(), frozenHue);
         EXPECT_EQ(c.Saturation(), frozenSat);
@@ -307,7 +307,7 @@ TEST_F(TestColorControlCommands, MoveStopHaltsBothAxes)
 TEST_F(TestColorControlCommands, MoveHueRateDownWrapsBelowZero)
 {
     ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00 == 2560
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kDown, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kDown, 10, /*isEnhanced=*/false), Status::Success);
 
     // 1.5 s at -2560/s = -3840, which takes the hue past 0: 2560 - 3840 = -1280 -> 65536 - 1280 = 64256.
     Tick(c, 1500);
@@ -323,7 +323,7 @@ TEST_F(TestColorControlCommands, MoveToHueDownwardArc)
     {
         ColorControlCluster c(kEp, HsConfig()); // start hue 10 -> enhanced 2560
         // Target hue 100 -> 25600. upArc = 23040, so the downward arc is 23040 - 65536 = -42496.
-        EXPECT_EQ(c.moveToHue(100, dir, 200, /*isEnhanced=*/false), Status::Success); // 20 s transition
+        EXPECT_EQ(c.MoveToHue(100, dir, 200, /*isEnhanced=*/false), Status::Success); // 20 s transition
 
         // Halfway: 2560 + (-42496 / 2) = -18688 -> 46848. Going up would read 14080 here.
         Tick(c, 10000);
@@ -339,7 +339,7 @@ TEST_F(TestColorControlCommands, StepHueDownWrapsBelowZero)
 {
     ColorControlCluster c(kEp, HsConfig()); // enhancedHue 0x0A00 == 2560
     // Legacy step 20 projects to -5120, taking the hue below 0: 2560 - 5120 = -2560 -> 62976.
-    EXPECT_EQ(c.stepHue(StepModeEnum::kDown, 20, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kDown, 20, 10, /*isEnhanced=*/false), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), 62976u);
 }
@@ -348,7 +348,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveHueRate)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // enhancedHue 0x1000
     // Enhanced rate is a full 16-bit hue-units/sec (no <<8 projection).
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kUp, 2560, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kUp, 2560, /*isEnhanced=*/true), Status::Success);
     Tick(c, 1000);
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(0x1000 + 2560));
 }
@@ -357,7 +357,7 @@ TEST_F(TestColorControlCommands, EnhancedStepHue)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // enhancedHue 0x1000
     // Enhanced step is a full 16-bit delta.
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 0x2000, 10, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 0x2000, 10, /*isEnhanced=*/true), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), 0x3000);
 }
@@ -367,7 +367,7 @@ TEST_F(TestColorControlCommands, EnhancedStepHue)
 TEST_F(TestColorControlCommands, MoveToHueAndSaturation)
 {
     ColorControlCluster c(kEp, HsConfig());
-    EXPECT_EQ(c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), static_cast<uint16_t>(100 << 8));
     EXPECT_EQ(c.Saturation(), 200);
@@ -376,7 +376,7 @@ TEST_F(TestColorControlCommands, MoveToHueAndSaturation)
 TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturation)
 {
     ColorControlCluster c(kEp, EnhancedConfig());
-    EXPECT_EQ(c.moveToHueAndSaturation(0x4000, 150, 10, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveToHueAndSaturation(0x4000, 150, 10, /*isEnhanced=*/true), Status::Success);
     Complete(c);
     EXPECT_EQ(c.EnhancedHue(), 0x4000);
     EXPECT_EQ(c.Saturation(), 150);
@@ -389,7 +389,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturation)
 TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturationImmediateDoesNotDrift)
 {
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
-    EXPECT_EQ(c.moveToHueAndSaturation(20000, 50, /*transitionTimeDs=*/0, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveToHueAndSaturation(20000, 50, /*transitionTimeDs=*/0, /*isEnhanced=*/true), Status::Success);
     Tick(c, 1); // first tick materializes the immediate move
     EXPECT_EQ(c.EnhancedHue(), 20000);
     EXPECT_EQ(c.Saturation(), 50);
@@ -402,7 +402,7 @@ TEST_F(TestColorControlCommands, EnhancedMoveToHueAndSaturationImmediateDoesNotD
 TEST_F(TestColorControlCommands, MoveToColor)
 {
     ColorControlCluster c(kEp, XyConfig()); // start x=1000 y=2000
-    EXPECT_EQ(c.moveToColor(30000, 40000, 10), Status::Success);
+    EXPECT_EQ(c.MoveToColor(30000, 40000, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.CurrentX(), 30000);
     EXPECT_EQ(c.CurrentY(), 40000);
@@ -411,13 +411,13 @@ TEST_F(TestColorControlCommands, MoveToColor)
 TEST_F(TestColorControlCommands, StepColor)
 {
     ColorControlCluster c(kEp, XyConfig()); // start x=1000 y=2000
-    EXPECT_EQ(c.stepColor(500, -500, 10), Status::Success);
+    EXPECT_EQ(c.StepColor(500, -500, 10), Status::Success);
     Complete(c);
     EXPECT_EQ(c.CurrentX(), 1500);
     EXPECT_EQ(c.CurrentY(), 1500);
 
     // Both-zero step is invalid.
-    EXPECT_EQ(c.stepColor(0, 0, 10), Status::InvalidCommand);
+    EXPECT_EQ(c.StepColor(0, 0, 10), Status::InvalidCommand);
 }
 
 TEST_F(TestColorControlCommands, MoveColorRate)
@@ -425,13 +425,13 @@ TEST_F(TestColorControlCommands, MoveColorRate)
     ColorControlCluster c(kEp, XyConfig());
     // Positive X rate -> moves toward the CIE max; negative Y -> toward 0. Rate is units/sec; pick a rate
     // large enough that both axes complete within Complete()'s advance window.
-    EXPECT_EQ(c.moveColor(2000, -2000, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::Success);
+    EXPECT_EQ(c.MoveColor(2000, -2000, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::Success);
     Complete(c);
     EXPECT_EQ(c.CurrentX(), kMaxCieXy);
     EXPECT_EQ(c.CurrentY(), 0);
 
     // Both-zero rate stops movement (no error).
-    EXPECT_EQ(c.moveColor(0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::Success);
+    EXPECT_EQ(c.MoveColor(0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::Success);
 }
 
 // ---------------------------------------------------------------------------- Color temperature
@@ -440,11 +440,11 @@ TEST_F(TestColorControlCommands, MoveColorTemperature)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250, physical [100,400]
     // Up increases mireds toward the (clamped) upper field limit; 0 field -> physical max.
-    EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success);
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 400);
 
-    EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kDown, 50, 0, 0), Status::Success);
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kDown, 50, 0, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 100);
 }
@@ -452,33 +452,33 @@ TEST_F(TestColorControlCommands, MoveColorTemperature)
 TEST_F(TestColorControlCommands, StepColorTemperature)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250
-    EXPECT_EQ(c.stepColorTemp(StepModeEnum::kUp, 100, 10, 0, 0), Status::Success);
+    EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 100, 10, 0, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 350); // 250 + 100
 
     // Step up beyond the physical max clamps to 400.
-    EXPECT_EQ(c.stepColorTemp(StepModeEnum::kUp, 500, 10, 0, 0), Status::Success);
+    EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 500, 10, 0, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 400);
 }
 
-// A valid moveToColorTemp target is CLAMPED to the configured physical min/max [100, 400].
+// A valid MoveToColorTemp target is CLAMPED to the configured physical min/max [100, 400].
 TEST_F(TestColorControlCommands, MoveToColorTemperatureClampsToPhysicalRange)
 {
     ColorControlCluster c(kEp, CtConfig()); // physical range [100, 400]
 
     // Above the physical max -> clamped down to it.
-    ASSERT_EQ(c.moveToColorTemp(500, 0), Status::Success);
+    ASSERT_EQ(c.MoveToColorTemp(500, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 400u);
 
     // Below the physical min -> clamped up to it.
-    ASSERT_EQ(c.moveToColorTemp(50, 0), Status::Success);
+    ASSERT_EQ(c.MoveToColorTemp(50, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 100u);
 
     // In-range value -> applied unchanged.
-    ASSERT_EQ(c.moveToColorTemp(300, 0), Status::Success);
+    ASSERT_EQ(c.MoveToColorTemp(300, 0), Status::Success);
     Complete(c);
     EXPECT_EQ(c.ColorTempMireds(), 300u);
 }
@@ -489,7 +489,7 @@ TEST_F(TestColorControlCommands, TransitionInterpolatesOverTime)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250
     // 200 ds = 20 s to reach 400.
-    EXPECT_EQ(c.moveToColorTemp(400, 200), Status::Success);
+    EXPECT_EQ(c.MoveToColorTemp(400, 200), Status::Success);
     Tick(c, 10000); // halfway (10 s)
     const uint16_t mid = c.ColorTempMireds();
     EXPECT_GT(mid, 250);
@@ -505,7 +505,7 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
     ColorControlCluster c(kEp, LoopConfig());
 
     // Update time and direction (no action): the color-loop attributes change, loop stays inactive.
-    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
                              ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, /*timeSec=*/30,
                              /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
@@ -514,20 +514,20 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
     EXPECT_EQ(c.ColorLoopActive(), 0);
 
     // Activate.
-    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction),
                              ColorLoopActionEnum::kActivateFromColorLoopStartEnhancedHue, ColorLoopDirectionEnum::kIncrement, 0, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 
     // Deactivate.
-    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kDeactivate,
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kDeactivate,
                              ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 0);
 
     // Unknown action is rejected.
-    EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kUnknownEnumValue,
+    EXPECT_EQ(c.ColorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateAction), ColorLoopActionEnum::kUnknownEnumValue,
                              ColorLoopDirectionEnum::kIncrement, 0, 0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::InvalidCommand);
 }
@@ -539,7 +539,7 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransition)
     ColorControlCluster c(kEp, CtConfig()); // start 250
     Testing::ClusterTester tester(c);
 
-    EXPECT_EQ(c.moveToColorTemp(400, 200), Status::Success); // 20 s transition
+    EXPECT_EQ(c.MoveToColorTemp(400, 200), Status::Success); // 20 s transition
     Tick(c, 10000);                                          // halfway
     const uint16_t frozen = c.ColorTempMireds();
     EXPECT_GT(frozen, 250);
@@ -570,13 +570,13 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransitionWhileColorLoopDorm
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    ASSERT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+    ASSERT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(c.ColorLoopActive(), 1);
 
     // A CT command switches the mode, which parks the loop (no longer driving) but leaves it ACTIVE.
-    EXPECT_EQ(c.moveToColorTemp(400, 200), Status::Success); // 20 s transition, starting from 250
+    EXPECT_EQ(c.MoveToColorTemp(400, 200), Status::Success); // 20 s transition, starting from 250
     ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     ASSERT_EQ(c.ColorLoopActive(), 1); // active, but dormant
 
@@ -586,20 +586,20 @@ TEST_F(TestColorControlCommands, StopMoveStepFreezesTransitionWhileColorLoopDorm
     EXPECT_LT(frozen, 400u);
 
     // The dormant loop must not shield the CT transition from StopMoveStep.
-    EXPECT_EQ(c.stopMoveStep(), Status::Success);
+    EXPECT_EQ(c.StopMoveStep(), Status::Success);
     Tick(c, 60000);
     EXPECT_EQ(c.ColorTempMireds(), frozen);
 }
 
 // ---------------------------------------------------------------------------- Validation / RemainingTime consistency
 
-// B4: moveToHueAndSaturation must apply the same constraint checks as its twin moveToSaturation.
+// B4: MoveToHueAndSaturation must apply the same constraint checks as its twin MoveToSaturation.
 TEST_F(TestColorControlCommands, MoveToHueAndSaturationRejectsOutOfRange)
 {
     ColorControlCluster c(kEp, HsConfig());
-    EXPECT_EQ(c.moveToHueAndSaturation(100, 255, 10, /*isEnhanced=*/false), Status::ConstraintError);    // sat > 254
-    EXPECT_EQ(c.moveToHueAndSaturation(100, 200, 65535, /*isEnhanced=*/false), Status::ConstraintError); // time > 65534
-    EXPECT_EQ(c.moveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);            // valid
+    EXPECT_EQ(c.MoveToHueAndSaturation(100, 255, 10, /*isEnhanced=*/false), Status::ConstraintError);    // sat > 254
+    EXPECT_EQ(c.MoveToHueAndSaturation(100, 200, 65535, /*isEnhanced=*/false), Status::ConstraintError); // time > 65534
+    EXPECT_EQ(c.MoveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);            // valid
 }
 
 // MoveToHue, EnhancedMoveToHue and EnhancedStepHue each carry a uint16 TransitionTime constrained to
@@ -610,9 +610,9 @@ TEST_F(TestColorControlCommands, HueCommandsRejectOutOfRangeTransitionTime)
     ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
     Testing::ClusterTester tester(c);
 
-    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 65535, /*isEnhanced=*/true), Status::ConstraintError);
-    EXPECT_EQ(c.moveToHue(100, DirectionEnum::kShortest, 65535, /*isEnhanced=*/false), Status::ConstraintError);
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 20, 65535, /*isEnhanced=*/true), Status::ConstraintError);
+    EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 65535, /*isEnhanced=*/true), Status::ConstraintError);
+    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kShortest, 65535, /*isEnhanced=*/false), Status::ConstraintError);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 20, 65535, /*isEnhanced=*/true), Status::ConstraintError);
 
     // Rejected before anything is set up: the hue is untouched and RemainingTime stays 0 — in particular
     // it never reads back as 0xFFFF, which is the indefinite-rate-move sentinel.
@@ -623,8 +623,8 @@ TEST_F(TestColorControlCommands, HueCommandsRejectOutOfRangeTransitionTime)
     EXPECT_EQ(rt, 0);
 
     // The boundary value itself is in range.
-    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 65534, /*isEnhanced=*/true), Status::Success);
-    EXPECT_EQ(c.stepHue(StepModeEnum::kUp, 20, 65534, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 65534, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.StepHue(StepModeEnum::kUp, 20, 65534, /*isEnhanced=*/true), Status::Success);
 }
 
 // RemainingTime saturates at its constraint max (0xFFFE, §3.2.7.2) instead of wrapping. A rate move's
@@ -638,7 +638,7 @@ TEST_F(TestColorControlCommands, SlowRateMoveSaturatesRemainingTime)
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
 
-        EXPECT_EQ(c.moveColor(1, 0), Status::Success); // toward x = 65279 at 1 unit/s ≈ 18 h
+        EXPECT_EQ(c.MoveColor(1, 0), Status::Success); // toward x = 65279 at 1 unit/s ≈ 18 h
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, kMaxRemainingTime);
 
@@ -658,7 +658,7 @@ TEST_F(TestColorControlCommands, SlowRateMoveSaturatesRemainingTime)
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
 
-        EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kUp, 1, 0, 0), Status::Success); // 65278 mireds at 1/s
+        EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 1, 0, 0), Status::Success); // 65278 mireds at 1/s
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, kMaxRemainingTime);
 
@@ -683,26 +683,26 @@ TEST_F(TestColorControlCommands, RemainingTimeCommandReportsOnlyOnLargeDelta)
     // 0 → 5 (a 0.5 s transition): neither the rise-from-0 arm (needs > 10) nor the command arm
     // (needs a delta > 10) is satisfied, so the new value is stored quietly.
     listener.DirtyList().clear();
-    EXPECT_EQ(c.moveToHue(100, DirectionEnum::kShortest, 5, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHue(100, DirectionEnum::kShortest, 5, /*isEnhanced=*/false), Status::Success);
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
     EXPECT_EQ(rt, 5);
     EXPECT_FALSE(listener.IsDirty(kRtPath));
 
     // 5 → 100: delta 95 → reportable.
     listener.DirtyList().clear();
-    EXPECT_EQ(c.moveToHue(150, DirectionEnum::kShortest, 100, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHue(150, DirectionEnum::kShortest, 100, /*isEnhanced=*/false), Status::Success);
     EXPECT_TRUE(listener.IsDirty(kRtPath));
 
     // 100 → 105: a command caused it, but the delta is only 5 → quiet.
     listener.DirtyList().clear();
-    EXPECT_EQ(c.moveToHue(200, DirectionEnum::kShortest, 105, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHue(200, DirectionEnum::kShortest, 105, /*isEnhanced=*/false), Status::Success);
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
     EXPECT_EQ(rt, 105);
     EXPECT_FALSE(listener.IsDirty(kRtPath));
 
     // Reaching 0 always reports, whatever the delta.
     listener.DirtyList().clear();
-    EXPECT_EQ(c.moveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
     EXPECT_EQ(rt, 0);
     EXPECT_TRUE(listener.IsDirty(kRtPath));
@@ -716,12 +716,12 @@ TEST_F(TestColorControlCommands, FreshCommandSetsRemainingTime)
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
 
-        EXPECT_EQ(c.stepColor(500, -500, 30), Status::Success);
+        EXPECT_EQ(c.StepColor(500, -500, 30), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 30);
 
-        // moveColor is rate-based with a computed time-to-boundary → finite and nonzero.
-        EXPECT_EQ(c.moveColor(2000, -2000), Status::Success);
+        // MoveColor is rate-based with a computed time-to-boundary → finite and nonzero.
+        EXPECT_EQ(c.MoveColor(2000, -2000), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_GT(rt, 0);
     }
@@ -730,11 +730,11 @@ TEST_F(TestColorControlCommands, FreshCommandSetsRemainingTime)
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
 
-        EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success); // 150 mireds @ 50/s = 3 s = 30 ds
+        EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success); // 150 mireds @ 50/s = 3 s = 30 ds
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 30);
 
-        EXPECT_EQ(c.stepColorTemp(StepModeEnum::kUp, 20, 15, 0, 0), Status::Success);
+        EXPECT_EQ(c.StepColorTemp(StepModeEnum::kUp, 20, 15, 0, 0), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 15);
     }
@@ -748,10 +748,10 @@ TEST_F(TestColorControlCommands, StopResetsRemainingTime)
         ColorControlCluster c(kEp, CtConfig());
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
-        EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success);
+        EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 50, 0, 0), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_GT(rt, 0);
-        EXPECT_EQ(c.moveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
+        EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 0);
     }
@@ -760,8 +760,8 @@ TEST_F(TestColorControlCommands, StopResetsRemainingTime)
         ColorControlCluster c(kEp, XyConfig());
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
-        EXPECT_EQ(c.moveColor(2000, -2000), Status::Success);
-        EXPECT_EQ(c.moveColor(0, 0), Status::Success); // stop
+        EXPECT_EQ(c.MoveColor(2000, -2000), Status::Success);
+        EXPECT_EQ(c.MoveColor(0, 0), Status::Success); // stop
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 0);
     }
@@ -770,10 +770,10 @@ TEST_F(TestColorControlCommands, StopResetsRemainingTime)
         ColorControlCluster c(kEp, HsConfig());
         Testing::ClusterTester tester(c);
         uint16_t rt = 0;
-        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kUp, 50), Status::Success);
+        EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kUp, 50), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_GT(rt, 0);
-        EXPECT_EQ(c.moveSaturation(MoveModeEnum::kStop, 0), Status::Success);
+        EXPECT_EQ(c.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
         ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
         EXPECT_EQ(rt, 0);
     }
@@ -791,7 +791,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickAdvancesEnhancedHueUp)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
     // 10 s / revolution, increment (up), starting from the current enhanced hue.
-    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
+    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
                              /*timeSec=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(c.ColorLoopActive(), 1);
@@ -813,7 +813,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kDecrement,
+    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kDecrement,
                              /*timeSec=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
@@ -832,12 +832,12 @@ TEST_F(TestColorControlCommands, HueCommandParksRunningColorLoop)
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
-    // moveToHue is honored: it drives the hue axis to its own target over 1 s and parks the loop.
-    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    // MoveToHue is honored: it drives the hue axis to its own target over 1 s and parks the loop.
+    EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1); // still "active" as an attribute — parked, not deactivated
 
     Tick(c, 1000);
@@ -860,16 +860,16 @@ TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
     const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
-    EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+    EXPECT_EQ(c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
                              BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
-    // moveToHue must not disturb the loop: returns Success but changes nothing.
-    EXPECT_EQ(c.moveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    // MoveToHue must not disturb the loop: returns Success but changes nothing.
+    EXPECT_EQ(c.MoveToHue(0x8000, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
     EXPECT_EQ(c.ColorLoopActive(), 1);
 
     Tick(c, 1000);
-    EXPECT_EQ(c.EnhancedHue(), 10649u); // still following the loop, not the (ignored) moveToHue target
+    EXPECT_EQ(c.EnhancedHue(), 10649u); // still following the loop, not the (ignored) MoveToHue target
 }
 
 } // namespace

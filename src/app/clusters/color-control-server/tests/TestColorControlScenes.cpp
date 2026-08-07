@@ -98,7 +98,7 @@ TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Drive the live color to a known value (immediate move), independent of what Startup restored.
-    EXPECT_EQ(cluster.moveToColor(30000, 40000, 0), Status::Success);
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
     Complete(cluster);
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
@@ -136,6 +136,8 @@ TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
     EXPECT_TRUE(sawX);
     EXPECT_TRUE(sawY);
     EXPECT_TRUE(sawMode);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // ApplyScene decodes an EFS and drives the live color to the scene's target. The EFS is built explicitly,
@@ -163,7 +165,7 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
     EXPECT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
 
     // Move the live color away from the scene target first, so ApplyScene has something to change.
-    EXPECT_EQ(cluster.moveToColor(30000, 40000, 0), Status::Success);
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
     Complete(cluster);
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
@@ -172,6 +174,8 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
     Complete(cluster);
     EXPECT_EQ(cluster.CurrentX(), 100u);
     EXPECT_EQ(cluster.CurrentY(), 200u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A scene's transition time is a uint32 of milliseconds (AddScene constrains it to 60000000), so the
@@ -203,6 +207,8 @@ TEST_F(TestColorControlScenes, ApplySceneSaturatesRemainingTime)
     uint16_t remainingTime = 0;
     ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
     EXPECT_EQ(remainingTime, 0xFFFE);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // A scene may carry ColorLoopActive == 1 on an endpoint that has no ColorLoop feature — nothing upstream
@@ -234,7 +240,7 @@ TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
     ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
 
     // Move the live color away from the scene target so the restore has something to change.
-    EXPECT_EQ(cluster.moveToColor(30000, 40000, 0), Status::Success);
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
     Complete(cluster);
     ASSERT_EQ(cluster.CurrentX(), 30000u);
 
@@ -245,6 +251,8 @@ TEST_F(TestColorControlScenes, ApplySceneIgnoresColorLoopWithoutFeature)
     EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kCurrentXAndCurrentY);
     EXPECT_EQ(cluster.CurrentX(), 100u); // saved color restored rather than discarded by a loop start
     EXPECT_EQ(cluster.CurrentY(), 200u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // The counterpart: on an endpoint that does support ColorLoop, a scene saved with ColorLoopActive == 1
@@ -277,6 +285,8 @@ TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.ColorLoopActive(), 1);
     EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // SerializeAdd only accepts the decodable form of an EFS, so a Type is TLV-encoded into `backing` and
@@ -349,6 +359,38 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingRequiredAttributes)
         uint8_t out[128];
         MutableByteSpan outSpan(out);
         EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT) << c.name;
+    }
+}
+
+// ColorLoopDirection is constrained to 0..1 (kDecrement/kIncrement), so AddScene must reject a scene
+// carrying an out-of-range direction. Without this bound the value would be stored verbatim and later
+// written straight into the attribute by ApplyScene, making a read report a value the type forbids.
+TEST_F(TestColorControlScenes, SerializeAddRejectsOutOfRangeColorLoopDirection)
+{
+    ColorControlCluster::Config config(delegate);
+    config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
+    ColorControlCluster cluster(kTestEndpointId, config);
+
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = Attributes::ColorLoopDirection::Id;
+
+    // kIncrement (1) is the largest legal value; anything above it is out of range.
+    for (uint8_t direction : { to_underlying(ColorLoopDirectionEnum::kDecrement), to_underlying(ColorLoopDirectionEnum::kIncrement),
+                               static_cast<uint8_t>(to_underlying(ColorLoopDirectionEnum::kIncrement) + 1), uint8_t{ 0xFF } })
+    {
+        pairs[0].valueUnsigned8.SetValue(direction);
+
+        uint8_t backing[128];
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(chip::Span<const AttributeValuePair>(pairs), backingSpan, efs), CHIP_NO_ERROR)
+            << "direction " << static_cast<int>(direction);
+
+        uint8_t out[128];
+        MutableByteSpan outSpan(out);
+        const CHIP_ERROR expected =
+            (direction <= to_underlying(ColorLoopDirectionEnum::kIncrement)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), expected) << "direction " << static_cast<int>(direction);
     }
 }
 

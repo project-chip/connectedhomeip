@@ -35,13 +35,9 @@ public:
     // inactive-mode attribute is read. The cluster passes the current color; the delegate fills
     // the requested representation in the out-params.
     //
-    // For any device that advertises both features, this conversion is GUARANTEED to exist: both
-    // representations describe the same physical color, so a mapping (possibly lossy / "closest
-    // achievable") always exists. The SDK default delegate ships standard color-science
-    // conversions; apps with real gamut data override for accuracy. There is no
-    // "cannot convert → fall back to stale" path, so these return void rather than a status —
-    // the delegate MUST populate the out-params. (The empty default bodies are never reached on a
-    // single-feature device, which can never switch into a mode it does not advertise.)
+    // For any device that advertises both features, this conversion is GUARANTEED to be
+    // provided by the manufacturer both representations describe the same physical color,
+    // so a mapping always exists.
 
     virtual void ConvertXYToHueSat(uint16_t x, uint16_t y, uint8_t & outHue, uint8_t & outSat) {}
     virtual void ConvertHueSatToXY(uint8_t hue, uint8_t sat, uint16_t & outX, uint16_t & outY) {}

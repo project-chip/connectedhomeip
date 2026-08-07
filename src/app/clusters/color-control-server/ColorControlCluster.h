@@ -143,7 +143,9 @@ struct State
 class OnOffCluster;
 
 // ColorControlCluster is its own scene handler (mirrors LevelControlCluster): the owning application
-// registers this cluster with the endpoint's scene table (table->RegisterHandler(&cluster)).
+// registers this cluster with the endpoint's scene table (table->RegisterHandler(&cluster)) and must
+// call table->UnregisterHandler(&cluster) before destroying it. Shutdown() does not do this, because
+// the table stores the raw handler pointer and only the registering application knows its lifetime.
 class ColorControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -190,8 +192,6 @@ public:
     CHIP_ERROR ArmTick();
     // ── t=100ms, 200ms, … · SystemLayer fires OnTick every 100ms ────────────────
     void OnTick();
-    // TickHue: t from wall clock, exact target on the last tick, then store + fan-out.
-    bool TickHue(HueTransition & tx, uint64_t now);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -271,31 +271,31 @@ public:
     // about the gate can omit them; InvokeCommand always forwards the decoded command fields.
     using OptMask = chip::BitMask<ColorControl::OptionsBitmap>;
 
-    Status moveHue(ColorControl::MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, OptMask optionsMask = {},
+    Status MoveHue(ColorControl::MoveModeEnum moveMode, uint16_t rate, bool isEnhanced, OptMask optionsMask = {},
                    OptMask optionsOverride = {});
-    Status moveToHue(uint16_t hue, ColorControl::DirectionEnum dir, uint16_t transitionTimeDs, bool isEnhanced,
+    Status MoveToHue(uint16_t hue, ColorControl::DirectionEnum dir, uint16_t transitionTimeDs, bool isEnhanced,
                      OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status stepHue(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, bool isEnhanced,
+    Status StepHue(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, bool isEnhanced,
                    OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status moveToSaturation(uint8_t saturation, uint16_t transitionTimeDs, OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTimeDs, bool isEnhanced,
+    Status MoveToSaturation(uint8_t saturation, uint16_t transitionTimeDs, OptMask optionsMask = {}, OptMask optionsOverride = {});
+    Status MoveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTimeDs, bool isEnhanced,
                                   OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status moveSaturation(ColorControl::MoveModeEnum moveMode, uint8_t rate, OptMask optionsMask = {},
+    Status MoveSaturation(ColorControl::MoveModeEnum moveMode, uint8_t rate, OptMask optionsMask = {},
                           OptMask optionsOverride = {});
-    Status stepSaturation(ColorControl::StepModeEnum stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
+    Status StepSaturation(ColorControl::StepModeEnum stepMode, uint8_t stepSize, uint16_t transitionTimeDs,
                           OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status moveColor(int16_t rateX, int16_t rateY, OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status stepColor(int16_t stepX, int16_t stepY, uint16_t transitionTimeDs, OptMask optionsMask = {},
+    Status MoveColor(int16_t rateX, int16_t rateY, OptMask optionsMask = {}, OptMask optionsOverride = {});
+    Status StepColor(int16_t stepX, int16_t stepY, uint16_t transitionTimeDs, OptMask optionsMask = {},
                      OptMask optionsOverride = {});
-    Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTimeDs, OptMask optionsMask = {},
+    Status MoveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTimeDs, OptMask optionsMask = {},
                        OptMask optionsOverride = {});
-    Status moveToColorTemp(uint16_t colorTemperature, uint16_t transitionTimeDs, OptMask optionsMask = {},
+    Status MoveToColorTemp(uint16_t colorTemperature, uint16_t transitionTimeDs, OptMask optionsMask = {},
                            OptMask optionsOverride = {});
-    Status moveColorTemp(ColorControl::MoveModeEnum moveMode, uint16_t rate, uint16_t minFieldMireds, uint16_t maxFieldMireds,
+    Status MoveColorTemp(ColorControl::MoveModeEnum moveMode, uint16_t rate, uint16_t minFieldMireds, uint16_t maxFieldMireds,
                          OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status stepColorTemp(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, uint16_t minFieldMireds,
+    Status StepColorTemp(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, uint16_t minFieldMireds,
                          uint16_t maxFieldMireds, OptMask optionsMask = {}, OptMask optionsOverride = {});
-    Status colorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
+    Status ColorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
                         ColorControl::ColorLoopDirectionEnum direction, uint16_t timeSec, uint16_t startHue,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsMask,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsOverride);
@@ -304,7 +304,7 @@ public:
     // command facade (see CodegenIntegration.h) and unit tests can invoke it directly. Has no effect while a
     // color loop is active (§3.2.8.1). InvokeCommand routes the wire command through HandleStopMoveStep,
     // which forwards here.
-    Status stopMoveStep(OptMask optionsMask = {}, OptMask optionsOverride = {});
+    Status StopMoveStep(OptMask optionsMask = {}, OptMask optionsOverride = {});
 
     // Consulted by command handlers to decide whether to run while the device is off (§3.2.8.3). Reads
     // the injected On/Off cluster (null == no coupling → always execute). Public for direct unit testing.
@@ -316,6 +316,8 @@ private:
 
     std::optional<DataModel::ActionReturnStatus> HandleStopMoveStep(const ColorControl::Commands::StopMoveStep::DecodableType & req,
                                                                     CommandHandler * handler);
+    // Tick*: t from wall clock, exact target on the last tick, then store + fan-out.
+    bool TickHue(HueTransition & tx, uint64_t now);
     bool TickXY(XYTransition & xyx, uint64_t now);
     bool TickSat(SatTransition & sx, uint64_t now);
     bool TickColorLoop(uint64_t now);
@@ -328,7 +330,7 @@ private:
     // Runtime (NON-persistent) "green light" for the loop, distinct from the ColorLoopActive attribute.
     // Latched off in OnTick once a command's hue transition owns the hue axis: the loop then stays dormant
     // (ColorLoopActive stays 1) and does NOT resume when that transition ends — only ColorLoopSet
-    // (startColorLoop) re-engages it. This is the one bit (active, mTransition, mode) can't carry: a loop
+    // (StartColorLoop) re-engages it. This is the one bit (active, mTransition, mode) can't carry: a loop
     // running normally and a loop parked after a finite move both sit at active==1 / monostate / enhanced-HS.
     // Defaults true so a loop active at construction / reboot drives; dormancy is transient, not persisted.
     bool mColorLoopEngaged = true;
@@ -369,8 +371,8 @@ private:
     void ApplyModeSwitch(ColorControl::EnhancedColorModeEnum target);
 
     // ---- Color-loop lifecycle ----
-    void startColorLoop(bool startFromStartHue);
-    void stopColorLoop();
+    void StartColorLoop(bool startFromStartHue);
+    void StopColorLoop();
 
     // ---- Per-tick / mode / reporting helpers ----
     bool TickCT(CTTransition & tx, uint64_t now);
@@ -394,8 +396,8 @@ private:
     void PersistColorLoop();    // ColorLoopActive / ColorLoopDirection / ColorLoopTime
     void StopTransitionAndFreeze();
 
-    static constexpr uint16_t kMaxTransitionTime         = 65534; // Max value as defined by the spec.
-    static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec.
+    static constexpr uint16_t kMaxTransitionTime         = 0xFFFE; // Max value as defined by the spec.
+    static constexpr uint16_t kMaxColorTemperatureMireds = 0xFEFF; // Max value as defined by the spec.
 };
 } // namespace Clusters
 } // namespace app

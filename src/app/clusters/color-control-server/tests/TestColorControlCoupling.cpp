@@ -92,18 +92,18 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
 
     // Device OFF, no ExecuteIfOff -> command suppressed: returns Success, color unchanged.
     ASSERT_EQ(onOff.SetOnOff(false), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.moveToColorTemp(400, 10, none, none), Status::Success);
+    EXPECT_EQ(cluster.MoveToColorTemp(400, 10, none, none), Status::Success);
     Complete(cluster);
     EXPECT_EQ(cluster.ColorTempMireds(), 250u); // did NOT move
 
     // Device OFF but ExecuteIfOff overridden on -> command runs.
-    EXPECT_EQ(cluster.moveToColorTemp(400, 10, executeIfOff, executeIfOff), Status::Success);
+    EXPECT_EQ(cluster.MoveToColorTemp(400, 10, executeIfOff, executeIfOff), Status::Success);
     Complete(cluster);
     EXPECT_EQ(cluster.ColorTempMireds(), 400u); // moved
 
     // Device ON -> command runs regardless of options.
     ASSERT_EQ(onOff.SetOnOff(true), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.moveToColorTemp(200, 10, none, none), Status::Success);
+    EXPECT_EQ(cluster.MoveToColorTemp(200, 10, none, none), Status::Success);
     Complete(cluster);
     EXPECT_EQ(cluster.ColorTempMireds(), 200u);
 

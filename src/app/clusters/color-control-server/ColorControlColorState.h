@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <variant>
 
@@ -27,6 +28,11 @@
 // cluster-internal and stay private to ColorControlCluster.
 
 namespace chip::app::Clusters::ColorControl {
+
+// §3.2.7.11: CurrentHue constraint max. EnhancedCurrentHue has no such cap, so the high-byte
+// projection has to be clamped rather than truncated.
+constexpr uint8_t kMinCurrentHue = 0x00;
+constexpr uint8_t kMaxCurrentHue = 0xFE;
 
 // CIE xy chromaticity coordinates.
 // §3.2.7 defines no Fallback for CurrentX/CurrentY,
@@ -60,7 +66,7 @@ struct EnhancedHueSatColor
     uint8_t saturation   = 0;
 
     // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue.
-    uint8_t hue8() const { return static_cast<uint8_t>(enhancedHue >> 8); }
+    uint8_t hue8() const { return std::clamp<uint8_t>(enhancedHue >> 8, kMinCurrentHue, kMaxCurrentHue); }
 };
 
 // The single active color value. The alternative held encodes the (Enhanced)ColorMode, so
