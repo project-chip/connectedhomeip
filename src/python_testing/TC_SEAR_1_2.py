@@ -36,6 +36,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_2_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/sear_1_2_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -220,7 +235,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         if self.check_pics("SEAR.S.F02"):
             await self.read_and_validate_supported_maps(step=2)
@@ -250,7 +265,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries in the SupportedMaps list"
             self.print_step("10", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "RemoveMap", "MapId": 3})
+                self.write_to_app_pipe({"Name": "RemoveMap", "EndpointId": self.endpoint, "MapId": 3})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -285,7 +300,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedMaps list"
             self.print_step("14", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddMap", "MapId": 1, "MapName": "NewTestMap1"})
+                self.write_to_app_pipe({"Name": "AddMap", "EndpointId": self.endpoint, "MapId": 1, "MapName": "NewTestMap1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -320,7 +335,7 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to remove one or more entries from the SupportedAreas list"
             self.print_step("18", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "RemoveArea", "AreaId": 10050})
+                self.write_to_app_pipe({"Name": "RemoveArea", "EndpointId": self.endpoint, "AreaId": 10050})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -354,7 +369,8 @@ class TC_SEAR_1_2(MatterBaseTest):
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddArea", "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
+                self.write_to_app_pipe({"Name": "AddArea", "EndpointId": self.endpoint,
+                                       "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

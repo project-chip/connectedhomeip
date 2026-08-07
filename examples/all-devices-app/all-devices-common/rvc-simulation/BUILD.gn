@@ -12,26 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("operational-state-delegate") {
+config("includes") {
+  include_dirs = [ "." ]
+}
+
+source_set("rvc-simulation") {
   sources = [
-    "impl/LoggingOperationalStateDelegate.cpp",
-    "impl/LoggingOperationalStateDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
+    "RvcSimulationLogic.h",
+    "RvcSimulationTopology.h",
   ]
 
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
-  ]
+  public_configs = [ ":includes" ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/service-area:service-area-delegate",
-    "${chip_root}/examples/all-devices-app/all-devices-common/rvc-simulation:rvc-simulation",
-    "${chip_root}/src/app/clusters/mode-base-server",
-    "${chip_root}/src/app/clusters/operational-state-server",
+    "${chip_root}/src/app/clusters/service-area-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

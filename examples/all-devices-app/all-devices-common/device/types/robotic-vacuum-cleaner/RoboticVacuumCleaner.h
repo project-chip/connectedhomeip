@@ -17,9 +17,20 @@
 
 #pragma once
 
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
+#include <device/capabilities/mode-base/impl/LoggingRvcCleanModeDelegate.h>
+#include <device/capabilities/mode-base/impl/LoggingRvcRunModeDelegate.h>
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
+#include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
+#include <string>
+
+namespace Json {
+class Value;
+} // namespace Json
 
 namespace chip::app {
 
@@ -33,10 +44,29 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::RvcOperationalState::RvcOperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
+    Clusters::ServiceArea::ServiceAreaCluster & GetServiceAreaCluster() { return mServiceAreaCluster.Cluster(); }
+    Clusters::ModeBaseCluster & RunMode() { return mRunModeCluster.Cluster(); }
+    Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
+    Clusters::OperationalState::LoggingRvcOperationalStateDelegate & OperationalStateDelegate() { return mDelegate; }
+
+    // Named-pipe simulation entry point used by all-devices-app posix/AppCommandDelegate.cpp.
+    void HandleNamedPipeCommand(const Json::Value & json);
 
 private:
+    void HandleReset();
+
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
+
+    Clusters::ServiceArea::LoggingServiceAreaStorageDelegate mServiceAreaStorageDelegate;
+    Clusters::ServiceArea::LoggingServiceAreaDelegate mServiceAreaDelegate;
+    LazyRegisteredServerCluster<Clusters::ServiceArea::ServiceAreaCluster> mServiceAreaCluster;
+
+    Clusters::RvcRunMode::LoggingRvcRunModeDelegate mRunModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mRunModeCluster;
+
+    Clusters::RvcCleanMode::LoggingRvcCleanModeDelegate mCleanModeDelegate;
+    LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mCleanModeCluster;
 };
 
 } // namespace chip::app

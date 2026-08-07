@@ -23,6 +23,7 @@
 # Exports:
 #   ALL_DEVICES_DEVICE_SRCDIRS  — list of device module source directories
 #   ALL_DEVICES_DEVICE_SOURCES  — list of device module source files (for non-component builds)
+#   ALL_DEVICES_EXTRA_INCLUDE_DIRS — shared include directories for enabled devices
 #
 # After including this file, callers must append ${CMAKE_CURRENT_BINARY_DIR}
 # to their include-directory list so that the generated
@@ -106,10 +107,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/mode-base/impl/LoggingRvcCleanModeDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/mode-base/impl/LoggingRvcRunModeDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/service-area/impl/LoggingServiceAreaDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -253,4 +258,9 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
+)
+
+# Header-only helpers for all-devices-app robotic vacuum simulation.
+set(ALL_DEVICES_EXTRA_INCLUDE_DIRS
+    "${ALL_DEVICES_COMMON_DIR}/rvc-simulation"
 )

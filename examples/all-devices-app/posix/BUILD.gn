@@ -33,6 +33,7 @@ executable("all-devices-app") {
     "PosixAudioManager.cpp",
     "PosixChime.cpp",
     "PosixSpeaker.cpp",
+    "RoboticVacuumCleanerNamedPipe.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -89,6 +90,7 @@ executable("all-devices-app") {
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]

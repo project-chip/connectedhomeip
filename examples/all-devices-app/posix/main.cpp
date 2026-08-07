@@ -64,6 +64,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -285,6 +286,20 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());
+        }
+        else if (config.type == "robotic-vacuum-cleaner")
+        {
+            auto * rvcDevice = static_cast<RoboticVacuumCleaner *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::RvcOperationalState::RvcOperationalStateCluster>(
+                    &rvcDevice->OperationalState());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ServiceArea::ServiceAreaCluster>(&rvcDevice->GetServiceAreaCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->RunMode());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::ModeBaseCluster>(&rvcDevice->CleanMode());
+            gAllDevicesAppCommandDelegate.RegisterRvcDevice(rvcDevice->GetEndpointId(), rvcDevice);
         }
     }
 
