@@ -27,6 +27,7 @@
 #include "qPinCfg.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "gpSched.h"

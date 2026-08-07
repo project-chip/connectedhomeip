@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +15,12 @@
  */
 
 #include "ThermostatClusterPresets.h"
-#include "Setpoints.h"
+#include "PresetStructWithOwnedMembers.h"
 #include "ThermostatCluster.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -32,62 +34,27 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-/**
- * @brief Check if a preset is valid.
- *
- * @param[in] preset The preset to check.
- *
- * @return true If the preset is valid i.e the PresetHandle (if not null) fits within size constraints and the presetScenario enum
- *         value is valid. Otherwise, return false.
- */
 bool IsValidPresetEntry(const PresetStructWithOwnedMembers & preset)
 {
-    // Check that the preset handle is not too long.
     if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().size() > kPresetHandleSize)
     {
         return false;
     }
-
-    // Ensure we have a valid PresetScenario.
     return (preset.GetPresetScenario() != PresetScenarioEnum::kUnknownEnumValue);
 }
 
-/**
- * @brief Checks if the preset is built-in
- *
- * @param[in] preset The preset to check.
- *
- * @return true If the preset is built-in, false otherwise.
- */
 bool IsBuiltIn(const PresetStructWithOwnedMembers & preset)
 {
     return preset.GetBuiltIn().ValueOr(false);
 }
 
-/**
- * @brief Checks if the presets are matching i.e the presetHandles are the same.
- *
- * @param[in] preset The preset to check.
- * @param[in] presetToMatch The preset to match with.
- *
- * @return true If the presets match, false otherwise. If both preset handles are null, returns false
- */
 bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
 {
     return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
         preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
 }
 
-/**
- * @brief Finds an entry in the pending presets list that matches a preset.
- *        The presetHandle of the two presets must match.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] presetToMatch The preset to match with.
- *
- * @return true if a matching entry was found in the pending presets list, false otherwise.
- */
-bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch)
+bool MatchingPendingPresetExists(ThermostatPresets::Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
 
@@ -115,17 +82,7 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
     return false;
 }
 
-/**
- * @brief Finds and returns an entry in the Presets attribute list that matches
- *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] presetToMatch The preset to match with.
- * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
- *
- * @return true if a matching entry was found in the  presets attribute list, false otherwise.
- */
-bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
+bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -144,7 +101,6 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
             return false;
         }
 
-        // Note: presets coming from our delegate always have a handle.
         if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
@@ -153,15 +109,7 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
     return false;
 }
 
-/**
- * @brief Gets the maximum number of presets allowed for a given preset scenario.
- *
- * @param[in]  delegate The delegate to use.
- * @param[in]  presetScenario The presetScenario to match with.
- * @param[out] count The maximum number of presets for the specified presetScenario
- * @return CHIP_NO_ERROR if the maximum number was determined, or an error if not
- */
-CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
+CHIP_ERROR MaximumPresetScenarioCount(ThermostatPresets::Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
 {
     count = 0;
     for (uint8_t i = 0; true; i++)
@@ -170,7 +118,6 @@ CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum pr
         auto err = delegate->GetPresetTypeAtIndex(i, presetType);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            // We exhausted the list trying to find the preset scenario
             return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
@@ -186,14 +133,7 @@ CHIP_ERROR MaximumPresetScenarioCount(Delegate * delegate, PresetScenarioEnum pr
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Returns the count of preset entries in the pending presets list that have the matching presetHandle.
- * @param[in] delegate The delegate to use.
- * @param[in] presetHandleToMatch The preset handle to match.
- *
- * @return count of the number of presets found with the matching presetHandle. Returns 0 if no matching presets were found.
- */
-uint8_t CountPresetsInPendingListWithPresetHandle(Delegate * delegate, const ByteSpan & presetHandleToMatch)
+uint8_t CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate * delegate, const ByteSpan & presetHandleToMatch)
 {
     uint8_t count = 0;
     VerifyOrReturnValue(delegate != nullptr, count);
@@ -216,15 +156,7 @@ uint8_t CountPresetsInPendingListWithPresetHandle(Delegate * delegate, const Byt
     return count;
 }
 
-/**
- * @brief Checks if the presetType for the given preset scenario supports name in the presetTypeFeatures bitmap.
- *
- * @param[in] delegate The delegate to use.
- * @param[in] presetScenario The presetScenario to match with.
- *
- * @return true if the presetType for the given preset scenario supports name, false otherwise.
- */
-bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
+bool PresetTypeSupportsNames(ThermostatPresets::Delegate * delegate, PresetScenarioEnum scenario)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
 
@@ -252,23 +184,220 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-extern ThermostatAttrAccess gThermostatAttrAccess;
-
-/**
- * @brief Checks if the given preset handle is present in the  presets attribute
- * @param[in] delegate The delegate to use.
- * @param[in] presetHandleToMatch The preset handle to match with.
- *
- * @return true if the given preset handle is present in the  presets attribute list, false otherwise.
- */
-bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & presetHandleToMatch)
+std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                              AttributeValueEncoder & encoder)
 {
-    VerifyOrReturnValue(delegate != nullptr, false);
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "ReadAttribute: PresetsDelegate is null");
+        return std::nullopt;
+    }
+
+    switch (request.path.mAttributeId)
+    {
+    case PresetTypes::Id: {
+        auto & delegate = mDelegate;
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                PresetTypeStruct::Type presetType;
+                auto err = delegate->GetPresetTypeAtIndex(i, presetType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(presetType));
+            }
+        });
+    }
+    case NumberOfPresets::Id:
+        return encoder.Encode(mDelegate->GetNumberOfPresets());
+    case Presets::Id: {
+        auto & delegate          = mDelegate;
+        auto & subjectDescriptor = encoder.GetSubjectDescriptor();
+        if (mCluster != nullptr &&
+            mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+        {
+            return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    PresetStructWithOwnedMembers preset;
+                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(enc.Encode(preset));
+                }
+            });
+        }
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                PresetStructWithOwnedMembers preset;
+                auto err = delegate->GetPresetAtIndex(i, preset);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(preset));
+            }
+        });
+    }
+    case ActivePresetHandle::Id: {
+        uint8_t buffer[kPresetHandleSize];
+        MutableByteSpan activePresetHandleSpan(buffer);
+        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
+        ReturnErrorOnFailure(mDelegate->GetActivePresetHandle(activePresetHandle));
+        return encoder.Encode(activePresetHandle);
+    }
+    case ScheduleTypes::Id: {
+        auto & delegate = mDelegate;
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(scheduleType));
+            }
+        });
+    }
+    default:
+        return std::nullopt;
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                               AttributeValueDecoder & decoder)
+{
+    if (mDelegate == nullptr || request.path.mAttributeId != Presets::Id)
+    {
+        return std::nullopt;
+    }
+
+    auto & subjectDescriptor = decoder.GetSubjectDescriptor();
+    VerifyOrReturnError(mCluster != nullptr &&
+                            mCluster->GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
+                        CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
+
+    if (!mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+    {
+        ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
+        return CHIP_IM_GLOBAL_STATUS(Busy);
+    }
+
+    if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    {
+        mDelegate->ClearPendingPresetList();
+        Presets::TypeInfo::DecodableType newPresetsList;
+        ReturnErrorOnFailure(decoder.Decode(newPresetsList));
+        auto iter = newPresetsList.begin();
+        while (iter.Next())
+        {
+            const PresetStruct::Type & preset = iter.GetValue();
+            ReturnErrorOnFailure(AppendPendingPreset(preset));
+        }
+        return iter.GetStatus();
+    }
+
+    if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        PresetStruct::Type preset;
+        ReturnErrorOnFailure(decoder.Decode(preset));
+        return AppendPendingPreset(preset);
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+std::optional<DataModel::ActionReturnStatus> ThermostatPresets::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
+{
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "InvokeCommand: PresetsDelegate is null");
+        return std::nullopt;
+    }
+
+    if (request.path.mCommandId == Commands::SetActivePresetRequest::Id)
+    {
+        Commands::SetActivePresetRequest::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+        return SetActivePreset(request_data.presetHandle);
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Status> ThermostatPresets::OnAtomicWriteBegin(AttributeId attributeId)
+{
+    if (attributeId == Presets::Id && mDelegate != nullptr)
+    {
+        mDelegate->InitializePendingPresets();
+        return Status::Success;
+    }
+    return std::nullopt;
+}
+
+std::optional<Status> ThermostatPresets::OnAtomicWritePrecommit(AttributeId attributeId)
+{
+    if (attributeId == Presets::Id && mDelegate != nullptr)
+    {
+        return PrecommitPresets();
+    }
+    return std::nullopt;
+}
+
+std::optional<Status> ThermostatPresets::OnAtomicWriteCommit(AttributeId attributeId)
+{
+    if (attributeId == Presets::Id && mDelegate != nullptr)
+    {
+        ClusterStatusCode status(mDelegate->CommitPendingPresets());
+        if (status.IsSuccess() && mCluster != nullptr)
+        {
+            mCluster->NotifyAttributeChanged(attributeId);
+        }
+        return status.GetStatus();
+    }
+    return std::nullopt;
+}
+
+std::optional<Status> ThermostatPresets::OnAtomicWriteRollback(AttributeId attributeId)
+{
+    if (attributeId == Presets::Id && mDelegate != nullptr)
+    {
+        mDelegate->ClearPendingPresetList();
+        return Status::Success;
+    }
+    return std::nullopt;
+}
+
+std::optional<System::Clock::Milliseconds16> ThermostatPresets::GetMaxAtomicWriteTimeout(AttributeId attributeId)
+{
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->GetMaxAtomicWriteTimeout(attributeId);
+    }
+    ChipLogError(Zcl, "GetMaxAtomicWriteTimeout: PresetsDelegate is null");
+    return std::nullopt;
+}
+
+bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch)
+{
+    VerifyOrReturnValue(mDelegate != nullptr, false);
 
     PresetStructWithOwnedMembers matchingPreset;
     for (uint8_t i = 0; true; i++)
     {
-        CHIP_ERROR err = delegate->GetPresetAtIndex(i, matchingPreset);
+        CHIP_ERROR err = mDelegate->GetPresetAtIndex(i, matchingPreset);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
@@ -290,24 +419,20 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     return false;
 }
 
-Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle)
+Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
-
-    auto delegate = GetDelegate(endpoint);
-
-    if (delegate == nullptr)
+    if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "PresetsDelegate is null");
         return Status::InvalidInState;
     }
 
-    // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(delegate, presetHandle.Value()))
+    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(presetHandle.Value()))
     {
         return Status::InvalidCommand;
     }
 
-    CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
+    CHIP_ERROR err = mDelegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -315,11 +440,22 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         return StatusIB(err).mStatus;
     }
 
+    if (mCluster != nullptr)
+    {
+        mCluster->NotifyAttributeChanged(ActivePresetHandle::Id);
+    }
+
     return Status::Success;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & newPreset)
+CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & newPreset)
 {
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "PresetsDelegate is null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     PresetStructWithOwnedMembers preset = newPreset;
     if (!IsValidPresetEntry(preset))
     {
@@ -332,33 +468,27 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        // Force to be false, if passed as null
         preset.SetBuiltIn(false);
     }
     else
     {
-        // Per spec we need to check that:
-        // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
+        if (!GetMatchingPresetInPresets(mDelegate, preset.GetPresetHandle().Value(), matchingPreset))
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
-        // (b) There is no existing pending preset with this handle.
-        if (CountPresetsInPendingListWithPresetHandle(delegate, preset.GetPresetHandle().Value()) > 0)
+        if (CountPresetsInPendingListWithPresetHandle(mDelegate, preset.GetPresetHandle().Value()) > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
         const auto & presetBuiltIn         = preset.GetBuiltIn();
         const auto & matchingPresetBuiltIn = matchingPreset.GetBuiltIn();
-        // (c)/(d) The built-in fields do not have a mismatch.
         if (presetBuiltIn.IsNull())
         {
             if (matchingPresetBuiltIn.IsNull())
             {
-                // This really shouldn't happen; internal presets should alway have built-in set
                 return CHIP_IM_GLOBAL_STATUS(InvalidInState);
             }
             preset.SetBuiltIn(matchingPresetBuiltIn.Value());
@@ -367,7 +497,6 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         {
             if (matchingPresetBuiltIn.IsNull())
             {
-                // This really shouldn't happen; internal presets should alway have built-in set
                 return CHIP_IM_GLOBAL_STATUS(InvalidInState);
             }
             if (presetBuiltIn.Value() != matchingPresetBuiltIn.Value())
@@ -377,34 +506,29 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         }
     }
 
-    size_t maximumPresetCount         = delegate->GetNumberOfPresets();
+    size_t maximumPresetCount         = mDelegate->GetNumberOfPresets();
     size_t maximumPresetScenarioCount = 0;
-    if (MaximumPresetScenarioCount(delegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
+    if (MaximumPresetScenarioCount(mDelegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
     {
         return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
 
     if (maximumPresetScenarioCount == 0)
     {
-        // This is not a supported preset scenario
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (preset.GetName().HasValue() && !PresetTypeSupportsNames(delegate, preset.GetPresetScenario()))
+    if (preset.GetName().HasValue() && !PresetTypeSupportsNames(mDelegate, preset.GetPresetScenario()))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    // Before adding this preset to the pending presets, if the expected length of the pending presets' list
-    // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
-
-    // We're going to append this preset, so let's assume a count as though it had already been inserted
     size_t presetCount         = 1;
     size_t presetScenarioCount = 1;
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers otherPreset;
-        CHIP_ERROR err = delegate->GetPendingPresetAtIndex(i, otherPreset);
+        CHIP_ERROR err = mDelegate->GetPendingPresetAtIndex(i, otherPreset);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
@@ -435,27 +559,23 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
-    return delegate->AppendToPendingPresetList(preset);
+    return mDelegate->AppendToPendingPresetList(preset);
 }
 
-Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
+Status ThermostatPresets::PrecommitPresets()
 {
-    auto delegate = GetDelegate(endpoint);
-
-    if (delegate == nullptr)
+    if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "PresetsDelegate is null");
         return Status::InvalidInState;
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // For each preset in the presets attribute, check that the matching preset in the pending presets list does not
-    // violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers preset;
-        err = delegate->GetPresetAtIndex(i, preset);
+        err = mDelegate->GetPresetAtIndex(i, preset);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
@@ -463,31 +583,23 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                         "PrecommitPresets: GetPresetAtIndex failed with error "
-                         "%" CHIP_ERROR_FORMAT,
-                         err.Format());
+            ChipLogError(Zcl, "PrecommitPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
             return Status::InvalidInState;
         }
 
-        bool found = MatchingPendingPresetExists(delegate, preset);
+        bool found = MatchingPendingPresetExists(mDelegate, preset);
 
-        // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
-        // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
             return Status::ConstraintError;
         }
     }
 
-    // If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
-    // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
-    // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
     MutableByteSpan activePresetHandleSpan(buffer);
     auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
 
-    err = delegate->GetActivePresetHandle(activePresetHandle);
+    err = mDelegate->GetActivePresetHandle(activePresetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -496,28 +608,26 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
 
     if (!activePresetHandle.IsNull())
     {
-        uint8_t count = CountPresetsInPendingListWithPresetHandle(delegate, activePresetHandle.Value());
+        uint8_t count = CountPresetsInPendingListWithPresetHandle(mDelegate, activePresetHandle.Value());
         if (count == 0)
         {
             return Status::InvalidInState;
         }
     }
 
-    Setpoints setpoints;
-    auto status = LoadSetpoints(endpoint, setpoints);
-    if (status != Status::Success)
-    {
-        return status;
-    }
+    auto heatLimits = mCluster != nullptr
+        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kHeat)
+        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinHeatSetpointLimit),
+                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxHeatSetpointLimit));
+    auto coolLimits = mCluster != nullptr
+        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kCool)
+        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinCoolSetpointLimit),
+                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxCoolSetpointLimit));
 
-    auto heatLimits = setpoints.GetLimits(SystemModeEnum::kHeat);
-    auto coolLimits = setpoints.GetLimits(SystemModeEnum::kCool);
-
-    // For each preset in the pending presets list, check that the preset does not violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers pendingPreset;
-        err = delegate->GetPendingPresetAtIndex(i, pendingPreset);
+        err = mDelegate->GetPendingPresetAtIndex(i, pendingPreset);
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
@@ -525,15 +635,10 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                         "PrecommitPresets: GetPendingPresetAtIndex failed with error "
-                         "%" CHIP_ERROR_FORMAT,
-                         err.Format());
+            ChipLogError(Zcl, "PrecommitPresets: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
             return Status::InvalidInState;
         }
 
-        // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
-        // TODO: This code does not work, because it's modifying our temporary copy.
         Optional<int16_t> coolingSetpoint = pendingPreset.GetCoolingSetpoint();
         if (coolingSetpoint.HasValue())
         {
@@ -550,21 +655,7 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
     return Status::Success;
 }
 
-bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    return Thermostat::emberAfThermostatClusterSetActivePresetRequestCallback(commandObj, commandPath, commandData);
-}

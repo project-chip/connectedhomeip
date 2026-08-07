@@ -24,6 +24,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp",
     "AppOptions.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
@@ -36,8 +40,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs =
-      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+  include_dirs = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
+  ]
 
   cflags = [ "-Wconversion" ]
 

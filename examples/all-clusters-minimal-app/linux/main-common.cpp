@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
@@ -28,6 +30,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+
+#include "thermostat-delegate-impl.h"
 
 #include <Options.h>
 
@@ -80,6 +84,9 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+    Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
+                                             chip::app::Clusters::Thermostat::ThermostatDelegate>(
+        chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
 }
 
 void ApplicationShutdown() {}

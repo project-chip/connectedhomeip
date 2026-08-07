@@ -21,13 +21,13 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
-// using namespace chip::app::Clusters;
 
 void OnIdentifyStart(Identify *)
 {
@@ -71,22 +71,26 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-void ApplicationInit() {}
+static EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 
-void ApplicationShutdown() {}
+void ApplicationInit()
+{
+    ChipLogProgress(Zcl, "Thermostat application init");
+
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
+        gThermostatEndpoint, &gThermostatDelegate);
+}
+
+void ApplicationShutdown()
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(
+        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+}
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-
-    SetDefaultDelegate(endpoint, &delegate);
 }

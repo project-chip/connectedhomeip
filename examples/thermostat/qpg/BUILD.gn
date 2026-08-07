@@ -56,6 +56,9 @@ qpg_executable("thermostat") {
 
   sources = [
     "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp",
     "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/BaseAppTask.cpp",
     "${examples_plat_dir}/app/battery.cpp",
