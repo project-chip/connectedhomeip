@@ -89,10 +89,11 @@ async def is_dut_tcp_supported(instance_qname: str):
     Returns:
         bool:
             - True if the DUT supports TCP (T key present and not "0")
-            - False if the DUT supports MRP-only (T key absent, empty, or "0")
+            - False if the DUT supports MRP-only (T key absent, empty, or "0",
+              or no TXT record was returned at all)
 
     Raises:
-        Exception: If the TXT record cannot be retrieved from the DUT.
+        Exception: If an error occurs during TXT record retrieval.
     """
     # Import here to avoid circular dependency
     from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
@@ -108,7 +109,10 @@ async def is_dut_tcp_supported(instance_qname: str):
             f"Failure during TXT record retrieval: {e}"
         ) from e
 
-    # Returns True when TCP is supported (T key present and not "0")
-    # Returns False when MRP-only (T key absent, empty, or "0")
+    if txt_record is None:
+        # If no TXT record returned, assume no TCP support (T=0) and return False
+        return False
+
+    # Return True if TCP is supported (T key present and not "0"), otherwise False
     t_key = txt_record.txt.get('T', None)
     return not (t_key is None or not str(t_key).strip() or str(t_key).strip() == "0")
