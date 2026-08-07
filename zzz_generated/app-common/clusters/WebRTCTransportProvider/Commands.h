@@ -214,8 +214,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
-    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
+    Optional<Globals::StreamUsageEnum> streamUsage;
+    Optional<chip::EndpointId> originatingEndpointID;
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Globals::Structs::ICEServerStruct::Type>> ICEServers;
@@ -241,8 +241,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
-    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
+    Optional<Globals::StreamUsageEnum> streamUsage;
+    Optional<chip::EndpointId> originatingEndpointID;
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Globals::Structs::ICEServerStruct::DecodableType>> ICEServers;
