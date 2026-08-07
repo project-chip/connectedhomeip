@@ -169,6 +169,7 @@ jobs:
         run: |
           mkdir -p python_testing/scripts/sdk
           mkdir -p python_testing/data_model
+          mkdir -p apps/push_av_server
           mkdir mock_server
           mv src/python_testing python_testing/scripts/sdk
           mv data_model python_testing/data_model
