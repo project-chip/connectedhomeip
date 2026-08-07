@@ -192,6 +192,17 @@ public:
      */
     CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr) const;
 
+    /**
+     * Get the transport type (WiFi/Ethernet/Thread/...) of this interface.
+     *
+     * @param[out]  type  Object to save the interface type.
+     *
+     * @retval CHIP_NO_ERROR                On success.
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED   On platforms where transport-type lookup is not
+     *                                      available; callers should treat this as Unknown.
+     */
+    CHIP_ERROR GetInterfaceType(InterfaceType & type) const;
+
 private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     static constexpr PlatformType kPlatformNull = nullptr;

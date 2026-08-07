@@ -227,7 +227,21 @@ private:
         };
 
         char mHostName[Dnssd::kHostNameMaxLength + 1];
-        otIp6Address mHostAddress;
+        // OT's otSrpClientSetHostAddresses does NOT copy the address array — it stores a
+        // pointer and requires the caller to keep the memory alive and unchanged for the
+        // lifetime of the registration. We therefore park the addresses in this struct
+        // (which lives as long as the impl instance) and pass &mHostAddresses[0] to OT.
+        // Stack-local arrays would get clobbered by subsequent stack frames, producing the
+        // pointer-fragment-looking garbage we observed via `srp client host`.
+        //
+        // OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES lives in OT's internal
+        // core config header, not always on chip's include path; provide the same fallback
+        // we use in the .hpp.
+#ifndef OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES
+#define OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES 2
+#endif
+        otIp6Address mHostAddresses[OPENTHREAD_CONFIG_SRP_CLIENT_BUFFERS_MAX_HOST_ADDRESSES];
+        uint8_t mHostAddressCount;
         Service mServices[kMaxServicesNumber];
         bool mIsInitialized;
         DnsAsyncReturnCallback mInitializedCallback;

@@ -130,6 +130,9 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
 {
     Transport::PeerAddress addressWithAdjustedInterface = result.address;
+    // Capture the *original* InterfaceId before we potentially clear it for non-LL addresses,
+    // so the transport-tier-aware re-scoring below sees a meaningful interface for old entries.
+    const Inet::InterfaceId originalInterface = result.address.GetInterface();
     if (!addressWithAdjustedInterface.GetIPAddress().IsIPv6LinkLocal())
     {
         // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
@@ -157,7 +160,10 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
             return false;
         }
 
-        auto oldScore = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
+        // Use the cached original InterfaceId (not oldAddress.GetInterface(), which has been
+        // cleared for non-LL entries) so the address-class score is computed against the same
+        // interface the entry was originally observed on.
+        auto oldScore = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), originalInterfaces[insertAtIndex]);
         if (newScore > oldScore)
         {
             // This is a score update, it will replace a previous entry.
@@ -174,7 +180,7 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
     // - insertAtIndex MUST be with some score that is `< newScore`, so all
     //   addresses with a `newScore` were duplicate-checked
 
-    // Move the following valid entries one level down.
+    // Move the following valid entries one level down (results AND the parallel cache).
     for (auto i = count; i > insertAtIndex; i--)
     {
         if (i >= kNodeLookupResultsLen)
@@ -182,7 +188,8 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
             continue;
         }
 
-        results[i] = results[i - 1];
+        results[i]            = results[i - 1];
+        originalInterfaces[i] = originalInterfaces[i - 1];
     }
 
     // If the number of valid entries is less than the size of the array there is an additional entry.
@@ -191,9 +198,10 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
         count++;
     }
 
-    auto & updatedResult  = results[insertAtIndex];
-    updatedResult         = result;
-    updatedResult.address = addressWithAdjustedInterface;
+    auto & updatedResult              = results[insertAtIndex];
+    updatedResult                     = result;
+    updatedResult.address             = addressWithAdjustedInterface;
+    originalInterfaces[insertAtIndex] = originalInterface;
 
     return true;
 }
