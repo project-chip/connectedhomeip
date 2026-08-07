@@ -23,7 +23,7 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
+#include <lib/dnssd/wire/HeapQName.h>
 #include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 

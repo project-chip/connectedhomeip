@@ -178,6 +178,9 @@ static void InitServer(intptr_t context)
 #endif
 
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
 }
 
 extern "C" void ChipTest(void)
