@@ -119,8 +119,7 @@ stm32:
 # 
 # tizen:
 #   maintainers:
-#     - enkiusz
-#     - arkq
+#     - dr-venkman
 #   paths:
 #     - "src/platform/Tizen/**"
 #     - "examples/platform/tizen/**"
