@@ -17,6 +17,7 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
+#import "MTRError_Test.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
@@ -71,6 +72,24 @@
     NSString * frameworkSource = [self sourceFileFromErrorString:frameworkError];
     XCTAssertTrue([frameworkSource hasSuffix:@".mm"]);
     XCTAssertFalse([frameworkSource containsString:@"/"], @"frameworkSource: %@", frameworkSource);
+
+    // Also verify the NSError (Matter) category exposes the same info the log captured.
+    // The values depend on whether the framework was built with CHIP_CONFIG_ERROR_SOURCE,
+    // which the test bundle can't reliably evaluate at preprocess time — the framework and
+    // the test bundle compile as separate translation units with potentially different config.
+    // So just verify shape: if the values are populated, the file must be a basename (no path
+    // separators) and the line must be > 0. If they're nil/0 the framework didn't capture
+    // source for this error, which is also valid.
+    NSString * categoryFile = error.mtr_underlyingMatterErrorSourceFile;
+    NSUInteger categoryLine = error.mtr_underlyingMatterErrorSourceLine;
+    if (categoryFile != nil) {
+        XCTAssertGreaterThan(categoryFile.length, (NSUInteger) 0);
+        XCTAssertEqual([categoryFile rangeOfString:@"/"].location, (NSUInteger) NSNotFound,
+            @"mtr_underlyingMatterErrorSourceFile must be basename only, got %@", categoryFile);
+        XCTAssertEqual([categoryFile rangeOfString:@"\\"].location, (NSUInteger) NSNotFound,
+            @"mtr_underlyingMatterErrorSourceFile must be basename only, got %@", categoryFile);
+        XCTAssertGreaterThan(categoryLine, (NSUInteger) 0);
+    }
 }
 
 - (NSString *)sourceFileFromErrorString:(NSString *)error
@@ -91,6 +110,17 @@
 - (void)tearDown
 {
     [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+}
+
+- (void)testUnderlyingErrorSourceFileStripsMixedSeparators
+{
+    XCTAssertEqualObjects(MTRErrorBasenameForPath("a/b/c.cpp"), @"c.cpp");
+    XCTAssertEqualObjects(MTRErrorBasenameForPath("a\\b\\c.cpp"), @"c.cpp");
+    XCTAssertEqualObjects(MTRErrorBasenameForPath("C:\\src\\foo/bar\\baz.cpp"), @"baz.cpp");
+    XCTAssertEqualObjects(MTRErrorBasenameForPath("a/b\\c.cpp"), @"c.cpp");
+    XCTAssertEqualObjects(MTRErrorBasenameForPath("noSeparator.cpp"), @"noSeparator.cpp");
+    XCTAssertNil(MTRErrorBasenameForPath(""));
+    XCTAssertNil(MTRErrorBasenameForPath(NULL));
 }
 
 @end
