@@ -20,8 +20,8 @@
 #include "ColorControlColorState.h"
 #include "ColorControlDelegate.h"
 #include <app/CommandHandler.h>
-#include <app/clusters/scenes-server/SceneHandlerImpl.h>  
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>  
+#include <app/clusters/scenes-server/SceneHandlerImpl.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -30,7 +30,7 @@
 #include <clusters/ColorControl/Commands.h>
 #include <clusters/ColorControl/Enums.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/Span.h>  
+#include <lib/support/Span.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <variant>

@@ -17,13 +17,13 @@
 
 #include "ColorControlCluster.h"
 #include <algorithm>
-#include <app/clusters/on-off-server/OnOffCluster.h>            
-#include <app/clusters/scenes-server/AttributeValuePairValidator.h>  
+#include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/scenes-server/AttributeValuePairValidator.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ColorControl/Metadata.h>
 #include <cstdlib>
-#include <lib/support/TypeTraits.h> 
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 #include <type_traits>
@@ -31,11 +31,11 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::DataModel;  
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ColorControl;
-using namespace chip::app::Clusters::ColorControl::Attributes;  
+using namespace chip::app::Clusters::ColorControl::Attributes;
 using chip::Protocols::InteractionModel::Status;
-using chip::System::SystemClock;  
+using chip::System::SystemClock;
 
 namespace {
 static constexpr uint16_t kMinCieXyValue = 0;
@@ -2461,8 +2461,8 @@ Status ColorControlCluster::stepColor(int16_t stepX, int16_t stepY, uint16_t tra
     ApplyModeSwitch(EnhancedColorModeEnum::kCurrentXAndCurrentY);
     auto & xy = std::get<XYColor>(mColorValue);
 
-    const uint16_t targetX = static_cast<uint16_t>(std::clamp<int32_t>(int32_t(xy.x) + stepX, kMinCieXyValue, kMaxCieXyValue));
-    const uint16_t targetY = static_cast<uint16_t>(std::clamp<int32_t>(int32_t(xy.y) + stepY, kMinCieXyValue, kMaxCieXyValue));
+    const uint16_t targetX    = static_cast<uint16_t>(std::clamp<int32_t>(int32_t(xy.x) + stepX, kMinCieXyValue, kMaxCieXyValue));
+    const uint16_t targetY    = static_cast<uint16_t>(std::clamp<int32_t>(int32_t(xy.y) + stepY, kMinCieXyValue, kMaxCieXyValue));
     const uint32_t durationMs = transitionTimeDs * 100u;
 
     mTransition = XYTransition{

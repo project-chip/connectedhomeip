@@ -28,7 +28,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/TypeTraits.h>  
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>

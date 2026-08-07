@@ -29,8 +29,8 @@
 namespace chip::app::Clusters::ColorControl {
 
 // CIE xy chromaticity coordinates.
-// §3.2.7 defines no Fallback for CurrentX/CurrentY, 
-//default values are matching zap app defaults.
+// §3.2.7 defines no Fallback for CurrentX/CurrentY,
+// default values are matching zap app defaults.
 struct XYColor
 {
     uint16_t x = 0x616B;
