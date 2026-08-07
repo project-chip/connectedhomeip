@@ -47,6 +47,10 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+# Upper bound the cluster XML places on MaxContinuousCurrent (amperage-mA) and
+# MaxVoltage (voltage-mV).
+MAX_ENERGY_MEASUREMENT_VALUE = 0x3FFFFFFFFFFFFFFF
+
 
 class TC_ELDIST_2_1(MatterBaseTest):
 
@@ -77,9 +81,8 @@ class TC_ELDIST_2_1(MatterBaseTest):
             attribute=attributes.MaxContinuousCurrent
         )
         if max_continuous_current is not Clusters.Types.NullValue:
-            matter_asserts.assert_valid_int64(max_continuous_current, "MaxContinuousCurrent")
-            asserts.assert_greater_equal(max_continuous_current, 1,
-                                         "MaxContinuousCurrent must be >= 1 mA")
+            matter_asserts.assert_int_in_range(max_continuous_current, 1, MAX_ENERGY_MEASUREMENT_VALUE,
+                                               "MaxContinuousCurrent")
         log.info("MaxContinuousCurrent: %s mA", max_continuous_current)
 
         self.step(3, "TH reads from the DUT the MaxVoltage attribute.",
@@ -91,9 +94,7 @@ class TC_ELDIST_2_1(MatterBaseTest):
             attribute=attributes.MaxVoltage
         )
         if max_voltage is not Clusters.Types.NullValue:
-            matter_asserts.assert_valid_int64(max_voltage, "MaxVoltage")
-            asserts.assert_greater_equal(max_voltage, 1,
-                                         "MaxVoltage must be >= 1 mV")
+            matter_asserts.assert_int_in_range(max_voltage, 1, MAX_ENERGY_MEASUREMENT_VALUE, "MaxVoltage")
         log.info("MaxVoltage: %s mV", max_voltage)
 
         self.step(4, "TH reads from the DUT the NumberOfPoles attribute.",
@@ -119,6 +120,10 @@ class TC_ELDIST_2_1(MatterBaseTest):
         )
         if end_of_life is not Clusters.Types.NullValue:
             matter_asserts.assert_valid_enum(end_of_life, "EndOfLife", cluster.Enums.EndOfLifeEnum)
+            # A value outside the enum decodes to kUnknownEnumValue, which is still an
+            # instance of the enum, so assert_valid_enum alone would accept it.
+            asserts.assert_not_equal(end_of_life, cluster.Enums.EndOfLifeEnum.kUnknownEnumValue,
+                                     "EndOfLife must be a value defined by EndOfLifeEnum")
         log.info("EndOfLife: %s", end_of_life)
 
         self.step(6, "TH reads from the DUT the ServiceEntranceRated attribute.",
