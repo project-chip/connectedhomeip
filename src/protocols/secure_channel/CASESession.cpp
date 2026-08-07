@@ -1053,18 +1053,24 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
             GetRemoteSessionParameters());
     }
 
-    if (parsedSigma1.sessionResumptionRequested &&
-        parsedSigma1.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize &&
-        CHIP_NO_ERROR ==
-            TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(parsedSigma1.resumptionId.data()),
-                             parsedSigma1.initiatorResumeMIC, parsedSigma1.initiatorRandom))
+    if (parsedSigma1.sessionResumptionRequested && parsedSigma1.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize)
     {
-        std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
-        std::copy(parsedSigma1.resumptionId.begin(), parsedSigma1.resumptionId.end(), mResumeResumptionId.begin());
+        CHIP_ERROR resumeErr = TryResumeSession(SessionResumptionStorage::ConstResumptionIdView(parsedSigma1.resumptionId.data()),
+                                                parsedSigma1.initiatorResumeMIC, parsedSigma1.initiatorRandom);
+        if (resumeErr == CHIP_NO_ERROR)
+        {
+            std::copy(parsedSigma1.initiatorRandom.begin(), parsedSigma1.initiatorRandom.end(), mInitiatorRandom);
+            std::copy(parsedSigma1.resumptionId.begin(), parsedSigma1.resumptionId.end(), mResumeResumptionId.begin());
 
-        //  Early returning here, since the next Step is known to be Sigma2Resume, and no further processing is needed for the
-        //  Sigma1 message
-        return NextStep::Create<Step>(Step::kSendSigma2Resume);
+            //  Early returning here, since the next Step is known to be Sigma2Resume, and no further processing is needed for the
+            //  Sigma1 message
+            return NextStep::Create<Step>(Step::kSendSigma2Resume);
+        }
+        // Log the resume failure so the silent-fallback to full Sigma2 is auditable. Common
+        // causes: stale resumption ID after fabric re-key, MIC mismatch, storage entry evicted,
+        // or peer's session-resumption-storage entry was removed by an admin / factory reset.
+        ChipLogProgress(SecureChannel, "CASE session resumption failed (%" CHIP_ERROR_FORMAT "); falling back to full Sigma2",
+                        resumeErr.Format());
     }
 
     //  ParseSigma1 ensures that:
@@ -1112,6 +1118,8 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
 
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), outSigma2ResData.sigma2ResumeMIC));
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2ResumeMIC, outSigma2ResData.sigma2ResumeMIC.data()[0] ^= 0xFF);
 
     outSigma2ResData.responderMrpConfig = &mLocalMRPConfig.Value();
 
@@ -1366,9 +1374,33 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     ParsedSigma2Resume parsedSigma2Resume;
     SuccessOrExit(err = ParseSigma2Resume(tlvReader, parsedSigma2Resume));
 
-    SuccessOrExit(err = ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom),
-                                               parsedSigma2Resume.resumptionId, ByteSpan(kKDFS2RKeyInfo),
-                                               ByteSpan(kResume2MIC_Nonce)));
+    {
+        // Reuse the shared ValidateSigmaResumeMIC helper (same key-derive + AES-CCM MIC check used
+        // by HandleSigma1's resume path) rather than re-implementing the crypto inline, then translate
+        // the failure to the CASE-specific code so callers can distinguish "session resumption MIC
+        // failed" from generic CASE param / decrypt failures. A resume-MIC mismatch typically means
+        // our cached resumption state is stale relative to the peer's (e.g. an admin removed it, the
+        // peer factory-reset, or the fabric was re-keyed).
+        //
+        // Only a genuine MIC-verification failure is remapped to CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.
+        // ValidateSigmaResumeMIC returns CHIP_ERROR_BUFFER_TOO_SMALL on a wire size-check failure and
+        // can surface NO_MEMORY / INVALID_ARGUMENT from the keystore / AES backend; those propagate
+        // verbatim so a peer wire-conformance bug or a local crypto fault isn't misdiagnosed as stale
+        // resumption state.
+        CHIP_ERROR resumeMicErr =
+            ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom), parsedSigma2Resume.resumptionId,
+                                   ByteSpan(kKDFS2RKeyInfo), ByteSpan(kResume2MIC_Nonce));
+        if (resumeMicErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2Resume MIC verification failed: %" CHIP_ERROR_FORMAT, resumeMicErr.Format());
+            if (resumeMicErr == CHIP_ERROR_BUFFER_TOO_SMALL || resumeMicErr == CHIP_ERROR_NO_MEMORY ||
+                resumeMicErr == CHIP_ERROR_INVALID_ARGUMENT)
+            {
+                ExitNow(err = resumeMicErr);
+            }
+            ExitNow(err = CHIP_ERROR_CASE_RESUME_MIC_MISMATCH);
+        }
+    }
 
     if (parsedSigma2Resume.responderSessionParamStructPresent)
     {
@@ -1510,9 +1542,27 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Because constructing SaltSigma2 uses the MessageDigest at a point when it should only include Msg1.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
-    ReturnErrorOnFailure(AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(),
-                                         nullptr, 0, parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(),
-                                         kTBEData2_Nonce, kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data()));
+    {
+        // AES-CCM decryption MIC failure indicates ephemeral-key mismatch / IPK divergence /
+        // wire corruption. Translate from the generic crypto error to a CASE-specific code so
+        // OnCommissioningFailure consumers can distinguish from cert-chain or signature failures.
+        // Only remap once we've excluded clearly non-MIC failure modes (NO_MEMORY from context
+        // allocation, INVALID_ARGUMENT from null inputs / wrong tag size) so a local crypto-host
+        // condition isn't misdiagnosed as a wire/security event.
+        CHIP_ERROR aesErr =
+            AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(), nullptr, 0,
+                            parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(), kTBEData2_Nonce,
+                            kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data());
+        if (aesErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, aesErr.Format());
+            if (aesErr == CHIP_ERROR_NO_MEMORY || aesErr == CHIP_ERROR_INVALID_ARGUMENT)
+            {
+                return aesErr;
+            }
+            return CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE;
+        }
+    }
 
     parsedSigma2.msgR2Decrypted = std::move(parsedSigma2.msgR2Encrypted);
     size_t msgR2DecryptedLength = parsedSigma2.msgR2EncryptedPayload.size();
@@ -1531,13 +1581,56 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         CompressedFabricId unused;
         FabricId responderFabricId;
         ReturnErrorOnFailure(SetEffectiveTime());
-        ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, parsedSigma2TBEData.responderNOC,
-                                                              parsedSigma2TBEData.responderICAC, mValidContext, unused,
-                                                              responderFabricId, responderNodeId, responderPublicKey));
-        VerifyOrReturnError(fabricId == responderFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        // Translate a VerifyCredentials failure to the CASE-specific cert-chain code so callers
+        // can distinguish "peer's NOC chain is structurally invalid" from generic CASE param errors.
+        // Only cert-validity-class errors are collapsed to CHIP_ERROR_CASE_NOCCHAIN_INVALID; a
+        // fabric-binding mismatch on the ICA is surfaced as CHIP_ERROR_CASE_WRONG_FABRIC and
+        // local/system errors (NO_MEMORY, INTERNAL, INVALID_ARGUMENT, etc.) are propagated verbatim
+        // so operator triage isn't misdirected to the peer's cert config when the cause is local.
+        CHIP_ERROR verifyErr =
+            mFabricsTable->VerifyCredentials(mFabricIndex, parsedSigma2TBEData.responderNOC, parsedSigma2TBEData.responderICAC,
+                                             mValidContext, unused, responderFabricId, responderNodeId, responderPublicKey);
+        if (verifyErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2 responder NOC chain validation failed: %" CHIP_ERROR_FORMAT, verifyErr.Format());
+            if (verifyErr == CHIP_ERROR_FABRIC_MISMATCH_ON_ICA)
+            {
+                return CHIP_ERROR_CASE_WRONG_FABRIC;
+            }
+            if (verifyErr == CHIP_ERROR_CERT_NOT_TRUSTED || verifyErr == CHIP_ERROR_CERT_EXPIRED ||
+                verifyErr == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || verifyErr == CHIP_ERROR_WRONG_CERT_DN ||
+                verifyErr == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED || verifyErr == CHIP_ERROR_CERT_NOT_FOUND ||
+                verifyErr == CHIP_ERROR_WRONG_CERT_TYPE ||
+                // A malformed NOC payload (e.g., bit-flip inside the TLV-encoded operational
+                // certificate) surfaces as a TLV-decode error from VerifyCredentials. That is a
+                // structural NOC-chain failure from the consumer's perspective, so it belongs in
+                // the NOCCHAIN_INVALID bucket alongside the cert-validity-class errors above.
+                verifyErr == CHIP_ERROR_WRONG_TLV_TYPE || verifyErr == CHIP_ERROR_INVALID_TLV_ELEMENT ||
+                verifyErr == CHIP_ERROR_INVALID_TLV_TAG || verifyErr == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT ||
+                verifyErr == CHIP_ERROR_TLV_UNDERRUN || verifyErr == CHIP_ERROR_END_OF_TLV)
+            {
+                return CHIP_ERROR_CASE_NOCCHAIN_INVALID;
+            }
+            return verifyErr;
+        }
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma2WrongFabricId, responderFabricId ^= 0xFFFFFFFFFFFFFFFFull);
+        if (fabricId != responderFabricId)
+        {
+            ChipLogError(SecureChannel,
+                         "Sigma2 responder fabric ID 0x" ChipLogFormatX64 " does not match local fabric ID 0x" ChipLogFormatX64,
+                         ChipLogValueX64(responderFabricId), ChipLogValueX64(fabricId));
+            return CHIP_ERROR_CASE_WRONG_FABRIC;
+        }
         // Verify that responderNodeId (from responderNOC) matches one that was included
         // in the computation of the Destination Identifier when generating Sigma1.
-        VerifyOrReturnError(mPeerNodeId == responderNodeId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma2WrongPeerNodeId, responderNodeId ^= 0x1ull);
+        if (mPeerNodeId != responderNodeId)
+        {
+            ChipLogError(SecureChannel,
+                         "Sigma2 responder node ID 0x" ChipLogFormatX64 " does not match expected peer node ID 0x" ChipLogFormatX64,
+                         ChipLogValueX64(responderNodeId), ChipLogValueX64(mPeerNodeId));
+            return CHIP_ERROR_CASE_WRONG_PEER_NODEID;
+        }
     }
 
     // Construct msgR2Signed and validate the signature in msgR2Decrypted.
@@ -1555,9 +1648,23 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
                                           ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
                                           ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msgR2SignedSpan));
 
-    // Validate signature
-    ReturnErrorOnFailure(responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
-                                                                         parsedSigma2TBEData.tbsData2Signature));
+    // Validate signature — distinguish from cert-chain / decrypt failures.
+    // Only remap CHIP_ERROR_INVALID_SIGNATURE to CHIP_ERROR_CASE_SIGNATURE_MISMATCH; let
+    // local crypto/HSM faults (INVALID_ARGUMENT, INTERNAL) propagate so they aren't
+    // misattributed to peer signature forgery.
+    {
+        CHIP_ERROR sigErr = responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
+                                                                            parsedSigma2TBEData.tbsData2Signature);
+        if (sigErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2 ECDSA signature verification failed: %" CHIP_ERROR_FORMAT, sigErr.Format());
+            if (sigErr == CHIP_ERROR_INVALID_SIGNATURE)
+            {
+                return CHIP_ERROR_CASE_SIGNATURE_MISMATCH;
+            }
+            return sigErr;
+        }
+    }
 
     ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
                   parsedSigma2.responderSessionId);
@@ -1957,10 +2064,21 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             // Add Sigma3 to the TranscriptHash which will be used to generate the Session Encryption Keys
             SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
         }
-        // Step 2 - Decrypt data blob
-        SuccessOrExit(err = AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
-                                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength,
-                                            msgR3EncryptedPayload.data()));
+        // Step 2 - Decrypt data blob — distinguish MIC failure from cert-chain / signature failures.
+        // Only remap once we've excluded clearly non-MIC failure modes (NO_MEMORY, INVALID_ARGUMENT)
+        // so a local crypto-host condition isn't misdiagnosed as a wire/security event.
+        err =
+            AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
+                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength, msgR3EncryptedPayload.data());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma3 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, err.Format());
+            if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_INVALID_ARGUMENT)
+            {
+                ExitNow();
+            }
+            ExitNow(err = CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
+        }
 
         decryptedDataTlvReader.Init(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size());
         SuccessOrExit(err = ParseSigma3TBEData(decryptedDataTlvReader, data));
@@ -2103,13 +2221,64 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
     CompressedFabricId unused;
     FabricId initiatorFabricId;
     P256PublicKey initiatorPublicKey;
-    ReturnErrorOnFailure(FabricTable::VerifyCredentials(data.initiatorNOC, data.initiatorICAC, data.fabricRCAC, data.validContext,
-                                                        unused, initiatorFabricId, data.initiatorNodeId, initiatorPublicKey));
-    VerifyOrReturnError(data.fabricId == initiatorFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    {
+        // Validate the initiator's NOC chain — distinguish a structural / linkage failure
+        // (CHIP_ERROR_CASE_NOCCHAIN_INVALID) from a fabric-binding mismatch
+        // (CHIP_ERROR_CASE_WRONG_FABRIC) so OnCommissioningFailure consumers see the right cause.
+        // Log the original error before mapping so the underlying cause is preserved in diagnostics.
+        // Only cert-validity-class errors are collapsed to CHIP_ERROR_CASE_NOCCHAIN_INVALID; local
+        // / system errors (NO_MEMORY, INTERNAL, INVALID_ARGUMENT, etc.) propagate verbatim.
+        CHIP_ERROR verifyErr =
+            FabricTable::VerifyCredentials(data.initiatorNOC, data.initiatorICAC, data.fabricRCAC, data.validContext, unused,
+                                           initiatorFabricId, data.initiatorNodeId, initiatorPublicKey);
+        if (verifyErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma3 initiator NOC chain validation failed: %" CHIP_ERROR_FORMAT, verifyErr.Format());
+            if (verifyErr == CHIP_ERROR_FABRIC_MISMATCH_ON_ICA)
+            {
+                return CHIP_ERROR_CASE_WRONG_FABRIC;
+            }
+            if (verifyErr == CHIP_ERROR_CERT_NOT_TRUSTED || verifyErr == CHIP_ERROR_CERT_EXPIRED ||
+                verifyErr == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || verifyErr == CHIP_ERROR_WRONG_CERT_DN ||
+                verifyErr == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED || verifyErr == CHIP_ERROR_CERT_NOT_FOUND ||
+                verifyErr == CHIP_ERROR_WRONG_CERT_TYPE ||
+                // A malformed NOC payload (e.g., bit-flip inside the TLV-encoded operational
+                // certificate) surfaces as a TLV-decode error from VerifyCredentials. That is a
+                // structural NOC-chain failure from the consumer's perspective, so it belongs in
+                // the NOCCHAIN_INVALID bucket alongside the cert-validity-class errors above.
+                verifyErr == CHIP_ERROR_WRONG_TLV_TYPE || verifyErr == CHIP_ERROR_INVALID_TLV_ELEMENT ||
+                verifyErr == CHIP_ERROR_INVALID_TLV_TAG || verifyErr == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT ||
+                verifyErr == CHIP_ERROR_TLV_UNDERRUN || verifyErr == CHIP_ERROR_END_OF_TLV)
+            {
+                return CHIP_ERROR_CASE_NOCCHAIN_INVALID;
+            }
+            return verifyErr;
+        }
+    }
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma3WrongFabricId, initiatorFabricId ^= 0xFFFFFFFFFFFFFFFFull);
+    if (data.fabricId != initiatorFabricId)
+    {
+        ChipLogError(SecureChannel,
+                     "Sigma3 initiator fabric ID 0x" ChipLogFormatX64 " does not match expected fabric ID 0x" ChipLogFormatX64,
+                     ChipLogValueX64(initiatorFabricId), ChipLogValueX64(data.fabricId));
+        return CHIP_ERROR_CASE_WRONG_FABRIC;
+    }
 
-    // Step 7 - Validate Signature
-    ReturnErrorOnFailure(initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(), data.msgR3SignedSpan.size(),
-                                                                         data.tbsData3Signature));
+    // Step 7 - Validate Signature — distinguish from cert-chain / decrypt failures.
+    // Only remap CHIP_ERROR_INVALID_SIGNATURE; let local crypto/HSM faults propagate verbatim.
+    {
+        CHIP_ERROR sigErr = initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(),
+                                                                            data.msgR3SignedSpan.size(), data.tbsData3Signature);
+        if (sigErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma3 ECDSA signature verification failed: %" CHIP_ERROR_FORMAT, sigErr.Format());
+            if (sigErr == CHIP_ERROR_INVALID_SIGNATURE)
+            {
+                return CHIP_ERROR_CASE_SIGNATURE_MISMATCH;
+            }
+            return sigErr;
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -2344,6 +2513,13 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
                                               Optional<uintptr_t> protocolData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    // NOTE: The CASE wire protocol only conveys kProtocolCodeInvalidParam / kProtocolCodeNoSharedRoot /
+    // kProtocolCodeBusy. The granular CHIP_ERROR_CASE_* codes (WRONG_FABRIC, WRONG_PEER_NODEID,
+    // NOCCHAIN_INVALID, SIGMA_DECRYPT_FAILURE, SIGNATURE_MISMATCH, RESUME_MIC_MISMATCH) are emitted
+    // ONLY for locally-detected failures in HandleSigma2 / HandleSigma3 / HandleSigma2Resume.
+    // Peer-receiving callers always see CHIP_ERROR_INVALID_CASE_PARAMETER for the remote side's
+    // authentication failures. Do NOT extend this switch to map specific CASE-local codes here —
+    // the wire protocol does not carry them.
     switch (protocolCode)
     {
     case kProtocolCodeInvalidParam:

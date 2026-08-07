@@ -138,6 +138,35 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         code = MTRErrorCodeNotFound;
         description = NSLocalizedString(@"Requested resource was not found.", nil);
         break;
+    // The six CHIP_ERROR_CASE_* codes below are mapped to MTRErrorCodeGeneralError with distinct
+    // localized descriptions so OnCommissioningFailure consumers can disambiguate CASE failure
+    // modes. TODO: Introduce dedicated MTRErrorCode enum values (e.g. MTRErrorCodeCASEWrongFabric,
+    // MTRErrorCodeCASESigmaDecryptFailure, etc.) in a follow-up PR so callers can switch on a
+    // stable code rather than parsing localizedDescription.
+    case CHIP_ERROR_CASE_WRONG_FABRIC.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE handshake failed: peer fabric ID mismatch.", nil);
+        break;
+    case CHIP_ERROR_CASE_WRONG_PEER_NODEID.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE handshake failed: peer node ID mismatch.", nil);
+        break;
+    case CHIP_ERROR_CASE_NOCCHAIN_INVALID.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE handshake failed: peer NOC chain validation failed.", nil);
+        break;
+    case CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE handshake failed: AES-CCM decryption failed (MIC mismatch).", nil);
+        break;
+    case CHIP_ERROR_CASE_SIGNATURE_MISMATCH.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE handshake failed: ECDSA signature verification failed.", nil);
+        break;
+    case CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.AsInteger():
+        code = MTRErrorCodeGeneralError;
+        description = NSLocalizedString(@"CASE session resumption failed: Resume MIC mismatch.", nil);
+        break;
     default:
         code = MTRErrorCodeGeneralError;
         description = [NSString stringWithFormat:NSLocalizedString(@"General error: %u", nil), errorCode.AsInteger()];
