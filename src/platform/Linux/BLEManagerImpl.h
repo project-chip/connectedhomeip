@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -79,6 +79,44 @@ class BLEManagerImpl final : public BLEManager,
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
     void OnScanError(CHIP_ERROR error) override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // ===== Public scan facade used by the Linux commissioning-proxy example.
+    //
+    // The proxy app needs to drive a BlueZ scan independently of the normal
+    // BleConnectionDelegate flow (which scans only when it has a specific
+    // discriminator to match).  StartProxyScan uses the internal scanner,
+    // forwarding each discovered CHIP-bearing peripheral to the caller's
+    // C-callback so the example does not need to include any BlueZ internals.
+    // The caller's StopProxyScan call restores the scanner's delegate.
+    //
+    // Returns CHIP_ERROR_BUSY if a scan (proxy or otherwise) is already
+    // running, BLE_ERROR_ADAPTER_UNAVAILABLE if no adapter is selected yet.
+    using BleScanResultCallback = void (*)(void * context, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
+                                           uint16_t productId);
+    CHIP_ERROR StartProxyScan(BleScanResultCallback cb, void * context);
+    CHIP_ERROR StopProxyScan();
+
+    // ===== Sequential peripheral→central mode switch for the commissioning-proxy.
+    //
+    // The CP starts in peripheral mode so it can be commissioned over BLE (or any
+    // other transport).  Once a BLE ProxyConnectRequest arrives, the CP needs to
+    // act as a BLE central — chip-tool style.  SwitchToCentralMode tears down the
+    // peripheral GATT server / advertising and re-initialises BluezEndpoint in
+    // central mode.
+    //
+    // Behaviour:
+    //   - Idempotent: returns CHIP_NO_ERROR if already central.
+    //   - Returns CHIP_ERROR_BUSY if any BLE connection is still tracked (eg. a
+    //     commissioning session has not closed yet) — caller should retry later.
+    //   - After this returns success, the CP can no longer be commissioned over
+    //     BLE until the process restarts.
+    CHIP_ERROR SwitchToCentralMode();
+
+    // True after SwitchToCentralMode has completed.  Lets the proxy transport
+    // skip the switch on subsequent BLE proxy operations.
+    bool IsCentralMode() const { return mIsCentral; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
