@@ -113,11 +113,11 @@ private:
 
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
 
-    SystemModeEnum mSystemMode                     = SystemModeEnum::kOff;
-    ThermostatRunningModeEnum mRunningMode         = ThermostatRunningModeEnum::kOff;
-    BitMask<RelayStateBitmap> mRunningState        = BitMask<RelayStateBitmap>(0);
+    SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
+    ThermostatRunningModeEnum mRunningMode             = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState            = BitMask<RelayStateBitmap>(0);
     DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
-    int8_t mLocalTemperatureCalibration            = 0;
+    int8_t mLocalTemperatureCalibration                = 0;
 
     BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
 
