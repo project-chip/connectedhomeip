@@ -389,9 +389,9 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             if not isinstance(ret24, Nullable):
                 asserts.assert_is_not_none(ret24.locationName, "LocationName should not be null")
                 asserts.assert_less_equal(len(ret24.locationName), 128, "LocationName should have max 128 characters")
-                asserts.assert_true(ret24.floorNumber is None or isinstance(ret24.floorNumber, int),
+                asserts.assert_true(ret24.floorNumber is NullValue or isinstance(ret24.floorNumber, int),
                                     "FloorNumber should be either null or an int16 value")
-                asserts.assert_true(ret24.areaType is None or (ret24.areaType >= 0x0000 and ret24.areaType <= 0x005F),
+                asserts.assert_true(ret24.areaType is NullValue or (ret24.areaType >= 0x0000 and ret24.areaType <= 0x005F),
                                     "AreaType should be either null or in the range of 0x0000 to 0x005F")
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()

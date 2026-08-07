@@ -399,6 +399,10 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         if constexpr (Policy::kHasDeviceLocation)
         {
             auto location = mPolicy.GetDeviceLocation();
+            if (!location.has_value())
+            {
+                return Protocols::InteractionModel::Status::UnsupportedAttribute;
+            }
             return encoder.Encode(*location);
         }
         else
@@ -503,12 +507,7 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
         // Optional because of forced multi-revision support for backwards compatibility
         // emulation: we emulate revision 3 when uniqueid is not enabled.
         UniqueID::kMetadataEntry, //
-
-        DeviceLocation::kMetadataEntry, //
     };
-
-    static constexpr auto & optionalAttributes =
-        Policy::kHasDeviceLocation ? optionalAttributesWithDeviceLocation : optionalAttributesNoDeviceLocation;
 
     // kMandatoryAttributes equivalent
     static constexpr DataModel::AttributeEntry mandatoryAttributes[] = {
@@ -531,7 +530,9 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
 
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(Span(mandatoryAttributes), Span(optionalAttributes), mPolicy.GetOptionalAttributes());
+    return listBuilder.Append(Span(mandatoryAttributes),
+     Policy::kHasDeviceLocation ? Span(optionalAttributesWithDeviceLocation) : Span(optionalAttributesNoDeviceLocation),
+     mPolicy.GetOptionalAttributes());
 }
 
 } // namespace chip::app::Clusters::BasicInformation

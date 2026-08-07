@@ -296,11 +296,12 @@ public:
     /// @param location The new device location to set.
     /// @param persistence The persistence handler.
     /// @return Status code indicating the result of the operation.
-
-    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> & value,
-                                   AttributePersistence & persistence)
+    DataModel::ActionReturnStatus WriteDeviceLocation(
+        const DataModel::Nullable<LocationDescriptorStructType> & value,
+        AttributePersistence & persistence)
     {
-        return SetDeviceLocationInternal(value, persistence, PersistenceMode::kPersist).GetUnderlyingError();
+        return SetDeviceLocationInternal(
+            value, persistence, PersistenceMode::kPersist);
     }
 
     void LoadDeviceLocation(AttributePersistence & persistence)
@@ -398,7 +399,7 @@ private:
         {
             if (location.IsNull())
             {
-                return Status::Success; // No change
+                return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp; // No change
             }
         }
         else
@@ -407,7 +408,7 @@ private:
             {
                 if (IsLocationEqual(mDeviceLocation->Value().ToView(), location.Value()))
                 {
-                    return Status::Success; // No change
+                    return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp; // No change
                 }
             }
         }
@@ -445,7 +446,10 @@ private:
             return CHIP_NO_ERROR;
         }
 
-        VerifyOrReturnError(mDeviceLocation.has_value(), CHIP_ERROR_INCORRECT_STATE);
+        if (!mDeviceLocation.has_value())
+        {
+            mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
+        }
 
         std::optional<DataModel::Nullable<LocationDescriptorStructType>> loc;
 
