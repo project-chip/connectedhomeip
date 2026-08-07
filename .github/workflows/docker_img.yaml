@@ -85,6 +85,9 @@ jobs:
         name: Build Docker CHIP Build images - base (arm64)
         runs-on: ubuntu-24.04-arm
         if: github.actor != 'restyled-io[bot]'
+        # Build-only, so no packages: write here, unlike the amd64 job above.
+        permissions:
+            contents: read
         strategy:
             fail-fast: false
             matrix:
