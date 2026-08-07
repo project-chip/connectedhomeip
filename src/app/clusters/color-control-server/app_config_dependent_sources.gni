@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  # Legacy Ember Color Control implementation: per-endpoint ember callbacks
+  # Legacy Ember Color Control implementation is preserved: per-endpoint ember callbacks
   # (emberAfColorControlClusterServerInitCallback / ShutdownCallback) + its own scene handler.
   "codegen/color-control-server.cpp",
   "codegen/color-control-server.h",
+  "color-control-server.h",
 ]

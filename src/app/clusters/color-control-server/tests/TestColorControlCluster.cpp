@@ -29,7 +29,7 @@ using Status = Protocols::InteractionModel::Status;
 
 constexpr EndpointId kTestEndpointId = 1;
 
-// Spec limits mirrored from ColorControlCluster (§ values):
+// Spec limits mirrored from ColorControlCluster:
 constexpr uint16_t kMaxColorTempMireds = 0xFEFF; // 65279, ColorTemperatureMireds max
 constexpr uint16_t kMaxCieXy           = 0xFEFF; // 65279, CurrentX/CurrentY max
 constexpr uint16_t kMaxTransitionTime  = 65534;
@@ -100,7 +100,7 @@ TEST_F(TestColorControlCluster, MoveToColorBoundaries)
 {
     ColorControlCluster cluster(kTestEndpointId, MakeConfig(delegate));
 
-    // CurrentX / CurrentY above the CIE max (0xFEFF) are rejected.
+    // CurrentX / CurrentY above the CIE max (65279) are rejected.
     EXPECT_EQ(cluster.moveToColor(kMaxCieXy + 1, 100, 0), Status::ConstraintError);
     EXPECT_EQ(cluster.moveToColor(100, kMaxCieXy + 1, 0), Status::ConstraintError);
     // Transition time above the max is rejected.

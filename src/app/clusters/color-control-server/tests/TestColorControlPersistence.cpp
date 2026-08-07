@@ -258,7 +258,7 @@ TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
                                                  .Set(UpdateFlagsBitmap::kUpdateDirection)
                                                  .Set(UpdateFlagsBitmap::kUpdateAction);
     EXPECT_EQ(a.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
-                             /*time=*/30, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+                             /*timeSec=*/30, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(a.ColorLoopActive(), 1);
 

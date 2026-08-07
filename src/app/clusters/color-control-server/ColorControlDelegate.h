@@ -19,12 +19,12 @@
 
 #include <cstdint>
 
-#include <lib/core/DataModelTypes.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
 
+// A delegate instance is bound to a single ColorControlCluster (and therefore a single endpoint).
+// Matches it's siblings LevelControlDelegate / OnOffDelegate.
 class ColorControlDelegate
 {
 public:
@@ -43,19 +43,19 @@ public:
     // the delegate MUST populate the out-params. (The empty default bodies are never reached on a
     // single-feature device, which can never switch into a mode it does not advertise.)
 
-    virtual void ConvertXYToHueSat(EndpointId ep, uint16_t x, uint16_t y, uint8_t & outHue, uint8_t & outSat) {}
-    virtual void ConvertHueSatToXY(EndpointId ep, uint8_t hue, uint8_t sat, uint16_t & outX, uint16_t & outY) {}
-    virtual void ConvertXYToMireds(EndpointId ep, uint16_t x, uint16_t y, uint16_t & outMireds) {}
-    virtual void ConvertMiredsToXY(EndpointId ep, uint16_t mireds, uint16_t & outX, uint16_t & outY) {}
-    virtual void ConvertHueSatToMireds(EndpointId ep, uint8_t hue, uint8_t sat, uint16_t & outMireds) {}
-    virtual void ConvertMiredsToHueSat(EndpointId ep, uint16_t mireds, uint8_t & outHue, uint8_t & outSat) {}
+    virtual void ConvertXYToHueSat(uint16_t x, uint16_t y, uint8_t & outHue, uint8_t & outSat) {}
+    virtual void ConvertHueSatToXY(uint8_t hue, uint8_t sat, uint16_t & outX, uint16_t & outY) {}
+    virtual void ConvertXYToMireds(uint16_t x, uint16_t y, uint16_t & outMireds) {}
+    virtual void ConvertMiredsToXY(uint16_t mireds, uint16_t & outX, uint16_t & outY) {}
+    virtual void ConvertHueSatToMireds(uint8_t hue, uint8_t sat, uint16_t & outMireds) {}
+    virtual void ConvertMiredsToHueSat(uint16_t mireds, uint8_t & outHue, uint8_t & outSat) {}
 
     // ---- Hardware output (PWM, LEDs, etc.) ----
     // §3.2.8 requires the physical movement to be continuous, so the cluster feeds the value on every tick.
-    virtual void OnColorXYChanged(EndpointId ep, uint16_t x, uint16_t y) {}
-    virtual void OnColorHSChanged(EndpointId ep, uint8_t hue, uint8_t sat) {}
-    virtual void OnColorCTChanged(EndpointId ep, uint16_t mireds) {}
-    virtual void OnEnhancedHueChanged(EndpointId ep, uint16_t enhancedHue) {}
+    virtual void OnColorXYChanged(uint16_t x, uint16_t y) {}
+    virtual void OnColorHSChanged(uint8_t hue, uint8_t sat) {}
+    virtual void OnColorCTChanged(uint16_t mireds) {}
+    virtual void OnEnhancedHueChanged(uint16_t enhancedHue) {}
 };
 
 } // namespace Clusters

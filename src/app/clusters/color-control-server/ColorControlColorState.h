@@ -29,12 +29,15 @@
 namespace chip::app::Clusters::ColorControl {
 
 // CIE xy chromaticity coordinates.
+// §3.2.7 defines no Fallback for CurrentX/CurrentY, 
+//default values are matching zap app defaults.
 struct XYColor
 {
-    uint16_t x = 0x616B; // ZAP defaults
+    uint16_t x = 0x616B;
     uint16_t y = 0x607D;
 };
-// Color Temperature in Mireds.
+// Color Temperature in Mireds. §3.2.7 defines no Fallback; 250 mireds = 4000 K, the white point
+// XYColor above defaults to.
 struct CTColor
 {
     uint16_t mireds = 0x00FA;
@@ -57,7 +60,7 @@ struct EnhancedHueSatColor
     uint8_t saturation   = 0;
 
     // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue.
-    uint8_t hue() const { return static_cast<uint8_t>(enhancedHue >> 8); }
+    uint8_t hue8() const { return static_cast<uint8_t>(enhancedHue >> 8); }
 };
 
 // The single active color value. The alternative held encodes the (Enhanced)ColorMode, so
@@ -68,10 +71,12 @@ using ColorValue = std::variant<XYColor, HueSatColor, EnhancedHueSatColor, CTCol
 // loop can be active-but-dormant while XY/CT owns the output.
 struct ColorLoopState
 {
-    uint8_t active             = 0;
-    uint8_t direction          = 0;
-    uint16_t time              = 0x0019;
-    uint16_t startEnhancedHue  = 0x2300;
+    uint8_t active    = 0;
+    uint8_t direction = 0;
+    // §3.2.7.16: ColorLoopTime is in SECONDS for one full revolution of EnhancedCurrentHue.
+    uint16_t timeSec          = 0x0019; // 25 s
+    uint16_t startEnhancedHue = 0x2300;
+    // Not an attribute: EnhancedCurrentHue captured at loop start, restored on Deactivate (§3.2.8.1).
     uint16_t storedEnhancedHue = 0;
 };
 

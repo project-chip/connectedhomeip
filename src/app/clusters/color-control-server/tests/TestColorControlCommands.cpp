@@ -506,7 +506,7 @@ TEST_F(TestColorControlCommands, ColorLoopSetUpdatesAndActivates)
 
     // Update time and direction (no action): the color-loop attributes change, loop stays inactive.
     EXPECT_EQ(c.colorLoopSet(BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateDirection),
-                             ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, /*time=*/30,
+                             ColorLoopActionEnum::kDeactivate, ColorLoopDirectionEnum::kIncrement, /*timeSec=*/30,
                              /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     EXPECT_EQ(c.ColorLoopTime(), 30);
@@ -792,7 +792,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickAdvancesEnhancedHueUp)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
     // 10 s / revolution, increment (up), starting from the current enhanced hue.
     EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement,
-                             /*time=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+                             /*timeSec=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
     ASSERT_EQ(c.ColorLoopActive(), 1);
     EXPECT_EQ(c.EnhancedHue(), 0x1000); // no tick yet → still the anchor
@@ -814,7 +814,7 @@ TEST_F(TestColorControlCommands, ColorLoopTickDecrementWrapsAroundZero)
                            .Set(UpdateFlagsBitmap::kUpdateDirection)
                            .Set(UpdateFlagsBitmap::kUpdateAction);
     EXPECT_EQ(c.colorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kDecrement,
-                             /*time=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
+                             /*timeSec=*/10, /*startHue=*/0, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()),
               Status::Success);
 
     // After 1 s decrementing: 4096 - 6553 = -2457 → wraps to 65536 - 2457 = 63079.

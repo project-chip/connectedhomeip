@@ -121,7 +121,7 @@ TEST_F(TestColorControlAttributes, StartUpColorTemperatureWriteRoundTripAndConst
     ASSERT_FALSE(readBack.IsNull());
     EXPECT_EQ(readBack.Value(), 300);
 
-    // Above the spec max (0xFEFF) is rejected.
+    // Above the spec max (65279) is rejected.
     EXPECT_EQ(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::MakeNullable<uint16_t>(0xFF00)),
               Status::ConstraintError);
 

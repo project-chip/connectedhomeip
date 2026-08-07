@@ -15,10 +15,6 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-# Ember-free core cluster + the cross-cluster coupling HEADERS (ember-free interfaces with
-# compile-guarded no-op stubs). The coupling .cpp implementations call CodegenDataModelProvider /
-# ScenesServer Instance()s, so they are codegen-layer code and live in app_config_dependent_sources
-# (linked in at app level), NOT here.
 source_set("color-control-server") {
   sources = [
     "ColorControlCluster.cpp",
@@ -33,7 +29,6 @@ source_set("color-control-server") {
     "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/clusters/ColorControl",

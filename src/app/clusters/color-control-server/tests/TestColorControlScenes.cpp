@@ -28,7 +28,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/TypeTraits.h> // chip::to_underlying
+#include <lib/support/TypeTraits.h>  
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
@@ -109,8 +109,10 @@ TEST_F(TestColorControlScenes, SerializeSaveCapturesLiveColor)
     DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> list;
     EXPECT_EQ(cluster.DecodeAttributeValueList(serializedBytes, list), CHIP_NO_ERROR);
 
-    bool sawX = false, sawY = false, sawMode = false;
-    auto it = list.begin();
+    bool sawX    = false;
+    bool sawY    = false;
+    bool sawMode = false;
+    auto it      = list.begin();
     while (it.Next())
     {
         const auto & p = it.GetValue();

@@ -121,7 +121,7 @@ TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecute
     EXPECT_TRUE(cluster.ShouldExecuteIfOff(BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()));
 }
 
-// Level -> color-temp coupling (ZCL 5.2.2.1.1). The application calls CoupleColorTempToLevel directly
+// Level -> color-temp coupling. The application calls CoupleColorTempToLevel directly
 // with Level Control's live CurrentLevel (no registry, no glue): max level maps to the coupling-min
 // mireds end, min level to the physical max, honoring the one-way mapping while in color-temperature mode.
 TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)

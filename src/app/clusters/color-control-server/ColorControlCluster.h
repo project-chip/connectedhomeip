@@ -20,8 +20,8 @@
 #include "ColorControlColorState.h"
 #include "ColorControlDelegate.h"
 #include <app/CommandHandler.h>
-#include <app/clusters/scenes-server/SceneHandlerImpl.h> // scenes::DefaultSceneHandlerImpl (the cluster is its own scene handler)
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h> // scenes::ScenesIntegrationDelegate (scene invalidation hook)
+#include <app/clusters/scenes-server/SceneHandlerImpl.h>  
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>  
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -30,7 +30,7 @@
 #include <clusters/ColorControl/Commands.h>
 #include <clusters/ColorControl/Enums.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/Span.h> // CharSpan for CompensationText (app-owned storage)
+#include <lib/support/Span.h>  
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <variant>
@@ -42,9 +42,11 @@ namespace Clusters {
 // CIE xy chromaticity coordinates.
 struct XYTransition
 {
-    uint16_t startX, targetX;
+    uint16_t startX;
+    uint16_t targetX;
     uint32_t durationXMs;
-    uint16_t startY, targetY;
+    uint16_t startY;
+    uint16_t targetY;
     uint32_t durationYMs;
     uint64_t startTimeMs;
 };
@@ -61,13 +63,15 @@ struct HueTransition
 
 struct SatTransition
 {
-    uint8_t startSat, targetSat;
+    uint8_t startSat;
+    uint8_t targetSat;
     uint64_t startTimeMs;
     uint32_t durationMs;
 };
 struct CTTransition
 {
-    uint16_t startMireds, targetMireds;
+    uint16_t startMireds;
+    uint16_t targetMireds;
     uint64_t startTimeMs;
     uint32_t durationMs;
 };
@@ -222,7 +226,7 @@ public:
                             const ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
                             MutableByteSpan & serializedBytes) override;
 
-    // §3.2.8.x Coupling color temperature to Level Control. The application calls this directly whenever the
+    // Coupling color temperature to Level Control. The application calls this directly whenever the
     // Level Control cluster's CurrentLevel changes and its CoupleColorTempToLevel option is set (it holds a
     // reference to this cluster — no registry lookup). `currentLevel` is Level Control's live value; the
     // mapping is one-way (level → color temp) and only takes effect while the active mode is color
@@ -245,7 +249,7 @@ public:
     uint16_t ColorTempMireds() const;
     uint8_t ColorLoopActive() const { return static_cast<uint8_t>(mColorLoop.active); }
     uint8_t ColorLoopDirection() const { return static_cast<uint8_t>(mColorLoop.direction); }
-    uint16_t ColorLoopTime() const { return mColorLoop.time; }
+    uint16_t ColorLoopTime() const { return mColorLoop.timeSec; }
     ColorControl::EnhancedColorModeEnum GetEnhancedColorMode() const;
     bool SupportsMode(ColorControl::EnhancedColorModeEnum mode) const;
 
@@ -292,7 +296,7 @@ public:
     Status stepColorTemp(ColorControl::StepModeEnum stepMode, uint16_t stepSize, uint16_t transitionTimeDs, uint16_t minFieldMireds,
                          uint16_t maxFieldMireds, OptMask optionsMask = {}, OptMask optionsOverride = {});
     Status colorLoopSet(chip::BitMask<ColorControl::UpdateFlagsBitmap> updateFlags, ColorControl::ColorLoopActionEnum action,
-                        ColorControl::ColorLoopDirectionEnum direction, uint16_t time, uint16_t startHue,
+                        ColorControl::ColorLoopDirectionEnum direction, uint16_t timeSec, uint16_t startHue,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsMask,
                         chip::BitMask<ColorControl::OptionsBitmap> optionsOverride);
 
@@ -391,7 +395,7 @@ private:
     void StopTransitionAndFreeze();
 
     static constexpr uint16_t kMaxTransitionTime         = 65534; // Max value as defined by the spec.
-    static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec (0xFEFF).
+    static constexpr uint16_t kMaxColorTemperatureMireds = 65279; // Max value as defined by the spec.
 };
 } // namespace Clusters
 } // namespace app
