@@ -142,6 +142,7 @@ void MatterWaterHeaterModePluginServerInitCallback() {}
 void MatterCommodityPricePluginServerInitCallback() {}
 void MatterCommodityTariffPluginServerInitCallback() {}
 void MatterElectricalGridConditionsPluginServerInitCallback() {}
+void MatterElectricalDistributionPluginServerInitCallback() {}
 void MatterSoilMeasurementPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterIcdManagementPluginServerInitCallback() {}
