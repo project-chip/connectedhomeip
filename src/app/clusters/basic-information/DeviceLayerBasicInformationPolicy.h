@@ -296,12 +296,10 @@ public:
     /// @param location The new device location to set.
     /// @param persistence The persistence handler.
     /// @return Status code indicating the result of the operation.
-    DataModel::ActionReturnStatus WriteDeviceLocation(
-        const DataModel::Nullable<LocationDescriptorStructType> & value,
-        AttributePersistence & persistence)
+    DataModel::ActionReturnStatus WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> & value,
+                                                      AttributePersistence & persistence)
     {
-        return SetDeviceLocationInternal(
-            value, persistence, PersistenceMode::kPersist);
+        return SetDeviceLocationInternal(value, persistence, PersistenceMode::kPersist);
     }
 
     void LoadDeviceLocation(AttributePersistence & persistence)
