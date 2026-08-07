@@ -73,7 +73,18 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     // Re-presenting an already-queued MessageID replaces the prior entry (and its pending
     // timers) instead of silently duplicating it, keeping MessageID usable as a real key.
     CancelMessageTimers(messageId);
-    mCachedMessages.remove_if([&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
+    auto existing = FindCachedMessage(messageId);
+    if (existing != mCachedMessages.end())
+    {
+        if (existing->GetState() == MessageState::kPresented)
+        {
+            CompleteMessage(messageId);
+        }
+        else
+        {
+            mCachedMessages.erase(existing);
+        }
+    }
 
     mCachedMessages.push_back(cachedMessage);
     LogErrorOnFailure(LogMessageQueuedEvent(mEndpointId, messageId));
@@ -92,7 +103,19 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
         auto & id = iter.GetValue();
 
         CancelMessageTimers(id);
-        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.MessageIdMatches(id); });
+        auto it = FindCachedMessage(id);
+        if (it == mCachedMessages.end())
+        {
+            continue;
+        }
+        if (it->GetState() == MessageState::kPresented)
+        {
+            CompleteMessage(id);
+        }
+        else
+        {
+            mCachedMessages.erase(it);
+        }
     }
     return CHIP_NO_ERROR;
 }
