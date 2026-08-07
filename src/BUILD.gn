@@ -125,6 +125,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/switch-server/tests",
       "${chip_root}/src/app/clusters/temperature-control-server/tests",
       "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thermostat-server/tests",
       "${chip_root}/src/app/clusters/thread-border-router-management-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/thread-network-directory-server/tests",
@@ -311,6 +312,14 @@ if (chip_build_tests) {
     # where the example's filesystem-backed delegate has no /tmp to write to.
     if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
       tests += [ "${chip_root}/examples/tv-app/tv-common/clusters/media-file-management/tests" ]
+    }
+
+    # Thermostat schedule delegate test. Excluded on embedded targets: linked into a single
+    # combined test image (e.g. nRF Connect SDK's AllChipTests), this example's test-only
+    # globals/zap config end up sharing a process with every other cluster's unit tests,
+    # which segfaults unrelated suites (observed with TestPowerSourceCluster on native_posix).
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+      tests += [ "${chip_root}/examples/thermostat/thermostat-common/tests" ]
     }
   }
 

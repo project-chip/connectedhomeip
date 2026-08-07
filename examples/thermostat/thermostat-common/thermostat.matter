@@ -3138,8 +3138,13 @@ endpoint 1 {
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
+    ram      attribute numberOfSchedules default = 0;
+    ram      attribute numberOfScheduleTransitions default = 0;
+    ram      attribute numberOfScheduleTransitionPerDay default = 0;
     ram      attribute activePresetHandle;
+    ram      attribute activeScheduleHandle;
     callback attribute presets;
+    callback attribute schedules;
     ram      attribute setpointHoldExpiryTimestamp;
     callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
@@ -3152,6 +3157,7 @@ endpoint 1 {
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
+    handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
     handle command AddThermostatSuggestion;
     handle command RemoveThermostatSuggestion;

@@ -31,6 +31,11 @@
 #include <app/CommandHandler.h>
 
 namespace chip {
+
+namespace Testing {
+class ThermostatAttrAccessTestAccess;
+} // namespace Testing
+
 namespace app {
 namespace Clusters {
 namespace Thermostat {
@@ -82,6 +87,32 @@ private:
      * @return Success if the list of pending presets is valid, an error code if not
      */
     Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
+
+    /**
+     * @brief Set the Active Schedule to a given schedule handle, or null
+     *
+     * @param endpoint The endpoint
+     * @param scheduleHandle The handle of the schedule to set active, or null to clear the active schedule
+     * @return Success if the active schedule was updated, an error code if not
+     */
+    Protocols::InteractionModel::Status SetActiveSchedule(EndpointId endpoint, DataModel::Nullable<ByteSpan> scheduleHandle);
+
+    /**
+     * @brief Apply a schedule to the pending lists of schedules during an atomic write
+     *
+     * @param delegate The current ThermostatDelegate
+     * @param schedule The schedule to append
+     * @return CHIP_NO_ERROR if successful, an error code if not
+     */
+    CHIP_ERROR AppendPendingSchedule(Thermostat::Delegate * delegate, const Structs::ScheduleStruct::DecodableType & schedule);
+
+    /**
+     * @brief Verifies if the pending schedules for a given endpoint are valid
+     *
+     * @param endpoint The endpoint
+     * @return Success if the list of pending schedules is valid, an error code if not
+     */
+    Protocols::InteractionModel::Status PrecommitSchedules(EndpointId endpoint);
 
     void GenerateEvents(const ConcreteAttributePath & attributePath);
 
@@ -215,6 +246,10 @@ private:
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
 
+    friend bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData);
+
     friend bool
     emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                   const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
@@ -226,6 +261,10 @@ private:
     friend bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+
+    // Grants unit tests access to the private schedule-related methods below without resorting to
+    // #define private public.
+    friend class chip::Testing::ThermostatAttrAccessTestAccess;
 
     struct AtomicWriteSession
     {

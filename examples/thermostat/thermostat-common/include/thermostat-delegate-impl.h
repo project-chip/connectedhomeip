@@ -50,6 +50,10 @@ static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes 
 
 static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
+static constexpr uint8_t kMaxNumberOfScheduleTransitionsSupported = 10;
+
+static constexpr uint8_t kMaxNumberOfScheduleTransitionsPerDaySupported = 4;
+
 class ThermostatDelegate : public Delegate
 {
 public:
@@ -98,6 +102,28 @@ public:
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
     CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
+
+    uint8_t GetNumberOfSchedules() override;
+
+    uint8_t GetNumberOfScheduleTransitions() override;
+
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override;
+
+    CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override;
+
+    CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) override;
+
+    CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & newActiveScheduleHandle) override;
+
+    void InitializePendingSchedules() override;
+
+    CHIP_ERROR AppendToPendingScheduleList(const ScheduleStructWithOwnedMembers & schedule) override;
+
+    CHIP_ERROR GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override;
+
+    CHIP_ERROR CommitPendingSchedules() override;
+
+    void ClearPendingScheduleList() override;
 
 private:
     static ThermostatDelegate sInstance;
@@ -171,6 +197,23 @@ private:
      * @brief Initializes the schedules types array with example schedule types.
      */
     void InitializeScheduleTypes();
+
+    /**
+     * @brief Initializes the schedules array with a sample built-in schedule for testing.
+     */
+    void InitializeSchedules();
+
+    uint8_t mNumberOfSchedules;
+
+    ScheduleStructWithOwnedMembers mSchedules[kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType];
+    ScheduleStructWithOwnedMembers mPendingSchedules[kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType];
+
+    uint8_t mNextFreeIndexInPendingSchedulesList;
+    uint8_t mNextFreeIndexInSchedulesList;
+
+    uint8_t mActiveScheduleHandleData[kScheduleHandleSize];
+    size_t mActiveScheduleHandleDataSize;
+    bool mActiveScheduleHandleIsNull = true;
 };
 
 } // namespace Thermostat
