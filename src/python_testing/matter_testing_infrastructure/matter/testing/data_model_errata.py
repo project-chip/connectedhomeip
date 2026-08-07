@@ -178,7 +178,7 @@ def _apply_cluster_revision_errata(target_cluster: Any, cluster_id: int, value: 
 
 def _parse_and_validate_attribute_id(attr_id_value: Any, context: str, cluster_id: int, problems: list[ProblemNotice]) -> uint | None:
     """Parses and validates an attribute ID value from errata.
-    
+
     Attribute IDs must be hex numbers (e.g., 0x17, 0x00, 0xFF).
     Returns the parsed uint value, or None if validation fails.
     """
@@ -186,7 +186,7 @@ def _parse_and_validate_attribute_id(attr_id_value: Any, context: str, cluster_i
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
                                       severity=ProblemSeverity.ERROR, problem=f"Invalid type for {ATTRIBUTE_ID_KEY} on '{context}': expected int or string (hex), got {type(attr_id_value).__name__}"))
         return None
-    
+
     try:
         # If it's an int, convert directly
         if isinstance(attr_id_value, int):
@@ -199,13 +199,13 @@ def _parse_and_validate_attribute_id(attr_id_value: Any, context: str, cluster_i
                                               severity=ProblemSeverity.ERROR, problem=f"Invalid {ATTRIBUTE_ID_KEY} format on '{context}': must be a hex number (e.g., 0x17), got '{attr_id_str}'"))
                 return None
             attr_id_uint = uint(int(attr_id_str, 16))
-        
+
         # Validate the attribute ID is in a reasonable range (0x00-0xFFFF for standard attributes)
         if attr_id_uint > 0xFFFF:
             problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
                                           severity=ProblemSeverity.ERROR, problem=f"Invalid {ATTRIBUTE_ID_KEY} on '{context}': attribute ID 0x{attr_id_uint:X} exceeds maximum value 0xFFFF"))
             return None
-        
+
         return attr_id_uint
     except (ValueError, TypeError) as e:
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
