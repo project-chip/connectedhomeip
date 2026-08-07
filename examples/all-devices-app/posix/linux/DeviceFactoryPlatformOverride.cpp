@@ -20,6 +20,7 @@
 #include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/types/commissioning-proxy/CommissioningProxyDevice.h>
 
 namespace chip {
 namespace app {
@@ -27,6 +28,12 @@ namespace app {
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
                                     PosixAudioManager & audioManager)
 {
+    if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
+    {
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
+                                                     []() { return std::make_unique<CommissioningProxyDevice>(); });
+    }
+
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {

@@ -27,5 +27,7 @@
 
 #pragma once
 
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>

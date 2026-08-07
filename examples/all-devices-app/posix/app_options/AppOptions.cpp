@@ -58,6 +58,9 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
 constexpr uint16_t kOptionDacProvider   = 0xffdd;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+constexpr uint16_t kOptionWiFiPAF = 0xffde;
+#endif
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -177,6 +180,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.dacProvider = value;
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kOptionWiFiPAF:
+        mConfig.wifipafExtCmds = value ? value : "";
+        return true;
+#endif
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -205,6 +213,9 @@ OptionSet * AppOptions::GetOptions()
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
         { "dac_provider", kArgumentRequired, kOptionDacProvider },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
+#endif
         {}, // need empty terminator
     };
 

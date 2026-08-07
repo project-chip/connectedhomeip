@@ -46,11 +46,15 @@ public:
         std::optional<std::string> dacProvider;
         bool enableWiFi        = false;
         uint32_t bleController = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        std::string wifipafExtCmds;
+#endif
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
 
     static const AppConfig & GetConfig();
+    static const AppConfig * TryGetConfig() { return sIsConfigValidated ? &mConfig : nullptr; }
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
     static CHIP_ERROR ValidateConfig();
 
