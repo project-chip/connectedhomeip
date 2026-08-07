@@ -400,6 +400,29 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 void AndroidDeviceControllerWrapper::Shutdown()
 {
     VerifyOrReturn(mIsInitialized);
+
+    // Listener objects are JNI global refs and must be released during teardown.
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env != nullptr)
+    {
+        if (mThreadCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
+            mThreadCredentialsNeededListenerObject = nullptr;
+        }
+        if (mWiFiCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
+            mWiFiCredentialsNeededListenerObject = nullptr;
+        }
+    }
+    else
+    {
+        ChipLogError(Controller, "Could not get JNIEnv for current thread during Shutdown");
+    }
+    mThreadCredentialsNeededListener = nullptr;
+    mWiFiCredentialsNeededListener   = nullptr;
+
     getICDClientStorage()->Shutdown();
     mController->Shutdown();
     DeviceControllerFactory::GetInstance().Shutdown();
@@ -428,6 +451,74 @@ void AndroidDeviceControllerWrapper::Shutdown()
         mAttestationTrustStoreBridge = nullptr;
     }
     mIsInitialized = false;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SetThreadCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    // Allow clearing the listener.
+    if (listener == nullptr)
+    {
+        if (mThreadCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
+            mThreadCredentialsNeededListenerObject = nullptr;
+        }
+        mThreadCredentialsNeededListener = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onThreadCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    jobject globalRef = env->NewGlobalRef(listener);
+    VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
+    if (mThreadCredentialsNeededListenerObject != nullptr)
+    {
+        env->DeleteGlobalRef(mThreadCredentialsNeededListenerObject);
+    }
+    mThreadCredentialsNeededListenerObject = globalRef;
+    mThreadCredentialsNeededListener       = method;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::SetWiFiCredentialsNeededListener(jobject listener)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    // Allow clearing the listener.
+    if (listener == nullptr)
+    {
+        if (mWiFiCredentialsNeededListenerObject != nullptr)
+        {
+            env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
+            mWiFiCredentialsNeededListenerObject = nullptr;
+        }
+        mWiFiCredentialsNeededListener = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID method;
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, listener, "onWiFiCredentialsNeeded", "(I)V", &method);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    jobject globalRef = env->NewGlobalRef(listener);
+    VerifyOrReturnError(globalRef != nullptr && !env->ExceptionCheck(), CHIP_ERROR_NO_MEMORY);
+    if (mWiFiCredentialsNeededListenerObject != nullptr)
+    {
+        env->DeleteGlobalRef(mWiFiCredentialsNeededListenerObject);
+    }
+    mWiFiCredentialsNeededListenerObject = globalRef;
+    mWiFiCredentialsNeededListener       = method;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
@@ -1139,6 +1230,44 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::ScopedNodeI
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jlong>(err.AsInteger()),
                         icdDeviceInfoObj);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::WiFiCredentialsNeeded(chip::EndpointId endpoint)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    if (mWiFiCredentialsNeededListenerObject == nullptr || mWiFiCredentialsNeededListener == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for WiFiCredentialsNeeded");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    env->CallVoidMethod(mWiFiCredentialsNeededListenerObject, mWiFiCredentialsNeededListener, static_cast<jint>(endpoint));
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::ThreadCredentialsNeeded(chip::EndpointId endpoint)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    if (mThreadCredentialsNeededListenerObject == nullptr || mThreadCredentialsNeededListener == nullptr)
+    {
+        ChipLogError(Controller, "No listener registered for ThreadCredentialsNeeded");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    env->CallVoidMethod(mThreadCredentialsNeededListenerObject, mThreadCredentialsNeededListener, static_cast<jint>(endpoint));
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
