@@ -1,0 +1,17 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/tc/4987/1",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "$ref": "../static/tc-4987-1-v1.json"
+                }
+            }
+        }
+    ]
+}
