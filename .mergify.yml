@@ -59,7 +59,6 @@ pull_request_rules:
               labels:
                   - backport-v1.7-branch
 
-
     - name: Backport to v1.6.1-branch
       conditions:
           - merged
