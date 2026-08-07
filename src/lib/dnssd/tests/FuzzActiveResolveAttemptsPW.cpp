@@ -85,10 +85,10 @@ std::vector<std::vector<uint8_t>> HostNameSeeds()
     return {
         { 0x0C, 'B', '7', '5', 'A', 'F', 'B', '4', '5', '8', 'E', 'C', 'D', 0x05, 'l', 'o', 'c', 'a', 'l', 0x00 },
         { 0x04, 'h', 'o', 's', 't', 0x05, 'l', 'o', 'c', 'a', 'l', 0x00 },
-        { 0x00 },             // root
-        { 0x05, 'a', 'b' },   // truncated label
-        { 0xC0, 0x00 },       // self-referential compression pointer
-        { 0x40, 'a', 0x00 },  // reserved label type
+        { 0x00 },            // root
+        { 0x05, 'a', 'b' },  // truncated label
+        { 0xC0, 0x00 },      // self-referential compression pointer
+        { 0x40, 'a', 0x00 }, // reserved label type
         { 0x01, 'x', 0x00 },
     };
 }
