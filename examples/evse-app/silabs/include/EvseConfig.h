@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +17,20 @@
  *    limitations under the License.
  */
 
-#pragma once
+#ifndef SL_MATTER_EVSE_CONFIG_H
+#define SL_MATTER_EVSE_CONFIG_H
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/BitMask.h>
+// <<< Use Configuration Wizard in Context Menu >>>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DeviceEnergyManagement {
+// EvseConfig.h
+// Preprocessor knobs for the silabs EVSE example. Edit these #define
+// statements to customize the endpoint hosting the EnergyEvse /
+// DeviceEnergyManagement clusters.
 
-chip::BitMask<Feature> GetFeatureMap();
+// <o EVSE_ENDPOINT> EnergyEvse / DeviceEnergyManagement cluster endpoint
+// <i> Default: 1
+#define EVSE_ENDPOINT 1
 
-} // namespace DeviceEnergyManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// <<< end of configuration section >>>
+
+#endif // SL_MATTER_EVSE_CONFIG_H
