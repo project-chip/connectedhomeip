@@ -25,6 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -81,12 +82,14 @@ bool OtaHeaderValidation(Ota_ImageHeader_t imageHeader)
 
 void InitializeOTARequestor(void)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Initialising OTA Requestor");
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    err = gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                              chip::GetOTARequestorAttributes(), chip::GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
