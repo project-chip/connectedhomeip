@@ -45,12 +45,26 @@ pull_request_rules:
     # Apply a request-backport-* label (such as request-backport-latest or
     # request-backport-supported) on the master PR (before or after merge)
     # to trigger the corresponding backport.
-    - name: Backport to v1.6.1-branch
+    - name: Backport to v1.7-branch
       conditions:
           - merged
           - base=master
           - or:
                 - label="request-backport-latest"
+                - label="request-backport-supported"
+      actions:
+          backport:
+              branches:
+                  - v1.7-branch
+              labels:
+                  - backport-v1.7-branch
+
+
+    - name: Backport to v1.6.1-branch
+      conditions:
+          - merged
+          - base=master
+          - or:
                 - label="request-backport-latest-mve-sve"
                 - label="request-backport-supported"
       actions:
