@@ -99,57 +99,47 @@ class OpCredClientFragment : Fragment() {
     val attributeName = attribute.name
     val attributeId = attribute.id
 
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        ChipClient.getDeviceController(requireContext())
+          .readPath(
+            object : ReportCallback {
+              override fun onError(
+                attributePath: ChipAttributePath?,
+                eventPath: ChipEventPath?,
+                ex: java.lang.Exception
+              ) {
+                showMessage("Read $attributeName failure $ex")
+                Log.e(TAG, "Read $attributeName failure", ex)
+              }
+
+              override fun onReport(nodeState: NodeState?) {
+                val tlv =
+                  nodeState
+                    ?.getEndpointState(endpointId)
+                    ?.getClusterState(clusterId)
+                    ?.getAttributeState(attributeId)
+                    ?.tlv
+
+                val value = tlv?.let { TlvReader(it).toAny() }
+                Log.i(TAG, "OpCred $attributeName value: $value")
+                showMessage("OpCred $attributeName value: $value")
+              }
+            },
+            devicePtr,
+            listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
+            null,
+            false,
+            0 /* imTimeoutMs */
+          )
       }
-
-    ChipClient.getDeviceController(requireContext())
-      .readPath(
-        object : ReportCallback {
-          override fun onError(
-            attributePath: ChipAttributePath?,
-            eventPath: ChipEventPath?,
-            ex: java.lang.Exception
-          ) {
-            showMessage("Read $attributeName failure $ex")
-            Log.e(TAG, "Read $attributeName failure", ex)
-          }
-
-          override fun onReport(nodeState: NodeState?) {
-            val tlv =
-              nodeState
-                ?.getEndpointState(endpointId)
-                ?.getClusterState(clusterId)
-                ?.getAttributeState(attributeId)
-                ?.tlv
-
-            val value = tlv?.let { TlvReader(it).toAny() }
-            Log.i(TAG, "OpCred $attributeName value: $value")
-            showMessage("OpCred $attributeName value: $value")
-          }
-        },
-        devicePtr,
-        listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
-        null,
-        false,
-        0 /* imTimeoutMs */
-      )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun sendRemoveFabricsBtnClick(fabricIndex: UInt) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
     // TODO : Need to be implement poj-to-tlv
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -167,23 +157,30 @@ class OpCredClientFragment : Fragment() {
         null
       )
 
-    deviceController.invoke(
-      object : InvokeCallback {
-        override fun onError(ex: Exception?) {
-          showMessage("RemoveFabric failure $ex")
-          Log.e(TAG, "RemoveFabric failure", ex)
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        deviceController.invoke(
+          object : InvokeCallback {
+            override fun onError(ex: Exception?) {
+              showMessage("RemoveFabric failure $ex")
+              Log.e(TAG, "RemoveFabric failure", ex)
+            }
 
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
-          showMessage("RemoveFabric success")
-        }
-      },
-      devicePtr,
-      invokeElement,
-      0,
-      0
-    )
+            override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+              Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+              showMessage("RemoveFabric success")
+            }
+          },
+          devicePtr,
+          invokeElement,
+          0,
+          0
+        )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showMessage(msg: String) {
