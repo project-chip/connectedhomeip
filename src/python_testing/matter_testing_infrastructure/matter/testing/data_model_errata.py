@@ -211,7 +211,7 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
     # Allow provisional elements to not exist in the baseline XML
     if is_provisional:
-        LOGGER.info(f"Provisional element '%s' not found in baseline XML (expected for in-progress spec additions).", context)
+        LOGGER.info("Provisional element '%s' not found in baseline XML (expected for in-progress spec additions).", context)
         return
 
     problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
