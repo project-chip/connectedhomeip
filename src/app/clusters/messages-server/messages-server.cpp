@@ -90,9 +90,10 @@ bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
 CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue,
                                        chip::FabricIndex fabricIndex)
 {
-    Events::MessageNotPresented::Type event{ .messageID        = messageId,
-                                             .removedFromQueue = removedFromQueue,
-                                             .fabricIndex      = fabricIndex };
+    Events::MessageNotPresented::Type event;
+    event.messageID        = messageId;
+    event.removedFromQueue = removedFromQueue;
+    event.fabricIndex      = fabricIndex;
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
@@ -106,7 +107,8 @@ CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan
 
 CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
 {
-    Events::MessageQueued::Type event{ .messageID = messageId };
+    Events::MessageQueued::Type event;
+    event.messageID = messageId;
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
@@ -120,7 +122,8 @@ CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & mes
 
 CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId)
 {
-    Events::MessagePresented::Type event{ .messageID = messageId };
+    Events::MessagePresented::Type event;
+    event.messageID = messageId;
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
@@ -137,9 +140,11 @@ CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & m
                                    const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
                                    const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference)
 {
-    Events::MessageComplete::Type event{
-        .messageID = messageId, .responseID = responseId, .reply = reply, .futureMessagesPreference = futureMessagesPreference
-    };
+    Events::MessageComplete::Type event;
+    event.messageID                = messageId;
+    event.responseID               = responseId;
+    event.reply                    = reply;
+    event.futureMessagesPreference = futureMessagesPreference;
 
     EventNumber eventNumber;
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
