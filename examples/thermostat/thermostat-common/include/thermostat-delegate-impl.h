@@ -50,6 +50,29 @@ public:
     ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr);
     ~ThermostatDelegate() override;
 
+    SystemModeEnum GetSystemMode() const override;
+    bool SetSystemMode(SystemModeEnum systemMode) override;
+    ThermostatRunningModeEnum GetRunningMode() const override;
+    bool SetRunningMode(ThermostatRunningModeEnum runningMode) override;
+    BitMask<RelayStateBitmap> GetRunningState() const override;
+    bool SetRunningState(BitMask<RelayStateBitmap> runningState) override;
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
+    bool SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation) override;
+    DataModel::Nullable<temperature> GetLocalTemperature() const override;
+    bool SetLocalTemperature(DataModel::Nullable<temperature> localTemperature) override;
+    int8_t GetLocalTemperatureCalibration() const override;
+    bool SetLocalTemperatureCalibration(int8_t localTemperatureCalibration) override;
+
+    BitMask<RemoteSensingBitmap> GetRemoteSensing() const override;
+
+    bool SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing) override;
+    TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override;
+    bool SetTemperatureSetpointHold(TemperatureSetpointHoldEnum temperatureSetpointHold) override;
+    DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const override;
+    bool SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration) override;
+    DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const override;
+    bool SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp) override;
+
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override;
     Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;
 
@@ -87,6 +110,20 @@ public:
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
+
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
+
+    SystemModeEnum mSystemMode                     = SystemModeEnum::kOff;
+    ThermostatRunningModeEnum mRunningMode         = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState        = BitMask<RelayStateBitmap>(0);
+    DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+    int8_t mLocalTemperatureCalibration            = 0;
+
+    BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
+
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
 
     // Occupancy state
     BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };

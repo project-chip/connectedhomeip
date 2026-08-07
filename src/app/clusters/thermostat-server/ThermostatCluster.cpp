@@ -51,19 +51,6 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat:
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
-    AttributePersistence persistence(context.attributeStorage);
-
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
-                                      mControlSequenceOfOperation, mDefaultValues.controlSequenceOfOperation);
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode,
-                                      mDefaultValues.systemMode);
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id }, mTemperatureSetpointHold,
-                                      mDefaultValues.temperatureSetpointHold);
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
-                                      mTemperatureSetpointHoldDuration, mDefaultValues.temperatureSetpointHoldDuration);
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
-                                      mSetpointHoldExpiryTimestamp, mDefaultValues.setpointHoldExpiryTimestamp);
-
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mFabricTable.AddFabricDelegate(this));
     return CHIP_NO_ERROR;
@@ -144,14 +131,48 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(Thermostat::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
+
+void ThermostatCluster::SetDelegate(Thermostat::Delegate * delegate) {
+    mDelegate = delegate;
+    auto hasHeating = mFeatures.Has(Feature::kHeating);
+    auto hasCooling = mFeatures.Has(Feature::kCooling);
+    if (hasHeating && hasCooling)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kCoolingAndHeating);
+    }
+    else if (hasHeating)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
+    }
+    else if (hasCooling)
+    {
+        mDelegate->SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kCoolingOnly);
+    }
+}
+
+ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation() const {
+    return mDelegate->GetControlSequenceOfOperation();
+}
+
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
-    SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation, ControlSequenceOfOperation::Id);
+    if (mDelegate->SetControlSequenceOfOperation(controlSequenceOfOperation))
+    {
+        NotifyAttributeChanged(ControlSequenceOfOperation::Id);
+    }
     return Status::Success;
+}
+
+SystemModeEnum ThermostatCluster::GetSystemMode() const
+{
+    return mDelegate->GetSystemMode();
 }
 
 Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
 {
+    if (mDelegate == nullptr) {
+        return Status::InvalidInState;
+    }
     switch (systemMode)
     {
     case SystemModeEnum::kOff:
@@ -199,15 +220,44 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mSystemMode, systemMode, app::Clusters::Thermostat::Attributes::SystemMode::Id);
+    if (mDelegate->SetSystemMode(systemMode))
+    {
+        NotifyAttributeChanged(SystemMode::Id);
+    }
     return Status::Success;
 }
 
-Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature,
+DataModel::Nullable<temperature> ThermostatCluster::GetLocalTemperature() const
+{
+    return mDelegate->GetLocalTemperature();
+}
+
+Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                                               DataModel::AttributeChangeType changeType)
 {
-    SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id, changeType);
+    if (mDelegate->SetLocalTemperature(localTemperature))
+    {
+        NotifyAttributeChanged(LocalTemperature::Id, changeType);
+    }
     return Status::Success;
+}
+
+int8_t ThermostatCluster::GetLocalTemperatureCalibration() const
+{
+    return mDelegate->GetLocalTemperatureCalibration();
+}
+
+Status ThermostatCluster::SetLocalTemperatureCalibration(int8_t localTemperatureCalibration)
+{
+    if (mDelegate->SetLocalTemperatureCalibration(localTemperatureCalibration))
+    {
+        NotifyAttributeChanged(LocalTemperatureCalibration::Id);
+    }
+    return Status::Success;
+}
+
+ThermostatRunningModeEnum ThermostatCluster::GetRunningMode() const {
+    return mDelegate->GetRunningMode();
 }
 
 Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
@@ -233,8 +283,15 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
     default:
         return Status::ConstraintError;
     }
-    SetAttributeValue(mRunningMode, runningMode, app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id);
+    if (mDelegate->SetRunningMode(runningMode))
+    {
+        NotifyAttributeChanged(ThermostatRunningMode::Id);
+    }
     return Status::Success;
+}
+
+BitMask<RelayStateBitmap> ThermostatCluster::GetRunningState() const {
+    return mDelegate->GetRunningState();
 }
 
 Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState)
@@ -249,7 +306,10 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
         ChipLogDetail(Zcl, "Cooling relay state is not supported");
         return Status::ConstraintError;
     }
-    SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id);
+    if (mDelegate->SetRunningState(runningState))
+    {
+        NotifyAttributeChanged(ThermostatRunningState::Id);
+    }
     return Status::Success;
 }
 
