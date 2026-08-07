@@ -180,7 +180,7 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
 
     if not _has_no_separators(element_name):
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
-                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use [...]
+                                      severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean sanitized names."))
         return
 
     # Check if this element is marked as provisional and skip if attribute doesn't exist
