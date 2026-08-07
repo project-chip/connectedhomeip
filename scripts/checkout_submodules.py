@@ -49,6 +49,7 @@ ALL_PLATFORMS = {
     'bouffalolab',
     'cc13xx_26xx',
     'cc32xx',
+    'cc35xx',
     'darwin',
     'silabs',
     'esp32',
