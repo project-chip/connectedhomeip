@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import enum
 import logging
+import multiprocessing
 import os
 import random
 import subprocess
@@ -29,28 +31,27 @@ from typing import Any
 
 import chiptest
 import click
+from chiptest.concurrency.config import WorkerConfig
 from chiptest.concurrency.context import SYNC_MANAGER_PATH, mp_wrapped_spawn_context
-from chiptest.concurrency.process import ProcessPhase
+from chiptest.concurrency.state import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
-from chiptest.concurrency.worker import GenericWorkerProcess, WorkerConfig, WorkerJob
+from chiptest.concurrency.worker import WorkerJob
+from chiptest.concurrency.worker_pool import worker_pool_class
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
 from chiptest.runner import SubprocessKind
 from chiptest.status import PeriodicStatusThread
-from chiptest.test_definition import CommissioningMethod, SubprocessInfoRepo, TestDefinition, TestJobConfig, TestRunTime, TestTag
+from chiptest.test_definition import (CommissioningMethod, SubprocessInfoRepo, TestConcurrencySchedulerType, TestDefinition,
+                                      TestJobConfig, TestRunTime, TestTag)
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
 if sys.platform == "linux":
     import chiptest.linux
-    WorkerProcessCls = chiptest.linux.LinuxWorkerProcess
 elif sys.platform == 'darwin':
     import chiptest.darwin
-    WorkerProcessCls = chiptest.darwin.DarwinWorkerProcess
-else:
-    WorkerProcessCls = GenericWorkerProcess
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
@@ -370,6 +371,20 @@ def cmd_list(context: click.Context) -> None:
     '--clear-worker-state',
     is_flag=True,
     help='Clear worker state in /tmp. Available only on Linux.')
+@click.option(
+    '--concurrency',
+    default=0,
+    show_default=True,
+    type=click.IntRange(min=0),
+    help='Number of tests executed concurrently. Use the CPU count if set to 0.')
+@click.option(
+    '--concurrency-scheduler',
+    type=click.Choice(TestConcurrencySchedulerType, case_sensitive=False),  # type: ignore[arg-type]
+    show_default=True,
+    default=TestConcurrencySchedulerType.FAST,
+    help=('Type of scheduler to use when running tests concurrently. "reproducible" tries to minimize randomness in test execution '
+          'order, while "fast" scheduler prioritizes overall execution time over reproducibility.')
+)
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -423,7 +438,8 @@ def cmd_list(context: click.Context) -> None:
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
             help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
             value_wait_extra_duration_ms: int | None, expected_failures: int, commissioning_method: CommissioningMethod,
-            summary_file: Path | None, periodic_status: int, clear_worker_state: bool,
+            summary_file: Path | None, periodic_status: int, clear_worker_state: bool, concurrency: int,
+            concurrency_scheduler: TestConcurrencySchedulerType,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -438,6 +454,21 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     if clear_worker_state and not sys.platform == "linux":
         raise click.BadOptionUsage("--clear-worker-state", "Worker state cleanup available only on Linux")
+
+    if sys.platform == "linux":
+        # Use all available CPUs if concurrency is not specified.
+        if concurrency == 0:
+            concurrency = multiprocessing.cpu_count()
+
+        # Limit concurrency to the number of tests if more workers than tests are requested.
+        if concurrency > 1:
+            concurrency = min(concurrency, len(context.obj.tests))
+            log.info("Running tests concurrently with %d workers using %s scheduler", concurrency, concurrency_scheduler)
+    else:
+        # Concurrency is not supported on non-Linux platforms, so we force it to 1.
+        if concurrency > 1:
+            raise click.BadOptionUsage("--concurrency", "Concurrent execution is supported only on Linux")
+        concurrency = 1
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
@@ -506,12 +537,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     run_summary = RunSummary(iterations, tests_per_iteration=len(context.obj.tests))
 
-    # For now, we have only one worker process.
     test_config = TestJobConfig(
         commissioning_method, dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds,
-        value_wait_extra_duration_ms, concurrency=1)
-    worker_config = WorkerConfig.from_test_job_config(
-        context.obj.log_config, test_config, tmp_dir_clear=clear_worker_state).with_formatted_name()
+        value_wait_extra_duration_ms, concurrency, concurrency_scheduler)
+    worker_config = WorkerConfig.from_test_job_config(context.obj.log_config, test_config, tmp_dir_clear=clear_worker_state)
+
+    # Workers need their own network and mount namespaces. An unprivileged user can only create them from within a user namespace,
+    # hence --map-root-user. As root we must not ask for one: --map-root-user maps uid 0 only, so every other uid (e.g. the owner of
+    # a CI workspace) becomes unmapped (nobody) inside the worker, and CAP_DAC_OVERRIDE does not apply to unmapped owners. Files
+    # written relative to the working directory (like the OpenThread simulation thread.log and tmp/*.flash) then fail with EACCES.
+    wrapper_linux = "unshare -n -m" if os.getuid() == 0 else "unshare --map-root-user -n -m"
 
     try:
         with (SyncManager(address=SYNC_MANAGER_PATH) as mp_manager,
@@ -525,37 +560,31 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
               ResultProcessingThread(run_summary, expected_failures, keep_going, result_queue) as result_thread,
 
               # Worker context.
-              mp_wrapped_spawn_context(wrapper_linux="unshare --map-root-user -n -m") as mp_ctx,
-              CancellableQueue(mp_manager, WorkerJob, "Task Queue") as task_queue,
-              WorkerProcessCls(mp_ctx, mp_manager, worker_config, task_queue, result_queue) as worker):
-            try:
-                # Schedule all tests.
-                log.info("Each test will be executed %d times", iterations)
-                for i in range(1, iterations + 1):
-                    log.info("Scheduling iteration %d", i)
-                    for test in context.obj.tests:
-                        log.debug("Enqueuing test %s", test.name)
-                        task_queue.put(WorkerJob(i, test))
+              mp_wrapped_spawn_context(wrapper_linux=wrapper_linux) as mp_ctx,
+              worker_pool_class(concurrency_scheduler)(mp_ctx, mp_manager, result_thread, worker_config) as pool):
 
-                    # If this is the last iteration schedule finalization event by closing the task queue.
-                    if i == iterations:
-                        task_queue.close()
+            # Status thread is a daemon thread which will close once log_msg_counter is closed.
+            PeriodicStatusThread(run_summary, log_msg_counter, periodic_status, pool.state).start()
 
-                log.info("All jobs scheduled")
+            # Schedule all tests.
+            log.info("Each test will be executed %d times", iterations)
+            for i in range(1, iterations + 1):
+                log.info("Scheduling iteration %d", i)
+                pool.new_iteration()
+                for test in context.obj.tests:
+                    log.debug("Enqueuing test %s", test.name)
+                    pool.schedule(WorkerJob(i, test))
 
-                # Start status thread only after all jobs are scheduled, so that there is something to report. It is a daemon thread
-                # which will close once log_msg_counter is closed.
-                PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status).start()
+                # If this is the last iteration schedule finalization event by closing worker pool.
+                if i == iterations:
+                    pool.close()
 
-                # Wait for exception or completion. Any exceptions will be raised in each of the context manager exit functions. In both
-                # cases, we want to stop waiting for results and exit the loop.
-                while True:
-                    if result_thread.exception is not None or worker.state.phase == ProcessPhase.CLOSED:
-                        break
-                    time.sleep(0.5)
-            finally:
-                task_queue.cancel()
-                result_queue.close()
+            log.info("All jobs scheduled. Waiting for results...")
+
+            # Wait for exception or completion. Any exceptions will be raised in each of the context manager exit functions. In
+            # both cases, we want to stop waiting for results and exit the loop.
+            pool.state.wait_for(
+                lambda states: pool.collect_exceptions() and all(state.phase == ProcessPhase.CLOSED for state in states))
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
         raise
@@ -564,10 +593,11 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         log.error("%s", error)
         raise SystemExit(2) from None
     finally:
-        with run_summary:
-            run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+        with run_summary, contextlib.suppress(BrokenPipeError):
             if summary_file is not None:
                 run_summary.write_json(summary_file)
+
+            run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
 
 
 @main.command(

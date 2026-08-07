@@ -16,6 +16,7 @@ import dataclasses
 import logging
 import threading
 
+from chiptest.concurrency.state import ProcessGroupState
 from chiptest.log_config import LogMessageCounter
 from chiptest.results import RunSummary
 
@@ -33,6 +34,7 @@ class PeriodicStatusThread(threading.Thread):
     run_summary: RunSummary
     log_counter: LogMessageCounter
     periodicity: int
+    pool_state: ProcessGroupState
 
     def __post_init__(self) -> None:
         super().__init__(name="Status", daemon=True)
@@ -65,9 +67,12 @@ class PeriodicStatusThread(threading.Thread):
                 if not test_status:
                     test_status.append("no tests completed")
 
+                worker_utilization = (f", worker utilization: {self.pool_state.working_count}/{len(self.pool_state)}"
+                                      if len(self.pool_state) > 1 else "")
+
                 status_message = (
                     f"Iteration {current_iteration}/{iterations}: "
-                    f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)})"
+                    f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)}){worker_utilization}"
                 )
                 log.info("", extra={"status": status_message, "count": False})
 

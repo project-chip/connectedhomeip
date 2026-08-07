@@ -36,15 +36,20 @@ class WaitableFor(Protocol, Generic[P]):
 
 
 def wait_for_mp_managed(waitable: Waitable | WaitableFor[P], predicate: Callable[P, bool] | None = None,
-                        timeout_sec: float | None = None, polling_interval_sec: float = 0.1) -> bool:
+                        timeout_sec: float | None = None, polling_interval_sec: float = 1.0) -> bool:
     """
     Wait for a resource managed by multiprocessing.Manager.
 
     Required because otherwise we wouldn't be able to catch a KeyboardInterrupt for a resource managed by multiprocessing.Manager,
     as the manager process explicitly ignores SIGINT.
 
+    The polling is also what makes the recovery in chiptest.concurrency.manager work: `polling_interval_sec` bounds how long the
+    reply to an interrupted call can take, so that reply can be drained and the connection kept in sync. A single unbounded wait
+    would never reply until notified and would defeat that recovery.
+
     TODO: Revisit this implementation so that we don't use busy waiting. It is possibly an issue with Python standard library, and
-    how it handles signals in a multi-process environment.
+          how it handles signals in a multi-process environment. Mind that removing it also requires replacing the recovery
+          workaround in chiptest.concurrency.manager.
     """
     if predicate is not None:
         if not isinstance(waitable, WaitableFor):
