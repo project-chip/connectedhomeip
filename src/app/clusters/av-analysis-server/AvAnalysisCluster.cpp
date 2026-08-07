@@ -37,6 +37,11 @@ CHIP_ERROR AvAnalysisCluster::AcceptedCommands(const ConcreteClusterPath & path,
     return mLogic.AcceptedCommands(builder);
 }
 
+CHIP_ERROR AvAnalysisCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return mLogic.GeneratedCommands(builder);
+}
+
 CHIP_ERROR AvAnalysisCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {

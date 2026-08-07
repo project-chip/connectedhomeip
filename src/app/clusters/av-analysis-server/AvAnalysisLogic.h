@@ -109,6 +109,9 @@ public:
     // Returns the commands accepted depending on the Feature Flags that are set
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
+    // Returns the commands generated depending on the Feature Flags that are set
+    CHIP_ERROR GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder);
+
     // Returns supported depending on the Feature Flags that are set
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
@@ -147,6 +150,16 @@ private:
 
     // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
     AvAnalysis::AnalysisStreamTable mStreamTable;
+
+    // The command whose response is pending on a camera interaction
+    CommandHandler::Handle mPendingCommandHandle;
+    ConcreteCommandPath mPendingCommandPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
+    ScopedNodeId mPendingCameraNode;
+
+    /**
+     * Applies a state transition to a stream entry and reports the AnalysisStreams attribute change.
+     */
+    void SetStreamState(AvAnalysis::AnalysisStreamEntry & aEntry, AvAnalysis::AnalysisStreamStateEnum aState);
 
     MarkDirtyCallback mMarkDirtyCallback;
 

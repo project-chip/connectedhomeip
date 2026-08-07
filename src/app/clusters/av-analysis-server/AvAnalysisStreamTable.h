@@ -26,6 +26,7 @@
 #include <clusters/AvAnalysis/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedMemoryBuffer.h>
@@ -44,6 +45,8 @@ struct AnalysisStreamEntry
     DataModel::Nullable<EndpointId> webRTCEndpointID;
     DataModel::Nullable<EndpointId> pushAVEndpointID;
     AnalysisStreamStateEnum state = AnalysisStreamStateEnum::kPendingInitiation;
+
+    ScopedNodeId cameraNode;
 
     Structs::AnalysisStreamStruct::Type ToEncodableStruct() const
     {
@@ -137,15 +140,15 @@ public:
     const AnalysisStreamEntry * begin() const { return mEntries.Get(); }
     const AnalysisStreamEntry * end() const { return mEntries.Get() + mCount; }
 
-    // Worst-case TLV size of one persisted entry (id + two endpoint ids + state).
+    // Worst-case TLV size of one persisted entry (id + camera node id + fabric index).
     static constexpr size_t kEntrySerializedSize =
-        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(EndpointId), sizeof(EndpointId), sizeof(uint8_t));
+        TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(NodeId), sizeof(FabricIndex));
 
     // TLV overhead of the enclosing anonymous array container written by Encode().
     static constexpr size_t kArraySerializedOverhead = 4;
 
     /**
-     * Writes the in-use entries as an anonymous TLV array of AnalysisStreamStruct.
+     * Writes the in-use entries as an anonymous TLV array of {AnalysisStreamID, camera NodeId, fabric}.
      */
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter) const
     {
@@ -153,15 +156,19 @@ public:
         ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
         for (const auto & entry : *this)
         {
-            ReturnErrorOnFailure(entry.ToEncodableStruct().Encode(aWriter, TLV::AnonymousTag()));
+            TLV::TLVType entryType;
+            ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, entryType));
+            ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagStreamId), entry.analysisStreamID));
+            ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagCameraNodeId), entry.cameraNode.GetNodeId()));
+            ReturnErrorOnFailure(aWriter.Put(TLV::ContextTag(kPersistedTagCameraFabric), entry.cameraNode.GetFabricIndex()));
+            ReturnErrorOnFailure(aWriter.EndContainer(entryType));
         }
         return aWriter.EndContainer(arrayType);
     }
 
     /**
-     * Replaces the table contents from a TLV array written by Encode(). Restored entries are reset to
-     * PendingInitiation with Null endpoint ids: WebRTC/PushAV sessions do not survive a reboot, only the
-     * stream allocations made on the camera do.
+     * Replaces the table contents from a TLV array written by Encode(). Restored entries restart in
+     * PendingInitiation state.
      */
     CHIP_ERROR Decode(TLV::TLVReader & aReader)
     {
@@ -171,11 +178,25 @@ public:
 
         mCount = 0;
         CHIP_ERROR err;
-        while ((err = aReader.Next()) == CHIP_NO_ERROR)
+        while ((err = aReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
         {
-            Structs::AnalysisStreamStruct::DecodableType decoded;
-            ReturnErrorOnFailure(DataModel::Decode(aReader, decoded));
-            VerifyOrReturnError(Add(decoded.analysisStreamID) != nullptr, CHIP_ERROR_NO_MEMORY);
+            TLV::TLVType entryType;
+            ReturnErrorOnFailure(aReader.EnterContainer(entryType));
+
+            uint16_t streamId        = 0;
+            NodeId cameraNodeId      = kUndefinedNodeId;
+            FabricIndex cameraFabric = kUndefinedFabricIndex;
+            ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagStreamId)));
+            ReturnErrorOnFailure(aReader.Get(streamId));
+            ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraNodeId)));
+            ReturnErrorOnFailure(aReader.Get(cameraNodeId));
+            ReturnErrorOnFailure(aReader.Next(TLV::ContextTag(kPersistedTagCameraFabric)));
+            ReturnErrorOnFailure(aReader.Get(cameraFabric));
+            ReturnErrorOnFailure(aReader.ExitContainer(entryType));
+
+            AnalysisStreamEntry * entry = Add(streamId);
+            VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
+            entry->cameraNode = ScopedNodeId(cameraNodeId, cameraFabric);
         }
         VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
@@ -184,6 +205,11 @@ public:
     }
 
 private:
+    // Context tags of one persisted entry written by Encode()
+    static constexpr uint8_t kPersistedTagStreamId     = 0;
+    static constexpr uint8_t kPersistedTagCameraNodeId = 1;
+    static constexpr uint8_t kPersistedTagCameraFabric = 2;
+
     Platform::ScopedMemoryBuffer<AnalysisStreamEntry> mEntries;
     uint8_t mCapacity = 0;
     uint8_t mCount    = 0;
