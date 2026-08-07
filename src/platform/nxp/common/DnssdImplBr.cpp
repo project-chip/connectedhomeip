@@ -17,8 +17,12 @@
  */
 
 #include "lib/dnssd/platform/Dnssd.h"
+#include <inet/InetInterface.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/IntrusiveList.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -27,8 +31,6 @@
 
 #include <openthread/mdns.h>
 #include <openthread/srp_server.h>
-
-#include "fsl_component_generic_list.h"
 
 #include <DnssdImplBr.h>
 
@@ -65,16 +67,15 @@ struct DnsServiceTxtEntries
     Dnssd::TextEntry mTxtEntries[kMaxMdnsServiceTxtEntriesNumber];
 };
 
-struct mDnsQueryCtx
+struct mDnsQueryCtx : public IntrusiveListNodeBase<>
 {
-    list_element_t link;
-    void * matterCtx;
+    void * mMatterCtx;
     chip::Dnssd::DnssdService mMdnsService;
     DnsServiceTxtEntries mServiceTxtEntry;
     char mServiceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1];
     Inet::IPAddress mResolvedAddresses[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES];
     uint8_t mResolvedAddressCount;
-    CHIP_ERROR error;
+    CHIP_ERROR mError;
     union
     {
         otMdnsBrowser mBrowseInfo;
@@ -90,21 +91,17 @@ struct mDnsQueryCtx
 
     mDnsQueryCtx(void * context, DnsBrowseCallback aBrowseCallback)
     {
-        link.next             = nullptr;
-        link.list             = nullptr;
-        matterCtx             = context;
+        mMatterCtx            = context;
         mDnsBrowseCallback    = aBrowseCallback;
         mResolvedAddressCount = 0;
-        error                 = CHIP_NO_ERROR;
+        mError                = CHIP_NO_ERROR;
     }
     mDnsQueryCtx(void * context, DnsResolveCallback aResolveCallback)
     {
-        link.next             = nullptr;
-        link.list             = nullptr;
-        matterCtx             = context;
+        mMatterCtx            = context;
         mDnsResolveCallback   = aResolveCallback;
         mResolvedAddressCount = 0;
-        error                 = CHIP_NO_ERROR;
+        mError                = CHIP_NO_ERROR;
     }
 };
 
@@ -154,86 +151,104 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
 
 // ID 0 is reserved for host
 static uint32_t mRegisterServiceId = 1;
-static uint8_t mNetifIndex         = 0;
+static uint32_t mNetifIndex        = 0;
 
-static list_label_t mResolveList;
-static list_label_t mBrowseList;
-static bool mListIsInit = false;
+otInstance * mOtInstance = nullptr;
+Inet::InterfaceId mExternalNetIf;
+Inet::InterfaceId mThreadNetIf;
+
+IntrusiveList<mDnsQueryCtx> mResolveList;
+IntrusiveList<mDnsQueryCtx> mBrowseList;
 
 #if USE_MDNS_NEXT_SERVICE_API
-static otMdnsService * mServiceList[kServiceListSize];
+static otMdnsService * mServiceList[kServiceListSize] = {};
 static uint32_t mServiceListFreeIndex;
 #endif
 
 CHIP_ERROR NxpChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    struct netif * extNetif = (ConnectivityManagerImpl().GetExternalInterface()).GetPlatformInterface();
-    VerifyOrReturnError(extNetif != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(DeviceLayer, "External interface not set, DNS-SD init failed"));
-    mNetifIndex = netif_get_index(extNetif);
+    mOtInstance = ThreadStackMgrImpl().OTInstance();
 
-    if (!mListIsInit)
+    mExternalNetIf = ConnectivityMgr().GetExternalInterface();
+    mThreadNetIf   = ConnectivityMgr().GetThreadInterface();
+
+    if (mExternalNetIf == Inet::InterfaceId::Null() || mThreadNetIf == Inet::InterfaceId::Null())
     {
-        mListIsInit = true;
-        LIST_Init(&mResolveList, 0);
-        LIST_Init(&mBrowseList, 0);
+        Inet::InterfaceIterator iter;
+        while (iter.HasCurrent())
+        {
+            Inet::InterfaceType ifType;
+            if (iter.IsUp() && iter.GetInterfaceType(ifType) == CHIP_NO_ERROR)
+            {
+                if (mExternalNetIf == Inet::InterfaceId::Null() &&
+                    (ifType == Inet::InterfaceType::Ethernet || ifType == Inet::InterfaceType::WiFi))
+                {
+                    mExternalNetIf = iter.GetInterfaceId();
+                }
+                else if (mThreadNetIf == Inet::InterfaceId::Null() && ifType == Inet::InterfaceType::Thread)
+                {
+                    mThreadNetIf = iter.GetInterfaceId();
+                }
+            }
+
+            if (mExternalNetIf != Inet::InterfaceId::Null() && mThreadNetIf != Inet::InterfaceId::Null())
+            {
+                break;
+            }
+            iter.Next();
+        }
     }
 
-    // The mDNS module is ready once the WIFI connectivity has been established
-    if (ConnectivityMgr().IsWiFiStationConnected())
+    VerifyOrReturnError(mExternalNetIf != Inet::InterfaceId::Null(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "External interface not set, DNS-SD init failed"));
+
+    mNetifIndex = mExternalNetIf.GetInterfaceIndex();
+
+    // The mDNS module is ready
+    if (otMdnsIsEnabled(mOtInstance))
     {
         initCallback(context, CHIP_NO_ERROR);
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 void NxpChipDnssdShutdown()
 {
-    if (mListIsInit)
+    while (!mBrowseList.Empty())
     {
-        // Stop all browse operations and clean the browse list
-        otInstance * thrInstancePtr  = ThreadStackMgrImpl().OTInstance();
-        mDnsQueryCtx * pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mBrowseList));
-
-        while (pQueryContext)
-        {
-            otMdnsStopBrowser(thrInstancePtr, &pQueryContext->mBrowseInfo);
-            LIST_RemoveElement(&pQueryContext->link);
-            Platform::Delete<mDnsQueryCtx>(pQueryContext);
-
-            pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mBrowseList));
-        }
-
-        // Stop all resolve operations and clean the resolve list
-        pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
-
-        while (pQueryContext)
-        {
-            otMdnsStopSrvResolver(thrInstancePtr, &pQueryContext->mSrvInfo);
-            LIST_RemoveElement(&pQueryContext->link);
-            Platform::Delete<mDnsQueryCtx>(pQueryContext);
-
-            pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
-        }
+        mDnsQueryCtx * pQueryContext = &(*mBrowseList.begin());
+        otMdnsStopBrowser(mOtInstance, &pQueryContext->mBrowseInfo);
+        mBrowseList.Remove(pQueryContext);
+        Platform::Delete<mDnsQueryCtx>(pQueryContext);
     }
+
+    // Stop all resolve operations and clean the resolve list
+    while (!mResolveList.Empty())
+    {
+        mDnsQueryCtx * pQueryContext = &(*mResolveList.begin());
+        otMdnsStopSrvResolver(mOtInstance, &pQueryContext->mSrvInfo);
+        mResolveList.Remove(pQueryContext);
+        Platform::Delete<mDnsQueryCtx>(pQueryContext);
+    }
+
+    mExternalNetIf = Inet::InterfaceId::Null();
+    mThreadNetIf   = Inet::InterfaceId::Null();
+    mNetifIndex    = 0;
 }
 
 #if USE_MDNS_NEXT_SERVICE_API
 CHIP_ERROR NxpChipDnssdRemoveServices()
 {
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-    otMdnsIterator * iterator   = nullptr;
-    ChipError error             = CHIP_NO_ERROR;
-    otError otError             = OT_ERROR_NONE;
+    otMdnsIterator * iterator = nullptr;
+    ChipError error           = CHIP_NO_ERROR;
+    otError otErr             = OT_ERROR_NONE;
     otMdnsEntryState state;
 
-    const char * hostName = ConnectivityManagerImpl().GetHostName();
+    const char * hostName = otMdnsGetLocalHostName(mOtInstance);
 
-    iterator = otMdnsAllocateIterator(thrInstancePtr);
+    iterator = otMdnsAllocateIterator(mOtInstance);
     VerifyOrExit(iterator != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     mServiceListFreeIndex = 0;
@@ -247,8 +262,8 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
             VerifyOrExit(mServiceList[mServiceListFreeIndex] != nullptr, error = CHIP_ERROR_NO_MEMORY);
         }
 
-        otError = otMdnsGetNextService(thrInstancePtr, iterator, mServiceList[mServiceListFreeIndex], &state);
-        if (otError == OT_ERROR_NOT_FOUND)
+        otErr = otMdnsGetNextService(mOtInstance, iterator, mServiceList[mServiceListFreeIndex], &state);
+        if (otErr == OT_ERROR_NOT_FOUND)
         {
             Platform::MemoryFree(mServiceList[mServiceListFreeIndex]);
             mServiceList[mServiceListFreeIndex] = nullptr;
@@ -268,22 +283,21 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 exit:
     if (iterator != nullptr)
     {
-        otMdnsFreeIterator(thrInstancePtr, iterator);
+        otMdnsFreeIterator(mOtInstance, iterator);
     }
     return error;
 }
 #else
 CHIP_ERROR NxpChipDnssdRemoveServices()
 {
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     otMdnsService otServiceData = { 0 };
 
-    otServiceData.mHostName = ConnectivityManagerImpl().GetHostName();
+    otServiceData.mHostName = otMdnsGetLocalHostName(mOtInstance);
 
     otServiceData.mServiceType = "_matter._tcp";
-    otMdnsUnregisterServiceType(thrInstancePtr, &otServiceData, OT_MDNS_SERVICE_MARK_FOR_UNREGISTER);
+    otMdnsUnregisterServiceType(mOtInstance, &otServiceData, OT_MDNS_SERVICE_MARK_FOR_UNREGISTER);
     otServiceData.mServiceType = "_matterc._udp";
-    otMdnsUnregisterServiceType(thrInstancePtr, &otServiceData, OT_MDNS_SERVICE_MARK_FOR_UNREGISTER);
+    otMdnsUnregisterServiceType(mOtInstance, &otServiceData, OT_MDNS_SERVICE_MARK_FOR_UNREGISTER);
 
     return CHIP_NO_ERROR;
 }
@@ -293,7 +307,6 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     uint32_t txtBufferOffset    = 0;
     otError otErr               = OT_ERROR_NONE;
     otMdnsService otServiceData = { 0 };
@@ -310,7 +323,7 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
     uint8_t txtBuffer[kMaxMdnsServiceTxtEntriesNumber + kTotalMdnsServiceTxtBufferSize] = { 0 };
 
     // Don't try to do anything until the mDNS server is started
-    VerifyOrReturnValue(otMdnsIsEnabled(thrInstancePtr), CHIP_NO_ERROR);
+    VerifyOrReturnValue(otMdnsIsEnabled(mOtInstance), CHIP_NO_ERROR);
 
     //  Create TXT Data as one string from multiple key entries
     for (uint32_t i = 0; i < service->mTextEntrySize; i++)
@@ -378,7 +391,7 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
         otServiceData.mTxtData             = txtBuffer;
         otServiceData.mTxtDataLength       = txtBufferOffset;
 
-        otErr = otMdnsRegisterService(thrInstancePtr, &otServiceData, mRegisterServiceId++, NULL);
+        otErr = otMdnsRegisterService(mOtInstance, &otServiceData, mRegisterServiceId++, NULL);
     }
 
     return MapOpenThreadError(otErr);
@@ -387,13 +400,11 @@ CHIP_ERROR NxpChipDnssdPublishService(const DnssdService * service, DnssdPublish
 #if USE_MDNS_NEXT_SERVICE_API
 CHIP_ERROR NxpChipDnssdFinalizeServiceUpdate()
 {
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-
     for (uint32_t i = 0; i < mServiceListFreeIndex; i++)
     {
         if (mServiceList[i] != nullptr)
         {
-            otMdnsUnregisterService(thrInstancePtr, mServiceList[i]);
+            otMdnsUnregisterService(mOtInstance, mServiceList[i]);
             Platform::MemoryFree(mServiceList[i]);
             mServiceList[i] = nullptr;
         }
@@ -406,15 +417,14 @@ CHIP_ERROR NxpChipDnssdFinalizeServiceUpdate()
 #else
 CHIP_ERROR NxpChipDnssdFinalizeServiceUpdate()
 {
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     otMdnsService otServiceData = { 0 };
 
-    otServiceData.mHostName = ConnectivityManagerImpl().GetHostName();
+    otServiceData.mHostName = otMdnsGetLocalHostName(mOtInstance);
 
     otServiceData.mServiceType = "_matter._tcp";
-    otMdnsUnregisterServiceType(thrInstancePtr, &otServiceData, OT_MDNS_SERVICE_UNREGISTER_MARKED_SERVICE);
+    otMdnsUnregisterServiceType(mOtInstance, &otServiceData, OT_MDNS_SERVICE_UNREGISTER_MARKED_SERVICE);
     otServiceData.mServiceType = "_matterc._udp";
-    otMdnsUnregisterServiceType(thrInstancePtr, &otServiceData, OT_MDNS_SERVICE_UNREGISTER_MARKED_SERVICE);
+    otMdnsUnregisterServiceType(mOtInstance, &otServiceData, OT_MDNS_SERVICE_UNREGISTER_MARKED_SERVICE);
 
     return CHIP_NO_ERROR;
 }
@@ -427,7 +437,6 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     *browseIdentifier             = reinterpret_cast<intptr_t>(nullptr);
     CHIP_ERROR error              = CHIP_NO_ERROR;
     CHIP_ERROR srpBrowseError     = CHIP_NO_ERROR;
-    otInstance * thrInstancePtr   = ThreadStackMgrImpl().OTInstance();
     mDnsQueryCtx * pBrowseContext = nullptr;
     char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1];
 
@@ -449,7 +458,7 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
 
     // First try to browse the service in the SRP cache
     // After browsing in the SRP cache we will continue with regular mDNS browse
-    srpBrowseError = BrowseBySrp(thrInstancePtr, pBrowseContext->mServiceType, pBrowseContext);
+    srpBrowseError = BrowseBySrp(mOtInstance, pBrowseContext->mServiceType, pBrowseContext);
 
     // Proceed to generate a mDNS query
     pBrowseContext->mBrowseInfo.mServiceType  = pBrowseContext->mServiceType;
@@ -457,9 +466,9 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     pBrowseContext->mBrowseInfo.mInfraIfIndex = mNetifIndex;
     pBrowseContext->mBrowseInfo.mCallback     = OtBrowseCallback;
 
-    LIST_AddTail(&mBrowseList, (list_element_handle_t) pBrowseContext);
+    mBrowseList.PushBack(pBrowseContext);
 
-    error = MapOpenThreadError(otMdnsStartBrowser(thrInstancePtr, &pBrowseContext->mBrowseInfo));
+    error = MapOpenThreadError(otMdnsStartBrowser(mOtInstance, &pBrowseContext->mBrowseInfo));
 
     if (CHIP_NO_ERROR == error)
     {
@@ -467,13 +476,13 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     }
     else
     {
-        LIST_RemoveElement(&pBrowseContext->link);
+        mBrowseList.Remove(pBrowseContext);
         if (srpBrowseError == CHIP_NO_ERROR)
         {
             // In this case, we need to send a final browse indication to signal the Matter App that there are no more
             // browse results coming but the result is no error since we have a match in the SRP cache.
-            error                 = CHIP_NO_ERROR;
-            pBrowseContext->error = CHIP_NO_ERROR;
+            error                  = CHIP_NO_ERROR;
+            pBrowseContext->mError = CHIP_NO_ERROR;
             TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty,
                                                                              reinterpret_cast<intptr_t>(pBrowseContext));
         }
@@ -489,16 +498,26 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
 CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
     mDnsQueryCtx * pBrowseContext = reinterpret_cast<mDnsQueryCtx *>(browseIdentifier);
-    otInstance * thrInstancePtr   = ThreadStackMgrImpl().OTInstance();
     otError error                 = OT_ERROR_INVALID_ARGS;
 
     // The Matter stack can call this function even with a browseContext that has been
     // freed in DispatchBrowseEmpty. If the browseContext is successfully freed from the
     // browse list then we consider it valid and proceed to stop the mDNS browse operation.
-    if (kLIST_Ok == LIST_RemoveElement(&pBrowseContext->link))
+    bool found = false;
+    for (auto & ctx : mBrowseList)
     {
-        error                 = otMdnsStopBrowser(thrInstancePtr, &pBrowseContext->mBrowseInfo);
-        pBrowseContext->error = MapOpenThreadError(error);
+        if (&ctx == pBrowseContext)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        error                  = otMdnsStopBrowser(mOtInstance, &pBrowseContext->mBrowseInfo);
+        pBrowseContext->mError = MapOpenThreadError(error);
+        mBrowseList.Remove(pBrowseContext);
 
         // browse context will be freed in DispatchBrowseEmpty
         DispatchBrowseEmpty(reinterpret_cast<intptr_t>(pBrowseContext));
@@ -515,8 +534,6 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
     if (browseResult == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-
     pResolveContext = reinterpret_cast<mDnsQueryCtx *>(GetResolveElement(browseResult->mName, kNameTypeInstance));
     if (pResolveContext != nullptr)
     {
@@ -531,7 +548,7 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
     snprintf(pResolveContext->mServiceType, sizeof(pResolveContext->mServiceType), "%s.%s", browseResult->mType,
              GetProtocolString(browseResult->mProtocol));
 
-    error = ResolveBySrp(thrInstancePtr, pResolveContext->mServiceType, pResolveContext, browseResult);
+    error = ResolveBySrp(mOtInstance, pResolveContext->mServiceType, pResolveContext, browseResult);
     // If the SRP cache returns not found, proceed to generate a MDNS query
     if (CHIP_ERROR_NOT_FOUND == error)
     {
@@ -544,14 +561,14 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
         pResolveContext->mSrvInfo.mServiceInstance = pResolveContext->mMdnsService.mName;
         pResolveContext->mSrvInfo.mServiceType     = pResolveContext->mServiceType;
 
-        LIST_AddTail(&mResolveList, (list_element_handle_t) pResolveContext);
+        mResolveList.PushBack(pResolveContext);
 
-        error = MapOpenThreadError(otMdnsStartSrvResolver(thrInstancePtr, &pResolveContext->mSrvInfo));
+        error = MapOpenThreadError(otMdnsStartSrvResolver(mOtInstance, &pResolveContext->mSrvInfo));
     }
 
     if (error != CHIP_NO_ERROR)
     {
-        LIST_RemoveElement(&pResolveContext->link);
+        mResolveList.Remove(pResolveContext);
         Platform::Delete<mDnsQueryCtx>(pResolveContext);
     }
 
@@ -564,9 +581,9 @@ void NxpChipDnssdResolveNoLongerNeeded(const char * instanceName)
     {
         if (strcmp(instanceName, pResolveContext->mMdnsService.mName) == 0)
         {
-            otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mSrvInfo);
+            otMdnsStopSrvResolver(mOtInstance, &pResolveContext->mSrvInfo);
 
-            LIST_RemoveElement(&pResolveContext->link);
+            mResolveList.Remove(pResolveContext);
             Platform::Delete<mDnsQueryCtx>(pResolveContext);
         }
     }
@@ -585,7 +602,7 @@ CHIP_ERROR BrowseBySrp(otInstance * thrInstancePtr, char * serviceName, mDnsQuer
             if ((false == otSrpServerServiceIsDeleted(service)) &&
                 (0 == strncmp(otSrpServerServiceGetServiceName(service), serviceName, strlen(serviceName))))
             {
-                mDnsQueryCtx * serviceContext = Platform::New<mDnsQueryCtx>(context->matterCtx, context->mDnsBrowseCallback);
+                mDnsQueryCtx * serviceContext = Platform::New<mDnsQueryCtx>(context->mMatterCtx, context->mDnsBrowseCallback);
                 if (serviceContext != nullptr)
                 {
                     if (CHIP_NO_ERROR ==
@@ -723,7 +740,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
     mdnsService.mPort = otSrpServerServiceGetPort(service);
 
     // All SRP cache hits come from the Thread Netif
-    mdnsService.mInterface = ConnectivityManagerImpl().GetThreadInterface();
+    mdnsService.mInterface = mThreadNetIf;
 
     mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
 
@@ -815,7 +832,7 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
     }
 
     // All mDNS replies come from the External Netif
-    mdnsService.mInterface = ConnectivityManagerImpl().GetExternalInterface();
+    mdnsService.mInterface = mExternalNetIf;
 
     return CHIP_NO_ERROR;
 }
@@ -831,7 +848,7 @@ static void OtBrowseCallback(otInstance * aInstance, const otMdnsBrowseResult * 
     pBrowseContext = reinterpret_cast<mDnsQueryCtx *>(GetResolveElement(aResult->mServiceType, kNameTypeService));
     VerifyOrReturn(pBrowseContext != nullptr);
 
-    mDnsQueryCtx * tmpContext = Platform::New<mDnsQueryCtx>(pBrowseContext->matterCtx, pBrowseContext->mDnsBrowseCallback);
+    mDnsQueryCtx * tmpContext = Platform::New<mDnsQueryCtx>(pBrowseContext->mMatterCtx, pBrowseContext->mDnsBrowseCallback);
     VerifyOrReturn(tmpContext != nullptr);
 
     Platform::CopyString(tmpContext->mMdnsService.mName, sizeof(tmpContext->mMdnsService.mName), aResult->mServiceInstance);
@@ -858,8 +875,8 @@ static void OtServiceCallback(otInstance * aInstance, const otMdnsSrvResult * aR
     pResolveContext = GetResolveElement(aResult->mServiceInstance, kNameTypeInstance);
     VerifyOrReturn(pResolveContext != nullptr);
 
-    error                  = FromServiceTypeToMdnsData(pResolveContext->mMdnsService, aResult->mServiceType);
-    pResolveContext->error = error;
+    error                   = FromServiceTypeToMdnsData(pResolveContext->mMdnsService, aResult->mServiceType);
+    pResolveContext->mError = error;
 
     if (CHIP_NO_ERROR == error)
     {
@@ -913,8 +930,8 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
 
         if (alloc.AnyAllocFailed())
         {
-            bSendDispatch          = false;
-            pResolveContext->error = CHIP_ERROR_NO_MEMORY;
+            bSendDispatch           = false;
+            pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
         }
         else
         {
@@ -973,14 +990,14 @@ static void OtAddressCallback(otInstance * aInstance, const otMdnsAddressResult 
 static void DispatchBrowseEmpty(intptr_t context)
 {
     auto * browseContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    browseContext->mDnsBrowseCallback(browseContext->matterCtx, nullptr, 0, true, browseContext->error);
+    browseContext->mDnsBrowseCallback(browseContext->mMatterCtx, nullptr, 0, true, browseContext->mError);
     Platform::Delete<mDnsQueryCtx>(browseContext);
 }
 
 static void DispatchBrowse(intptr_t context)
 {
     auto * browseContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    browseContext->mDnsBrowseCallback(browseContext->matterCtx, &browseContext->mMdnsService, 1, false, browseContext->error);
+    browseContext->mDnsBrowseCallback(browseContext->mMatterCtx, &browseContext->mMdnsService, 1, false, browseContext->mError);
     Platform::Delete<mDnsQueryCtx>(browseContext);
 }
 
@@ -992,17 +1009,17 @@ static void DispatchTxtResolve(intptr_t context)
     VerifyOrReturn(IsInResolveList(pResolveContext));
 
     // Stop SRV resolver before starting TXT one, ignore error as it will only happen if mMDS module is not initialized
-    (void) otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mSrvInfo);
+    (void) otMdnsStopSrvResolver(mOtInstance, &pResolveContext->mSrvInfo);
 
     pResolveContext->mTxtInfo.mServiceInstance = pResolveContext->mMdnsService.mName;
     pResolveContext->mTxtInfo.mServiceType     = pResolveContext->mServiceType;
     pResolveContext->mTxtInfo.mCallback        = OtTxtCallback;
     pResolveContext->mTxtInfo.mInfraIfIndex    = mNetifIndex;
 
-    error = otMdnsStartTxtResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mTxtInfo);
+    error = otMdnsStartTxtResolver(mOtInstance, &pResolveContext->mTxtInfo);
     if (error != OT_ERROR_NONE)
     {
-        pResolveContext->error = MapOpenThreadError(error);
+        pResolveContext->mError = MapOpenThreadError(error);
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
                                                                          reinterpret_cast<intptr_t>(pResolveContext));
     }
@@ -1016,16 +1033,16 @@ static void DispatchAddressResolve(intptr_t context)
     VerifyOrReturn(IsInResolveList(pResolveContext));
 
     // Stop TXT resolver before starting address one, ignore error as it will only happen if mMDS module is not initialized
-    (void) otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mTxtInfo);
+    (void) otMdnsStopTxtResolver(mOtInstance, &pResolveContext->mTxtInfo);
 
     pResolveContext->mAddrInfo.mCallback     = OtAddressCallback;
     pResolveContext->mAddrInfo.mHostName     = pResolveContext->mMdnsService.mHostName;
     pResolveContext->mAddrInfo.mInfraIfIndex = mNetifIndex;
 
-    error = otMdnsStartIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
+    error = otMdnsStartIp6AddressResolver(mOtInstance, &pResolveContext->mAddrInfo);
     if (error != OT_ERROR_NONE)
     {
-        pResolveContext->error = MapOpenThreadError(error);
+        pResolveContext->mError = MapOpenThreadError(error);
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
                                                                          reinterpret_cast<intptr_t>(pResolveContext));
     }
@@ -1041,16 +1058,16 @@ static void DispatchResolve(intptr_t context)
 
     // Stop Address resolver, we have finished resolving the service. Ignore error as it will only happen if
     // mMDS module is not initialized
-    (void) otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
+    (void) otMdnsStopIp6AddressResolver(mOtInstance, &pResolveContext->mAddrInfo);
 
     // The context will be freed and the resolve operation is stopped. Matter will
     // try to stop it again on the mDnsResolveCallback but nothing will happen because the
     // element is no longer present in the list.
-    LIST_RemoveElement(&pResolveContext->link);
+    mResolveList.Remove(pResolveContext);
 
     Span<Inet::IPAddress> ipAddrs(pResolveContext->mResolvedAddresses, pResolveContext->mResolvedAddressCount);
 
-    pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, &service, ipAddrs, pResolveContext->error);
+    pResolveContext->mDnsResolveCallback(pResolveContext->mMatterCtx, &service, ipAddrs, pResolveContext->mError);
     Platform::Delete<mDnsQueryCtx>(pResolveContext);
 }
 
@@ -1066,7 +1083,7 @@ static void DispatchResolveSrp(intptr_t context)
     // Address resolver was not started and the resolve context was not added to the resolve list
     // when the result came directly from SRP.
 
-    pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, &service, ipAddrs, pResolveContext->error);
+    pResolveContext->mDnsResolveCallback(pResolveContext->mMatterCtx, &service, ipAddrs, pResolveContext->mError);
     Platform::Delete<mDnsQueryCtx>(pResolveContext);
 }
 
@@ -1081,9 +1098,9 @@ static void DispatchResolveError(intptr_t context)
     // The context will be freed and the resolve operation is stopped. Matter will
     // try to stop it again on the mDnsResolveCallback but nothing will happen because the
     // element is no longer present in the list.
-    LIST_RemoveElement(&pResolveContext->link);
+    mResolveList.Remove(pResolveContext);
 
-    pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, nullptr, ipAddrs, pResolveContext->error);
+    pResolveContext->mDnsResolveCallback(pResolveContext->mMatterCtx, nullptr, ipAddrs, pResolveContext->mError);
     Platform::Delete<mDnsQueryCtx>(pResolveContext);
 }
 
@@ -1092,13 +1109,13 @@ static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep step
     switch (stepType)
     {
     case kResolveStepSrv:
-        otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext.mSrvInfo);
+        otMdnsStopSrvResolver(mOtInstance, &resolveContext.mSrvInfo);
         break;
     case kResolveStepTxt:
-        otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext.mTxtInfo);
+        otMdnsStopTxtResolver(mOtInstance, &resolveContext.mTxtInfo);
         break;
     case kResolveStepIpAddr:
-        otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext.mAddrInfo);
+        otMdnsStopIp6AddressResolver(mOtInstance, &resolveContext.mAddrInfo);
         break;
     }
 
@@ -1112,56 +1129,35 @@ static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep step
 
 static mDnsQueryCtx * GetResolveElement(const char * aName, NameType aType)
 {
-    mDnsQueryCtx * pResolveContext = nullptr;
+    IntrusiveList<mDnsQueryCtx> & list = (aType == kNameTypeService) ? mBrowseList : mResolveList;
 
-    if (aType == kNameTypeService)
+    for (auto & ctx : list)
     {
-        pResolveContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mBrowseList));
-    }
-    else
-    {
-        pResolveContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
-    }
-
-    while (pResolveContext)
-    {
-        if (aType == kNameTypeInstance)
+        if (aType == kNameTypeInstance && strcmp(aName, ctx.mMdnsService.mName) == 0)
         {
-            if (strcmp(aName, pResolveContext->mMdnsService.mName) == 0)
-            {
-                break;
-            }
+            return &ctx;
         }
-        else if (aType == kNameTypeHost)
+        if (aType == kNameTypeHost && strcmp(aName, ctx.mMdnsService.mHostName) == 0)
         {
-            if (strcmp(aName, pResolveContext->mMdnsService.mHostName) == 0)
-            {
-                break;
-            }
+            return &ctx;
         }
-        else if (aType == kNameTypeService)
+        if (aType == kNameTypeService && strcmp(aName, ctx.mServiceType) == 0)
         {
-            if (strcmp(aName, pResolveContext->mServiceType) == 0)
-            {
-                break;
-            }
+            return &ctx;
         }
-        pResolveContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetNext(&pResolveContext->link));
     }
 
-    return pResolveContext;
+    return nullptr;
 }
 
 static bool IsInResolveList(const mDnsQueryCtx * pResolveContext)
 {
-    mDnsQueryCtx * pContextIterator = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
-    while (pContextIterator)
+    for (auto & ctx : mResolveList)
     {
-        if (pContextIterator == pResolveContext)
+        if (&ctx == pResolveContext)
         {
             return true;
         }
-        pContextIterator = reinterpret_cast<mDnsQueryCtx *>(LIST_GetNext(&pContextIterator->link));
     }
     return false;
 }
