@@ -23,6 +23,8 @@ source_set("av-analysis-server") {
     "AvAnalysisLogic.h",
     "AvAnalysisStorage.h",
     "AvAnalysisStreamTable.h",
+    "DefaultAvAnalysisCameraClient.cpp",
+    "DefaultAvAnalysisCameraClient.h",
   ]
 
   deps = [
