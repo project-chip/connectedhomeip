@@ -54,6 +54,18 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 
+#ifdef DEBUG
+// Pair-atomic snapshot of the three first-Thread-subscribe deferral state
+// flags.  Tests use -unitTestSnapshotFirstThreadSubscribeFlags to read all
+// three under _lock in a single hop, instead of per-flag KVC reads which
+// race the daemon-side mutations under TSAN.
+typedef struct {
+    BOOL deferring;
+    BOOL hasDeferred;
+    BOOL hasCachedIP;
+} MTRDeviceFirstThreadSubscribeFlags;
+#endif
+
 /**
  * container of MTRDevice delegate weak reference, its queue, and its interested
  * paths for attribute reports.
