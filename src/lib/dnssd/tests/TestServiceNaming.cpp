@@ -255,4 +255,41 @@ TEST(TestServiceNaming, TestMakeServiceTypeName)
     EXPECT_EQ(MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_CM._sub._matterc");
 }
+
+TEST(TestServiceNaming, TestMakeHostNameEmptyInput)
+{
+    char buffer[64];
+
+    memset(buffer, 'x', sizeof(buffer));
+    // An empty mac/eui64 has no valid host name representation; the call must not report success
+    // while leaving the destination untouched.
+    EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const uint8_t mac[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
+    EXPECT_EQ(MakeHostName(buffer, sizeof(buffer), ByteSpan(mac)), CHIP_NO_ERROR);
+    EXPECT_STREQ(buffer, "001122334455");
+}
+
+TEST(TestServiceNaming, TestZeroLengthDestination)
+{
+    char buffer[64];
+    DiscoveryFilter filter;
+
+    // bufferLen == 0 leaves no room even for a terminator, so every builder must reject it
+    // rather than underflow the (bufferLen - 1) comparison and report success.
+    filter.type = DiscoveryFilterType::kNone;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    filter.type = DiscoveryFilterType::kCommissioningMode;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    filter.type = DiscoveryFilterType::kLongDiscriminator;
+    filter.code = 0xFFF;
+    EXPECT_EQ(MakeServiceSubtype(buffer, 0, filter), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(MakeServiceTypeName(buffer, 0, filter, DiscoveryType::kCommissionableNode), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    EXPECT_EQ(MakeHostName(buffer, 0, ByteSpan()), CHIP_ERROR_BUFFER_TOO_SMALL);
+}
 } // namespace

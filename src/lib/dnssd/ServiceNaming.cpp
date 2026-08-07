@@ -89,6 +89,8 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64)
 {
     VerifyOrReturnError(bufferLen >= macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    // An empty input would otherwise leave the destination untouched and still report success.
+    VerifyOrReturnError(!macOrEui64.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     int idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)
@@ -100,6 +102,10 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 
 CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
 {
+    // Checked up front: the kNone case below writes a terminator unconditionally, and the
+    // final size comparison subtracts one from bufferLen.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     int requiredSize;
     switch (subtype.type)
     {
@@ -153,11 +159,15 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         buffer[0]    = '\0';
         break;
     }
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) < bufferLen) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
+    // Checked up front: the subtype branch below relies on the buffer being terminated by
+    // MakeServiceSubtype, and the final size comparison subtracts one from bufferLen.
+    VerifyOrReturnError(bufferLen > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     int requiredSize;
     if (nameDesc.type == DiscoveryFilterType::kNone)
     {
@@ -203,7 +213,7 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
         }
     }
 
-    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) < bufferLen) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 } // namespace Dnssd
