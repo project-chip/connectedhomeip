@@ -24,9 +24,12 @@ on:
     push:
         paths:
             - "integrations/docker/**"
+            # Changing which images this workflow builds should build them.
+            - ".github/workflows/docker_img.yaml"
     pull_request:
         paths:
             - "integrations/docker/**"
+            - ".github/workflows/docker_img.yaml"
     workflow_dispatch:
         inputs:
             push_images:
