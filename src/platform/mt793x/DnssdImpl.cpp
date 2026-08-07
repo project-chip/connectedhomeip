@@ -44,6 +44,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Dnssd;
@@ -204,7 +205,7 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     ChipLogDetail(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %ld", __func__, name, type, domain, flags);
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
-    sdCtx->Finalize(err);
+    TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err);
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
@@ -320,7 +321,16 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     DnssdService service;
 
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", StringOrNullMarker(serviceName));
-    strcpy(service.mName, serviceName);
+
+    chip::StringBuilderBase nameBuilder(service.mName, sizeof(service.mName));
+    nameBuilder.Add(serviceName);
+    if (!nameBuilder.Fit())
+    {
+        // This is a DNSServiceBrowseReply callback with a fixed signature, so we cannot
+        // propagate an error. The StringBuilder still guarantees service.mName stays
+        // bounded and null-terminated, so just log the truncation and continue.
+        ChipLogError(ServiceProvisioning, "serviceName truncated: %s", StringOrNullMarker(serviceName));
+    }
 
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
@@ -335,9 +345,15 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
     (void) addressType;
     ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", StringOrNullMarker(type));
-    strcpy(ServiceType, type);
-    strcat(ServiceType, ".");
-    strcat(ServiceType, GetProtocolString(protocol));
+    chip::StringBuilderBase typeBuilder(ServiceType, sizeof(ServiceType));
+    typeBuilder.Add(type).Add(".").Add(GetProtocolString(protocol));
+    if (!typeBuilder.Fit())
+    {
+        ChipLogError(ServiceProvisioning, "ServiceType too long, truncated: type=%s protocol=%s", StringOrNullMarker(type),
+                     GetProtocolString(protocol));
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return error;
+    }
     err = DNSServiceBrowse(&BrowseClient, 0, 0, ServiceType, SERVICE_DOMAIN, ChipDNSServiceBrowseReply, (void *) callback);
     ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int) err);
     if (err)
@@ -409,7 +425,7 @@ static void resolve_client_task(void * parameter)
                 GenericContext * context = MdnsContexts::GetInstance().GetBySockFd(fd);
                 if (context && context->mSelectCount > 10)
                 {
-                    context->Finalize(kDNSServiceErr_Timeout);
+                    TEMPORARY_RETURN_IGNORED context->Finalize(kDNSServiceErr_Timeout);
                 }
             }
         }
@@ -429,13 +445,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (kDNSServiceErr_NoError == err)
     {
-        sdCtx->OnNewAddress(interfaceId, address);
+        TEMPORARY_RETURN_IGNORED sdCtx->OnNewAddress(interfaceId, address);
     }
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
-        VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
-        sdCtx->Finalize();
+        VerifyOrReturn(sdCtx->HasAddress(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
+        TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
     }
 }
 
@@ -456,7 +472,7 @@ static void GetAddrInfo(ResolveContext * sdCtx)
 
         auto err          = DNSServiceGetAddrInfo(&resolveClient, 0, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
         sdCtx->serviceRef = resolveClient;
-        VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+        VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
     }
 }
 
@@ -472,13 +488,13 @@ void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint
         sdCtx->OnNewInterface(interfaceIndex, fullname, hosttarget, port, txtLen, txtRecord);
         if (kDNSServiceInterfaceIndexLocalOnly == interfaceIndex)
         {
-            sdCtx->OnNewLocalOnlyAddress();
-            sdCtx->Finalize();
+            TEMPORARY_RETURN_IGNORED sdCtx->OnNewLocalOnlyAddress();
+            TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
             return;
         }
         if (!(flags & kDNSServiceFlagsMoreComing))
         {
-            VerifyOrReturn(sdCtx->HasInterface(), sdCtx->Finalize(kDNSServiceErr_BadState));
+            VerifyOrReturn(sdCtx->HasInterface(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
             GetAddrInfo(sdCtx);
         }
     }
@@ -495,9 +511,14 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     uint32_t interfaceIndex = GetInterfaceId(interface);
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdResolve %s", service->mName);
-    strcpy(ServiceType, service->mType);
-    strcat(ServiceType, ".");
-    strcat(ServiceType, GetProtocolString(service->mProtocol));
+    chip::StringBuilderBase typeBuilder(ServiceType, sizeof(ServiceType));
+    typeBuilder.Add(service->mType).Add(".").Add(GetProtocolString(service->mProtocol));
+    if (!typeBuilder.Fit())
+    {
+        ChipLogError(ServiceProvisioning, "ServiceType too long, truncated: type=%s protocol=%s",
+                     StringOrNullMarker(service->mType), GetProtocolString(service->mProtocol));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, service->mAddressType);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
