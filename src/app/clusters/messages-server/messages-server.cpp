@@ -108,7 +108,8 @@ CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & mes
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "LogMessageQueuedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+        ChipLogError(Zcl, "LogMessageQueuedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                    endpoint);
     }
     return err;
 }
@@ -121,7 +122,8 @@ CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & 
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "LogMessagePresentedEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+        ChipLogError(Zcl, "LogMessagePresentedEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                    endpoint);
     }
     return err;
 }
@@ -139,7 +141,8 @@ CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & m
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "LogMessageCompleteEvent: unable to send event: %s [endpointId=%d]", err.AsString(), endpoint);
+        ChipLogError(Zcl, "LogMessageCompleteEvent: unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]", err.Format(),
+                    endpoint);
     }
     return err;
 }

@@ -193,17 +193,17 @@ private:
 
     static constexpr uint32_t kClockRecheckIntervalSeconds = 30;
 
-    std::list<CachedMessage>::iterator FindCachedMessage(const chip::ByteSpan & messageId);
+    std::list<CachedMessage>::iterator FindCachedMessage(chip::ByteSpan messageId);
 
     // Computes the delay until `messageId`'s StartTime and (re-)schedules the
     // present-timer for it, or presents it immediately if StartTime has already
     // passed (or is null). Also used to recheck once the real time becomes synced.
-    void ScheduleOrPresentMessage(const chip::ByteSpan & messageId);
+    void ScheduleOrPresentMessage(chip::ByteSpan messageId);
     void PresentMessage(CachedMessage & message);
-    void CompleteMessage(const chip::ByteSpan & messageId);
+    void CompleteMessage(chip::ByteSpan messageId);
 
-    void StartMessageTimer(const chip::ByteSpan & messageId, MessageTimerType type, uint32_t delayMs);
-    void CancelMessageTimers(const chip::ByteSpan & messageId);
+    void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);
+    void CancelMessageTimers(chip::ByteSpan messageId);
     static void OnMessageTimerExpired(chip::System::Layer * systemLayer, void * context);
 
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;

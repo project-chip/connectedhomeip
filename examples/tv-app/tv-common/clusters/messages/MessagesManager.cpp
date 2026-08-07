@@ -75,7 +75,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     mCachedMessages.remove_if([&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
 
     mCachedMessages.push_back(cachedMessage);
-    TEMPORARY_RETURN_IGNORED LogMessageQueuedEvent(mEndpointId, messageId);
+    LogErrorOnFailure(LogMessageQueuedEvent(mEndpointId, messageId));
 
     ScheduleOrPresentMessage(messageId);
 
@@ -160,13 +160,13 @@ uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 
 // State machine
 
-std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(const ByteSpan & messageId)
+std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(ByteSpan messageId)
 {
     return std::find_if(mCachedMessages.begin(), mCachedMessages.end(),
                         [&messageId](CachedMessage & entry) { return entry.MessageIdMatches(messageId); });
 }
 
-void MessagesManager::ScheduleOrPresentMessage(const ByteSpan & messageId)
+void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
 {
     auto it = FindCachedMessage(messageId);
     if (it == mCachedMessages.end())
@@ -175,26 +175,28 @@ void MessagesManager::ScheduleOrPresentMessage(const ByteSpan & messageId)
         return;
     }
 
-    uint32_t nowEpochS = 0;
-    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(nowEpochS);
-    if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
+    const auto & startTime = it->GetStartTime();
+    if (startTime.IsNull())
     {
-        ChipLogProgress(Zcl, "MessagesManager: real time not synced yet, rechecking in %u s", kClockRecheckIntervalSeconds);
-        StartMessageTimer(messageId, MessageTimerType::kPresent, kClockRecheckIntervalSeconds * 1000);
-        return;
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "MessagesManager: failed to read current time: %s", err.AsString());
+        PresentMessage(*it);
         return;
     }
 
-    const auto & startTime = it->GetStartTime();
-    if (!startTime.IsNull() && startTime.Value() > nowEpochS)
+    uint32_t nowEpochS = 0;
+    CHIP_ERROR err     = System::Clock::GetClock_MatterEpochS(nowEpochS);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "MessagesManager: could not read current time (%" CHIP_ERROR_FORMAT "), rechecking in %u s",
+                         err.Format(), kClockRecheckIntervalSeconds);
+        StartMessageTimer(messageId, MessageTimerType::kPresent, kClockRecheckIntervalSeconds * 1000);
+        return;
+    }
+
+    if (startTime.Value() > nowEpochS)
     {
         // Cap the delay so `delaySeconds * 1000` can't overflow uint32_t (~49.7 days worth of
         // ms); if StartTime is further out than that, wait the max chunk and let this function
-        // re-run and re-check/reschedule, same as the real-time-not-synced retry above.
+        // re-run and re-check/reschedule, same as the clock-error retry above.
         constexpr uint32_t kMaxSingleTimerDelaySeconds = UINT32_MAX / 1000;
         uint32_t delaySeconds                          = startTime.Value() - nowEpochS;
         if (delaySeconds > kMaxSingleTimerDelaySeconds)
@@ -234,7 +236,7 @@ void MessagesManager::PresentMessage(CachedMessage & message)
     }
 
     message.SetState(MessageState::kPresented);
-    TEMPORARY_RETURN_IGNORED LogMessagePresentedEvent(mEndpointId, message.GetMessageId());
+    LogErrorOnFailure(LogMessagePresentedEvent(mEndpointId, message.GetMessageId()));
 
     const auto & duration = message.GetDuration();
     if (!duration.IsNull())
@@ -248,7 +250,7 @@ void MessagesManager::PresentMessage(CachedMessage & message)
     }
 }
 
-void MessagesManager::CompleteMessage(const ByteSpan & messageId)
+void MessagesManager::CompleteMessage(ByteSpan messageId)
 {
     auto it = FindCachedMessage(messageId);
     if (it == mCachedMessages.end())
@@ -258,15 +260,21 @@ void MessagesManager::CompleteMessage(const ByteSpan & messageId)
 
     // Auto-dismissed after Duration elapsed with no real user response available
     // (this example app has no UI to collect one).
-    TEMPORARY_RETURN_IGNORED LogMessageCompleteEvent(mEndpointId, messageId, Optional<DataModel::Nullable<uint32_t>>(),
-                                                     Optional<DataModel::Nullable<CharSpan>>(),
-                                                     DataModel::Nullable<FutureMessagePreferenceEnum>());
+    LogErrorOnFailure(LogMessageCompleteEvent(mEndpointId, messageId, Optional<DataModel::Nullable<uint32_t>>(),
+                                              Optional<DataModel::Nullable<CharSpan>>(),
+                                              DataModel::Nullable<FutureMessagePreferenceEnum>()));
 
     mCachedMessages.erase(it);
 }
 
-void MessagesManager::StartMessageTimer(const ByteSpan & messageId, MessageTimerType type, uint32_t delayMs)
+void MessagesManager::StartMessageTimer(ByteSpan messageId, MessageTimerType type, uint32_t delayMs)
 {
+    if (messageId.size() != sizeof(MessageTimerContext::messageId))
+    {
+        ChipLogError(Zcl, "MessagesManager: unexpected message id size %u", static_cast<unsigned>(messageId.size()));
+        return;
+    }
+
     auto context     = std::make_shared<MessageTimerContext>();
     context->manager = this;
     context->type    = type;
@@ -276,13 +284,13 @@ void MessagesManager::StartMessageTimer(const ByteSpan & messageId, MessageTimer
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayMs), OnMessageTimerExpired, context.get());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MessagesManager: failed to start timer: %s", err.AsString());
+        ChipLogError(Zcl, "MessagesManager: failed to start timer: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
     mTimerContexts.push_back(context);
 }
 
-void MessagesManager::CancelMessageTimers(const ByteSpan & messageId)
+void MessagesManager::CancelMessageTimers(ByteSpan messageId)
 {
     for (auto it = mTimerContexts.begin(); it != mTimerContexts.end();)
     {
