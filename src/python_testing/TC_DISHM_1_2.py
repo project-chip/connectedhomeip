@@ -40,13 +40,13 @@ from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster_dishm_mode = Clusters.DishwasherMode
 
 
-class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
+class TC_DISHM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)

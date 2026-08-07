@@ -74,6 +74,13 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestCreateNewController.py",
         "test_testing/TestCommissioningTimeSync.py",
         "test_testing/TestCleanupFramework.py",
+        # Representatives of the support-module bases: mixed bases carry the marker on the
+        # concrete class (CADMIN/ICDB_1_x), uniform bases carry it on the base and the tests
+        # single-inherit (SMOKECO/BINFO). All must resolve to Commissioned.
+        "TC_CADMIN_1_10.py",
+        "TC_ICDB_1_1.py",
+        "TC_SMOKECO_2_1.py",
+        "TC_BINFO_2_1.py",
     ],
     MatterTestCommissioner: [
         "test_testing/TestCommissioningStatusDetectionIntegration.py",
@@ -94,6 +101,22 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "TC_SC_TC_2_2.py",
         "TC_SC_TC_3_1.py",
         "TC_SC_TC_4_1.py",
+        # commission the primary DUT themselves (ICDB via commission_device; JF via joint-fabric
+        # pairing; SC_3_5 is a DUT-as-commissioner test). ICDB/JFADMIN_2_2 also exercise the mixed
+        # support bases (ICDBaseTest/CADMINBaseTest) that must stay marker-free.
+        "TC_ICDB_2_1_2_2.py",
+        "TC_ICDB_2_3.py",
+        "TC_ICDB_2_4.py",
+        "TC_JFADMIN_1_1.py",
+        "TC_JFADMIN_1_2.py",
+        "TC_JFADMIN_1_4.py",
+        "TC_JFADMIN_2_1.py",
+        "TC_JFADMIN_2_2.py",
+        "TC_JFDS_2_1.py",
+        "TC_JFDS_2_2.py",
+        "TC_JFDS_2_3.py",
+        "TC_JFDS_2_4.py",
+        "TC_SC_3_5.py",
     ],
     MatterTestUncommissionedDevice: [
         "TC_DD_1_16_17.py",
@@ -254,6 +277,34 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         if source_fallback:
             print(f"\n[TestDeviceRequirementMarkers] source-only (import deps unavailable): {source_fallback}",
                   file=sys.stderr)
+
+    def test_no_concrete_test_inherits_matterbasetest_directly(self):
+        """Coverage guard: every concrete test must declare its device requirement through a
+        marker (or an intermediate base such as BasicCompositionTests), never bare MatterBaseTest.
+
+        AST-scans src/python_testing/TC_*.py and test_testing/*.py (no imports needed, so it is
+        independent of optional dependencies). Any top-level class that both defines a test
+        method (test_/steps_/desc_) and lists MatterBaseTest as a *direct* base is flagged --
+        that is a test sitting on the raw base with no device classification. Mixin/base helpers
+        (no such methods) may still derive from MatterBaseTest directly.
+        """
+        def base_names(cd):
+            return {b.id if isinstance(b, ast.Name) else b.attr
+                    for b in cd.bases if isinstance(b, (ast.Name, ast.Attribute))}
+
+        def defines_test(cd):
+            return any(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                       and n.name.startswith(("test_", "steps_", "desc_")) for n in cd.body)
+
+        offenders = []
+        for path in sorted(_PY_TESTING.glob("TC_*.py")) + sorted((_PY_TESTING / "test_testing").glob("*.py")):
+            tree = ast.parse(path.read_text())
+            for node in tree.body:
+                if isinstance(node, ast.ClassDef) and defines_test(node) and "MatterBaseTest" in base_names(node):
+                    offenders.append(f"{path.name}:{node.name}")
+        self.assertEqual(offenders, [],
+                         "concrete tests must derive from a device-requirement marker, not bare "
+                         f"MatterBaseTest: {offenders}")
 
 
 if __name__ == "__main__":

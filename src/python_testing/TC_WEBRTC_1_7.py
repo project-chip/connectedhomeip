@@ -47,14 +47,14 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
+class TC_WEBRTC_1_7(MatterTestCommissionedDevice, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_7(self) -> list[TestStep]:
         return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),

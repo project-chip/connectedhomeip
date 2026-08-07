@@ -45,7 +45,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # This test requires several additional command line arguments.
@@ -77,7 +77,7 @@ def error_enum_to_text(error_enum):
     raise AttributeError("Unknown Enum value")
 
 
-class TC_RVCRUNM_2_2(MatterBaseTest):
+class TC_RVCRUNM_2_2(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)

@@ -75,14 +75,14 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import IcdAppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
 
 
-class TC_BRBINFO_4_1(MatterBaseTest):
+class TC_BRBINFO_4_1(MatterTestCommissionedDevice):
 
     # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
     # so 6 minutes is more than enough.

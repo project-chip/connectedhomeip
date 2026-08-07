@@ -50,6 +50,7 @@ from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 from matter.clusters import MeterIdentification
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ log = logging.getLogger(__name__)
 cluster = MeterIdentification
 
 
-class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
+class TC_MTRID_3_1(MatterTestCommissionedDevice, MeterIdentificationTestBaseHelper):
     """Implementation of test case TC_MTRID_3_1."""
 
     def desc_TC_MTRID_3_1(self) -> str:

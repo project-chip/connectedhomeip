@@ -57,13 +57,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # Create a logger
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_2(SoftwareUpdateBaseTest):
+class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     def matcher_ota_updatestate(self, step_name, start_states, allowed_states, min_interval_sec, final_state=None):
         """

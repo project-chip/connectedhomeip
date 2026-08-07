@@ -45,14 +45,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_24(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_24(self) -> str:
         """Returns a description of this test"""
         return "[TC-WEBRTCP-2.24] Validate SolicitOffer SFrame configuration handling"
