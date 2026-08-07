@@ -355,13 +355,18 @@ void ResolverLifecycleNoCorruption(uint8_t flavorSel, const std::string & instan
     // ---- Feed an address record whose body is the wrong length ----
     // IPResourceRecord always writes a correctly sized address, so a body the
     // address parser rejects has to be supplied directly.
+    // A three-byte body is the wrong length for both record types, so one pass
+    // covers the IPv6 and the IPv4 address parser.
     if (malformedIpBody)
     {
-        RawResourceRecord shortAddr(QType::AAAA, hostName.Full(), ipBytes.data(), 3);
-        WireRecord shortAddrWire;
-        if (shortAddrWire.Build(shortAddr))
+        for (QType type : { QType::AAAA, QType::A })
         {
-            (void) resolver.OnRecord(interface, shortAddrWire.Resource(), shortAddrWire.Packet());
+            RawResourceRecord shortAddr(type, hostName.Full(), ipBytes.data(), 3);
+            WireRecord shortAddrWire;
+            if (shortAddrWire.Build(shortAddr))
+            {
+                (void) resolver.OnRecord(interface, shortAddrWire.Resource(), shortAddrWire.Packet());
+            }
         }
     }
 
