@@ -105,7 +105,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         asserts.assert_equal(reserved_bits, 0,
                              f"Reserved bits set in FeatureMap: 0x{reserved_bits:08X}")
 
-        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints present iff SET, ActiveEndpoints present iff DYPF")
+        self.step(5, "TH reads AttributeList; verifies AvailableEndpoints present iff SET, ActiveEndpoints present iff DYPF, ElectricalCircuitNodes present iff CIRC")
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -133,6 +133,16 @@ class TC_PWRTL_2_1(MatterBaseTest):
         else:
             asserts.assert_not_in(active_ep_id, attribute_list,
                                   "ActiveEndpoints must NOT be in AttributeList when DYPF feature is not set")
+
+        # ElectricalCircuitNodes (0x0002): conformance "CIRC" (Matter 1.7); mandatory iff CIRC feature,
+        # disallowed otherwise.
+        ecn_id = attributes.ElectricalCircuitNodes.attribute_id
+        if has_circ:
+            asserts.assert_in(ecn_id, attribute_list,
+                              "ElectricalCircuitNodes must be in AttributeList when CIRC feature is set")
+        else:
+            asserts.assert_not_in(ecn_id, attribute_list,
+                                  "ElectricalCircuitNodes must NOT be in AttributeList when CIRC feature is not set")
 
         self.step(6, "TH reads AvailableEndpoints (if present in AttributeList)")
         avail_eps = None
