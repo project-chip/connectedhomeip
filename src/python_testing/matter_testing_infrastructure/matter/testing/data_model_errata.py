@@ -183,8 +183,27 @@ def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: st
                                       severity=ProblemSeverity.ERROR, problem=f"CRITICAL: Element name '{element_name}' in '{cluster_name}' violates Matter SDK PascalCase conventions. Please use clean sanitized names."))
         return
 
-    # Check if this element is marked as provisional and skip if attribute doesn't exist
-    is_provisional = overrides.get(PROVISIONAL_KEY, False)
+    # Check if this element is marked as provisional.
+    # The key is optional and defaults to False when omitted.
+    is_provisional = False
+    if PROVISIONAL_KEY in overrides:
+        provisional_value = overrides[PROVISIONAL_KEY]
+
+        if not isinstance(provisional_value, bool):
+            problems.append(
+                ProblemNotice(
+                    test_name='Data Model Errata',
+                    location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                    severity=ProblemSeverity.ERROR,
+                    problem=(
+                        f"Invalid value for '{PROVISIONAL_KEY}' on "
+                        f"'{cluster_name}::{element_name}': expected a boolean "
+                        f"(True or False), got {type(provisional_value).__name__}."
+                    ),
+                )
+            )
+            return
+        is_provisional = provisional_value
 
     san_elem = element_name.lower()
     context = f"{cluster_name}::{element_name}"
