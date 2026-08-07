@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -48,8 +50,38 @@ config("enable_exceptions") {
   ]
 }
 
-pkg_config("luna-service") {
-  packages = [ "luna-service2++" ]
+declare_args() {
+  # Use the host-build Luna Service 2 stub headers for fuzz tests. Production
+  # webOS builds should continue to consume luna-service2++ from pkg-config.
+  chip_webos_use_luna_service_stubs =
+      (is_libfuzzer || oss_fuzz) && chip_build_tests
+}
+
+if (chip_webos_use_luna_service_stubs) {
+  config("luna-service") {
+    include_dirs = [ "${chip_root}/src/platform/tests/webos_stubs" ]
+    defines = [ "CHIP_WEBOS_FUZZER_STUBS=1" ]
+    cflags_cc = [
+      "-include",
+      "chrono",
+      "-include",
+      "thread",
+      "-Wno-shorten-64-to-32",
+      "-Wno-unused-private-field",
+      "-Wno-unused-value",
+    ]
+  }
+
+  pkg_config("webos-host-glib") {
+    packages = [
+      "glib-2.0",
+      "gio-2.0",
+    ]
+  }
+} else {
+  pkg_config("luna-service") {
+    packages = [ "luna-service2++" ]
+  }
 }
 static_library("webos") {
   sources = [
@@ -95,7 +127,7 @@ static_library("webos") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (chip_enable_thread) {
+  if (chip_enable_thread && !chip_webos_use_luna_service_stubs) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
@@ -158,7 +190,7 @@ static_library("webos") {
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
-  if (chip_enable_thread) {
+  if (chip_enable_thread && !chip_webos_use_luna_service_stubs) {
     sources += [
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
@@ -168,7 +200,7 @@ static_library("webos") {
     public_deps += [ "dbus/openthread" ]
   }
 
-  if (chip_enable_wifi) {
+  if (chip_enable_wifi && !chip_webos_use_luna_service_stubs) {
     sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
 
     public_deps += [ "dbus/wpa" ]
@@ -176,6 +208,9 @@ static_library("webos") {
 
   if (chip_enable_ble) {
     public_configs += [ ":luna-service" ]
+    if (chip_webos_use_luna_service_stubs) {
+      public_configs += [ ":webos-host-glib" ]
+    }
   }
 
   if (chip_with_trusty_os) {
