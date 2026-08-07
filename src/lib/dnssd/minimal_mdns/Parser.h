@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/core/Constants.h>
-#include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/dnssd/wire/Constants.h>
+#include <lib/dnssd/wire/DnsHeader.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 
 namespace mdns {
 namespace Minimal {

@@ -47,12 +47,12 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.bdx import BdxProtocol, BdxTransfer
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TestBdxTransfer(MatterBaseTest):
-    requires_dut = False
+class TestBdxTransfer(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
 
     _intents = [
         (Clusters.DiagnosticLogs.Enums.IntentEnum.kEndUserSupport, "/tmp/eusl.txt", 9240),  # BDX
