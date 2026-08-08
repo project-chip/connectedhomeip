@@ -289,8 +289,13 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    chip::app::Clusters::Thermostat::SetDefaultDelegate(Thermostat_ENDPOINT_ID,
-                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
+        Thermostat_ENDPOINT_ID, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    if (status != chip::Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
+        return;
+    }
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);

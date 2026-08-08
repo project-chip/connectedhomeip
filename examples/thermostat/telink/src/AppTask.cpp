@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
 #include <thermostat-delegate-impl.h>
@@ -37,8 +38,9 @@ CHIP_ERROR AppTask::Init(void)
 
     ReturnErrorOnFailure(InitCommonParts());
 
-    chip::app::Clusters::Thermostat::SetDefaultDelegate(kExampleEndpointId,
-                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
+        kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    ReturnErrorOnFailure(chip::app::StatusIB(status).ToChipError());
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)

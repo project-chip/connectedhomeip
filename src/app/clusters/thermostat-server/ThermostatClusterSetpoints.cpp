@@ -166,6 +166,7 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
     setpoints.heatSupported      = mFeatures.Has(Feature::kHeating);
     setpoints.coolSupported      = mFeatures.Has(Feature::kCooling);
     setpoints.occupancySupported = mFeatures.Has(Feature::kOccupancy);
+    setpoints.eventsSupported    = mFeatures.Has(Feature::kEvents);
 
     if (setpoints.autoSupported)
     {
@@ -264,7 +265,10 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     {
         return chip::Protocols::InteractionModel::ClusterStatusCode(status).GetStatus();
     }
-    GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
+    if (mFeatures.Has(Feature::kEvents))
+    {
+        GenerateSetpointEvent(oldSetpoint.AttributeId(), oldSetpoint.Temperature(), newSetpoint.Temperature());
+    }
     oldSetpoint.SetTemperature(newSetpoint.Temperature());
     NotifyAttributeChanged(oldSetpoint.AttributeId());
     return Status::Success;
