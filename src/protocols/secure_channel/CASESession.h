@@ -170,6 +170,8 @@ public:
      **/
     void Clear();
 
+    void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
+
     enum class State : uint8_t
     {
         kInitialized         = 0,
@@ -214,8 +216,8 @@ protected:
 
     struct EncodeSigma1Inputs : Sigma1Param
     {
-        const Crypto::P256PublicKey * initiatorEphPubKey         = nullptr;
-        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
+        const Crypto::P256PublicKey * initiatorEphPubKey = nullptr;
+        SessionParameters initiatorSessionParams;
         uint8_t initiatorResume1MICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
 
@@ -238,7 +240,7 @@ protected:
         // size
         Platform::ScopedMemoryBuffer<uint8_t> msgR2Encrypted;
         size_t encrypted2Length = 0;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
     struct ParsedSigma2
     {
@@ -275,7 +277,7 @@ protected:
         uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
         MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
 
     struct ParsedSigma2Resume
@@ -589,6 +591,8 @@ private:
     Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
+
+    SessionParameters mLocalSessionParams;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();

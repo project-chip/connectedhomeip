@@ -772,7 +772,8 @@ CHIP_ERROR CASESession::SendSigma1()
     }
 
     VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    encodeSigma1Inputs.initiatorMrpConfig = &mLocalMRPConfig.Value();
+    mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
+    encodeSigma1Inputs.initiatorSessionParams = mLocalSessionParams;
 
     // Try to find persistent session, and resume it.
     if (mSessionResumptionStorage != nullptr)
@@ -857,9 +858,8 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
     ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(Sigma1Tags::kInitiatorEphPubKey), *input.initiatorEphPubKey,
                                             static_cast<uint32_t>(input.initiatorEphPubKey->Length())));
 
-    VerifyOrReturnError(input.initiatorMrpConfig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(
-        EncodeSessionParameters(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), *input.initiatorMrpConfig, tlvWriter));
+        EncodeSessionParameters(AsTlvContextTag(Sigma1Tags::kInitiatorSessionParams), input.initiatorSessionParams, tlvWriter));
 
     if (input.sessionResumptionRequested)
     {
@@ -1113,7 +1113,8 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), outSigma2ResData.sigma2ResumeMIC));
 
-    outSigma2ResData.responderMrpConfig = &mLocalMRPConfig.Value();
+    mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
+    outSigma2ResData.responderSessionParams = mLocalSessionParams;
 
     return CHIP_NO_ERROR;
 }
@@ -1121,8 +1122,6 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
 CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Resume, EncodeSigma2ResumeInputs & input)
 {
     MATTER_TRACE_SCOPE("EncodeSigma2Resume", "CASESession");
-
-    VerifyOrReturnError(input.responderMrpConfig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t maxDatalLen = EstimateStructOverhead(SessionResumptionStorage::kResumptionIdSize, // resumptionID
                                                 CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,           // sigma2ResumeMIC
@@ -1143,8 +1142,8 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Res
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.sigma2ResumeMIC));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), input.responderSessionId));
 
-    ReturnErrorOnFailure(
-        EncodeSessionParameters(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams), *input.responderMrpConfig, tlvWriter));
+    ReturnErrorOnFailure(EncodeSessionParameters(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams),
+                                                 input.responderSessionParams, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msgR2Resume));
@@ -1282,7 +1281,8 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
                                          outSigma2Data.msgR2Encrypted.Get() + msgR2SignedEncLen,
                                          CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-    outSigma2Data.responderMrpConfig = &mLocalMRPConfig.Value();
+    mLocalSessionParams.SetMRPConfig(mLocalMRPConfig.Value());
+    outSigma2Data.responderSessionParams = mLocalSessionParams;
 
     return CHIP_NO_ERROR;
 }
@@ -1293,7 +1293,6 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
     VerifyOrReturnError(input.msgR2Encrypted, CHIP_ERROR_INCORRECT_STATE);
     // Check if length of msgR2Encrypted is set and is at least larger than the MIC length
     VerifyOrReturnError(input.encrypted2Length > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(input.responderMrpConfig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t dataLen = EstimateStructOverhead(kSigmaParamRandomNumberSize,         // responderRandom
                                             sizeof(uint16_t),                    // responderSessionId
@@ -1326,7 +1325,7 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
     input.msgR2Encrypted.Free();
 
     ReturnErrorOnFailure(
-        EncodeSessionParameters(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), *input.responderMrpConfig, tlvWriterMsg2));
+        EncodeSessionParameters(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), input.responderSessionParams, tlvWriterMsg2));
 
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msgR2));
