@@ -109,6 +109,10 @@ if (chip_mdns == "platform") {
 }
 
 static_library("Linux") {
+  # Declared here so the conditional blocks below can all use "+=". A plain "defines = [...]"
+  # inside one of them would be an overwrite of a non-empty list once another has run.
+  defines = []
+
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
@@ -272,7 +276,7 @@ static_library("Linux") {
       sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
     }
 
-    defines = [
+    defines += [
       "CHIP_LINUX_NETWORK_MANAGER=\"${chip_linux_network_manager}\"",
       "CHIP_LINUX_WIFI_PAF_MANAGER=\"${chip_linux_wifi_paf_manager}\"",
     ]
@@ -331,5 +335,14 @@ static_library("Linux") {
 
   if (chip_device_config_enable_wifipaf) {
     public_deps += [ "${chip_root}/src/wifipaf" ]
+  }
+
+  # minimal-mDNS enumerates the interfaces once when it starts, so it needs to be told when the
+  # set changes. The platform implementation tracks them itself and does not.
+  if (chip_mdns == "minimal") {
+    sources += [
+      "DnssdInterfaceMonitor.cpp",
+      "DnssdInterfaceMonitor.h",
+    ]
   }
 }
