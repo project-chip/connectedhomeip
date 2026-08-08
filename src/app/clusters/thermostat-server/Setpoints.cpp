@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <clusters/Thermostat/Metadata.h>
 
 #include "Setpoint.h"
@@ -28,7 +29,6 @@
 #include "SetpointRange.h"
 #include "Setpoints.h"
 #include "Temperature.h"
-#include "app/data-model-provider/ActionReturnStatus.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -419,7 +419,6 @@ DataModel::ActionReturnStatus Setpoints::ChangeRange(SetpointRange & range, Opti
             changedAttributes.Set(range.cooling.AttributeId());
         }
     }
-    ChipLogProgress(Zcl, "Changed setpoint ranges, calling Fix");
     return Fix(changedAttributes);
 }
 

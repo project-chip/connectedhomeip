@@ -67,7 +67,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Pump Configuration and Control
-
     # keep-sorted end
 
 ClustersWithShutdownFunctions:

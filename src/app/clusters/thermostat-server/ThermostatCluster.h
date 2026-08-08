@@ -138,24 +138,24 @@ public:
 private:
     OptionalAttributes mOptionalAttributes;
 
-    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
 
-    Thermostat::Delegate * mDelegate;
+    Thermostat::Delegate * mDelegate = nullptr;
 
     AtomicWriteSession mAtomicWriteSession;
 
-    BitMask<RemoteSensingBitmap> mRemoteSensing;
-    BitMask<OccupancyBitmap> mOccupancy;
+    BitMask<RemoteSensingBitmap> mRemoteSensing = 0;
+    BitMask<OccupancyBitmap> mOccupancy = 0;
 
-    SystemModeEnum mSystemMode;
-    ThermostatRunningModeEnum mRunningMode;
-    BitMask<RelayStateBitmap> mRunningState;
+    SystemModeEnum mSystemMode = SystemModeEnum::kOff;
+    ThermostatRunningModeEnum mRunningMode = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState = 0;
     DataModel::Nullable<int16_t> mLocalTemperature;
-    int8_t mLocalTemperatureCalibration;
+    int8_t mLocalTemperatureCalibration = 0;
 
-    TemperatureSetpointHoldEnum mTemperatureSetpointHold;
-    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
-    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration = DataModel::Nullable<uint16_t>(0);
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp = DataModel::Nullable<uint32_t>(0);
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
@@ -171,7 +171,6 @@ private:
     /**
      * @brief Set the Active Preset to a given preset handle, or null
      *
-     * @param endpoint The endpoint
      * @param presetHandle The handle of the preset to set active, or null to clear the active preset
      * @return Success if the active preset was updated, an error code if not
      */
@@ -180,7 +179,6 @@ private:
     /**
      * @brief Apply a preset to the pending lists of presets during an atomic write
      *
-     * @param delegate The current ThermostatDelegate
      * @param preset The preset to append
      * @return CHIP_NO_ERROR if successful, an error code if not
      */

@@ -282,6 +282,12 @@ Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
 
 CHIP_ERROR ThermostatCluster::AppendPendingPreset(const PresetStruct::Type & newPreset)
 {
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null");
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
     PresetStructWithOwnedMembers preset = newPreset;
     if (!IsValidPresetEntry(preset))
     {

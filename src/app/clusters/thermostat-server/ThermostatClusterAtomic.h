@@ -20,8 +20,16 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/List.h>
 #include <app/persistence/AttributePersistence.h>
+#include <lib/core/ScopedNodeId.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/Constants.h>
+#include <system/SystemClock.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -76,7 +84,7 @@ public:
                                                                      const ConcreteCommandPath & commandPath,
                                                                      const Commands::AtomicRequest::DecodableType & commandData);
     /**
-     * @brief Resets the atomic write for a given endpoint
+     * @brief Resets the atomic write session and cancels its timer
      */
     void ResetAtomicWrite();
 

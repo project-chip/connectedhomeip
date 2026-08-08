@@ -82,6 +82,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)
 {
+    mAtomicWriteSession.ResetAtomicWrite();
     mAtomicWriteSession.SetDelegate(nullptr);
     DefaultServerCluster::Shutdown(type);
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
@@ -91,11 +92,6 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
 CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-
-    ChipLogProgress(Zcl, "Fetching attributes hasOccupancy: %d, hasHeating: %d, hasCooling: %d, hasAuto: %d",
-                    mFeatures.Has(Feature::kOccupancy), mFeatures.Has(Feature::kHeating), mFeatures.Has(Feature::kCooling),
-                    mFeatures.Has(Feature::kAutoMode));
-
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         // Setpoints
         { HasAttribute(OccupiedHeatingSetpoint::Id), OccupiedHeatingSetpoint::kMetadataEntry },
@@ -128,7 +124,6 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
         { HasAttribute(SetpointChangeSource::Id), SetpointChangeSource::kMetadataEntry },
         { HasAttribute(SetpointChangeAmount::Id), SetpointChangeAmount::kMetadataEntry },
         { HasAttribute(SetpointChangeSourceTimestamp::Id), SetpointChangeSourceTimestamp::kMetadataEntry },
-        { HasAttribute(ThermostatProgrammingOperationMode::Id), ThermostatProgrammingOperationMode::kMetadataEntry },
 
         // Setpoint Holds
         { HasAttribute(TemperatureSetpointHold::Id), TemperatureSetpointHold::kMetadataEntry },
@@ -178,23 +173,38 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         break;
     case SystemModeEnum::kAuto:
         if (!mFeatures.Has(Feature::kAutoMode))
+        {
+            ChipLogDetail(Zcl, "Auto mode is not supported");
             return Status::Failure;
+        }
         break;
     case SystemModeEnum::kCool:
         if (!mFeatures.Has(Feature::kCooling))
+        {
+            ChipLogDetail(Zcl, "Cooling mode is not supported");
             return Status::Failure;
+        }
         break;
     case SystemModeEnum::kHeat:
         if (!mFeatures.Has(Feature::kHeating))
+        {
+            ChipLogDetail(Zcl, "Heating mode is not supported");
             return Status::Failure;
+        }
         break;
     case SystemModeEnum::kEmergencyHeat:
         if (!mFeatures.Has(Feature::kHeating))
+        {
+            ChipLogDetail(Zcl, "Emergency heat mode is not supported");
             return Status::Failure;
+        }
         break;
     case SystemModeEnum::kPrecooling:
         if (!mFeatures.Has(Feature::kCooling))
+        {
+            ChipLogDetail(Zcl, "Precooling mode is not supported");
             return Status::Failure;
+        }
         break;
     case SystemModeEnum::kFanOnly:
     case SystemModeEnum::kDry:

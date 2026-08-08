@@ -99,7 +99,7 @@ std::optional<DataModel::ActionReturnStatus>
 ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
-    if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
+    if (commandData.presetHandle.size() > kThermostatSuggestionPresetHandleSize)
     {
         return Status::ConstraintError;
     }
@@ -253,6 +253,11 @@ void ThermostatCluster::ReEvaluateCurrentSuggestion()
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentSuggestionAfterReevaluation;
     mDelegate->GetCurrentThermostatSuggestion(currentSuggestionAfterReevaluation);
+
+    if (currentSuggestionBeforeReevaluation.IsNull() && currentSuggestionAfterReevaluation.IsNull())
+    {
+        return;
+    }
 
     if (!currentSuggestionBeforeReevaluation.IsNull() && !currentSuggestionAfterReevaluation.IsNull())
     {

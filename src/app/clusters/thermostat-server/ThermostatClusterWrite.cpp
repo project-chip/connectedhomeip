@@ -55,7 +55,6 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
     case MaxCoolSetpointLimit::Id: {
         temperature setpoint;
         ReturnErrorOnFailure(decoder.Decode(setpoint));
-
         return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
     }
     case MinSetpointDeadBand::Id: {
@@ -70,25 +69,25 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         return Status::Success;
     }
     case RemoteSensing::Id: {
+        BitMask<RemoteSensingBitmap> valueRemoteSensing;
+        ReturnErrorOnFailure(decoder.Decode(valueRemoteSensing));
         if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
         {
-            BitMask<RemoteSensingBitmap> valueRemoteSensing;
-            ReturnErrorOnFailure(decoder.Decode(valueRemoteSensing));
             if (valueRemoteSensing.Has(RemoteSensingBitmap::kLocalTemperature))
             {
                 return Status::ConstraintError;
             }
-            auto remoteSensing = valueRemoteSensing.Raw();
-            AttributePersistence persistence(mContext->attributeStorage);
-            auto result =
-                persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing);
-            if (result != CHIP_NO_ERROR)
-            {
-                return result;
-            }
-            mRemoteSensing = valueRemoteSensing;
             return Status::Success;
         }
+        auto remoteSensing = valueRemoteSensing.Raw();
+        AttributePersistence persistence(mContext->attributeStorage);
+        auto result =
+            persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing);
+        if (result != CHIP_NO_ERROR)
+        {
+            return result;
+        }
+        mRemoteSensing = valueRemoteSensing;
         return Status::Success;
     }
     case ControlSequenceOfOperation::Id:
@@ -193,7 +192,6 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         }
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    break;
     case Schedules::Id:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     default: {
@@ -224,8 +222,11 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
             }
             if (clearActivePreset)
             {
-                ChipLogProgress(Zcl, "Setting active preset to null");
-                SetActivePreset(std::nullopt);
+                result = SetActivePreset(std::nullopt);
+                if (!result.IsSuccess())
+                {
+                    ChipLogError(Zcl, "Failed to set active preset to null on setpoint change");
+                }
             }
         }
         return result;

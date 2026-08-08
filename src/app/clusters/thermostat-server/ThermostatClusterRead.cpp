@@ -61,13 +61,14 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ThermostatRunningMode::Id:
         return encoder.Encode(mRunningMode);
     case RemoteSensing::Id:
+    {
+        BitMask<RemoteSensingBitmap> valueRemoteSensing = mRemoteSensing;
         if (localTemperatureNotExposedSupported)
         {
-            BitMask<RemoteSensingBitmap> valueRemoteSensing = mRemoteSensing;
-            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
-            return encoder.Encode(valueRemoteSensing);
+            valueRemoteSensing.ClearAll();
         }
-        break;
+        return encoder.Encode(valueRemoteSensing);
+    }
     case ControlSequenceOfOperation::Id:
         return encoder.Encode(mControlSequenceOfOperation);
     case LocalTemperatureCalibration::Id:

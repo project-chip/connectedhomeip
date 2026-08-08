@@ -15,21 +15,20 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
+#include <clusters/Thermostat/Metadata.h>
+#include <lib/support/Assertions.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #include "ThermostatClusterSetpoints.h"
 #include "Setpoint.h"
 #include "Temperature.h"
 #include "ThermostatCluster.h"
 
 #include "Setpoints.h"
-#include "app/data-model-provider/ActionReturnStatus.h"
-#include "lib/support/Assertions.h"
-#include "protocols/interaction_model/StatusCode.h"
-#include <new>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <clusters/Thermostat/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -278,7 +277,7 @@ DataModel::ActionReturnStatus ThermostatCluster::SaveSetpoints(Setpoints & setpo
         return Status::ConstraintError;
     }
 
-    Status status;
+    Status status = Status::Success;
     if (setpoints.heatSupported)
     {
         if (changedAttributes.Has(MinHeatSetpointLimit::Id) && setpoints.userHeatLimits.minimum.HasTemperature())

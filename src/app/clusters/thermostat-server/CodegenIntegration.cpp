@@ -91,7 +91,7 @@ public:
             emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id);
         optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
 
-        ChipLogError(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
+        ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
         gClusters[clusterInstanceIndex].Create(endpointId, BitFlags<Thermostat::Feature>(featureMap), optionalAttributes);
         return gClusters[clusterInstanceIndex].Registration();
     }

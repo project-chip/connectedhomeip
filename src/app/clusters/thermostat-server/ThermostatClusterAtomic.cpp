@@ -54,8 +54,8 @@ namespace {
 /**
  * @brief Schedules a timer for the given timeout in milliseconds.
  *
- * @param[in] endpoint The endpoint to use.
- * @param[in] timeoutMilliseconds The timeout in milliseconds.
+ * @param[in] session The atomic write session that owns the timer.
+ * @param[in] timeout The timeout in milliseconds.
  */
 void ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
 {
@@ -66,11 +66,11 @@ void ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 t
 /**
  * @brief Clears the currently scheduled timer.
  *
- * @param[in] endpoint The endpoint to use.
+ * @param[in] session The atomic write session that owns the timer.
  */
 void ClearTimer(AtomicWriteSession * session)
 {
-    DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, reinterpret_cast<void *>(session));
+    DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(session));
 }
 
 /**
@@ -240,7 +240,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
 
     if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
         return Status::InvalidInState;
     }
 
@@ -342,11 +342,10 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
                                       const Commands::AtomicRequest::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate       = mDelegate;
 
-    if (delegate == nullptr)
+    if (mDelegate == nullptr)
     {
-        ChipLogError(Zcl, "Delegate is null");
+        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
         return Status::InvalidInState;
     }
 
@@ -397,6 +396,12 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                         const Commands::AtomicRequest::DecodableType & commandData)
 {
+
+    if (mDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
+        return Status::InvalidInState;
+    }
 
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -460,7 +465,10 @@ Status AtomicWriteSession::BuildAttributeStatuses(
         // List can't be empty
         return Status::InvalidCommand;
     }
-    attributeStatuses.Alloc(attributeStatusCount);
+    if (!attributeStatuses.Alloc(attributeStatusCount))
+    {
+        return Status::ResourceExhausted;
+    }
     for (size_t i = 0; i < attributeStatusCount; ++i)
     {
         attributeStatuses[i].attributeID = kInvalidAttributeId;
