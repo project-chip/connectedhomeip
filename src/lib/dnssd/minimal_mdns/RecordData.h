@@ -19,8 +19,8 @@
 
 #include <inet/IPAddress.h>
 
-#include <lib/dnssd/minimal_mdns/core/BytesRange.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/wire/BytesRange.h>
+#include <lib/dnssd/wire/QName.h>
 
 namespace mdns {
 namespace Minimal {
