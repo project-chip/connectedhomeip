@@ -79,8 +79,8 @@ if (pw_enable_fuzz_test_targets) {
       public_deps = [
         "${chip_root}/src/lib/dnssd",
         "${chip_root}/src/lib/dnssd/minimal_mdns",
-        "${chip_root}/src/lib/dnssd/wire/records",
         "${chip_root}/src/lib/dnssd/wire",
+        "${chip_root}/src/lib/dnssd/wire/records",
         "${chip_root}/src/platform/logging:default",
       ]
     }
