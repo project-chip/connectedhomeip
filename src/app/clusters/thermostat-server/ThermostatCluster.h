@@ -124,7 +124,9 @@ public:
     Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState);
 
     DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
-    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
+    Protocols::InteractionModel::Status
+    SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature,
+                        DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
     DataModel::ActionReturnStatus SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);

@@ -211,12 +211,11 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
     return Status::Success;
 }
 
-Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature)
+Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature,
+                                              DataModel::AttributeChangeType changeType)
 {
-    if (!SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id))
-    {
-        return Status::Failure;
-    }
+    SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id,
+                      changeType);
     return Status::Success;
 }
 

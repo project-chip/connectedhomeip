@@ -72,7 +72,7 @@ Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
     return Status::Success;
 }
 
-Status Set(EndpointId endpoint, int16_t value)
+Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
 {
     ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
@@ -80,12 +80,14 @@ Status Set(EndpointId endpoint, int16_t value)
         ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
-    return cluster->SetLocalTemperature(value);
+    auto changeType = (markDirty == MarkAttributeDirty::kNo) ? DataModel::AttributeChangeType::kQuiet
+                                                             : DataModel::AttributeChangeType::kReportable;
+    return cluster->SetLocalTemperature(value, changeType);
 }
 
-Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty)
+Status Set(EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value);
+    return Set(endpoint, value, MarkAttributeDirty::kYes);
 }
 
 } // namespace LocalTemperature
