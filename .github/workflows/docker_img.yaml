@@ -109,6 +109,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -163,6 +168,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -197,6 +207,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -231,6 +246,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
