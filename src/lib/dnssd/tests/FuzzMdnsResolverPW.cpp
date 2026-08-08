@@ -58,13 +58,13 @@
 #include <lib/dnssd/Types.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/dnssd/wire/records/IP.h>
 #include <lib/dnssd/wire/records/Ptr.h>
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 #include <lib/dnssd/wire/records/Srv.h>
 #include <lib/dnssd/wire/records/Txt.h>
-#include <lib/dnssd/wire/QName.h>
-#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
