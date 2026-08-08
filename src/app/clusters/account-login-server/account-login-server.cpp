@@ -138,6 +138,7 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
 
     switch (aPath.mAttributeId)
     {
