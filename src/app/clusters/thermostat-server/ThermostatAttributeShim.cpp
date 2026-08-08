@@ -248,58 +248,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
 
 } // namespace OccupiedHeatingSetpoint
 
-namespace UnoccupiedCoolingSetpoint {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    *value = cluster->mSetpoints.unoccupiedRange.cooling.Temperature();
-    return Status::Success;
-}
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
-}
-
-} // namespace UnoccupiedCoolingSetpoint
-
-namespace UnoccupiedHeatingSetpoint {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    *value = cluster->mSetpoints.unoccupiedRange.heating.Temperature();
-    return Status::Success;
-}
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value)
-{
-    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::FindClusterOnEndpoint(endpoint);
-    if (cluster == nullptr)
-    {
-        ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-    return cluster->ChangeSetpointAttribute(Id, value).GetStatusCode().GetStatus();
-}
-
-} // namespace UnoccupiedHeatingSetpoint
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 {
