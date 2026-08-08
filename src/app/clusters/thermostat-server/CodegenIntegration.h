@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,16 +18,12 @@
 
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/persistence/AttributePersistence.h>
-#include <protocols/interaction_model/Constants.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 
-#include "Setpoints.h"
+namespace chip::app::Clusters::Thermostat {
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace chip::app::Clusters::Thermostat

@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
@@ -71,7 +72,11 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+    chip::app::Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
+                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+}
 
 void ApplicationShutdown() {}
 
@@ -80,13 +85,4 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
-{
-    // Register the delegate for the Thermostat
-    auto & delegate = ThermostatDelegate::GetInstance();
-
-    SetDefaultDelegate(endpoint, &delegate);
 }

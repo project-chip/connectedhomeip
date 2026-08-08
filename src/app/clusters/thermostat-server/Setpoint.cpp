@@ -69,6 +69,27 @@ SystemModeEnum Setpoint::Mode() const
     }
 }
 
+CHIP_ERROR OptionalSetpoint::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+{
+    return writer.Put(tag, Temperature());
+}
+
+CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader)
+{
+    if (reader.GetType() == chip::TLV::kTLVType_Null)
+    {
+        mTemperature.ClearValue();
+        return CHIP_NO_ERROR;
+    }
+    temperature temp;
+    CHIP_ERROR error = reader.Get(temp);
+    if (error == CHIP_NO_ERROR)
+    {
+        mTemperature.SetValue(temp);
+    }
+    return error;
+}
+
 temperature OptionalSetpoint::Temperature() const
 {
     if (mTemperature.HasValue())
@@ -77,7 +98,6 @@ temperature OptionalSetpoint::Temperature() const
     }
     return mAbsoluteSetpoint.Temperature();
 }
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
