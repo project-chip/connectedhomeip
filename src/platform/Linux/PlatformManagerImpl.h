@@ -30,6 +30,10 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD_INTERFACE_MONITOR
+#include <platform/Linux/DnssdInterfaceMonitor.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 #include <gio/gio.h>
 #endif
@@ -110,6 +114,10 @@ private:
     friend class Internal::BLEManagerImpl;
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD_INTERFACE_MONITOR
+    Internal::DnssdInterfaceMonitor mDnssdInterfaceMonitor;
+#endif
 
     static PlatformManagerImpl sInstance;
 

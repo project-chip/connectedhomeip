@@ -254,11 +254,28 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD_INTERFACE_MONITOR
+    // Needs the system layer, so it goes after the generic init. Not being able to watch for
+    // interface changes costs discoverability after one, which is worth a log line and not worth
+    // refusing to start over.
+    CHIP_ERROR monitorErr = mDnssdInterfaceMonitor.Init();
+    if (monitorErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to watch for network interface changes: %" CHIP_ERROR_FORMAT, monitorErr.Format());
+    }
+#endif
+
     return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_Shutdown()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD_INTERFACE_MONITOR
+    // Before the generic shutdown below, which tears down the system layer that the socket watch
+    // and the settle timer are registered with.
+    mDnssdInterfaceMonitor.Shutdown();
+#endif
+
     uint64_t upTime = 0;
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
