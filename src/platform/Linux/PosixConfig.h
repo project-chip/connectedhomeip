@@ -52,8 +52,11 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
+    static const char kConfigNamespace_ChipKVS[];
 
     // Key definitions for well-known keys.
+    static const Key kConfigKey_KVS;
+
     static const Key kConfigKey_SerialNum;
     static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
@@ -110,7 +113,6 @@ public:
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
-private:
     static ChipLinuxStorage * GetStorageForNamespace(Key key);
 };
 
