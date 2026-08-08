@@ -66,7 +66,10 @@ struct EnhancedHueSatColor
     uint8_t saturation   = 0;
 
     // §3.2.7.12: CurrentHue is the most-significant byte of EnhancedCurrentHue.
-    uint8_t hue8() const { return std::clamp<uint8_t>(enhancedHue >> 8, kMinCurrentHue, kMaxCurrentHue); }
+    uint8_t hue8() const
+    {
+        return std::clamp(static_cast<uint8_t>(enhancedHue >> 8), kMinCurrentHue, kMaxCurrentHue);
+    }
 };
 
 // The single active color value. The alternative held encodes the (Enhanced)ColorMode, so
