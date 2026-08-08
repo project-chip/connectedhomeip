@@ -597,7 +597,6 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     gPairingServer.Shutdown();
 }
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
 {
     TemporarySessionManager sessionManager(*this);
@@ -650,7 +649,6 @@ TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
     EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
               accessorySessionParams.GetMaxTCPPayloadSize());
 }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 TEST_F(TestCASESession, ClientReceivesBusyTest)
 {

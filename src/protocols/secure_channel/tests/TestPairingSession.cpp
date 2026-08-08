@@ -95,7 +95,6 @@ TEST_F(TestPairingSession, PairingSessionEncodeDecodeMRPParams)
     EXPECT_EQ(GetRemoteMRPConfig(), mrpConfig);
 }
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 TEST_F(TestPairingSession, PairingSessionEncodeDecodeTCPParams)
 {
     ReliableMessageProtocolConfig mrpConfig(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
@@ -132,7 +131,6 @@ TEST_F(TestPairingSession, PairingSessionEncodeDecodeTCPParams)
     EXPECT_EQ(decodedParams.GetSupportedTransports(), sessionParams.GetSupportedTransports());
     EXPECT_EQ(decodedParams.GetMaxTCPPayloadSize(), sessionParams.GetMaxTCPPayloadSize());
 }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
 {
