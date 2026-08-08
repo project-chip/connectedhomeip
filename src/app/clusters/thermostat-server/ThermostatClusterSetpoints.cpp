@@ -23,10 +23,10 @@
 #include <lib/support/Assertions.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#include "ThermostatClusterSetpoints.h"
 #include "Setpoint.h"
 #include "Temperature.h"
 #include "ThermostatCluster.h"
+#include "ThermostatClusterSetpoints.h"
 
 #include "Setpoints.h"
 

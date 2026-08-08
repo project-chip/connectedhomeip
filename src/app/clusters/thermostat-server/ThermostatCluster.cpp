@@ -224,8 +224,7 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
 Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature,
                                               DataModel::AttributeChangeType changeType)
 {
-    SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id,
-                      changeType);
+    SetAttributeValue(mLocalTemperature, localTemperature, app::Clusters::Thermostat::Attributes::LocalTemperature::Id, changeType);
     return Status::Success;
 }
 
