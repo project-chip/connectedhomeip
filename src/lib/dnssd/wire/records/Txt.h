@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {

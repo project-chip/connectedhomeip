@@ -20,7 +20,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 #include <lib/dnssd/wire/DnsHeader.h>
 
 namespace mdns {
