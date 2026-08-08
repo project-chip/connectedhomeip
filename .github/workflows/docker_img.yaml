@@ -14,6 +14,10 @@
 
 name: Docker CHIP images
 
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
 on:
     workflow_call:
         inputs:
@@ -24,9 +28,12 @@ on:
     push:
         paths:
             - "integrations/docker/**"
+            # Changing which images this workflow builds should build them.
+            - ".github/workflows/docker_img.yaml"
     pull_request:
         paths:
             - "integrations/docker/**"
+            - ".github/workflows/docker_img.yaml"
     workflow_dispatch:
         inputs:
             push_images:
@@ -37,7 +44,7 @@ on:
 jobs:
     build_images_base:
         name: Build Docker CHIP Build images - base
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]'
         permissions:
             contents: read
@@ -77,20 +84,27 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
-    # NOTE: docker images builds are disabled for all beyond base image because
-    #       underlying image builds fail either due to size restrictions (we only
-    #       have a few GB in github: 14GB for everything) or dependencies which
-    #       result in a "cannot find package" error.
+    # These jobs run on namespace runners rather than GitHub-hosted ones. A
+    # GitHub-hosted runner guarantees only 14GB of free space and frequently
+    # provides more, so an image needing more than that does not fail cleanly,
+    # it fails depending on which runner it draws. Two images measured above
+    # that line: efr32 at 17.8GB and nxp at 14.6GB. A namespace shape gives a
+    # fixed disk size instead, which turns that class of flake into a property
+    # we can size for.
     #
-    # Until the above is fixed, we do not try to build things so we do not train
-    # developers to ignore CI failures.
+    # Per-image peaks were measured with one build per runner, since each job
+    # here builds a single image; the figure that matters is that peak, not the
+    # total a sequential run would accumulate.
     #
     # See https://github.com/project-chip/connectedhomeip/issues/30750
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && false
+        runs-on: namespace-profile-4x16
+        if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            packages: write
         strategy:
             fail-fast: false
             matrix:
@@ -99,6 +113,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -117,8 +136,11 @@ jobs:
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && false
+        runs-on: namespace-profile-4x16
+        if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            packages: write
         strategy:
             fail-fast: false
             matrix:
@@ -127,12 +149,16 @@ jobs:
                     - "-asr"
                     - "-bouffalolab"
                     - "-doxygen"
+                    # The two largest: 17.8GB and 14.6GB peak. Both exceed what a
+                    # GitHub-hosted runner guarantees, which is why these jobs
+                    # run on a namespace shape.
                     - "-efr32"
                     - "-esp32"
                     - "-infineon"
-                    # NOTE: imx image requires too much space for GitHub-hosted runners. It fails with:
-                    # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
-                    # - "-imx"
+                    # imx was disabled for "no space left on device". Built alone
+                    # it peaks at 8.9GB, so the original failure came from sharing
+                    # a runner rather than from the image.
+                    - "-imx"
                     - "-java"
                     - "-nxp"
                     - "-nxp-zephyr"
@@ -146,6 +172,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -165,8 +196,11 @@ jobs:
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && false
+        runs-on: namespace-profile-4x16
+        if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            packages: write
         strategy:
             fail-fast: false
             matrix:
@@ -177,6 +211,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -192,10 +231,16 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+    # NOTE: vscode stays disabled. It is an aggregator, with 28 COPY --from=
+    #       lines pulling toolchains out of 17 other images, and those bytes are
+    #       duplicated rather than shared. On a dedicated runner with 88GB free
+    #       and nothing else on it, the build did not fail: it killed the runner
+    #       outright after ~12 minutes, leaving no logs to diagnose. Nothing
+    #       depends on this image, so it does not block anything else.
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
@@ -205,6 +250,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: ${{ inputs.push_images == true }}
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -213,7 +263,7 @@ jobs:
             - name: Build images using project bash script
               if: ${{ inputs.push_images == false }}
               run: |
-                  cd integrations/docker/images/vscode-3/chip-build${{ matrix.img }}
+                  cd integrations/docker/images/vscode/chip-build${{ matrix.img }}
                   ./build.sh --latest
             - name: Notify Slack on Failure
               if: failure()
