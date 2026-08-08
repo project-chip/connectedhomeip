@@ -2881,7 +2881,8 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percen
 
 namespace MistType {
 Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value); // MistTypeBitmap
+GetDefault(EndpointId endpoint,
+           DataModel::Nullable<chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap>> & value); // MistTypeBitmap
 } // namespace MistType
 
 namespace Continuous {
@@ -2895,6 +2896,14 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 namespace Optimal {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
 } // namespace Optimal
+
+namespace CondPumpEnabled {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
+} // namespace CondPumpEnabled
+
+namespace CondRunCount {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
+} // namespace CondRunCount
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32

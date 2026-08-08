@@ -459,7 +459,7 @@ def run_tests_no_exit(
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
             # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
+            if not matter_test_config.commission_only and not matter_test_config.commission_only_re_open_window:
                 runner.add_test_class(test_config, test_class, tests)
 
             if hooks:
@@ -632,6 +632,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     config.commissioning_method = args.commissioning_method
     config.in_test_commissioning_method = args.in_test_commissioning_method
     config.commission_only = args.commission_only
+    config.commission_only_re_open_window = args.commission_only_re_open_window
 
     config.qr_code_content.extend(args.qr_code)
     config.manual_code.extend(args.manual_code)
@@ -757,14 +758,28 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if "nfc" in (args.commissioning_method or []):
 
         if "NFC_Reader_index" not in config.global_test_params:
-            LOGGER.error("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for "
-                         "NFC commissioning tests")
-            sys.exit(1)
+            LOGGER.warning("WARNING: NFC_Reader_index not found in global_test_params; "
+                           "defaulting to 0.")
+            config.global_test_params["NFC_Reader_index"] = 0
+        if args.passcodes:
+            LOGGER.warning("WARNING: Provided passcode is ignored for NFC commissioning. "
+                           "The onboarding data is read directly from the NFC tag.")
+            args.passcodes = []
 
-        if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
-            LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
-                         "The onboarding data is read directly from the NFC tag.")
-            sys.exit(1)
+        if args.discriminators:
+            LOGGER.warning("WARNING: Provided discriminator is ignored for NFC commissioning. "
+                           "The onboarding data is read directly from the NFC tag.")
+            args.discriminators = []
+
+        if args.manual_code:
+            LOGGER.warning("WARNING: Provided manual code is ignored for NFC commissioning. "
+                           "The onboarding data is read directly from the NFC tag.")
+            args.manual_code = []
+
+        if args.qr_code:
+            LOGGER.warning("WARNING: Provided qr-code is ignored for NFC commissioning. "
+                           "The onboarding data is read directly from the NFC tag.")
+            args.qr_code = None
 
         from matter.testing.nfc import NFCReader
         nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
@@ -783,7 +798,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        config.pics = read_pics_from_file(args.PICS)
+        config.pics = read_pics_from_file(args.PICS, endpoint=args.endpoint)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
@@ -1040,6 +1055,9 @@ def matter_test_args_parser() -> argparse.ArgumentParser:
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
+    commission_group.add_argument('--commission-only-re-open-window', action="store_true", default=False,
+                                  help="If true, test commissions, opens a commissioning window using the original "
+                                       "passcode/discriminator, and then exits without running subsequent tests")
 
     commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
 

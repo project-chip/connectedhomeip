@@ -26,7 +26,7 @@
 #include <lib/support/PoolWrapper.h>
 
 #include <lib/dnssd/minimal_mdns/ListenIterator.h>
-#include <lib/dnssd/minimal_mdns/core/BytesRange.h>
+#include <lib/dnssd/wire/BytesRange.h>
 
 namespace mdns {
 namespace Minimal {
