@@ -63,9 +63,9 @@ CHIP_ERROR MediaFileManagementBdxServer::Arm()
 {
     // Advertise only synchronous receiver-drive transfers, matching OTA.
     chip::BitFlags<TransferControlFlags> flags(TransferControlFlags::kReceiverDrive);
-    constexpr uint16_t kMaxBlockSize                            = 1024;
-    constexpr chip::System::Clock::Timeout kBdxTimeout          = chip::System::Clock::Seconds16(5 * 60);
-    constexpr chip::System::Clock::Timeout kBdxPollIntervalMs   = chip::System::Clock::Milliseconds32(50);
+    constexpr uint16_t kMaxBlockSize                          = 1024;
+    constexpr chip::System::Clock::Timeout kBdxTimeout        = chip::System::Clock::Seconds16(5 * 60);
+    constexpr chip::System::Clock::Timeout kBdxPollIntervalMs = chip::System::Clock::Milliseconds32(50);
     return PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, flags, kMaxBlockSize,
                               kBdxTimeout, kBdxPollIntervalMs);
 }

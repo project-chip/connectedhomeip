@@ -39,9 +39,9 @@ using chip::bdx::TransferSession;
 namespace {
 
 // Receiver-drive BDX, matching the client's advertised sender-drive-capable set.
-constexpr uint16_t kMaxBlockSize                       = 1024;
-constexpr System::Clock::Timeout kBdxTimeout           = System::Clock::Seconds16(5 * 60);
-constexpr System::Clock::Timeout kBdxPollIntervalMs    = System::Clock::Milliseconds32(50);
+constexpr uint16_t kMaxBlockSize                    = 1024;
+constexpr System::Clock::Timeout kBdxTimeout        = System::Clock::Seconds16(5 * 60);
+constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 
 } // namespace
 
@@ -98,8 +98,8 @@ CHIP_ERROR MediaFileManagementBdxRequestor::BeginTransfer(Messaging::ExchangeMan
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
     mExchangeCtx = exchangeCtx;
 
-    CHIP_ERROR err =
-        Initiator::InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initData, kBdxTimeout, kBdxPollIntervalMs);
+    CHIP_ERROR err = Initiator::InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initData, kBdxTimeout,
+                                                 kBdxPollIntervalMs);
     if (err != CHIP_NO_ERROR)
     {
         exchangeCtx->Close();

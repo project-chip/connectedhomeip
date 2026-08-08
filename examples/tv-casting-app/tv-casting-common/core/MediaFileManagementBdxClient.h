@@ -49,9 +49,7 @@ namespace core {
 class MediaFileManagementBdxClient : public chip::bdx::Initiator
 {
 public:
-    MediaFileManagementBdxClient() :
-        mOnConnected(OnDeviceConnected, this), mOnConnectionFailure(OnDeviceConnectionFailure, this)
-    {}
+    MediaFileManagementBdxClient() : mOnConnected(OnDeviceConnected, this), mOnConnectionFailure(OnDeviceConnectionFailure, this) {}
 
     /**
      * Download the file identified by `designator` from `peer` into `targetPath`.

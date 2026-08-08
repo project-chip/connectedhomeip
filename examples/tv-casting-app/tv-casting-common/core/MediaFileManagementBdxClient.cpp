@@ -40,8 +40,8 @@ using chip::bdx::TransferSession;
 namespace {
 
 // Receiver-drive BDX, matching the tv-app's advertised sender-drive-capable set.
-constexpr uint16_t kMaxBlockSize                         = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout       = chip::System::Clock::Seconds16(5 * 60);
+constexpr uint16_t kMaxBlockSize                          = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout        = chip::System::Clock::Seconds16(5 * 60);
 constexpr chip::System::Clock::Timeout kBdxPollIntervalMs = chip::System::Clock::Milliseconds32(50);
 
 } // namespace

@@ -32,8 +32,8 @@
 #include <lib/support/StringBuilder.h>
 #include <memory>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/bdx/BdxUri.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <protocols/bdx/BdxUri.h>
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
 const uint16_t kDesiredEndpointVendorId    = 65521; // 0xFFF1
@@ -369,8 +369,7 @@ void InvokeMediaFileManagementGetSharedFile(matter::casting::memory::Strong<matt
 
     getSharedFileCommand->Invoke(
         request, new chip::ScopedNodeId(peer),
-        [](void * context,
-           const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type::ResponseType & response) {
+        [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type::ResponseType & response) {
             std::unique_ptr<chip::ScopedNodeId> peerId(static_cast<chip::ScopedNodeId *>(context));
             if (!response.fileDescription.HasValue() || response.fileDescription.Value().IsNull())
             {
@@ -483,26 +482,39 @@ void RunMediaFileManagementDemoSequence(matter::casting::memory::Strong<matter::
     // ~5s between flows: each BDX transfer here is a single small block and
     // completes in well under a second, but the spacing keeps the single
     // sender/receiver idle between flows and keeps the demo log readable.
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(Seconds32(5), [](chip::System::Layer *, void *) {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementOfferFile()");
-        InvokeMediaFileManagementOfferFile(gMediaFileManagementEndpoint);
-    }, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(5),
+        [](chip::System::Layer *, void *) {
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementOfferFile()");
+            InvokeMediaFileManagementOfferFile(gMediaFileManagementEndpoint);
+        },
+        nullptr);
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(Seconds32(10), [](chip::System::Layer *, void *) {
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementRequestSharedFiles()");
-        InvokeMediaFileManagementRequestSharedFiles(gMediaFileManagementEndpoint);
-    }, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(10),
+        [](chip::System::Layer *, void *) {
+            ChipLogProgress(AppServer,
+                            "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementRequestSharedFiles()");
+            InvokeMediaFileManagementRequestSharedFiles(gMediaFileManagementEndpoint);
+        },
+        nullptr);
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(Seconds32(15), [](chip::System::Layer *, void *) {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementGetSharedFile()");
-        InvokeMediaFileManagementGetSharedFile(gMediaFileManagementEndpoint);
-    }, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(15),
+        [](chip::System::Layer *, void *) {
+            ChipLogProgress(AppServer,
+                            "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementGetSharedFile()");
+            InvokeMediaFileManagementGetSharedFile(gMediaFileManagementEndpoint);
+        },
+        nullptr);
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(Seconds32(20), [](chip::System::Layer *, void *) {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadMediaFileManagementTotalStorage()");
-        ReadMediaFileManagementTotalStorage(gMediaFileManagementEndpoint);
-    }, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(20),
+        [](chip::System::Layer *, void *) {
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadMediaFileManagementTotalStorage()");
+            ReadMediaFileManagementTotalStorage(gMediaFileManagementEndpoint);
+        },
+        nullptr);
 }
 
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
@@ -642,15 +654,15 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
         // AddFile and OfferFile push bytes to the Media Device over BDX; GetSharedFile pulls bytes back.
         // MediaFileManagement is hosted on the Media Device's root-adjacent endpoint (not the content-app
         // endpoint selected above by Vendor ID), so locate the endpoint that actually exposes the cluster.
-        auto mfmIt = std::find_if(endpoints.begin(), endpoints.end(),
-                                  [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
-                                      return endpoint->GetCluster<matter::casting::clusters::media_file_management::
-                                                                     MediaFileManagementCluster>() != nullptr;
-                                  });
+        auto mfmIt = std::find_if(
+            endpoints.begin(), endpoints.end(),
+            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
+                return endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>() !=
+                    nullptr;
+            });
         if (mfmIt != endpoints.end())
         {
-            ChipLogProgress(AppServer,
-                            "simple-app-helper.cpp::ConnectionHandler() MediaFileManagement demo on Endpoint ID: %d",
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() MediaFileManagement demo on Endpoint ID: %d",
                             (*mfmIt)->GetId());
             // Each flow drives a single-transfer-at-a-time BDX sender/receiver, so
             // they are staggered on the event loop rather than fired back-to-back.

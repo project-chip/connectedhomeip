@@ -325,8 +325,8 @@ Status MediaFileManagementManager::HandleRequestSharedFiles(
     // arms the BDX sender and emits a SharedFilesAdded event for that file.
     for (const FileEntry & entry : mFiles)
     {
-        CHIP_ERROR err = mBdxCoordinator->ShareFileWithClient(peer, requestID, entry.fileID,
-                                                              CharSpan(entry.name.data(), entry.name.size()));
+        CHIP_ERROR err =
+            mBdxCoordinator->ShareFileWithClient(peer, requestID, entry.fileID, CharSpan(entry.name.data(), entry.name.size()));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "MediaFileManagementManager: ShareFileWithClient failed for id %llu: %" CHIP_ERROR_FORMAT,

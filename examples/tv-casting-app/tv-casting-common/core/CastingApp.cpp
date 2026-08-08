@@ -167,8 +167,8 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
 
     // The BDX server serves incoming (Media-Device-initiated) BDX pulls for the
     // AddFile / OfferFile flows, so it must be the unsolicited BDX handler.
-    ReturnErrorOnFailure(server.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
-        chip::Protocols::BDX::Id, &mMediaFileManagementBdxServer));
+    ReturnErrorOnFailure(server.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
+                                                                                                  &mMediaFileManagementBdxServer));
 
     ChipLogProgress(
         Discovery,
