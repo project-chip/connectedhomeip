@@ -652,7 +652,11 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     // mNeedsNetworkSetup may be set by SetNetworkSetupNeeded().
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kBle);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
+    if (transportType == Transport::Type::kNfc)
+    {
+        // If RequiresNetworkSetup is not set, return true to keep original logic
+        mNeedsNetworkSetup = mNeedsNetworkSetup || mParams.GetRequiresNetworkSetup().ValueOr(true);
+    }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
