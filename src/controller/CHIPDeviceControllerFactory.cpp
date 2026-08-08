@@ -283,6 +283,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
+    SessionParameters localSessionParams;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (params.enableTCPServer)
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
+        localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                                SessionParameters::kTCPFramingHeaderSize);
+    }
+#endif
+
     if (params.enableServerInteractions)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
@@ -291,6 +305,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
+        stateParams.caseServer->SetLocalSessionParameters(localSessionParams);
 
         if (!params.preventDnssdPortOverwrite)
         {
@@ -340,22 +355,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // the then-current value.
         .mrpLocalConfig            = NullOptional,
         .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
+        .localSessionParams        = localSessionParams,
     };
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    {
-        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
-        if (params.enableTCPServer)
-        {
-            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
-        }
-        sessionInitParams.localSessionParams.SetSupportedTransports(supportedTransports);
-        // Maximum size of the TCP payload that the node is capable of receiving
-        // from its peer. Make sure we subtract the framing length prefix.
-        sessionInitParams.localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
-                                                                  SessionParameters::kTCPFramingHeaderSize);
-    }
-#endif
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = sessionInitParams,
