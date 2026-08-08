@@ -40,7 +40,7 @@ on:
 jobs:
     build_images_base:
         name: Build Docker CHIP Build images - base
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]'
         permissions:
             contents: read
@@ -80,20 +80,23 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
-    # Every image below is built on its own runner, so the figure that matters is
-    # the peak a single image reaches, not the total of a sequential run. GitHub
-    # guarantees 14GB of free space; runners frequently provide more, so anything
-    # above the guarantee is a flake waiting to happen rather than a clean failure.
+    # These jobs run on namespace runners rather than GitHub-hosted ones. A
+    # GitHub-hosted runner guarantees only 14GB of free space and frequently
+    # provides more, so an image needing more than that does not fail cleanly,
+    # it fails depending on which runner it draws. Two images measured above
+    # that line: efr32 at 17.8GB and nxp at 14.6GB. A namespace shape gives a
+    # fixed disk size instead, which turns that class of flake into a property
+    # we can size for.
     #
-    # Images measured above that line are commented out individually with what
-    # they actually cost, in the same style as the entries that were already
-    # disabled here. Measurements are from a per-image probe on ubuntu-latest.
+    # Per-image peaks were measured with one build per runner, since each job
+    # here builds a single image; the figure that matters is that peak, not the
+    # total a sequential run would accumulate.
     #
     # See https://github.com/project-chip/connectedhomeip/issues/30750
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]'
         permissions:
             contents: read
@@ -124,7 +127,7 @@ jobs:
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]'
         permissions:
             contents: read
@@ -137,25 +140,21 @@ jobs:
                     - "-asr"
                     - "-bouffalolab"
                     - "-doxygen"
-                    # NOTE: efr32 peaks at 17.8GB, well past the 14GB GitHub
-                    # guarantees. It succeeds only on runners that happen to
-                    # offer more, so enabling it buys intermittent failures.
-                    # - "-efr32"
+                    # The two largest: 17.8GB and 14.6GB peak. Both exceed what a
+                    # GitHub-hosted runner guarantees, which is why these jobs
+                    # run on a namespace shape.
+                    - "-efr32"
                     - "-esp32"
                     - "-infineon"
-                    # imx was disabled for "no space left on device". Measured on
-                    # its own runner it peaks at 8.9GB, comfortably inside the
-                    # guarantee; the old failure was a shared-runner artifact.
+                    # imx was disabled for "no space left on device". Built alone
+                    # it peaks at 8.9GB, so the original failure came from sharing
+                    # a runner rather than from the image.
                     - "-imx"
                     - "-java"
-                    # NOTE: nxp peaks at 14.6GB, just past the 14GB guarantee.
-                    # - "-nxp"
+                    - "-nxp"
                     - "-nxp-zephyr"
                     - "-nrf-platform"
                     - "-realtek-zephyr"
-                    # silabs-zephyr (12.3GB) and telink (14.1GB) are inside the
-                    # guarantee but with little room. If either starts failing
-                    # intermittently, disk is the first thing to check.
                     - "-silabs-zephyr"
                     - "-telink"
                     - "-telink-zephyr_3_3"
@@ -183,7 +182,7 @@ jobs:
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]'
         permissions:
             contents: read
@@ -222,7 +221,7 @@ jobs:
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-4x16
         if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
