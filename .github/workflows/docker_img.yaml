@@ -14,6 +14,10 @@
 
 name: Docker CHIP images
 
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
 on:
     workflow_call:
         inputs:
