@@ -1556,22 +1556,19 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupInfoIterator::AutoReleasing it(groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex()));
 
     jobject groupIds;
     err = chip::JniReferences::GetInstance().CreateArrayList(groupIds);
 
     chip::Credentials::GroupDataProvider::GroupInfo group;
 
-    if (it)
+    while (it.Next(group))
     {
-        while (it->Next(group))
-        {
-            jobject jGroupId;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                "java/lang/Integer", "(I)V", static_cast<jint>(group.group_id), jGroupId);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
-        }
+        jobject jGroupId;
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(group.group_id), jGroupId);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
     }
 
     return groupIds;
@@ -1585,19 +1582,16 @@ JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupInfoIterator::AutoReleasing it(groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex()));
 
     GroupId groupId = static_cast<GroupId>(jGroupId);
     chip::Credentials::GroupDataProvider::GroupInfo group;
 
-    if (it)
+    while (it.Next(group))
     {
-        while (it->Next(group))
+        if (group.group_id == groupId)
         {
-            if (group.group_id == groupId)
-            {
-                return env->NewStringUTF(group.name);
-            }
+            return env->NewStringUTF(group.name);
         }
     }
 
@@ -1612,26 +1606,21 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
     GroupId groupId = static_cast<GroupId>(jGroupId);
     jobject wrapperKeyId;
 
-    if (iter)
+    while (iter.Next(groupKey))
     {
-        while (iter->Next(groupKey))
+        if (groupKey.group_id == groupId)
         {
-            if (groupKey.group_id == groupId)
-            {
-                jobject jKeyId;
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    "java/lang/Integer", "(I)V", static_cast<jint>(groupKey.keyset_id), jKeyId);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
-                iter->Release();
-                return wrapperKeyId;
-            }
+            jobject jKeyId;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(groupKey.keyset_id), jKeyId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
+            return wrapperKeyId;
         }
-        iter->Release();
     }
     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
     return wrapperKeyId;
@@ -1678,23 +1667,19 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::KeySetIterator::AutoReleasing it(groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex()));
 
     jobject keySetIds;
     err = chip::JniReferences::GetInstance().CreateArrayList(keySetIds);
 
     chip::Credentials::GroupDataProvider::KeySet keySet;
 
-    if (it)
+    while (it.Next(keySet))
     {
-        while (it->Next(keySet))
-        {
-            jobject jKeySetId;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                "java/lang/Integer", "(I)V", static_cast<jint>(keySet.keyset_id), jKeySetId);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
-        }
-        it->Release();
+        jobject jKeySetId;
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(keySet.keyset_id), jKeySetId);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
     }
 
     return keySetIds;
@@ -1708,29 +1693,25 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::KeySetIterator::AutoReleasing it(groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex()));
 
     chip::Credentials::GroupDataProvider::KeySet keySet;
 
     uint16_t keySetId = static_cast<uint16_t>(jKeySetId);
     jobject wrapperKeyPolicy;
 
-    if (it)
+    while (it.Next(keySet))
     {
-        while (it->Next(keySet))
+        if (keySet.keyset_id == keySetId)
         {
-            if (keySet.keyset_id == keySetId)
-            {
-                jobject jKeyPolicy;
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    "java/lang/Integer", "(I)V", static_cast<jint>(keySet.policy), jKeyPolicy);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
-                it->Release();
-                return wrapperKeyPolicy;
-            }
+            jobject jKeyPolicy;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(keySet.policy), jKeyPolicy);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
+            return wrapperKeyPolicy;
         }
-        it->Release();
     }
+
     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
     return wrapperKeyPolicy;
 }
@@ -1743,10 +1724,15 @@ JNI_METHOD(jboolean, bindKeySet)(JNIEnv * env, jobject self, jlong handle, jint 
     VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter            = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t current_count = iter->Count();
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
 
-    iter->Release();
+    if (!iter.IsValid())
+    {
+        return JNI_FALSE;
+    }
+
+    size_t current_count = iter.Count();
+
     CHIP_ERROR err = groupDataProvider->SetGroupKeyAt(
         wrapper->Controller()->GetFabricIndex(), current_count,
         chip::Credentials::GroupDataProvider::GroupKey(static_cast<uint16_t>(jGroupId), static_cast<uint16_t>(jKeySetId)));
@@ -1762,14 +1748,14 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
 
     size_t index                                             = 0;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter       = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t maxCount = iter->Count();
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
+    size_t maxCount = iter.Count();
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
 
     GroupId groupId   = static_cast<GroupId>(jGroupId);
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
 
-    while (iter->Next(groupKey))
+    while (iter.Next(groupKey))
     {
         if (groupKey.group_id == groupId && groupKey.keyset_id == keysetId)
         {
@@ -1777,7 +1763,6 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
         }
         index++;
     }
-    iter->Release();
     if (index >= maxCount)
     {
         return JNI_FALSE;
@@ -1835,32 +1820,33 @@ JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jin
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
     size_t index      = 0;
-    auto iter         = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
-    if (iter)
+    if (!iter.IsValid())
     {
-        while (iter->Next(groupKey))
-        {
-            if (groupKey.keyset_id == keysetId)
-            {
-                err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
-                if (err != CHIP_NO_ERROR)
-                {
-                    break;
-                }
-            }
-            index++;
-        }
-        iter->Release();
-        if (err == CHIP_NO_ERROR)
-        {
-            err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
-        }
-        return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+        return JNI_FALSE;
     }
 
-    return JNI_FALSE;
+    while (iter.Next(groupKey))
+    {
+        if (groupKey.keyset_id == keysetId)
+        {
+            err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
+        }
+        index++;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
+    }
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
 }
 
 JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
