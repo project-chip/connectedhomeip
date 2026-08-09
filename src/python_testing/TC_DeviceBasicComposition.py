@@ -1126,6 +1126,11 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         REFRIGERATOR_NAMESPACE_ID = 0x41
         ROOM_AIRCONDITIONER_NAMESPACE_ID = 0x42
         SWITCHES_NAMESPACE_ID = 0x43
+        CLOSURE_NAMESPACE_ID = 0x44
+        CLOSURE_PANEL_NAMESPACE_ID = 0x45
+        CLOSURE_COVERING_NAMESPACE_ID = 0x46
+        CLOSURE_WINDOW_NAMESPACE_ID = 0x47
+        CLOSURE_CABINET_NAMESPACE_ID = 0x48
 
         END_POINT_UNIQUE_ID_LENGTH_BYTES = 32
 
@@ -1297,7 +1302,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                                       COMMON_RELATIVE_POSITION_ID,
                                                       REFRIGERATOR_NAMESPACE_ID,
                                                       ROOM_AIRCONDITIONER_NAMESPACE_ID,
-                                                      SWITCHES_NAMESPACE_ID]:
+                                                      SWITCHES_NAMESPACE_ID,
+                                                      CLOSURE_NAMESPACE_ID,
+                                                      CLOSURE_PANEL_NAMESPACE_ID,
+                                                      CLOSURE_COVERING_NAMESPACE_ID,
+                                                      CLOSURE_WINDOW_NAMESPACE_ID,
+                                                      CLOSURE_CABINET_NAMESPACE_ID]:
                         self.fail_current_test("Non manufacturer specific tag is not a tag from namespace defined in spec")
                 else:
 
