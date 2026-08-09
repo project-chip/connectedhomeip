@@ -23,7 +23,10 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestDoorLockLocalBufferCopy.cpp" ]
 
-  sources = []
+  # door-lock-server.h has no standalone library target (it is compiled
+  # per-application via chip_data_model.gni), so list it here to make the
+  # include visible to `gn check`.
+  sources = [ "../door-lock-server.h" ]
 
   # Build the header with DOOR_LOCK_USE_LOCAL_BUFFER=1 (never set in the
   # default configuration) so the local-buffer copy semantics of the
