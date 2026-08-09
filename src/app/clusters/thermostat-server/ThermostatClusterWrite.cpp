@@ -129,13 +129,12 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                 AttributeValueDecoder & decoder)
 {
-    auto attributeId         = request.path.mAttributeId;
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
     if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor))
     {
         ChipLogError(Zcl, "Can not write to non-atomic attribute " ChipLogFormatMEI " during atomic write",
-                     ChipLogValueMEI(attributeId));
+                     ChipLogValueMEI(request.path.mAttributeId));
         return Status::InvalidInState;
     }
     return WriteNonAtomicAttribute(request, decoder);

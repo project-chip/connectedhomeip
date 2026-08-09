@@ -84,6 +84,10 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+static EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -289,12 +293,8 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-        Thermostat_ENDPOINT_ID, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
+        gThermostatEndpoint, &gThermostatDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
