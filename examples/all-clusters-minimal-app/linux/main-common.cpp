@@ -42,6 +42,9 @@ using namespace chip::DeviceLayer;
 namespace {
 static LowPowerManager lowPowerManager;
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+
+static EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 } // namespace
 
 void OnIdentifyStart(::Identify *)
@@ -84,16 +87,15 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    if (auto status = Clusters::Thermostat::SetDefaultDelegate<chip::app::Clusters::Thermostat::DefaultThermostatCluster,
-                                                               chip::app::Clusters::Thermostat::ThermostatDelegate>(
-            chip::EndpointId(1), &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-        status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-    }
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster,
+                                     Clusters::Thermostat::ThermostatDelegate>(
+        gThermostatEndpoint, &gThermostatDelegate);
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown() {
+    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(
+        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+}
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
