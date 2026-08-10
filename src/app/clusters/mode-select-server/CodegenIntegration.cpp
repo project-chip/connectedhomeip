@@ -21,14 +21,6 @@
 #include <app/clusters/mode-select-server/ModeSelectCluster.h>
 #include <app/clusters/mode-select-server/SupportedModesManager.h>
 
-// ManufacturerExtension (0xFFF10001) is a MEI test extension defined in
-// mode-select-extensions.xml. Apps using zcl-with-test-extensions.json (e.g. Realtek
-// all-clusters-app) include it, causing the generated static-cluster-config/ModeSelect.h
-// to reference Attributes::ManufacturerExtension::Id which is not in standard AttributeIds.h.
-namespace chip::app::Clusters::ModeSelect::Attributes::ManufacturerExtension {
-inline constexpr AttributeId Id = 0xFFF10001u;
-} // namespace chip::app::Clusters::ModeSelect::Attributes::ManufacturerExtension
-
 #include <app/static-cluster-config/ModeSelect.h>
 #include <app/util/attribute-storage.h>
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
@@ -137,23 +129,12 @@ public:
             standardNamespace.SetNull();
         }
 
-        // StartUpMode and OnMode are EXTERNAL_STORAGE (NVM) in code-driven clusters;
-        // Ember raw reads do not work for them. Provide ZAP defaults directly:
-        //   StartUpMode default = 0 (first mode, per all-clusters ZAP config)
-        //   OnMode default = null (ZAP default 255 = null sentinel, meaning no override)
-        DataModel::Nullable<uint8_t> initialStartUpMode = optionalAttributeSet.IsSet(StartUpMode::Id)
-            ? DataModel::MakeNullable(static_cast<uint8_t>(0))
-            : DataModel::NullNullable;
-        DataModel::Nullable<uint8_t> initialOnMode      = DataModel::NullNullable;
-
         ModeSelectCluster::Config config{
             .featureMap             = BitMask<Feature>(featureMap),
             .optionalAttributeSet   = optionalAttributeSet,
             .description            = chip::CharSpan(entry.descriptionBuffer, descSpan.size()),
             .standardNamespace      = standardNamespace,
             .onOffValueForStartUp   = onOffValueForStartUp,
-            .initialStartUpMode     = initialStartUpMode,
-            .initialOnMode          = initialOnMode,
             .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
         };
 

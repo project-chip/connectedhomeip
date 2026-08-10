@@ -58,7 +58,7 @@ ModeSelectCluster::ModeSelectCluster(EndpointId endpointId, Delegate & delegate,
     DefaultServerCluster({ endpointId, ModeSelect::Id }), DefaultSceneHandlerImpl(GlobalValidator()), mDelegate(delegate),
     mFeatureMap(config.featureMap), mOptionalAttributeSet(config.optionalAttributeSet), mDescription(config.description),
     mStandardNamespace(config.standardNamespace), mOnOffValueForStartUp(config.onOffValueForStartUp),
-    mDiagnosticDataProvider(config.diagnosticDataProvider), mStartUpMode(config.initialStartUpMode), mOnMode(config.initialOnMode)
+    mDiagnosticDataProvider(config.diagnosticDataProvider)
 {}
 
 CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
