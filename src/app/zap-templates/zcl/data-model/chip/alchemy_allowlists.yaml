@@ -22,8 +22,8 @@ MANUAL_ALLOWLIST:
     - fault-injection-cluster.xml
     - global-attributes.xml
     - global-bitmaps.xml
-    - matter-devices.xml
     - measurement-and-sensing.xml
+
     - mode-base-cluster.xml
     - proxy-configuration-cluster.xml
     - proxy-discovery-cluster.xml
