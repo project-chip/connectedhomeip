@@ -137,6 +137,34 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
+namespace {
+
+/**
+ * FabricTable delegate that triggers a factory reset when the last fabric
+ * is removed from the device.
+ */
+class LastFabricRemovedDelegate : public chip::FabricTable::Delegate
+{
+public:
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        if (fabricTable.FabricCount() == 0)
+        {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+            /* Trigger factory reset for BLEApplicationManager */
+            chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+            ChipLogProgress(AppServer, "Last fabric removed - scheduling factory reset");
+            chip::Server::GetInstance().GenerateShutDownEvent();
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
+static LastFabricRemovedDelegate sLastFabricRemovedDelegate;
+
+} // namespace
+
 #if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
@@ -240,6 +268,9 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+
+    // Register the delegate that triggers a factory reset when the last fabric is removed.
+    VerifyOrDie(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sLastFabricRemovedDelegate) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
