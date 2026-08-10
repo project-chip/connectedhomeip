@@ -921,9 +921,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         # or no DUT), so there is no DUT state to clean up and no session to do it
         # over. Skip DUT cleanup.
         dut_reachable = self._original_acl is not None
-        if not dut_reachable and self.matter_test_config.commissioning_method is not None:
-            LOGGER.warning("[CLN] Class finished without a DUT baseline despite runner "
-                           "commissioning; DUT cleanup skipped")
+        # commissioning_method may also be set by in-test commissioning flows, so the
+        # warning stays neutral about who commissioned. is_commissioning classes skip
+        # capture by design and must not warn.
+        if not dut_reachable and not self.is_commissioning and self.matter_test_config.commissioning_method is not None:
+            LOGGER.warning("[CLN] Class finished without a DUT baseline although commissioning "
+                           "was configured; DUT cleanup skipped")
         if dut_reachable:
             try:
                 # Bound session re-establishment before the reachability read: after a
