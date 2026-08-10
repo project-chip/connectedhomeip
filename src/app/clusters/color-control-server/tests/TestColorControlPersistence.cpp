@@ -302,6 +302,42 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
     a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// §3.2.11.10 null row: once StartUpColorTemperatureMireds is cleared, the next boot owes the PREVIOUS
+// ColorTemperatureMireds. That only holds if the boot which APPLIED a startup value also stored it —
+// otherwise the pre-startup mode is still the newest thing in NVM and the color reverts to it. No command
+// runs here on purpose: Startup() is the only writer under test.
+TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFollowingNullBoot)
+{
+    ColorControlCluster::Config cfg(delegate);
+    cfg.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
+    cfg.mColorValue                         = HueSatColor{ .hue = 10, .saturation = 20 };
+    cfg.ctConfig.colorTempPhysicalMinMireds = 100;
+    cfg.ctConfig.colorTempPhysicalMaxMireds = 400;
+    cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(300);
+
+    // Boot 1: storage is empty, so the color comes up as the configured HS value and the startup override
+    // then forces CT mode @300.
+    ColorControlCluster a(kEp, cfg);
+    Testing::ClusterTester tester(a);
+    ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(a.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
+    ASSERT_EQ(a.ColorTempMireds(), 300u);
+
+    // The client clears the override. This write touches StartUpColorTemperatureMireds only — the color
+    // itself is never re-stored by it.
+    ASSERT_TRUE(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::Nullable<uint16_t>()).IsSuccess());
+
+    // Boot 2 takes the null path, so it restores purely from NVM: 300 in CT mode is what boot 1 was
+    // showing. Coming up as the configured HueSatColor would mean boot 1 never stored the startup value.
+    ColorControlCluster b(kEp, cfg);
+    ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
+    EXPECT_EQ(b.ColorTempMireds(), 300u);
+
+    b.Shutdown(ClusterShutdownType::kClusterShutdown);
+    a.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // Issue 3: a color loop running at shutdown resumes on the next boot instead of lying dormant.
 TEST_F(TestColorControlPersistence, ColorLoopResumesAfterReboot)
 {
@@ -361,6 +397,10 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
     EXPECT_EQ(b.ColorLoopActive(), 1);                                                   // still active...
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds); // ...but CT owns the output
     EXPECT_EQ(b.ColorTempMireds(), 300u);
+
+    const uint16_t before = b.EnhancedHue();
+    Tick(b, 1000);
+    EXPECT_NE(b.EnhancedHue(), before);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
     a.Shutdown(ClusterShutdownType::kClusterShutdown);

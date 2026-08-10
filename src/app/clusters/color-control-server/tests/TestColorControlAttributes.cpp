@@ -104,6 +104,17 @@ TEST_F(TestColorControlAttributes, OptionsWriteRoundTrip)
     ASSERT_TRUE(tester.ReadAttribute(Attributes::Options::Id, readBack).IsSuccess());
     EXPECT_EQ(readBack.Raw(), options.Raw());
 
+    // Reserved bits (everything but bit 0) are rejected and leave the attribute untouched.
+    BitMask<OptionsBitmap> reserved;
+    reserved.SetRaw(0x02);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::Options::Id, reserved), Status::ConstraintError);
+    ASSERT_TRUE(tester.ReadAttribute(Attributes::Options::Id, readBack).IsSuccess());
+    EXPECT_EQ(readBack.Raw(), options.Raw());
+
+    // Clearing all bits stays valid.
+    BitMask<OptionsBitmap> none;
+    EXPECT_TRUE(tester.WriteAttribute(Attributes::Options::Id, none).IsSuccess());
+
     c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 

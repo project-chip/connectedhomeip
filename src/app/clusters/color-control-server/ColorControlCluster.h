@@ -392,9 +392,9 @@ private:
     // the in-flight transition are RAM-only, so persisting mid-transition would only wear flash.
     template <typename T>
     void PersistValue(chip::AttributeId id, const T & value);
-    void PersistCurrentColor(); // EnhancedColorMode + the active mode's stored axes
-    void PersistColorLoop();    // ColorLoopActive / ColorLoopDirection / ColorLoopTime
-    void StopTransitionAndFreeze();
+    void PersistCurrentColor();     // EnhancedColorMode + the active mode's stored axes
+    void PersistColorLoop();        // ColorLoopActive / ColorLoopDirection / ColorLoopTime
+    bool StopTransitionAndFreeze(); // true when a driver was actually stopped (i.e. the output moved)
 
     static constexpr uint16_t kMaxTransitionTime         = 0xFFFE; // Max value as defined by the spec.
     static constexpr uint16_t kMaxColorTemperatureMireds = 0xFEFF; // Max value as defined by the spec.
