@@ -470,19 +470,10 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
 {
     using namespace Attributes;
 
-#define BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES \
-    ManufacturingDate::kMetadataEntry,              \
-    PartNumber::kMetadataEntry,                     \
-    ProductURL::kMetadataEntry,                     \
-    ProductLabel::kMetadataEntry,                   \
-    SerialNumber::kMetadataEntry,                   \
-    LocalConfigDisabled::kMetadataEntry,            \
-    Reachable::kMetadataEntry,                      \
-    ProductAppearance::kMetadataEntry,              \
-    /* Optional because of forced multi-revision support for backwards */ \
-    /* compatibility emulation: we emulate revision 3 when UniqueID */    \
-    /* is not enabled. */                                           \
-    UniqueID::kMetadataEntry
+#define BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES                                                                                                                                                                                                                                                    \
+    ManufacturingDate::kMetadataEntry, PartNumber::kMetadataEntry, ProductURL::kMetadataEntry, ProductLabel::kMetadataEntry,                                                                                                                                                                            \
+        SerialNumber::kMetadataEntry, LocalConfigDisabled::kMetadataEntry, Reachable::kMetadataEntry, ProductAppearance::kMetadataEntry, /* Optional because of forced multi-revision support for backwards */ /* compatibility emulation: we emulate revision 3 when UniqueID */ /* is not enabled. */ \
+        UniqueID::kMetadataEntry
 
     static constexpr DataModel::AttributeEntry optionalAttributesNoDeviceLocation[] = {
         BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES,
@@ -516,11 +507,9 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
 
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(
-        Span(mandatoryAttributes),
-        Policy::kHasDeviceLocation
-            ? Span(optionalAttributesWithDeviceLocation)
-            : Span(optionalAttributesNoDeviceLocation),
-        mPolicy.GetOptionalAttributes());
+    return listBuilder.Append(Span(mandatoryAttributes),
+                              Policy::kHasDeviceLocation ? Span(optionalAttributesWithDeviceLocation)
+                                                         : Span(optionalAttributesNoDeviceLocation),
+                              mPolicy.GetOptionalAttributes());
 }
 } // namespace chip::app::Clusters::BasicInformation
