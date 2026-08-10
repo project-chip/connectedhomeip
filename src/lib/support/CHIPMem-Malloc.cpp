@@ -90,9 +90,14 @@ void MemoryAllocatorShutdown()
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
+// Note that we either define the typed malloc wrappers (if
+// CHIP_SYSTEM_CONFIG_TYPED_MALLOC is enabled), or the untyped malloc wrappers.
+// This ensures that the automatic replacement of calls to the untyped wrappers
+// is working, since if the replacement wasn't always done then it would lead
+// to linker issues due to the missing definition of the untyped wrappers.
 #if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
 
-CHIP_MALLOC_WRAPPER_BEGIN
+CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 
 void * MemoryAllocTyped(size_t size, malloc_type_id_t typeId)
 {
@@ -113,7 +118,7 @@ void * MemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId)
     return malloc_type_realloc(p, size, typeId);
 }
 
-CHIP_MALLOC_WRAPPER_END
+CHIP_TYPED_MALLOC_WRAPPER_END
 
 #else
 

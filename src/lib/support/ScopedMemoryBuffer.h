@@ -45,7 +45,7 @@ namespace Impl {
  * the class will be stored in flash.
  */
 template <class Impl>
-class ScopedMemoryBufferBase
+class ScopedMemoryBufferBase : protected Impl
 {
 public:
     ScopedMemoryBufferBase() {}
@@ -85,6 +85,7 @@ public:
 protected:
     void * Ptr() { return mBuffer; }
     const void * Ptr() const { return mBuffer; }
+    void SetPtr(void * ptr) { mBuffer = ptr; }
 
     /**
      * Releases the underlying buffer.
@@ -98,41 +99,26 @@ protected:
         return buffer;
     }
 
-    void Alloc(size_t elementCount, size_t elementSize)
-    {
-        Free();
-        mBuffer = Impl::MemoryAlloc(elementCount, elementSize);
-    }
-
-    void Calloc(size_t elementCount, size_t elementSize)
-    {
-        Free();
-        mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
-    }
-
 private:
     void * mBuffer = nullptr;
 };
 
 /**
  * Helper class that forwards memory management tasks to Platform::Memory* calls.
- * Note that it is required that the second size_t argument passed to
- * MemoryAlloc/MemoryCalloc by ScopedMemoryBuffer is the size of the
- * ScopedMemoryBuffer's T parameter.
  */
 #if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
 template <typename T>
 class PlatformMemoryManagement
 {
-public:
+protected:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t num, size_t) { return chip::Platform::MemoryAllocTyped<T>(num); }
-    static void * MemoryCalloc(size_t num, size_t) { return chip::Platform::MemoryCallocTyped<T>(num); }
+    static void * MemoryAlloc(size_t num) { return chip::Platform::MemoryAllocTyped<T>(num); }
+    static void * MemoryCalloc(size_t num) { return chip::Platform::MemoryCallocTyped<T>(num); }
 };
 #else
 class SimplePlatformMemoryManagement
 {
-public:
+protected:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
     static void * MemoryAlloc(size_t num, size_t size) { return chip::Platform::MemoryAlloc(num * size); }
     static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
@@ -176,14 +162,30 @@ public:
 
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
-        Base::Calloc(elementCount, sizeof(T));
+        Base::Free();
+        if constexpr (std::is_invocable_v<decltype(Base::MemoryCalloc), size_t>)
+        {
+            Base::SetPtr(Base::MemoryCalloc(elementCount));
+        }
+        else
+        {
+            Base::SetPtr(Base::MemoryCalloc(elementCount, sizeof(T)));
+        }
         ExecuteConstructors(elementCount);
         return *this;
     }
 
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::Alloc(elementCount, sizeof(T));
+        Base::Free();
+        if constexpr (std::is_invocable_v<decltype(Base::MemoryAlloc), size_t>)
+        {
+            Base::SetPtr(Base::MemoryAlloc(elementCount));
+        }
+        else
+        {
+            Base::SetPtr(Base::MemoryAlloc(elementCount, sizeof(T)));
+        }
         ExecuteConstructors(elementCount);
         return *this;
     }

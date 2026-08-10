@@ -96,7 +96,7 @@ extern void MemoryShutdown();
  */
 extern void * MemoryAlloc(size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryAllocTyped, 1);
 
-CHIP_MALLOC_WRAPPER_BEGIN
+CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 
 /**
  * This is a helper mainly intended for implementing wrappers that forward to MemoryAlloc.
@@ -117,7 +117,7 @@ T * MemoryAllocTyped(size_t num)
     return static_cast<T *>(MemoryAlloc(num * sizeof(T)));
 }
 
-CHIP_MALLOC_WRAPPER_END
+CHIP_TYPED_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory for an array of num
@@ -133,7 +133,7 @@ CHIP_MALLOC_WRAPPER_END
  */
 extern void * MemoryCalloc(size_t num, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryCallocTyped, 2);
 
-CHIP_MALLOC_WRAPPER_BEGIN
+CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 
 /**
  * This is a helper mainly intended for implementing wrappers that forward to MemoryCalloc.
@@ -150,7 +150,7 @@ T * MemoryCallocTyped(size_t num)
     return static_cast<T *>(MemoryCalloc(num, sizeof(T)));
 }
 
-CHIP_MALLOC_WRAPPER_END
+CHIP_TYPED_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the Chip layer to change the size of the memory block pointed to by p.

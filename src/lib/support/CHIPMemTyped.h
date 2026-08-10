@@ -29,7 +29,8 @@
 //
 // We also provide a CHIP_OVERRIDE_MALLOC_TYPED macro, which can be added to
 // malloc-like wrappers, and allows the compiler to automatically replace the
-// wrapper with the corresponding type-aware variant. The
+// wrapper with the corresponding type-aware variant. If the compiler replaces
+// the wrappers, then only the type-aware variant should have a definition. The
 // CHIP_OVERRIDE_MALLOC_TYPED macro has two arguments, the first one points to
 // the relevant type-aware replacement, and the second is a 1-based index that
 // points to the argument that can be used to perform type inference over.
@@ -59,22 +60,22 @@
 #endif
 #endif
 
-// Macros to turn off warnings for allocator wrappers. We use this to turn off
-// the warnings for our own type-aware wrappers when they are enabled. For
-// example, to turn off the warning for MemoryAllocTyped because it is a
-// type-aware wrapper:
+// Macros to turn off warnings for typed malloc wrappers. These can be enabled
+// by defining CHIP_WARN_UNTYPED_MALLOC. For example, to turn off the warning
+// for MemoryAllocTyped because it is a typed malloc wrapper:
 //
-// CHIP_MALLOC_WRAPPER_BEGIN
+// CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 // T * MemoryAllocTyped(size_t num)
 // {
 //     …
 // }
-// CHIP_MALLOC_WRAPPER_END
+// CHIP_TYPED_MALLOC_WRAPPER_END
 //
-#if defined(__APPLE__) && CHIP_SYSTEM_CONFIG_TYPED_MALLOC
-#define CHIP_MALLOC_WRAPPER_BEGIN _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wallocator-wrappers\"")
-#define CHIP_MALLOC_WRAPPER_END _Pragma("clang diagnostic pop")
+#if defined(__APPLE__) && CHIP_SYSTEM_CONFIG_TYPED_MALLOC && defined(CHIP_WARN_UNTYPED_MALLOC)
+#define CHIP_TYPED_MALLOC_WRAPPER_BEGIN                                                                                            \
+    _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wallocator-wrappers\"")
+#define CHIP_TYPED_MALLOC_WRAPPER_END _Pragma("clang diagnostic pop")
 #else
-#define CHIP_MALLOC_WRAPPER_BEGIN
-#define CHIP_MALLOC_WRAPPER_END
+#define CHIP_TYPED_MALLOC_WRAPPER_BEGIN
+#define CHIP_TYPED_MALLOC_WRAPPER_END
 #endif
