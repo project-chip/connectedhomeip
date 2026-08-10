@@ -1347,7 +1347,8 @@ Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturat
 {
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     // Same constraint checks as MoveToSaturation (its twin): reject before any mode switch / transition.
-    // Note: `hue` is unconstrained — 8-bit legacy hue and 16-bit enhanced hue both span their full range.
+    // Legacy Hue is constrained to kMaxCurrentHue; EnhancedHue spans the full uint16 range.
+    VerifyOrReturnValue(isEnhanced || hue <= kMaxCurrentHue, Status::ConstraintError);
     VerifyOrReturnValue(saturation <= kMaxSaturationValue, Status::ConstraintError);
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
 
@@ -1367,10 +1368,8 @@ Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturat
     else
     {
         // HueSatColor holds the legacy 8-bit hue as-is (it projects up via enhancedHue()), so this axis
-        // takes the command value straight — no shift — clamped to the kMaxCurrentHue cap (§3.2.7.11).
-        StartHueAndSatTransition(
-            HueSatColor{ .hue = std::clamp(static_cast<uint8_t>(hue), kMinCurrentHue, kMaxCurrentHue), .saturation = targetSat },
-            timeMs, moveHue);
+        // takes the command value straight — no shift. The constraint check above already bounded it.
+        StartHueAndSatTransition(HueSatColor{ .hue = static_cast<uint8_t>(hue), .saturation = targetSat }, timeMs, moveHue);
     }
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
     InvalidateScenes();
@@ -1607,17 +1606,18 @@ Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
     VerifyOrReturnValue(dir != DirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
     // Both MoveToHue and EnhancedMoveToHue carry a uint16 TransitionTime constrained to max 65534.
     VerifyOrReturnValue(transitionTimeDs <= kMaxTransitionTime, Status::ConstraintError);
+    // MoveToHue's Hue is constrained to kMaxCurrentHue; EnhancedMoveToHue's EnhancedHue spans the full uint16 range.
+    VerifyOrReturnValue(isEnhanced || hue <= kMaxCurrentHue, Status::ConstraintError);
 
     ApplyModeSwitch(isEnhanced ? EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation
                                : EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     const uint16_t start = GetEnhancedHue(); // 16-bit canonical
-    // The arc math below is all 16-bit, so a legacy hue has to be projected up into that space. Clamp
-    // before the shift, not after: legacy hue caps at kMaxCurrentHue (§3.2.7.11), and clamping the 8-bit
-    // value keeps the projection inside the legacy-representable band. Enhanced hue is already canonical.
-    const uint16_t target =
-        isEnhanced ? hue : static_cast<uint16_t>(std::clamp(static_cast<uint8_t>(hue), kMinCurrentHue, kMaxCurrentHue) << 8);
-    const uint16_t upArc = static_cast<uint16_t>(target - start); // distance going up (wraps)
+    // The arc math below is all 16-bit, so a legacy hue has to be projected up into that space. The
+    // constraint check above already rejected anything above kMaxCurrentHue (§3.2.7.11), so the shift
+    // lands inside the legacy-representable band. Enhanced hue is already canonical.
+    const uint16_t target = isEnhanced ? hue : static_cast<uint16_t>(hue << 8);
+    const uint16_t upArc  = static_cast<uint16_t>(target - start); // distance going up (wraps)
 
     bool up = false;
     switch (dir)

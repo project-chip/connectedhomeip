@@ -602,6 +602,32 @@ TEST_F(TestColorControlCommands, MoveToHueAndSaturationRejectsOutOfRange)
     EXPECT_EQ(c.MoveToHueAndSaturation(100, 200, 10, /*isEnhanced=*/false), Status::Success);            // valid
 }
 
+// The Hue field of MoveToHue / MoveToHueAndSaturation is constrained to kMaxCurrentHue (0xFE), so 0xFF must
+// be rejected, not normalized into range. Hue wrapping applies to values *within* the hue circle; 0xFF is
+// not a representable CurrentHue at all, so it is a malformed field rather than a hue past the top of the
+// circle. The Enhanced* variants carry a uint16 EnhancedHue for which 0xFF is a legitimate value.
+TEST_F(TestColorControlCommands, LegacyHueCommandsRejectHueAboveMax)
+{
+    ColorControlCluster c(kEp, EnhancedConfig()); // start enhancedHue 0x1000
+    Testing::ClusterTester tester(c);
+
+    EXPECT_EQ(c.MoveToHue(255, DirectionEnum::kShortest, 10, /*isEnhanced=*/false), Status::ConstraintError);
+    EXPECT_EQ(c.MoveToHueAndSaturation(255, 200, 10, /*isEnhanced=*/false), Status::ConstraintError);
+
+    // Rejected before any mode switch or transition: the hue is untouched and RemainingTime stays 0.
+    Tick(c, 1000);
+    EXPECT_EQ(c.EnhancedHue(), 0x1000);
+    uint16_t rt = 0;
+    ASSERT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, rt).IsSuccess());
+    EXPECT_EQ(rt, 0);
+
+    // The boundary value itself is in range, and 255 is fine as a 16-bit enhanced hue.
+    EXPECT_EQ(c.MoveToHue(254, DirectionEnum::kShortest, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHueAndSaturation(254, 200, 10, /*isEnhanced=*/false), Status::Success);
+    EXPECT_EQ(c.MoveToHue(255, DirectionEnum::kShortest, 10, /*isEnhanced=*/true), Status::Success);
+    EXPECT_EQ(c.MoveToHueAndSaturation(255, 200, 10, /*isEnhanced=*/true), Status::Success);
+}
+
 // MoveToHue, EnhancedMoveToHue and EnhancedStepHue each carry a uint16 TransitionTime constrained to
 // max 65534, so 65535 must be rejected before any transition starts — like every other timed command.
 // (Legacy StepHue's TransitionTime is a uint8 and can never carry an out-of-range value.)

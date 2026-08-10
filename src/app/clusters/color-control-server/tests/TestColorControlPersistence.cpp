@@ -400,7 +400,7 @@ TEST_F(TestColorControlPersistence, DormantColorLoopDoesNotResumeUnderStartupCt)
 
     const uint16_t before = b.EnhancedHue();
     Tick(b, 1000);
-    EXPECT_NE(b.EnhancedHue(), before);
+    EXPECT_EQ(b.EnhancedHue(), before);
 
     b.Shutdown(ClusterShutdownType::kClusterShutdown);
     a.Shutdown(ClusterShutdownType::kClusterShutdown);
