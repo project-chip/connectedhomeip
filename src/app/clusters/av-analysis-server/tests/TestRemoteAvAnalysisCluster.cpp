@@ -312,8 +312,14 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamBusyWhileAllocationPe
     Testing::MockCommandHandler secondHandler;
     secondHandler.SetFabricIndex(1);
     auto secondResponse = mServer.GetLogic().HandleEstablishAnalysisStream(secondHandler, path, commandData);
-    ASSERT_TRUE(secondResponse.has_value());
-    ASSERT_TRUE(secondResponse.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
+    if (secondResponse.has_value())
+    {
+        ASSERT_TRUE(secondResponse->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
+    }
+    else
+    {
+        FAIL();
+    }
     ASSERT_EQ(mFakeCameraClient.mAllocationRequests, 1);
 
     // Completing the first command frees the pending slot
@@ -339,8 +345,14 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamExhaustsAtCapacity)
     commandHandler.SetFabricIndex(1);
 
     auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_TRUE(response.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::ResourceExhausted));
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::ResourceExhausted));
+    }
+    else
+    {
+        FAIL();
+    }
     ASSERT_EQ(mFakeCameraClient.mAllocationRequests, kTestMaxAnalysisStreams);
 }
 
@@ -355,8 +367,14 @@ TEST_F(TestRemoteAvAnalysisCluster, EstablishAnalysisStreamWithoutCameraClientFa
     commandHandler.SetFabricIndex(1);
 
     auto response = mServer.GetLogic().HandleEstablishAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_FALSE(response.value().IsSuccess());
+    if (response.has_value())
+    {
+        ASSERT_FALSE(response->IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
@@ -440,8 +458,14 @@ TEST_F(TestRemoteAvAnalysisCluster, RemoveAnalysisStreamUnknownIdIsNotFound)
     commandHandler.SetFabricIndex(1);
 
     auto response = mServer.GetLogic().HandleRemoveAnalysisStream(commandHandler, path, commandData);
-    ASSERT_TRUE(response.has_value());
-    ASSERT_TRUE(response.value().GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::NotFound));
+    }
+    else
+    {
+        FAIL();
+    }
     ASSERT_EQ(mFakeCameraClient.mDeallocationRequests, 0);
 }
 
@@ -501,6 +525,9 @@ TEST_F(TestRemoteAvAnalysisCluster, AnalysisStreamsPersistAcrossRestart)
     auto response = mServer.GetLogic().HandleRemoveAnalysisStream(removeHandler, path, commandData);
     ASSERT_FALSE(response.has_value());
     ASSERT_EQ(mFakeCameraClient.mLastCamera, ScopedNodeId(kCameraNodeId, 1));
+
+    mFakeCameraClient.mLastCallback->OnVideoStreamDeallocated(Status::Success, 42);
+    ASSERT_TRUE(removeHandler.HasStatus());
 }
 
 TEST_F(TestRemoteAvAnalysisCluster, ExecuteTrackingEnabledPersistenceTest)
