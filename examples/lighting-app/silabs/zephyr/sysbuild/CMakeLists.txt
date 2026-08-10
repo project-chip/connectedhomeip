@@ -14,8 +14,7 @@
 #    limitations under the License.
 #
 
-# Sysbuild-scope CHIP module so its sysbuild-cmake hooks run (app CMakeLists only covers the app image).
-get_filename_component(CHIP_ROOT ${APP_DIR}/../third_party/connectedhomeip REALPATH)
+get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../.. REALPATH)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/silabs)
 
 # west passes -DUSE_CCACHE=0 as UNINITIALIZED; normalize for connectedhomeip_PRE_CMAKE.

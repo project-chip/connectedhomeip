@@ -323,8 +323,6 @@ west build -b xg24_rb4187c -p always --sysbuild examples/lighting-app/silabs/zep
        -DSB_CONFIG_BOOTLOADER_MCUBOOT=y
 ```
 
-The same flags apply to `xg26_rb4118a`.
-
 Build the update image with a higher software version so the provider offers it
 as a newer version:
 
