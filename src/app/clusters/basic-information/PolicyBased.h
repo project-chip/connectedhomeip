@@ -470,9 +470,11 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
 {
     using namespace Attributes;
 
-#define BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES                                                                                                                                                                                                                                                    \
-    ManufacturingDate::kMetadataEntry, PartNumber::kMetadataEntry, ProductURL::kMetadataEntry, ProductLabel::kMetadataEntry,                                                                                                                                                                            \
-        SerialNumber::kMetadataEntry, LocalConfigDisabled::kMetadataEntry, Reachable::kMetadataEntry, ProductAppearance::kMetadataEntry, /* Optional because of forced multi-revision support for backwards */ /* compatibility emulation: we emulate revision 3 when UniqueID */ /* is not enabled. */ \
+#define BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES                                                                               \
+    ManufacturingDate::kMetadataEntry, PartNumber::kMetadataEntry, ProductURL::kMetadataEntry, ProductLabel::kMetadataEntry,       \
+        SerialNumber::kMetadataEntry, LocalConfigDisabled::kMetadataEntry, Reachable::kMetadataEntry,                              \
+        ProductAppearance::kMetadataEntry, /* Optional because of forced multi-revision support for backwards */                   \
+        /* compatibility emulation: we emulate revision 3 when UniqueID */ /* is not enabled. */                                   \
         UniqueID::kMetadataEntry
 
     static constexpr DataModel::AttributeEntry optionalAttributesNoDeviceLocation[] = {
