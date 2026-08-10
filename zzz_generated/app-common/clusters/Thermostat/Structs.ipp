@@ -269,6 +269,99 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ScheduleTypeStruct
 
+namespace SensorScheduleTransitionStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kDayOfWeek), dayOfWeek);
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kEnabledSensors), enabledSensors);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kDayOfWeek))
+        {
+            err = DataModel::Decode(reader, dayOfWeek);
+        }
+        else if (__context_tag == to_underlying(Fields::kTransitionTime))
+        {
+            err = DataModel::Decode(reader, transitionTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kEnabledSensors))
+        {
+            err = DataModel::Decode(reader, enabledSensors);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SensorScheduleTransitionStruct
+
+namespace ThermostatSensorStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kName), name);
+    encoder.Encode(to_underlying(Fields::kSensorHandle), sensorHandle);
+    encoder.Encode(to_underlying(Fields::kCluster), cluster);
+    encoder.Encode(to_underlying(Fields::kEndpoint), endpoint);
+    encoder.Encode(to_underlying(Fields::kNode), node);
+    encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kName))
+        {
+            err = DataModel::Decode(reader, name);
+        }
+        else if (__context_tag == to_underlying(Fields::kSensorHandle))
+        {
+            err = DataModel::Decode(reader, sensorHandle);
+        }
+        else if (__context_tag == to_underlying(Fields::kCluster))
+        {
+            err = DataModel::Decode(reader, cluster);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpoint))
+        {
+            err = DataModel::Decode(reader, endpoint);
+        }
+        else if (__context_tag == to_underlying(Fields::kNode))
+        {
+            err = DataModel::Decode(reader, node);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ThermostatSensorStruct
+
 namespace ThermostatSuggestionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
