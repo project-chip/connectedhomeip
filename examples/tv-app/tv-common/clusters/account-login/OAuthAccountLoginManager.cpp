@@ -70,7 +70,7 @@ void OAuthAccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetD
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "OAuthAccountLoginManager::HandleGetDeviceAuthURI failed to start login timer: %" CHIP_ERROR_FORMAT,
-                    err.Format());
+                     err.Format());
         LogErrorOnFailure(helper.Failure(Protocols::InteractionModel::Status::Failure));
         return;
     }
