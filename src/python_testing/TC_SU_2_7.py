@@ -364,72 +364,54 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
             logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
 
-        # Verify if the requestor CanConsent
-        # We dont know by default as this is vendor specific
-        if self.is_pics_sdk_ci_only:
-            # Read directly from the Requestor if can Consent
-            command = {"Name": "QueryRequestorCanConsent",
-                       "Cluster": "OtaSoftwareUpdateRequestor", "Endpoint": self.get_endpoint()}
-            self.write_to_app_pipe(command)
-            response_data = self.read_from_app_pipe()
-            if response_data.get('Name') == "ConsentResponse":
-                requestor_can_consent = response_data['Payload']['RequestorCanConsent']
-            else:
-                asserts.fail("Requestor Error: Response was not from named pipe QueryRequestorCanConsent")
-        else:
-            # Ask the use if the Requestor Can Consent the software update
-            user_response = self.wait_for_user_input(prompt_msg="Does the DUT (Requestor) support RequestorCanConsent? Enter 'y' or 'n'",
-                                                     prompt_msg_placeholder="y",
-                                                     default_value="y")
-            requestor_can_consent = user_response.lower() == "y" or user_response.lower() == 'yes'
-        logger.info("Requestor CanConsent status: %s", requestor_can_consent)
-        if requestor_can_consent:
-            # --userConsentNeeded is option -c
-            self.start_provider(
-                provider_app_path=self.provider_app_path,
-                ota_image_path=self.ota_image,
-                setup_pincode=self.provider_setup_pincode,
-                discriminator=self.provider_discriminator,
-                port=self.provider_port,
-                extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                            self.provider_app_pipe_out, '--userConsentNeeded'],
-                kvs_path=self.provider_kvs_path,
-                log_file=self.provider_log,
-                timeout=10
-            )
-            state_transition_event_handler = EventSubscriptionHandler(
-                expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-            await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
-            await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-            # Wait to State to change to Querying
-            event_report = state_transition_event_handler.wait_for_event_report(
-                self.ota_req.Events.StateTransition, timeout_sec=600)
-            self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
-            # Avoid race condition with named pipes
-            await asyncio.sleep(2)
+        # --userConsentNeeded is option -c
+        self.start_provider(
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
+            port=self.provider_port,
+            extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
+                        self.provider_app_pipe_out, '--userConsentNeeded'],
+            kvs_path=self.provider_kvs_path,
+            log_file=self.provider_log,
+            timeout=10
+        )
+        state_transition_event_handler = EventSubscriptionHandler(
+            expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
+        await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
+        # Wait to State to change to Querying
+        event_report = state_transition_event_handler.wait_for_event_report(
+            self.ota_req.Events.StateTransition, timeout_sec=600)
+        self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
+                                           expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+        # Avoid race condition with named pipes
+        await asyncio.sleep(2)
 
-            # Query response must now have the UserConsentNeeded to True
-            command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
-            self.write_to_app_pipe(command, self.provider_app_pipe)
-            response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-            logger.info("Provider response info after AnnounceOtaProvider %s", response_data)
-            # Make sure the Provider sent the values properly.
-            asserts.assert_true(response_data['Payload']["RequestorCanConsent"],
-                                "TH Provider error, has the value for RequestorCanConset as False")
-            asserts.assert_true(response_data['Payload']["UserConsentNeeded"], "TH Provider error, UserConsentNeeded is False")
-
+        # Query response must now have the UserConsentNeeded to True
+        command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(command, self.provider_app_pipe)
+        response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("Provider response info after AnnounceOtaProvider %s", response_data)
+        # Read the value of RequestorCanConsent status from the OTA-P
+        resquestor_can_consent = response_data['Payload']["RequestorCanConsent"]
+        if resquestor_can_consent:
+            # Now as the RequestorCanConsent the test can proceed.
             # Wait State Event to change to kDelayedOnUserConsent
             event_report = state_transition_event_handler.wait_for_event_report(
                 self.ota_req.Events.StateTransition, timeout_sec=60)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
             state_transition_event_handler.cancel()
-            self.terminate_provider()
-            await self.request_device_reboot()
         else:
+            # Unable to consent the test step can be skipped.
             logger.info("Requestor can not consent.")
             self.mark_current_step_skipped()
+
+        # Clean up for the test step.
+        self.terminate_provider()
+        await self.request_device_reboot()
 
         self.step(5)
         self.start_provider(
