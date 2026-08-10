@@ -53,8 +53,6 @@ public:
         chip::CharSpan description;
         DataModel::Nullable<uint16_t> standardNamespace;
         bool onOffValueForStartUp = false;
-        DataModel::Nullable<uint8_t> initialStartUpMode; // ZAP default; fallback when no persisted value
-        DataModel::Nullable<uint8_t> initialOnMode;      // ZAP default; fallback when no persisted value
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
