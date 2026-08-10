@@ -17,6 +17,7 @@
 
 #include "EventHandlerLibShell.h"
 #include "AppTask.h"
+#include "RefrigeratorConfig.h"
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
 
@@ -24,7 +25,7 @@
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CodeUtils.h>
 
-constexpr uint8_t kRefEndpointId = 1;
+constexpr chip::EndpointId kRefEndpointId = REFRIGERATOR_ENDPOINT;
 
 using namespace chip;
 using namespace chip::app;
@@ -107,7 +108,7 @@ CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
     data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kMask;
-    data->doorState                   = static_cast<AlarmBitmap>(0);
+    data->doorState                   = static_cast<RefrigeratorAlarm::AlarmBitmap>(0);
 
     return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
@@ -137,7 +138,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
     data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kState;
-    data->doorState                   = static_cast<AlarmBitmap>(value);
+    data->doorState                   = static_cast<RefrigeratorAlarm::AlarmBitmap>(value);
 
     return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
