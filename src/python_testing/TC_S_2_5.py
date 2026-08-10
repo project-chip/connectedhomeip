@@ -85,129 +85,6 @@ class TC_S_2_5(MatterBaseTest):
     _scene_endpoint: int
     _fabric_index: int
 
-    def steps_TC_S_2_5(self) -> list[TestStep]:
-        return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
-            TestStep(
-                "0a",
-                "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT "
-                "with GroupKeySetID 0x01a1.",
-                "DUT sends a SUCCESS response.",
-            ),
-            TestStep(
-                "0b",
-                "If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. "
-                "Otherwise, TH writes the GroupKeyMap attribute on the GroupKeyManagement "
-                "cluster binding G1 to GroupKeySetID 0x01a1.",
-                "DUT sends a SUCCESS response.",
-            ),
-            TestStep(
-                "1a",
-                "If the Groupcast cluster is enabled on the RootNode endpoint, TH reads the "
-                "Groupcast Membership attribute on the DUT. Otherwise, skip this step.",
-                "DUT sends the Membership attribute; its contents decide whether Step 1b "
-                "needs to leave any group.",
-            ),
-            TestStep(
-                "1b",
-                "If the Groupcast cluster is enabled on the RootNode endpoint and Membership "
-                "was not empty in Step 1a, TH sends the Groupcast LeaveGroup command with "
-                "GroupID 0. Otherwise, TH sends a Groups RemoveAllGroups command.",
-                "DUT sends a LeaveGroupResponse (groupcast) or a SUCCESS response "
-                "(legacy Groups).",
-            ),
-            TestStep(
-                2,
-                "If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
-                "If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
-                "sends a Groups AddGroup command with GroupID G1.",
-                "DUT sends SUCCESS (JoinGroup) or an AddGroupResponse with Status 0x00 "
-                "(SUCCESS) and GroupID G1.",
-            ),
-            TestStep(
-                3,
-                "TH sends a RemoveAllScenes command to DUT with GroupID G1.",
-                "DUT sends a RemoveAllScenesResponse with Status 0x00 (SUCCESS) and GroupID G1.",
-            ),
-            TestStep(
-                "4a",
-                "TH reads the SceneTableSize attribute from the DUT.",
-                "DUT sends SceneTableSize, which is at least 16. MaxRemainingCapacity is "
-                "(SceneTableSize - 1) / 2.",
-            ),
-            TestStep(
-                "4b",
-                "TH sends a subscription request action for FabricSceneInfo to the DUT with "
-                "MinIntervalFloor 5 and MaxIntervalCeiling 100.",
-                "The subscription is activated and the DUT reports FabricSceneInfo with "
-                "RemainingCapacity equal to MaxRemainingCapacity for this fabric's entry.",
-            ),
-            TestStep(
-                "5a",
-                "TH sends an AddScene command to DUT with GroupID G1, SceneID 0x01, "
-                "TransitionTime 20000 and no extension field sets.",
-                "DUT sends an AddSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
-                "SceneID 0x01.",
-            ),
-            TestStep(
-                "5b",
-                "TH waits for a FabricSceneInfo report and records RemainingCapacity.",
-                "RemainingCapacity equals (MaxRemainingCapacity - 1).",
-            ),
-            TestStep(
-                "6a",
-                "If RemainingCapacity is greater than 0, TH sends a StoreScene command to DUT "
-                "with GroupID G1 and SceneID 0x02. Otherwise, skip to Step 8a.",
-                "DUT sends a StoreSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
-                "SceneID 0x02.",
-            ),
-            TestStep(
-                "6b",
-                "TH waits for a FabricSceneInfo report and records RemainingCapacity.",
-                "RemainingCapacity equals (MaxRemainingCapacity - 2).",
-            ),
-            TestStep(
-                "7a",
-                "If RemainingCapacity is greater than 0, TH sends an AddScene command to DUT "
-                "with GroupID G1, SceneID 0x03, TransitionTime 20000 and no extension field "
-                "sets. Otherwise, skip to Step 8a.",
-                "DUT sends an AddSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
-                "SceneID 0x03.",
-            ),
-            TestStep(
-                "7b",
-                "TH waits for a FabricSceneInfo report and records RemainingCapacity.",
-                "RemainingCapacity equals (MaxRemainingCapacity - 3).",
-            ),
-            TestStep(
-                "8a",
-                "TH sends a RemoveScene command to DUT with GroupID G1 and SceneID 0x01.",
-                "DUT sends a RemoveSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
-                "SceneID 0x01.",
-            ),
-            TestStep(
-                "8b",
-                "TH waits for a FabricSceneInfo report and records RemainingCapacity.",
-                "RemainingCapacity equals (MaxRemainingCapacity - 2).",
-            ),
-            TestStep(
-                "9a",
-                "TH sends a RemoveAllScenes command to DUT with GroupID G1.",
-                "DUT sends a RemoveAllScenesResponse with Status 0x00 (SUCCESS) and GroupID G1.",
-            ),
-            TestStep(
-                "9b",
-                "TH waits for a FabricSceneInfo report and records RemainingCapacity.",
-                "RemainingCapacity equals MaxRemainingCapacity.",
-            ),
-            TestStep(
-                10,
-                "TH sends a KeySetRemove command to the GroupKeyManagement cluster with "
-                "GroupKeySetID 0x01a1.",
-                "DUT sends a SUCCESS response.",
-            ),
-        ]
-
     def teardown_test(self) -> None:
         sub = getattr(self, "_scene_info_subscription", None)
         if sub is not None:
@@ -257,10 +134,9 @@ class TC_S_2_5(MatterBaseTest):
 
         # Step 0a: KeySetWrite for keyset 0x01a1.
         self.step(step="0a",
-                  description="If the Groupcast cluster is enabled on the RootNode endpoint, skip this step. "
-                  "Otherwise, TH writes the GroupKeyMap attribute on the GroupKeyManagement "
-                  "cluster binding G1 to GroupKeySetID 0x01a1.",
-                  expectation="DUT sends a SUCCESS response.")
+                  description="TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT "
+                  "with GroupKeySetID 0x01a1.",
+                  expectation="DUT sends a SUCCESS response.",)
 
         await self.send_single_cmd(
             endpoint=0,
@@ -332,7 +208,6 @@ class TC_S_2_5(MatterBaseTest):
 
             self.step(step=2,
                       description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
-                      "If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
                       "sends a Groups AddGroup command with GroupID G1.",
                       expectation="DUT sends SUCCESS (JoinGroup) or an AddGroupResponse with Status 0x00 "
                       "(SUCCESS) and GroupID G1.")
