@@ -119,7 +119,7 @@ void RoboticVacuumCleaner::HandleNamedPipeCommand(const Json::Value & json)
     }
     else if (name == "AddMap")
     {
-        if (json.isMember("MapId") && json.isMember("MapName"))
+        if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
         {
             std::string mapName = json["MapName"].asString();
             mServiceAreaCluster.Cluster().AddSupportedMap(json["MapId"].asUInt(), CharSpan(mapName.data(), mapName.size()));
@@ -127,14 +127,14 @@ void RoboticVacuumCleaner::HandleNamedPipeCommand(const Json::Value & json)
     }
     else if (name == "RemoveMap")
     {
-        if (json.isMember("MapId"))
+        if (json.isMember("MapId") && json["MapId"].isUInt())
         {
             mServiceAreaCluster.Cluster().RemoveSupportedMap(json["MapId"].asUInt());
         }
     }
     else if (name == "AddArea")
     {
-        if (!json.isMember("AreaId"))
+        if (!json.isMember("AreaId") || !json["AreaId"].isUInt())
         {
             return;
         }
@@ -143,10 +143,18 @@ void RoboticVacuumCleaner::HandleNamedPipeCommand(const Json::Value & json)
         area.SetAreaId(json["AreaId"].asUInt());
         if (json.isMember("MapId"))
         {
+            if (!json["MapId"].isUInt())
+            {
+                return;
+            }
             area.SetMapId(json["MapId"].asUInt());
         }
         if (json.isMember("LocationName"))
         {
+            if (!json["LocationName"].isString())
+            {
+                return;
+            }
             std::string locationName = json["LocationName"].asString();
             area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
                                  DataModel::NullNullable);
@@ -155,7 +163,7 @@ void RoboticVacuumCleaner::HandleNamedPipeCommand(const Json::Value & json)
     }
     else if (name == "RemoveArea")
     {
-        if (json.isMember("AreaId"))
+        if (json.isMember("AreaId") && json["AreaId"].isUInt())
         {
             mServiceAreaCluster.Cluster().RemoveSupportedArea(json["AreaId"].asUInt());
         }

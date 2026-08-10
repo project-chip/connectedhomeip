@@ -59,6 +59,10 @@ public:
     void HandleClearError();
     void HandleErrorEvent(const std::string & error);
 
+    // Clears dock/charge simulation flags when leaving dock/charge for Running,
+    // mirroring examples/rvc-app/rvc-common/src/rvc-device.cpp HandleRvcRunChangeToMode().
+    void ClearDockChargingTracking();
+
 private:
     void SetDeviceToIdleState();
     void UpdateServiceAreaProgressOnExit();

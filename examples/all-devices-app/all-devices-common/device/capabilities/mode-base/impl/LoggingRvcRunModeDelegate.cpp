@@ -99,6 +99,15 @@ void LoggingRvcRunModeDelegate::HandleChangeToMode(uint8_t newMode, ModeBase::Co
             response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
+        if (newMode == kModeIdle)
+        {
+            response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+            return;
+        }
+        if (mClearDockChargingTrackingHandler)
+        {
+            mClearDockChargingTrackingHandler();
+        }
         LogErrorOnFailure(mOperationalStateCluster->SetOperationalState(OperationalState::OperationalStateEnum::kRunning));
         if (mServiceAreaDelegate != nullptr)
         {

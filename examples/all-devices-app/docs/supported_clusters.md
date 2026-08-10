@@ -157,9 +157,9 @@ To update or validate this list manually, follow these steps:
 | 111       | Pulse Width Modulation                                     | 28 (0x001C)   | No                 | No                  |                                       |
 | 112       | Pump Configuration and Control                             | 512 (0x0200)  | No                 | No                  |                                       |
 | 113       | Push AV Stream Transport                                   | 1365 (0x0555) | Yes                | No                  |                                       |
-| 114       | RVC Clean Mode                                             | 85 (0x0055)   | Yes                | No                  | Instance of Mode Base                 |
+| 114       | RVC Clean Mode                                             | 85 (0x0055)   | Yes                | Yes                 | Used by Robotic Vacuum Cleaner        |
 | 115       | RVC Operational State                                      | 97 (0x0061)   | Yes                | Yes                 |                                       |
-| 116       | RVC Run Mode                                               | 84 (0x0054)   | Yes                | No                  | Instance of Mode Base                 |
+| 116       | RVC Run Mode                                               | 84 (0x0054)   | Yes                | Yes                 | Used by Robotic Vacuum Cleaner        |
 | 117       | Radon Concentration Measurement                            | 1071 (0x042F) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 118       | Refrigerator Alarm                                         | 87 (0x0057)   | No                 | No                  |                                       |
 | 119       | Refrigerator And Temperature Controlled Cabinet Mode       | 82 (0x0052)   | Yes                | No                  | Instance of Mode Base                 |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **101**            | **54**              |                                       |
+| **Total** | **159**                                                    |               | **101**            | **57**              |                                       |

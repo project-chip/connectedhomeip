@@ -20,11 +20,12 @@
 #include <app/clusters/mode-base-server/AppDelegate.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
+#include <clusters/RvcRunMode/Enums.h>
+#include <functional>
 
 namespace chip::app::Clusters::ServiceArea {
 class LoggingServiceAreaDelegate;
-}
-#include <clusters/RvcRunMode/Enums.h>
+} // namespace chip::app::Clusters::ServiceArea
 
 namespace chip::app::Clusters::RvcRunMode {
 
@@ -48,11 +49,16 @@ public:
     {
         mServiceAreaDelegate = serviceAreaDelegate;
     }
+    void SetClearDockChargingTrackingHandler(std::function<void()> handler)
+    {
+        mClearDockChargingTrackingHandler = std::move(handler);
+    }
 
 private:
     ModeBaseCluster * mCluster                                           = nullptr;
     OperationalState::OperationalStateCluster * mOperationalStateCluster = nullptr;
     ServiceArea::LoggingServiceAreaDelegate * mServiceAreaDelegate       = nullptr;
+    std::function<void()> mClearDockChargingTrackingHandler;
 };
 
 } // namespace chip::app::Clusters::RvcRunMode
