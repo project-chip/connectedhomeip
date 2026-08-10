@@ -63,8 +63,10 @@ extern struct low_level_spi_device SPI_FLASH0_DEV;
 /* Additional api, not included in cmsis arm driver flash interface */
 int32_t Spi_Flash_Config_Exe(void);
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
+#ifdef __cplusplus
+
+} /* extern "C" */
+
+#endif
+
 #endif /* __LOW_LEVEL_SPI_FLASH_H */
