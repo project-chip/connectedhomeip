@@ -46,9 +46,10 @@ using namespace chip::app::Clusters::DoorLock::Attributes;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR     = 23;
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE   = 59;
-static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR               = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE             = 59;
+static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE           = 65;
+static constexpr uint8_t DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX = 0x04;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
@@ -723,6 +724,15 @@ void DoorLockServer::setCredentialCommandHandler(
 
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
+    if (DlStatus::kSuccess != status)
+    {
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
+    // appclusters, SetCredentialResponse Status field (DoorLock.adoc#10211-status-field): return INVALID_COMMAND if
+    // CredentialData violates the uncompressed EC public key requirement in 5.2.6.9 (SEC 1 section 2.3.3).
+    status = aliroCredentialDataValid(credentialType, credentialData);
     if (DlStatus::kSuccess != status)
     {
         sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
@@ -1669,6 +1679,30 @@ DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId
                         "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
                         endpointId, to_underlying(type), minLen, maxLen, static_cast<unsigned int>(credentialData.size()));
         return DlStatus::kInvalidField;
+    }
+
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockServer::aliroCredentialDataValid(CredentialTypeEnum type, const chip::ByteSpan & credentialData)
+{
+    switch (type)
+    {
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        if (credentialData.size() == DOOR_LOCK_ALIRO_CREDENTIAL_SIZE &&
+            credentialData[0] != DOOR_LOCK_ALIRO_UNCOMPRESSED_POINT_PREFIX)
+        {
+            ChipLogProgress(Zcl,
+                            "Aliro credential data must be an uncompressed EC public key "
+                            "[credentialType=%u,firstByte=0x%02x]",
+                            to_underlying(type), credentialData[0]);
+            return DlStatus::kInvalidField;
+        }
+        break;
+    default:
+        break;
     }
 
     return DlStatus::kSuccess;
