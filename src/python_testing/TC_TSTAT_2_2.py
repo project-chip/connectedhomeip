@@ -58,7 +58,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
     def pics_TC_TSTAT_2_2(self):
         """This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return [self.check_pics("TSTAT.S")]
+        return ["TSTAT.S"]
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [

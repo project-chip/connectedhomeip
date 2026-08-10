@@ -135,6 +135,11 @@ class TC_DA_1_7(MatterTestCommissionedDevice):
                 --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
     '''
 
+    # Class-level defaults so steps_TC_DA_1_7 (which calls expected_number_of_DUTs)
+    # works on a bare instance at test-listing time, before setup_class runs.
+    allow_sdk_dac = False
+    post_cert_test = False
+
     def setup_class(self):
         super().setup_class()
         self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)

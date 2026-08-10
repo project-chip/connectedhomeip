@@ -72,6 +72,7 @@ realtek:
   maintainers:
     - pankore
     - shensaifeng
+    - xshuqun
   paths:
     - "src/platform/realtek/**"
     - "src/platform/Ameba/**"

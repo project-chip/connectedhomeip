@@ -16,16 +16,48 @@
 #
 import glob
 import json
+import logging
 import os
+import re
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass, field
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceException
 from matter.testing.global_attribute_ids import (AttributeIdType, GlobalAttributeIds, attribute_id_type, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
+
+LOGGER = logging.getLogger(__name__)
+
+# Aggregator device type ID. Endpoints with this device type identify the
+# device as a Bridge for the MCORE.BRIDGE PICS.
+_AGGREGATOR_DEVICE_TYPE_ID = 0x000E
+
+# Root node device type ID. EP0 carries this on any commissionable Matter
+# device. Used to derive MCORE.ROLE.COMMISSIONEE.
+_ROOT_NODE_DEVICE_TYPE_ID = 0x0016
+
+_ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
+
+
+def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
+    """
+    Find the subdirectory under root_dir whose name resolves to `endpoint`.
+    Tolerates common conventions: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
+    Case-insensitive. Returns None if no match.
+    """
+    for name in os.listdir(root_dir):
+        full = os.path.join(root_dir, name)
+        if not os.path.isdir(full):
+            continue
+        match = _ENDPOINT_DIR_PATTERN.match(name)
+        if match and int(match.group(1)) == endpoint:
+            return full
+    return None
 
 
 def event_pics_str(pics_base: str, eid: int) -> str:
@@ -99,19 +131,181 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(path: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
+    """
+    Reads PICS from a CI-format text file or a directory of PICS XML files.
+    For directory inputs, top-level *.xml files are always loaded (device-wide
+    codes like MCORE.*). If `endpoint` is supplied, the matching per-endpoint
+    subdirectory's *.xml files are loaded too. Common naming conventions are
+    accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`, etc. (case-
+    insensitive). Other endpoint subdirs are skipped so per-endpoint test
+    checks don't see foreign clusters.
+    """
     if os.path.isdir(os.path.abspath(path)):
-        pics_dict = {}
+        pics_dict: dict[str, bool] = {}
         for filename in glob.glob(f'{path}/*.xml'):
             with open(filename) as f:
-                contents = f.read()
-                pics_dict.update(parse_pics_xml(contents))
+                pics_dict.update(parse_pics_xml(f.read()))
+        if endpoint is not None:
+            ep_dir = _find_endpoint_subdir(path, endpoint)
+            if ep_dir is not None:
+                for filename in glob.glob(f'{ep_dir}/*.xml'):
+                    with open(filename) as f:
+                        pics_dict.update(parse_pics_xml(f.read()))
         return pics_dict
 
     with open(path) as f:
-        lines = f.readlines()
-        return parse_pics(lines)
+        return parse_pics(f.readlines())
+
+
+@dataclass
+class BasePicsFacts:
+    """
+    Device facts that map to Base/MCORE PICS codes.
+
+    Populated by derive_base_pics_facts_from_device_wildcard. Two consumers
+    today: PICSGenerator writes these to Base.xml, and TC_IDM_10_4 asserts
+    them against the supplied PICS file.
+
+    The MCORE.COM.* transport-related PICS (WIFI / THR / ETH / WIRELESS and
+    the WIFI_2P4GHZ / WIFI_5GHZ band marks) are intentionally not derived
+    here: the band PICS indicate Public Action Frame support on the
+    corresponding band, which is not protocol-observable from a wildcard
+    read. PICSGenerator continues to derive transport bits locally until
+    the test-plans cleanup PRs land.
+    """
+    is_commissionee: bool = False
+    is_server: bool = False
+    is_bridge: bool = False
+    is_ota_requestor: bool = False
+    is_ota_provider: bool = False
+    has_groups_on_multiple_endpoints: bool = False
+    # endpoint_id -> cluster_id -> set of event ids the spec marks MANDATORY
+    # for this device's feature set, attribute list, command list, and
+    # cluster revision. Populated by running each XmlEvent's parsed
+    # conformance against ConformanceAssessmentData built from the wildcard.
+    mandatory_events_by_cluster: dict[int, dict[int, set[int]]] = field(default_factory=dict)
+
+
+# Complete set of Base/MCORE PICS codes this helper knows how to derive. The
+# Base/MCORE TC_IDM_10_4 step uses this set for the "device says no, so PICS
+# file must also say no" half of the consistency check.
+BASE_PICS_CODES_DERIVED: frozenset[str] = frozenset({
+    "MCORE.ROLE.COMMISSIONEE",
+    "MCORE.IDM.S",
+    "MCORE.BRIDGE",
+    "MCORE.OTA.Requestor",
+    "MCORE.OTA.Provider",
+    "MCORE.G.MULTIENDPOINT",
+})
+
+
+def base_pics_facts_to_pics_codes(facts: BasePicsFacts) -> set[str]:
+    """
+    Translate a BasePicsFacts to the set of MCORE PICS codes that should be
+    marked true.
+
+    Only codes in BASE_PICS_CODES_DERIVED can appear in the result. Per-event
+    PICS (cluster.S.E<id>) are NOT included here; those have a different
+    callable (event_pics_str) and a separate iteration path on the consumer.
+    """
+    codes: set[str] = set()
+    if facts.is_commissionee:
+        codes.add("MCORE.ROLE.COMMISSIONEE")
+    if facts.is_server:
+        codes.add("MCORE.IDM.S")
+    if facts.is_bridge:
+        codes.add("MCORE.BRIDGE")
+    if facts.is_ota_requestor:
+        codes.add("MCORE.OTA.Requestor")
+    if facts.is_ota_provider:
+        codes.add("MCORE.OTA.Provider")
+    if facts.has_groups_on_multiple_endpoints:
+        codes.add("MCORE.G.MULTIENDPOINT")
+    return codes
+
+
+def derive_base_pics_facts_from_device_wildcard(
+    wildcard: AsyncReadTransaction.ReadResponse,
+    xml_clusters: dict[uint, XmlCluster],
+) -> tuple[BasePicsFacts, list[ProblemNotice]]:
+    """
+    Derive device-fact-based Base/MCORE PICS from a wildcard read.
+
+    Mirrors the in-scope logic in PICSGenerator.DeviceMapping. Does not touch
+    MCORE.COM.WIFI / THR / ETH / WIRELESS while GRL stress-test feedback on
+    those is outstanding.
+    """
+    facts = BasePicsFacts()
+    problems: list[ProblemNotice] = []
+
+    # Commissionee: root node device type on EP0. Matches the rule already
+    # used by generate_device_element_pics_from_device_wildcard below.
+    ep0_device_type_list = wildcard.attributes.get(0, {}).get(
+        Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.DeviceTypeList, [])
+    if any(d.deviceType == _ROOT_NODE_DEVICE_TYPE_ID for d in ep0_device_type_list):
+        facts.is_commissionee = True
+
+    # Bridge: aggregator device type on any endpoint.
+    for endpoint_id, endpoint_attributes in wildcard.attributes.items():
+        device_type_list = endpoint_attributes.get(
+            Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.DeviceTypeList, [])
+        if any(d.deviceType == _AGGREGATOR_DEVICE_TYPE_ID for d in device_type_list):
+            facts.is_bridge = True
+            break
+
+    groups_endpoint_count = 0
+
+    for endpoint_id, endpoint in wildcard.tlvAttributes.items():
+        endpoint_has_server = False
+        for cluster_id, cluster_attrs in endpoint.items():
+            if not is_standard_cluster_id(cluster_id):
+                continue
+            endpoint_has_server = True
+
+            # OTA Requestor/Provider and Groups membership keyed off cluster
+            # presence in the wildcard. The wildcard already implies the
+            # cluster is on the ServerList, so no separate Descriptor read.
+            if cluster_id == Clusters.OtaSoftwareUpdateRequestor.id:
+                facts.is_ota_requestor = True
+            if cluster_id == Clusters.OtaSoftwareUpdateProvider.id:
+                facts.is_ota_provider = True
+            if cluster_id == Clusters.Groups.id:
+                groups_endpoint_count += 1
+
+            # Mandatory events: build a ConformanceAssessmentData for this
+            # cluster instance and ask each XmlEvent's conformance whether
+            # it's mandatory. EventList (0xFFFA) is provisional and not read
+            # back by the SDK, so spec conformance is the only signal.
+            if cluster_id in xml_clusters and xml_clusters[cluster_id].events:
+                attribute_list = list(cluster_attrs.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []))
+                accepted_commands = list(cluster_attrs.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, []))
+                generated_commands = list(cluster_attrs.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, []))
+                assessment_data = ConformanceAssessmentData(
+                    feature_map=uint(cluster_attrs.get(GlobalAttributeIds.FEATURE_MAP_ID, 0)),
+                    attribute_list=attribute_list,
+                    all_command_list=accepted_commands + generated_commands,
+                    cluster_revision=uint(cluster_attrs.get(GlobalAttributeIds.CLUSTER_REVISION_ID, 1)),
+                )
+                for event_id, xml_event in xml_clusters[cluster_id].events.items():
+                    try:
+                        decision = xml_event.conformance(assessment_data)
+                    except ConformanceException as e:
+                        LOGGER.debug(
+                            "Conformance evaluation failed for endpoint %s cluster 0x%04x event 0x%02x: %s",
+                            endpoint_id, cluster_id, event_id, e)
+                        continue
+                    if decision.is_mandatory():
+                        facts.mandatory_events_by_cluster.setdefault(
+                            endpoint_id, {}).setdefault(cluster_id, set()).add(event_id)
+
+        if endpoint_has_server:
+            facts.is_server = True
+
+    if groups_endpoint_count >= 2:
+        facts.has_groups_on_multiple_endpoints = True
+
+    return facts, problems
 
 
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
