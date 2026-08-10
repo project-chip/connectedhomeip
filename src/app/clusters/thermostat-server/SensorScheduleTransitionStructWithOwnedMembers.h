@@ -41,7 +41,8 @@ public:
     SensorScheduleTransitionStructWithOwnedMembers(const Structs::SensorScheduleTransitionStruct::DecodableType & other);
     SensorScheduleTransitionStructWithOwnedMembers(const SensorScheduleTransitionStructWithOwnedMembers & other) = delete;
     SensorScheduleTransitionStructWithOwnedMembers & operator=(const Structs::SensorScheduleTransitionStruct::Type & other);
-    SensorScheduleTransitionStructWithOwnedMembers & operator=(const Structs::SensorScheduleTransitionStruct::DecodableType & other);
+    SensorScheduleTransitionStructWithOwnedMembers &
+    operator=(const Structs::SensorScheduleTransitionStruct::DecodableType & other);
     SensorScheduleTransitionStructWithOwnedMembers & operator=(const SensorScheduleTransitionStructWithOwnedMembers & other);
 
     void SetDayOfWeek(BitMask<ScheduleDayOfWeekBitmap> newDayOfWeek);

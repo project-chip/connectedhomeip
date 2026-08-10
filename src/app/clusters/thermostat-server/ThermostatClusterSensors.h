@@ -49,9 +49,9 @@ public:
         virtual ~Delegate() = default;
 
         virtual CHIP_ERROR GetSensorAtIndex(size_t index, ThermostatSensorStructWithOwnedMembers & sensor) = 0;
-        virtual CHIP_ERROR GetAvailableSensorAtIndex(size_t index, ByteSpan & sensorHandle)                 = 0;
+        virtual CHIP_ERROR GetAvailableSensorAtIndex(size_t index, ByteSpan & sensorHandle)                = 0;
         virtual bool SetAvailableSensors(Span<const ByteSpan> availableSensors)                            = 0;
-        virtual CHIP_ERROR GetEnabledSensorAtIndex(size_t index, ByteSpan & sensorHandle)                   = 0;
+        virtual CHIP_ERROR GetEnabledSensorAtIndex(size_t index, ByteSpan & sensorHandle)                  = 0;
         virtual bool SetEnabledSensors(Span<const ByteSpan> enabledSensors)                                = 0;
         virtual uint8_t GetNumberOfSensorScheduleTransitions()                                             = 0;
 
@@ -65,7 +65,7 @@ public:
         virtual void ClearPendingSensorScheduleTransitions()      = 0;
         virtual CHIP_ERROR
         AppendToPendingSensorScheduleTransitions(const SensorScheduleTransitionStructWithOwnedMembers & transition) = 0;
-        virtual CHIP_ERROR CommitPendingSensorScheduleTransitions()                                                  = 0;
+        virtual CHIP_ERROR CommitPendingSensorScheduleTransitions()                                                 = 0;
 
         virtual std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
         {
