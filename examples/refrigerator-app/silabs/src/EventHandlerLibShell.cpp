@@ -195,17 +195,26 @@ void EventWorkerFunction(intptr_t context)
     case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         BitMask<AlarmMap> mask(alarmData->doorState);
-        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, mask);
+        if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, mask) != Status::Success)
+        {
+            ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+        }
         break;
     }
 
     case RefrigeratorAlarm::Events::Notify::Fields::kState: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         BitMask<AlarmMap> doorState(alarmData->doorState);
-        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, doorState);
-        if (doorState.Raw() != 0)
+        if (RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, doorState) != Status::Success)
         {
-            RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState);
+            ChipLogError(Zcl, "Failed to set refrigerator alarm mask value");
+        }
+        else if (doorState.Raw() != 0)
+        {
+            if (RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, doorState) != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set refrigerator alarm state value");
+            }
         }
         break;
     }

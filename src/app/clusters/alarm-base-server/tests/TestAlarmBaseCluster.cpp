@@ -76,7 +76,7 @@ struct TestAlarmBaseCluster : public ::testing::Test
             feature.Set(Feature::kReset);
         }
 
-        return AlarmBaseCluster::Config{
+        AlarmBaseCluster::Config config = {
             .feature                     = feature,
             .clusterRevision             = DishwasherAlarm::kRevision,
             .supported                   = AlarmMap(0x3F),
@@ -84,11 +84,12 @@ struct TestAlarmBaseCluster : public ::testing::Test
             .supportsModifyEnabledAlarms = withModifyCommand,
             .delegate                    = &delegate,
         };
+        return config;
     }
 
     AlarmBaseCluster::Config MakeRefrigeratorConfig()
     {
-        return AlarmBaseCluster::Config{
+        AlarmBaseCluster::Config config = {
             .feature                     = {},
             .clusterRevision             = RefrigeratorAlarm::kRevision,
             .supported                   = AlarmMap(0x1),
@@ -96,6 +97,7 @@ struct TestAlarmBaseCluster : public ::testing::Test
             .supportsModifyEnabledAlarms = false,
             .delegate                    = nullptr,
         };
+        return config;
     }
 
     TestServerClusterContext testContext;
