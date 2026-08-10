@@ -106,7 +106,7 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         # support bases (ICDBaseTest/CADMINBaseTest) that must stay marker-free.
         "TC_ICDB_2_1_2_2.py",
         "TC_ICDB_2_3.py",
-        "TC_ICDB_2_4.py","TC_ICDB_2_5.py",
+        "TC_ICDB_2_4.py", "TC_ICDB_2_5.py",
         "TC_JFADMIN_1_1.py",
         "TC_JFADMIN_1_2.py",
         "TC_JFADMIN_1_4.py",
