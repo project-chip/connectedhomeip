@@ -270,6 +270,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
+        case SensorSchedule::Id: {
             auto attributeTimeout = mDelegate.GetMaxAtomicWriteTimeout(attributeId);
 
             if (attributeTimeout.has_value())
@@ -278,6 +279,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
                 maximumTimeout += attributeTimeout.value();
             }
             break;
+        }
         }
     }
 
@@ -294,6 +296,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
+        case SensorSchedule::Id:
             statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
             break;
         default:

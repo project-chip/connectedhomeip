@@ -26,6 +26,7 @@ source_set("thermostat-delegate-impl") {
     "src/thermostat-hold-delegate-impl.cpp",
     "src/thermostat-occupancy-delegate-impl.cpp",
     "src/thermostat-presets-delegate-impl.cpp",
+    "src/thermostat-sensors-delegate-impl.cpp",
     "src/thermostat-setpoints-delegate-impl.cpp",
     "src/thermostat-suggestions-delegate-impl.cpp",
   ]

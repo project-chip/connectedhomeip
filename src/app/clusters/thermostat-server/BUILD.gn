@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 source_set("thermostat-server") {
   sources = [
     "PresetStructWithOwnedMembers.cpp",
+    "SensorScheduleTransitionStructWithOwnedMembers.cpp",
     "Setpoint.cpp",
     "SetpointAttributes.cpp",
     "Setpoints.cpp",
@@ -30,11 +31,13 @@ source_set("thermostat-server") {
     "ThermostatClusterOccupancy.cpp",
     "ThermostatClusterPresets.cpp",
     "ThermostatClusterRead.cpp",
+    "ThermostatClusterSensors.cpp",
     "ThermostatClusterSetpoints.cpp",
     "ThermostatClusterSetpointsBase.cpp",
     "ThermostatClusterSuggestions.cpp",
     "ThermostatClusterWrite.cpp",
     "ThermostatDelegate.cpp",
+    "ThermostatSensorStructWithOwnedMembers.cpp",
     "ThermostatSuggestionStructWithOwnedMembers.cpp",
   ]
 
