@@ -42,7 +42,10 @@ class TC_PICS_Checker(BasicCompositionTests):
         # Scope the lookup to the endpoint under test: PICS are an endpoint-keyed
         # tree, and the same cluster code (e.g. SWTCH.S) can legitimately be true
         # on another endpoint's slice. Using the endpoint-agnostic check here
-        # would let those foreign codes leak into this endpoint's check.
+        # would let those foreign codes leak into this endpoint's check. PICS
+        # inputs that carry no endpoint labels (a CI-format text file, or a
+        # directory of XMLs for a single endpoint) are attributed to the endpoint
+        # under test when they are read, so they are reachable here too.
         if required and not self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
@@ -116,6 +119,15 @@ class TC_PICS_Checker(BasicCompositionTests):
         asserts.assert_not_equal(self.matter_test_config.endpoint, None,
                                  "An explicit endpoint is required for this test, please use --endpoint")
         self.endpoint_id = self.get_endpoint()
+
+        # An unlabelled PICS input is attributed to the endpoint under test when
+        # it is read, so a missing slice here means an endpoint-structured tree
+        # that holds nothing for this endpoint. Every element on the endpoint
+        # would be reported as a missing PICS, so say why up front instead.
+        asserts.assert_in(self.endpoint_id, self.matter_test_config.pics,
+                          f"The PICS supplied to --PICS contain no codes for endpoint {self.endpoint_id}. "
+                          f"An endpoint-structured PICS tree needs an endpoint{self.endpoint_id} subdirectory; "
+                          "a PICS file or directory for a single endpoint is attributed to --endpoint automatically.")
 
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True

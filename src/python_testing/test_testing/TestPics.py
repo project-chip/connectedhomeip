@@ -450,6 +450,47 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
             asserts.assert_equal(read_pics_from_file(path),
                                  {0: {'TEST.S.A0000': True, 'TEST.S.A0001': False}})
 
+    def test_read_pics_from_file_ci_text_file_uses_default_endpoint(self):
+        """
+        A CI-format text file carries no endpoint labels, so its codes are
+        attributed to the endpoint under test rather than always to EP0.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, 'pics.txt')
+            with open(path, 'w') as f:
+                f.write("TEST.S.A0000=1\n")
+            asserts.assert_equal(read_pics_from_file(path, default_endpoint=1),
+                                 {1: {'TEST.S.A0000': True}})
+
+    def test_read_pics_from_file_single_endpoint_dir_uses_default_endpoint(self):
+        """
+        A directory of XMLs for one endpoint (no endpoint subdirs) is a single
+        unlabelled slice, so it too is attributed to the endpoint under test.
+        This is the layout the PICS docs describe: point --PICS at the XML
+        directory for the endpoint being checked.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+            asserts.assert_equal(read_pics_from_file(d, default_endpoint=1), {1: {'SWTCH.S': True}})
+
+    def test_read_pics_from_file_default_endpoint_ignored_when_structured(self):
+        """
+        An endpoint-structured tree is labelled, so the labels win: top-level
+        files stay device-wide (EP0) and each subdir keeps its own endpoint,
+        regardless of which endpoint is under test.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'Base.xml'), 'w') as f:
+                f.write(_make_pics_xml({'MCORE.IDM.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+
+            tree = read_pics_from_file(d, default_endpoint=1)
+
+        asserts.assert_equal(tree, {0: {'MCORE.IDM.S': True}, 1: {'SWTCH.S': True}})
+
     # ------------------------------------------------------------------
     # check_pics: endpoint-aware lookups over the endpoint-keyed tree
     # ------------------------------------------------------------------

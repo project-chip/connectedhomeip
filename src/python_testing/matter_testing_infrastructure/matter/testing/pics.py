@@ -122,22 +122,30 @@ def parse_pics_xml(contents: str, endpoint: int = 0) -> dict[int, dict[str, bool
     return {endpoint: pics}
 
 
-def read_pics_from_file(path: str) -> dict[int, dict[str, bool]]:
+def read_pics_from_file(path: str, default_endpoint: int = 0) -> dict[int, dict[str, bool]]:
     """
     Reads PICS into an endpoint-keyed tree of the form
     {endpoint: {pics_code: supported}}, preserving the PICSGenerator
     endpoint layout.
 
-    Two input formats are supported:
+    Inputs come in two shapes:
 
-    * A CI-format text file (key=0/1 lines). These codes are not endpoint-
-      scoped, so they are all placed under endpoint 0.
-    * A PICSGenerator directory tree. Top-level *.xml files hold device-
-      wide codes (e.g. Base.xml with the MCORE.* codes) and are placed
-      under endpoint 0. Each per-endpoint subdirectory's *.xml files are
-      placed under that endpoint. Common subdir naming conventions are
-      accepted: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
-      (case-insensitive).
+    * Endpoint-structured: a PICSGenerator directory tree with per-endpoint
+      subdirectories. Top-level *.xml files hold device-wide codes (e.g.
+      Base.xml with the MCORE.* codes) and are placed under endpoint 0. Each
+      subdirectory's *.xml files are placed under that endpoint. Common subdir
+      naming conventions are accepted: endpoint0, Endpoint_0, EP0, ep 0, 0,
+      etc. (case-insensitive). default_endpoint is not used for these.
+    * A single unlabelled slice: a CI-format text file (key=0/1 lines), or a
+      directory of *.xml files with no endpoint subdirectories. Nothing in the
+      input says which endpoint the codes describe, so they are all placed
+      under default_endpoint - the endpoint under test, supplied by the caller.
+      There is only one slice, so attributing it to the endpoint being checked
+      cannot pull in codes belonging to some other endpoint.
+
+    Args:
+        path: A PICS file or PICSGenerator directory.
+        default_endpoint: Endpoint to attribute an unlabelled slice to.
     """
     pics_tree: dict[int, dict[str, bool]] = {}
 
@@ -146,29 +154,46 @@ def read_pics_from_file(path: str) -> dict[int, dict[str, bool]]:
             pics_tree.setdefault(endpoint, {}).update(codes)
 
     if os.path.isdir(os.path.abspath(path)):
-        # Top-level files carry device-wide codes -> endpoint 0.
+        endpoint_dirs = {}
+        for name in sorted(os.listdir(path)):
+            full = os.path.join(path, name)
+            match = _ENDPOINT_DIR_PATTERN.match(name)
+            if os.path.isdir(full) and match is not None:
+                endpoint_dirs[full] = int(match.group(1))
+
+        # With endpoint subdirs present the tree is labelled, so top-level files
+        # are the device-wide slice -> endpoint 0. Without them the whole
+        # directory is one unlabelled slice for the endpoint under test.
+        top_level_endpoint = 0 if endpoint_dirs else default_endpoint
         for filename in os.listdir(path):
             if filename.endswith('.xml'):
                 with open(os.path.join(path, filename), encoding='utf-8') as f:
-                    _merge(parse_pics_xml(f.read(), endpoint=0))
-        # Each endpoint subdir carries that endpoint's cluster codes.
-        for name in sorted(os.listdir(path)):
-            full = os.path.join(path, name)
-            if not os.path.isdir(full):
-                continue
-            match = _ENDPOINT_DIR_PATTERN.match(name)
-            if match is None:
-                continue
-            endpoint = int(match.group(1))
+                    _merge(parse_pics_xml(f.read(), endpoint=top_level_endpoint))
+
+        for full, endpoint in endpoint_dirs.items():
             for filename in os.listdir(full):
                 if filename.endswith('.xml'):
                     with open(os.path.join(full, filename), encoding='utf-8') as f:
                         _merge(parse_pics_xml(f.read(), endpoint=endpoint))
+
+        if not endpoint_dirs:
+            _log_unlabelled_slice(path, default_endpoint, pics_tree)
         return pics_tree
 
     with open(path, encoding='utf-8') as f:
-        _merge({0: parse_pics(f.readlines())})
+        _merge({default_endpoint: parse_pics(f.readlines())})
+    _log_unlabelled_slice(path, default_endpoint, pics_tree)
     return pics_tree
+
+
+def _log_unlabelled_slice(path: str, endpoint: int, pics_tree: dict[int, dict[str, bool]]) -> None:
+    """
+    Record which endpoint an unlabelled PICS slice was attributed to. The input
+    carries no endpoint information, so this association comes purely from the
+    caller (--endpoint) and is worth stating out loud.
+    """
+    LOGGER.info("PICS input %s has no endpoint structure: attributing its %d codes to endpoint %d",
+                path, len(pics_tree.get(endpoint, {})), endpoint)
 
 
 @dataclass

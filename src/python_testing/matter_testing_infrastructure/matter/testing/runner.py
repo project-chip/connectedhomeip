@@ -798,7 +798,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        config.pics = read_pics_from_file(args.PICS)
+        # A PICS input with no endpoint structure (CI-format text file, or a
+        # directory of XMLs for a single endpoint) carries no endpoint labels,
+        # so its codes are attributed to the endpoint under test.
+        config.pics = read_pics_from_file(args.PICS, default_endpoint=args.endpoint if args.endpoint is not None else 0)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default

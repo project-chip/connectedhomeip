@@ -304,6 +304,14 @@ def main():
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: foreign-endpoint (EP1) PICS leaked into EP0 check - expected success")
 
+    # An endpoint-structured PICS tree with no slice for the endpoint under test
+    # has nothing to check against. The test must say so rather than reporting
+    # every element on the endpoint as a missing PICS code.
+    test_runner.config.pics = {1: {"SWTCH.S": True}}
+    resp = create_read()
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: no PICS slice for the endpoint under test - expected failure")
+
     test_runner.Shutdown()
 
     print(
