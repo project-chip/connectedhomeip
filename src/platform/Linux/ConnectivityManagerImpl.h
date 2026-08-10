@@ -48,6 +48,7 @@
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#include <atomic>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
@@ -66,6 +67,7 @@ enum class PafChannelState : uint8_t
     kAvailable,   // The radio is free and PAF frames may be sent
     kAssociating, // Association in progress, radio cannot carry PAF frames
     kAwaitingNan, // STA link up but NAN not yet ready
+    kNoInterface, // No wpa_supplicant interface to send on
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
@@ -234,8 +236,9 @@ private:
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
     // The resource checking is needed right before sending data packets that they are initialized and connected.
-    bool _WiFiPAFResourceAvailable() { return mPafChannelState == PafChannelState::kAvailable; };
-    PafChannelState mPafChannelState = PafChannelState::kAvailable;
+    bool _WiFiPAFResourceAvailable() { return mPafChannelState.load() == PafChannelState::kAvailable; };
+    // Written from both the glib D-Bus thread and the CHIP thread.
+    std::atomic<PafChannelState> mPafChannelState{ PafChannelState::kAvailable };
     // Association hooks, called from the wpa_supplicant state machine.  Defined in
     // ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp; no-ops below when PAF is disabled so the
     // call sites need no #if.
@@ -248,6 +251,11 @@ private:
     void PafChannelNoteNanActivity();
     void ArmNanRecoveryTimer();
     static void HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context);
+    // True if this call released the wait, false if there was none to release.
+    bool TryReleaseNanRecoveryWait();
+    // Identifies the NAN recovery wait a timer was armed for, so it releases only its own.
+    std::atomic<uint32_t> mNanRecoveryId{ 0 };
+    std::atomic<uint32_t> mArmedNanRecoveryId{ 0 };
 #else
     void OnAssociationRequested() {}
     void OnAssociationStarting() {}
