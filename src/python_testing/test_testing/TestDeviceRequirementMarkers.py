@@ -288,13 +288,13 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         that is a test sitting on the raw base with no device classification. Mixin/base helpers
         (no such methods) may still derive from MatterBaseTest directly.
         """
-        def base_names(cd):
-            return {b.id if isinstance(b, ast.Name) else b.attr
-                    for b in cd.bases if isinstance(b, (ast.Name, ast.Attribute))}
+        def base_names(class_def):
+            return {base.id if isinstance(base, ast.Name) else base.attr
+                    for base in class_def.bases if isinstance(base, (ast.Name, ast.Attribute))}
 
-        def defines_test(cd):
-            return any(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-                       and n.name.startswith(("test_", "steps_", "desc_")) for n in cd.body)
+        def defines_test(class_def):
+            return any(isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                       and body_node.name.startswith(("test_", "steps_", "desc_")) for body_node in class_def.body)
 
         offenders = []
         for path in sorted(_PY_TESTING.glob("TC_*.py")) + sorted((_PY_TESTING / "test_testing").glob("*.py")):
