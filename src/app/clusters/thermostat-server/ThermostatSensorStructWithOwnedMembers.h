@@ -61,7 +61,7 @@ public:
     using Structs::ThermostatSensorStruct::Type::kIsFabricScoped;
 
 private:
-    char mNameData[kThermostatSensorNameMaxSize]             = { 0 };
+    char mNameData[kThermostatSensorNameMaxSize]              = { 0 };
     uint8_t mSensorHandleData[kThermostatSensorHandleMaxSize] = { 0 };
 };
 

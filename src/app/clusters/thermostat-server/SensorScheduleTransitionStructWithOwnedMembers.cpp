@@ -104,8 +104,8 @@ SensorScheduleTransitionStructWithOwnedMembers::SetEnabledSensors(const DataMode
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SensorScheduleTransitionStructWithOwnedMembers::SetEnabledSensors(
-    const DataModel::DecodableList<ByteSpan> & newEnabledSensors)
+CHIP_ERROR
+SensorScheduleTransitionStructWithOwnedMembers::SetEnabledSensors(const DataModel::DecodableList<ByteSpan> & newEnabledSensors)
 {
     mNumEnabledSensors = 0;
     auto iter          = newEnabledSensors.begin();
