@@ -465,9 +465,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
 }
 
 template <typename Policy>
-CHIP_ERROR PolicyBased<Policy>::Attributes(
-    const ConcreteClusterPath & path,
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace Attributes;
 
@@ -510,8 +509,6 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(
 
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(
-        Span(kMandatoryAttributes),
-        Span(kOptionalAttributes));
+    return listBuilder.Append(Span(kMandatoryAttributes), Span(kOptionalAttributes));
 }
 } // namespace chip::app::Clusters::BasicInformation

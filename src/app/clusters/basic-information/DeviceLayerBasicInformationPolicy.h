@@ -224,7 +224,7 @@ public:
                                       DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
         DeviceLayerBasicInformationPolicyBase(optionalAttributes, deviceInstanceInfoProvider, configurationManager, platformManager,
                                               subscriptionsPerFabric)
-    {        
+    {
         mDeviceLocation = DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable);
     }
 
@@ -307,15 +307,14 @@ public:
         MutableByteSpan tlvBuffer(buffer);
 
         DataModel::Nullable<LocationDescriptorStructType> decoded;
-        
+
         CHIP_ERROR err = persistence.LoadTLV(path, decoded, tlvBuffer);
 
         if (err == CHIP_NO_ERROR)
         {
             // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence
             // errors. Other failures (like constraint errors) are not expected here as the value comes from storage.
-            LogErrorOnFailure(
-                SetDeviceLocationInternal(decoded, persistence, PersistenceMode::kDoNotPersist).GetUnderlyingError());
+            LogErrorOnFailure(SetDeviceLocationInternal(decoded, persistence, PersistenceMode::kDoNotPersist).GetUnderlyingError());
         }
         else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
