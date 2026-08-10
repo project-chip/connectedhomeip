@@ -102,6 +102,11 @@ void ApplicationInit()
     constexpr uint16_t kApp4VendorId  = 1111;
     constexpr uint16_t kApp4ProductId = 22;
     factory->InstallContentApp(kApp4VendorId, kApp4ProductId);
+
+    // Content App 5 - OAuth-only login (see OAuthAccountLoginManager)
+    constexpr uint16_t kApp5VendorId  = 4242;
+    constexpr uint16_t kApp5ProductId = 1;
+    factory->InstallContentApp(kApp5VendorId, kApp5ProductId);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 }
 
