@@ -19,6 +19,7 @@
 
 #include "laundry-dryer-controls-delegate.h"
 
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/LaundryDryerControls/Attributes.h>
 #include <clusters/LaundryDryerControls/Commands.h>

@@ -64,9 +64,7 @@ LaundryDryerControlsCluster::SetSelectedDrynessLevel(DataModel::Nullable<Dryness
     }
 
     // Update + notify only when the value actually changes.
-    const bool changed = drynessLevel.IsNull()
-        ? SetAttributeValue(mSelectedDrynessLevel, DataModel::NullNullable, SelectedDrynessLevel::Id)
-        : SetAttributeValue(mSelectedDrynessLevel, drynessLevel.Value(), SelectedDrynessLevel::Id);
+    const bool changed = SetAttributeValue(mSelectedDrynessLevel, drynessLevel, SelectedDrynessLevel::Id);
 
     if (changed)
     {
