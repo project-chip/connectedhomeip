@@ -49,6 +49,6 @@ screen displays "Network Join" when the board joins thread network. The LCD
 screen displays "LED ON" + the light level when the controller enable the light
 ON and the line is erased when the controller disable the light.
 
-## OTA and OEMiROT application
+## OTA and `OEMiROT` application
 
-See dedicated readme : examples/platform/stm32/STM32WBA65I-DK1/oemirot/
+See dedicated readme : `examples/platform/stm32/STM32WBA65I-DK1/oemirot/`
