@@ -19,7 +19,9 @@
 #include "OAuthAccountLoginManager.h"
 #include <app/CommandHandler.h>
 #include <app/reporting/reporting.h>
+#include <clusters/AccountLogin/Enums.h>
 #include <clusters/AccountLogin/Metadata.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -98,6 +100,11 @@ void OAuthAccountLoginManager::SimulateAsyncLoginSuccess(System::Layer * systemL
 uint16_t OAuthAccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     return chip::app::Clusters::AccountLogin::kRevision;
+}
+
+uint32_t OAuthAccountLoginManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    return chip::to_underlying(Feature::kOAuth);
 }
 
 OAuthAccountLoginManager::~OAuthAccountLoginManager()

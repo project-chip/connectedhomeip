@@ -53,6 +53,7 @@ public:
     bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };
 
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
     // Not part of the AccountLogin::Delegate contract. ContentAppImpl calls this
     // once the app-platform assigns this app's dynamic endpoint, so the delayed
