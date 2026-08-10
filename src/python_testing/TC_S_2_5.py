@@ -68,11 +68,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 # FabricSceneInfo subscription intervals (MinIntervalFloor, MaxIntervalCeiling) in seconds.
-_MIN_INTERVAL_FLOOR_SEC = 5
-_MAX_INTERVAL_CEILING_SEC = 100
+_MIN_INTERVAL_FLOOR_SEC = 1
+_MAX_INTERVAL_CEILING_SEC = 5
 
 # Reports are throttled by MinIntervalFloor, so allow several floor periods of margin.
-_REPORT_TIMEOUT_SEC = 4 * _MIN_INTERVAL_FLOOR_SEC
+_REPORT_TIMEOUT_SEC = 2 * _MAX_INTERVAL_CEILING_SEC
 
 # Smallest SceneTableSize the spec permits.
 _MIN_SCENE_TABLE_SIZE = 16
