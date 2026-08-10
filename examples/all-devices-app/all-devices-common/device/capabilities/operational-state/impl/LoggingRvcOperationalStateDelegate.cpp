@@ -56,6 +56,12 @@ CHIP_ERROR LoggingRvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t
     return CHIP_NO_ERROR;
 }
 
+void LoggingRvcOperationalStateDelegate::ClearDockChargingTracking()
+{
+    mCharging = false;
+    mDocked   = false;
+}
+
 void LoggingRvcOperationalStateDelegate::SetDeviceToIdleState()
 {
     VerifyOrReturn(mCluster != nullptr);
