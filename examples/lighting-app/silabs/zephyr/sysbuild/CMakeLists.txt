@@ -27,6 +27,8 @@ endif()
 if(EXISTS ${APP_DIR}/boards/${BOARD}.overlay)
     set(mcuboot_EXTRA_DTC_OVERLAY_FILE ${APP_DIR}/boards/${BOARD}.overlay
         CACHE INTERNAL "App board overlay for MCUboot partitions")
+else()
+    unset(mcuboot_EXTRA_DTC_OVERLAY_FILE CACHE)
 endif()
 
 # Do not use a sysbuild/mcuboot/ directory: it becomes APPLICATION_CONFIG_DIR and replaces MCUboot's prj.conf.
