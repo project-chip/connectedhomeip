@@ -238,4 +238,3 @@ Use this file with your OTA provider (e.g., chip-tool, ota-provider-app).
 
 -   `oemirot_tz_ns_app_enc_sign.bin` - for OTA updates
 -   `oemirot_tz_ns_app_init_sign.bin` - for initial provisioning
-
