@@ -298,7 +298,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 #else
 
-
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
 #endif

@@ -377,7 +377,6 @@ CHIP_ERROR NXPConfig::FactoryResetEraseSettings(void)
     if (status == 0)
     {
         status = nvs_clear(static_cast<nvs_fs *>(storage));
-
     }
     if (status)
     {
@@ -400,9 +399,8 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 
     if (err_string != 0 || err_int != 0 || entry_string.result != 0 || entry_int.result != 0)
     {
-        ChipLogError(DeviceLayer,
-                     "FactoryResetConfig failed: load_string=%d load_int=%d del_string=%d del_int=%d",
-                     err_string, err_int, entry_string.result, entry_int.result);
+        ChipLogError(DeviceLayer, "FactoryResetConfig failed: load_string=%d load_int=%d del_string=%d del_int=%d", err_string,
+                     err_int, entry_string.result, entry_int.result);
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
     return CHIP_NO_ERROR;
