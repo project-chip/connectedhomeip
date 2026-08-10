@@ -63,7 +63,7 @@ from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +136,7 @@ class TC_S_2_5(MatterBaseTest):
         self.step(step="0a",
                   description="TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT "
                   "with GroupKeySetID 0x01a1.",
-                  expectation="DUT sends a SUCCESS response.",)
+                  expectation="DUT sends a SUCCESS response.")
 
         await self.send_single_cmd(
             endpoint=0,
