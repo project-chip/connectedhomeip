@@ -115,6 +115,7 @@ silabs_executable("thermostat_app") {
     "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "${thermostat_common_dir}/src/thermostat-occupancy-delegate-impl.cpp",
     "${thermostat_common_dir}/src/thermostat-presets-delegate-impl.cpp",
+    "${thermostat_common_dir}/src/thermostat-sensors-delegate-impl.cpp",
     "${thermostat_common_dir}/src/thermostat-suggestions-delegate-impl.cpp",
     "src/AppTask.cpp",
   ]

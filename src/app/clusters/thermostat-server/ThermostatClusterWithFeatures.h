@@ -19,6 +19,7 @@
 #include "ThermostatCluster.h"
 #include "ThermostatClusterOccupancy.h"
 #include "ThermostatClusterPresets.h"
+#include "ThermostatClusterSensors.h"
 #include "ThermostatClusterSuggestions.h"
 #include <type_traits>
 #include <variant>
@@ -77,6 +78,7 @@ public:
     static constexpr bool kHasPresets     = (std::is_base_of_v<ThermostatPresets::Delegate, Delegates> || ...);
     static constexpr bool kHasSuggestions = (std::is_base_of_v<ThermostatSuggestions::Delegate, Delegates> || ...);
     static constexpr bool kHasOccupancy   = (std::is_base_of_v<ThermostatOccupancy::Delegate, Delegates> || ...);
+    static constexpr bool kHasSensors     = (std::is_base_of_v<ThermostatSensors::Delegate, Delegates> || ...);
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
 
@@ -86,7 +88,8 @@ public:
         mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
         mSuggestions(
             detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
-        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this))
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...), *this)),
+        mSensors(detail::MakeFeature<kHasSensors, ThermostatSensors>(std::forward_as_tuple(delegates...), *this))
     {
         static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
                       "Missing Thermostat::Delegate in constructor arguments");
@@ -131,6 +134,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.ReadAttribute(request, encoder))
+            {
+                return *status;
+            }
+        }
         return ThermostatCluster::ReadAttribute(request, encoder);
     }
 
@@ -140,6 +150,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.WriteAttribute(request, decoder))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.WriteAttribute(request, decoder))
             {
                 return *status;
             }
@@ -190,6 +207,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteBegin(attributeId))
+            {
+                return *status;
+            }
+        }
         return ThermostatCluster::OnAtomicWriteBegin(attributeId);
     }
 
@@ -198,6 +222,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.OnAtomicWritePrecommit(attributeId))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWritePrecommit(attributeId))
             {
                 return *status;
             }
@@ -214,6 +245,13 @@ public:
                 return *status;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteCommit(attributeId))
+            {
+                return *status;
+            }
+        }
         return ThermostatCluster::OnAtomicWriteCommit(attributeId);
     }
 
@@ -222,6 +260,13 @@ public:
         if constexpr (kHasPresets)
         {
             if (auto status = mPresets.OnAtomicWriteRollback(attributeId))
+            {
+                return *status;
+            }
+        }
+        if constexpr (kHasSensors)
+        {
+            if (auto status = mSensors.OnAtomicWriteRollback(attributeId))
             {
                 return *status;
             }
@@ -238,6 +283,13 @@ public:
                 return timeout;
             }
         }
+        if constexpr (kHasSensors)
+        {
+            if (auto timeout = mSensors.GetMaxAtomicWriteTimeout(attributeId))
+            {
+                return timeout;
+            }
+        }
         return ThermostatCluster::GetMaxAtomicWriteTimeout(attributeId);
     }
 
@@ -245,6 +297,7 @@ private:
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
     CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSensors, ThermostatSensors, std::monostate> mSensors;
 };
 
 template <typename... DelegateArgs>
@@ -252,7 +305,8 @@ ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const T
     -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
 
 using DefaultThermostatCluster =
-    ThermostatClusterWithFeatures<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;
+    ThermostatClusterWithFeatures<Thermostat::Delegate, ThermostatPresets::Delegate, ThermostatSuggestions::Delegate,
+                                  ThermostatOccupancy::Delegate, ThermostatSensors::Delegate>;
 
 } // namespace Thermostat
 } // namespace Clusters

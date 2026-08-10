@@ -124,6 +124,13 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
         { HasAttribute(Attributes::ThermostatSuggestions::Id), Attributes::ThermostatSuggestions::kMetadataEntry },
         { HasAttribute(CurrentThermostatSuggestion::Id), CurrentThermostatSuggestion::kMetadataEntry },
         { HasAttribute(ThermostatSuggestionNotFollowingReason::Id), ThermostatSuggestionNotFollowingReason::kMetadataEntry },
+
+        // Sensors
+        { HasAttribute(Sensors::Id), Sensors::kMetadataEntry },
+        { HasAttribute(AvailableSensors::Id), AvailableSensors::kMetadataEntry },
+        { HasAttribute(EnabledSensors::Id), EnabledSensors::kMetadataEntry },
+        { HasAttribute(NumberOfSensorScheduleTransitions::Id), NumberOfSensorScheduleTransitions::kMetadataEntry },
+        { HasAttribute(SensorSchedule::Id), SensorSchedule::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -349,7 +356,8 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
         ReturnErrorOnFailure(builder.AppendElements({ Commands::SetActivePresetRequest::kMetadataEntry }));
     }
 
-    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
+    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration) ||
+        mFeatures.Has(Feature::kThermostatSensors))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicRequest::kMetadataEntry }));
     }
@@ -367,7 +375,8 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
+    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration) ||
+        mFeatures.Has(Feature::kThermostatSensors))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::AtomicResponse::Id }));
     }
@@ -521,6 +530,12 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     case CurrentThermostatSuggestion::Id:
     case ThermostatSuggestionNotFollowingReason::Id:
         return mFeatures.Has(Feature::kThermostatSuggestions);
+    case Sensors::Id:
+    case AvailableSensors::Id:
+    case EnabledSensors::Id:
+    case NumberOfSensorScheduleTransitions::Id:
+    case SensorSchedule::Id:
+        return mFeatures.Has(Feature::kThermostatSensors);
     default:
         return false;
     }
