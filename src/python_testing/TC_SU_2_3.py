@@ -269,7 +269,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         # zero if resume is not implemented. Both outcomes are valid; only
         # inconsistent behavior fails the test.
 
-        #Download resumption is not supported in the SDK so the test will always
+        # Download resumption is not supported in the SDK so the test will always
         # warn that resume starts from zero.
         self.step(2)
 
