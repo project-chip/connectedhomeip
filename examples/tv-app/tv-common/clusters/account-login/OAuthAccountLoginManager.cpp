@@ -109,5 +109,10 @@ uint32_t OAuthAccountLoginManager::GetFeatureMap(chip::EndpointId endpoint)
 
 OAuthAccountLoginManager::~OAuthAccountLoginManager()
 {
-    DeviceLayer::SystemLayer().CancelTimer(SimulateAsyncLoginSuccess, this);
+    // Deliberately not cancelling the timer here: this object is owned by the
+    // global ContentAppFactoryImpl, so this destructor can run during static
+    // destruction at process exit, after DeviceLayer::SystemLayer()'s own global
+    // has already been torn down (C++ doesn't order static destructors across
+    // translation units). Calling into it here previously caused a pure-virtual-call
+    // abort. The OS reclaims any outstanding timer when the process exits anyway.
 }
