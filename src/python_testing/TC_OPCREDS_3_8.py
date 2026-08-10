@@ -36,6 +36,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import enum
 import hashlib
 import inspect
@@ -350,7 +351,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             self.current_step_id = 0
             self.is_aggregating_steps = True
             self.aggregated_steps = []
-            self.test_TC_OPCREDS_3_8()
+            # Run the bare test body, not the run_if_endpoint_matches wrapper: the
+            # wrapper needs a live DUT and self.event_loop, neither of which exists
+            # at test-listing time. In aggregation mode every test_step block skips
+            # its body, so the bare coroutine completes without device interaction.
+            asyncio.run(inspect.unwrap(type(self).test_TC_OPCREDS_3_8)(self))
         finally:
             self.is_aggregating_steps = False
 
