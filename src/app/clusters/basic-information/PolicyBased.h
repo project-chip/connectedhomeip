@@ -465,9 +465,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
 }
 
 template <typename Policy>
-CHIP_ERROR PolicyBased<Policy>::Attributes(
-    const ConcreteClusterPath & path,
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace Attributes;
 
