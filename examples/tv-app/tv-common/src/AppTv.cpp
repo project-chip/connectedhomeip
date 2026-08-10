@@ -370,8 +370,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::CatalogList::Id, ARRA
 
 // Declare Account Login cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(accountLoginAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::OAuthLoggedIn::Id, BOOLEAN, 1, 0), /* OAuthLoggedIn */
-    DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::FeatureMap::Id, BITMAP32, 4, 0),                       /* FeatureMap */
+DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::OAuthLoggedIn::Id, BOOLEAN, 1, 0),   /* OAuthLoggedIn */
+    DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Content Launcher cluster attributes
