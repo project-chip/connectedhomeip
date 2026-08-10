@@ -96,7 +96,7 @@ void InitializeOTARequestor(void)
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
-    // Test to trigger ota. this function can be trigger by a Push Button
+        // Test to trigger ota. this function can be trigger by a Push Button
         TriggerOTAQuery();
     }
 }
