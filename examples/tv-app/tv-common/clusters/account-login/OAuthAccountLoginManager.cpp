@@ -17,10 +17,9 @@
  */
 
 #include "OAuthAccountLoginManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/reporting/reporting.h>
-#include <app/util/config.h>
+#include <clusters/AccountLogin/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -37,7 +36,7 @@ bool OAuthAccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifie
 
 bool OAuthAccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
-    DeviceLayer::SystemLayer().CancelTimer(OnLoginTimerExpired, this);
+    DeviceLayer::SystemLayer().CancelTimer(SimulateAsyncLoginSuccess, this);
     if (mOAuthLoggedIn)
     {
         mOAuthLoggedIn = false;
@@ -57,7 +56,7 @@ void OAuthAccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupP
     // that can never be used to successfully call Login.
     GetSetupPINResponse response;
     response.setupPIN = "N/A"_span;
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void OAuthAccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper)
@@ -65,19 +64,26 @@ void OAuthAccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetD
     ChipLogProgress(Zcl, "OAuthAccountLoginManager::HandleGetDeviceAuthURI: will report logged-in in %u seconds",
                     static_cast<unsigned>(kLoginDelaySeconds));
 
+    DeviceLayer::SystemLayer().CancelTimer(SimulateAsyncLoginSuccess, this);
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kLoginDelaySeconds), SimulateAsyncLoginSuccess, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OAuthAccountLoginManager::HandleGetDeviceAuthURI failed to start login timer: %" CHIP_ERROR_FORMAT,
+                    err.Format());
+        LogErrorOnFailure(helper.Failure(Protocols::InteractionModel::Status::Failure));
+        return;
+    }
+
     GetDeviceAuthURIResponse response;
     response.userCode        = "ABCD-EFGH"_span;
     response.verificationURI = "https://example.com/device"_span;
     response.expiresIn       = 1800;
     response.interval        = 5;
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
-
-    DeviceLayer::SystemLayer().CancelTimer(OnLoginTimerExpired, this);
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kLoginDelaySeconds),
-                                                                   OnLoginTimerExpired, this);
+    LogErrorOnFailure(helper.Success(response));
 }
 
-void OAuthAccountLoginManager::OnLoginTimerExpired(System::Layer * systemLayer, void * context)
+void OAuthAccountLoginManager::SimulateAsyncLoginSuccess(System::Layer * systemLayer, void * context)
 {
     auto * self          = reinterpret_cast<OAuthAccountLoginManager *>(context);
     self->mOAuthLoggedIn = true;
@@ -91,22 +97,10 @@ void OAuthAccountLoginManager::OnLoginTimerExpired(System::Layer * systemLayer, 
 
 uint16_t OAuthAccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT)
-    {
-        return kClusterRevision;
-    }
-
-    uint16_t clusterRevision = 0;
-    bool success =
-        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
-    if (!success)
-    {
-        ChipLogError(Zcl, "OAuthAccountLoginManager::GetClusterRevision error reading cluster revision");
-    }
-    return clusterRevision;
+    return chip::app::Clusters::AccountLogin::kRevision;
 }
 
 OAuthAccountLoginManager::~OAuthAccountLoginManager()
 {
-    DeviceLayer::SystemLayer().CancelTimer(OnLoginTimerExpired, this);
+    DeviceLayer::SystemLayer().CancelTimer(SimulateAsyncLoginSuccess, this);
 }

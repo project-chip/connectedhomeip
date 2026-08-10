@@ -64,9 +64,8 @@ public:
 private:
     static constexpr uint32_t kLoginDelaySeconds = 5;
 
-    static void OnLoginTimerExpired(chip::System::Layer * systemLayer, void * context);
+    static void SimulateAsyncLoginSuccess(chip::System::Layer * systemLayer, void * context);
 
-    bool mOAuthLoggedIn                        = false;
-    chip::EndpointId mEndpointId               = chip::kInvalidEndpointId;
-    static constexpr uint16_t kClusterRevision = 3;
+    bool mOAuthLoggedIn          = false;
+    chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
 };

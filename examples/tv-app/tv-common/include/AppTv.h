@@ -146,7 +146,7 @@ protected:
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
 {
-#define APP_LIBRARY_SIZE 4
+#define APP_LIBRARY_SIZE 5
 public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
