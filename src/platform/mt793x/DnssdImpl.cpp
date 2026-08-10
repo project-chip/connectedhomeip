@@ -326,10 +326,11 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     nameBuilder.Add(serviceName);
     if (!nameBuilder.Fit())
     {
-        // This is a DNSServiceBrowseReply callback with a fixed signature, so we cannot
-        // propagate an error. The StringBuilder still guarantees service.mName stays
-        // bounded and null-terminated, so just log the truncation and continue.
+        // A truncated name cannot be resolved later, so fail the browse instead of
+        // reporting the service under a different identifier.
         ChipLogError(ServiceProvisioning, "serviceName truncated: %s", StringOrNullMarker(serviceName));
+        ChipBrowseHandler(NULL, NULL, 0, true, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
     }
 
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);

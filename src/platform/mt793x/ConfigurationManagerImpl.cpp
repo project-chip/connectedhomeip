@@ -58,7 +58,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<MT793XConfig>::Init();
     SuccessOrExit(err);
     // TODO: Initialize the global GroupKeyStore object here (#1626)
-    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
+    LogErrorOnFailure(IncreaseBootCount());
 
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
@@ -97,7 +97,8 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
     uint32_t bootCount = 0;
     if (MT793XConfig::ConfigValueExists(MT793XConfig::kConfigKey_BootCount))
     {
-        TEMPORARY_RETURN_IGNORED GetRebootCount(bootCount);
+        // Do not overwrite a persisted count that could not be read.
+        ReturnErrorOnFailure(GetRebootCount(bootCount));
     }
     return MT793XConfig::WriteConfigValue(MT793XConfig::kConfigKey_BootCount, bootCount + 1);
 }

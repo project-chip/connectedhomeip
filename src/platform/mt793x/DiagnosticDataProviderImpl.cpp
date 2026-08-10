@@ -215,7 +215,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     /* TODO */
 #endif
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    // Never publish macBuffer unless the lookup filled it in.
+    CHIP_ERROR macErr = ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    if (macErr != CHIP_NO_ERROR)
+    {
+        delete ifp;
+        return macErr;
+    }
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
 
     *netifpp = ifp;

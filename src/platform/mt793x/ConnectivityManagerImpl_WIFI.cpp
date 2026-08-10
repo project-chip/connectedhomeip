@@ -188,7 +188,12 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         DriveStationState();
 
         UpdateInternetConnectivityState(hadIPv4Conn, TRUE, event_data->u.ipv6_str.addr);
-        mtk_route_hook_init();
+        // Retried on the next IPv6 address-ready event; the hook install is idempotent.
+        int8_t routeHookRet = mtk_route_hook_init();
+        if (routeHookRet != 0)
+        {
+            ChipLogError(DeviceLayer, "mtk_route_hook_init failed: %d", routeHookRet);
+        }
     }
     else if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
     {

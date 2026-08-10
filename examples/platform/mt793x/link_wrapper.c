@@ -128,10 +128,7 @@ int _read(int file, char * ptr, int len)
         int c = __io_getchar();
         if (c < 0)
         {
-            if (DataIdx == 0)
-            {
-                return -1;
-            }
+            // Returning 0 reports EOF to newlib; -1 would report an I/O error.
             break;
         }
         *ptr++ = (char) c;

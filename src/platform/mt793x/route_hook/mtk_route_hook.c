@@ -80,7 +80,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
     while (payload_len >= 2)
     {
         uint8_t opt_type = icmp_payload[0];
-        uint8_t opt_len  = icmp_payload[1] << 3;
+        uint16_t opt_len = (uint16_t) icmp_payload[1] << 3;
 
         if (opt_len == 0 || opt_len > payload_len)
         {
@@ -131,13 +131,14 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 route.preference       = preference;
                 route.lifetime_seconds = lwip_ntohl(rio_header.route_lifetime);
                 mt793xLog("prefix %s lifetime %lu", ip6addr_ntoa(&prefix), route.lifetime_seconds);
-                if (mtk_route_table_add_route_entry(&route) == NULL)
-                {
-                    mt793xLog("Failed to add route table entry");
-                }
-                else
+                // A zero lifetime withdraws the route, so a NULL return is expected there.
+                if (mtk_route_table_add_route_entry(&route) != NULL)
                 {
                     mt793xLog("Added entry to route table");
+                }
+                else if (route.lifetime_seconds != 0)
+                {
+                    mt793xLog("Failed to add route table entry");
                 }
             }
         }

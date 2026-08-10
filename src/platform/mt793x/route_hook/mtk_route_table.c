@@ -29,6 +29,27 @@
 
 static mtk_route_entry_t s_route_entries[MAX_RIO_ROUTE];
 
+static inline bool route_match(const mtk_route_entry_t * route, const ip6_addr_t * dest)
+{
+    uint8_t bytes = route->prefix_length / 8;
+    uint8_t bits  = route->prefix_length % 8;
+    if (memcmp(dest->addr, route->prefix.addr, bytes) != 0)
+    {
+        return false;
+    }
+    if (bits > 0)
+    {
+        uint8_t mask      = (uint8_t) (0xFF << (8 - bits));
+        const uint8_t * d = (const uint8_t *) dest->addr;
+        const uint8_t * p = (const uint8_t *) route->prefix.addr;
+        if ((d[bytes] & mask) != (p[bytes] & mask))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 static mtk_route_entry_t * find_route_entry(const mtk_route_entry_t * route_entry)
 {
     for (size_t i = 0; i < LWIP_ARRAYSIZE(s_route_entries); i++)
@@ -39,7 +60,7 @@ static mtk_route_entry_t * find_route_entry(const mtk_route_entry_t * route_entr
         }
         if (s_route_entries[i].netif == route_entry->netif && s_route_entries[i].prefix_length == route_entry->prefix_length &&
             memcmp(s_route_entries[i].gateway.addr, route_entry->gateway.addr, sizeof(route_entry->gateway.addr)) == 0 &&
-            memcmp(s_route_entries[i].prefix.addr, route_entry->prefix.addr, route_entry->prefix_length / 8) == 0)
+            route_match(&s_route_entries[i], &route_entry->prefix))
         {
             return &s_route_entries[i];
         }
@@ -74,6 +95,16 @@ mtk_route_entry_t * mtk_route_table_add_route_entry(const mtk_route_entry_t * ro
     }
 
     mtk_route_entry_t * entry = find_route_entry(route_entry);
+
+    // A zero lifetime withdraws the route: drop it now instead of via a zero-delay timeout.
+    if (route_entry->lifetime_seconds == 0)
+    {
+        if (entry != NULL)
+        {
+            mtk_route_table_remove_route_entry(entry);
+        }
+        return NULL;
+    }
 
     if (entry == NULL)
     {
@@ -124,27 +155,6 @@ static inline bool is_better_route(const mtk_route_entry_t * lhs, const mtk_rout
     }
     return (lhs->prefix_length > rhs->prefix_length) ||
         (lhs->prefix_length == rhs->prefix_length && lhs->preference > rhs->preference);
-}
-
-static inline bool route_match(const mtk_route_entry_t * route, const ip6_addr_t * dest)
-{
-    uint8_t bytes = route->prefix_length / 8;
-    uint8_t bits  = route->prefix_length % 8;
-    if (memcmp(dest->addr, route->prefix.addr, bytes) != 0)
-    {
-        return false;
-    }
-    if (bits > 0)
-    {
-        uint8_t mask      = (uint8_t) (0xFF << (8 - bits));
-        const uint8_t * d = (const uint8_t *) dest->addr;
-        const uint8_t * p = (const uint8_t *) route->prefix.addr;
-        if ((d[bytes] & mask) != (p[bytes] & mask))
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr_t * dest)

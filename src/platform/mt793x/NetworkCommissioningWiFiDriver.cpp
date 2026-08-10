@@ -82,13 +82,10 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     // an internal assert.
     CHIP_ERROR startErr =
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kBootAutoConnectDelayMs), BootAutoConnectHandler, this);
-    if (startErr != CHIP_NO_ERROR)
-    {
-        ChipLogError(NetworkProvisioning,
-                     "GenioWiFiDriver::Init: StartTimer failed (%" CHIP_ERROR_FORMAT "); falling back to immediate connect",
-                     startErr.Format());
-        TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
-    }
+    // No immediate-connect fallback: connecting from Init() hard-faults, see above.
+    VerifyOrReturnError(
+        startErr == CHIP_NO_ERROR, startErr,
+        ChipLogError(NetworkProvisioning, "GenioWiFiDriver::Init: StartTimer failed (%" CHIP_ERROR_FORMAT ")", startErr.Format()));
 
     return err;
 }
@@ -247,8 +244,14 @@ void GenioWiFiDriver::OnConnectWiFiNetwork()
 
     if (mpConnectCallback)
     {
-        TEMPORARY_RETURN_IGNORED CommitConfiguration();
-        mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
+        // Credentials that did not persist cannot be restored after reboot, so do not
+        // report success.
+        CHIP_ERROR commitErr = CommitConfiguration();
+        if (commitErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(NetworkProvisioning, "CommitConfiguration failed: %" CHIP_ERROR_FORMAT, commitErr.Format());
+        }
+        mpConnectCallback->OnResult(commitErr == CHIP_NO_ERROR ? Status::kSuccess : Status::kUnknownError, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
 }
