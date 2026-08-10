@@ -74,7 +74,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -85,7 +85,7 @@ _MIN_INTERVAL_FLOOR_SEC = 1
 _MAX_INTERVAL_CEILING_SEC = 5
 
 # Reports are throttled by MinIntervalFloor, so allow several floor periods of margin.
-_REPORT_TIMEOUT_SEC = 4 * _MIN_INTERVAL_FLOOR_SEC
+_REPORT_TIMEOUT_SEC = 2 * _MAX_INTERVAL_CEILING_SEC
 
 # How long to wait when asserting that another fabric did not receive an updated report.
 _NO_UPDATE_WAIT_SEC = _MIN_INTERVAL_FLOOR_SEC + 2
@@ -100,123 +100,20 @@ _TRANSITION_TIME_MS = 20000
 
 
 class TC_S_2_6(MatterBaseTest):
-
-    def desc_TC_S_2_6(self) -> str:
-        return "[TC-S-2.6] RemainingCapacity functionality with DUT as Server - Multi-Fabric"
-
-    def pics_TC_S_2_6(self):
-        return ["S.S"]
-
-    def steps_TC_S_2_6(self) -> list[TestStep]:
-        return [
-            TestStep(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.", is_commissioning=True),
-            TestStep(
-                "1a",
-                "TH1 sends a RemoveAllScenes command to DUT with GroupID 0x0000.",
-                "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.",
-            ),
-            TestStep("1b", "Repeat Step 1a with TH2."),
-            TestStep("1c", "Repeat Step 1a with TH3."),
-            TestStep(
-                "2a",
-                "TH1 reads the SceneTableSize attribute from the DUT.",
-                "DUT reports SceneTableSize (at least 16). MaxRemainingCapacity is (SceneTableSize - 1) / 2.",
-            ),
-            TestStep(
-                "2b",
-                "TH1 subscribes to FabricSceneInfo.",
-                "Subscription activates; RemainingCapacity equals MaxRemainingCapacity for TH1's fabric entry.",
-            ),
-            TestStep("2c", "Repeat Step 2b with TH2."),
-            TestStep("2d", "Repeat Step 2b with TH3."),
-            TestStep(
-                "3a",
-                "TH1 sends AddScene with GroupID 0x0000, SceneID 0x01, TransitionTime 20000 and no extension field sets.",
-                "DUT sends AddSceneResponse with Status SUCCESS, GroupID 0x0000 and SceneID 0x01.",
-            ),
-            TestStep(
-                "3b",
-                "TH1 waits for a FabricSceneInfo report.",
-                "RemainingCapacity equals MaxRemainingCapacity - 1.",
-            ),
-            TestStep(
-                "4a",
-                "TH1 sends AddScene with SceneID starting at 2 and incrementing until RemainingCapacity becomes 0.",
-                "Each AddScene succeeds; RemainingCapacity decreases to 0.",
-            ),
-            TestStep(
-                "4b",
-                "TH1 sends AddScene with SceneID one more than the last value used in Step 4a.",
-                "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.",
-            ),
-            TestStep(
-                "5a",
-                "Repeat Step 4a with TH2.",
-                "TH2 RemainingCapacity decreases to 0. TH3 RemainingCapacity decreases to SceneTableSize - (2 * MaxRemainingCapacity).",
-            ),
-            TestStep(
-                "5b",
-                "Repeat Step 4b with TH2.",
-                "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.",
-            ),
-            TestStep(
-                "6a",
-                "Repeat Step 4a with TH3.",
-                "TH3 RemainingCapacity decreases to 0.",
-            ),
-            TestStep(
-                "6b",
-                "TH3 sends AddScene with GroupID 0x0000 and SceneID 0x01.",
-                "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.",
-            ),
-            TestStep(
-                7,
-                "TH3 sends StoreScene with GroupID 0x0000 and SceneID 0xfe.",
-                "DUT sends StoreSceneResponse with Status RESOURCE_EXHAUSTED.",
-            ),
-            TestStep(
-                8,
-                "TH1 sends CopyScene mode 0x00 from GroupID/SceneID 0x0000/0x01 to a unused destination SceneID.",
-                "DUT sends CopySceneResponse with Status RESOURCE_EXHAUSTED, groupIdentifierFrom 0x0000 and sceneIdentifierFrom 0x01.",
-            ),
-            TestStep(
-                "9a",
-                "TH1 sends RemoveAllScenes with GroupID 0x0000.",
-                "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.",
-            ),
-            TestStep(
-                "9b",
-                "TH1 waits for a FabricSceneInfo report; TH2 must not see an updated RemainingCapacity.",
-                "TH1 RemainingCapacity equals MaxRemainingCapacity. TH2 RemainingCapacity is unchanged.",
-            ),
-            TestStep(
-                "10a",
-                "TH2 sends RemoveAllScenes with GroupID 0x0000.",
-                "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.",
-            ),
-            TestStep(
-                "10b",
-                "TH2 waits for a FabricSceneInfo report; TH1 must not see an updated RemainingCapacity.",
-                "TH2 RemainingCapacity equals MaxRemainingCapacity. TH1 RemainingCapacity is unchanged.",
-            ),
-            TestStep(
-                "11a",
-                "TH1 sends RemoveFabric for TH2's fabric index.",
-                "DUT responds with Status SUCCESS and TH2's fabric index.",
-            ),
-            TestStep(
-                "11b",
-                "TH1 sends RemoveFabric for TH3's fabric index.",
-                "DUT responds with Status SUCCESS and TH3's fabric index.",
-            ),
-        ]
-
     def teardown_test(self):
+        self._shutdown_subscriptions()
+
+    def _shutdown_subscriptions(self) -> None:
         for attr in ("_th1_sub", "_th2_sub", "_th3_sub"):
             sub = getattr(self, attr, None)
-            if sub is not None:
+            if sub is None:
+                continue
+            delattr(self, attr)
+            try:
                 sub.Shutdown()
-                delattr(self, attr)
+            except Exception:
+                # Cleanup runs in a finally block: never mask the original failure.
+                log.exception("Cleanup: failed to shut down subscription %s", attr)
 
     def _remaining_capacity(self, fabric_scene_info, fabric_index: int) -> int | None:
         for entry in fabric_scene_info or []:
@@ -295,6 +192,25 @@ class TC_S_2_6(MatterBaseTest):
         )
         return controller, fabric_index
 
+    async def _remove_fabric(self, fabric_index: int, context: str) -> None:
+        resp = await self.send_single_cmd(
+            Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_index),
+            dev_ctrl=self.th1,
+            endpoint=0,
+        )
+        asserts.assert_equal(resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, context)
+        asserts.assert_equal(resp.fabricIndex, fabric_index, f"{context} fabricIndex")
+        self._fabrics_to_remove.remove(fabric_index)
+
+    async def _remove_remaining_fabrics(self) -> None:
+        """Remove fabrics the test commissioned but did not get to remove."""
+        for fabric_index in list(self._fabrics_to_remove):
+            try:
+                await self._remove_fabric(fabric_index, "Cleanup: RemoveFabric")
+            except Exception:
+                # Cleanup runs in a finally block: never mask the original failure.
+                log.exception("Cleanup: failed to remove fabric %s", fabric_index)
+
     async def _subscribe_fabric_scene_info(self, controller):
         subscription = await controller.ReadAttribute(
             nodeId=self.dut_node_id,
@@ -362,12 +278,15 @@ class TC_S_2_6(MatterBaseTest):
             if remaining == 0:
                 return scene_id
 
+    @pics("S.S")
     @async_test_body
     async def test_TC_S_2_6(self):
+        """[TC-S-2.6] RemainingCapacity functionality with DUT as Server - Multi-Fabric"""
         self._endpoint = self.get_endpoint()
         self.th1 = self.default_controller
+        self._fabrics_to_remove: list[int] = []
 
-        self.step(0)
+        self.step(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.", is_commissioning=True)
         self._th1_fabric = typing.cast(
             int,
             await self.read_single_attribute_check_success(
@@ -376,157 +295,168 @@ class TC_S_2_6(MatterBaseTest):
                 endpoint=0,
             ),
         )
-        self.th2, self._th2_fabric = await self._commission_on_new_fabric(fabric_id_offset=1, controller_node_id_offset=2)
-        self.th3, self._th3_fabric = await self._commission_on_new_fabric(fabric_id_offset=2, controller_node_id_offset=3)
-        log.info("Fabric indexes: TH1=%s TH2=%s TH3=%s", self._th1_fabric, self._th2_fabric, self._th3_fabric)
+        try:
+            self.th2, self._th2_fabric = await self._commission_on_new_fabric(fabric_id_offset=1, controller_node_id_offset=2)
+            self._fabrics_to_remove.append(self._th2_fabric)
+            self.th3, self._th3_fabric = await self._commission_on_new_fabric(fabric_id_offset=2, controller_node_id_offset=3)
+            self._fabrics_to_remove.append(self._th3_fabric)
+            log.info("Fabric indexes: TH1=%s TH2=%s TH3=%s", self._th1_fabric, self._th2_fabric, self._th3_fabric)
 
-        self.step("1a")
-        await self._remove_all_scenes(self.th1, "Step 1a")
+            self.step("1a", "TH1 sends a RemoveAllScenes command to DUT with GroupID 0x0000."
+                      "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.")
+            await self._remove_all_scenes(self.th1, "Step 1a")
 
-        self.step("1b")
-        await self._remove_all_scenes(self.th2, "Step 1b")
+            self.step("1b", "Repeat Step 1a with TH2.")
+            await self._remove_all_scenes(self.th2, "Step 1b")
 
-        self.step("1c")
-        await self._remove_all_scenes(self.th3, "Step 1c")
+            self.step("1c", "Repeat Step 1a with TH3.")
+            await self._remove_all_scenes(self.th3, "Step 1c")
 
-        self.step("2a")
-        scene_table_size = typing.cast(
-            int,
-            await self.read_single_attribute_check_success(
+            self.step("2a", "TH1 reads the SceneTableSize attribute from the DUT."
+                      "DUT reports SceneTableSize (at least 16). MaxRemainingCapacity is (SceneTableSize - 1) / 2.")
+            scene_table_size = typing.cast(
+                int,
+                await self.read_single_attribute_check_success(
+                    endpoint=self._endpoint,
+                    cluster=Clusters.ScenesManagement,
+                    attribute=Clusters.ScenesManagement.Attributes.SceneTableSize,
+                ),
+            )
+            asserts.assert_greater_equal(
+                scene_table_size, _MIN_SCENE_TABLE_SIZE, f"Step 2a: SceneTableSize must be at least {_MIN_SCENE_TABLE_SIZE}"
+            )
+            max_remaining_capacity = (scene_table_size - 1) // 2
+            log.info("SceneTableSize=%s MaxRemainingCapacity=%s", scene_table_size, max_remaining_capacity)
+
+            self.step("2b", "TH1 subscribes to FabricSceneInfo."
+                      "Subscription activates; RemainingCapacity equals MaxRemainingCapacity for TH1's fabric entry.")
+            self._th1_sub, self._th1_cb = await self._subscribe_fabric_scene_info(self.th1)
+            self._assert_remaining_capacity(
+                self._priming_fabric_scene_info(self._th1_sub), self._th1_fabric, max_remaining_capacity, "Step 2b"
+            )
+
+            self.step("2c", "Repeat Step 2b with TH2.")
+            self._th2_sub, self._th2_cb = await self._subscribe_fabric_scene_info(self.th2)
+            self._assert_remaining_capacity(
+                self._priming_fabric_scene_info(self._th2_sub), self._th2_fabric, max_remaining_capacity, "Step 2c"
+            )
+
+            self.step("2d", "Repeat Step 2b with TH3.")
+            self._th3_sub, self._th3_cb = await self._subscribe_fabric_scene_info(self.th3)
+            self._assert_remaining_capacity(
+                self._priming_fabric_scene_info(self._th3_sub), self._th3_fabric, max_remaining_capacity, "Step 2d"
+            )
+
+            self.step("3a", "TH1 sends AddScene with GroupID 0x0000, SceneID 0x01, TransitionTime 20000 and no extension field sets."
+                      "DUT sends AddSceneResponse with Status SUCCESS, GroupID 0x0000 and SceneID 0x01.")
+            self._th1_cb.reset()
+            await self._add_scene(self.th1, 0x01, "Step 3a")
+
+            self.step("3b", "TH1 waits for a FabricSceneInfo report."
+                      "RemainingCapacity equals MaxRemainingCapacity - 1.")
+            self._await_remaining_capacity(self._th1_cb, self._th1_fabric, max_remaining_capacity - 1, "Step 3b")
+
+            self.step("4a", "TH1 sends AddScene with SceneID starting at 2 and incrementing until RemainingCapacity becomes 0."
+                      "Each AddScene succeeds; RemainingCapacity decreases to 0.")
+            th1_next_scene = await self._fill_until_remaining_zero(
+                self.th1, self._th1_cb, self._th1_fabric, start_scene_id=0x02, context="Step 4a"
+            )
+
+            self.step("4b", "TH1 sends AddScene with SceneID one more than the last value used in Step 4a."
+                      "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.")
+            await self._add_scene(self.th1, th1_next_scene, "Step 4b", expected_status=Status.ResourceExhausted)
+
+            self.step("5a", "Repeat Step 4a with TH2."
+                      "TH2 RemainingCapacity decreases to 0. TH3 RemainingCapacity decreases to SceneTableSize - (2 * MaxRemainingCapacity).")
+            self._th3_cb.reset()
+            th2_next_scene = await self._fill_until_remaining_zero(
+                self.th2, self._th2_cb, self._th2_fabric, start_scene_id=0x01, context="Step 5a"
+            )
+            th3_expected_after_th2_full = scene_table_size - (2 * max_remaining_capacity)
+            self._await_remaining_capacity_equals(
+                self._th3_cb, self._th3_fabric, th3_expected_after_th2_full, "Step 5a TH3"
+            )
+
+            self.step("5b", "Repeat Step 4b with TH2."
+                      "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.")
+            await self._add_scene(self.th2, th2_next_scene, "Step 5b", expected_status=Status.ResourceExhausted)
+
+            self.step("6a", "Repeat Step 4a with TH3."
+                      "TH3 RemainingCapacity decreases to 0.")
+            # TH3 already has RemainingCapacity == SceneTableSize - 2*MaxRemainingCapacity; fill to 0.
+            # Use SceneIDs starting at 0x02 so SceneID 0x01 remains free for Step 6b.
+            th3_next_scene = await self._fill_until_remaining_zero(
+                self.th3, self._th3_cb, self._th3_fabric, start_scene_id=0x02, context="Step 6a"
+            )
+            asserts.assert_greater(th3_next_scene, 0x01, "Step 6a: expected SceneID 0x01 to remain unused")
+
+            self.step("6b", "TH3 sends AddScene with GroupID 0x0000 and SceneID 0x01."
+                      "DUT sends AddSceneResponse with Status RESOURCE_EXHAUSTED.")
+            await self._add_scene(self.th3, 0x01, "Step 6b", expected_status=Status.ResourceExhausted)
+
+            self.step(7, "TH3 sends StoreScene with GroupID 0x0000 and SceneID 0xfe."
+                      "DUT sends StoreSceneResponse with Status RESOURCE_EXHAUSTED.")
+            resp = await self.send_single_cmd(
+                Clusters.ScenesManagement.Commands.StoreScene(groupID=_GROUP_ID, sceneID=0xFE),
+                dev_ctrl=self.th3,
                 endpoint=self._endpoint,
-                cluster=Clusters.ScenesManagement,
-                attribute=Clusters.ScenesManagement.Attributes.SceneTableSize,
-            ),
-        )
-        asserts.assert_greater_equal(
-            scene_table_size, _MIN_SCENE_TABLE_SIZE, f"Step 2a: SceneTableSize must be at least {_MIN_SCENE_TABLE_SIZE}"
-        )
-        max_remaining_capacity = (scene_table_size - 1) // 2
-        log.info("SceneTableSize=%s MaxRemainingCapacity=%s", scene_table_size, max_remaining_capacity)
+            )
+            asserts.assert_equal(resp.status, Status.ResourceExhausted, "Step 7: StoreScene status")
+            asserts.assert_equal(resp.groupID, _GROUP_ID, "Step 7: StoreScene groupID")
+            asserts.assert_equal(resp.sceneID, 0xFE, "Step 7: StoreScene sceneID")
 
-        self.step("2b")
-        self._th1_sub, self._th1_cb = await self._subscribe_fabric_scene_info(self.th1)
-        self._assert_remaining_capacity(
-            self._priming_fabric_scene_info(self._th1_sub), self._th1_fabric, max_remaining_capacity, "Step 2b"
-        )
+            self.step(8, "TH1 sends CopyScene mode 0x00 from GroupID/SceneID 0x0000/0x01 to a unused destination SceneID."
+                      "DUT sends CopySceneResponse with Status RESOURCE_EXHAUSTED, groupIdentifierFrom 0x0000 and sceneIdentifierFrom 0x01.")
+            copy_to_scene = th1_next_scene
+            resp = await self.send_single_cmd(
+                Clusters.ScenesManagement.Commands.CopyScene(
+                    mode=0x00,
+                    groupIdentifierFrom=_GROUP_ID,
+                    sceneIdentifierFrom=0x01,
+                    groupIdentifierTo=_GROUP_ID,
+                    sceneIdentifierTo=copy_to_scene,
+                ),
+                dev_ctrl=self.th1,
+                endpoint=self._endpoint,
+            )
+            asserts.assert_equal(resp.status, Status.ResourceExhausted, "Step 8: CopyScene status")
+            asserts.assert_equal(resp.groupIdentifierFrom, _GROUP_ID, "Step 8: CopyScene groupIdentifierFrom")
+            asserts.assert_equal(resp.sceneIdentifierFrom, 0x01, "Step 8: CopyScene sceneIdentifierFrom")
 
-        self.step("2c")
-        self._th2_sub, self._th2_cb = await self._subscribe_fabric_scene_info(self.th2)
-        self._assert_remaining_capacity(
-            self._priming_fabric_scene_info(self._th2_sub), self._th2_fabric, max_remaining_capacity, "Step 2c"
-        )
+            self.step("9a", "TH1 sends RemoveAllScenes with GroupID 0x0000."
+                      "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.")
+            self._th1_cb.reset()
+            self._th2_cb.reset()
+            await self._remove_all_scenes(self.th1, "Step 9a")
 
-        self.step("2d")
-        self._th3_sub, self._th3_cb = await self._subscribe_fabric_scene_info(self.th3)
-        self._assert_remaining_capacity(
-            self._priming_fabric_scene_info(self._th3_sub), self._th3_fabric, max_remaining_capacity, "Step 2d"
-        )
+            self.step("9b", "TH1 waits for a FabricSceneInfo report; TH2 must not see an updated RemainingCapacity."
+                      "TH1 RemainingCapacity equals MaxRemainingCapacity. TH2 RemainingCapacity is unchanged.")
+            self._await_remaining_capacity(self._th1_cb, self._th1_fabric, max_remaining_capacity, "Step 9b")
+            self._assert_no_remaining_capacity_change(self._th2_cb, self._th2_fabric, 0, "Step 9b TH2")
 
-        self.step("3a")
-        self._th1_cb.reset()
-        await self._add_scene(self.th1, 0x01, "Step 3a")
+            self.step("10a", "TH2 sends RemoveAllScenes with GroupID 0x0000."
+                      "DUT sends RemoveAllScenesResponse with Status SUCCESS and GroupID 0x0000.")
+            self._th1_cb.reset()
+            self._th2_cb.reset()
+            await self._remove_all_scenes(self.th2, "Step 10a")
 
-        self.step("3b")
-        self._await_remaining_capacity(self._th1_cb, self._th1_fabric, max_remaining_capacity - 1, "Step 3b")
+            self.step("10b", "TH2 waits for a FabricSceneInfo report; TH1 must not see an updated RemainingCapacity."
+                      "TH2 RemainingCapacity equals MaxRemainingCapacity. TH1 RemainingCapacity is unchanged.")
+            self._await_remaining_capacity(self._th2_cb, self._th2_fabric, max_remaining_capacity, "Step 10b")
+            self._assert_no_remaining_capacity_change(
+                self._th1_cb, self._th1_fabric, max_remaining_capacity, "Step 10b TH1"
+            )
 
-        self.step("4a")
-        th1_next_scene = await self._fill_until_remaining_zero(
-            self.th1, self._th1_cb, self._th1_fabric, start_scene_id=0x02, context="Step 4a"
-        )
+            self.step("11a", "TH1 sends RemoveFabric for TH2's fabric index."
+                      "DUT responds with Status SUCCESS and TH2's fabric index.")
+            await self._remove_fabric(self._th2_fabric, "Step 11a")
 
-        self.step("4b")
-        await self._add_scene(self.th1, th1_next_scene, "Step 4b", expected_status=Status.ResourceExhausted)
-
-        self.step("5a")
-        self._th3_cb.reset()
-        th2_next_scene = await self._fill_until_remaining_zero(
-            self.th2, self._th2_cb, self._th2_fabric, start_scene_id=0x01, context="Step 5a"
-        )
-        th3_expected_after_th2_full = scene_table_size - (2 * max_remaining_capacity)
-        self._await_remaining_capacity_equals(
-            self._th3_cb, self._th3_fabric, th3_expected_after_th2_full, "Step 5a TH3"
-        )
-
-        self.step("5b")
-        await self._add_scene(self.th2, th2_next_scene, "Step 5b", expected_status=Status.ResourceExhausted)
-
-        self.step("6a")
-        # TH3 already has RemainingCapacity == SceneTableSize - 2*MaxRemainingCapacity; fill to 0.
-        # Use SceneIDs starting at 0x02 so SceneID 0x01 remains free for Step 6b.
-        th3_next_scene = await self._fill_until_remaining_zero(
-            self.th3, self._th3_cb, self._th3_fabric, start_scene_id=0x02, context="Step 6a"
-        )
-        asserts.assert_greater(th3_next_scene, 0x01, "Step 6a: expected SceneID 0x01 to remain unused")
-
-        self.step("6b")
-        await self._add_scene(self.th3, 0x01, "Step 6b", expected_status=Status.ResourceExhausted)
-
-        self.step(7)
-        resp = await self.send_single_cmd(
-            Clusters.ScenesManagement.Commands.StoreScene(groupID=_GROUP_ID, sceneID=0xFE),
-            dev_ctrl=self.th3,
-            endpoint=self._endpoint,
-        )
-        asserts.assert_equal(resp.status, Status.ResourceExhausted, "Step 7: StoreScene status")
-        asserts.assert_equal(resp.groupID, _GROUP_ID, "Step 7: StoreScene groupID")
-        asserts.assert_equal(resp.sceneID, 0xFE, "Step 7: StoreScene sceneID")
-
-        self.step(8)
-        # Destination must not already exist; otherwise CopyScene overwrites and succeeds.
-        # The YAML uses SceneID 0x02, but that ID is already used while filling TH1.
-        copy_to_scene = th1_next_scene
-        resp = await self.send_single_cmd(
-            Clusters.ScenesManagement.Commands.CopyScene(
-                mode=0x00,
-                groupIdentifierFrom=_GROUP_ID,
-                sceneIdentifierFrom=0x01,
-                groupIdentifierTo=_GROUP_ID,
-                sceneIdentifierTo=copy_to_scene,
-            ),
-            dev_ctrl=self.th1,
-            endpoint=self._endpoint,
-        )
-        asserts.assert_equal(resp.status, Status.ResourceExhausted, "Step 8: CopyScene status")
-        asserts.assert_equal(resp.groupIdentifierFrom, _GROUP_ID, "Step 8: CopyScene groupIdentifierFrom")
-        asserts.assert_equal(resp.sceneIdentifierFrom, 0x01, "Step 8: CopyScene sceneIdentifierFrom")
-
-        self.step("9a")
-        self._th1_cb.reset()
-        self._th2_cb.reset()
-        await self._remove_all_scenes(self.th1, "Step 9a")
-
-        self.step("9b")
-        self._await_remaining_capacity(self._th1_cb, self._th1_fabric, max_remaining_capacity, "Step 9b")
-        self._assert_no_remaining_capacity_change(self._th2_cb, self._th2_fabric, 0, "Step 9b TH2")
-
-        self.step("10a")
-        self._th1_cb.reset()
-        self._th2_cb.reset()
-        await self._remove_all_scenes(self.th2, "Step 10a")
-
-        self.step("10b")
-        self._await_remaining_capacity(self._th2_cb, self._th2_fabric, max_remaining_capacity, "Step 10b")
-        self._assert_no_remaining_capacity_change(
-            self._th1_cb, self._th1_fabric, max_remaining_capacity, "Step 10b TH1"
-        )
-
-        self.step("11a")
-        resp = await self.send_single_cmd(
-            Clusters.OperationalCredentials.Commands.RemoveFabric(self._th2_fabric),
-            dev_ctrl=self.th1,
-            endpoint=0,
-        )
-        asserts.assert_equal(resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Step 11a")
-        asserts.assert_equal(resp.fabricIndex, self._th2_fabric, "Step 11a fabricIndex")
-
-        self.step("11b")
-        resp = await self.send_single_cmd(
-            Clusters.OperationalCredentials.Commands.RemoveFabric(self._th3_fabric),
-            dev_ctrl=self.th1,
-            endpoint=0,
-        )
-        asserts.assert_equal(resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Step 11b")
-        asserts.assert_equal(resp.fabricIndex, self._th3_fabric, "Step 11b fabricIndex")
+            self.step("11b", "TH1 sends RemoveFabric for TH3's fabric index."
+                      "DUT responds with Status SUCCESS and TH3's fabric index.")
+            await self._remove_fabric(self._th3_fabric, "Step 11b")
+        finally:
+            self._shutdown_subscriptions()
+            await self._remove_remaining_fabrics()
 
 
 if __name__ == "__main__":
