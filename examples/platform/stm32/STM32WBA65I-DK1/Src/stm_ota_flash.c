@@ -130,6 +130,11 @@ STM_OTA_StatusTypeDef STM_OTA_FLASH_Delete_Image(uint32_t Address, uint32_t Leng
         }
     } while (error == FM_BUSY);
 
+    if (error == FM_ERROR)
+    {
+        UnLockFMThread();
+    }
+        
     return ((error == FM_OK) ? STM_OTA_FLASH_OK : STM_OTA_FLASH_DELETE_FAILED);
 }
 
@@ -173,7 +178,12 @@ STM_OTA_StatusTypeDef STM_OTA_FLASH_WriteChunk(uint32_t * pDestAddress, uint32_t
             osSemaphoreAcquire(FlashOperationCompletedSema, osWaitForever);
         }
     } while (error == FM_BUSY);
-
+    
+    if (error == FM_ERROR)
+    {
+        UnLockFMThread();
+    }
+    
     return ((error == FM_OK) ? STM_OTA_FLASH_OK : STM_OTA_FLASH_WRITE_FAILED);
 }
 

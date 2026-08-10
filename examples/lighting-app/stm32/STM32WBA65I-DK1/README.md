@@ -51,4 +51,4 @@ ON and the line is erased when the controller disable the light.
 
 ## OTA and OEMiROT application
 
-See dedicated readme : example/platform/stm32/STM32WBA65I-DK1/oemirot/
+See dedicated readme : examples/platform/stm32/STM32WBA65I-DK1/oemirot/

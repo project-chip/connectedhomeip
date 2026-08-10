@@ -57,9 +57,15 @@ STM_OTA_StatusTypeDef STM_OTA_SPI_FLASH_Init(void)
     if (LOADER_FLASH_DEV_NAME.Initialize(NULL) != ARM_DRIVER_OK)
     {
         LOG_INFO_APP("Driver Flash Init : Failed\n");
+        return STM_OTA_FLASH_INIT_FAILED;
     }
 
     ARM_FLASH_INFO * data = LOADER_FLASH_DEV_NAME.GetInfo();
+    if(data == NULL)
+    {
+        LOG_INFO_APP("Driver Flash get data : Failed\n");
+        return STM_OTA_FLASH_INIT_FAILED;
+    }
 
     m_uFlashSectorSize   = data->sector_size;
     m_uFlashMinWriteSize = data->program_unit;
