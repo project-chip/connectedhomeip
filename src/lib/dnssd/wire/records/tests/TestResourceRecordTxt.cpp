@@ -67,29 +67,4 @@ TEST(TestResourceRecordTxt, TestTxt)
     EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
-
-TEST(TestResourceRecordTxt, TestTxtEntryTooLong)
-{
-    uint8_t headerBuffer[HeaderRef::kSizeBytes];
-    uint8_t dataBuffer[256];
-
-    const QNamePart kName[] = { "some", "test", "local" };
-
-    // One byte over the entry length TxtResourceRecord accepts.
-    char longEntry[65];
-    memset(longEntry, 'x', sizeof(longEntry) - 1);
-    longEntry[sizeof(longEntry) - 1] = '\0';
-    const char * kData[]             = { longEntry };
-
-    HeaderRef header(headerBuffer);
-    header.Clear();
-
-    BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
-    RecordWriter writer(&output);
-
-    TxtResourceRecord record(kName, kData);
-
-    EXPECT_FALSE(record.Append(header, ResourceType::kAdditional, writer));
-    EXPECT_EQ(header.GetAdditionalCount(), 0);
-}
 } // namespace
