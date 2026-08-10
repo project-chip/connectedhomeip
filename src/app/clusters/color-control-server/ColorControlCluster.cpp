@@ -1311,10 +1311,10 @@ Status ColorControlCluster::MoveToSaturation(uint8_t saturation, uint16_t transi
     const uint32_t durationMs = transitionTimeDs * 100u;  // deciseconds → ms
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
-        .startSat    = GetSaturation(), // read AFTER the mode switch
-        .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-        .durationMs  = durationMs,
+                           .startSat    = GetSaturation(), // read AFTER the mode switch
+                           .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
+                           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+                           .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
@@ -1570,10 +1570,10 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     auto & hs = EnsureHueSatTransition(); // preserve a running sat axis (§3.2.5.2)
     hs.hue    = HueTransition{
-        .startHue    = GetEnhancedHue(), // 16-bit canonical current
-        .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-        .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
+           .startHue    = GetEnhancedHue(), // 16-bit canonical current
+           .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
+           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
     };
     SetQuietReportRemainingTime(kMaxInt16uValue, /*isNewTransition=*/true); // indefinite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
@@ -1739,10 +1739,10 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     auto & hs = EnsureHueSatTransition(); // preserve a running HUE axis (§3.2.5.2)
     hs.sat    = SatTransition{
-        .startSat    = start,
-        .targetSat   = target, // the boundary — bounded, so it stops here
-        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-        .durationMs  = durationMs,
+           .startSat    = start,
+           .targetSat   = target, // the boundary — bounded, so it stops here
+           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+           .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
@@ -2174,7 +2174,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint> and `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
