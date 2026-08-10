@@ -1612,7 +1612,7 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
         groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
     GroupId groupId = static_cast<GroupId>(jGroupId);
-    jobject wrapperKeyId;
+    jobject wrapperKeyId = nullptr;
 
     while (iter.Next(groupKey))
     {
