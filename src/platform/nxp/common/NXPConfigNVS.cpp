@@ -392,11 +392,19 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 {
     DeleteSubtreeEntry entry_string{ /* success */ 0 };
     DeleteSubtreeEntry entry_int{ /* success */ 0 };
-    // Clear CHIP_DEVICE_STRING_SETTINGS_KEY/* keys
-    settings_load_subtree_direct(CHIP_DEVICE_STRING_SETTINGS_KEY, DeleteSubtreeCallback, &entry_string);
-    // Clear CHIP_DEVICE_INTEGER_SETTINGS_KEY/* keys
-    settings_load_subtree_direct(CHIP_DEVICE_INTEGER_SETTINGS_KEY, DeleteSubtreeCallback, &entry_int);
 
+    // Clear CHIP_DEVICE_STRING_SETTINGS_KEY/* keys
+    int err_string = settings_load_subtree_direct(CHIP_DEVICE_STRING_SETTINGS_KEY, DeleteSubtreeCallback, &entry_string);
+    // Clear CHIP_DEVICE_INTEGER_SETTINGS_KEY/* keys
+    int err_int = settings_load_subtree_direct(CHIP_DEVICE_INTEGER_SETTINGS_KEY, DeleteSubtreeCallback, &entry_int);
+
+    if (err_string != 0 || err_int != 0 || entry_string.result != 0 || entry_int.result != 0)
+    {
+        ChipLogError(DeviceLayer,
+                     "FactoryResetConfig failed: load_string=%d load_int=%d del_string=%d del_int=%d",
+                     err_string, err_int, entry_string.result, entry_int.result);
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
     return CHIP_NO_ERROR;
 }
 
