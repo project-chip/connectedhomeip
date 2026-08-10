@@ -76,7 +76,8 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
     def pics_TC_SU_2_3(self):
         """Return the PICS definitions associated with this test."""
         return [
-            "MCORE.OTA",
+            "MCORE.OTA.RequestorConsent",
+            "MCORE.OTA.Resume"
         ]
 
     async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0):
@@ -267,6 +268,9 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         # bytesDownloaded at abort) OR report a clean error / restart from
         # zero if resume is not implemented. Both outcomes are valid; only
         # inconsistent behavior fails the test.
+
+        #Download resumption is not supported in the SDK so the test will always
+        # warn that resume starts from zero.
         self.step(2)
 
         provider_extra_args_resume = [
