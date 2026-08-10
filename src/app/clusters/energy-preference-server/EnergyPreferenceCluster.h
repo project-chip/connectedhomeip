@@ -51,14 +51,14 @@ public:
     uint8_t GetCurrentEnergyBalance() const { return mCurrentEnergyBalance; }
     uint8_t GetCurrentLowPowerModeSensitivity() const { return mCurrentLowPowerModeSensitivity; }
 
-    static void SetDelegate(EnergyPreference::Delegate * aDelegate);
+    static void SetDelegate(EnergyPreference::Delegate * delegate);
     static EnergyPreference::Delegate * GetDelegate();
 
 private:
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
-    CHIP_ERROR ReadEnergyBalances(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadEnergyPriorities(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadLowPowerModeSensitivities(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadEnergyBalances(const ConcreteAttributePath & path, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadEnergyPriorities(const ConcreteAttributePath & path, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadLowPowerModeSensitivities(const ConcreteAttributePath & path, AttributeValueEncoder & encoder);
 
     BitFlags<EnergyPreference::Feature> mFeatures;
 

@@ -21,7 +21,7 @@
 
 namespace chip::app::Clusters::EnergyPreference {
 
-void SetDelegate(Delegate * aDelegate);
+void SetDelegate(Delegate * delegate);
 Delegate * GetDelegate();
 
 EnergyPreferenceCluster * FindClusterOnEndpoint(EndpointId endpoint);

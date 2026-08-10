@@ -89,9 +89,9 @@ void MatterEnergyPreferenceClusterShutdownCallback(EndpointId endpointId, Matter
 
 namespace chip::app::Clusters::EnergyPreference {
 
-void SetDelegate(Delegate * aDelegate)
+void SetDelegate(Delegate * delegate)
 {
-    EnergyPreferenceCluster::SetDelegate(aDelegate);
+    EnergyPreferenceCluster::SetDelegate(delegate);
 }
 
 Delegate * GetDelegate()

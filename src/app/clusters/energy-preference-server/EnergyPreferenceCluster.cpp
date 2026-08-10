@@ -153,12 +153,12 @@ CHIP_ERROR EnergyPreferenceCluster::SetCurrentLowPowerModeSensitivity(uint8_t cu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePath & path, AttributeValueEncoder & encoder)
 {
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         do
@@ -174,20 +174,16 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePa
             }
         } while (err == CHIP_NO_ERROR);
 
-        if (err == CHIP_ERROR_NOT_FOUND)
-        {
-            return CHIP_NO_ERROR;
-        }
-        return err;
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
     });
 }
 
-CHIP_ERROR EnergyPreferenceCluster::ReadEnergyPriorities(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR EnergyPreferenceCluster::ReadEnergyPriorities(const ConcreteAttributePath & path, AttributeValueEncoder & encoder)
 {
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
         EnergyPriorityEnum priority;
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -196,21 +192,17 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyPriorities(const ConcreteAttribute
             ReturnErrorOnFailure(encoder.Encode(priority));
             index++;
         }
-        if (err == CHIP_ERROR_NOT_FOUND)
-        {
-            return CHIP_NO_ERROR;
-        }
-        return err;
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
     });
 }
 
-CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const ConcreteAttributePath & aPath,
-                                                                  AttributeValueEncoder & aEncoder)
+CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const ConcreteAttributePath & path,
+                                                                  AttributeValueEncoder & encoder)
 {
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         do
@@ -225,17 +217,13 @@ CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const Concrete
                 index++;
             }
         } while (err == CHIP_NO_ERROR);
-        if (err == CHIP_ERROR_NOT_FOUND)
-        {
-            return CHIP_NO_ERROR;
-        }
-        return err;
+        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
     });
 }
 
-void EnergyPreferenceCluster::SetDelegate(Delegate * aDelegate)
+void EnergyPreferenceCluster::SetDelegate(Delegate * delegate)
 {
-    sDelegate = aDelegate;
+    sDelegate = delegate;
 }
 
 Delegate * EnergyPreferenceCluster::GetDelegate()
