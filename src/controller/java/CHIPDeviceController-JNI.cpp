@@ -1700,7 +1700,7 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
 
     chip::Credentials::GroupDataProvider::KeySet keySet;
 
-    uint16_t keySetId = static_cast<uint16_t>(jKeySetId);
+    uint16_t keySetId        = static_cast<uint16_t>(jKeySetId);
     jobject wrapperKeyPolicy = nullptr;
     while (it.Next(keySet))
     {
