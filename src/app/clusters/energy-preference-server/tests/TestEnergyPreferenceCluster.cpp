@@ -325,6 +325,7 @@ TEST_F(TestEnergyPreferenceCluster, TestReadWriteAttributeAndBounds)
 TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
 {
     EnergyPreferenceCluster cluster(kTestEndpointId, bothFeatures);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // currentEnergyBalance
     for (CurrentEnergyBalance::TypeInfo::Type i = 0;
@@ -356,6 +357,8 @@ TEST_F(TestEnergyPreferenceCluster, TestSettersAndGetters)
     EXPECT_EQ(cluster.SetCurrentLowPowerModeSensitivity(static_cast<CurrentLowPowerModeSensitivity::TypeInfo::Type>(
                   testDelegate.GetNumLowPowerModeSensitivities(kTestEndpointId))),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestEnergyPreferenceCluster, TestPersistence)
