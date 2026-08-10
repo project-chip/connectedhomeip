@@ -158,7 +158,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePa
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & enc) -> CHIP_ERROR {
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         do
@@ -169,7 +169,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePa
             if ((err = sDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
             {
                 BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
-                ReturnErrorOnFailure(encoder.Encode(balance));
+                ReturnErrorOnFailure(enc.Encode(balance));
                 index++;
             }
         } while (err == CHIP_NO_ERROR);
@@ -183,13 +183,13 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyPriorities(const ConcreteAttribute
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & enc) -> CHIP_ERROR {
         EnergyPriorityEnum priority;
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         while ((err = sDelegate->GetEnergyPriorityAtIndex(endpoint, index, priority)) == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(encoder.Encode(priority));
+            ReturnErrorOnFailure(enc.Encode(priority));
             index++;
         }
         return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
@@ -202,7 +202,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const Concrete
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return encoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint](const auto & enc) -> CHIP_ERROR {
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         do
@@ -213,7 +213,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const Concrete
             if ((err = sDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
             {
                 BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
-                ReturnErrorOnFailure(encoder.Encode(balance));
+                ReturnErrorOnFailure(enc.Encode(balance));
                 index++;
             }
         } while (err == CHIP_NO_ERROR);
