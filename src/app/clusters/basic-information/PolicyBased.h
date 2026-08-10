@@ -399,11 +399,7 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         if constexpr (Policy::kHasDeviceLocation)
         {
             auto location = mPolicy.GetDeviceLocation();
-            if (!location.has_value())
-            {
-                return Protocols::InteractionModel::Status::UnsupportedAttribute;
-            }
-            return encoder.Encode(*location);
+            return encoder.Encode(location);
         }
         else
         {
@@ -469,48 +465,14 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
 }
 
 template <typename Policy>
-CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
-                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR PolicyBased<Policy>::Attributes(
+    const ConcreteClusterPath & path,
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace Attributes;
 
-    // TODO: MetadataEntry for these are static constants in the generated code.
-    // They are available as Attributes::X::kMetadataEntry
-
-    static constexpr DataModel::AttributeEntry optionalAttributesWithDeviceLocation[] = {
-        ManufacturingDate::kMetadataEntry,   //
-        PartNumber::kMetadataEntry,          //
-        ProductURL::kMetadataEntry,          //
-        ProductLabel::kMetadataEntry,        //
-        SerialNumber::kMetadataEntry,        //
-        LocalConfigDisabled::kMetadataEntry, //
-        Reachable::kMetadataEntry,           //
-        ProductAppearance::kMetadataEntry,   //
-
-        // Optional because of forced multi-revision support for backwards compatibility
-        // emulation: we emulate revision 3 when uniqueid is not enabled.
-        UniqueID::kMetadataEntry, //
-
-        DeviceLocation::kMetadataEntry, //
-    };
-
-    static constexpr DataModel::AttributeEntry optionalAttributesNoDeviceLocation[] = {
-        ManufacturingDate::kMetadataEntry,   //
-        PartNumber::kMetadataEntry,          //
-        ProductURL::kMetadataEntry,          //
-        ProductLabel::kMetadataEntry,        //
-        SerialNumber::kMetadataEntry,        //
-        LocalConfigDisabled::kMetadataEntry, //
-        Reachable::kMetadataEntry,           //
-        ProductAppearance::kMetadataEntry,   //
-
-        // Optional because of forced multi-revision support for backwards compatibility
-        // emulation: we emulate revision 3 when uniqueid is not enabled.
-        UniqueID::kMetadataEntry, //
-    };
-
     // kMandatoryAttributes equivalent
-    static constexpr DataModel::AttributeEntry mandatoryAttributes[] = {
+    static constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
         DataModelRevision::kMetadataEntry,
         VendorName::kMetadataEntry,
         VendorID::kMetadataEntry,
@@ -528,12 +490,28 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
         ConfigurationVersion::kMetadataEntry,
     };
 
+    static constexpr AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
+        { true, ManufacturingDate::kMetadataEntry },
+        { true, PartNumber::kMetadataEntry },
+        { true, ProductURL::kMetadataEntry },
+        { true, ProductLabel::kMetadataEntry },
+        { true, SerialNumber::kMetadataEntry },
+        { true, LocalConfigDisabled::kMetadataEntry },
+        { true, Reachable::kMetadataEntry },
+        { true, ProductAppearance::kMetadataEntry },
+
+        // Optional because of forced multi-revision support for backwards
+        // compatibility emulation: we emulate revision 3 when UniqueID
+        // is not enabled.
+        { true, UniqueID::kMetadataEntry },
+
+        { Policy::kHasDeviceLocation, DeviceLocation::kMetadataEntry },
+    };
+
     AttributeListBuilder listBuilder(builder);
 
-    return listBuilder.Append(Span(mandatoryAttributes),
-                              Policy::kHasDeviceLocation ? Span(optionalAttributesWithDeviceLocation)
-                                                         : Span(optionalAttributesNoDeviceLocation),
-                              mPolicy.GetOptionalAttributes());
+    return listBuilder.Append(
+        Span(kMandatoryAttributes),
+        Span(kOptionalAttributes));
 }
-
 } // namespace chip::app::Clusters::BasicInformation

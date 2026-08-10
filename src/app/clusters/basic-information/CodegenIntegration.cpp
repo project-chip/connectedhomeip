@@ -64,7 +64,7 @@ public:
         BasicInformationOptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
         DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
-        VerifyOrDie(nullptr != provider);
+        VerifyOrDie(provider != nullptr);
 
         gServer.Create(optionalAttributeSet, *provider, DeviceLayer::ConfigurationMgr(), DeviceLayer::PlatformMgr(),
                        InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
