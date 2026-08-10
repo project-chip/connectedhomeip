@@ -79,28 +79,28 @@ struct TestColorControlCommands : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kHueAndSaturation);
-        c.mColorValue = HueSatColor{ .hue = 10, .saturation = 20 };
+        c.mColorValue = HueSatColor{ 10, 20 };
         return c;
     }
     ColorControlCluster::Config EnhancedConfig()
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
-        c.mColorValue = EnhancedHueSatColor{ .enhancedHue = 0x1000, .saturation = 20 };
+        c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
     }
     ColorControlCluster::Config XyConfig()
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kXy);
-        c.mColorValue = XYColor{ .x = 1000, .y = 2000 };
+        c.mColorValue = XYColor{ 1000, 2000 };
         return c;
     }
     ColorControlCluster::Config CtConfig()
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorTemperature);
-        c.mColorValue                         = CTColor{ .mireds = 250 };
+        c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
         c.ctConfig.colorTempPhysicalMaxMireds = 400;
         return c;
@@ -109,7 +109,7 @@ struct TestColorControlCommands : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
-        c.mColorValue = EnhancedHueSatColor{ .enhancedHue = 0x1000, .saturation = 20 };
+        c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
     }
 };
@@ -167,7 +167,7 @@ TEST_F(TestColorControlCommands, StepSaturation)
 TEST_F(TestColorControlCommands, SaturationCommandsPreserveEnhancedHue)
 {
     ColorControlCluster::Config config = EnhancedConfig();
-    config.mColorValue                 = EnhancedHueSatColor{ .enhancedHue = 0x1234, .saturation = 20 };
+    config.mColorValue                 = EnhancedHueSatColor{ 0x1234, 20 };
     ColorControlCluster c(kEp, config);
     ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
 
@@ -677,7 +677,7 @@ TEST_F(TestColorControlCommands, SlowRateMoveSaturatesRemainingTime)
         // Physical range 1..65279 so a rate-1 move spans the whole color-temperature axis.
         ColorControlCluster::Config cfg(delegate);
         cfg.mFeatures.Set(Feature::kColorTemperature);
-        cfg.mColorValue                         = CTColor{ .mireds = 1 };
+        cfg.mColorValue                         = CTColor{ 1 };
         cfg.ctConfig.colorTempPhysicalMinMireds = 1;
         cfg.ctConfig.colorTempPhysicalMaxMireds = 65279;
         ColorControlCluster c(kEp, cfg);

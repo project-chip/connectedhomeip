@@ -81,7 +81,7 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
 
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorTemperature);
-    config.mColorValue                         = CTColor{ .mireds = 250 };
+    config.mColorValue                         = CTColor{ 250 };
     config.ctConfig.colorTempPhysicalMinMireds = 100;
     config.ctConfig.colorTempPhysicalMaxMireds = 400;
     config.onOff                               = &onOff;
@@ -115,7 +115,7 @@ TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecute
     // No On/Off injected (config.onOff stays null) -> coupling absent -> always executes.
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorTemperature);
-    config.mColorValue = CTColor{ .mireds = 250 };
+    config.mColorValue = CTColor{ 250 };
     ColorControlCluster cluster(kTestEndpointId, config);
 
     EXPECT_TRUE(cluster.ShouldExecuteIfOff(BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()));
@@ -128,7 +128,7 @@ TEST_F(TestColorControlCoupling, CoupleColorTempToLevelMapsLevelToColorTemp)
 {
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorTemperature);
-    config.mColorValue                              = CTColor{ .mireds = 250 };
+    config.mColorValue                              = CTColor{ 250 };
     config.ctConfig.colorTempPhysicalMinMireds      = 100;
     config.ctConfig.colorTempPhysicalMaxMireds      = 400;
     config.ctConfig.coupleColorTempToLevelMinMireds = 150;
@@ -151,7 +151,7 @@ TEST_F(TestColorControlCoupling, CoupleColorTempToLevelIsNoOpOutsideColorTempMod
 {
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kXy);
-    config.mColorValue = XYColor{ .x = 100, .y = 200 };
+    config.mColorValue = XYColor{ 100, 200 };
     ColorControlCluster cluster(kTestEndpointId, config);
 
     cluster.CoupleColorTempToLevel(254);

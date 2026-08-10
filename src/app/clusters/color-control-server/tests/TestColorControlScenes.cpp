@@ -280,7 +280,7 @@ TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
 {
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
-    config.mColorValue = EnhancedHueSatColor{ .enhancedHue = 0x1000, .saturation = 20 };
+    config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
     ColorControlCluster cluster(kTestEndpointId, config);
     Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

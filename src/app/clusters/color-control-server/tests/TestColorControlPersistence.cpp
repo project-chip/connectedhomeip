@@ -73,7 +73,7 @@ struct TestColorControlPersistence : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorTemperature);
-        c.mColorValue                         = CTColor{ .mireds = 250 };
+        c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
         c.ctConfig.colorTempPhysicalMaxMireds = 400;
         return c;
@@ -82,21 +82,21 @@ struct TestColorControlPersistence : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kXy);
-        c.mColorValue = XYColor{ .x = 1000, .y = 2000 };
+        c.mColorValue = XYColor{ 1000, 2000 };
         return c;
     }
     ColorControlCluster::Config HsConfig()
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kHueAndSaturation);
-        c.mColorValue = HueSatColor{ .hue = 10, .saturation = 20 };
+        c.mColorValue = HueSatColor{ 10, 20 };
         return c;
     }
     ColorControlCluster::Config LoopConfig()
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation);
-        c.mColorValue = EnhancedHueSatColor{ .enhancedHue = 0x1000, .saturation = 20 };
+        c.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
         return c;
     }
 
@@ -180,7 +180,7 @@ TEST_F(TestColorControlPersistence, StoredModeOutranksConfiguredColorAlternative
 {
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
-    config.mColorValue                         = HueSatColor{ .hue = 10, .saturation = 20 }; // boots in HS
+    config.mColorValue                         = HueSatColor{ 10, 20 }; // boots in HS
     config.ctConfig.colorTempPhysicalMinMireds = 100;
     config.ctConfig.colorTempPhysicalMaxMireds = 400;
 
@@ -195,14 +195,14 @@ TEST_F(TestColorControlPersistence, StoredModeOutranksConfiguredColorAlternative
 // falling back to the attribute's own default.
 TEST_F(TestColorControlPersistence, FirstBootKeepsConfiguredColor)
 {
-    ColorControlCluster hs(kEp, HsConfig()); // HueSatColor{ .hue = 10, .saturation = 20 }
+    ColorControlCluster hs(kEp, HsConfig()); // HueSatColor{ 10, 20 }
     Testing::ClusterTester hsTester(hs);
     ASSERT_EQ(hs.Startup(hsTester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(hs.CurrentHue(), 10u);
     EXPECT_EQ(hs.Saturation(), 20u);
     hs.Shutdown(ClusterShutdownType::kClusterShutdown);
 
-    ColorControlCluster xy(kEp, XyConfig()); // XYColor{ .x = 1000, .y = 2000 }
+    ColorControlCluster xy(kEp, XyConfig()); // XYColor{ 1000, 2000 }
     Testing::ClusterTester xyTester(xy);
     ASSERT_EQ(xy.Startup(xyTester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(xy.CurrentX(), 1000u);
@@ -302,7 +302,7 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureWriteSurvivesReboot)
     a.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// §3.2.11.10 null row: once StartUpColorTemperatureMireds is cleared, the next boot owes the PREVIOUS
+// §3.2.11.10 null row: a boot whose StartUpColorTemperatureMireds is null owes the PREVIOUS
 // ColorTemperatureMireds. That only holds if the boot which APPLIED a startup value also stored it —
 // otherwise the pre-startup mode is still the newest thing in NVM and the color reverts to it. No command
 // runs here on purpose: Startup() is the only writer under test.
@@ -310,7 +310,7 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFoll
 {
     ColorControlCluster::Config cfg(delegate);
     cfg.mFeatures.Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
-    cfg.mColorValue                         = HueSatColor{ .hue = 10, .saturation = 20 };
+    cfg.mColorValue                         = HueSatColor{ 10, 20 };
     cfg.ctConfig.colorTempPhysicalMinMireds = 100;
     cfg.ctConfig.colorTempPhysicalMaxMireds = 400;
     cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(300);
@@ -322,7 +322,6 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFoll
     ASSERT_EQ(a.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     ASSERT_EQ(a.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     ASSERT_EQ(a.ColorTempMireds(), 300u);
-
     // The client clears the override. This write touches StartUpColorTemperatureMireds only — the color
     // itself is never re-stored by it.
     ASSERT_TRUE(tester.WriteAttribute(Attributes::StartUpColorTemperatureMireds::Id, DataModel::Nullable<uint16_t>()).IsSuccess());
@@ -330,6 +329,7 @@ TEST_F(TestColorControlPersistence, StartUpColorTemperatureIsPersistedForTheFoll
     // Boot 2 takes the null path, so it restores purely from NVM: 300 in CT mode is what boot 1 was
     // showing. Coming up as the configured HueSatColor would mean boot 1 never stored the startup value.
     ColorControlCluster b(kEp, cfg);
+    cfg.ctConfig.startUpColorTemperatureMireds.SetNonNull(200);
     ASSERT_EQ(b.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EXPECT_EQ(b.GetEnhancedColorMode(), EnhancedColorModeEnum::kColorTemperatureMireds);
     EXPECT_EQ(b.ColorTempMireds(), 300u);

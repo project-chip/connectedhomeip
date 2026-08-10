@@ -46,7 +46,7 @@ struct TestColorControlAttributes : public ::testing::Test
     {
         ColorControlCluster::Config c(delegate);
         c.mFeatures.Set(Feature::kColorTemperature);
-        c.mColorValue                         = CTColor{ .mireds = 250 };
+        c.mColorValue                         = CTColor{ 250 };
         c.ctConfig.colorTempPhysicalMinMireds = 100;
         c.ctConfig.colorTempPhysicalMaxMireds = 400;
         return c;
@@ -151,7 +151,7 @@ TEST_F(TestColorControlAttributes, AttributesListIsFeatureGated)
     {
         ColorControlCluster::Config config(delegate);
         config.mFeatures.Set(Feature::kXy);
-        config.mColorValue = XYColor{ .x = 1, .y = 2 };
+        config.mColorValue = XYColor{ 1, 2 };
         ColorControlCluster c(kEp, config);
         EXPECT_TRUE(AttributeListHas(c, Attributes::CurrentX::Id));
         EXPECT_TRUE(AttributeListHas(c, Attributes::CurrentY::Id));

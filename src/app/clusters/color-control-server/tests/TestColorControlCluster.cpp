@@ -39,7 +39,7 @@ ColorControlCluster::Config MakeConfig(ColorControlDelegate & delegate)
 {
     ColorControlCluster::Config config(delegate);
     config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy);
-    config.mColorValue                              = CTColor{ .mireds = 250 };
+    config.mColorValue                              = CTColor{ 250 };
     config.ctConfig.colorTempPhysicalMinMireds      = 100;
     config.ctConfig.colorTempPhysicalMaxMireds      = 400;
     config.ctConfig.coupleColorTempToLevelMinMireds = 150;
