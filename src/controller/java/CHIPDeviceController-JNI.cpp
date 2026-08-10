@@ -1754,6 +1754,10 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
     GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
         groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
+    if (!iter.IsValid())
+    {
+        return JNI_FALSE;
+    }
     size_t maxCount = iter.Count();
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
 
