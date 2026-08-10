@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/RecordData.h>
 
 #include <string>
 #include <vector>
