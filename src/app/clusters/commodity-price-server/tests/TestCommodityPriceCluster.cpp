@@ -23,8 +23,10 @@
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/CommodityPrice/Attributes.h>
 #include <clusters/CommodityPrice/Commands.h>
+#include <clusters/CommodityPrice/Events.h>
 #include <clusters/CommodityPrice/Metadata.h>
 
+#include <string>
 #include <vector>
 
 namespace {
@@ -40,7 +42,61 @@ using namespace chip::Testing;
 constexpr EndpointId kTestEndpointId = 1;
 
 constexpr BitMask<OptionalCommands> kAllOptionalCommands{ OptionalCommands::kSupportsGetDetailedPriceRequest,
-                                                         OptionalCommands::kSupportsGetDetailedForecastRequest };
+                                                          OptionalCommands::kSupportsGetDetailedForecastRequest };
+
+constexpr uint32_t kPeriodStart     = 1700000000;
+constexpr uint32_t kPeriodDuration  = 3600;
+constexpr int64_t kPrice            = 1234;
+constexpr uint16_t kCurrencyEuro    = 978;
+constexpr uint8_t kCurrencyDecimals = 2;
+
+constexpr CharSpan kPriceDescription     = "peak"_span;
+constexpr CharSpan kComponentDescription = "standing charge"_span;
+constexpr int64_t kComponentPrice        = 100;
+
+Structs::CommodityPriceStruct::Type MakePrice(uint32_t periodStart = kPeriodStart, int64_t price = kPrice)
+{
+    Structs::CommodityPriceStruct::Type value;
+
+    value.periodStart = periodStart;
+    value.periodEnd.SetNonNull(periodStart + kPeriodDuration);
+    value.price.SetValue(price);
+
+    return value;
+}
+
+/// Stores a CurrentPrice that carries both a description and a described component.
+void SetDetailedPrice(CommodityPriceCluster & cluster)
+{
+    Structs::CommodityPriceComponentStruct::Type component;
+    component.price = kComponentPrice;
+    component.description.SetValue(kComponentDescription);
+
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.description.SetValue(kPriceDescription);
+    price.components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(&component, 1));
+
+    ASSERT_EQ(cluster.SetCurrentPrice(price), CHIP_NO_ERROR);
+}
+
+/// Stores a single entry PriceForecast carrying both a description and a described component.
+void SetDetailedForecast(CommodityPriceCluster & cluster)
+{
+    Structs::CommodityPriceComponentStruct::Type component;
+    component.price = kComponentPrice;
+    component.description.SetValue(kComponentDescription);
+
+    Structs::CommodityPriceStruct::Type entry = MakePrice();
+    entry.description.SetValue(kPriceDescription);
+    entry.components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(&component, 1));
+
+    ASSERT_EQ(cluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(&entry, 1)), CHIP_NO_ERROR);
+}
+
+BitMask<CommodityPriceDetailBitmap> AllDetails()
+{
+    return BitMask<CommodityPriceDetailBitmap>(CommodityPriceDetailBitmap::kDescription, CommodityPriceDetailBitmap::kComponents);
+}
 
 struct TestCommodityPriceCluster : public ::testing::Test
 {
@@ -169,20 +225,443 @@ TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithForecastRequestOnly)
                                                }));
 }
 
-// TODO: replace with an actual value check once ReadAttribute is implemented. TariffUnit is now in
-// the attribute list, so this exercises the ReadAttribute stub's default branch.
-TEST_F(TestCommodityPriceCluster, ReadUnimplementedAttribute)
+TEST_F(TestCommodityPriceCluster, ReadTariffUnitInitialValue)
 {
     TariffUnit::TypeInfo::DecodableType tariffUnit;
-    EXPECT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), Status::UnsupportedAttribute);
+    ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
+    EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKWh);
 }
 
-// TODO: replace with a response check once InvokeCommand is implemented. GetDetailedPriceRequest is
-// now in the accepted commands list, so this exercises the InvokeCommand stub.
-TEST_F(TestCommodityPriceCluster, InvokeUnimplementedCommand)
+TEST_F(TestCommodityPriceCluster, ReadCurrencyInitialValueIsNull)
 {
+    Currency::TypeInfo::DecodableType currency;
+    ASSERT_EQ(mTester.ReadAttribute(Currency::Id, currency), CHIP_NO_ERROR);
+    EXPECT_TRUE(currency.IsNull());
+}
+
+TEST_F(TestCommodityPriceCluster, ReadCurrentPriceInitialValueIsNull)
+{
+    CurrentPrice::TypeInfo::DecodableType currentPrice;
+    ASSERT_EQ(mTester.ReadAttribute(CurrentPrice::Id, currentPrice), CHIP_NO_ERROR);
+    EXPECT_TRUE(currentPrice.IsNull());
+}
+
+TEST_F(TestCommodityPriceCluster, ReadPriceForecastInitialValueIsEmpty)
+{
+    PriceForecast::TypeInfo::DecodableType priceForecast;
+    ASSERT_EQ(mTester.ReadAttribute(PriceForecast::Id, priceForecast), CHIP_NO_ERROR);
+
+    auto iter = priceForecast.begin();
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+}
+
+// PriceForecast is not part of the attribute list without FORE, so reading it is rejected before it
+// ever reaches ReadAttribute.
+TEST_F(TestCommodityPriceCluster, ReadPriceForecastWithoutForecastingFeature)
+{
+    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+    ClusterTester tester{ cluster };
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    PriceForecast::TypeInfo::DecodableType priceForecast;
+    EXPECT_EQ(tester.ReadAttribute(PriceForecast::Id, priceForecast), Status::UnsupportedAttribute);
+}
+
+TEST_F(TestCommodityPriceCluster, SetTariffUnitUpdatesTheAttribute)
+{
+    ASSERT_EQ(mCluster.SetTariffUnit(Globals::TariffUnitEnum::kKVAh), CHIP_NO_ERROR);
+
+    TariffUnit::TypeInfo::DecodableType tariffUnit;
+    ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
+    EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKVAh);
+    EXPECT_TRUE(mTester.IsAttributeDirty(TariffUnit::Id));
+}
+
+TEST_F(TestCommodityPriceCluster, SetTariffUnitRejectsAnUnknownValue)
+{
+    EXPECT_EQ(mCluster.SetTariffUnit(static_cast<Globals::TariffUnitEnum>(0x02)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    TariffUnit::TypeInfo::DecodableType tariffUnit;
+    ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
+    EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKWh);
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrencyUpdatesTheAttribute)
+{
+    Globals::Structs::CurrencyStruct::Type euro;
+    euro.currency      = kCurrencyEuro;
+    euro.decimalPoints = kCurrencyDecimals;
+
+    ASSERT_EQ(mCluster.SetCurrency(euro), CHIP_NO_ERROR);
+
+    Currency::TypeInfo::DecodableType currency;
+    ASSERT_EQ(mTester.ReadAttribute(Currency::Id, currency), CHIP_NO_ERROR);
+    ASSERT_FALSE(currency.IsNull());
+    EXPECT_EQ(currency.Value().currency, kCurrencyEuro);
+    EXPECT_EQ(currency.Value().decimalPoints, kCurrencyDecimals);
+    EXPECT_TRUE(mTester.IsAttributeDirty(Currency::Id));
+}
+
+// The spec caps the currency code at 999, the highest ISO 4217 numeric code.
+TEST_F(TestCommodityPriceCluster, SetCurrencyRejectsAnOutOfRangeCode)
+{
+    Globals::Structs::CurrencyStruct::Type invalid;
+    invalid.currency = kMaxCurrencyValue + 1;
+
+    EXPECT_EQ(mCluster.SetCurrency(invalid), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    Currency::TypeInfo::DecodableType currency;
+    ASSERT_EQ(mTester.ReadAttribute(Currency::Id, currency), CHIP_NO_ERROR);
+    EXPECT_TRUE(currency.IsNull());
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrencyToNull)
+{
+    Globals::Structs::CurrencyStruct::Type euro;
+    euro.currency = kCurrencyEuro;
+    ASSERT_EQ(mCluster.SetCurrency(euro), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mCluster.SetCurrency(DataModel::NullNullable), CHIP_NO_ERROR);
+
+    Currency::TypeInfo::DecodableType currency;
+    ASSERT_EQ(mTester.ReadAttribute(Currency::Id, currency), CHIP_NO_ERROR);
+    EXPECT_TRUE(currency.IsNull());
+}
+
+// The description and the components are stored, but never exposed through the attribute.
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceStripsDetailsFromTheAttribute)
+{
+    Structs::CommodityPriceComponentStruct::Type components[2];
+    components[0].price = 100;
+    components[0].description.SetValue("standing charge"_span);
+    components[1].price = 200;
+
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.description.SetValue("peak"_span);
+    price.components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(components, 2));
+
+    ASSERT_EQ(mCluster.SetCurrentPrice(price), CHIP_NO_ERROR);
+
+    CurrentPrice::TypeInfo::DecodableType currentPrice;
+    ASSERT_EQ(mTester.ReadAttribute(CurrentPrice::Id, currentPrice), CHIP_NO_ERROR);
+    ASSERT_FALSE(currentPrice.IsNull());
+    EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
+    ASSERT_FALSE(currentPrice.Value().periodEnd.IsNull());
+    EXPECT_EQ(currentPrice.Value().periodEnd.Value(), kPeriodStart + kPeriodDuration);
+    ASSERT_TRUE(currentPrice.Value().price.HasValue());
+    EXPECT_EQ(currentPrice.Value().price.Value(), kPrice);
+    EXPECT_FALSE(currentPrice.Value().description.HasValue());
+    EXPECT_FALSE(currentPrice.Value().components.HasValue());
+    EXPECT_TRUE(mTester.IsAttributeDirty(CurrentPrice::Id));
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceGeneratesAPriceChangeEvent)
+{
+    ASSERT_EQ(mCluster.SetCurrentPrice(MakePrice()), CHIP_NO_ERROR);
+
+    auto generatedEvent = mTester.GetNextGeneratedEvent();
+    ASSERT_TRUE(generatedEvent.has_value());
+
+    Events::PriceChange::DecodableType event;
+    ASSERT_EQ(generatedEvent->GetEventData(event), CHIP_NO_ERROR);
+    ASSERT_FALSE(event.currentPrice.IsNull());
+    EXPECT_EQ(event.currentPrice.Value().periodStart, kPeriodStart);
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceToNull)
+{
+    ASSERT_EQ(mCluster.SetCurrentPrice(MakePrice()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mCluster.SetCurrentPrice(DataModel::NullNullable), CHIP_NO_ERROR);
+
+    CurrentPrice::TypeInfo::DecodableType currentPrice;
+    ASSERT_EQ(mTester.ReadAttribute(CurrentPrice::Id, currentPrice), CHIP_NO_ERROR);
+    EXPECT_TRUE(currentPrice.IsNull());
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceRejectsAPeriodEndingBeforeItStarts)
+{
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.periodEnd.SetNonNull(price.periodStart - 1);
+
+    EXPECT_EQ(mCluster.SetCurrentPrice(price), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceRejectsAPriceWithoutAValue)
+{
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.price.ClearValue();
+
+    EXPECT_EQ(mCluster.SetCurrentPrice(price), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceRejectsAnOverlongDescription)
+{
+    const std::string description(kMaxDescriptionLength + 1, 'x');
+
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.description.SetValue(CharSpan(description.data(), description.size()));
+
+    EXPECT_EQ(mCluster.SetCurrentPrice(price), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceRejectsTooManyComponents)
+{
+    Structs::CommodityPriceComponentStruct::Type components[kMaxComponentsPerPriceEntry + 1];
+
+    Structs::CommodityPriceStruct::Type price = MakePrice();
+    price.components.SetValue(
+        DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(components, kMaxComponentsPerPriceEntry + 1));
+
+    EXPECT_EQ(mCluster.SetCurrentPrice(price), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+// A rejected value must not disturb the price that is already stored.
+TEST_F(TestCommodityPriceCluster, SetCurrentPriceKeepsThePreviousValueOnRejection)
+{
+    ASSERT_EQ(mCluster.SetCurrentPrice(MakePrice()), CHIP_NO_ERROR);
+
+    Structs::CommodityPriceStruct::Type invalid = MakePrice(kPeriodStart + kPeriodDuration);
+    invalid.price.ClearValue();
+    ASSERT_EQ(mCluster.SetCurrentPrice(invalid), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    CurrentPrice::TypeInfo::DecodableType currentPrice;
+    ASSERT_EQ(mTester.ReadAttribute(CurrentPrice::Id, currentPrice), CHIP_NO_ERROR);
+    ASSERT_FALSE(currentPrice.IsNull());
+    EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
+}
+
+TEST_F(TestCommodityPriceCluster, SetForecastUpdatesTheAttribute)
+{
+    // The entries are deep copied, so they and everything they point at are gone by the time the
+    // attribute is read.
+    {
+        const std::string description = "off peak";
+        Structs::CommodityPriceComponentStruct::Type component;
+        component.price = 100;
+        component.description.SetValue(CharSpan(description.data(), description.size()));
+
+        Structs::CommodityPriceStruct::Type entries[2];
+        entries[0] = MakePrice();
+        entries[0].description.SetValue(CharSpan(description.data(), description.size()));
+        entries[0].components.SetValue(DataModel::List<const Structs::CommodityPriceComponentStruct::Type>(&component, 1));
+        entries[1] = MakePrice(kPeriodStart + kPeriodDuration, kPrice * 2);
+
+        ASSERT_EQ(mCluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(entries, 2)), CHIP_NO_ERROR);
+    }
+
+    PriceForecast::TypeInfo::DecodableType priceForecast;
+    ASSERT_EQ(mTester.ReadAttribute(PriceForecast::Id, priceForecast), CHIP_NO_ERROR);
+
+    auto iter = priceForecast.begin();
+
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().periodStart, kPeriodStart);
+    ASSERT_TRUE(iter.GetValue().price.HasValue());
+    EXPECT_EQ(iter.GetValue().price.Value(), kPrice);
+    EXPECT_FALSE(iter.GetValue().description.HasValue());
+    EXPECT_FALSE(iter.GetValue().components.HasValue());
+
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().periodStart, kPeriodStart + kPeriodDuration);
+    ASSERT_TRUE(iter.GetValue().price.HasValue());
+    EXPECT_EQ(iter.GetValue().price.Value(), kPrice * 2);
+
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_TRUE(mTester.IsAttributeDirty(PriceForecast::Id));
+}
+
+TEST_F(TestCommodityPriceCluster, SetForecastToAnEmptyList)
+{
+    Structs::CommodityPriceStruct::Type entry = MakePrice();
+    ASSERT_EQ(mCluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(&entry, 1)), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mCluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>()), CHIP_NO_ERROR);
+
+    PriceForecast::TypeInfo::DecodableType priceForecast;
+    ASSERT_EQ(mTester.ReadAttribute(PriceForecast::Id, priceForecast), CHIP_NO_ERROR);
+
+    auto iter = priceForecast.begin();
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommodityPriceCluster, SetForecastRejectsTooManyEntries)
+{
+    Structs::CommodityPriceStruct::Type entries[kMaxForecastEntries + 1];
+    for (size_t i = 0; i < kMaxForecastEntries + 1; i++)
+    {
+        entries[i] = MakePrice(static_cast<uint32_t>(kPeriodStart + (i * kPeriodDuration)));
+    }
+
+    EXPECT_EQ(mCluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(entries, kMaxForecastEntries + 1)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+// Without FORE there is no PriceForecast attribute to hold the value.
+TEST_F(TestCommodityPriceCluster, SetForecastRequiresTheForecastingFeature)
+{
+    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(), kAllOptionalCommands };
+
+    Structs::CommodityPriceStruct::Type entry = MakePrice();
+    EXPECT_EQ(cluster.SetForecast(Span<const Structs::CommodityPriceStruct::Type>(&entry, 1)), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestReturnsWhatWasAskedFor)
+{
+    SetDetailedPrice(mCluster);
+
+    Commands::GetDetailedPriceRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    const auto & currentPrice = result.response->currentPrice;
+    ASSERT_FALSE(currentPrice.IsNull());
+    EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
+
+    ASSERT_TRUE(currentPrice.Value().description.HasValue());
+    EXPECT_TRUE(currentPrice.Value().description.Value().data_equal(kPriceDescription));
+
+    ASSERT_TRUE(currentPrice.Value().components.HasValue());
+    auto iter = currentPrice.Value().components.Value().begin();
+    ASSERT_TRUE(iter.Next());
+    EXPECT_EQ(iter.GetValue().price, kComponentPrice);
+    ASSERT_TRUE(iter.GetValue().description.HasValue());
+    EXPECT_TRUE(iter.GetValue().description.Value().data_equal(kComponentDescription));
+    EXPECT_FALSE(iter.Next());
+    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutDetailsStripsThePrice)
+{
+    SetDetailedPrice(mCluster);
+
+    // The Details argument defaults to none of the bits being set.
     auto result = mTester.Invoke(Commands::GetDetailedPriceRequest::Type{});
+    ASSERT_TRUE(result.IsSuccess());
+
+    const auto & currentPrice = result.response->currentPrice;
+    ASSERT_FALSE(currentPrice.IsNull());
+    EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
+    EXPECT_FALSE(currentPrice.Value().description.HasValue());
+    EXPECT_FALSE(currentPrice.Value().components.HasValue());
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithDescriptionOnly)
+{
+    SetDetailedPrice(mCluster);
+
+    Commands::GetDetailedPriceRequest::Type request;
+    request.details.Set(CommodityPriceDetailBitmap::kDescription);
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    const auto & currentPrice = result.response->currentPrice;
+    ASSERT_FALSE(currentPrice.IsNull());
+    ASSERT_TRUE(currentPrice.Value().description.HasValue());
+    EXPECT_TRUE(currentPrice.Value().description.Value().data_equal(kPriceDescription));
+    EXPECT_FALSE(currentPrice.Value().components.HasValue());
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutAPrice)
+{
+    Commands::GetDetailedPriceRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response->currentPrice.IsNull());
+}
+
+// The spec defines two Details bits; anything else is not a valid request.
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestRejectsUndefinedDetailBits)
+{
+    Commands::GetDetailedPriceRequest::Type request;
+    request.details.SetRaw(0x04);
+
+    auto result = mTester.Invoke(request);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestIsRejectedWhenNotOptedInto)
+{
+    CommodityPriceCluster cluster{ kTestEndpointId, BitMask<Feature>(Feature::kForecasting), BitMask<OptionalCommands>() };
+    ClusterTester tester{ cluster };
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    auto result = tester.Invoke(Commands::GetDetailedPriceRequest::Type{});
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::UnsupportedCommand));
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestReturnsWhatWasAskedFor)
+{
+    SetDetailedForecast(mCluster);
+
+    Commands::GetDetailedForecastRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    auto forecast = result.response->priceForecast.begin();
+    ASSERT_TRUE(forecast.Next());
+    EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
+
+    ASSERT_TRUE(forecast.GetValue().description.HasValue());
+    EXPECT_TRUE(forecast.GetValue().description.Value().data_equal(kPriceDescription));
+
+    ASSERT_TRUE(forecast.GetValue().components.HasValue());
+    auto components = forecast.GetValue().components.Value().begin();
+    ASSERT_TRUE(components.Next());
+    EXPECT_EQ(components.GetValue().price, kComponentPrice);
+    ASSERT_TRUE(components.GetValue().description.HasValue());
+    EXPECT_TRUE(components.GetValue().description.Value().data_equal(kComponentDescription));
+    EXPECT_FALSE(components.Next());
+
+    EXPECT_FALSE(forecast.Next());
+    EXPECT_EQ(forecast.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutDetailsStripsTheEntries)
+{
+    SetDetailedForecast(mCluster);
+
+    auto result = mTester.Invoke(Commands::GetDetailedForecastRequest::Type{});
+    ASSERT_TRUE(result.IsSuccess());
+
+    auto forecast = result.response->priceForecast.begin();
+    ASSERT_TRUE(forecast.Next());
+    EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
+    EXPECT_FALSE(forecast.GetValue().description.HasValue());
+    EXPECT_FALSE(forecast.GetValue().components.HasValue());
+    EXPECT_FALSE(forecast.Next());
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutAForecast)
+{
+    Commands::GetDetailedForecastRequest::Type request;
+    request.details = AllDetails();
+
+    auto result = mTester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    auto forecast = result.response->priceForecast.begin();
+    EXPECT_FALSE(forecast.Next());
+    EXPECT_EQ(forecast.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestRejectsUndefinedDetailBits)
+{
+    Commands::GetDetailedForecastRequest::Type request;
+    request.details.SetRaw(0x04);
+
+    auto result = mTester.Invoke(request);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 }
 
 } // namespace
