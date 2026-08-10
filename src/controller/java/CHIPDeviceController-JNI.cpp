@@ -1611,7 +1611,7 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
     GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
         groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
-    GroupId groupId = static_cast<GroupId>(jGroupId);
+    GroupId groupId      = static_cast<GroupId>(jGroupId);
     jobject wrapperKeyId = nullptr;
 
     while (iter.Next(groupKey))
