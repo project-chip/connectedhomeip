@@ -471,8 +471,33 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(
 {
     using namespace Attributes;
 
+#define BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES \
+    ManufacturingDate::kMetadataEntry,              \
+    PartNumber::kMetadataEntry,                     \
+    ProductURL::kMetadataEntry,                     \
+    ProductLabel::kMetadataEntry,                   \
+    SerialNumber::kMetadataEntry,                   \
+    LocalConfigDisabled::kMetadataEntry,            \
+    Reachable::kMetadataEntry,                      \
+    ProductAppearance::kMetadataEntry,              \
+    /* Optional because of forced multi-revision support for backwards */ \
+    /* compatibility emulation: we emulate revision 3 when UniqueID */    \
+    /* is not enabled. */                                           \
+    UniqueID::kMetadataEntry
+
+    static constexpr DataModel::AttributeEntry optionalAttributesNoDeviceLocation[] = {
+        BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES,
+    };
+
+    static constexpr DataModel::AttributeEntry optionalAttributesWithDeviceLocation[] = {
+        BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES,
+        DeviceLocation::kMetadataEntry,
+    };
+
+#undef BASIC_INFORMATION_COMMON_OPTIONAL_ATTRIBUTES
+
     // kMandatoryAttributes equivalent
-    static constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    static constexpr DataModel::AttributeEntry mandatoryAttributes[] = {
         DataModelRevision::kMetadataEntry,
         VendorName::kMetadataEntry,
         VendorID::kMetadataEntry,
@@ -490,28 +515,13 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(
         ConfigurationVersion::kMetadataEntry,
     };
 
-    static constexpr AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
-        { true, ManufacturingDate::kMetadataEntry },
-        { true, PartNumber::kMetadataEntry },
-        { true, ProductURL::kMetadataEntry },
-        { true, ProductLabel::kMetadataEntry },
-        { true, SerialNumber::kMetadataEntry },
-        { true, LocalConfigDisabled::kMetadataEntry },
-        { true, Reachable::kMetadataEntry },
-        { true, ProductAppearance::kMetadataEntry },
-
-        // Optional because of forced multi-revision support for backwards
-        // compatibility emulation: we emulate revision 3 when UniqueID
-        // is not enabled.
-        { true, UniqueID::kMetadataEntry },
-
-        { Policy::kHasDeviceLocation, DeviceLocation::kMetadataEntry },
-    };
-
     AttributeListBuilder listBuilder(builder);
 
     return listBuilder.Append(
-        Span(kMandatoryAttributes),
-        Span(kOptionalAttributes));
+        Span(mandatoryAttributes),
+        Policy::kHasDeviceLocation
+            ? Span(optionalAttributesWithDeviceLocation)
+            : Span(optionalAttributesNoDeviceLocation),
+        mPolicy.GetOptionalAttributes());
 }
 } // namespace chip::app::Clusters::BasicInformation
