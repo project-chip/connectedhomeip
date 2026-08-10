@@ -154,13 +154,13 @@ that endpoint.
     `EP1`, ...) and the device-wide files such as `Base.xml` at the top level.
     Each endpoint's codes are checked against that endpoint. If the tree has no
     subdirectory for the endpoint passed to `--endpoint`, the test fails
-    immediately rather than reporting every element on the endpoint as a
-    missing PICS code.
+    immediately rather than reporting every element on the endpoint as a missing
+    PICS code.
 -   A single set of PICS with no endpoint structure: the XML directory for one
     endpoint, or a CI-format text file such as
-    `src/app/tests/suites/certification/ci-pics-values`. These carry no
-    endpoint labels, so their codes are checked against whichever endpoint
-    `--endpoint` names.
+    `src/app/tests/suites/certification/ci-pics-values`. These carry no endpoint
+    labels, so their codes are checked against whichever endpoint `--endpoint`
+    names.
 
 ## Setting PIXITs for Matter devices
 
