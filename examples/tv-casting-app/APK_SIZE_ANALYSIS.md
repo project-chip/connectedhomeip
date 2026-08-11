@@ -18,17 +18,17 @@ Casting App on Android (arm64-v8a).
 
 ### What drives the reduction
 
-| Optimization                           | Mechanism                                                                                                | Impact                                                                                                    |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                        | Major `.so` reduction                                                                                     |
-| Slim TLV decoder overrides             | Compile TLV decoders for 19 casting clusters only via `chip_data_model_overrides_dir`                    | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
-| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                             | Further `.so` reduction                                                                                   |
-| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                              | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
-| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                          | ~10–20 % further `.so` reduction                                                                          |
+| Optimization                           | Mechanism                                                                                                | Impact                                                                                                     |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_data_model_overrides_dir`                        | Major `.so` reduction                                                                                      |
+| Slim TLV decoder overrides             | Compile TLV decoders for 19 casting clusters only via `chip_data_model_overrides_dir`                    | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional  |
+| Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                             | Further `.so` reduction                                                                                    |
+| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                              | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                             |
+| Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                          | ~10–20 % further `.so` reduction                                                                           |
 | R8 Java shrinking                      | `minifyEnabled true` + cluster-scoped proguard keeps for the 19 slim-decoder clusters                    | Prunes ~6,500 unused classes from `CHIPInteractionModel.jar`; chip.* method count reduced from 29K to 2.5K |
-| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                      |
-| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                      |
-| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime          | ~350 KB (not achievable)                                                                                  |
+| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_data_model_overrides_dir` + `cluster-servers-override.gni` | ~1.1 MB `.o` savings                                                                                       |
+| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_data_model_overrides_dir` + `Accessors-override.cpp`    | ~826 KB `.o` savings                                                                                       |
+| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime          | ~350 KB (not achievable)                                                                                   |
 
 ---
 
@@ -40,11 +40,11 @@ casting use case.
 
 ### Matter core infrastructure
 
--   Transport layer (TCP/UDP, MRP reliable messaging)
--   Cryptographic primitives (HKDF, AES-CCM, ECDSA via mbedTLS / BoringSSL)
--   Secure channel (CASE, PASE session establishment)
--   Messaging layer (exchange management, protocol dispatch)
--   Interaction model engine (read / write / invoke / subscribe)
+- Transport layer (TCP/UDP, MRP reliable messaging)
+- Cryptographic primitives (HKDF, AES-CCM, ECDSA via mbedTLS / BoringSSL)
+- Secure channel (CASE, PASE session establishment)
+- Messaging layer (exchange management, protocol dispatch)
+- Interaction model engine (read / write / invoke / subscribe)
 
 ### Casting-specific clusters (29 clusters, ~116 `.ipp` includes)
 
@@ -62,63 +62,63 @@ TargetNavigator, WakeOnLan
 
 ### Simplified casting API
 
--   Core layer (~12 files): `CastingApp`, `CastingPlayer`,
-    `CastingPlayerDiscovery`, `Endpoint`, `CommissionerDeclarationHandler`,
-    `Types`
--   Support layer (~12 files): `CastingStore`, `ChipDeviceEventHandler`,
-    `EndpointListLoader`, `AppParameters`, `DataProvider`
--   Minimal optimized sources: `ContentAppObserver`, `ZCLCallbacks`
+- Core layer (~12 files): `CastingApp`, `CastingPlayer`,
+  `CastingPlayerDiscovery`, `Endpoint`, `CommissionerDeclarationHandler`,
+  `Types`
+- Support layer (~12 files): `CastingStore`, `ChipDeviceEventHandler`,
+  `EndpointListLoader`, `AppParameters`, `DataProvider`
+- Minimal optimized sources: `ContentAppObserver`, `ZCLCallbacks`
 
 ### JNI wrappers (Android-specific)
 
--   `core/` JNI: `CastingApp-JNI`, `CastingPlayerDiscovery-JNI`,
-    `MatterCastingPlayer-JNI`, `MatterEndpoint-JNI`
--   `support/` JNI: `Converters-JNI`, `JNIDACProvider`, `MatterCallback-JNI`,
-    `RotatingDeviceIdUniqueIdProvider-JNI`
+- `core/` JNI: `CastingApp-JNI`, `CastingPlayerDiscovery-JNI`,
+  `MatterCastingPlayer-JNI`, `MatterEndpoint-JNI`
+- `support/` JNI: `Converters-JNI`, `JNIDACProvider`, `MatterCallback-JNI`,
+  `RotatingDeviceIdUniqueIdProvider-JNI`
 
 ### Java controller interaction model
 
--   `android_chip_im_jni` — interaction model JNI bindings
--   Slim TLV decoders (`CHIPAttributeTLVValueDecoder-override.cpp`,
-    `CHIPEventTLVValueDecoder-override.cpp`) — hand-maintained files covering
-    only the 18 casting clusters, selected at build time via
-    `chip_data_model_overrides_dir`. These keep `ChipClusters.java`
-    read/subscribe APIs functional at runtime while avoiding link-time
-    dependencies on all ~200+ cluster implementations.
+- `android_chip_im_jni` — interaction model JNI bindings
+- Slim TLV decoders (`CHIPAttributeTLVValueDecoder-override.cpp`,
+  `CHIPEventTLVValueDecoder-override.cpp`) — hand-maintained files covering only
+  the 18 casting clusters, selected at build time via
+  `chip_data_model_overrides_dir`. These keep `ChipClusters.java` read/subscribe
+  APIs functional at runtime while avoiding link-time dependencies on all ~200+
+  cluster implementations.
 
 ### Android platform layer
 
--   Android platform abstraction (BLE manager, preferences KVS, DNS-SD via NSD)
--   Logging, connectivity manager, system layer
+- Android platform abstraction (BLE manager, preferences KVS, DNS-SD via NSD)
+- Logging, connectivity manager, system layer
 
 ### Data model and server infrastructure
 
--   App server, data model provider (`data-model:heap`)
--   Device attestation, credential management
--   ICD client handler/manager
+- App server, data model provider (`data-model:heap`)
+- Device attestation, credential management
+- ICD client handler/manager
 
 ### Static libc++ (dead-code-stripped)
 
--   Only the libc++ symbols actually referenced by the above components survive
-    `--gc-sections` and thin LTO
--   Estimated overhead: ~0.5–1 MB (vs. 7.5 MB for the full `libc++_shared.so`)
+- Only the libc++ symbols actually referenced by the above components survive
+  `--gc-sections` and thin LTO
+- Estimated overhead: ~0.5–1 MB (vs. 7.5 MB for the full `libc++_shared.so`)
 
 ### What is excluded (compared to default build)
 
--   ~164 non-casting cluster implementations (DoorLock, Thermostat,
-    PumpConfigurationAndControl, etc.)
--   ~31 non-casting cluster server implementations (phase 3 — only 13 of ~44
-    cluster server directories are compiled)
--   Full zap-generated TLV decoder files for all ~200+ clusters (replaced by
-    slim 18-cluster versions)
--   Full zap-generated Accessors.cpp for all ~200+ clusters (phase 3 — replaced
-    by slim 29-cluster `Accessors-override.cpp`)
--   Legacy chip-tool command sources (`Command.cpp`, `Commands.cpp`,
-    `CHIPCommand.cpp`, `RemoteDataModelLogger.cpp`, etc.)
--   Tracing dependencies (`commandline`, `json`, `jsoncpp`)
--   Interaction model test suites
--   `ExamplePersistentStorage`, `ComplexArgumentParser`, `DataModelLogger`
--   Debug symbols (`-g0`)
+- ~164 non-casting cluster implementations (DoorLock, Thermostat,
+  PumpConfigurationAndControl, etc.)
+- ~31 non-casting cluster server implementations (phase 3 — only 13 of ~44
+  cluster server directories are compiled)
+- Full zap-generated TLV decoder files for all ~200+ clusters (replaced by slim
+  18-cluster versions)
+- Full zap-generated Accessors.cpp for all ~200+ clusters (phase 3 — replaced by
+  slim 29-cluster `Accessors-override.cpp`)
+- Legacy chip-tool command sources (`Command.cpp`, `Commands.cpp`,
+  `CHIPCommand.cpp`, `RemoteDataModelLogger.cpp`, etc.)
+- Tracing dependencies (`commandline`, `json`, `jsoncpp`)
+- Interaction model test suites
+- `ExamplePersistentStorage`, `ComplexArgumentParser`, `DataModelLogger`
+- Debug symbols (`-g0`)
 
 ---
 
@@ -167,8 +167,8 @@ overhead is removed.
 
 The `CHIPInteractionModel.jar` (7.3 MB) is the largest Java component, but it
 contains classes for all ~200+ clusters. The proguard rules keep only the 19
-clusters present in the slim TLV decoder overrides; R8 prunes the rest,
-reducing `CHIPInteractionModel.jar`'s contribution to well under 1 MB.
+clusters present in the slim TLV decoder overrides; R8 prunes the rest, reducing
+`CHIPInteractionModel.jar`'s contribution to well under 1 MB.
 
 For a production app shipping a single ABI (arm64-v8a), the casting SDK adds an
 estimated **2–3 MB compressed** to the APK — down from **27.9 MB** of native
@@ -182,30 +182,31 @@ Measured on the size-optimized build (`optimize_apk_size=true`, arm64-v8a) using
 the following methodology:
 
 1. Build an AAB: `./gradlew bundleRelease`
-2. Convert to APK set: `bundletool build-apks --bundle=app-release.aab --output=app.apks`
+2. Convert to APK set:
+   `bundletool build-apks --bundle=app-release.aab --output=app.apks`
 3. Measure download size: `bundletool get-size total --apks=app.apks`
 4. Inspect DEX, resources, and native breakdown in Android Studio APK Analyzer
 
-Three scenarios were measured to isolate the SDK contribution and the proguard impact:
+Three scenarios were measured to isolate the SDK contribution and the proguard
+impact:
 
-| Scenario | Download size | DEX | Resources | Native | Method count |
-| ---------------------------------------------------- | ------------- | ------- | --------- | ------ | ----------------------- |
-| Without libs — app only (baseline)                   | 1 MB          | 637 KB  | 357 KB    | 0      | 8K                      |
-| With libs — broad `chip.devicecontroller.**` keep    | 2.77–2.85 MB  | 1.5 MB  | 371 KB    | 1 MB   | 38K (chip: 29K)         |
-| With libs — cluster-scoped keeps (this change)       | 2.1 MB        | 757 KB  | 357 KB    | 1 MB   | 11K (chip: 2.5K)        |
+| Scenario                                          | Download size | DEX    | Resources | Native | Method count     |
+| ------------------------------------------------- | ------------- | ------ | --------- | ------ | ---------------- |
+| Without libs — app only (baseline)                | 1 MB          | 637 KB | 357 KB    | 0      | 8K               |
+| With libs — broad `chip.devicecontroller.**` keep | 2.77–2.85 MB  | 1.5 MB | 371 KB    | 1 MB   | 38K (chip: 29K)  |
+| With libs — cluster-scoped keeps (this change)    | 2.1 MB        | 757 KB | 357 KB    | 1 MB   | 11K (chip: 2.5K) |
 
 ### Key findings
 
--   **chip.* method count: 29K → 2.5K** — 91% reduction from scoping proguard
-    keeps to the 19 casting clusters in the slim TLV decoders.
--   **DEX: 1.5 MB → 757 KB** — ~750 KB reduction; R8 pruned ~6,500 unused
-    cluster classes from `CHIPInteractionModel.jar`.
--   **Download size: 2.77–2.85 MB → 2.1 MB** — ~700 KB reduction from proguard
-    alone, on top of the native `.so` optimizations already applied.
+- _*chip.* method count: 29K → 2.5K_* — 91% reduction from scoping proguard
+  keeps to the 19 casting clusters in the slim TLV decoders.
+- **DEX: 1.5 MB → 757 KB** — ~750 KB reduction; R8 pruned ~6,500 unused cluster
+  classes from `CHIPInteractionModel.jar`.
+- **Download size: 2.77–2.85 MB → 2.1 MB** — ~700 KB reduction from proguard
+  alone, on top of the native `.so` optimizations already applied.
 
-The net SDK contribution (download size minus the app-only baseline) is
-**~1.1 MB** with cluster-scoped keeps, down from **~1.77–1.85 MB** with the
-broad keep.
+The net SDK contribution (download size minus the app-only baseline) is **~1.1
+MB** with cluster-scoped keeps, down from **~1.77–1.85 MB** with the broad keep.
 
 ---
 
@@ -245,18 +246,18 @@ Output lands in `out/android-arm64-tv-casting-app/`.
 
 The `size-optimized` modifier sets the following GN args automatically:
 
--   `optimize_apk_size=true` — activates slim cluster and TLV decoder overrides,
-    excludes legacy sources, enables `-Os`/`-g0`/LTO/ICF
--   `is_debug=false` — removes assert checks and extra logging
--   `matter_enable_tracing_support=false` — excludes tracing deps
--   `use_static_libcxx=true` — statically links libc++ with dead-code stripping
+- `optimize_apk_size=true` — activates slim cluster and TLV decoder overrides,
+  excludes legacy sources, enables `-Os`/`-g0`/LTO/ICF
+- `is_debug=false` — removes assert checks and extra logging
+- `matter_enable_tracing_support=false` — excludes tracing deps
+- `use_static_libcxx=true` — statically links libc++ with dead-code stripping
 
 For the TV Casting App specifically, the build also sets:
 
--   `chip_data_model_overrides_dir` — points to the `tv-casting-common/`
-    directory containing all slim override files (cluster-objects, TLV decoders,
-    cluster servers, and accessors). The build system looks for well-known
-    filenames inside this directory and uses them as source overrides.
+- `chip_data_model_overrides_dir` — points to the `tv-casting-common/` directory
+  containing all slim override files (cluster-objects, TLV decoders, cluster
+  servers, and accessors). The build system looks for well-known filenames
+  inside this directory and uses them as source overrides.
 
 Output lands in `out/android-arm64-tv-casting-app-size-optimized/`.
 
@@ -350,11 +351,11 @@ python -m pytest examples/tv-casting-app/tests/ -v
 
 ### When to run them
 
--   After modifying the slim decoders (`casting-CHIP*TLVValueDecoder.cpp`)
--   After changing the 18-cluster set in any file
--   After editing `BUILD.gn`, `android.py`, `config.gni`, or `args.gni` build
-    plumbing
--   Before pushing a commit that touches any of the above
+- After modifying the slim decoders (`casting-CHIP*TLVValueDecoder.cpp`)
+- After changing the 18-cluster set in any file
+- After editing `BUILD.gn`, `android.py`, `config.gni`, or `args.gni` build
+  plumbing
+- Before pushing a commit that touches any of the above
 
 ---
 
@@ -386,16 +387,16 @@ and disabled in the ZAP server-side configuration. A casting client does not
 serve these clusters — they are diagnostic, localization, and management
 clusters irrelevant to the casting use case:
 
--   EthernetNetworkDiagnostics
--   SoftwareDiagnostics
--   WiFiNetworkDiagnostics
--   TimeSynchronization
--   TimeFormatLocalization
--   UnitLocalization
--   FixedLabel
--   UserLabel
--   IcdManagement
--   LocalizationConfiguration
+- EthernetNetworkDiagnostics
+- SoftwareDiagnostics
+- WiFiNetworkDiagnostics
+- TimeSynchronization
+- TimeFormatLocalization
+- UnitLocalization
+- FixedLabel
+- UserLabel
+- IcdManagement
+- LocalizationConfiguration
 
 The 12 commissioning-essential clusters (AccessControl,
 AdministratorCommissioning, BasicInformation, Binding, Descriptor,
@@ -502,12 +503,11 @@ clusters only.
 `examples/tv-casting-app/tv-casting-common/cluster-servers-override.gni` defines
 exactly 13 cluster server directories:
 
--   `access-control-server`, `administrator-commissioning-server`,
-    `basic-information`, `bindings`, `descriptor`,
-    `general-commissioning-server`, `general-diagnostics-server`,
-    `group-key-management-server`, `groups-server`, `identify-server`,
-    `network-commissioning`, `operational-credentials-server`,
-    `content-app-observer`
+- `access-control-server`, `administrator-commissioning-server`,
+  `basic-information`, `bindings`, `descriptor`, `general-commissioning-server`,
+  `general-diagnostics-server`, `group-key-management-server`, `groups-server`,
+  `identify-server`, `network-commissioning`, `operational-credentials-server`,
+  `content-app-observer`
 
 **Default behavior:** When `chip_data_model_overrides_dir` is empty (default),
 the template calls `zap_cluster_list.py` as before — no change for non-casting
@@ -535,14 +535,14 @@ provides identical function signatures for the retained clusters.
 
 **Retained clusters (29):**
 
--   **Commissioning (12):** AccessControl, AdministratorCommissioning,
-    BasicInformation, Binding, Descriptor, GeneralCommissioning,
-    GeneralDiagnostics, GroupKeyManagement, Groups, Identify,
-    NetworkCommissioning, OperationalCredentials
--   **Casting (17):** AccountLogin, ApplicationBasic, ApplicationLauncher,
-    AudioOutput, Channel, ContentAppObserver, ContentControl, ContentLauncher,
-    KeypadInput, LevelControl, LowPower, MediaInput, MediaPlayback, Messages,
-    OnOff, TargetNavigator, WakeOnLan
+- **Commissioning (12):** AccessControl, AdministratorCommissioning,
+  BasicInformation, Binding, Descriptor, GeneralCommissioning,
+  GeneralDiagnostics, GroupKeyManagement, Groups, Identify,
+  NetworkCommissioning, OperationalCredentials
+- **Casting (17):** AccountLogin, ApplicationBasic, ApplicationLauncher,
+  AudioOutput, Channel, ContentAppObserver, ContentControl, ContentLauncher,
+  KeypadInput, LevelControl, LowPower, MediaInput, MediaPlayback, Messages,
+  OnOff, TargetNavigator, WakeOnLan
 
 **Default behavior:** When `chip_data_model_overrides_dir` is empty (default),
 the full Accessors.cpp is compiled — no change for non-casting builds.
@@ -559,12 +559,12 @@ JSON-TLV conversion at runtime. However, build testing revealed that
 `android_chip_im_jni` — call `JsonToTlv()`, `TlvToJson()`, and `ConvertTlvTag()`
 directly. These functions are used for:
 
--   Converting command invoke payloads from JSON to TLV
-    (`AndroidInteractionClient.cpp`)
--   Converting attribute/event report TLV to JSON for Java callbacks
-    (`AndroidCallbacks.cpp`)
--   Converting write attribute payloads from JSON to TLV
-    (`AndroidInteractionClient.cpp`)
+- Converting command invoke payloads from JSON to TLV
+  (`AndroidInteractionClient.cpp`)
+- Converting attribute/event report TLV to JSON for Java callbacks
+  (`AndroidCallbacks.cpp`)
+- Converting write attribute payloads from JSON to TLV
+  (`AndroidInteractionClient.cpp`)
 
 These are core interaction model operations that the casting app uses at runtime
 for sending commands, reading attributes, and subscribing to events on the
@@ -613,9 +613,9 @@ libTvCastingApp.so (examples/tv-casting-app/android/BUILD.gn :jni)
 Setting `chip_support_commissioning_in_controller=false` excludes **all** `.cpp`
 files in the conditional, including two the casting app needs:
 
--   `AbstractDnssdDiscoveryController.cpp` — base class of
-    `CommissionableNodeController`
--   `CHIPCommissionableNodeController.cpp` — discovery of casting targets
+- `AbstractDnssdDiscoveryController.cpp` — base class of
+  `CommissionableNodeController`
+- `CHIPCommissionableNodeController.cpp` — discovery of casting targets
 
 The linker fails with unresolved symbols for `DiscoverCommissioners()`,
 `GetDiscoveredCommissioner()`, `OnNodeDiscovered()`, etc.
@@ -745,10 +745,10 @@ python3 examples/tv-casting-app/tv-casting-common/generate_slim_overrides.py \
 The script reads `casting-cluster-config.yaml` which defines three cluster
 lists:
 
--   `casting_clusters` (29 clusters) — used for `cluster-objects-override.cpp`
-    and `Accessors-override.cpp`
--   `tlv_decoder_clusters` (18 clusters) — used for the slim TLV decoder files
--   `cluster_servers` (13 directories) — used for `cluster-servers-override.gni`
+- `casting_clusters` (29 clusters) — used for `cluster-objects-override.cpp` and
+  `Accessors-override.cpp`
+- `tlv_decoder_clusters` (18 clusters) — used for the slim TLV decoder files
+- `cluster_servers` (13 directories) — used for `cluster-servers-override.gni`
 
 To add or remove clusters, edit the YAML config and re-run the script. The
 script produces byte-identical output when run with the same inputs
@@ -777,10 +777,10 @@ Additional unit-level validations:
 
 ### When to run phase 3 tests
 
--   After modifying `Accessors-override.cpp` or `cluster-servers-override.gni`
--   After changing `chip_data_model.gni`, `common_flags.gni`, `android.py`, or
-    `src/controller/java/BUILD.gn`
--   Before pushing a commit that touches any phase 3 files
+- After modifying `Accessors-override.cpp` or `cluster-servers-override.gni`
+- After changing `chip_data_model.gni`, `common_flags.gni`, `android.py`, or
+  `src/controller/java/BUILD.gn`
+- Before pushing a commit that touches any phase 3 files
 
 ```bash
 python -m pytest examples/tv-casting-app/tests/ -v
