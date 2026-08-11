@@ -48,16 +48,18 @@ public:
 
     CHIP_ERROR SetCurrentEnergyBalance(uint8_t currentEnergyBalance)
     {
-        return SetCurrentUint8Attribute(mCurrentEnergyBalance, currentEnergyBalance, sDelegate->GetNumEnergyBalances(GetEndpointId()),
-                                EnergyPreference::Attributes::CurrentEnergyBalance::Id, EnergyPreference::Feature::kEnergyBalance,
-                                &EnergyPreference::Delegate::OnCurrentEnergyBalanceChanged);
+        return SetCurrentUint8Attribute(
+            mCurrentEnergyBalance, currentEnergyBalance, sDelegate->GetNumEnergyBalances(GetEndpointId()),
+            EnergyPreference::Attributes::CurrentEnergyBalance::Id, EnergyPreference::Feature::kEnergyBalance,
+            &EnergyPreference::Delegate::OnCurrentEnergyBalanceChanged);
     }
     CHIP_ERROR SetCurrentLowPowerModeSensitivity(uint8_t currentLowPowerModeSensitivity)
     {
         return SetCurrentUint8Attribute(mCurrentLowPowerModeSensitivity, currentLowPowerModeSensitivity,
-                                sDelegate->GetNumLowPowerModeSensitivities(GetEndpointId()),
-                                EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id, EnergyPreference::Feature::kLowPowerModeSensitivity,
-                                &EnergyPreference::Delegate::OnCurrentLowPowerModeSensitivityChanged);
+                                        sDelegate->GetNumLowPowerModeSensitivities(GetEndpointId()),
+                                        EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id,
+                                        EnergyPreference::Feature::kLowPowerModeSensitivity,
+                                        &EnergyPreference::Delegate::OnCurrentLowPowerModeSensitivityChanged);
     }
     uint8_t GetCurrentEnergyBalance() const { return mCurrentEnergyBalance; }
     uint8_t GetCurrentLowPowerModeSensitivity() const { return mCurrentLowPowerModeSensitivity; }
@@ -69,11 +71,14 @@ private:
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     using OnCurrentUint8AttributeChangedCallback = void (EnergyPreference::Delegate::*)(EndpointId, uint8_t);
-    CHIP_ERROR SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue, size_t correspondingArraySize, AttributeId attributeId, EnergyPreference::Feature featureGate, OnCurrentUint8AttributeChangedCallback onChangedCallback);
+    CHIP_ERROR SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue, size_t correspondingArraySize,
+                                        AttributeId attributeId, EnergyPreference::Feature featureGate,
+                                        OnCurrentUint8AttributeChangedCallback onChangedCallback);
 
     using BalanceStructAtIndexGetter = CHIP_ERROR (EnergyPreference::Delegate::*)(chip::EndpointId, size_t, chip::Percent &,
-                                               chip::Optional<chip::MutableCharSpan> &);
-    CHIP_ERROR ReadBalanceStructListAttribute(const ConcreteAttributePath & path, AttributeValueEncoder & encoder, BalanceStructAtIndexGetter getter);
+                                                                                  chip::Optional<chip::MutableCharSpan> &);
+    CHIP_ERROR ReadBalanceStructListAttribute(const ConcreteAttributePath & path, AttributeValueEncoder & encoder,
+                                              BalanceStructAtIndexGetter getter);
     CHIP_ERROR ReadEnergyBalances(const ConcreteAttributePath & path, AttributeValueEncoder & encoder)
     {
         return ReadBalanceStructListAttribute(path, encoder, &EnergyPreference::Delegate::GetEnergyBalanceAtIndex);

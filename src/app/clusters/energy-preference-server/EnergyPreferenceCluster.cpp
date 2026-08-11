@@ -35,7 +35,7 @@ CHIP_ERROR EnergyPreferenceCluster::Startup(ServerClusterContext & context)
     AttributePersistence persistence(context.attributeStorage);
 
     // These are indexes, so 0 is picked as fallback.
-    constexpr uint8_t kCurrentenergyBalanceFallback = 0;
+    constexpr uint8_t kCurrentenergyBalanceFallback           = 0;
     constexpr uint8_t kCurrentLowPowerModeSensitivityFallback = 0;
 
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, mCurrentEnergyBalance,
@@ -105,7 +105,10 @@ CHIP_ERROR EnergyPreferenceCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR EnergyPreferenceCluster::SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue, size_t correspondingArraySize, AttributeId attributeId, Feature featureGate, OnCurrentUint8AttributeChangedCallback onChangedCallback)
+CHIP_ERROR EnergyPreferenceCluster::SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue,
+                                                             size_t correspondingArraySize, AttributeId attributeId,
+                                                             Feature featureGate,
+                                                             OnCurrentUint8AttributeChangedCallback onChangedCallback)
 {
     if (!mFeatures.Has(featureGate))
     {
@@ -130,7 +133,9 @@ CHIP_ERROR EnergyPreferenceCluster::SetCurrentUint8Attribute(uint8_t & attribute
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EnergyPreferenceCluster::ReadBalanceStructListAttribute(const ConcreteAttributePath & path, AttributeValueEncoder & encoder, BalanceStructAtIndexGetter getter)
+CHIP_ERROR EnergyPreferenceCluster::ReadBalanceStructListAttribute(const ConcreteAttributePath & path,
+                                                                   AttributeValueEncoder & encoder,
+                                                                   BalanceStructAtIndexGetter getter)
 {
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
