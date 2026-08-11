@@ -3011,6 +3011,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
             dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, endpoint: int | None = None,
             timedRequestTimeoutMs: OptionalTimeout = None,
+            interactionTimeoutMs: OptionalTimeout = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         """Send a single command to a Matter device.
 
@@ -3020,6 +3021,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id: Target node ID, defaults to dut_node_id.
             endpoint: Target endpoint, defaults to configured endpoint.
             timedRequestTimeoutMs: Timeout for timed requests in milliseconds.
+            interactionTimeoutMs: Overall interaction timeout in milliseconds. Defaults to an SDK-computed timeout.
             payloadCapability: Transport payload capability setting.
 
         Returns:
@@ -3033,7 +3035,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
 
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                          payloadCapability=payloadCapability)
+                                          interactionTimeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes | None = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
