@@ -123,7 +123,7 @@ class TC_CC_10_1(MatterBaseTest):
                      "set to 0x01."),
             TestStep("5d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field "
                      "set to 0x01."),
-            TestStep("6", "If the ClusterRevision is < 2, then skip the tests 7b and 7e. Otherwise, skip the tests 7a and 7d."),
+            TestStep("6", "If the ScenesManagement ClusterRevision is < 2, then skip the tests 7b and 7e. Otherwise, skip the tests 7a and 7d."),
             TestStep(
                 "7a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02,"
                 " the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300,"
@@ -408,7 +408,7 @@ class TC_CC_10_1(MatterBaseTest):
                         asserts.assert_greater_equal(AV.valueUnsigned16, 18200, "View Scene failed on EnhancedHue below limit")
         self.step("6")
         clusterRevision = await self.read_single_attribute_check_success(
-            cluster=cluster, attribute=cluster.Attributes.ClusterRevision, dev_ctrl=self.TH1, endpoint=self.matter_test_config.endpoint)
+            cluster=Clusters.Objects.ScenesManagement, attribute=Clusters.ScenesManagement.Attributes.ClusterRevision, dev_ctrl=self.TH1, endpoint=self.matter_test_config.endpoint)
 
         self.step("7a")
         if clusterRevision < 2 and self.pics_guard(self.check_pics("CC.S.F00")):
