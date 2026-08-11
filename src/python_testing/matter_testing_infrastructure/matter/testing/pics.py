@@ -157,8 +157,7 @@ def read_pics_from_file(path: str, default_endpoint: int = 0) -> dict[int, dict[
         endpoint_dirs = {}
         for name in sorted(os.listdir(path)):
             full = os.path.join(path, name)
-            match = _ENDPOINT_DIR_PATTERN.match(name)
-            if os.path.isdir(full) and match is not None:
+            if os.path.isdir(full) and (match := _ENDPOINT_DIR_PATTERN.match(name)):
                 endpoint_dirs[full] = int(match.group(1))
 
         # With endpoint subdirs present the tree is labelled, so top-level files
