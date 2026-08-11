@@ -232,7 +232,7 @@ public:
          *
          *  @param[in] modified_group_id  ID of the modified group.
          */
-        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) {};
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
@@ -301,15 +301,17 @@ public:
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
-     *  @retval An instance of EndpointIterator on success
+     *  @retval An instance of GroupInfoIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
     virtual GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  If you wish to iterate only the endpoints of a particular group id you can provide the optional `group_id` to do so.
      *  @retval An instance of EndpointIterator on success
@@ -330,7 +332,8 @@ public:
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the keyset mappings during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
@@ -361,7 +364,8 @@ public:
 
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
-     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished;
+     *  the use of the AutoRelease wrapper (lib/support/AutoRelease.h) is recommended.
      *  Modifying the key sets table during the iteration is currently not supported, and may yield unexpected behaviour.
      *
      *  @retval An instance of KeySetIterator on success
