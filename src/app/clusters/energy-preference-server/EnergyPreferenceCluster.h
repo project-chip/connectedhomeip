@@ -56,8 +56,7 @@ public:
         VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return SetCurrentUint8Attribute(
             mCurrentEnergyBalance, currentEnergyBalance, sDelegate->GetNumEnergyBalances(GetEndpointId()),
-            EnergyPreference::Attributes::CurrentEnergyBalance::Id,
-            &EnergyPreference::Delegate::OnCurrentEnergyBalanceChanged);
+            EnergyPreference::Attributes::CurrentEnergyBalance::Id, &EnergyPreference::Delegate::OnCurrentEnergyBalanceChanged);
     }
     CHIP_ERROR SetCurrentLowPowerModeSensitivity(uint8_t currentLowPowerModeSensitivity)
     {
