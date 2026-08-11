@@ -72,13 +72,16 @@ void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const
     mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
         VerifyOrReturnValue(node->PathListsContainAnyEndpoint(targetedEndpoints), Loop::Continue);
 
-        System::Clock::Timeout remaining      = GetRemainingTimeout(node->GetMaxTimestamp(), now);
-        System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
-        const Timestamp newDeferralEnd        = now + effectiveDelay;
-        if (newDeferralEnd > node->GetMinTimestamp())
+        System::Clock::Timeout remaining = GetRemainingTimeout(node->GetMaxTimestamp(), now);
+        System::Clock::Timeout delay     = aDelay;
+        if (node->GetDeferralEndTimestamp() > now)
         {
-            node->SetDeferralEndTimestamp(newDeferralEnd);
+            System::Clock::Timeout remainingDeferral = node->GetDeferralEndTimestamp() - now;
+            delay                                    = delay < remainingDeferral ? delay : remainingDeferral;
         }
+        System::Clock::Timeout effectiveDelay = delay < remaining ? delay : remaining;
+        const Timestamp newDeferralEnd        = now + effectiveDelay;
+        node->SetDeferralEndTimestamp(newDeferralEnd);
         return Loop::Continue;
     });
     RescheduleAllReports();

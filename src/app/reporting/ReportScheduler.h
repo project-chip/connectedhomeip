@@ -154,6 +154,7 @@ public:
         Timestamp GetMinTimestamp() const { return mMinTimestamp > mDeferralEndTimestamp ? mMinTimestamp : mDeferralEndTimestamp; }
         Timestamp GetMaxTimestamp() const { return mMaxTimestamp > mDeferralEndTimestamp ? mMaxTimestamp : mDeferralEndTimestamp; }
 
+        Timestamp GetDeferralEndTimestamp() const { return mDeferralEndTimestamp; }
         void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }
         bool PathListsContainAnyEndpoint(Span<const EndpointId> targetedEndpoints) const
         {

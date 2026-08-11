@@ -848,13 +848,13 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferral)
     sScheduler.DeferReports(System::Clock::Seconds32(3));
     EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
 
-    // 2. Defer reports with a shorter delay (2 seconds). The scheduled timeout should remain 3s and NOT shrink.
+    // 2. Defer reports with a shorter delay (2 seconds). The scheduled timeout should become min(3s remaining, 2s) = 2s.
     sScheduler.DeferReports(System::Clock::Seconds32(2));
-    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(2));
 
-    // 3. Defer reports by 10 seconds. Since 10s > maxInterval(5s), the scheduled timeout should be bounded to maxInterval (5s).
+    // 3. Defer reports by 10 seconds. Since 2s active deferral is smaller than 10s, min(2s remaining, 10s) keeps timeout at 2s.
     sScheduler.DeferReports(System::Clock::Seconds32(10));
-    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(5));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(2));
 
     // Clean up
     sScheduler.UnregisterAllHandlers();
