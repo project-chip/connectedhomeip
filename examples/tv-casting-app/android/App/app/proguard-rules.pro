@@ -76,9 +76,9 @@
 -keep class chip.devicecontroller.ChipClusters$BaseAttributeCallback { *; }
 -keep class chip.devicecontroller.ChipClusters$BaseClusterCallback { *; }
 
-# ChipClusters inner classes — exactly the 19 casting clusters present in the
-# slim TLV decoder overrides compiled into libTvCastingApp.so.
-# Source of truth: CHIPAttributeTLVValueDecoder-override.cpp and
+# ChipClusters inner classes — clusters referenced by the casting app 
+# and/or the slim TLV decoder overrides compiled into libTvCastingApp.so.
+# Decoder source of truth: CHIPAttributeTLVValueDecoder-override.cpp and
 # CHIPEventTLVValueDecoder-override.cpp in tv-casting-common/.
 -keep class chip.devicecontroller.ChipClusters$AccountLoginCluster { *; }
 -keep class chip.devicecontroller.ChipClusters$AccountLoginCluster$* { *; }
