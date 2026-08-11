@@ -924,9 +924,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         # commissioning_method may also be set by in-test commissioning flows, so the
         # warning stays neutral about who commissioned. is_commissioning classes skip
         # capture by design and must not warn.
-        if not dut_reachable and not self.is_commissioning and self.matter_test_config.commissioning_method is not None:
-            LOGGER.warning("[CLN] Class finished without a DUT baseline although commissioning "
-                           "was configured; DUT cleanup skipped")
+        if not dut_reachable and not self.is_commissioning:
+            if self.matter_test_config.commissioning_method is not None:
+                LOGGER.warning("[CLN] Class finished without a DUT baseline although commissioning "
+                               "was configured; DUT cleanup skipped")
+            else:
+                LOGGER.info("[CLN] No DUT baseline captured during this class run; skipping DUT "
+                            "cleanup. If a commissioned DUT was expected, likely causes: the DUT "
+                            "was unreachable, or it needed more time to establish a CASE session.")
         if dut_reachable:
             try:
                 # Bound session re-establishment before the reachability read: after a
@@ -1466,21 +1471,40 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.is_commissioning or not self.requires_dut:
             # No DUT to snapshot: unit tests / file mode, or the DUT is not on the fabric yet.
             return
+
         if self._original_acl is not None and self._original_fabrics is not None:
             # Baseline already captured earlier in this class run. The two captures retry
             # independently, so skip only when both are present.
             return
-        dut_evidence = (self.matter_test_config.commissioning_method is not None
-                        or self._dut_confirmed_available)
-        probe_timeout_ms = 5000 if dut_evidence else 500
+
+        # Deadline for the GetConnectedDevice call below, not a fixed wait; with a CASE
+        # session already cached it returns immediately.
+        # - 5s when there is evidence of a commissioned DUT: gives a real DUT room to
+        #   establish a new session.
+        # - 0.5s when there is no evidence: the call is expected to fail regardless of
+        #   the wait, so the short deadline just keeps that failure cheap.
+        commissioning_configured = self.matter_test_config.commissioning_method is not None
+        dut_evidence = commissioning_configured or self._dut_confirmed_available
+        case_timeout_ms = 5000 if dut_evidence else 500
+
+        evidence = "" if not dut_evidence else (", commissioning was configured" if commissioning_configured
+                                                else ", commissioned by framework during this run")
+        LOGGER.info("[CLN] DUT evidence found: %s%s. CASE timeout set to %dms",
+                    dut_evidence, evidence, case_timeout_ms)
+
+        # Try to establish a CASE session with the DUT
+        case_check_start = time.monotonic()
         try:
             self.event_loop.run_until_complete(
                 self.default_controller.GetConnectedDevice(
-                    nodeId=self.dut_node_id, allowPASE=False, timeoutMs=probe_timeout_ms))
+                    nodeId=self.dut_node_id, allowPASE=False, timeoutMs=case_timeout_ms))
         except Exception as e:
-            LOGGER.info("[CLN] No CASE session to the DUT (not commissioned, or unreachable), "
-                        "skipping pre-test ACL capture: %s", e)
+            elapsed_ms = int((time.monotonic() - case_check_start) * 1000)
+            LOGGER.info("[CLN] No CASE session to the DUT after %dms (not commissioned, or "
+                        "unreachable), skipping pre-test ACL capture: %s", elapsed_ms, e)
             return
+
+        # Capture the original ACL and Fabrics
         if self._original_acl is None:
             self._capture_original_acl()
         if self._original_fabrics is None:
