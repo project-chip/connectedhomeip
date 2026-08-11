@@ -273,10 +273,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
         const struct bt_le_adv_param params =
             BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
         int adv_err = bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
-        if (adv_err != 0)
-        {
-            ChipLogError(DeviceLayer, "Failed to start minimal BLE advertisement: %d", adv_err);
-        }
+        VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
     }
 
     tlx_bt_802154_dual_mode_start();
@@ -309,17 +306,6 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 {
     BLEMgrImpl().DriveBLEState();
 }
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
-void BLEManagerImpl::HandleConcurrentModeReAdv(intptr_t arg)
-{
-    // Runs after CommissioningWindowManager::Cleanup() has disabled BLE advertising.
-    // Re-enable it so that BLE (e.g. Channel Sounding) remains available alongside Thread.
-    ChipLogProgress(AppServer, "Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
-    VerifyOrReturn(BLEMgrImpl()._SetAdvertisingEnabled(true) == CHIP_NO_ERROR,
-                   ChipLogError(DeviceLayer, "Failed to re-enable BLE advertising"));
-}
-#endif
 
 void BLEManagerImpl::DriveBLEState()
 {
@@ -711,7 +697,8 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
+#if defined(CONFIG_BT_TLX) && defined(CONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION) &&                                                 \
+    !defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
     // On Telink TLX, bt_conn_unref() may trigger bt_le_adv_resume() which
     // bypasses the kAdvertisingEnabled check. In BLE idle mode, force-stop
     // advertising to keep BLE idle after disconnection.
@@ -865,17 +852,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kPlatformZephyrBleC2IndDoneEvent:
         err = HandleTXCharComplete(event);
         break;
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
-    case DeviceEventType::kCommissioningComplete:
-        // Concurrent mode: re-enable BLE advertising after commissioning completes.
-        // ScheduleWork defers this until after CommissioningWindowManager::Cleanup()
-        // (which runs later in the application layer) has called SetBLEAdvertisingEnabled(false),
-        // so the re-enable is not immediately overridden.
-        VerifyOrReturn(PlatformMgr().ScheduleWork(HandleConcurrentModeReAdv, 0) == CHIP_NO_ERROR,
-                       ChipLogError(DeviceLayer, "Failed to schedule BLE re-advertising"));
-        break;
-#endif
 
     default:
         break;

@@ -131,9 +131,6 @@ private:
     CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
-    static void HandleConcurrentModeReAdv(intptr_t arg);
-#endif
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
     static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);

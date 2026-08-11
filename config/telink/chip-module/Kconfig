@@ -211,28 +211,21 @@ config CHIP_ENABLE_PM_DURING_BLE
 	help
 	  Enable PM during BLE operation.
 
-config CHIP_CONCURRENT_MODE
-	bool "Keep BLE active while Thread is running"
-	depends on IEEE802154_TLX_BLE_COEXIST
+config CHIP_ENABLE_CONCURRENT_CONNECTION
+	bool "Enable Concurrent Connection"
+	default y if SOC_RISCV_TELINK_W91
 	default n
+	select IEEE802154_TLX_BLE_COEXIST if !SOC_RISCV_TELINK_W91
 	help
-	  Allow BLE and Thread to run simultaneously on TLX SoCs. Without this
-	  option, BLE is disabled once Thread is commissioned. With it enabled,
-	  BLE stays available for connection or Channel Sounding alongside
-	  an active Thread network.
+	  Enable Matter concurrent connection support and BLE/Thread coexistence.
 
-config CHIP_CONCURRENT_BLE_IDLE
-	bool "Keep BLE idle after Thread commissioning in concurrent mode"
-	depends on CHIP_CONCURRENT_MODE
+config CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+	bool "Enable BLE advertising after commissioning"
+	depends on CHIP_ENABLE_CONCURRENT_CONNECTION
 	default n
 	help
-	  When enabled, BLE advertising is not automatically re-enabled after
-	  Thread commissioning completes or after a commissioned device reboots.
-	  The BLE stack stays initialized but idle, and advertising must be
-	  started manually (e.g. via a button press). This saves power while
-	  still allowing on-demand BLE access alongside an active Thread network.
-	  Use this together with a button handler that calls
-	  SetBLEAdvertisingEnabled(true) when BLE is needed.
+	  Automatically enable BLE advertising after commissioning and on reboot
+	  when the device is already commissioned.
 
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
 	default 255 if SHELL_BACKEND_SERIAL
