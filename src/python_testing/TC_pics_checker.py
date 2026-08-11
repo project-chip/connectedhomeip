@@ -127,7 +127,7 @@ class TC_PICS_Checker(BasicCompositionTests):
         if self.endpoint_id not in self.matter_test_config.pics:
             self.record_error("PICS check", location=UnknownProblemLocation(),
                               problem=f"No PICS were supplied for endpoint {self.endpoint_id}. PICS are present for "
-                                      f"endpoints {sorted(self.matter_test_config.pics)}")
+                              f"endpoints {sorted(self.matter_test_config.pics)}")
             self.fail_current_test(
                 f"No PICS were supplied for endpoint {self.endpoint_id}. An endpoint-structured PICS tree needs an "
                 f"endpoint{self.endpoint_id} subdirectory; a PICS file or directory for a single endpoint is "
