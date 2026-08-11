@@ -43,6 +43,8 @@ source_set("tv-common-sources") {
   sources = [
     "clusters/account-login/AccountLoginManager.cpp",
     "clusters/account-login/AccountLoginManager.h",
+    "clusters/account-login/OAuthAccountLoginManager.cpp",
+    "clusters/account-login/OAuthAccountLoginManager.h",
     "clusters/application-basic/ApplicationBasicManager.cpp",
     "clusters/application-basic/ApplicationBasicManager.h",
     "clusters/application-launcher/ApplicationLauncherManager.cpp",

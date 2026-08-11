@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,24 +17,13 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include "EnergyPreferenceCluster.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip::app::Clusters::EnergyPreference {
 
-class PtrResourceRecord : public ResourceRecord
-{
-public:
-    PtrResourceRecord(const FullQName & qName, const FullQName & ptrName) : ResourceRecord(QType::PTR, qName), mPtrName(ptrName) {}
+void SetDelegate(Delegate * delegate);
+Delegate * GetDelegate();
 
-    const FullQName & GetPtr() const { return mPtrName; }
+EnergyPreferenceCluster * FindClusterOnEndpoint(EndpointId endpoint);
 
-protected:
-    bool WriteData(RecordWriter & out) const override { return out.WriteQName(mPtrName).Fit(); }
-
-private:
-    const FullQName mPtrName;
-};
-
-} // namespace Minimal
-} // namespace mdns
+} // namespace chip::app::Clusters::EnergyPreference

@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
- *    Copyright 2024 NXP
+ *    Copyright 2024, 2026 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,6 +104,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
 #include "platform/OpenThread/GenericThreadBorderRouterDelegate.h"
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/StringBuilder.h>
+#include <openthread/dns.h>
+#include <openthread/link.h>
+#include <platform/ThreadStackManager.h>
 #endif
 
 #ifndef CONFIG_THREAD_DEVICE_TYPE
@@ -184,10 +189,6 @@ app::Clusters::NetworkCommissioning::Instance
 
 #if CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-extern const char sBaseServiceInstanceName[];
 #endif
 
 #ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
@@ -593,6 +594,38 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskBase::BuildBorderRouterName(const char * baseName)
+{
+    // OpenThread does not expose the constructed MeshCoP service instance name, so rebuild it here as
+    // base name + extended address hex to match what the border agent advertises.
+
+    static chip::StringBuilder<OT_DNS_MAX_LABEL_SIZE + 1> sBorderAgentName;
+
+    sBorderAgentName.Reset();
+    sBorderAgentName.Add(baseName);
+
+    const otExtAddress * extAddr = otLinkGetExtendedAddress(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
+    if (extAddr != nullptr)
+    {
+        char hex[OT_EXT_ADDRESS_SIZE * 2 + 1];
+        if (chip::Encoding::BytesToLowercaseHexString(extAddr->m8, OT_EXT_ADDRESS_SIZE, hex, sizeof(hex)) == CHIP_NO_ERROR)
+        {
+            sBorderAgentName.Add(hex);
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get Thread extended address; reporting base border router name only");
+    }
+
+    if (!sBorderAgentName.Fit())
+    {
+        ChipLogError(DeviceLayer, "Border router name truncated to fit the MeshCoP service instance name buffer");
+    }
+
+    return chip::CharSpan::fromCharString(sBorderAgentName.c_str());
+}
+
 void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
 {
     if (mTbrmClusterEnabled == false)
@@ -605,7 +638,7 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
                                                                                   Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
-        CharSpan brName(sBaseServiceInstanceName, strlen(sBaseServiceInstanceName));
+        CharSpan brName = GetBorderRouterName();
         sThreadBRDelegate.SetThreadBorderRouterName(brName);
         // Initialize TBR cluster
         TEMPORARY_RETURN_IGNORED sThreadBRMgmtInstance.Init();
