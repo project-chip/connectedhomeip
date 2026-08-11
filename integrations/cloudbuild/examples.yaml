@@ -48,11 +48,11 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - >-
+          - >- # RPC not supported
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-x64-camera-ipv6only-no-ble-no-wifi-asan-clang-test
-              --target esp32-m5stack-camera-ipv6only-rpc
+              --target esp32-m5stack-camera-ipv6only
               build
               --create-archives /workspace/artifacts/
       waitFor:
