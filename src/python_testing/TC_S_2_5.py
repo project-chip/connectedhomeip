@@ -133,7 +133,7 @@ class TC_S_2_5(MatterBaseTest):
         )
 
         # Step 0a: KeySetWrite for keyset 0x01a1.
-        self.step(step="0a",
+        self.step("0a",
                   description="TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT "
                   "with GroupKeySetID 0x01a1.",
                   expectation="DUT sends a SUCCESS response.")
@@ -159,7 +159,7 @@ class TC_S_2_5(MatterBaseTest):
             if groupcast_enabled:
                 self.skip_step("0b")
             else:
-                self.step(step="0b",
+                self.step("0b",
                           description="If the Groupcast cluster is enabled on the RootNode endpoint, skip this step."
                           "Otherwise, TH writes the GroupKeyMap attribute on the GroupKeyManagement "
                           "cluster binding G1 to GroupKeySetID 0x01a1.",
@@ -180,7 +180,7 @@ class TC_S_2_5(MatterBaseTest):
 
             membership = []
             if groupcast_enabled:
-                self.step(step="1a",
+                self.step("1a",
                           description="If the Groupcast cluster is enabled on the RootNode endpoint, TH reads the "
                           "Groupcast Membership attribute on the DUT. Otherwise, skip this step.",
                           expectation="DUT sends the Membership attribute; its contents decide whether Step 1b "
@@ -191,7 +191,7 @@ class TC_S_2_5(MatterBaseTest):
             else:
                 self.skip_step("1a")
 
-            self.step(step="1b",
+            self.step("1b",
                       description="If the Groupcast cluster is enabled on the RootNode endpoint and Membership "
                       "was not empty in Step 1a, TH sends the Groupcast LeaveGroup command with "
                       "GroupID 0. Otherwise, TH sends a Groups RemoveAllGroups command.",
@@ -206,7 +206,7 @@ class TC_S_2_5(MatterBaseTest):
             else:
                 await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=self._scene_endpoint)
 
-            self.step(step=2,
+            self.step(2,
                       description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
                       "sends a Groups AddGroup command with GroupID G1.",
                       expectation="DUT sends SUCCESS (JoinGroup) or an AddGroupResponse with Status 0x00 "
@@ -224,7 +224,7 @@ class TC_S_2_5(MatterBaseTest):
                 asserts.assert_equal(resp.status, Status.Success, "Step 2: AddGroup G1 status")
                 asserts.assert_equal(resp.groupID, group_g1, "Step 2: AddGroup G1 groupID")
 
-            self.step(step=3,
+            self.step(3,
                       description="TH sends a RemoveAllScenes command to DUT with GroupID G1.",
                       expectation="DUT sends a RemoveAllScenesResponse with Status 0x00 (SUCCESS) and GroupID G1.")
             resp = await self.send_single_cmd(
@@ -233,7 +233,7 @@ class TC_S_2_5(MatterBaseTest):
             asserts.assert_equal(resp.status, Status.Success, "Step 3: RemoveAllScenes status")
             asserts.assert_equal(resp.groupID, group_g1, "Step 3: RemoveAllScenes groupID")
 
-            self.step(step="4a",
+            self.step("4a",
                       description="TH reads the SceneTableSize attribute from the DUT.",
                       expectation="DUT sends SceneTableSize, which is at least 16. MaxRemainingCapacity is "
                       "(SceneTableSize - 1) / 2.")
@@ -251,7 +251,7 @@ class TC_S_2_5(MatterBaseTest):
             max_remaining_capacity = (scene_table_size - 1) // 2
             log.info("SceneTableSize is %s, MaxRemainingCapacity is %s", scene_table_size, max_remaining_capacity)
 
-            self.step(step="4b",
+            self.step("4b",
                       description="TH sends a subscription request action for FabricSceneInfo to the DUT with "
                       "MinIntervalFloor 5 and MaxIntervalCeiling 100.",
                       expectation="The subscription is activated and the DUT reports FabricSceneInfo with "
@@ -277,7 +277,7 @@ class TC_S_2_5(MatterBaseTest):
             ]
             self._assert_remaining_capacity(fabric_scene_info, max_remaining_capacity, "Step 4b")
 
-            self.step(step="5a",
+            self.step("5a",
                       description="TH sends an AddScene command to DUT with GroupID G1, SceneID 0x01, "
                       "TransitionTime 20000 and no extension field sets.",
                       expectation="DUT sends an AddSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
@@ -294,13 +294,13 @@ class TC_S_2_5(MatterBaseTest):
             asserts.assert_equal(resp.sceneID, 0x01, "Step 5a: AddScene sceneID")
             scene_count = 1
 
-            self.step(step="5b",
+            self.step("5b",
                       description="TH waits for a FabricSceneInfo report and records RemainingCapacity.",
                       expectation="RemainingCapacity equals (MaxRemainingCapacity - 1).")
             self._await_remaining_capacity(max_remaining_capacity - scene_count, "Step 5b")
 
             if max_remaining_capacity - scene_count > 0:
-                self.step(step="6a",
+                self.step("6a",
                           description="If RemainingCapacity is greater than 0, TH sends a StoreScene command to DUT "
                           "with GroupID G1 and SceneID 0x02. Otherwise, skip to Step 8a.",
                           expectation="DUT sends a StoreSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
@@ -316,7 +316,7 @@ class TC_S_2_5(MatterBaseTest):
                 asserts.assert_equal(resp.sceneID, 0x02, "Step 6a: StoreScene sceneID")
                 scene_count += 1
 
-                self.step(step="6b",
+                self.step("6b",
                           description="TH waits for a FabricSceneInfo report and records RemainingCapacity.",
                           expectation="RemainingCapacity equals (MaxRemainingCapacity - 2).")
                 self._await_remaining_capacity(max_remaining_capacity - scene_count, "Step 6b")
@@ -325,7 +325,7 @@ class TC_S_2_5(MatterBaseTest):
                 self.skip_step("6b")
 
             if max_remaining_capacity - scene_count > 0:
-                self.step(step="7a",
+                self.step("7a",
                           description="If RemainingCapacity is greater than 0, TH sends an AddScene command to DUT "
                           "with GroupID G1, SceneID 0x03, TransitionTime 20000 and no extension field "
                           "sets. Otherwise, skip to Step 8a.",
@@ -344,7 +344,7 @@ class TC_S_2_5(MatterBaseTest):
                 asserts.assert_equal(resp.sceneID, 0x03, "Step 7a: AddScene sceneID")
                 scene_count += 1
 
-                self.step(step="7b",
+                self.step("7b",
                           description="TH waits for a FabricSceneInfo report and records RemainingCapacity.",
                           expectation="RemainingCapacity equals (MaxRemainingCapacity - 3).")
                 self._await_remaining_capacity(max_remaining_capacity - scene_count, "Step 7b")
@@ -352,7 +352,7 @@ class TC_S_2_5(MatterBaseTest):
                 self.skip_step("7a")
                 self.skip_step("7b")
 
-            self.step(step="8a",
+            self.step("8a",
                       description="TH sends a RemoveScene command to DUT with GroupID G1 and SceneID 0x01.",
                       expectation="DUT sends a RemoveSceneResponse with Status 0x00 (SUCCESS), GroupID G1 and "
                       "SceneID 0x01.")
@@ -367,12 +367,12 @@ class TC_S_2_5(MatterBaseTest):
             asserts.assert_equal(resp.sceneID, 0x01, "Step 8a: RemoveScene sceneID")
             scene_count -= 1
 
-            self.step(step="8b",
+            self.step("8b",
                       description="TH waits for a FabricSceneInfo report and records RemainingCapacity.",
                       expectation="RemainingCapacity equals (MaxRemainingCapacity - 2).")
             self._await_remaining_capacity(max_remaining_capacity - scene_count, "Step 8b")
 
-            self.step(step="9a",
+            self.step("9a",
                       description="TH sends a RemoveAllScenes command to DUT with GroupID G1.",
                       expectation="DUT sends a RemoveAllScenesResponse with Status 0x00 (SUCCESS) and GroupID G1.")
             # clear the subscription cache
@@ -383,12 +383,12 @@ class TC_S_2_5(MatterBaseTest):
             asserts.assert_equal(resp.status, Status.Success, "Step 9a: RemoveAllScenes status")
             asserts.assert_equal(resp.groupID, group_g1, "Step 9a: RemoveAllScenes groupID")
 
-            self.step(step="9b",
+            self.step("9b",
                       description="TH waits for a FabricSceneInfo report and records RemainingCapacity.",
                       expectation="RemainingCapacity equals MaxRemainingCapacity.")
             self._await_remaining_capacity(max_remaining_capacity, "Step 9b")
 
-            self.step(step=10,
+            self.step(10,
                       description="TH sends a KeySetRemove command to the GroupKeyManagement cluster with "
                       "GroupKeySetID 0x01a1.",
                       expectation="DUT sends a SUCCESS response.")
