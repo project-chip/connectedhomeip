@@ -44,7 +44,14 @@ CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatS
     CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     ReturnErrorOnFailure(err);
 
-    for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions() - 1); i >= 0; i--)
+    size_t suggestionCount = delegate->GetNumberOfThermostatSuggestions();
+
+    if (suggestionCount == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    for (int i = static_cast<int>(suggestionCount - 1); i >= 0; i--)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
         err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
