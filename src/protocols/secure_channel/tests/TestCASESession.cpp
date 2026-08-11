@@ -643,11 +643,74 @@ TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
               commissionerSessionParams.GetSupportedTransports());
     EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
               commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), GetDefaultMRPConfig());
 
     EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
               accessorySessionParams.GetSupportedTransports());
     EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
               accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), GetDefaultMRPConfig());
+}
+
+TEST_F(TestCASESession, SecurePairingHandshakeCustomMRPAndTCPParamsTest)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingAccessory;
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    // Custom MRP configs
+    ReliableMessageProtocolConfig commissionerRmpConfig(System::Clock::Milliseconds32(1000), System::Clock::Milliseconds32(2000),
+                                                         System::Clock::Milliseconds16(300));
+    ReliableMessageProtocolConfig accessoryRmpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                     System::Clock::Milliseconds16(4000));
+
+    SessionParameters commissionerSessionParams;
+    commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+    pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+    SessionParameters accessorySessionParams;
+    accessorySessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    accessorySessionParams.SetMaxTCPPayloadSize(50000);
+    pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), MakeOptional(accessoryRmpConfig)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                   nullptr, nullptr, &delegateCommissioner, MakeOptional(commissionerRmpConfig)),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), commissionerRmpConfig);
+
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), accessoryRmpConfig);
 }
 
 TEST_F(TestCASESession, ClientReceivesBusyTest)
