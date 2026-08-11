@@ -52,7 +52,6 @@ steps:
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-x64-camera-ipv6only-no-ble-no-wifi-asan-clang-test
-              --target esp32-m5stack-camera-ipv6only
               build
               --create-archives /workspace/artifacts/
       waitFor:
