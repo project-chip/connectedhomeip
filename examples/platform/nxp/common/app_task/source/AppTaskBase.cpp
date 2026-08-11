@@ -114,7 +114,7 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #endif
 
@@ -137,6 +137,34 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
+namespace {
+
+/**
+ * FabricTable delegate that triggers a factory reset when the last fabric
+ * is removed from the device.
+ */
+class LastFabricRemovedDelegate : public chip::FabricTable::Delegate
+{
+public:
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        if (fabricTable.FabricCount() == 0)
+        {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+            /* Trigger factory reset for BLEApplicationManager */
+            chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+            ChipLogProgress(AppServer, "Last fabric removed - scheduling factory reset");
+            chip::Server::GetInstance().GenerateShutDownEvent();
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
+static LastFabricRemovedDelegate sLastFabricRemovedDelegate;
+
+} // namespace
+
 #if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
@@ -154,7 +182,7 @@ app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
-#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#if CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
@@ -218,7 +246,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 
-#elif CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#elif CONFIG_CHIP_CRYPTO_PSA
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -240,6 +268,9 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+
+    // Register the delegate that triggers a factory reset when the last fabric is removed.
+    VerifyOrDie(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sLastFabricRemovedDelegate) == CHIP_NO_ERROR);
 
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
@@ -400,6 +431,17 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 
     PrintCurrentVersion();
 
+#if CONFIG_CHIP_SE05X
+    /* Se05x::PostInit() must complete before starting CHIP event loop task to avoid lock contention on se05x library mutexes
+     * between main thread and CHIP thread. */
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
+        goto exit;
+    }
+#endif
+
     /* Start a task to run the CHIP Device event loop. */
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -414,14 +456,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
-    }
-#endif
-
-#if CONFIG_CHIP_SE05X
-    err = chip::NXP::App::Se05x::PostInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 

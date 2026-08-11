@@ -22,44 +22,58 @@
  * Includes
  *********************************************************/
 
+#include <cstring>
 #include <stdbool.h>
 #include <stdint.h>
+#include <utility>
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "RefrigeratorUI.h"
 #endif
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "RefrigeratorManager.h"
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
+#include <app/data-model/List.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-/**********************************************************
- * Defines
- *********************************************************/
+namespace chip {
+namespace app {
+namespace Clusters {
 
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
+
+const uint8_t ModeNormal      = 0;
+const uint8_t ModeRapidCool   = 1;
+const uint8_t ModeRapidFreeze = 2;
+
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 /**********************************************************
  * AppTask Declaration
  *********************************************************/
 
-class AppTask : public BaseApplication
+class AppTask : public BaseApplication, public chip::app::Clusters::ModeBase::Delegate
 {
 
 public:
     AppTask() = default;
 
-    static AppTask & GetAppTask() { return sAppTask; }
+    /** @brief Returns the active app instance */
+    static AppTask & GetAppTask();
 
     /**
      * @brief AppTask task main loop function
@@ -68,21 +82,50 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
      *
-     * @param buttonHandle APP_CONTROL_BUTTON or APP_FUNCTION_BUTTON
+     * @param button    APP_FUNCTION_BUTTON
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-private:
-    static AppTask sAppTask;
+    /** @brief Data model hook invoked when a cluster attribute changes */
+    void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value);
 
+    /**
+     * @brief Constructs the ModeBase::Instance for the cabinet mode cluster on @p endpointId.
+     *        Invoked from the emberAf...CabinetModeClusterInitCallback CRTP forwarder.
+     */
+    void CabinetModeClusterInit(chip::EndpointId endpointId);
+
+    // ModeBase::Delegate interface. Override matching *Impl() hooks in CustomerAppTask to customize.
+
+    /** @brief Cabinet mode cluster delegate initialization hook. */
+    CHIP_ERROR Init() override;
+
+    /** @brief Validates the requested mode transition and sets the ChangeToModeResponse status. */
+    void HandleChangeToMode(uint8_t newMode,
+                            chip::app::Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+
+    /** @brief Supplies the SupportedModes label for @p modeIndex. */
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
+
+    /** @brief Supplies the SupportedModes value for @p modeIndex. */
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
+
+    /** @brief Supplies the SupportedModes tags for @p modeIndex. */
+    CHIP_ERROR
+    GetModeTagsByIndex(uint8_t modeIndex,
+                       chip::app::DataModel::List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & tags) override;
+
+protected:
     /**
      * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
@@ -91,20 +134,15 @@ private:
     CHIP_ERROR AppInit() override;
 
     /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
+     * @brief Refrigerator specific initialization. Sets endpoint composition, tag lists,
+     *        and the supported temperature levels delegate.
      */
-    static void ButtonHandler(AppEvent * aEvent);
+    CHIP_ERROR InitRefrigerator();
 
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers an action sent to the CHIP task
-     // TODO: Action for refrigerator is not decided yet
-     *
-     * @param aEvent button event being processed
-     */
-    static void RefrigeratorActionEventHandler(AppEvent * aEvent);
+private:
+    // Refrigerator state, updated from the datamodel attribute-change hook.
+    int16_t mTemperatureSetpoint;
+
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mMask;
+    chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap mState;
 };

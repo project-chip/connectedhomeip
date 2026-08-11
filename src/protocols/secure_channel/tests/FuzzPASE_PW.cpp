@@ -295,7 +295,9 @@ FUZZ_TEST(FuzzPASE_PW, PASESession_Unbounded)
 void FuzzSpake2pVerifier(const vector<uint8_t> & aW0, const vector<uint8_t> & aL, const vector<uint8_t> & aSalt,
                          const uint32_t fuzzedPBKDF2Iter, const uint32_t fuzzedSetupPasscode)
 {
-    Spake2pVerifier fuzzedSpake2pVerifier;
+    // Zero-initialize: aW0/aL may be shorter than mW0/mL, so the copy_n calls below leave the tail unset and
+    // BeginVerifier()/FELoad() would read uninitialized bytes. Production verifiers come from Generate()/Deserialize().
+    Spake2pVerifier fuzzedSpake2pVerifier{};
 
     copy_n(aW0.data(), aW0.size(), fuzzedSpake2pVerifier.mW0);
     copy_n(aL.data(), aL.size(), fuzzedSpake2pVerifier.mL);
@@ -495,6 +497,10 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     memcpy(&pairingCommissioner.mPBKDFLocalRandomData[0], fuzzPBKDFLocalRandomDataInitiator.data(),
            fuzzPBKDFLocalRandomDataInitiator.size());
 
+    // This harness skips Init()/Pair(), which normally set mSetupPINCode; HandlePBKDFParamResponse() -> ComputeWS()
+    // reads it. Set a fixed valid passcode (production always initializes it via Init()/Pair()).
+    pairingCommissioner.mSetupPINCode = 20202021;
+
     // In order to cover the Code path where the Commissioner has PBKDF Parameters before Starting PASE, as such, the Accessory will
     // not send the PBKDF Parameters in the Response message
     bool initiatorHasPBKDFParams             = fuzzHavePBKDFParameters;
@@ -648,7 +654,10 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
 
     //  Compute mPASEVerifier (in order for mSpake2p.BeginVerifier() to use it, once it is called by the pairingAccessory through
     //  HandleMsg1_and_SendMsg2)
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     /************************Injecting Fuzzed Pake1 Message into PaseSession::OnMessageReceived*************************/
 
@@ -750,7 +759,10 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     // Compute mPASEVerifier to be able to pass it to BeginVerifier()
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
@@ -880,7 +892,10 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     //  compute mPASEVerifier to be able to pass it to BeginVerifier()
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,

@@ -46,6 +46,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/channel/"
                       "${CHEF}/common/clusters/chime/"
                       "${CHEF}/common/clusters/content-launch/"
+                      "${CHEF}/common/clusters/device-energy-management-mode/"
                       "${CHEF}/common/clusters/door-lock/"
                       "${CHEF}/common/clusters/keypad-input/"
                       "${CHEF}/common/clusters/laundry-dryer-controls/"
@@ -66,6 +67,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
                       "${CHEF}/common/clusters/water-heater-management/"
+                      "${CHEF}/common/clusters/water-heater-mode/"
                       "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
@@ -139,6 +141,7 @@ chip_configure_data_model(${COMPONENT_LIB}
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )

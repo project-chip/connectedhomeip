@@ -152,23 +152,21 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
         log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
+                             f"OperationalState({operational_state}) should be {state_enum_to_text(expected_state)}")
 
     # Sends the Pause command and checks that the returned error matches the expected_error
     async def send_pause_cmd_with_check(self, step_number, expected_error):
         self.print_step(step_number, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     # Sends the Resume command and checks that the returned error matches the expected_error
     async def send_resume_cmd_with_check(self, step_number, expected_error):
         self.print_step(step_number, "Send Pause command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     async def send_run_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -244,7 +242,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             if initial_countdown_time is not NullValue:
                 in_range = (1 <= initial_countdown_time <= 259200)
             asserts.assert_true(initial_countdown_time is NullValue or in_range,
-                                "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
+                                f"invalid CountdownTime({initial_countdown_time}). Must be in between 1 and 259200, or null ")
 
             self.print_step(8, "Waiting for 5 seconds")
             await asyncio.sleep(5)
@@ -253,9 +251,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
             log.info("CountdownTime: %s", countdown_time)
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
-                                "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
-            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) not equal to the initial CountdownTime(%s)"
-                                 % (countdown_time, initial_countdown_time))
+                                f"invalid CountdownTime({countdown_time}). Must be a non zero integer, or null")
+            asserts.assert_equal(countdown_time, initial_countdown_time,
+                                 f"CountdownTime({countdown_time}) not equal to the initial CountdownTime({initial_countdown_time})")
 
         await self.send_pause_cmd_with_check(10, op_errors.kNoError)
 
@@ -266,7 +264,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                                                                          attribute=attributes.OperationalState)
         log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, old_opstate_dut,
-                             "OperationalState(%s) should be the state before pause (%s)" % (operational_state, old_opstate_dut))
+                             f"OperationalState({operational_state}) should be the state before pause ({old_opstate_dut})")
 
         await self.send_resume_cmd_with_check(13, op_errors.kNoError)
 

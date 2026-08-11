@@ -34,8 +34,24 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     pre-existing-fabric: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import enum
 import hashlib
 import inspect
@@ -43,7 +59,6 @@ import logging
 import re
 import sys
 from binascii import hexlify, unhexlify
-from typing import Optional
 
 import nest_asyncio
 from ecdsa import NIST256p, VerifyingKey
@@ -166,7 +181,7 @@ def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         client_challenge: bytes,
                                         fabric_index: int,
                                         vendor_fabric_binding_message: bytes,
-                                        vid_verification_statement: Optional[bytes] = None) -> bytes:
+                                        vid_verification_statement: bytes | None = None) -> bytes:
     assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
     assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
     # Valid fabric indices are [1..254]. 255 is forbidden.
@@ -350,7 +365,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             self.current_step_id = 0
             self.is_aggregating_steps = True
             self.aggregated_steps = []
-            self.test_TC_OPCREDS_3_8()
+            # Run the bare test body, not the run_if_endpoint_matches wrapper: the
+            # wrapper needs a live DUT and self.event_loop, neither of which exists
+            # at test-listing time. In aggregation mode every test_step block skips
+            # its body, so the bare coroutine completes without device interaction.
+            asyncio.run(inspect.unwrap(type(self).test_TC_OPCREDS_3_8)(self))
         finally:
             self.is_aggregating_steps = False
 
@@ -385,18 +404,23 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 dev_ctrl=th1_dev_ctrl,
                 node_id=th1_dut_node_id,
                 cluster=opcreds,
-                attribute=opcreds.Attributes.TrustedRootCertificates,
-                fabric_filtered=True
+                attribute=opcreds.Attributes.TrustedRootCertificates
             )
-            asserts.assert_true(len(root_certs) == 1,
-                                f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
 
             log.info("Parsing root certificate for TH1's fabric")
-            try:
-                th1_root_parser = MatterCertParser(root_certs[0])
-                th1_root_public_key = th1_root_parser.get_public_key_bytes()
-            except (ValueError, IndexError, KeyError, TypeError) as e:
-                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
+            th1_root_public_key = th1_dev_ctrl.rootPublicKeyBytes
+            th1_root_cert = None
+            for cert in root_certs:
+                try:
+                    parser = MatterCertParser(cert)
+                    if parser.get_public_key_bytes() == th1_root_public_key:
+                        th1_root_cert = cert
+                        break
+                except (ValueError, IndexError, KeyError, TypeError):
+                    continue
+            asserts.assert_is_not_none(
+                th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
+
             log.info("Parsed TH1's RCAC successfully.")
             log.info("  -> Root public key bytes: %s", to_octet_string(th1_root_public_key))
 
@@ -543,7 +567,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         with test_step(5, description="Send bad SignVIDVerificationRequest commands and verify failures"):
             # Must fail with correct client challenge but non-existent fabric.
-            unassigned_fabric_index = get_unassigned_fabric_index(fabric_indices.values())
+            assigned_fabric_indices = [noc_struct.fabricIndex for noc_struct in nocs_list]
+            unassigned_fabric_index = get_unassigned_fabric_index(assigned_fabric_indices)
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=unassigned_fabric_index, clientChallenge=client_challenge))
 
