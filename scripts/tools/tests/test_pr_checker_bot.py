@@ -1005,7 +1005,8 @@ esp32:
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("PR has merge conflicts", comment_body)
 
-    def test_check_and_process_pr_merge_conflicts_computing(self) -> None:
+    @patch("time.sleep", return_value=None)
+    def test_check_and_process_pr_merge_conflicts_computing(self, mock_sleep: MagicMock) -> None:
         """Tests that a PR whose mergeability state is still computing is blocked."""
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
         reviews = [self.create_mock_review("doru91", "APPROVED")]
@@ -1019,6 +1020,7 @@ esp32:
         mock_pr.create_issue_comment.assert_called_once()
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("Mergeability state is computing", comment_body)
+        mock_sleep.assert_called()
 
     def test_check_and_process_pr_dependabot_merge(self) -> None:
         """Tests that a Dependabot PR is merged when all checks pass."""
@@ -1194,11 +1196,11 @@ esp32:
         mock_mergify_old_pending.created_at = now - timedelta(hours=7)
 
         # 9. Allowed non-critical suite (coderabbitai) - pending - old (7h > 6h) - should be ignored
-        mock_mergify_old_pending = MagicMock()
-        mock_mergify_old_pending.app.name = "coderabbitai"
-        mock_mergify_old_pending.status = "queued"
-        mock_mergify_old_pending.conclusion = None
-        mock_mergify_old_pending.created_at = now - timedelta(hours=7)
+        mock_coderabbitai_old_pending = MagicMock()
+        mock_coderabbitai_old_pending.app.name = "coderabbitai"
+        mock_coderabbitai_old_pending.status = "queued"
+        mock_coderabbitai_old_pending.conclusion = None
+        mock_coderabbitai_old_pending.created_at = now - timedelta(hours=7)
 
         # Test Case A: Only old non-critical pending suites present (and some passing suites to meet min 10 checks)
         # Should MERGE (ignore the old pending non-critical suites)
@@ -1212,7 +1214,8 @@ esp32:
             mock_sonarqube_old_pending,
             mock_buildjet_old_pending,
             mock_mergify_old_pending,
-        ] + [mock_success_suite] * 5
+            mock_coderabbitai_old_pending,
+        ] + [mock_success_suite] * 4
 
         self.bot.check_and_process_pr(mock_pr)
         mock_pr.merge.assert_called_once()
