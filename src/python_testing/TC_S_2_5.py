@@ -67,13 +67,6 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-# FabricSceneInfo subscription intervals (MinIntervalFloor, MaxIntervalCeiling) in seconds.
-_MIN_INTERVAL_FLOOR_SEC = 1
-_MAX_INTERVAL_CEILING_SEC = 5
-
-# Reports are throttled by MinIntervalFloor, so allow several floor periods of margin.
-_REPORT_TIMEOUT_SEC = 2 * _MAX_INTERVAL_CEILING_SEC
-
 # Smallest SceneTableSize the spec permits.
 _MIN_SCENE_TABLE_SIZE = 16
 
@@ -105,7 +98,7 @@ class TC_S_2_5(MatterBaseTest):
 
     def _await_remaining_capacity(self, expected: int, context: str) -> None:
         """Wait for the next FabricSceneInfo report and assert RemainingCapacity."""
-        report = self._scene_info_cb.wait_for_attribute_report(timeout_sec=_REPORT_TIMEOUT_SEC)
+        report = self._scene_info_cb.wait_for_attribute_report(timeout_sec=10)
         self._assert_remaining_capacity(report.value, expected, context)
 
     @pics("S.S")
@@ -207,9 +200,9 @@ class TC_S_2_5(MatterBaseTest):
                 await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=self._scene_endpoint)
 
             self.step(2,
-                     description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
-                    "Groupcast JoinGroup command with GroupID G1, the scene endpoint and KeySetID 0x01a1. "
-                    "Otherwise, TH sends a Groups AddGroup command with GroupID G1.",
+                      description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
+                      "Groupcast JoinGroup command with GroupID G1, the scene endpoint and KeySetID 0x01a1. "
+                      "Otherwise, TH sends a Groups AddGroup command with GroupID G1.",
                       expectation="DUT sends SUCCESS (JoinGroup) or an AddGroupResponse with Status 0x00 "
                       "(SUCCESS) and GroupID G1.")
             if groupcast_enabled:
@@ -254,13 +247,13 @@ class TC_S_2_5(MatterBaseTest):
 
             self.step("4b",
                       description="TH sends a subscription request action for FabricSceneInfo to the DUT with "
-                      "MinIntervalFloor 5 and MaxIntervalCeiling 100.",
+                      "MinIntervalFloor 1 and MaxIntervalCeiling 5.",
                       expectation="The subscription is activated and the DUT reports FabricSceneInfo with "
                       "RemainingCapacity equal to MaxRemainingCapacity for this fabric's entry.")
             self._scene_info_subscription = await dev_ctrl.ReadAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(self._scene_endpoint, Clusters.ScenesManagement.Attributes.FabricSceneInfo)],
-                reportInterval=(_MIN_INTERVAL_FLOOR_SEC, _MAX_INTERVAL_CEILING_SEC),
+                reportInterval=(1, 5),
                 fabricFiltered=False,
                 keepSubscriptions=True,
                 autoResubscribe=False,
