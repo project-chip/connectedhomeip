@@ -61,7 +61,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-logsBucket: matter-build-automation-build-logs
+logsBucket: gs://matter-build-automation-build-logs
 
 # Global timeout for all steps
 timeout: 43200s
