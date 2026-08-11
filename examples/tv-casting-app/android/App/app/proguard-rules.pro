@@ -110,8 +110,8 @@
 -keep class chip.devicecontroller.ChipClusters$MediaInputCluster$* { *; }
 -keep class chip.devicecontroller.ChipClusters$MediaPlaybackCluster { *; }
 -keep class chip.devicecontroller.ChipClusters$MediaPlaybackCluster$* { *; }
--keep class chip.devicecontroller.ChipClusters$MessagesCluster { *; }
--keep class chip.devicecontroller.ChipClusters$MessagesCluster$* { *; }
+-keep class chip.devicecontroller.ChipClusters$MediaFileManagementCluster { *; }
+-keep class chip.devicecontroller.ChipClusters$MediaFileManagementCluster$* { *; }
 -keep class chip.devicecontroller.ChipClusters$OnOffCluster { *; }
 -keep class chip.devicecontroller.ChipClusters$OnOffCluster$* { *; }
 -keep class chip.devicecontroller.ChipClusters$TargetNavigatorCluster { *; }
@@ -137,7 +137,7 @@
 -keep class chip.devicecontroller.ChipStructs$LowPowerCluster* { *; }
 -keep class chip.devicecontroller.ChipStructs$MediaInputCluster* { *; }
 -keep class chip.devicecontroller.ChipStructs$MediaPlaybackCluster* { *; }
--keep class chip.devicecontroller.ChipStructs$MessagesCluster* { *; }
+-keep class chip.devicecontroller.ChipStructs$MediaFileManagementCluster* { *; }
 -keep class chip.devicecontroller.ChipStructs$OnOffCluster* { *; }
 -keep class chip.devicecontroller.ChipStructs$TargetNavigatorCluster* { *; }
 -keep class chip.devicecontroller.ChipStructs$WakeOnLanCluster* { *; }
@@ -158,7 +158,7 @@
 -keep class chip.devicecontroller.ChipEventStructs$LowPowerCluster* { *; }
 -keep class chip.devicecontroller.ChipEventStructs$MediaInputCluster* { *; }
 -keep class chip.devicecontroller.ChipEventStructs$MediaPlaybackCluster* { *; }
--keep class chip.devicecontroller.ChipEventStructs$MessagesCluster* { *; }
+-keep class chip.devicecontroller.ChipEventStructs$MediaFileManagementCluster* { *; }
 -keep class chip.devicecontroller.ChipEventStructs$OnOffCluster* { *; }
 -keep class chip.devicecontroller.ChipEventStructs$TargetNavigatorCluster* { *; }
 -keep class chip.devicecontroller.ChipEventStructs$WakeOnLanCluster* { *; }
