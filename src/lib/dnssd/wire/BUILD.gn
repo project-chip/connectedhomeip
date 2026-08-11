@@ -35,3 +35,23 @@ static_library("wire") {
     "${chip_root}/src/lib/support:span",
   ]
 }
+
+# Lib for the decoding of DNS messages received off the wire. Split from ":wire" so that
+# write-only users, or users that only build messages, do not need to pull in the parser.
+static_library("reader") {
+  sources = [
+    "Parser.cpp",
+    "Parser.h",
+    "Query.h",
+    "RecordData.cpp",
+    "RecordData.h",
+  ]
+
+  public_deps = [
+    ":wire",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}
