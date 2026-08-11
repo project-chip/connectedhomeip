@@ -665,7 +665,7 @@ TEST_F(TestCASESession, SecurePairingHandshakeCustomMRPAndTCPParamsTest)
 
     // Custom MRP configs
     ReliableMessageProtocolConfig commissionerRmpConfig(System::Clock::Milliseconds32(1000), System::Clock::Milliseconds32(2000),
-                                                         System::Clock::Milliseconds16(300));
+                                                        System::Clock::Milliseconds16(300));
     ReliableMessageProtocolConfig accessoryRmpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
                                                      System::Clock::Milliseconds16(4000));
 
