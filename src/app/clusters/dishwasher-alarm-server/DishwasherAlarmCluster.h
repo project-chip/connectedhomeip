@@ -28,8 +28,7 @@ class DishwasherAlarmCluster : public AlarmBaseCluster
 public:
     using Config = AlarmBaseCluster::Config;
 
-    DishwasherAlarmCluster(EndpointId endpointId, const Config & config) :
-        AlarmBaseCluster(endpointId, DishwasherAlarm::Id, config)
+    DishwasherAlarmCluster(EndpointId endpointId, const Config & config) : AlarmBaseCluster(endpointId, DishwasherAlarm::Id, config)
     {}
 };
 

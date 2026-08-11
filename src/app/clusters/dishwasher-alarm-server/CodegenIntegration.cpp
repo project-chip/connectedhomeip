@@ -134,10 +134,10 @@ public:
         }
 
         DishwasherAlarmCluster::Config config(gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper);
-        config.feature         = features;
-        config.clusterRevision = DishwasherAlarm::kRevision;
-        config.supported       = supported;
-        config.latch           = latch;
+        config.feature                     = features;
+        config.clusterRevision             = DishwasherAlarm::kRevision;
+        config.supported                   = supported;
+        config.latch                       = latch;
         config.supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId);
 
         gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(

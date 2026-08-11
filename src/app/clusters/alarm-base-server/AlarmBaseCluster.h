@@ -38,7 +38,7 @@ public:
 
         AlarmBase::Delegate & delegate;
         BitMask<AlarmBase::Feature> feature{};
-        uint32_t clusterRevision             = 0;
+        uint32_t clusterRevision = 0;
         AlarmBase::AlarmMap supported{};
         AlarmBase::AlarmMap latch{};
         bool supportsModifyEnabledAlarms = false;
