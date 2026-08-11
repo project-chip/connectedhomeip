@@ -407,6 +407,15 @@ def run_tests_no_exit(
     if external_stack:
         stack = external_stack
     else:
+        # Honor the test class's server-interactions opt-out before the stack starts
+        # advertising. When opted out, the TH publishes no DNS-SD records at all
+        # (neither its commissioner service nor its operational identities).
+        #
+        # Needed by tests that browse a service type the TH itself advertises and
+        # whose records carry nothing to tell the TH's apart from the DUT's
+        # (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records
+        # have no mandatory DUT-identifying key to filter on).
+        matter_test_config.enable_server_interactions = getattr(test_class, "enable_server_interactions", True)
         stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
