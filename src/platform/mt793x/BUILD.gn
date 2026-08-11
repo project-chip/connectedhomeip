@@ -52,13 +52,6 @@ static_library("mt793x") {
     "SystemPlatformConfig.h",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
-    ]
-  }
-
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_deps += [ "${chip_root}/third_party/mt793x_sdk/mDNSResponder" ]
@@ -68,6 +61,14 @@ static_library("mt793x") {
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
 
   # mDNS
   if (chip_mdns == "platform") {
