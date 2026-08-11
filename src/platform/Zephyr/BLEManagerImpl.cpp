@@ -65,6 +65,7 @@ extern "C" {
 extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
 #elif defined(CONFIG_BT_TLX)
 extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+extern __attribute__((noinline)) void tlx_bt_802154_dual_mode_start(void);
 #elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 #endif
@@ -243,6 +244,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+#if defined(CONFIG_BT_TLX)
+    // Telink TLX: enable BLE + 802.15.4 hardware coexistence so that
+    // OpenThread's tlx_start_radio() does not block on
+    // ieee802154_task_ready_sem. Must be called after bt_enable().
+    tlx_bt_802154_dual_mode_start();
+#endif
 #endif
 #endif // CONFIG_BT_BONDABLE
 
