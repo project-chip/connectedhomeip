@@ -36,16 +36,18 @@
 # being ChipClusters, ChipStructs, and ChipEventStructs inner classes
 # generated for all ~200 Matter clusters.
 #
-# The optimized build compiles slim TLV decoder overrides covering only the
-# 19 casting clusters (CHIPAttributeTLVValueDecoder-override.cpp and
-# CHIPEventTLVValueDecoder-override.cpp in tv-casting-common/). Only those
-# 19 clusters' switch-case branches exist in libTvCastingApp.so, so only
-# their Java counterparts need to be kept. R8 prunes all remaining cluster
-# classes, including ClusterInfoMapping/ReadMapping/WriteMapping (~1,047
-# generated classes) which are not referenced by the casting app.
+# Two sources of truth determine what to keep:
+#   1. FindClass/GetLocalClassRef calls in the android_chip_im_jni source set
+#      (src/controller/java/BUILD.gn) — drives the non-cluster class list below.
+#   2. The 19 casting clusters in the slim TLV decoder overrides
+#      (tv-casting-common/CHIPAttributeTLVValueDecoder-override.cpp and
+#       tv-casting-common/CHIPEventTLVValueDecoder-override.cpp) — drives the
+#      cluster class list.
+# Only classes present in CHIPInteractionModel.jar in the actual build need
+# keep rules; others are unreachable by R8 regardless.
 # ============================================================================
 
-# Interaction model callbacks and exceptions — called from JNI
+# Non-cluster classes — referenced by android_chip_im_jni and present in CHIPInteractionModel.jar
 -keep class chip.devicecontroller.ChipDeviceControllerException { *; }
 -keep class chip.devicecontroller.ChipClusterException { *; }
 -keep class chip.devicecontroller.StatusException { *; }
