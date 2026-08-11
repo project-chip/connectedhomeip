@@ -84,7 +84,10 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
+    // The base-class API returns void, so the failure cannot be propagated to Init().
+    // Nothing has been erased at this point, so the fail-safe flag survives and the
+    // reset is retried on the next boot.
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DoFactoryReset));
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -226,10 +229,22 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = MT793XConfig::FactoryResetConfig();
+    // Erase the KVS (fabrics, operational credentials) before chip-config, which holds
+    // the fail-safe flag: if the erase fails, the flag survives and Init() retries the
+    // factory reset on the next boot instead of rebooting still commissioned.
+    err = PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "ErasePartition() failed: %" CHIP_ERROR_FORMAT "; fail-safe left armed to retry on next boot",
+                     err.Format());
+    }
+    else
+    {
+        err = MT793XConfig::FactoryResetConfig();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -238,8 +253,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
