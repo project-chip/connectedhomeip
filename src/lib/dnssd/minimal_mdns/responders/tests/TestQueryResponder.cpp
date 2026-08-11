@@ -21,7 +21,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
+#include <lib/dnssd/wire/records/Ptr.h>
 
 namespace {
 

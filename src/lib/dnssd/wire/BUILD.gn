@@ -33,6 +33,5 @@ static_library("wire") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:span",
-    "${chip_root}/src/platform",
   ]
 }
