@@ -211,7 +211,8 @@ void LoggingServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaO
     uint32_t currentAreaIndex;
     if (!mCluster->GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea))
     {
-        ChipLogError(Zcl, "GoToNextArea: current area %u not found in supported areas.", currentAreaId);
+        ChipLogError(Zcl, "GoToNextArea: current area %u not found in supported areas.",
+                    static_cast<unsigned>(currentAreaId));
         return;
     }
     auto currentAreaMapId = currentArea.mapID;
