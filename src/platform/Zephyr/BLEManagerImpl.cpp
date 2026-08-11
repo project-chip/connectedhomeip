@@ -279,6 +279,17 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     BLEMgrImpl().DriveBLEState();
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
+void BLEManagerImpl::HandleConcurrentModeReAdv(intptr_t arg)
+{
+    // Runs after CommissioningWindowManager::Cleanup() has disabled BLE advertising.
+    // Re-enable it so that BLE (e.g. Channel Sounding) remains available alongside Thread.
+    ChipLogProgress(AppServer, "Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+    VerifyOrReturn(BLEMgrImpl()._SetAdvertisingEnabled(true) == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Failed to re-enable BLE advertising"));
+}
+#endif
+
 void BLEManagerImpl::DriveBLEState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -669,6 +680,16 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
+    // On Telink TLX, bt_conn_unref() may trigger bt_le_adv_resume() which
+    // bypasses the kAdvertisingEnabled check. In BLE idle mode, force-stop
+    // advertising to keep BLE idle after disconnection.
+    if (!mFlags.Has(Flags::kAdvertisingEnabled))
+    {
+        bt_le_adv_stop();
+    }
+#endif
+
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
@@ -813,6 +834,17 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kPlatformZephyrBleC2IndDoneEvent:
         err = HandleTXCharComplete(event);
         break;
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
+    case DeviceEventType::kCommissioningComplete:
+        // Concurrent mode: re-enable BLE advertising after commissioning completes.
+        // ScheduleWork defers this until after CommissioningWindowManager::Cleanup()
+        // (which runs later in the application layer) has called SetBLEAdvertisingEnabled(false),
+        // so the re-enable is not immediately overridden.
+        VerifyOrReturn(PlatformMgr().ScheduleWork(HandleConcurrentModeReAdv, 0) == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to schedule BLE re-advertising"));
+        break;
+#endif
 
     default:
         break;
