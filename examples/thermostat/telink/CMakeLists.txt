@@ -41,6 +41,9 @@ target_sources(app PRIVATE
                src/TemperatureManager.cpp
                src/ZclCallbacks.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-presets-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/common/src/SensorManagerCommon.cpp
