@@ -556,9 +556,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     if (GetFabricTable().FabricCount() != 0)
     {
 #if CONFIG_NETWORK_LAYER_BLE
+#ifdef CONFIG_CHIP_CONCURRENT_BLE_IDLE
+        // Concurrent mode with idle BLE: leave BLE stack initialized but
+        // do not auto-start advertising. BLE scheduler must stay active
+        // for Telink TLX BLE+802.15.4 hardware coexistence. Advertising
+        // can be toggled on/off via button press.
+        ChipLogProgress(AppServer, "Fabric already commissioned. BLE idle in concurrent mode");
+#elif defined(CONFIG_CHIP_CONCURRENT_MODE)
+        // Concurrent mode: keep BLE advertising enabled so the device
+        // stays discoverable (e.g. for Channel Sounding) alongside Thread.
+        ChipLogProgress(AppServer, "Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+#else
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
         TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+#endif
 #endif
     }
     else if (initParams.advertiseCommissionableIfNoFabrics)
