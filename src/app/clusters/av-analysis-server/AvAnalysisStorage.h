@@ -129,6 +129,18 @@ public:
     void SetZoneIDs(chip::Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIDs) { mZoneIDs = aZoneIDs; }
 };
 
+struct ActiveAmbientContextSession 
+{
+private:
+    uint16_t mSessionId;
+    
+public:
+    virtual ~ActiveAmbientContextSession() = default;
+    ActiveAmbientContextSession() {}
+    
+    void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
+};
+
 } // namespace AvAnalysis
 } // namespace Clusters
 } // namespace app

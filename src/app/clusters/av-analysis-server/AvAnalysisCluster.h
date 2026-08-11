@@ -80,7 +80,7 @@ public:
     /**
      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
      */
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) = 0;
+    virtual CHIP_ERROR VerifyZoneIDsAreValid(std::vector<uint16_t> aZoneIDs) = 0;
 
     /**
      * Allows the delegate to determine whether or not resources exist to add additional context triggers.
@@ -174,6 +174,16 @@ public:
 
     // Attribute mutators
     CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
+    
+    // Context detection
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, 
+        std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext);
+    
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext);
+    
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext);
+    
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId);
 
 private:
     AvAnalysisServerLogic mLogic;

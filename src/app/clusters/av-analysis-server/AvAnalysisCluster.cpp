@@ -156,6 +156,29 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
     return Status::UnsupportedCommand;
 }
 
+// Context detection
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, 
+    std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext)
+{
+    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, aTriggeringContext);
+}
+    
+CHIP_ERROR AvAnalysisCluster::NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext)
+{
+    return mLogic.NewContextDetected(aSessionId, aNewContext);
+}
+    
+CHIP_ERROR AvAnalysisCluster::ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext)
+{
+    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext);
+}
+   
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionEnd(uint16_t aSessionId)
+{
+    return mLogic.AnalysisSessionEnd(aSessionId);
+}
+
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

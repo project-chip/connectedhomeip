@@ -67,7 +67,7 @@ Protocols::InteractionModel::Status AvAnalysisManager::RemoveAnalysisStream()
 /**
  * Delegate command assists
  */
-CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs)
+CHIP_ERROR AvAnalysisManager::VerifyZoneIDsAreValid(std::vector<uint16_t> aZoneIDs)
 {
     return CHIP_NO_ERROR;
 }

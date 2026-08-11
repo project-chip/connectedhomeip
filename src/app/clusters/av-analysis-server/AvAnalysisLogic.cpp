@@ -18,6 +18,7 @@
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
 #include <app/reporting/reporting.h>
@@ -28,13 +29,10 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AvAnalysis;
 using namespace chip::app::Clusters::AvAnalysis::Structs;
 using namespace chip::app::Clusters::AvAnalysis::Attributes;
-using namespace Protocols::InteractionModel;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -413,6 +411,11 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 return Status::InvalidCommand;
             }
 
+            // Get the ZoneIDs, if present, into a format that can be used, that is convert the DecodableList to a List
+            //
+            std::vector<uint16_t> zoneIDs;
+            size_t size;
+            
             if (hasZoneIDs)
             {
                 // Verify via the delegate that the provided list of ZoneIDs contains values present in ZoneManagement only
@@ -420,7 +423,16 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                 //
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
-                    CHIP_ERROR err = mDelegate->VerifyZoneIDsAreValid(contextTrigger.zoneIDs.Value().Value());
+                    CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+
+                    auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
+
+                    while (zone_iter.Next())
+                    {
+                        zoneIDs.push_back(zone_iter.GetValue());
+                    }
+                    err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
                     hasNonNullZoneIDs = true;
                 }
@@ -438,24 +450,6 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalE
                                         return acs.GetContext().namespaceID == contextTrigger.context.namespaceID &&
                                             acs.GetContext().tag == contextTrigger.context.tag;
                                     });
-
-            // Get the ZoneIDs, if present, into a format that can be used, that is convert the DecodableList to a List
-            //
-            std::vector<uint16_t> zoneIDs;
-            size_t size;
-
-            if (hasNonNullZoneIDs)
-            {
-                CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
-                VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
-
-                auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
-
-                while (zone_iter.Next())
-                {
-                    zoneIDs.push_back(zone_iter.GetValue());
-                }
-            }
 
             // Does an entry with this context already exist?
             //
@@ -602,7 +596,19 @@ AvAnalysisServerLogic::HandleDisableContextTriggers(CommandHandler & handler, co
                 //
                 if (!contextTrigger.zoneIDs.Value().IsNull())
                 {
-                    CHIP_ERROR err = mDelegate->VerifyZoneIDsAreValid(contextTrigger.zoneIDs.Value().Value());
+                    std::vector<uint16_t> zoneIDs;
+                    size_t size;
+                    
+                    CHIP_ERROR err = contextTrigger.zoneIDs.Value().Value().ComputeSize(&size);
+                    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::Failure);
+
+                    auto zone_iter = contextTrigger.zoneIDs.Value().Value().begin();
+
+                    while (zone_iter.Next())
+                    {
+                        zoneIDs.push_back(zone_iter.GetValue());
+                    }
+                    err = mDelegate->VerifyZoneIDsAreValid(zoneIDs);
                     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::NotFound);
                 }
             }
@@ -734,6 +740,88 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
         }
     }
     return false;
+}
+
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, 
+    std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext)
+{
+    // Validate the information received
+    // 1. are the zoneIDs known (if provided)
+    if (!aZoneList.IsNull()) 
+    {
+        ReturnErrorOnFailure(mDelegate->VerifyZoneIDsAreValid(aZoneList.Value()));
+    }
+    
+    // 2. are the contexts part of our active set
+    bool notFound = false;
+    for (const auto& contextTrigger : aTriggeringContext)
+    {
+        auto it = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(),
+            [&contextTrigger](AmbientContextStorage & acs) {
+                return acs.GetContext().namespaceID == contextTrigger.identifiedContext.namespaceID &&
+                    acs.GetContext().tag == contextTrigger.identifiedContext.tag;
+        });
+
+        if (it == mActiveAmbientContextTriggers.end())
+        {
+            notFound = true;
+            break;
+        }
+    }
+    
+    if (notFound)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+            
+    // Get our current session ID, and increment for next use
+    aSessionId = mNextAnalysisSessionID++;
+    
+    // Capture our new active session information
+    AvAnalysis::ActiveAmbientContextSession newSession;
+    newSession.SetSessionId(aSessionId);
+    
+    // Create the Initial Event
+    Events::AnalysisSessionStart::Type startEvent;
+    EventNumber startEventNumber;
+
+    startEvent.sessionID = aSessionId;
+    startEvent.triggeredZones = DataModel::MakeNullable(DataModel::List<const uint16_t>(aZoneList.Value().data(), aZoneList.Value().size()));
+
+    CHIP_ERROR err = LogEvent(startEvent, mEndpointId, startEventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Unable to generate AnalysisSessionStart event");
+    }
+    
+    // Now create the first Perceived Context Event with the tiggering context
+    Events::PerceivedContext::Type perceivedEvent;
+    EventNumber perceivedEventNumber;
+
+    perceivedEvent.sessionID = aSessionId;
+    perceivedEvent.newIdentifiedContexts = chip::MakeOptional(DataModel::List<const Structs::TrackedContext::Type>(aTriggeringContext.data(), aTriggeringContext.size()));
+
+    err = LogEvent(perceivedEvent, mEndpointId, perceivedEventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Unable to generate PerceivedContext event");
+    }
+    return CHIP_NO_ERROR;
+}
+    
+CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext)
+{
+    return CHIP_NO_ERROR;
+}
+    
+CHIP_ERROR AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext)
+{
+    return CHIP_NO_ERROR;
+}
+   
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId)
+{
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clusters

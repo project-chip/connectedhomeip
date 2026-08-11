@@ -127,10 +127,22 @@ public:
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
+                               
+    // Active context tracking and events
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, 
+        std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext);
+    
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext);
+    
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext);
+    
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId);
 
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+    uint16_t mNextAnalysisSessionID                              = 0;
+    std::vector<AvAnalysis::ActiveAmbientContextSession> mActiveSessions;
 
     MarkDirtyCallback mMarkDirtyCallback;
 
