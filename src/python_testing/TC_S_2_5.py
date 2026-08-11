@@ -207,8 +207,9 @@ class TC_S_2_5(MatterBaseTest):
                 await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=self._scene_endpoint)
 
             self.step(2,
-                      description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
-                      "sends a Groups AddGroup command with GroupID G1.",
+                     description="If the Groupcast cluster is enabled on the RootNode endpoint, TH sends a "
+                    "Groupcast JoinGroup command with GroupID G1, the scene endpoint and KeySetID 0x01a1. "
+                    "Otherwise, TH sends a Groups AddGroup command with GroupID G1.",
                       expectation="DUT sends SUCCESS (JoinGroup) or an AddGroupResponse with Status 0x00 "
                       "(SUCCESS) and GroupID G1.")
             if groupcast_enabled:
