@@ -16,10 +16,10 @@
 #
 import json
 import logging
-import os
 import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
@@ -153,39 +153,34 @@ def read_pics_from_file(path: str, default_endpoint: int = 0) -> dict[int, dict[
         for endpoint, codes in file_tree.items():
             pics_tree.setdefault(endpoint, {}).update(codes)
 
-    if os.path.isdir(os.path.abspath(path)):
-        endpoint_dirs = {}
-        for name in sorted(os.listdir(path)):
-            full = os.path.join(path, name)
-            if os.path.isdir(full) and (match := _ENDPOINT_DIR_PATTERN.match(name)):
-                endpoint_dirs[full] = int(match.group(1))
+    root = Path(path)
+
+    if root.is_dir():
+        endpoint_dirs = {child: int(match.group(1))
+                         for child in sorted(root.iterdir())
+                         if child.is_dir() and (match := _ENDPOINT_DIR_PATTERN.match(child.name))}
 
         # With endpoint subdirs present the tree is labelled, so top-level files
         # are the device-wide slice -> endpoint 0. Without them the whole
         # directory is one unlabelled slice for the endpoint under test.
         top_level_endpoint = 0 if endpoint_dirs else default_endpoint
-        for filename in os.listdir(path):
-            if filename.endswith('.xml'):
-                with open(os.path.join(path, filename), encoding='utf-8') as f:
-                    _merge(parse_pics_xml(f.read(), endpoint=top_level_endpoint))
+        for xml_file in root.glob('*.xml'):
+            _merge(parse_pics_xml(xml_file.read_text(encoding='utf-8'), endpoint=top_level_endpoint))
 
-        for full, endpoint in endpoint_dirs.items():
-            for filename in os.listdir(full):
-                if filename.endswith('.xml'):
-                    with open(os.path.join(full, filename), encoding='utf-8') as f:
-                        _merge(parse_pics_xml(f.read(), endpoint=endpoint))
+        for endpoint_dir, endpoint in endpoint_dirs.items():
+            for xml_file in endpoint_dir.glob('*.xml'):
+                _merge(parse_pics_xml(xml_file.read_text(encoding='utf-8'), endpoint=endpoint))
 
         if not endpoint_dirs:
-            _log_unlabelled_slice(path, default_endpoint, pics_tree)
+            _log_unlabelled_slice(root, default_endpoint, pics_tree)
         return pics_tree
 
-    with open(path, encoding='utf-8') as f:
-        _merge({default_endpoint: parse_pics(f.readlines())})
-    _log_unlabelled_slice(path, default_endpoint, pics_tree)
+    _merge({default_endpoint: parse_pics(root.read_text(encoding='utf-8').splitlines())})
+    _log_unlabelled_slice(root, default_endpoint, pics_tree)
     return pics_tree
 
 
-def _log_unlabelled_slice(path: str, endpoint: int, pics_tree: dict[int, dict[str, bool]]) -> None:
+def _log_unlabelled_slice(path: Path, endpoint: int, pics_tree: dict[int, dict[str, bool]]) -> None:
     """
     Record which endpoint an unlabelled PICS slice was attributed to. The input
     carries no endpoint information, so this association comes purely from the
