@@ -2315,8 +2315,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         )
 
         result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
-        if result:
-            self._dut_confirmed_available = True
+        # This flag only ever moves from False to True: one successful commissioning
+        # proves a DUT exists for the rest of the class run.
+        self._dut_confirmed_available = self._dut_confirmed_available or bool(result)
         return result
 
     async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
@@ -2385,8 +2386,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
         result = bool(pairing_status)
-        if result:
-            self._dut_confirmed_available = True
+        # Only ever moves from False to True, see commission_devices.
+        self._dut_confirmed_available = self._dut_confirmed_available or result
         return result
 
     async def open_commissioning_window(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None, node_id: int | None = None, timeout: int = 900) -> CustomCommissioningParameters:
