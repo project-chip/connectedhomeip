@@ -171,23 +171,17 @@ def read_pics_from_file(path: str, default_endpoint: int = 0) -> dict[int, dict[
             for xml_file in endpoint_dir.glob('*.xml'):
                 _merge(parse_pics_xml(xml_file.read_text(encoding='utf-8'), endpoint=endpoint))
 
-        if not endpoint_dirs:
-            _log_unlabelled_slice(root, default_endpoint, pics_tree)
-        return pics_tree
+        unlabelled = not endpoint_dirs
+    else:
+        _merge({default_endpoint: parse_pics(root.read_text(encoding='utf-8').splitlines())})
+        unlabelled = True
 
-    _merge({default_endpoint: parse_pics(root.read_text(encoding='utf-8').splitlines())})
-    _log_unlabelled_slice(root, default_endpoint, pics_tree)
+    if unlabelled:
+        # Nothing in the input says which endpoint these codes describe, so the
+        # association comes purely from the caller and is worth stating.
+        LOGGER.info("PICS input %s has no endpoint structure: attributing its %d codes to endpoint %d",
+                    root, len(pics_tree.get(default_endpoint, {})), default_endpoint)
     return pics_tree
-
-
-def _log_unlabelled_slice(path: Path, endpoint: int, pics_tree: dict[int, dict[str, bool]]) -> None:
-    """
-    Record which endpoint an unlabelled PICS slice was attributed to. The input
-    carries no endpoint information, so this association comes purely from the
-    caller (--endpoint) and is worth stating out loud.
-    """
-    LOGGER.info("PICS input %s has no endpoint structure: attributing its %d codes to endpoint %d",
-                path, len(pics_tree.get(endpoint, {})), endpoint)
 
 
 @dataclass
