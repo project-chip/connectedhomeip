@@ -1193,6 +1193,13 @@ esp32:
         mock_mergify_old_pending.conclusion = None
         mock_mergify_old_pending.created_at = now - timedelta(hours=7)
 
+        # 9. Allowed non-critical suite (coderabbitai) - pending - old (7h > 6h) - should be ignored
+        mock_mergify_old_pending = MagicMock()
+        mock_mergify_old_pending.app.name = "coderabbitai"
+        mock_mergify_old_pending.status = "queued"
+        mock_mergify_old_pending.conclusion = None
+        mock_mergify_old_pending.created_at = now - timedelta(hours=7)
+
         # Test Case A: Only old non-critical pending suites present (and some passing suites to meet min 10 checks)
         # Should MERGE (ignore the old pending non-critical suites)
         mock_success_suite = MagicMock()
