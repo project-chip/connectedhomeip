@@ -90,8 +90,7 @@ CHIP_ERROR ScenesManagementCluster::RecallGlobalScene(FabricIndex fabricIndex)
     return RecallScene(fabricIndex, scenes::kGlobalSceneGroupId, scenes::kGlobalSceneId);
 }
 
-CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric, Optional<GroupId> group, Optional<SceneId> scene,
-                                                          Optional<bool> sceneValid)
+CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric)
 {
     VerifyOrReturnError(kUndefinedFabricIndex != fabric, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -100,20 +99,9 @@ CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric, Op
     SceneInfoStruct::Type * sceneInfo = GetSceneInfoStruct(fabric);
     if (nullptr != sceneInfo)
     {
-        if (group.HasValue())
-        {
-            sceneInfo->currentGroup = group.Value();
-        }
-
-        if (scene.HasValue())
-        {
-            sceneInfo->currentScene = scene.Value();
-        }
-
-        if (sceneValid.HasValue())
-        {
-            sceneInfo->sceneValid = sceneValid.Value();
-        }
+        sceneInfo->currentGroup = 0;
+        sceneInfo->currentScene = 0xFF;
+        sceneInfo->sceneValid   = false;
 
         ReturnErrorOnFailure(sceneTable->GetFabricSceneCount(fabric, sceneInfo->sceneCount));
         ReturnErrorOnFailure(sceneTable->GetRemainingCapacity(fabric, sceneInfo->remainingCapacity));
@@ -124,9 +112,9 @@ CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric, Op
         SceneInfoStruct::Type newSceneInfo;
         newSceneInfo.fabricIndex = fabric;
 
-        newSceneInfo.currentGroup = group.ValueOr(0);
-        newSceneInfo.currentScene = scene.ValueOr(0);
-        newSceneInfo.sceneValid   = sceneValid.ValueOr(false);
+        newSceneInfo.currentGroup = 0;
+        newSceneInfo.currentScene = 0xFF;
+        newSceneInfo.sceneValid   = false;
 
         ReturnErrorOnFailure(sceneTable->GetFabricSceneCount(fabric, newSceneInfo.sceneCount));
         ReturnErrorOnFailure(sceneTable->GetRemainingCapacity(fabric, newSceneInfo.remainingCapacity));
@@ -189,8 +177,6 @@ void ScenesManagementCluster::FabricSceneInfo::ClearSceneInfoStruct(FabricIndex 
     // Clear the last populated SceneInfoStruct
     mSceneInfoStructs[mSceneInfoStructsCount].fabricIndex       = kUndefinedFabricIndex;
     mSceneInfoStructs[mSceneInfoStructsCount].sceneCount        = 0;
-    mSceneInfoStructs[mSceneInfoStructsCount].currentScene      = 0;
-    mSceneInfoStructs[mSceneInfoStructsCount].currentGroup      = 0;
     mSceneInfoStructs[mSceneInfoStructsCount].remainingCapacity = 0;
 }
 
@@ -270,11 +256,14 @@ void ScenesManagementCluster::OnFabricRemoved(const FabricTable & fabricTable, F
     mFabricSceneInfo.ClearSceneInfoStruct(fabricIndex);
 }
 
+void ScenesManagementCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    // Update FabricSceneInfo for the committed fabric
+    LogErrorOnFailure(UpdateFabricSceneInfo(fabricIndex));
+}
+
 CHIP_ERROR ScenesManagementCluster::StoreSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID, const SceneId & sceneID)
 {
-    // Make the current fabric's SceneValid false before storing a scene
-    ReturnErrorOnFailure(MakeSceneInvalid(fabricIdx));
-
     ScopedSceneTable sceneTable(mSceneTableProvider);
 
     // Verify Endpoint in group
@@ -315,25 +304,13 @@ CHIP_ERROR ScenesManagementCluster::StoreSceneParse(const FabricIndex & fabricId
     ReturnErrorOnFailure(sceneTable->SetSceneTableEntry(fabricIdx, scene));
 
     // Update SceneInfo Attribute
-    return UpdateFabricSceneInfo(fabricIdx, MakeOptional(groupID), MakeOptional(sceneID), MakeOptional(static_cast<bool>(true)));
-}
-
-CHIP_ERROR ScenesManagementCluster::MakeSceneInvalidForAllFabrics()
-{
-    for (auto & info : *mFabricTable)
-    {
-        ReturnErrorOnFailure(MakeSceneInvalid(info.GetFabricIndex()));
-    }
-    return CHIP_NO_ERROR;
+    return UpdateFabricSceneInfo(fabricIdx);
 }
 
 CHIP_ERROR ScenesManagementCluster::RecallSceneParse(const FabricIndex & fabricIdx, const GroupId & groupID,
                                                      const SceneId & sceneID,
                                                      const Optional<DataModel::Nullable<uint32_t>> & transitionTime)
 {
-    // Make SceneValid false for all fabrics before recalling a scene
-    ReturnErrorOnFailure(MakeSceneInvalidForAllFabrics());
-
     // Get Scene Table Instance
     ScopedSceneTable sceneTable(mSceneTableProvider);
 
@@ -363,7 +340,7 @@ CHIP_ERROR ScenesManagementCluster::RecallSceneParse(const FabricIndex & fabricI
     ReturnErrorOnFailure(sceneTable->SceneApplyEFS(scene));
 
     // Update FabricSceneInfo, at this point the scene is considered valid
-    return UpdateFabricSceneInfo(fabricIdx, Optional<GroupId>(groupID), Optional<SceneId>(sceneID), Optional<bool>(true));
+    return UpdateFabricSceneInfo(fabricIdx);
 }
 
 std::optional<DataModel::ActionReturnStatus> ScenesManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -476,7 +453,7 @@ CHIP_ERROR ScenesManagementCluster::Startup(ServerClusterContext & context)
     for (const FabricInfo & info : *mFabricTable)
     {
         FabricIndex fabric = info.GetFabricIndex();
-        LogErrorOnFailure(UpdateFabricSceneInfo(fabric, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>()));
+        LogErrorOnFailure(UpdateFabricSceneInfo(fabric));
     }
 
     return DefaultServerCluster::Startup(context);
@@ -509,17 +486,6 @@ CHIP_ERROR ScenesManagementCluster::GroupWillBeRemoved(FabricIndex aFabricIdx, G
     // Get Scene Table Instance
     ScopedSceneTable sceneTable(mSceneTableProvider);
     VerifyOrReturnError(sceneTable, CHIP_ERROR_INTERNAL);
-
-    SceneInfoStruct::Type * sceneInfo = mFabricSceneInfo.GetSceneInfoStruct(aFabricIdx);
-    chip::GroupId currentGroup        = (nullptr != sceneInfo) ? sceneInfo->currentGroup : 0x0000;
-
-    // If currentGroup is what is being removed, we can't possibly still have a valid scene,
-    // because the scene we have (if any) will also be removed.
-    if (aGroupId == currentGroup)
-    {
-        ReturnErrorOnFailure(MakeSceneInvalid(aFabricIdx));
-    }
-
     VerifyOrReturnError(nullptr != mGroupProvider, CHIP_ERROR_INCORRECT_STATE);
 
     if (0 != aGroupId && !mGroupProvider->HasEndpoint(aFabricIdx, aGroupId, mPath.mEndpointId))
@@ -528,11 +494,6 @@ CHIP_ERROR ScenesManagementCluster::GroupWillBeRemoved(FabricIndex aFabricIdx, G
     }
 
     return sceneTable->DeleteAllScenesInGroup(aFabricIdx, aGroupId);
-}
-
-CHIP_ERROR ScenesManagementCluster::MakeSceneInvalid(FabricIndex aFabricIdx)
-{
-    return UpdateFabricSceneInfo(aFabricIdx, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>(false));
 }
 
 CHIP_ERROR ScenesManagementCluster::StoreCurrentScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId)
@@ -646,8 +607,7 @@ AddSceneResponse::Type ScenesManagementCluster::HandleAddScene(FabricIndex fabri
     SuccessOrReturnWithFailureStatus(sceneTable->SetSceneTableEntry(fabricIndex, scene), response);
 
     // Update FabricSceneInfo
-    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>()),
-                                     response);
+    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex), response);
 
     // Write response
     response.status = to_underlying(Status::Success);
@@ -776,15 +736,7 @@ ScenesManagementCluster::HandleRemoveScene(FabricIndex fabricIndex,
     SuccessOrReturnWithFailureStatus(sceneTable->RemoveSceneTableEntry(fabricIndex, scene.mStorageId), response);
 
     // Update SceneInfoStruct Attributes
-    SceneInfoStruct::Type * sceneInfo = GetSceneInfoStruct(fabricIndex);
-    Optional<bool> sceneValid;
-    if (nullptr != sceneInfo && req.groupID == sceneInfo->currentGroup && req.sceneID == sceneInfo->currentScene)
-    {
-        sceneValid.Emplace(false);
-    }
-
-    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex, Optional<GroupId>(), Optional<SceneId>(), sceneValid),
-                                     response);
+    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex), response);
 
     response.status = to_underlying(Status::Success);
     return response;
@@ -822,16 +774,7 @@ ScenesManagementCluster::HandleRemoveAllScenes(FabricIndex fabricIndex,
     SuccessOrReturnWithFailureStatus(sceneTable->DeleteAllScenesInGroup(fabricIndex, req.groupID), response);
 
     // Update Attributes
-    SceneInfoStruct::Type * sceneInfo = GetSceneInfoStruct(fabricIndex);
-
-    Optional<bool> sceneValid;
-    if (nullptr != sceneInfo && req.groupID == sceneInfo->currentGroup)
-    {
-        sceneValid.Emplace(false);
-    }
-
-    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex, Optional<GroupId>(), Optional<SceneId>(), sceneValid),
-                                     response);
+    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex), response);
 
     response.status = to_underlying(Status::Success);
     return response;
@@ -1013,9 +956,7 @@ ScenesManagementCluster::HandleCopyScene(FabricIndex fabricIndex, const ScenesMa
             SuccessOrReturnWithFailureStatus(sceneTable->SetSceneTableEntry(fabricIndex, scene), response);
 
             // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
-            SuccessOrReturnWithFailureStatus(
-                UpdateFabricSceneInfo(fabricIndex, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/),
-                response);
+            SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex), response);
         }
 
         response.status = to_underlying(Status::Success);
@@ -1029,8 +970,7 @@ ScenesManagementCluster::HandleCopyScene(FabricIndex fabricIndex, const ScenesMa
     SuccessOrReturnWithFailureStatus(sceneTable->SetSceneTableEntry(fabricIndex, scene), response);
 
     // Update Attributes
-    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>()),
-                                     response);
+    SuccessOrReturnWithFailureStatus(UpdateFabricSceneInfo(fabricIndex), response);
     response.status = to_underlying(Status::Success);
     return response;
 }
