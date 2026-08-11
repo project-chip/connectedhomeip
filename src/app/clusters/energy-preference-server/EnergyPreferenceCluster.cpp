@@ -34,10 +34,14 @@ CHIP_ERROR EnergyPreferenceCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(context.attributeStorage);
 
+    // These are indexes, so 0 is picked as fallback.
+    constexpr uint8_t kCurrentenergyBalanceFallback = 0;
+    constexpr uint8_t kCurrentLowPowerModeSensitivityFallback = 0;
+
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id }, mCurrentEnergyBalance,
-                                      uint8_t{});
+                                      kCurrentenergyBalanceFallback);
     persistence.LoadNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id },
-                                      mCurrentLowPowerModeSensitivity, uint8_t{});
+                                      mCurrentLowPowerModeSensitivity, kCurrentLowPowerModeSensitivityFallback);
 
     return CHIP_NO_ERROR;
 }
@@ -101,64 +105,37 @@ CHIP_ERROR EnergyPreferenceCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR EnergyPreferenceCluster::SetCurrentEnergyBalance(uint8_t currentEnergyBalance)
+CHIP_ERROR EnergyPreferenceCluster::SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue, size_t correspondingArraySize, AttributeId attributeId, Feature featureGate, OnCurrentUint8AttributeChangedCallback onChangedCallback)
 {
-    if (!mFeatures.Has(Feature::kEnergyBalance))
+    if (!mFeatures.Has(featureGate))
     {
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    if (currentEnergyBalance >= sDelegate->GetNumEnergyBalances(GetEndpointId()))
+    if (newValue >= correspondingArraySize)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (SetAttributeValue(mCurrentEnergyBalance, currentEnergyBalance, CurrentEnergyBalance::Id))
+    if (SetAttributeValue(attributeValue, newValue, attributeId))
     {
-        sDelegate->OnCurrentEnergyBalanceChanged(GetEndpointId(), currentEnergyBalance);
+        (sDelegate->*onChangedCallback)(GetEndpointId(), newValue);
         if (mContext != nullptr)
         {
             AttributePersistence persistence(mContext->attributeStorage);
-            ReturnErrorOnFailure(persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, CurrentEnergyBalance::Id },
-                                                                    currentEnergyBalance));
+            ReturnErrorOnFailure(persistence.StoreNativeEndianValue({ GetEndpointId(), mPath.mClusterId, attributeId }, newValue));
         }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EnergyPreferenceCluster::SetCurrentLowPowerModeSensitivity(uint8_t currentLowPowerModeSensitivity)
-{
-    if (!mFeatures.Has(Feature::kLowPowerModeSensitivity))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    if (currentLowPowerModeSensitivity >= sDelegate->GetNumLowPowerModeSensitivities(GetEndpointId()))
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    if (SetAttributeValue(mCurrentLowPowerModeSensitivity, currentLowPowerModeSensitivity, CurrentLowPowerModeSensitivity::Id))
-    {
-        sDelegate->OnCurrentLowPowerModeSensitivityChanged(GetEndpointId(), currentLowPowerModeSensitivity);
-        if (mContext != nullptr)
-        {
-            AttributePersistence persistence(mContext->attributeStorage);
-            ReturnErrorOnFailure(persistence.StoreNativeEndianValue(
-                { GetEndpointId(), mPath.mClusterId, CurrentLowPowerModeSensitivity::Id }, currentLowPowerModeSensitivity));
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePath & path, AttributeValueEncoder & encoder)
+CHIP_ERROR EnergyPreferenceCluster::ReadBalanceStructListAttribute(const ConcreteAttributePath & path, AttributeValueEncoder & encoder, BalanceStructAtIndexGetter getter)
 {
     VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     EndpointId endpoint = GetEndpointId();
 
-    return encoder.EncodeList([endpoint](const auto & enc) -> CHIP_ERROR {
+    return encoder.EncodeList([endpoint, getter](const auto & enc) -> CHIP_ERROR {
         size_t index   = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         do
@@ -166,7 +143,7 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyBalances(const ConcreteAttributePa
             Percent step;
             char buffer[kMaxBalanceStructLabelLength];
             Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
-            if ((err = sDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
+            if ((err = (sDelegate->*getter)(endpoint, index, step, label)) == CHIP_NO_ERROR)
             {
                 BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
                 ReturnErrorOnFailure(enc.Encode(balance));
@@ -192,31 +169,6 @@ CHIP_ERROR EnergyPreferenceCluster::ReadEnergyPriorities(const ConcreteAttribute
             ReturnErrorOnFailure(enc.Encode(priority));
             index++;
         }
-        return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
-    });
-}
-
-CHIP_ERROR EnergyPreferenceCluster::ReadLowPowerModeSensitivities(const ConcreteAttributePath & path,
-                                                                  AttributeValueEncoder & encoder)
-{
-    VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    EndpointId endpoint = GetEndpointId();
-
-    return encoder.EncodeList([endpoint](const auto & enc) -> CHIP_ERROR {
-        size_t index   = 0;
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        do
-        {
-            Percent step;
-            char buffer[kMaxBalanceStructLabelLength];
-            Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
-            if ((err = sDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
-            {
-                BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
-                ReturnErrorOnFailure(enc.Encode(balance));
-                index++;
-            }
-        } while (err == CHIP_NO_ERROR);
         return err.NoErrorIf(CHIP_ERROR_NOT_FOUND);
     });
 }
