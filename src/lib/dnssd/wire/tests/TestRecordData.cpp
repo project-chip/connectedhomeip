@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/RecordData.h>
 
 #include <string>
 #include <vector>
@@ -240,5 +240,54 @@ TEST(TestRecordData, TxtRecord)
     EXPECT_EQ(accumulator.Data()[1], (std::make_pair<std::string, std::string>("foo", "bar")));
     EXPECT_EQ(accumulator.Data()[2], (std::make_pair<std::string, std::string>("x", "y=z")));
     EXPECT_EQ(accumulator.Data()[3], (std::make_pair<std::string, std::string>("a", "")));
+}
+
+TEST(TestRecordData, TxtRecordZeroLengthEntry)
+{
+    // A zero-length length prefix is valid TXT padding (RFC 6763).
+    const uint8_t record[] = {
+        0,                // empty string
+        3, 'f', 'o', 'o', // foo
+        0,                // empty string at end of RDATA
+    };
+
+    TxtRecordAccumulator accumulator;
+
+    EXPECT_TRUE(ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
+    ASSERT_EQ(accumulator.Data().size(), 3u);
+    EXPECT_EQ(accumulator.Data()[0], (std::make_pair<std::string, std::string>("", "")));
+    EXPECT_EQ(accumulator.Data()[1], (std::make_pair<std::string, std::string>("foo", "")));
+    EXPECT_EQ(accumulator.Data()[2], (std::make_pair<std::string, std::string>("", "")));
+}
+
+TEST(TestRecordData, SrvRecordRejectsTrailingBytes)
+{
+    const uint8_t record[] = {
+        0,    12,                  // Priority
+        0,    3,                   // weight
+        0x12, 0x34,                // port
+        4,    's',  'o', 'm', 'e', // QNAME part: some
+        0,                         // QNAME ends
+        0xFF,                      // trailing junk after the target name
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record, record + sizeof(record));
+
+    SrvRecord srv;
+    EXPECT_FALSE(srv.Parse(data, packet));
+}
+
+TEST(TestRecordData, PtrRecordRejectsTruncatedName)
+{
+    const uint8_t record[] = {
+        4, 's', 'o', 'm', // truncated: claims 4 bytes, only 3 present
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record, record + sizeof(record));
+    SerializedQNameIterator name;
+
+    EXPECT_FALSE(ParsePtrRecord(data, packet, &name));
 }
 } // namespace
