@@ -209,7 +209,11 @@ void LoggingServiceAreaDelegate::GoToNextArea(OperationalStatusEnum currentAreaO
     auto currentAreaId = currentAreaIdN.Value();
     AreaStructureWrapper currentArea;
     uint32_t currentAreaIndex;
-    mCluster->GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea);
+    if (!mCluster->GetSupportedAreaById(currentAreaId, currentAreaIndex, currentArea))
+    {
+        ChipLogError(Zcl, "GoToNextArea: current area %u not found in supported areas.", currentAreaId);
+        return;
+    }
     auto currentAreaMapId = currentArea.mapID;
 
     if (mCluster->HasFeature(Feature::kProgressReporting))

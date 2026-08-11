@@ -92,8 +92,13 @@ void LoggingRvcOperationalStateDelegate::UpdateServiceAreaProgressOnExit()
 void LoggingRvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Pause command received.");
-    mStateBeforePause = mCluster ? mCluster->GetCurrentOperationalState() : 0;
+    const uint8_t stateBeforePause = mCluster ? mCluster->GetCurrentOperationalState() : 0;
     LoggingOperationalStateDelegate::HandlePauseStateCallback(err);
+    if (err.errorStateID == to_underlying(ErrorStateEnum::kNoError) && mCluster != nullptr &&
+        mCluster->GetCurrentOperationalState() == to_underlying(OperationalStateEnum::kPaused))
+    {
+        mStateBeforePause = stateBeforePause;
+    }
 }
 
 void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
