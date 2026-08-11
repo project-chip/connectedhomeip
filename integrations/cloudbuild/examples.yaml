@@ -56,7 +56,7 @@ steps:
               build
               --create-archives /workspace/artifacts/
       waitFor:
-          - Bootstrap
+          - AllDevices
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv
