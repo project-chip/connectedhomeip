@@ -30,8 +30,6 @@
 #       --autoApplyImage
 #       --requestorCanConsent true
 #       --userConsentState deferred
-#       --app-pipe /tmp/requestor_2_7_fifo
-#       --app-pipe-out /tmp/requestor_2_7_fifo_out
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
