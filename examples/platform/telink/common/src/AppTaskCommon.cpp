@@ -770,9 +770,15 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEConnectionClosed:
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
+        {
+            // Unexpected BLE disconnect during commissioning
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        // Concurrent mode: do NOT call bt_disable() — BLE scheduler must stay
+        // active for Telink TLX BLE+802.15.4 hardware coexistence.
 #else
         if (ConnectivityMgr().GetBleLayer()->IsInitialized())
-#endif
         {
             // Unexpected BLE disconnect during commissioning
             ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
@@ -799,6 +805,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
 #endif
         }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
