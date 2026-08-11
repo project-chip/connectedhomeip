@@ -73,44 +73,91 @@ if [ -f "$DOCKER_VOLUME_PATH" ]; then
     mb_space_before=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
 fi
 
+# Save original arguments for recursive calls before parsing
+ORIG_ARGS=("$@")
+
+BUILD_ARGS=()
+LATEST=false
+PUSH=false
+SKIP_BUILD=false
+SQUASH=false
+CLEAR=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --no-cache)
+            BUILD_ARGS+=("$1")
+            shift
+            ;;
+        --latest)
+            LATEST=true
+            shift
+            ;;
+        --push)
+            PUSH=true
+            shift
+            ;;
+        --skip-build)
+            SKIP_BUILD=true
+            shift
+            ;;
+        --squash)
+            SQUASH=true
+            shift
+            ;;
+        --clear)
+            CLEAR=true
+            shift
+            ;;
+        --build-arg)
+            BUILD_ARGS+=("$1" "$2")
+            shift 2
+            ;;
+        --build-arg=*)
+            BUILD_ARGS+=("$1")
+            shift
+            ;;
+        *)
+            # Forward any other arguments to docker build
+            BUILD_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "$@")
+    (cd "../$dep" && ./build.sh "${ORIG_ARGS[@]}")
 done
 
-BUILD_ARGS=()
-if [[ ${*/--no-cache//} != "${*}" ]]; then
-    BUILD_ARGS+=(--no-cache)
-fi
-
-[[ ${*/--skip-build//} != "${*}" ]] || {
+if [ "$SKIP_BUILD" = false ]; then
     docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
     docker image prune --force
-}
+fi
 
-[[ ${*/--latest//} != "${*}" ]] && {
+if [ "$LATEST" = true ]; then
     docker tag "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION" "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
-}
+fi
 
-[[ ${*/--squash//} != "${*}" ]] && {
+if [ "$SQUASH" = true ]; then
     command -v docker-squash >/dev/null &&
         docker-squash "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION" -t "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
-}
+fi
 
-[[ ${*/--push//} != "${*}" ]] && {
+if [ "$PUSH" = true ]; then
     docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
-    [[ ${*/--latest//} != "${*}" ]] && {
+    if [ "$LATEST" = true ]; then
         docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
-    }
-}
+    fi
+fi
 
-[[ ${*/--clear//} != "${*}" ]] && {
+if [ "$CLEAR" = true ]; then
     docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
-    [[ ${*/--latest//} != "${*}" ]] && {
+    if [ "$LATEST" = true ]; then
         docker rmi -f "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
-    }
-}
+    fi
+fi
 
 docker images --filter=reference="$GHCR_ORG/$ORG/*"
 

@@ -83,6 +83,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/energy-evse-server/tests",
+      "${chip_root}/src/app/clusters/energy-preference-server/tests",
       "${chip_root}/src/app/clusters/fan-control-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
@@ -157,7 +158,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/server/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+      "${chip_root}/src/lib/dnssd/wire/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
       "${chip_root}/src/lib/dnssd/tests",
@@ -210,7 +211,7 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr") {
-      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+      tests += [ "${chip_root}/src/lib/dnssd/wire/records/tests" ]
     }
 
     if (current_os != "zephyr") {

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/core/QName.h>
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 
 #include <inet/IPPacketInfo.h>
 
