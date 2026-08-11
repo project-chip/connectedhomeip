@@ -129,7 +129,10 @@ done
 # Images are referenced as ghcr.io/project-chip/<name>:<tag>, and the parent may
 # live in any stage directory, so resolve it by name under images/ rather than
 # assuming it is a sibling.
-IMAGES_ROOT="$(git rev-parse --show-toplevel)/integrations/docker/images"
+# The script is symlinked into each image directory and has already cd'd there,
+# so images/ is two levels up. Derived from that rather than from git, so the
+# walk works on an exported tree with no repository.
+IMAGES_ROOT="$(cd ../.. && pwd)"
 # Take the image token ($2) so a trailing "AS <alias>" is excluded by
 # construction rather than by the tag strip happening to swallow it, and cut at
 # ":" or "@" so both tagged and digest references reduce to the image name.
