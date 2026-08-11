@@ -245,9 +245,40 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 #if defined(CONFIG_BT_TLX)
-    // Telink TLX: enable BLE + 802.15.4 hardware coexistence so that
-    // OpenThread's tlx_start_radio() does not block on
-    // ieee802154_task_ready_sem. Must be called after bt_enable().
+    // WORKAROUND (Telink TLX BLE + 802.15.4 coexistence):
+    //
+    // On Telink TLX SoCs, BLE and Thread share a single hardware radio and
+    // are arbitrated by the BLE scheduler (TLKSW SDK). Thread cannot start
+    // its radio until the BLE task has been inserted into the scheduler.
+    // ThreadStackManager calls tlx_start_radio(), which blocks forever on
+    // the ieee802154_task_ready_sem as long as tlksdk_thd_checkIsInsertTask1()
+    // returns 0 (i.e. no BLE task is active in the scheduler yet).
+    //
+    // Therefore, before calling tlx_bt_802154_dual_mode_start(), we must
+    // ensure the BLE stack is running a real scheduler task. Simply calling
+    // bt_enable() is not enough - the scheduler only becomes active once an
+    // advertisement/connection is actually started. So we launch a minimal
+    // BLE advertisement here, synchronously inside _Init(), before Thread
+    // auto-starts. On first boot Thread is not yet provisioned and would
+    // otherwise start its radio later (after DriveBLEState has already run),
+    // which masks the problem; on reboot with stored fabric data Thread
+    // tries to rejoin immediately and deadlocks without this workaround.
+    //
+    // The real CHIPoBLE advertisement replaces this minimal one later, when
+    // DriveBLEState() runs (StartAdvertising).
+    {
+        static const struct bt_data minimal_ad[] = {
+            BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+        };
+        const struct bt_le_adv_param params =
+            BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
+        int adv_err = bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
+        if (adv_err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to start minimal BLE advertisement: %d", adv_err);
+        }
+    }
+
     tlx_bt_802154_dual_mode_start();
 #endif
 #endif
