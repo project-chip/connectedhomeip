@@ -124,10 +124,14 @@ class TC_PICS_Checker(BasicCompositionTests):
         # it is read, so a missing slice here means an endpoint-structured tree
         # that holds nothing for this endpoint. Every element on the endpoint
         # would be reported as a missing PICS, so say why up front instead.
-        asserts.assert_in(self.endpoint_id, self.matter_test_config.pics,
-                          f"The PICS supplied to --PICS contain no codes for endpoint {self.endpoint_id}. "
-                          f"An endpoint-structured PICS tree needs an endpoint{self.endpoint_id} subdirectory; "
-                          "a PICS file or directory for a single endpoint is attributed to --endpoint automatically.")
+        if self.endpoint_id not in self.matter_test_config.pics:
+            self.record_error("PICS check", location=UnknownProblemLocation(),
+                              problem=f"No PICS were supplied for endpoint {self.endpoint_id}. PICS are present for "
+                                      f"endpoints {sorted(self.matter_test_config.pics)}")
+            self.fail_current_test(
+                f"No PICS were supplied for endpoint {self.endpoint_id}. An endpoint-structured PICS tree needs an "
+                f"endpoint{self.endpoint_id} subdirectory; a PICS file or directory for a single endpoint is "
+                "attributed to --endpoint automatically.")
 
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True

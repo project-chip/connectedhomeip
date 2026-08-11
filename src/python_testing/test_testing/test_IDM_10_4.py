@@ -291,6 +291,14 @@ def main():
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Groups on 2 endpoints with MCORE.G.MULTIENDPOINT - expected success")
 
+    # An endpoint-structured PICS tree with no slice for the endpoint under test
+    # has nothing to check against. The test must say so rather than reporting
+    # every element on the endpoint as a missing PICS code.
+    test_runner.config.pics = {1: {"SWTCH.S": True}}
+    resp = create_read()
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: no PICS slice for the endpoint under test - expected failure")
+
     # Regression: PICS codes that belong to a different endpoint's slice must
     # not be evaluated against the endpoint under test (here, EP0). The Switch
     # cluster is marked supported only on endpoint 1's slice and is absent from
@@ -303,14 +311,6 @@ def main():
     resp = create_read()
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: foreign-endpoint (EP1) PICS leaked into EP0 check - expected success")
-
-    # An endpoint-structured PICS tree with no slice for the endpoint under test
-    # has nothing to check against. The test must say so rather than reporting
-    # every element on the endpoint as a missing PICS code.
-    test_runner.config.pics = {1: {"SWTCH.S": True}}
-    resp = create_read()
-    if test_runner.run_test_with_mock_read(resp):
-        failures.append("Test case failure: no PICS slice for the endpoint under test - expected failure")
 
     test_runner.Shutdown()
 
