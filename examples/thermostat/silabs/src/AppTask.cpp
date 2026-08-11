@@ -74,6 +74,8 @@ constexpr EndpointId kThermostatEndpoint = THERMOSTAT_ENDPOINT;
 constexpr uint16_t kSensorTimerPeriodMs  = SENSOR_TIMER_PERIOD_MS;
 constexpr uint16_t kMinTemperatureDelta  = MIN_TEMPERATURE_DELTA;
 
+static Clusters::Thermostat::ThermostatDelegate kThermostatDelegate(kThermostatEndpoint);
+
 osTimerId_t sSensorTimer = nullptr;
 
 int8_t ConvertToPrintableTemp(int16_t temperature)
@@ -104,9 +106,8 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
-    using namespace chip::app::Clusters::Thermostat;
-    auto & delegate = ThermostatDelegate::GetInstance();
-    SetDefaultDelegate(kThermostatEndpoint, &delegate);
+    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
+        kThermostatEndpoint, &kThermostatDelegate);
 
     err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)
