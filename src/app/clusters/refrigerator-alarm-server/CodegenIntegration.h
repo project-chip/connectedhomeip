@@ -18,10 +18,34 @@
 
 #pragma once
 
-#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/refrigerator-alarm-server/RefrigeratorAlarmCluster.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+class RefrigeratorAlarmServer
+{
+public:
+    static RefrigeratorAlarmServer & Instance();
+
+    chip::Protocols::InteractionModel::Status GetMaskValue(
+        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
+    chip::Protocols::InteractionModel::Status GetStateValue(
+        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    chip::Protocols::InteractionModel::Status GetSupportedValue(
+        chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
+
+    chip::Protocols::InteractionModel::Status
+    SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+
+    chip::Protocols::InteractionModel::Status
+    SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+
+private:
+    static RefrigeratorAlarmServer instance;
+};
 
 namespace chip::app::Clusters::RefrigeratorAlarm {
 
-AlarmBaseCluster * FindClusterOnEndpoint(EndpointId endpointId);
+RefrigeratorAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::RefrigeratorAlarm

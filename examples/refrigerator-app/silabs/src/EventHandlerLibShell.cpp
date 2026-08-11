@@ -152,9 +152,6 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 
 CHIP_ERROR RegisterRefrigeratorEvents()
 {
-    BitMask<AlarmMap> supported(AlarmMap::kDoorOpen);
-    RefrigeratorAlarmServer::Instance().SetSupportedValue(kRefEndpointId, supported);
-
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
         { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },

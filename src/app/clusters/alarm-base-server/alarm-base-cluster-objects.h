@@ -24,7 +24,6 @@
 #include <clusters/DishwasherAlarm/Enums.h>
 #include <clusters/DishwasherAlarm/Events.h>
 #include <clusters/DishwasherAlarm/Metadata.h>
-#include <clusters/RefrigeratorAlarm/Metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
 
@@ -39,18 +38,6 @@ enum class AlarmBitmap : uint32_t
     kNone = 0,
 };
 using AlarmMap = BitMask<AlarmBitmap>;
-
-// A pair of cluster ID and revision.
-struct ClusterRevisionEntry
-{
-    ClusterId id;
-    uint32_t revision;
-};
-
-static constexpr ClusterRevisionEntry kAliasedClusters[] = {
-    { DishwasherAlarm::Id, DishwasherAlarm::kRevision },
-    { RefrigeratorAlarm::Id, RefrigeratorAlarm::kRevision },
-};
 
 using Feature      = DishwasherAlarm::Feature;
 namespace Commands = DishwasherAlarm::Commands;

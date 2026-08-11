@@ -15,10 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -67,6 +70,28 @@ bool DishwasherAlarmDelegate::ResetAlarmsCallback(const BitMask<AlarmMap> alarms
 } // namespace app
 } // namespace chip
 
+namespace {
+
+using namespace chip::app::Clusters::DishwasherAlarm;
+using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
+
+void VerifyDishwasherAlarmFixedAttributes(EndpointId endpoint)
+{
+    BitMask<AlarmMap> expectedSupported;
+    BitMask<AlarmMap> expectedLatch;
+    BitMask<AlarmMap> actualSupported;
+    BitMask<AlarmMap> actualLatch;
+
+    VerifyOrDie(Supported::GetDefault(endpoint, &expectedSupported) == Status::Success);
+    VerifyOrDie(Latch::GetDefault(endpoint, &expectedLatch) == Status::Success);
+    VerifyOrDie(DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &actualSupported) == Status::Success);
+    VerifyOrDie(DishwasherAlarmServer::Instance().GetLatchValue(endpoint, &actualLatch) == Status::Success);
+    VerifyOrDie(actualSupported == expectedSupported);
+    VerifyOrDie(actualLatch == expectedLatch);
+}
+
+} // namespace
+
 /*
  * An example to present device's endpointId
  */
@@ -80,21 +105,7 @@ void MatterDishwasherAlarmServerInit()
     static DishwasherAlarm::DishwasherAlarmDelegate delegate;
     DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
 
-    // Set Supported attribute = 0x2F = 47
-    // Bit Name              Value
-    // 0   InflowError       1
-    // 1   DrainError        1
-    // 2   DoorError         1
-    // 3   TempTooLow        1
-    // 4   TempTooHigh       0
-    // 5   WaterLevelError   1
-    BitMask<AlarmMap> supported;
-    supported.SetField(AlarmMap::kInflowError, 1);
-    supported.SetField(AlarmMap::kDrainError, 1);
-    supported.SetField(AlarmMap::kDoorError, 1);
-    supported.SetField(AlarmMap::kTempTooLow, 1);
-    supported.SetField(AlarmMap::kWaterLevelError, 1);
-    DishwasherAlarmServer::Instance().SetSupportedValue(kDemoEndpointId, supported);
+    VerifyDishwasherAlarmFixedAttributes(kDemoEndpointId);
 
     // Set Mask attribute = 0x2F = 47
     // Bit Name              Value
@@ -111,19 +122,6 @@ void MatterDishwasherAlarmServerInit()
     mask.SetField(AlarmMap::kTempTooLow, 1);
     mask.SetField(AlarmMap::kWaterLevelError, 1);
     DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, mask);
-
-    // Set Latch attribute = 0x03
-    // Bit Name              Value
-    // 0   InflowError       1
-    // 1   DrainError        1
-    // 2   DoorError         0
-    // 3   TempTooLow        0
-    // 4   TempTooHigh       0
-    // 5   WaterLevelError   0
-    BitMask<AlarmMap> latch;
-    latch.SetField(AlarmMap::kInflowError, 1);
-    latch.SetField(AlarmMap::kDrainError, 1);
-    DishwasherAlarmServer::Instance().SetLatchValue(kDemoEndpointId, latch);
 
     // Set State attribute = 0x07
     // Bit Name              Value

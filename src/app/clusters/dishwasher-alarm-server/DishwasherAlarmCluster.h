@@ -18,12 +18,19 @@
 
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
+#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
+#include <clusters/DishwasherAlarm/Metadata.h>
 
-namespace chip::app::Clusters::AlarmBase {
+namespace chip::app::Clusters {
 
-uint32_t GetClusterRevision(ClusterId clusterId);
+class DishwasherAlarmCluster : public AlarmBaseCluster
+{
+public:
+    using Config = AlarmBaseCluster::Config;
 
-bool EndpointHasCommand(EndpointId endpointId, ClusterId clusterId, CommandId commandId);
+    DishwasherAlarmCluster(EndpointId endpointId, const Config & config) :
+        AlarmBaseCluster(endpointId, DishwasherAlarm::Id, config)
+    {}
+};
 
-} // namespace chip::app::Clusters::AlarmBase
+} // namespace chip::app::Clusters

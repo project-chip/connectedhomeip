@@ -69,13 +69,6 @@ CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
     Protocols::InteractionModel::Status status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-    BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
-    supported.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
-    supported.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
-    supported.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
-    supported.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
-    supported.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
-
     BitMask<AlarmMap> mask;                       // Set dishwasher alarm mask value
     mask.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
     mask.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
@@ -87,13 +80,6 @@ CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
     state.SetField(AlarmMap::kDrainError, 1); // 0x02, 2
     state.SetField(AlarmMap::kDoorError, 1);  // 0x04, 4
     state.SetField(AlarmMap::kTempTooLow, 1); // 0x08, 8
-
-    status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
 
     status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
     if (status != Protocols::InteractionModel::Status::Success)
@@ -128,26 +114,12 @@ CHIP_ERROR ManualDishWasherAlarmSetLowerCommandHandler(int argc, char ** argv)
     Protocols::InteractionModel::Status status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-    BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
-    supported.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
-    supported.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
-    supported.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
-    supported.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
-    supported.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
-
     BitMask<AlarmMap> mask;                       // Set dishwasher alarm mask value
     mask.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
     mask.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
     mask.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
     mask.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
     mask.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
-
-    status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
 
     status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
     if (status != Protocols::InteractionModel::Status::Success)

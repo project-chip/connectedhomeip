@@ -17,22 +17,23 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
-#include <app/clusters/alarm-base-server/CodegenIntegrationHelpers.h>
 #include <app/clusters/alarm-base-server/alarm-base-cluster-objects.h>
 #include <app/clusters/dishwasher-alarm-server/CodegenIntegration.h>
-#include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-delegate.h>
+#include <app/clusters/dishwasher-alarm-server/DishwasherAlarmCluster.h>
 #include <app/static-cluster-config/DishwasherAlarm.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
+using namespace chip::app::Clusters::DishwasherAlarm;
 using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
@@ -45,12 +46,39 @@ static_assert(kDishwasherAlarmFixedClusterCount == MATTER_DM_DISHWASHER_ALARM_CL
               "DishwasherAlarm static cluster config must match ZAP server endpoint count");
 static_assert(kDishwasherAlarmMaxClusterCount <= kEmberInvalidEndpointIndex, "DishwasherAlarm cluster table size error");
 
+BitMask<DishwasherAlarm::AlarmMap> ToAlarmMap(AlarmBase::AlarmMap map)
+{
+    return BitMask<DishwasherAlarm::AlarmMap>(map.Raw());
+}
+
+AlarmBase::AlarmMap FromAlarmMap(const BitMask<DishwasherAlarm::AlarmMap> map)
+{
+    return AlarmBase::AlarmMap(map.Raw());
+}
+
+bool EndpointHasModifyEnabledAlarmsCommand(EndpointId endpointId)
+{
+    constexpr CommandId kCommandId = DishwasherAlarm::Commands::ModifyEnabledAlarms::Id;
+    const EmberAfCluster * cluster = emberAfFindServerCluster(endpointId, DishwasherAlarm::Id);
+    VerifyOrReturnValue(cluster != nullptr, false);
+    VerifyOrReturnValue(cluster->acceptedCommandList != nullptr, false);
+
+    for (const CommandId * cmd = cluster->acceptedCommandList; *cmd != kInvalidCommandId; cmd++)
+    {
+        if (*cmd == kCommandId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 class DishwasherAlarmIntegrationDelegateWrapper final : public AlarmBase::Delegate
 {
 public:
     void Init(DishwasherAlarm::Delegate * wrapped) { mWrapped = wrapped; }
 
-    bool ModifyEnabledAlarms(AlarmMap mask) override
+    bool ModifyEnabledAlarms(AlarmBase::AlarmMap mask) override
     {
         if (mWrapped == nullptr)
         {
@@ -59,7 +87,7 @@ public:
         return mWrapped->ModifyEnabledAlarmsCallback(BitMask<DishwasherAlarm::AlarmBitmap>(mask.Raw()));
     }
 
-    bool ResetAlarms(AlarmMap alarms) override
+    bool ResetAlarms(AlarmBase::AlarmMap alarms) override
     {
         if (mWrapped == nullptr)
         {
@@ -74,7 +102,7 @@ private:
 
 struct DishwasherAlarmClusterSlot
 {
-    LazyRegisteredServerCluster<AlarmBaseCluster> cluster;
+    LazyRegisteredServerCluster<DishwasherAlarmCluster> cluster;
     DishwasherAlarmIntegrationDelegateWrapper integrationDelegateWrapper;
     DishwasherAlarm::Delegate * userDelegate = nullptr;
 };
@@ -91,46 +119,43 @@ public:
 
         BitFlags<DishwasherAlarm::Feature> features(featureMap);
 
-        AlarmMap supported{};
+        AlarmBase::AlarmMap supported{};
         BitMask<DishwasherAlarm::AlarmBitmap> supportedDefault{};
         if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
         {
-            supported = AlarmMap(supportedDefault.Raw());
+            supported = AlarmBase::AlarmMap(supportedDefault.Raw());
         }
 
-        AlarmMap latch{};
+        AlarmBase::AlarmMap latch{};
         BitMask<DishwasherAlarm::AlarmBitmap> latchDefault{};
         if (Latch::GetDefault(endpointId, &latchDefault) == Status::Success)
         {
-            latch = AlarmMap(latchDefault.Raw());
+            latch = AlarmBase::AlarmMap(latchDefault.Raw());
         }
 
-        AlarmBaseCluster::Config config{
-            .feature         = features,
-            .clusterRevision = GetClusterRevision(DishwasherAlarm::Id),
-            .supported       = supported,
-            .latch           = latch,
-            .supportsModifyEnabledAlarms =
-                EndpointHasCommand(endpointId, DishwasherAlarm::Id, DishwasherAlarm::Commands::ModifyEnabledAlarms::Id),
-            .delegate = &gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
-        };
+        DishwasherAlarmCluster::Config config(gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper);
+        config.feature         = features;
+        config.clusterRevision = DishwasherAlarm::kRevision;
+        config.supported       = supported;
+        config.latch           = latch;
+        config.supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId);
 
         gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(
             gDishwasherAlarmClusters[clusterInstanceIndex].userDelegate);
-        gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, DishwasherAlarm::Id, config);
+        gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, config);
 
-        AlarmBaseCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
+        DishwasherAlarmCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
 
         BitMask<DishwasherAlarm::AlarmBitmap> maskDefault{};
         if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
         {
-            cluster.SetMaskValue(AlarmMap(maskDefault.Raw()));
+            cluster.SetMaskValue(AlarmBase::AlarmMap(maskDefault.Raw()));
         }
 
         BitMask<DishwasherAlarm::AlarmBitmap> stateDefault{};
         if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
         {
-            cluster.SetStateValue(AlarmMap(stateDefault.Raw()), true);
+            cluster.SetStateValue(AlarmBase::AlarmMap(stateDefault.Raw()), true);
         }
 
         return gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Registration();
@@ -183,10 +208,10 @@ __attribute__((weak)) void MatterDishwasherAlarmPluginServerShutdownCallback() {
 
 namespace chip::app::Clusters::DishwasherAlarm {
 
-AlarmBaseCluster * FindClusterOnEndpoint(EndpointId endpointId)
+DishwasherAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     DishwasherAlarmIntegrationDelegate integrationDelegate;
-    return static_cast<AlarmBaseCluster *>(CodegenClusterIntegration::FindClusterOnEndpoint(
+    return static_cast<DishwasherAlarmCluster *>(CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = DishwasherAlarm::Id,
@@ -211,13 +236,98 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     {
         gDishwasherAlarmClusters[ep].userDelegate = delegate;
         gDishwasherAlarmClusters[ep].integrationDelegateWrapper.Init(delegate);
-
-        AlarmBaseCluster * cluster = FindClusterOnEndpoint(endpoint);
-        if (cluster != nullptr)
-        {
-            cluster->SetDelegate(&gDishwasherAlarmClusters[ep].integrationDelegateWrapper);
-        }
     }
+}
+
+DishwasherAlarmServer DishwasherAlarmServer::instance;
+
+DishwasherAlarmServer & DishwasherAlarmServer::Instance()
+{
+    return instance;
+}
+
+Status DishwasherAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+
+    AlarmBase::AlarmMap value;
+    Status status = cluster->GetMaskValue(&value);
+    if (status == Status::Success && mask != nullptr)
+    {
+        *mask = ToAlarmMap(value);
+    }
+    return status;
+}
+
+Status DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+
+    AlarmBase::AlarmMap value;
+    Status status = cluster->GetLatchValue(&value);
+    if (status == Status::Success && latch != nullptr)
+    {
+        *latch = ToAlarmMap(value);
+    }
+    return status;
+}
+
+Status DishwasherAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+
+    AlarmBase::AlarmMap value;
+    Status status = cluster->GetStateValue(&value);
+    if (status == Status::Success && state != nullptr)
+    {
+        *state = ToAlarmMap(value);
+    }
+    return status;
+}
+
+Status DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+
+    AlarmBase::AlarmMap value;
+    Status status = cluster->GetSupportedValue(&value);
+    if (status == Status::Success && supported != nullptr)
+    {
+        *supported = ToAlarmMap(value);
+    }
+    return status;
+}
+
+Status DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+    return cluster->SetMaskValue(FromAlarmMap(mask));
+}
+
+Status DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+    return cluster->SetStateValue(FromAlarmMap(newState), ignoreLatchState);
+}
+
+Status DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
+    return cluster->ResetLatchedAlarms(FromAlarmMap(alarms));
+}
+
+bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
+{
+    DishwasherAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
+    VerifyOrReturnError(cluster != nullptr, false);
+    return cluster->HasResetFeature();
 }
 
 } // namespace chip::app::Clusters::DishwasherAlarm

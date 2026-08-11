@@ -14,7 +14,7 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "DishwasherAlarmCluster.h",
   "dishwasher-alarm-delegate.h",
-  "dishwasher-alarm-server.cpp",
   "dishwasher-alarm-server.h",
 ]

@@ -76,32 +76,26 @@ struct TestAlarmBaseCluster : public ::testing::Test
             feature.Set(Feature::kReset);
         }
 
-        AlarmBaseCluster::Config config = {
-            .feature                     = feature,
-            .clusterRevision             = DishwasherAlarm::kRevision,
-            .supported                   = AlarmMap(0x3F),
-            .latch                       = AlarmMap(0),
-            .supportsModifyEnabledAlarms = withModifyCommand,
-            .delegate                    = &delegate,
-        };
+        AlarmBaseCluster::Config config(delegate);
+        config.feature                     = feature;
+        config.clusterRevision             = DishwasherAlarm::kRevision;
+        config.supported                   = AlarmMap(0x3F);
+        config.latch                       = AlarmMap(0);
+        config.supportsModifyEnabledAlarms = withModifyCommand;
         return config;
     }
 
     AlarmBaseCluster::Config MakeRefrigeratorConfig()
     {
-        AlarmBaseCluster::Config config = {
-            .feature                     = {},
-            .clusterRevision             = RefrigeratorAlarm::kRevision,
-            .supported                   = AlarmMap(0x1),
-            .latch                       = {},
-            .supportsModifyEnabledAlarms = false,
-            .delegate                    = nullptr,
-        };
+        AlarmBaseCluster::Config config(defaultDelegate);
+        config.clusterRevision = RefrigeratorAlarm::kRevision;
+        config.supported       = AlarmMap(0x1);
         return config;
     }
 
     TestServerClusterContext testContext;
     TestAlarmDelegate delegate;
+    AlarmBase::Delegate defaultDelegate;
 };
 
 TEST_F(TestAlarmBaseCluster, DishwasherAttributeListWithResetFeature)
@@ -177,12 +171,13 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsSupportedAndMask)
 
 TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    AlarmBaseCluster::Config config = MakeDishwasherConfig();
+    config.latch                    = AlarmMap(0x1);
+    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, config);
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.SetMaskValue(AlarmMap(0x3)), Status::Success);
-    EXPECT_EQ(cluster.SetLatchValue(AlarmMap(0x1)), Status::Success);
     EXPECT_EQ(cluster.SetStateValue(AlarmMap(0x1)), Status::Success);
 
     EXPECT_EQ(cluster.SetStateValue(AlarmMap(0)), Status::Success);

@@ -34,12 +34,14 @@ class AlarmBaseCluster : public DefaultServerCluster
 public:
     struct Config
     {
-        BitMask<AlarmBase::Feature> feature;
-        uint32_t clusterRevision = 0;
+        Config(AlarmBase::Delegate & delegate) : delegate(delegate) {}
+
+        AlarmBase::Delegate & delegate;
+        BitMask<AlarmBase::Feature> feature{};
+        uint32_t clusterRevision             = 0;
         AlarmBase::AlarmMap supported{};
         AlarmBase::AlarmMap latch{};
         bool supportsModifyEnabledAlarms = false;
-        AlarmBase::Delegate * delegate   = nullptr;
     };
 
     AlarmBaseCluster(EndpointId endpointId, ClusterId clusterId, const Config & config);
@@ -62,25 +64,21 @@ public:
     Protocols::InteractionModel::Status GetSupportedValue(AlarmBase::AlarmMap * supported) const;
 
     Protocols::InteractionModel::Status SetMaskValue(const AlarmBase::AlarmMap mask);
-    Protocols::InteractionModel::Status SetLatchValue(const AlarmBase::AlarmMap latch);
-    Protocols::InteractionModel::Status SetSupportedValue(const AlarmBase::AlarmMap supported);
     Protocols::InteractionModel::Status SetStateValue(const AlarmBase::AlarmMap newState, bool ignoreLatchState = false);
     Protocols::InteractionModel::Status ResetLatchedAlarms(const AlarmBase::AlarmMap alarms);
 
     bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
 
-    void SetDelegate(AlarmBase::Delegate * delegate) { mDelegate = delegate; }
-
 private:
     const BitMask<AlarmBase::Feature> mFeature;
     const uint32_t mClusterRevision;
     const bool mSupportsModifyEnabledAlarms;
-    AlarmBase::Delegate * mDelegate;
+    AlarmBase::Delegate & mDelegate;
 
     AlarmBase::AlarmMap mMask{};
-    AlarmBase::AlarmMap mLatch{};
+    const AlarmBase::AlarmMap mLatch;
     AlarmBase::AlarmMap mState{};
-    AlarmBase::AlarmMap mSupported{};
+    const AlarmBase::AlarmMap mSupported;
 
     void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
                          AlarmBase::AlarmMap mask);

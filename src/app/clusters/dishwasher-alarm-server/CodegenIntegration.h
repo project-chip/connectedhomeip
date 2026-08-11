@@ -18,10 +18,40 @@
 
 #pragma once
 
-#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/dishwasher-alarm-server/DishwasherAlarmCluster.h>
+#include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-delegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters::DishwasherAlarm {
 
-AlarmBaseCluster * FindClusterOnEndpoint(EndpointId endpointId);
+DishwasherAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+class DishwasherAlarmServer
+{
+public:
+    static DishwasherAlarmServer & Instance();
+
+    Protocols::InteractionModel::Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
+    Protocols::InteractionModel::Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
+    Protocols::InteractionModel::Status GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
+    Protocols::InteractionModel::Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
+
+    Protocols::InteractionModel::Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
+
+    Protocols::InteractionModel::Status SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState,
+                                                      bool ignoreLatchState = false);
+
+    Protocols::InteractionModel::Status ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+
+    bool HasResetFeature(EndpointId endpoint);
+
+private:
+    static DishwasherAlarmServer instance;
+};
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+Delegate * GetDelegate(EndpointId endpoint);
 
 } // namespace chip::app::Clusters::DishwasherAlarm

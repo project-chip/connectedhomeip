@@ -18,4 +18,19 @@
 
 #pragma once
 
-#include <app/clusters/alarm-base-server/CodegenIntegration.h>
+#include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
+#include <clusters/RefrigeratorAlarm/Metadata.h>
+
+namespace chip::app::Clusters {
+
+class RefrigeratorAlarmCluster : public AlarmBaseCluster
+{
+public:
+    using Config = AlarmBaseCluster::Config;
+
+    RefrigeratorAlarmCluster(EndpointId endpointId, const Config & config) :
+        AlarmBaseCluster(endpointId, RefrigeratorAlarm::Id, config)
+    {}
+};
+
+} // namespace chip::app::Clusters

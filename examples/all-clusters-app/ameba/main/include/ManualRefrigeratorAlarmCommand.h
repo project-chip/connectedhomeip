@@ -80,13 +80,6 @@ CHIP_ERROR ManualRefrigeratorAlarmDoorOpenCommandHandler(int argc, char ** argv)
         goto exit;
     }
 
-    status = serverInstance.SetSupportedValue(1, 0);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -116,13 +109,6 @@ CHIP_ERROR ManualRefrigeratorAlarmDoorCloseCommandHandler(int argc, char ** argv
         goto exit;
     }
 
-    status = serverInstance.SetSupportedValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -137,13 +123,6 @@ CHIP_ERROR ManualRefrigeratorAlarmSuppressCommandHandler(int argc, char ** argv)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status;
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
-
-    status = serverInstance.SetSupportedValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
 
     status = serverInstance.SetStateValue(1, 0);
     if (status != Protocols::InteractionModel::Status::Success)

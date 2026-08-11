@@ -64,38 +64,6 @@ Status AlarmBaseCluster::GetSupportedValue(AlarmMap * supported) const
     return Status::Success;
 }
 
-Status AlarmBaseCluster::SetSupportedValue(const AlarmMap supported)
-{
-    VerifyOrReturnError(SetAttributeValue(mSupported, supported, Supported::Id), Status::Success);
-
-    AlarmMap latch;
-    if (GetLatchValue(&latch) == Status::Success && !supported.HasAll(latch))
-    {
-        latch         = latch & supported;
-        Status status = SetLatchValue(latch);
-        if (status != Status::Success)
-        {
-            return status;
-        }
-    }
-
-    AlarmMap mask;
-    if (GetMaskValue(&mask) != Status::Success)
-    {
-        return Status::Failure;
-    }
-    if (!supported.HasAll(mask))
-    {
-        mask          = supported & mask;
-        Status status = SetMaskValue(mask);
-        if (status != Status::Success)
-        {
-            return status;
-        }
-    }
-    return Status::Success;
-}
-
 Status AlarmBaseCluster::SetMaskValue(const AlarmMap mask)
 {
     VerifyOrReturnError(mSupported.HasAll(mask), Status::Failure);
@@ -115,14 +83,6 @@ Status AlarmBaseCluster::SetMaskValue(const AlarmMap mask)
             return status;
         }
     }
-    return Status::Success;
-}
-
-Status AlarmBaseCluster::SetLatchValue(const AlarmMap latch)
-{
-    VerifyOrReturnError(HasResetFeature(), Status::UnsupportedAttribute);
-    VerifyOrReturnError(mSupported.HasAll(latch), Status::Failure);
-    VerifyOrReturnError(SetAttributeValue(mLatch, latch, Latch::Id), Status::Success);
     return Status::Success;
 }
 
@@ -282,7 +242,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
         return Status::Failure;
     }
 
-    if (mDelegate != nullptr && !mDelegate->ResetAlarms(alarms))
+    if (!mDelegate.ResetAlarms(alarms))
     {
         return Status::Failure;
     }
@@ -307,7 +267,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmM
         return Status::InvalidCommand;
     }
 
-    if (mDelegate != nullptr && !mDelegate->ModifyEnabledAlarms(mask))
+    if (!mDelegate.ModifyEnabledAlarms(mask))
     {
         return Status::Failure;
     }
