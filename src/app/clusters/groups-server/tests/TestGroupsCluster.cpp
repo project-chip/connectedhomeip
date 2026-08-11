@@ -85,8 +85,6 @@ public:
 
     CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override { return CHIP_NO_ERROR; }
-
     uint32_t mGroupWillBeRemovedCallCount = 0;
     FabricIndex mLastFabricIndex          = kUndefinedFabricIndex;
     GroupId mLastGroupId                  = kUndefinedGroupId;
