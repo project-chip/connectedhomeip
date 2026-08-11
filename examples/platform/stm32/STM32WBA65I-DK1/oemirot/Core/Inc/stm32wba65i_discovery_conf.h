@@ -34,10 +34,11 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32wbaxx_hal.h"
+
 #include "stm32wba65i_discovery_bus.h"
 #include "stm32wba65i_discovery_eeprom.h"
 #include "stm32wba65i_discovery_errno.h"
-#include "stm32wbaxx_hal.h"
 /* Usage of STM32WBA65I_DK1 board */
 #define USE_STM32WBA65I_DK1 1U
 
