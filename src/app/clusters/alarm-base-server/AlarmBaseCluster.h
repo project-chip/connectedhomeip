@@ -34,7 +34,7 @@ class AlarmBaseCluster : public DefaultServerCluster
 public:
     struct Config
     {
-        Config(AlarmBase::Delegate & delegate) : delegate(delegate) {}
+        Config(AlarmBase::Delegate & aDelegate) : delegate(aDelegate) {}
 
         AlarmBase::Delegate & delegate;
         BitMask<AlarmBase::Feature> feature{};
