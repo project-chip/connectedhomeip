@@ -68,7 +68,7 @@ class TC_CNET_4_4(MatterBaseTest):
         connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
-         # Dynamically compute the interaction timeout based on the DUT's reported max scan time
+        # Dynamically compute the interaction timeout based on the DUT's reported max scan time
         scan_max_time_s = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.ScanMaxTimeSeconds)
         scan_interaction_timeout_ms = self.default_controller.ComputeRoundTripTimeout(
             self.dut_node_id, upperLayerProcessingTimeoutMs=scan_max_time_s * 1000)
