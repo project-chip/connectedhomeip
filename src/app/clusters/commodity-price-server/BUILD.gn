@@ -18,6 +18,7 @@ source_set("commodity-price-server") {
   sources = [
     "CommodityPriceCluster.cpp",
     "CommodityPriceCluster.h",
+    "CommodityPriceTestEventTriggerHandler.h",
   ]
 
   public_deps = [
