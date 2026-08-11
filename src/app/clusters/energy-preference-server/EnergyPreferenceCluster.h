@@ -48,17 +48,28 @@ public:
 
     CHIP_ERROR SetCurrentEnergyBalance(uint8_t currentEnergyBalance)
     {
+        if (!mFeatures.Has(EnergyPreference::Feature::kEnergyBalance))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+
+        VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return SetCurrentUint8Attribute(
             mCurrentEnergyBalance, currentEnergyBalance, sDelegate->GetNumEnergyBalances(GetEndpointId()),
-            EnergyPreference::Attributes::CurrentEnergyBalance::Id, EnergyPreference::Feature::kEnergyBalance,
+            EnergyPreference::Attributes::CurrentEnergyBalance::Id,
             &EnergyPreference::Delegate::OnCurrentEnergyBalanceChanged);
     }
     CHIP_ERROR SetCurrentLowPowerModeSensitivity(uint8_t currentLowPowerModeSensitivity)
     {
+        if (!mFeatures.Has(EnergyPreference::Feature::kLowPowerModeSensitivity))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+
+        VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return SetCurrentUint8Attribute(mCurrentLowPowerModeSensitivity, currentLowPowerModeSensitivity,
                                         sDelegate->GetNumLowPowerModeSensitivities(GetEndpointId()),
                                         EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id,
-                                        EnergyPreference::Feature::kLowPowerModeSensitivity,
                                         &EnergyPreference::Delegate::OnCurrentLowPowerModeSensitivityChanged);
     }
     uint8_t GetCurrentEnergyBalance() const { return mCurrentEnergyBalance; }
@@ -72,8 +83,7 @@ private:
 
     using OnCurrentUint8AttributeChangedCallback = void (EnergyPreference::Delegate::*)(EndpointId, uint8_t);
     CHIP_ERROR SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue, size_t correspondingArraySize,
-                                        AttributeId attributeId, EnergyPreference::Feature featureGate,
-                                        OnCurrentUint8AttributeChangedCallback onChangedCallback);
+                                        AttributeId attributeId, OnCurrentUint8AttributeChangedCallback onChangedCallback);
 
     using BalanceStructAtIndexGetter = CHIP_ERROR (EnergyPreference::Delegate::*)(chip::EndpointId, size_t, chip::Percent &,
                                                                                   chip::Optional<chip::MutableCharSpan> &);

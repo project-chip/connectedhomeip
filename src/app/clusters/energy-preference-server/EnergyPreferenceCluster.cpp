@@ -107,15 +107,9 @@ CHIP_ERROR EnergyPreferenceCluster::Attributes(const ConcreteClusterPath & path,
 
 CHIP_ERROR EnergyPreferenceCluster::SetCurrentUint8Attribute(uint8_t & attributeValue, uint8_t newValue,
                                                              size_t correspondingArraySize, AttributeId attributeId,
-                                                             Feature featureGate,
                                                              OnCurrentUint8AttributeChangedCallback onChangedCallback)
 {
-    if (!mFeatures.Has(featureGate))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    VerifyOrReturnError(sDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // validness check for sDelegate is expected to be done by the caller.
     if (newValue >= correspondingArraySize)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
