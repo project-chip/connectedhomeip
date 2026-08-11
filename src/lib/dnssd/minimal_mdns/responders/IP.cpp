@@ -23,6 +23,8 @@
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
+
 
 using chip::Platform::UniquePtr;
 
