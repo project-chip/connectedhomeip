@@ -369,12 +369,33 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
         asserts.assert_true(result['A.S'], "support 'true' must parse as True")
         asserts.assert_false(result['B.S'], "support 'false' must parse as False")
 
+    # A picsItem is a (code, value) pair, so both halves are required: the
+    # itemNumber holds the PICS code (e.g. BINFO.S) and the support element
+    # holds the declared value for it. See the PICS code format described in
+    # the PICS Guidelines, linked from docs/testing/pics_and_pixit.md. Neither
+    # half can be defaulted - a code with no value says nothing about the
+    # device, and a value with no code cannot be attributed to one - so a
+    # malformed item is rejected rather than skipped. Skipping would drop the
+    # item from the returned mapping, which every consumer reads as "this PICS
+    # was not declared", making a malformed file indistinguishable from one
+    # that deliberately declares the code as 0.
+
     def test_parse_pics_xml_missing_item_number_raises(self):
+        """
+        A picsItem with a support value but no itemNumber declares a value that
+        belongs to no PICS code, so parsing must fail rather than discard it.
+        """
         xml = "<clusterPICS><picsItem><support>true</support></picsItem></clusterPICS>"
         with asserts.assert_raises(ValueError):
             parse_pics_xml(xml)
 
     def test_parse_pics_xml_missing_support_raises(self):
+        """
+        A picsItem naming a PICS code with no support element leaves that code
+        undeclared. Parsing must fail rather than assume a value: assuming
+        false would silently under-declare the device, and assuming true would
+        claim support that was never stated.
+        """
         xml = "<clusterPICS><picsItem><itemNumber>X.S</itemNumber></picsItem></clusterPICS>"
         with asserts.assert_raises(ValueError):
             parse_pics_xml(xml)
