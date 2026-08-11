@@ -124,7 +124,6 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_ble.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_matter.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_thread.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/crypto_platform.cpp",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/custom_stm.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/flash.c",
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bleplat.c",

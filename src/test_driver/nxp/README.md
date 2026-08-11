@@ -28,7 +28,7 @@ libASN1Tests
 libMdnsFakePlatformTests
 libMdnsTests
 libMinimalMdnsCoreTests
-libMinimalMdnsRecordsTests
+libDnssdRecordsTests
 libMinimalMdnsRespondersTests
 libTestShell
 libUserDirectedCommissioningTests
