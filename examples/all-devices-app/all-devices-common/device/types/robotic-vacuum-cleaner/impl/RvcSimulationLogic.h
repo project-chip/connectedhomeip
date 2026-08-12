@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <RvcSimulationTopology.h>
 #include <app/clusters/service-area-server/service-area-cluster-objects.h>
 #include <app/data-model/Nullable.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <lib/support/Span.h>
 
 namespace chip {

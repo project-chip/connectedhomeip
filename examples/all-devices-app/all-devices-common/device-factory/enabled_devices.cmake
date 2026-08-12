@@ -264,7 +264,5 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
 
-# Header-only helpers for all-devices-app robotic vacuum simulation.
-set(ALL_DEVICES_EXTRA_INCLUDE_DIRS
-    "${ALL_DEVICES_COMMON_DIR}/rvc-simulation"
-)
+# No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
+set(ALL_DEVICES_EXTRA_INCLUDE_DIRS)

@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include "include/RoboticVacuumCleanerNamedPipe.h"
+#include <RoboticVacuumCleanerNamedPipe.h>
 
-#include "include/AllDevicesAppNamedPipeCommandHandler.h"
-#include "include/AppCommandDelegate.h"
-#include <RvcSimulationLogic.h>
-#include <RvcSimulationTopology.h>
+#include <AllDevicesAppNamedPipeCommandHandler.h>
+#include <AppCommandDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
