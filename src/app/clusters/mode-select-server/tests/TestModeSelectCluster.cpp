@@ -235,7 +235,7 @@ TEST_F(TestModeSelectCluster, ReadCurrentMode)
     EXPECT_EQ(currentMode, 0u);
 }
 
-TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultNull)
+TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultZero)
 {
     optionalAttributeSet.Set<StartUpMode::Id>();
     ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
@@ -244,7 +244,8 @@ TEST_F(TestModeSelectCluster, ReadStartUpModeDefaultNull)
 
     DataModel::Nullable<uint8_t> startUpMode;
     ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
-    EXPECT_TRUE(startUpMode.IsNull());
+    ASSERT_FALSE(startUpMode.IsNull());
+    EXPECT_EQ(startUpMode.Value(), 0u);
 }
 
 TEST_F(TestModeSelectCluster, ReadOnModeDefaultNull)
