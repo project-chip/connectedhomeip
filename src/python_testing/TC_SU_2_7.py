@@ -188,7 +188,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnQuery."),
             TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does not respond back to DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."),
-            TestStep(4, "If LocalConfigDisabled from BasicInformationCluster is supported writes the LocalConfigDisabled attribute as False on the DUT",),
+            TestStep(4, "If LocalConfigDisabled from BasicInformationCluster is supported writes the LocalConfigDisabled attribute as False on the DUT"),
             TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnUserConsent."),
             TestStep(6, "Force an error during the download of the OTA image to the DUT. Wait for the Idle timeout which should be no less than 5 minutes.", "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."
