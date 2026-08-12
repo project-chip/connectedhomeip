@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +17,20 @@
  *    limitations under the License.
  */
 
-#pragma once
+#ifndef SL_MATTER_EVSE_CONFIG_H
+#define SL_MATTER_EVSE_CONFIG_H
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+// <<< Use Configuration Wizard in Context Menu >>>
 
-namespace mdns {
-namespace Minimal {
+// EvseConfig.h
+// Preprocessor knobs for the silabs EVSE example. Edit these #define
+// statements to customize the endpoint hosting the EnergyEvse /
+// DeviceEnergyManagement clusters.
 
-class PtrResourceRecord : public ResourceRecord
-{
-public:
-    PtrResourceRecord(const FullQName & qName, const FullQName & ptrName) : ResourceRecord(QType::PTR, qName), mPtrName(ptrName) {}
+// <o EVSE_ENDPOINT> EnergyEvse / DeviceEnergyManagement cluster endpoint
+// <i> Default: 1
+#define EVSE_ENDPOINT 1
 
-    const FullQName & GetPtr() const { return mPtrName; }
+// <<< end of configuration section >>>
 
-protected:
-    bool WriteData(RecordWriter & out) const override { return out.WriteQName(mPtrName).Fit(); }
-
-private:
-    const FullQName mPtrName;
-};
-
-} // namespace Minimal
-} // namespace mdns
+#endif // SL_MATTER_EVSE_CONFIG_H

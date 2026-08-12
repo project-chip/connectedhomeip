@@ -32,8 +32,10 @@ chip_test_suite("tests") {
   test_sources = [
     "TestFlatAllocatedQName.cpp",
     "TestHeapQName.cpp",
+    "TestParser.cpp",
     "TestQName.cpp",
     "TestQNameString.cpp",
+    "TestRecordData.cpp",
     "TestRecordWriter.cpp",
   ]
 
@@ -44,5 +46,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/dnssd/wire",
+    "${chip_root}/src/lib/dnssd/wire:reader",
   ]
 }

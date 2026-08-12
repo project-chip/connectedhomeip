@@ -19,7 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/records/IP.h>
+#include <lib/dnssd/wire/records/IP.h>
 
 namespace {
 
