@@ -142,6 +142,7 @@ TEST_F(TestInetEndPoint, TestInetInterface)
     InterfaceId intId;
     IPAddress addr{};
     InterfaceType intType;
+    uint32_t intIndex;
     // 64 bit IEEE MAC address
     const uint8_t kMaxHardwareAddressSize = 8;
     uint8_t intHwAddress[kMaxHardwareAddressSize];
@@ -161,6 +162,9 @@ TEST_F(TestInetEndPoint, TestInetInterface)
     err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(intName[0], '\0');
+
+    // A Null interface must always report index 0.
+    EXPECT_EQ(InterfaceId::Null().GetInterfaceIndex(), 0u);
 
     intId = InterfaceId::FromIPAddress(addr);
     EXPECT_FALSE(intId.IsPresent());
@@ -188,6 +192,9 @@ TEST_F(TestInetEndPoint, TestInetInterface)
         err = intId.GetLinkLocalAddr(&addr);
         EXPECT_TRUE(err == CHIP_NO_ERROR || err == INET_ERROR_ADDRESS_NOT_FOUND);
         InterfaceId::MatchLocalIPv6Subnet(addr);
+
+        intIndex = intId.GetInterfaceIndex();
+        EXPECT_NE(intIndex, 0u);
 
         // Not all platforms support getting interface type and hardware address
         err = intIterator.GetInterfaceType(intType);
