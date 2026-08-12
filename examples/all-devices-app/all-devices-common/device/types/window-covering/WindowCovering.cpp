@@ -45,16 +45,17 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     // Configure all optional attributes supported by this simulated Lift + Tilt device
     Clusters::WindowCovering::OptionalAttributeSet optionals;
     optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-             .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-             .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-             .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-             .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
+        .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
+        .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
+        .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
+        .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
 
     Clusters::WindowCovering::WindowCoveringCluster::Config config(mWindowCoveringDelegate);
-    config.WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
-        Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
-        Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt))
-          .WithOptionalAttributes(optionals);
+    config
+        .WithFeatures(BitFlags<Clusters::WindowCovering::Feature>(
+            Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
+            Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt))
+        .WithOptionalAttributes(optionals);
     mWindowCoveringCluster.Create(endpoint, config);
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
 
