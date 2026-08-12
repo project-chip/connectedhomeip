@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <RvcSimulationLogic.h>
-#include <RvcSimulationTopology.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <clusters/RvcCleanMode/Metadata.h>
 #include <clusters/RvcRunMode/Metadata.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
