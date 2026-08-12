@@ -157,6 +157,7 @@ ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation(
 
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
+    VerifyOrReturnError(mDelegate != nullptr, Status::InvalidInState);
     if (mDelegate->SetControlSequenceOfOperation(controlSequenceOfOperation))
     {
         NotifyAttributeChanged(ControlSequenceOfOperation::Id);
@@ -171,10 +172,7 @@ SystemModeEnum ThermostatCluster::GetSystemMode() const
 
 Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
 {
-    if (mDelegate == nullptr)
-    {
-        return Status::InvalidInState;
-    }
+    VerifyOrReturnError(mDelegate != nullptr, Status::InvalidInState);
     switch (systemMode)
     {
     case SystemModeEnum::kOff:
@@ -222,9 +220,11 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         return Status::ConstraintError;
     }
 
+    SystemModeEnum oldSystemMode = GetSystemMode();
     if (mDelegate->SetSystemMode(systemMode))
     {
         NotifyAttributeChanged(SystemMode::Id);
+        GenerateSystemModeChangeEvent(Optional<SystemModeEnum>(oldSystemMode), systemMode);
     }
     return Status::Success;
 }
@@ -237,9 +237,11 @@ DataModel::Nullable<temperature> ThermostatCluster::GetLocalTemperature() const
 Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<temperature> localTemperature,
                                               DataModel::AttributeChangeType changeType)
 {
+    VerifyOrReturnError(mDelegate != nullptr, Status::InvalidInState);
     if (mDelegate->SetLocalTemperature(localTemperature))
     {
         NotifyAttributeChanged(LocalTemperature::Id, changeType);
+        GenerateLocalTemperatureChangeEvent(localTemperature);
     }
     return Status::Success;
 }
@@ -286,9 +288,11 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
     default:
         return Status::ConstraintError;
     }
+    auto currentRunningMode = GetRunningMode();
     if (mDelegate->SetRunningMode(runningMode))
     {
         NotifyAttributeChanged(ThermostatRunningMode::Id);
+        GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum>(currentRunningMode), runningMode);
     }
     return Status::Success;
 }
@@ -300,6 +304,7 @@ BitMask<RelayStateBitmap> ThermostatCluster::GetRunningState() const
 
 Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState)
 {
+    VerifyOrReturnError(mDelegate != nullptr, Status::InvalidInState);
     if (runningState.HasAny(RelayStateBitmap::kHeat, RelayStateBitmap::kHeatStage2) && !mFeatures.Has(Feature::kHeating))
     {
         ChipLogDetail(Zcl, "Heating relay state is not supported");
@@ -310,9 +315,11 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
         ChipLogDetail(Zcl, "Cooling relay state is not supported");
         return Status::ConstraintError;
     }
+    auto currentRunningState = GetRunningState();
     if (mDelegate->SetRunningState(runningState))
     {
         NotifyAttributeChanged(ThermostatRunningState::Id);
+        GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>>(currentRunningState), runningState);
     }
     return Status::Success;
 }

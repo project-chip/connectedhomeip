@@ -54,15 +54,11 @@ public:
         virtual CHIP_ERROR ReEvaluateCurrentSuggestion()                                                          = 0;
     };
 
-    ThermostatSuggestions() = default;
-    ThermostatSuggestions(ThermostatCluster & cluster) : mCluster(&cluster) {}
-
-    void SetCluster(ThermostatCluster & cluster) { mCluster = &cluster; }
+    ThermostatSuggestions() = delete;
+    ThermostatSuggestions(ThermostatCluster & cluster, ThermostatPresets & presets) : mCluster(cluster), mPresets(presets) {}
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
     Delegate * GetDelegate() const { return mDelegate; }
-
-    void SetPresets(ThermostatPresets * presets) { mPresets = presets; }
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
@@ -81,9 +77,9 @@ public:
     void ReEvaluateCurrentSuggestion();
 
 private:
-    ThermostatCluster * mCluster = nullptr;
-    Delegate * mDelegate         = nullptr;
-    ThermostatPresets * mPresets = nullptr;
+    ThermostatCluster & mCluster;
+    Delegate * mDelegate = nullptr;
+    ThermostatPresets & mPresets;
 };
 
 } // namespace Thermostat

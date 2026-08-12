@@ -40,25 +40,11 @@ public:
                                   const OptionalAttributes & optionalAttributes,
                                   const DefaultValues & defaultValues,
                                   FabricTable & fabricTable) :
-        ThermostatCluster(aEndpointId, features, optionalAttributes, defaultValues, fabricTable)
-    {
-        if constexpr (kHasPresets)
-        {
-            mPresets.SetCluster(*this);
-        }
-        if constexpr (kHasSuggestions)
-        {
-            mSuggestions.SetCluster(*this);
-            if constexpr (kHasPresets)
-            {
-                mSuggestions.SetPresets(&mPresets);
-            }
-        }
-        if constexpr (kHasOccupancy)
-        {
-            mOccupancy.SetCluster(*this);
-        }
-    }
+        ThermostatCluster(aEndpointId, features, optionalAttributes, defaultValues, fabricTable),
+        mPresets(MakeFeature<kHasPresets, ThermostatPresets>(*this)),
+        mSuggestions(MakeFeature<kHasSuggestions, ThermostatSuggestions>(*this, mPresets)),
+        mOccupancy(MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this))
+    {}
 
     template <typename DelegateT>
     void SetDelegate(DelegateT * delegate)
@@ -97,6 +83,12 @@ public:
             return mOccupancy.IsOccupied();
         }
         return ThermostatCluster::IsOccupied();
+    }
+
+    template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
+    Protocols::InteractionModel::Status SetOccupied(DataModel::Nullable<bool> occupied)
+    {
+        return mOccupancy.SetOccupied(occupied);
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -237,6 +229,19 @@ private:
     [[no_unique_address]] std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
     [[no_unique_address]] std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
     [[no_unique_address]] std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
+
+    template <bool Enabled, typename FeatureType, typename... Args>
+    static auto MakeFeature(Args &&... args)
+    {
+        if constexpr (Enabled)
+        {
+            return FeatureType(std::forward<Args>(args)...);
+        }
+        else
+        {
+            return std::monostate{};
+        }
+    }
 };
 
 using DefaultThermostatCluster =

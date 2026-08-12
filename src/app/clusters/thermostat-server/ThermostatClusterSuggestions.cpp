@@ -194,7 +194,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::InvalidInState;
     }
 
-    if (mPresets != nullptr && !mPresets->IsPresetHandlePresentInPresets(commandData.presetHandle))
+    if (!mPresets.IsPresetHandlePresentInPresets(commandData.presetHandle))
     {
         return Status::NotFound;
     }
@@ -245,10 +245,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::Failure;
     }
 
-    if (mCluster != nullptr)
-    {
-        mCluster->NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
-    }
+    mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
 
     ReEvaluateCurrentSuggestion();
 
@@ -280,10 +277,7 @@ ThermostatSuggestions::RemoveThermostatSuggestion(CommandHandler * commandObj, c
         return status;
     }
 
-    if (mCluster != nullptr)
-    {
-        mCluster->NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
-    }
+    mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
     LogErrorOnFailure(RemoveExpiredSuggestions(mDelegate));
@@ -306,9 +300,9 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
     MutableByteSpan beforeReevaluationHandleSpan(buffer);
     auto beforeReevaluationHandle = DataModel::MakeNullable(beforeReevaluationHandleSpan);
 
-    if (mPresets != nullptr && mPresets->GetDelegate() != nullptr)
+    if (auto presetsDelegate = mPresets.GetDelegate(); presetsDelegate != nullptr)
     {
-        CHIP_ERROR err = mPresets->GetDelegate()->GetActivePresetHandle(beforeReevaluationHandle);
+        CHIP_ERROR err = presetsDelegate->GetActivePresetHandle(beforeReevaluationHandle);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Failed to GetActivePresetHandle with error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -339,18 +333,15 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
         }
     }
 
-    if (mCluster != nullptr)
-    {
-        mCluster->NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
-    }
+    mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
 
-    if (mPresets != nullptr && mPresets->GetDelegate() != nullptr)
+    if (auto presetsDelegate = mPresets.GetDelegate(); presetsDelegate != nullptr)
     {
         uint8_t afterReevaluationBuffer[kPresetHandleSize];
         MutableByteSpan afterReevaluationHandleSpan(afterReevaluationBuffer);
         auto afterReevaluationHandle = DataModel::MakeNullable(afterReevaluationHandleSpan);
 
-        err = mPresets->GetDelegate()->GetActivePresetHandle(afterReevaluationHandle);
+        err = presetsDelegate->GetActivePresetHandle(afterReevaluationHandle);
         if (err != CHIP_NO_ERROR)
         {
             return;
@@ -367,10 +358,7 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
             return;
         }
 
-        if (mCluster != nullptr)
-        {
-            mCluster->NotifyAttributeChanged(ActivePresetHandle::Id);
-        }
+        mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
     }
 }
 

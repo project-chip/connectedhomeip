@@ -60,10 +60,8 @@ public:
         }
     };
 
-    ThermostatPresets() = default;
-    ThermostatPresets(ThermostatCluster & cluster) : mCluster(&cluster) {}
-
-    void SetCluster(ThermostatCluster & cluster) { mCluster = &cluster; }
+    ThermostatPresets() = delete;
+    ThermostatPresets(ThermostatCluster & cluster) : mCluster(cluster) {}
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
     Delegate * GetDelegate() const { return mDelegate; }
@@ -89,7 +87,7 @@ public:
     bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
 
 private:
-    ThermostatCluster * mCluster = nullptr;
+    ThermostatCluster & mCluster;
     Delegate * mDelegate         = nullptr;
 };
 

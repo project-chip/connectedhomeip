@@ -42,17 +42,12 @@ public:
     };
 
     ThermostatOccupancy() = default;
-    ThermostatOccupancy(ThermostatCluster & cluster) : mCluster(&cluster) {}
-
-    void SetCluster(ThermostatCluster & cluster) { mCluster = &cluster; }
+    ThermostatOccupancy(ThermostatCluster & cluster) {};
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
-    Delegate * GetDelegate() const { return mDelegate; }
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
-
-    ThermostatCluster * GetCluster() const { return mCluster; }
 
     bool IsOccupied() const
     {
@@ -63,8 +58,9 @@ public:
         return true;
     }
 
+    
+
 private:
-    ThermostatCluster * mCluster = nullptr;
     Delegate * mDelegate         = nullptr;
 };
 
