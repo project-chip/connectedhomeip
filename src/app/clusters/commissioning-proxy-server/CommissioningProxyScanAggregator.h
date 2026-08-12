@@ -23,6 +23,7 @@
 #include <clusters/CommissioningProxy/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemLayer.h>
 
 #include <cstdint>
@@ -46,13 +47,14 @@ namespace CommissioningProxy {
  * Only one aggregation may be in flight at a time (matches a single outstanding
  * foreground scan). Entry points run on the Matter thread with the stack lock held.
  */
-class CommissioningProxyScanAggregator
+class CommissioningProxyScanAggregator : public TimerContext
 {
 public:
     using ScanResultEntry = Structs::ScanResultStruct::Type;
 
-    CommissioningProxyScanAggregator()  = default;
-    ~CommissioningProxyScanAggregator() = default;
+    CommissioningProxyScanAggregator() = delete;
+    explicit CommissioningProxyScanAggregator(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
+    ~CommissioningProxyScanAggregator() override = default;
 
     /**
      * @brief Start a fresh aggregation. Takes ownership of the command handle for
@@ -98,10 +100,14 @@ public:
     /// Abandon any in-flight aggregation (cluster teardown).
     void Shutdown() { Abort(); }
 
+    /// Watchdog expiry: a sub-scan never reported, so emit whatever did arrive rather
+    /// than leave the aggregation (and every later ProxyScanRequest) blocked.
+    void TimerFired() override;
+
 private:
-    static void WatchdogCallback(System::Layer * layer, void * appState);
     void EmitCombinedResponse();
 
+    TimerDelegate & mTimerDelegate;
     app::CommandHandler::Handle mHandle;
     app::ConcreteCommandPath mPath;
     bool mInProgress     = false;

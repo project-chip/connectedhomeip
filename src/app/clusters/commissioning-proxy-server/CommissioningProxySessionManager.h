@@ -23,6 +23,7 @@
 #include <clusters/CommissioningProxy/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemLayer.h>
 
@@ -57,7 +58,8 @@ public:
         FabricIndex fabricIndex;
     };
 
-    CommissioningProxySessionManager()  = default;
+    CommissioningProxySessionManager() = delete;
+    explicit CommissioningProxySessionManager(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
     ~CommissioningProxySessionManager() = default;
 
     // --- Session table ------------------------------------------------------
@@ -111,10 +113,15 @@ public:
     void Shutdown();
 
 private:
-    struct PendingMessage; // defined in the .cpp
+    // Each pending request is its own TimerContext, so several sessions can have a
+    // response timeout armed at once. Defined in the .cpp.
+    struct PendingMessage;
 
-    static void ResponseTimeoutCallback(System::Layer * layer, void * appState);
+    /// Resolve the pending request for @p sessionId with Status::Timeout (called by
+    /// PendingMessage::TimerFired).
+    void OnResponseTimeout(PendingMessage * pm);
 
+    TimerDelegate & mTimerDelegate;
     std::map<uint16_t, SessionInfo> mSessions;
     std::map<uint16_t, PendingMessage *> mPending;
     uint16_t mNextSessionId = 1;

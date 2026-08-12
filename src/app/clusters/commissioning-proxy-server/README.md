@@ -201,9 +201,13 @@ MyBleTransport gBleTransport;
 
 chip::BitMask<Feature> gFeatures(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
 
+// Supplies the response-timeout and scan-watchdog timers.
+chip::app::DefaultTimerDelegate gTimerDelegate;
+
 // Config: featureFlags, MaxSessions, MaxCachedResults, supported Wi-Fi bands.
 chip::app::RegisteredServerCluster<CommissioningProxyCluster> gCPCluster(
-    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures, /*aMaxSessions=*/1, /*aMaxCachedResults=*/10));
+    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures, /*aMaxSessions=*/1, /*aMaxCachedResults=*/10),
+    gTimerDelegate);
 
 void SetUpProxy()
 {

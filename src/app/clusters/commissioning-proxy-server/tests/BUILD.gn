@@ -36,6 +36,7 @@ chip_test_suite("tests") {
   # test aggregation in src/BUILD.gn references only ":tests", so
   # mock_model/mock_ember never enters the Zephyr binary.
   sources = [
+    "CommissioningProxyMockTimer.h",
     "CommissioningProxyMockTransport.cpp",
     "CommissioningProxyMockTransport.h",
   ]

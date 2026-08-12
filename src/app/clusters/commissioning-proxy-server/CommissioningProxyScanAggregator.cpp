@@ -47,8 +47,8 @@ CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * command
     mResults.clear();
     mInProgress = true;
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs), WatchdogCallback, this);
+    CHIP_ERROR err =
+        mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
     if (err != CHIP_NO_ERROR)
     {
         // Without the watchdog a sub-scan that never reports would leave mInProgress
@@ -67,19 +67,18 @@ void CommissioningProxyScanAggregator::AddPendingContributor()
     ++mExpected;
 }
 
-void CommissioningProxyScanAggregator::WatchdogCallback(System::Layer * /*layer*/, void * appState)
+void CommissioningProxyScanAggregator::TimerFired()
 {
-    auto * self = static_cast<CommissioningProxyScanAggregator *>(appState);
-    if (self->mInProgress)
+    if (mInProgress)
     {
         ChipLogError(Zcl, "CommissioningProxy: scan watchdog fired (a sub-scan never completed); emitting partial results");
-        self->EmitCombinedResponse();
+        EmitCombinedResponse();
     }
 }
 
 void CommissioningProxyScanAggregator::EmitCombinedResponse()
 {
-    DeviceLayer::SystemLayer().CancelTimer(WatchdogCallback, this);
+    mTimerDelegate.CancelTimer(this);
 
     if (app::CommandHandler * cmd = mHandle.Get())
     {
@@ -166,7 +165,7 @@ void CommissioningProxyScanAggregator::Abort()
     {
         return;
     }
-    DeviceLayer::SystemLayer().CancelTimer(WatchdogCallback, this);
+    mTimerDelegate.CancelTimer(this);
     mHandle.Release();
     mAddressStore.clear();
     mExtStore.clear();

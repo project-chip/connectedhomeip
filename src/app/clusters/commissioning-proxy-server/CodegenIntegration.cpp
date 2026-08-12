@@ -20,6 +20,7 @@
 #include <clusters/CommissioningProxy/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -27,7 +28,15 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) : mCluster(aEndpointId, config) {}
+namespace {
+// Shared by every codegen-registered CommissioningProxy instance: DefaultTimerDelegate
+// is stateless, forwarding to the system layer and keying timers on the TimerContext.
+DefaultTimerDelegate gDefaultTimerDelegate;
+} // namespace
+
+Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) :
+    mCluster(aEndpointId, config, gDefaultTimerDelegate)
+{}
 
 CHIP_ERROR Instance::Init()
 {
