@@ -191,7 +191,11 @@ if [ "$SKIP_BUILD" = false ]; then
     # then 30s.
     attempts=${DOCKER_BUILD_ATTEMPTS:-3}
     retry_delay=${DOCKER_BUILD_RETRY_DELAY:-15}
-    for attempt in $(seq 1 "$attempts"); do
+    # Reject bad values rather than looping zero times, which would skip the
+    # build entirely and still exit 0.
+    [[ $attempts =~ ^[1-9][0-9]*$ ]] || die "DOCKER_BUILD_ATTEMPTS must be a positive integer, got '$attempts'"
+    [[ $retry_delay =~ ^[0-9]+$ ]] || die "DOCKER_BUILD_RETRY_DELAY must be a non-negative integer, got '$retry_delay'"
+    for ((attempt = 1; attempt <= attempts; attempt++)); do
         if docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .; then
             break
         fi
