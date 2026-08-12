@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "Parser.h"
 #include "ResponseBuilder.h"
 #include "Server.h"
+#include <lib/dnssd/wire/Parser.h>
 
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 
