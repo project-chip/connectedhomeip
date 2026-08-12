@@ -172,6 +172,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::EnergyEvse::Id:
         MatterEnergyEvseClusterInitCallback(endpoint);
         break;
+    case app::Clusters::EnergyPreference::Id:
+        MatterEnergyPreferenceClusterInitCallback(endpoint);
+        break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterInitCallback(endpoint);
         break;
@@ -364,6 +367,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::EnergyEvse::Id:
         MatterEnergyEvseClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::EnergyPreference::Id:
+        MatterEnergyPreferenceClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);

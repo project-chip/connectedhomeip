@@ -20,14 +20,14 @@
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 #include <lib/dnssd/minimal_mdns/responders/RecordResponder.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/QName.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
