@@ -22,7 +22,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
@@ -263,8 +263,7 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 """
 
 
-class TestSpecParsingSupport(MatterBaseTest):
-    requires_dut = False
+class TestSpecParsingSupport(CertificationUnitTestNoDevice):
 
     def setup_class(self):
         super().setup_class()
