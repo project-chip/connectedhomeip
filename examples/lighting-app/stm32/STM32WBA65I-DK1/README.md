@@ -42,8 +42,8 @@ guides to get started
 
 Lighting application is provided with OTA feature disabled by default. To enable
 OTA feature, chip_enable_ota_requestor flag shall be set to True in args.gni.
-When OTA feature is enabled, MCUBoot & `OEMiRoT` are used. Dedicated build process
-applies. Please refer to Build Instructions section below
+When OTA feature is enabled, MCUBoot & `OEMiRoT` are used. Dedicated build
+process applies. Please refer to Build Instructions section below
 
 ## Cluster Control
 
