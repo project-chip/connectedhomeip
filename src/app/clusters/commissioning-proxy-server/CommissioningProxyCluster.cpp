@@ -63,8 +63,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
                                                                         AttributeValueDecoder & decoder)
 {
     // These writable attributes are stored by the cluster so that change-reporting is
-    // always the cluster's responsibility. Only emit a change report when the stored
-    // value actually changes, to avoid redundant reports.
+    // always the cluster's responsibility. SetAttributeValue reports only on an actual
+    // value change.
     switch (request.path.mAttributeId)
     {
     case ScanMaxTime::Id: {
@@ -72,27 +72,20 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         ReturnErrorOnFailure(decoder.Decode(time));
         // Spec: ScanMaxTime has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(time >= 1, Status::ConstraintError);
-        // No change → no write, no report.
-        VerifyOrReturnValue(time != mScanMaxTime, Status::Success);
-        mScanMaxTime = time;
-        break;
+        SetAttributeValue(mScanMaxTime, time, ScanMaxTime::Id);
+        return Status::Success;
     }
     case CacheTimeout::Id: {
         uint16_t cacheTimeout;
         ReturnErrorOnFailure(decoder.Decode(cacheTimeout));
         // Spec: CacheTimeout has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(cacheTimeout >= 1, Status::ConstraintError);
-        // No change → no write, no report.
-        VerifyOrReturnValue(cacheTimeout != mCacheTimeout, Status::Success);
-        mCacheTimeout = cacheTimeout;
-        break;
+        SetAttributeValue(mCacheTimeout, cacheTimeout, CacheTimeout::Id);
+        return Status::Success;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
-
-    NotifyAttributeChanged(request.path.mAttributeId);
-    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
