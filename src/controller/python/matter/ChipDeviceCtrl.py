@@ -1996,7 +1996,8 @@ class ChipDeviceControllerBase:
                              ],
                              timedRequestTimeoutMs: int | None = None,
                              interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                             suppressResponse: bool | None = None):
         '''
         Write a list of attributes on a target node.
 
@@ -2005,6 +2006,7 @@ class ChipDeviceControllerBase:
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        suppressResponse: Do not send a response to this action
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -2022,7 +2024,8 @@ class ChipDeviceControllerBase:
                                           interactionTimeoutMs=interactionTimeoutMs,
                                           busyWaitMs=busyWaitMs,
                                           payloadCapability=payloadCapability,
-                                          forceLegacyListEncoding=False)
+                                          forceLegacyListEncoding=False,
+                                          suppressResponse=suppressResponse)
 
     async def _WriteAttribute(self, nodeId: int,
                               attributes: list[
@@ -2031,7 +2034,8 @@ class ChipDeviceControllerBase:
                               ],
                               timedRequestTimeoutMs: int | None = None,
                               interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
+                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False,
+                              suppressResponse: bool | None = None):
 
         self.CheckIsActive()
 
@@ -2043,7 +2047,10 @@ class ChipDeviceControllerBase:
             attrs = self._prepare_write_attribute_requests(attributes)
             ClusterAttribute.WriteAttributes(
                 future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding,
+                suppressResponse=bool(suppressResponse)).raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _write_impl)
