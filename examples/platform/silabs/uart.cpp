@@ -673,18 +673,12 @@ void uartSendBytes(uint8_t * data, uint16_t length)
     //
     // Board_UARTPutSTR(data) does the exact same thing and is not compatible with
     // the Silabs Matter console.
-    if (osKernelGetState() == osKernelRunning)
-    {
-        osMutexAcquire(si91x_prints_mutex, osWaitForever);
-    }
+    osMutexAcquire(si91x_prints_mutex, osWaitForever);
     for (uint8_t i = 0; i < length; i++)
     {
         Board_UARTPutChar(data[i]);
     }
-    if (osKernelGetState() == osKernelRunning)
-    {
-        osMutexRelease(si91x_prints_mutex);
-    }
+    osMutexRelease(si91x_prints_mutex);
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
