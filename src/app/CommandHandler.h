@@ -195,11 +195,55 @@ public:
      * using `AddResponse` which will automatically reply with `Failure` in
      * case AddResponseData fails.
      */
+    /**
+     * Non-virtual response payload descriptor binding an untyped pointer to command data with a type-erased encoding callback.
+     *
+     * Using a POD struct with a standalone function pointer callback explicitly avoids compiler-generated virtual class
+     * constructors, destructors (both complete object and deleting destructors), vtable arrays, and RTTI metadata per
+     * response command type.
+     */
+    struct EncodableResponsePayload
+    {
+        using EncodeFn = CHIP_ERROR (*)(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag);
+
+        const void * mData;
+        EncodeFn mEncodeFn;
+
+        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const
+        {
+            return mEncodeFn(mData, writer, tag);
+        }
+    };
+
+    /**
+     * Encodes and adds response data via the polymorphic EncodableToTLV virtual interface.
+     * Supports dynamic or custom encodables that implement EncodableToTLV.
+     */
     virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                        const DataModel::EncodableToTLV & aEncodable) = 0;
 
     /**
-     * Attempts to encode a response to a command.
+     * Encodes and adds response data via the non-virtual EncodableResponsePayload callback descriptor.
+     * Default implementation adapts the payload to EncodableToTLV for compatibility with mock implementations.
+     */
+    virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                       const EncodableResponsePayload & aPayload)
+    {
+        struct PayloadAdapter : public DataModel::EncodableToTLV
+        {
+            const EncodableResponsePayload & mPayload;
+            PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
+            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
+            {
+                return mPayload.EncodeTo(writer, tag);
+            }
+        };
+        PayloadAdapter adapter(aPayload);
+        return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+    }
+
+    /**
+     * Attempts to encode a response to a command via the polymorphic EncodableToTLV virtual interface.
      *
      * `aRequestCommandPath` represents the request path (endpoint/cluster/commandid) and the reply
      * will preserve the same path and switch the command id to aResponseCommandId.
@@ -213,6 +257,26 @@ public:
      */
     virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                              const DataModel::EncodableToTLV & aEncodable) = 0;
+
+    /**
+     * Attempts to encode a response to a command via the non-virtual EncodableResponsePayload callback descriptor.
+     * Default implementation adapts the payload to EncodableToTLV for compatibility with mock implementations.
+     */
+    virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                             const EncodableResponsePayload & aPayload)
+    {
+        struct PayloadAdapter : public DataModel::EncodableToTLV
+        {
+            const EncodableResponsePayload & mPayload;
+            PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
+            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
+            {
+                return mPayload.EncodeTo(writer, tag);
+            }
+        };
+        PayloadAdapter adapter(aPayload);
+        AddResponse(aRequestCommandPath, aResponseCommandId, adapter);
+    }
 
     /**
      * Check whether the InvokeRequest we are handling is a timed invoke.
@@ -278,10 +342,16 @@ public:
      *             correct data structure for building a reply.
      */
     template <typename CommandData>
+    static CHIP_ERROR EncodeTypedCommandPayload(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag)
+    {
+        return DataModel::EncodeResponseCommandPayload(writer, tag, *static_cast<const CommandData *>(data));
+    }
+
+    template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        EncodableResponseCommandPayload<CommandData> encoder(aData);
-        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+        EncodableResponsePayload payload{ &aData, &EncodeTypedCommandPayload<CommandData> };
+        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), payload);
     }
 
     /**
@@ -304,34 +374,9 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        EncodableResponseCommandPayload<CommandData> encodable(aData);
-        AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
+        EncodableResponsePayload payload{ &aData, &EncodeTypedCommandPayload<CommandData> };
+        AddResponse(aRequestCommandPath, CommandData::GetCommandId(), payload);
     }
-
-protected:
-    // Encoding a response command payload requires a fabric index, in general,
-    // because any fabric-scoped fields in the payload need it to deal with
-    // their fabric-sensitive fields.
-    template <typename CommandData>
-    class EncodableResponseCommandPayload : public DataModel::EncodableToTLV
-    {
-    public:
-        EncodableResponseCommandPayload(const CommandData & value) : mValue(value) {}
-
-        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const final
-        {
-            return DataModel::EncodeResponseCommandPayload(writer, tag, mValue);
-        }
-
-        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final
-        {
-            // Not used, keep it as small as we can.
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-    private:
-        const CommandData & mValue;
-    };
 
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.

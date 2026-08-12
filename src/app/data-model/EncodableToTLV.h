@@ -39,7 +39,9 @@ public:
         // about it should override as needed.
         return EncodeTo(writer.mTLVWriter, tag);
     }
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
+    /// Encodes to a standard TLVWriter. Implementations that only support FabricAwareTLVWriter
+    /// do not need to override this method and inherit the default error return.
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const { return CHIP_ERROR_INCORRECT_STATE; }
 };
 
 /// An `EncodableToTLV` that uses `DataModel::Encode` to encode things in one call.

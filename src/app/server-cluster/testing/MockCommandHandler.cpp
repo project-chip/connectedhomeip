@@ -63,10 +63,37 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(chip::kMaxAppMessageLen);
+    VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    TLV::TLVWriter baseWriter;
+    baseWriter.Init(handle->Start(), handle->MaxDataLength());
+    app::DataModel::FabricAwareTLVWriter writer(baseWriter, mSubjectDescriptor.fabricIndex);
+    TLV::TLVType ct;
+
+    ReturnErrorOnFailure(writer.mTLVWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
+    ReturnErrorOnFailure(aPayload.EncodeTo(writer, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
+    ReturnErrorOnFailure(writer.mTLVWriter.EndContainer(ct));
+    handle->SetDataLength(writer.mTLVWriter.GetLengthWritten());
+
+    mResponses.emplace_back(ResponseRecord{ aResponseCommandId, std::move(handle), aRequestCommandPath });
+    return CHIP_NO_ERROR;
+}
+
 void MockCommandHandler::AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                      const app::DataModel::EncodableToTLV & aEncodable)
 {
     CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
+    VerifyOrDie(err == CHIP_NO_ERROR);
+}
+
+void MockCommandHandler::AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 

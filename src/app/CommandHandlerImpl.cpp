@@ -173,6 +173,43 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
+// Encodes response command data using non-virtual EncodableResponsePayload descriptors.
+// This avoids virtual table dispatch, RTTI metadata, and virtual destructor generation
+// per command response struct type.
+CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                                  const EncodableResponsePayload & aPayload)
+{
+    ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
+                                                aResponseCommandId };
+
+    InvokeResponseParameters prepareParams(aRequestCommandPath);
+    prepareParams.SetStartOrEndDataStruct(false);
+
+    {
+        ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(responseCommandPath, prepareParams));
+    }
+
+    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    auto context = TryGetExchangeContextWhenAsync();
+    FabricIndex accessingFabricIndex;
+    if (context && context->HasSessionHandle())
+    {
+        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
+    }
+    else
+    {
+        accessingFabricIndex = kUndefinedFabricIndex;
+    }
+
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aPayload.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
+    return FinishCommand(/* aEndDataStruct = */ false);
+}
+
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
@@ -180,6 +217,24 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
     return TryAddingResponse(
         [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
+}
+
+CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+    return TryAddingResponse(
+        [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
+}
+
+void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    if (AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload) != CHIP_NO_ERROR)
+    {
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+    }
 }
 
 CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
