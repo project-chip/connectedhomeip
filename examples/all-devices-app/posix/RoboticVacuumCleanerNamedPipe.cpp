@@ -15,163 +15,196 @@
  *    limitations under the License.
  */
 
+#include "include/RoboticVacuumCleanerNamedPipe.h"
+
+#include "include/AllDevicesAppNamedPipeCommandHandler.h"
+#include "include/AppCommandDelegate.h"
 #include <RvcSimulationLogic.h>
 #include <RvcSimulationTopology.h>
-#include <clusters/RvcCleanMode/Metadata.h>
-#include <clusters/RvcRunMode/Metadata.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
-#include <json/json.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-namespace chip::app {
+namespace {
 
-using namespace Clusters::ServiceArea;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::all_devices::rvc_simulation;
-using namespace chip::app::all_devices::rvc_simulation::Topology;
 
-void RoboticVacuumCleaner::HandleReset()
+// Reset is composed entirely from RoboticVacuumCleaner's public accessors and the shared
+// simulation helpers, so it needs no dedicated API on the device type itself.
+void HandleReset(RoboticVacuumCleaner & rvcDevice)
 {
-    mRunModeCluster.Cluster().UpdateCurrentMode(kRunModeIdle);
-    LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-        to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
-    mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
+    rvcDevice.RunMode().UpdateCurrentMode(Topology::kRunModeIdle);
+    LogErrorOnFailure(
+        rvcDevice.OperationalState().SetOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
+    rvcDevice.CleanMode().UpdateCurrentMode(Topology::kCleanModeQuick);
 
-    mServiceAreaCluster.Cluster().ClearSelectedAreas();
-    mServiceAreaCluster.Cluster().ClearProgress();
-    mServiceAreaCluster.Cluster().SetCurrentArea(DataModel::NullNullable);
-    mServiceAreaCluster.Cluster().SetEstimatedEndTime(DataModel::NullNullable);
+    rvcDevice.GetServiceAreaCluster().ClearSelectedAreas();
+    rvcDevice.GetServiceAreaCluster().ClearProgress();
+    rvcDevice.GetServiceAreaCluster().SetCurrentArea(DataModel::NullNullable);
+    rvcDevice.GetServiceAreaCluster().SetEstimatedEndTime(DataModel::NullNullable);
 
-    mServiceAreaDelegate.SetMapTopology();
-    mServiceAreaCluster.Cluster().SetCurrentArea(DefaultCurrentAreaId());
+    ApplyDefaultMapTopology(rvcDevice.GetServiceAreaCluster());
+    rvcDevice.GetServiceAreaCluster().SetCurrentArea(DefaultCurrentAreaId());
 }
 
-void RoboticVacuumCleaner::HandleNamedPipeCommand(const Json::Value & json)
+class RvcNamedPipeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
-    if (!json.isMember("Name") || !json["Name"].isString())
-    {
-        return;
-    }
+public:
+    explicit RvcNamedPipeCommandHandler(std::string commandName) : mCommandName(std::move(commandName)) {}
 
-    const std::string name = json["Name"].asString();
+    const char * GetName() const override { return mCommandName.c_str(); }
 
-    if (name == "Reset")
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        HandleReset();
-    }
-    else if (name == "Charged")
-    {
-        mDelegate.HandleCharged();
-    }
-    else if (name == "Charging")
-    {
-        mDelegate.HandleCharging();
-    }
-    else if (name == "Docked")
-    {
-        mDelegate.HandleDocked();
-    }
-    else if (name == "ChargerFound")
-    {
-        mDelegate.HandleChargerFound();
-    }
-    else if (name == "LowCharge")
-    {
-        mDelegate.HandleLowCharge();
-    }
-    else if (name == "ActivityComplete")
-    {
-        mDelegate.HandleActivityComplete();
-    }
-    else if (name == "AreaComplete")
-    {
-        mDelegate.HandleAreaComplete();
-    }
-    else if (name == "ClearError")
-    {
-        mDelegate.HandleClearError();
-    }
-    else if (name == "EmptyingDustBin")
-    {
-        LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
-    }
-    else if (name == "CleaningMop")
-    {
-        LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCleaningMop)));
-    }
-    else if (name == "FillingWaterTank")
-    {
-        LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
-    }
-    else if (name == "UpdatingMaps")
-    {
-        LogErrorOnFailure(mOperationalStateCluster.Cluster().SetOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
-    }
-    else if (name == "ErrorEvent")
-    {
-        if (json.isMember("Error") && json["Error"].isString())
+        auto * rvcDevice = delegate->GetRvcDeviceByEndpoint(endpointId);
+        if (rvcDevice == nullptr)
         {
-            mDelegate.HandleErrorEvent(json["Error"].asString());
-        }
-    }
-    else if (name == "AddMap")
-    {
-        if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
-        {
-            std::string mapName = json["MapName"].asString();
-            mServiceAreaCluster.Cluster().AddSupportedMap(json["MapId"].asUInt(), CharSpan(mapName.data(), mapName.size()));
-        }
-    }
-    else if (name == "RemoveMap")
-    {
-        if (json.isMember("MapId") && json["MapId"].isUInt())
-        {
-            mServiceAreaCluster.Cluster().RemoveSupportedMap(json["MapId"].asUInt());
-        }
-    }
-    else if (name == "AddArea")
-    {
-        if (!json.isMember("AreaId") || !json["AreaId"].isUInt())
-        {
+            ChipLogError(AppServer, "RoboticVacuumCleaner not found on endpoint %d", endpointId);
             return;
         }
 
-        Clusters::ServiceArea::AreaStructureWrapper area;
-        area.SetAreaId(json["AreaId"].asUInt());
-        if (json.isMember("MapId"))
+        auto & opStateDelegate = rvcDevice->OperationalStateDelegate();
+
+        if (mCommandName == "Reset")
         {
-            if (!json["MapId"].isUInt())
+            HandleReset(*rvcDevice);
+        }
+        else if (mCommandName == "Charged")
+        {
+            opStateDelegate.HandleCharged();
+        }
+        else if (mCommandName == "Charging")
+        {
+            opStateDelegate.HandleCharging();
+        }
+        else if (mCommandName == "Docked")
+        {
+            opStateDelegate.HandleDocked();
+        }
+        else if (mCommandName == "ChargerFound")
+        {
+            opStateDelegate.HandleChargerFound();
+        }
+        else if (mCommandName == "LowCharge")
+        {
+            opStateDelegate.HandleLowCharge();
+        }
+        else if (mCommandName == "ActivityComplete")
+        {
+            opStateDelegate.HandleActivityComplete();
+        }
+        else if (mCommandName == "AreaComplete")
+        {
+            opStateDelegate.HandleAreaComplete();
+        }
+        else if (mCommandName == "ClearError")
+        {
+            opStateDelegate.HandleClearError();
+        }
+        else if (mCommandName == "EmptyingDustBin")
+        {
+            LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+                to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
+        }
+        else if (mCommandName == "CleaningMop")
+        {
+            LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+                to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
+        }
+        else if (mCommandName == "FillingWaterTank")
+        {
+            LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+                to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+        }
+        else if (mCommandName == "UpdatingMaps")
+        {
+            LogErrorOnFailure(rvcDevice->OperationalState().SetOperationalState(
+                to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
+        }
+        else if (mCommandName == "ErrorEvent")
+        {
+            if (json.isMember("Error") && json["Error"].isString())
+            {
+                opStateDelegate.HandleErrorEvent(json["Error"].asString());
+            }
+        }
+        else if (mCommandName == "AddMap")
+        {
+            if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
+            {
+                std::string mapName = json["MapName"].asString();
+                rvcDevice->GetServiceAreaCluster().AddSupportedMap(json["MapId"].asUInt(),
+                                                                   CharSpan(mapName.data(), mapName.size()));
+            }
+        }
+        else if (mCommandName == "RemoveMap")
+        {
+            if (json.isMember("MapId") && json["MapId"].isUInt())
+            {
+                rvcDevice->GetServiceAreaCluster().RemoveSupportedMap(json["MapId"].asUInt());
+            }
+        }
+        else if (mCommandName == "AddArea")
+        {
+            if (!json.isMember("AreaId") || !json["AreaId"].isUInt())
             {
                 return;
             }
-            area.SetMapId(json["MapId"].asUInt());
-        }
-        if (json.isMember("LocationName"))
-        {
-            if (!json["LocationName"].isString())
+
+            ServiceArea::AreaStructureWrapper area;
+            area.SetAreaId(json["AreaId"].asUInt());
+            if (json.isMember("MapId"))
             {
-                return;
+                if (!json["MapId"].isUInt())
+                {
+                    return;
+                }
+                area.SetMapId(json["MapId"].asUInt());
             }
-            std::string locationName = json["LocationName"].asString();
-            area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
-                                 DataModel::NullNullable);
+            if (json.isMember("LocationName"))
+            {
+                if (!json["LocationName"].isString())
+                {
+                    return;
+                }
+                std::string locationName = json["LocationName"].asString();
+                area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
+                                     DataModel::NullNullable);
+            }
+            rvcDevice->GetServiceAreaCluster().AddSupportedArea(area);
         }
-        mServiceAreaCluster.Cluster().AddSupportedArea(area);
-    }
-    else if (name == "RemoveArea")
-    {
-        if (json.isMember("AreaId") && json["AreaId"].isUInt())
+        else if (mCommandName == "RemoveArea")
         {
-            mServiceAreaCluster.Cluster().RemoveSupportedArea(json["AreaId"].asUInt());
+            if (json.isMember("AreaId") && json["AreaId"].isUInt())
+            {
+                rvcDevice->GetServiceAreaCluster().RemoveSupportedArea(json["AreaId"].asUInt());
+            }
+        }
+        else
+        {
+            ChipLogError(AppServer, "Unknown RVC named-pipe command: %s", mCommandName.c_str());
         }
     }
-    else
+
+private:
+    std::string mCommandName;
+};
+
+} // namespace
+
+void RegisterRvcNamedPipeCommandHandlers(AllDevicesAppCommandDelegate & delegate)
+{
+    static constexpr const char * kRvcNamedPipeCommands[] = {
+        "Reset",        "Charged",    "Charging",        "Docked",      "ChargerFound",     "LowCharge",    "ActivityComplete",
+        "AreaComplete", "ClearError", "EmptyingDustBin", "CleaningMop", "FillingWaterTank", "UpdatingMaps", "ErrorEvent",
+        "AddMap",       "RemoveMap",  "AddArea",         "RemoveArea",
+    };
+    for (const char * commandName : kRvcNamedPipeCommands)
     {
-        ChipLogError(AppServer, "Unknown RVC named-pipe command: %s", name.c_str());
+        delegate.RegisterCommandHandler(std::make_unique<RvcNamedPipeCommandHandler>(commandName));
     }
 }
-
-} // namespace chip::app

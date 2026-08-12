@@ -17,15 +17,14 @@
 
 #include "include/AppCommandDelegate.h"
 
+#include "include/RoboticVacuumCleanerNamedPipe.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
-#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
-#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
-#include <lib/support/TypeTraits.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -518,31 +517,6 @@ public:
     }
 };
 
-// RVC named-pipe commands are delegated to RoboticVacuumCleaner, which ports the simulation
-// logic from examples/rvc-app/rvc-common/src/rvc-device.cpp.
-class RvcNamedPipeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
-{
-public:
-    explicit RvcNamedPipeCommandHandler(std::string commandName) : mCommandName(std::move(commandName)) {}
-
-    const char * GetName() const override { return mCommandName.c_str(); }
-
-    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
-    {
-        auto * rvcDevice = delegate->GetRvcDeviceByEndpoint(endpointId);
-        if (rvcDevice == nullptr)
-        {
-            ChipLogError(AppServer, "RoboticVacuumCleaner not found on endpoint %d", endpointId);
-            return;
-        }
-
-        rvcDevice->HandleNamedPipeCommand(json);
-    }
-
-private:
-    std::string mCommandName;
-};
-
 } // namespace
 
 void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -621,15 +595,7 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
-    static constexpr const char * kRvcNamedPipeCommands[] = {
-        "Reset",        "Charged",    "Charging",        "Docked",      "ChargerFound",     "LowCharge",    "ActivityComplete",
-        "AreaComplete", "ClearError", "EmptyingDustBin", "CleaningMop", "FillingWaterTank", "UpdatingMaps", "ErrorEvent",
-        "AddMap",       "RemoveMap",  "AddArea",         "RemoveArea",
-    };
-    for (const char * commandName : kRvcNamedPipeCommands)
-    {
-        RegisterCommandHandler(std::make_unique<RvcNamedPipeCommandHandler>(commandName));
-    }
+    RegisterRvcNamedPipeCommandHandlers(*this);
 }
 
 void AllDevicesAppCommandDelegate::RegisterRvcDevice(chip::EndpointId endpoint, chip::app::RoboticVacuumCleaner * device)
