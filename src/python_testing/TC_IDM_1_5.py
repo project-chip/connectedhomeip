@@ -137,7 +137,7 @@ class TC_IDM_1_5(IDMBaseTest):
 
         cmd = Clusters.OnOff.Commands.Toggle()
         log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=200, DelayJitterWindowMs=500)")
-        
+
         await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
