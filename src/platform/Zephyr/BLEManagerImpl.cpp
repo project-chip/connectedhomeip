@@ -207,6 +207,25 @@ int InitRandomStaticAddress(bool idPresent, int & id)
 
 } // unnamed namespace
 
+#if defined(CONFIG_BT_TLX)
+/**
+ * Telink TLX: start a minimal BLE advertisement that carries no CHIPoBLE
+ * service data. It is invisible to Matter controllers but keeps a real BLE
+ * task active in the TLKSW scheduler, which is required for the shared
+ * BLE/802.15.4 coexistence arbitration to work (see the workaround note in
+ * BLEManagerImpl::_Init()). Returns a Zephyr errno, 0 on success.
+ */
+int StartMinimalBLEAdvertisement()
+{
+    static const struct bt_data minimal_ad[] = {
+        BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+    };
+    const struct bt_le_adv_param params =
+        BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
+    return bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
+}
+#endif // CONFIG_BT_TLX
+
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -266,15 +285,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     //
     // The real CHIPoBLE advertisement replaces this minimal one later, when
     // DriveBLEState() runs (StartAdvertising).
-    {
-        static const struct bt_data minimal_ad[] = {
-            BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-        };
-        const struct bt_le_adv_param params =
-            BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
-        int adv_err = bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
-        VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
-    }
+    int adv_err = StartMinimalBLEAdvertisement();
+    VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
 
     tlx_bt_802154_dual_mode_start();
 #endif
@@ -367,6 +379,18 @@ void BLEManagerImpl::DriveBLEState()
                 mFlags.Clear(Flags::kChipoBleGattServiceRegister);
             }
         }
+
+#if defined(CONFIG_BT_TLX) && defined(CONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION) &&                                                 \
+    !defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
+        // In concurrent idle mode, once Thread is attached the 802.15.4 radio
+        // has been initialised (tlx_start_radio() succeeded) so the minimal
+        // BLE advertisement from _Init is no longer needed for coexistence.
+        // Stop it to keep BLE completely silent.
+        if (ConnectivityMgr().IsThreadAttached())
+        {
+            bt_le_adv_stop();
+        }
+#endif
     }
 }
 
