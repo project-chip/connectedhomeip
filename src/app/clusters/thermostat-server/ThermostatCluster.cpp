@@ -175,35 +175,35 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         if (!mFeatures.Has(Feature::kAutoMode))
         {
             ChipLogDetail(Zcl, "Auto mode is not supported");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
         break;
     case SystemModeEnum::kCool:
         if (!mFeatures.Has(Feature::kCooling))
         {
             ChipLogDetail(Zcl, "Cooling mode is not supported");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
         break;
     case SystemModeEnum::kHeat:
         if (!mFeatures.Has(Feature::kHeating))
         {
             ChipLogDetail(Zcl, "Heating mode is not supported");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
         break;
     case SystemModeEnum::kEmergencyHeat:
         if (!mFeatures.Has(Feature::kHeating))
         {
             ChipLogDetail(Zcl, "Emergency heat mode is not supported");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
         break;
     case SystemModeEnum::kPrecooling:
         if (!mFeatures.Has(Feature::kCooling))
         {
             ChipLogDetail(Zcl, "Precooling mode is not supported");
-            return Status::Failure;
+            return Status::ConstraintError;
         }
         break;
     case SystemModeEnum::kFanOnly:
@@ -211,7 +211,7 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
     case SystemModeEnum::kSleep:
         break;
     default:
-        return Status::InvalidValue;
+        return Status::ConstraintError;
     }
 
     if (!SetAttributeValue(mSystemMode, systemMode, app::Clusters::Thermostat::Attributes::SystemMode::Id))
@@ -230,6 +230,26 @@ Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> local
 
 Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
+    switch (runningMode) {
+    case ThermostatRunningModeEnum::kOff:
+        break;
+    case ThermostatRunningModeEnum::kCool:
+        if (!mFeatures.Has(Feature::kCooling))
+        {
+            ChipLogDetail(Zcl, "Cooling mode is not supported");
+            return Status::ConstraintError;
+        }
+        break;
+    case ThermostatRunningModeEnum::kHeat:
+        if (!mFeatures.Has(Feature::kHeating))
+        {
+            ChipLogDetail(Zcl, "Heating mode is not supported");
+            return Status::ConstraintError;
+        }
+        break;
+    default:
+        return Status::ConstraintError;
+    }
     if (!SetAttributeValue(mRunningMode, runningMode, app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id))
     {
         return Status::Failure;
@@ -239,6 +259,16 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
 
 Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState)
 {
+    if (runningState.HasAny(RelayStateBitmap::kHeat, RelayStateBitmap::kHeatStage2) && !mFeatures.Has(Feature::kHeating))
+    {
+        ChipLogDetail(Zcl, "Heating relay state is not supported");
+        return Status::ConstraintError;
+    }
+    if (runningState.HasAny(RelayStateBitmap::kCool, RelayStateBitmap::kCoolStage2) && !mFeatures.Has(Feature::kCooling))
+    {
+        ChipLogDetail(Zcl, "Cooling relay state is not supported");
+        return Status::ConstraintError;
+    }    
     if (!SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id))
     {
         return Status::Failure;

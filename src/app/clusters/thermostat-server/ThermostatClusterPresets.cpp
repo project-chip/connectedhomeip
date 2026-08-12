@@ -407,11 +407,11 @@ CHIP_ERROR ThermostatCluster::AppendPendingPreset(const PresetStruct::Type & new
 }
 
 /**
- * @brief Checks if the given preset handle is present in the  presets attribute
+ * @brief Checks if the given preset handle is present in the presets attribute
  * @param[in] delegate The delegate to use.
  * @param[in] presetHandleToMatch The preset handle to match with.
  *
- * @return true if the given preset handle is present in the  presets attribute list, false otherwise.
+ * @return true if the given preset handle is present in the presets attribute list, false otherwise.
  */
 bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & presetHandleToMatch)
 {

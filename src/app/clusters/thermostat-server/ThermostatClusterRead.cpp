@@ -252,6 +252,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     }
     break;
     case Schedules::Id: {
+        // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
