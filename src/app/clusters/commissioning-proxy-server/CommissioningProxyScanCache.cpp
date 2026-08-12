@@ -48,18 +48,13 @@ bool CommissioningProxyScanCache::Key::operator<(const Key & o) const
     return pid < o.pid;
 }
 
-void CommissioningProxyScanCache::SweepTimerCallback(System::Layer * /*layer*/, void * appState)
-{
-    static_cast<CommissioningProxyScanCache *>(appState)->OnSweep();
-}
-
 void CommissioningProxyScanCache::ArmSweepIfNeeded()
 {
     if (mSweepArmed || mEntries.empty())
     {
         return;
     }
-    if (DeviceLayer::SystemLayer().StartTimer(kSweepInterval, SweepTimerCallback, this) == CHIP_NO_ERROR)
+    if (mTimerDelegate.StartTimer(this, kSweepInterval) == CHIP_NO_ERROR)
     {
         mSweepArmed = true;
     }
@@ -69,7 +64,7 @@ void CommissioningProxyScanCache::OnSweep()
 {
     mSweepArmed = false;
 
-    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto now     = mTimerDelegate.GetCurrentMonotonicTimestamp();
     bool removed = false;
     for (auto it = mEntries.begin(); it != mEntries.end();)
     {
@@ -99,7 +94,7 @@ void CommissioningProxyScanCache::Report(const ScanResultEntry & result)
     Key key{ static_cast<uint8_t>(result.transport.Raw()), result.discriminator, static_cast<uint16_t>(result.vendorID),
              result.productID };
 
-    auto expiresAt = System::SystemClock().GetMonotonicTimestamp() + System::Clock::Seconds16(mCluster.GetCacheTimeout());
+    auto expiresAt = mTimerDelegate.GetCurrentMonotonicTimestamp() + System::Clock::Seconds16(mCluster.GetCacheTimeout());
 
     auto it = mEntries.find(key);
     if (it != mEntries.end())
@@ -211,7 +206,7 @@ void CommissioningProxyScanCache::Shutdown()
 {
     if (mSweepArmed)
     {
-        DeviceLayer::SystemLayer().CancelTimer(SweepTimerCallback, this);
+        mTimerDelegate.CancelTimer(this);
         mSweepArmed = false;
     }
     mEntries.clear();

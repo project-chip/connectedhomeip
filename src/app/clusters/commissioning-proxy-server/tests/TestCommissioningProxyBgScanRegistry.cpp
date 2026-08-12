@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "CommissioningProxyMockTimer.h"
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
 #include <pw_unit_test/framework.h>
 
@@ -57,10 +58,9 @@ public:
     CHIP_ERROR startResult = CHIP_NO_ERROR;
 };
 
-// All tests use timeoutSecs == 0 so no lifetime timer is armed: the registry logic
-// is exercised synchronously with no dependency on the system layer / event loop.
-// The lifetime-timer expiry path reuses the same removal + OnBecameEmpty() logic
-// that Stop() exercises directly here.
+// Most tests pass timeoutSecs == 0 so no lifetime timer is armed and the registry
+// logic is exercised synchronously. The lifetime tests at the end instead arm a timer
+// and advance CommissioningProxyMockTimer's virtual clock.
 constexpr uint16_t kNoTimeout = 0;
 
 } // namespace
@@ -68,7 +68,8 @@ constexpr uint16_t kNoTimeout = 0;
 TEST(TestCommissioningProxyBgScanRegistry, FirstFabricStartsHardware)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
@@ -79,7 +80,8 @@ TEST(TestCommissioningProxyBgScanRegistry, FirstFabricStartsHardware)
 TEST(TestCommissioningProxyBgScanRegistry, SecondFabricDoesNotRestartHardware)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, kNoTimeout), Status::Success);
@@ -89,8 +91,9 @@ TEST(TestCommissioningProxyBgScanRegistry, SecondFabricDoesNotRestartHardware)
 TEST(TestCommissioningProxyBgScanRegistry, StartBusyStaysPausedAndKeepsFabric)
 {
     MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
     hw.startResult = CHIP_ERROR_BUSY; // radio held (BLE scanner / PAF connect slot)
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
@@ -107,8 +110,9 @@ TEST(TestCommissioningProxyBgScanRegistry, StartBusyStaysPausedAndKeepsFabric)
 TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRejectsAndDropsFabric)
 {
     MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
     hw.startResult = CHIP_ERROR_INTERNAL;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Failure);
     EXPECT_TRUE(reg.IsEmpty());
@@ -123,7 +127,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRejectsAndDropsFabric
 TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRefreshingLastFabricClearsPausedState)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
 
@@ -146,7 +151,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRefreshingLastFabricC
 TEST(TestCommissioningProxyBgScanRegistry, StopLastFabricStopsHardwareAndClears)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kBle, kNoBands, kNoTimeout), Status::Success);
     EXPECT_EQ(reg.Stop(kFabric1, kNode1, kBle, kNoBands), Status::Success);
@@ -158,7 +164,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StopLastFabricStopsHardwareAndClears)
 TEST(TestCommissioningProxyBgScanRegistry, StopUnknownFabricNotFound)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Stop(kFabric1, kNode1, kBle, kNoBands), Status::NotFound);
 }
@@ -166,7 +173,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StopUnknownFabricNotFound)
 TEST(TestCommissioningProxyBgScanRegistry, StopNoOverlapSucceedsAndKeepsFabric)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     // Stop targets a different transport (BLE); nothing overlaps this PAF fabric.
@@ -178,7 +186,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StopNoOverlapSucceedsAndKeepsFabric)
 TEST(TestCommissioningProxyBgScanRegistry, StopBandSubsetKeepsFabricThenRemoves)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, kBoth, kNoTimeout), Status::Success);
 
@@ -197,7 +206,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StopBandSubsetKeepsFabricThenRemoves)
 TEST(TestCommissioningProxyBgScanRegistry, StopWithOtherFabricCoveringKeepsHardware)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, kNoTimeout), Status::Success);
@@ -212,7 +222,8 @@ TEST(TestCommissioningProxyBgScanRegistry, StopWithOtherFabricCoveringKeepsHardw
 TEST(TestCommissioningProxyBgScanRegistry, PauseStopsAndResumeRestarts)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kBle, kNoBands, kNoTimeout), Status::Success);
     EXPECT_EQ(hw.startCount, 1);
@@ -229,7 +240,8 @@ TEST(TestCommissioningProxyBgScanRegistry, PauseStopsAndResumeRestarts)
 TEST(TestCommissioningProxyBgScanRegistry, PauseWhenEmptyIsNoop)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     reg.Pause();
     EXPECT_FALSE(reg.IsPaused());
@@ -239,7 +251,8 @@ TEST(TestCommissioningProxyBgScanRegistry, PauseWhenEmptyIsNoop)
 TEST(TestCommissioningProxyBgScanRegistry, ResumeWhenNotPausedIsNoop)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kBle, kNoBands, kNoTimeout), Status::Success);
     reg.ResumeIfNeeded();
@@ -249,7 +262,8 @@ TEST(TestCommissioningProxyBgScanRegistry, ResumeWhenNotPausedIsNoop)
 TEST(TestCommissioningProxyBgScanRegistry, ResumeStillBusyStaysPaused)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     reg.Pause();
@@ -263,8 +277,9 @@ TEST(TestCommissioningProxyBgScanRegistry, ResumeStillBusyStaysPaused)
 TEST(TestCommissioningProxyBgScanRegistry, ShutdownStopsHardware)
 {
     MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
     {
-        CommissioningProxyBgScanRegistry reg(hw);
+        CommissioningProxyBgScanRegistry reg(hw, timers);
         EXPECT_EQ(reg.Start(kFabric1, kNode1, kBle, kNoBands, kNoTimeout), Status::Success);
         reg.Shutdown();
         EXPECT_TRUE(reg.IsEmpty());
@@ -277,7 +292,8 @@ TEST(TestCommissioningProxyBgScanRegistry, ShutdownStopsHardware)
 TEST(TestCommissioningProxyBgScanRegistry, RefreshExistingFabricUpdatesBands)
 {
     MockHardwareControl hw;
-    CommissioningProxyBgScanRegistry reg(hw);
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
 
     EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
     // Re-register the same fabric with a different band; still one fabric, no restart.
@@ -291,4 +307,71 @@ TEST(TestCommissioningProxyBgScanRegistry, RefreshExistingFabricUpdatesBands)
     // Stopping the current band (5G) removes it.
     EXPECT_EQ(reg.Stop(kFabric1, kNode1, kNoTransport, k5g), Status::Success);
     EXPECT_TRUE(reg.IsEmpty());
+}
+
+// Spec § ProxyBackGroundScanStartRequest Timeout: "The background scan is
+// automatically stopped when this duration elapses."
+TEST(TestCommissioningProxyBgScanRegistry, LifetimeExpiryRemovesFabricAndStopsHardware)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(hw.startCount, 1);
+
+    // Still inside the lifetime: nothing changes.
+    timers.AdvanceClock(System::Clock::Seconds16(29));
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+
+    // Spec: "any cached results for that fabric's transports are cleared".
+    timers.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1);
+    EXPECT_EQ(hw.clearCount, 1);
+}
+
+// Without a lifetime timer the hardware scan would run unbounded, so a StartTimer
+// failure SHALL reject the request and tear down the scan it had already started.
+TEST(TestCommissioningProxyBgScanRegistry, LifetimeTimerArmFailureRejectsAndCleansUp)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    timers.FailNextStart();
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Failure);
+
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_FALSE(reg.IsPaused());
+    EXPECT_EQ(hw.startCount, 1); // hardware was started before the timer failed
+    EXPECT_EQ(hw.stopCount, 1);  // ... so it must be stopped again
+    EXPECT_EQ(hw.clearCount, 1);
+}
+
+// Spec: the proxy keeps per-fabric records and scans "until the timeout fires or
+// ProxyBackGroundScanStopRequest is received for that fabric". Each fabric's lifetime
+// is therefore independent: expiring one must not disturb another.
+TEST(TestCommissioningProxyBgScanRegistry, IndependentLifetimesExpireSeparately)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 10), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, 60), Status::Success);
+    EXPECT_EQ(hw.startCount, 1);
+
+    // Fabric 1 expires; fabric 2 still wants the scan, so the radio keeps running.
+    timers.AdvanceClock(System::Clock::Seconds16(10));
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+    EXPECT_EQ(hw.clearCount, 0);
+
+    // Fabric 2 expires: last fabric gone, scan torn down.
+    timers.AdvanceClock(System::Clock::Seconds16(50));
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1);
+    EXPECT_EQ(hw.clearCount, 1);
 }

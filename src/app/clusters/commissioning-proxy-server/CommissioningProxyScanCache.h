@@ -24,6 +24,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
@@ -67,13 +68,15 @@ public:
  *
  * All entry points must run on the Matter thread with the stack lock held.
  */
-class CommissioningProxyScanCache
+class CommissioningProxyScanCache : public TimerContext
 {
 public:
     using ScanResultEntry = Structs::ScanResultStruct::Type;
 
-    explicit CommissioningProxyScanCache(ScanCacheObserver & cluster) : mCluster(cluster) {}
-    ~CommissioningProxyScanCache() = default;
+    CommissioningProxyScanCache(ScanCacheObserver & cluster, TimerDelegate & timerDelegate) :
+        mCluster(cluster), mTimerDelegate(timerDelegate)
+    {}
+    ~CommissioningProxyScanCache() override = default;
 
     /**
      * @brief Insert or refresh a discovered device. @p result.transport carries the
@@ -95,6 +98,8 @@ public:
 
     /// Cancel the sweep timer and drop all entries (cluster teardown).
     void Shutdown();
+
+    void TimerFired() override { OnSweep(); }
 
 private:
     // A device is unique per discriminator/VendorID/ProductID/Transport (spec).
@@ -122,11 +127,13 @@ private:
         System::Clock::Timestamp expiresAt{};
     };
 
-    static void SweepTimerCallback(System::Layer * layer, void * appState);
+    /// Sweep expiry: drop every entry whose TTL has passed, then re-arm while any
+    /// entry remains.
     void OnSweep();
     void ArmSweepIfNeeded();
 
     ScanCacheObserver & mCluster;
+    TimerDelegate & mTimerDelegate;
     std::map<Key, Entry> mEntries;
     bool mSweepArmed = false;
 };

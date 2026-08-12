@@ -96,7 +96,7 @@ public:
                 config.featureFlags.Has(CommissioningProxy::Feature::kWiFiNetworkInterface));
             return attrs;
         }()),
-        mSessions(timerDelegate), mScanCache(*this), mScanAggregator(timerDelegate)
+        mSessions(timerDelegate), mScanCache(*this, timerDelegate), mScanAggregator(timerDelegate)
     {
         mMainCommissioningProxyState = kState_CPDisconnected;
     }

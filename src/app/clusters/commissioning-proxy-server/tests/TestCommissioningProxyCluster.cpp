@@ -20,7 +20,6 @@
 #include "CommissioningProxyMockTransport.h"
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockTransport.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h> // for kMaxDiscriminatorValue
 #include <pw_unit_test/framework.h>
 
@@ -46,20 +45,10 @@ namespace {
 constexpr EndpointId kTestEndpointId = 1;
 struct TestCommissioningProxyCluster : public ::testing::Test
 {
-    // The scan cache still arms its sweep through the system layer, so the stack has to
-    // be initialised for StartTimer to succeed. The event loop is never run, so that
-    // timer never fires. (The session manager and scan aggregator instead take the
-    // mockTimer below, which is what lets these tests drive expiry and failure.)
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        chip::Platform::MemoryShutdown();
-    }
+    // No stack init needed: every cluster timer goes through the mockTimer below, so
+    // nothing under test touches the system layer or the event loop.
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     void SetUp() override {}
 
@@ -2279,6 +2268,37 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeout)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A sub-scan whose completion callback never fires must not block the aggregator
+// forever: the watchdog ends the aggregation so later scans are still accepted.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WatchdogEndsStalledAggregation)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    // The sub-scan starts but never reports, so only the watchdog can finish this.
+    mockBle.SetAutoContribute(false);
+    Commands::ProxyScanRequest::Type command;
+    command.transport             = CapabilitiesBitmap::kBle;
+    [[maybe_unused]] auto stalled = tester.Invoke(command);
+
+    // A second request while the first is still aggregating is rejected.
+    EXPECT_EQ(tester.Invoke(command).GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::Busy));
+
+    // ScanMaxTime defaults to 10s and the watchdog adds a 5s margin.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(16));
+
+    // The aggregation has been closed out, so a new scan is accepted again.
+    mockBle.SetAutoContribute(true);
+    EXPECT_TRUE(tester.Invoke(command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // The response timer is what eventually answers a ProxyMessageRequest the commissionee
 // never replies to. If it cannot be armed the command SHALL be rejected, so the
 // commissioner gets an answer instead of an exchange that is never resolved.
@@ -2368,6 +2388,112 @@ TEST_F(TestCommissioningProxyCluster, TestCachedResults_ReportDedupAndClear)
     // Clearing the BLE transport removes all its entries → count 0.
     cluster.ScanCache().ClearTransport(chip::BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle));
     EXPECT_EQ(readNum(), 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Spec § ProxyBackGroundScanStartRequest: "The proxy SHALL retain each result for
+// CacheTimeout ... and SHALL remove the result upon expiry."
+TEST_F(TestCommissioningProxyCluster, TestCachedResults_EntryExpiresAfterCacheTimeout)
+{
+    BitMask<Feature> bgs(Feature::kBackgroundScan);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(bgs), mockTimer);
+    RegisterMocks(cluster);
+
+    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    auto readNum = [&]() {
+        uint8_t n = 0xFF;
+        EXPECT_EQ(tester.ReadAttribute(CPAttributes::NumCachedResults::Id, n), CHIP_NO_ERROR);
+        return n;
+    };
+
+    // CacheTimeout defaults to 120s.
+    cluster.ScanCache().Report(MakeScanEntry(1000, CapabilitiesBitmap::kBle));
+    EXPECT_EQ(readNum(), 1u);
+
+    // Still inside the TTL: the sweep runs but keeps the entry.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(119));
+    EXPECT_EQ(readNum(), 1u);
+
+    // Past the TTL: the entry is dropped and both attributes are reported.
+    tester.GetDirtyList().clear();
+    mockTimer.AdvanceClock(System::Clock::Seconds16(2));
+    EXPECT_EQ(readNum(), 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(CPAttributes::CachedResults::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(CPAttributes::NumCachedResults::Id));
+
+    // Nothing left to sweep, so the cache stops re-arming its timer.
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Spec § ProxyBackGroundScanStartRequest: "for each discovered device, the proxy SHALL
+// reset the timer associated to this device on rediscovery of the same device".
+TEST_F(TestCommissioningProxyCluster, TestCachedResults_RediscoveryResetsTtl)
+{
+    BitMask<Feature> bgs(Feature::kBackgroundScan);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(bgs), mockTimer);
+    RegisterMocks(cluster);
+
+    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    auto readNum = [&]() {
+        uint8_t n = 0xFF;
+        EXPECT_EQ(tester.ReadAttribute(CPAttributes::NumCachedResults::Id, n), CHIP_NO_ERROR);
+        return n;
+    };
+
+    cluster.ScanCache().Report(MakeScanEntry(1000, CapabilitiesBitmap::kBle));
+
+    // Rediscovered at t=100s, which pushes expiry out to t=220s.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(100));
+    cluster.ScanCache().Report(MakeScanEntry(1000, CapabilitiesBitmap::kBle));
+
+    // t=130s is past the ORIGINAL 120s expiry; the refreshed entry SHALL survive.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(30));
+    EXPECT_EQ(readNum(), 1u);
+
+    // t=221s is past the refreshed expiry.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(91));
+    EXPECT_EQ(readNum(), 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Entries with different TTLs expire independently, and the sweep keeps re-arming
+// while any entry remains.
+TEST_F(TestCommissioningProxyCluster, TestCachedResults_SweepExpiresOnlyDueEntries)
+{
+    BitMask<Feature> bgs(Feature::kBackgroundScan);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(bgs), mockTimer);
+    RegisterMocks(cluster);
+
+    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    auto readNum = [&]() {
+        uint8_t n = 0xFF;
+        EXPECT_EQ(tester.ReadAttribute(CPAttributes::NumCachedResults::Id, n), CHIP_NO_ERROR);
+        return n;
+    };
+
+    cluster.ScanCache().Report(MakeScanEntry(1000, CapabilitiesBitmap::kBle)); // expires t=120
+    mockTimer.AdvanceClock(System::Clock::Seconds16(60));
+    cluster.ScanCache().Report(MakeScanEntry(2000, CapabilitiesBitmap::kBle)); // expires t=180
+    EXPECT_EQ(readNum(), 2u);
+
+    // t=121: only the first entry is due; the sweep stays armed for the second.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(61));
+    EXPECT_EQ(readNum(), 1u);
+    EXPECT_EQ(mockTimer.ActiveCount(), 1u);
+
+    mockTimer.AdvanceClock(System::Clock::Seconds16(60));
+    EXPECT_EQ(readNum(), 0u);
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

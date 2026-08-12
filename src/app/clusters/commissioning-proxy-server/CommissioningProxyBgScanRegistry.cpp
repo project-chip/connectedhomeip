@@ -42,7 +42,7 @@ void CommissioningProxyBgScanRegistry::CancelLifetime(Record & rec)
 {
     if (rec.lifetimeCtx != nullptr)
     {
-        DeviceLayer::SystemLayer().CancelTimer(LifetimeExpiryCallback, rec.lifetimeCtx);
+        mTimerDelegate.CancelTimer(rec.lifetimeCtx);
         delete rec.lifetimeCtx;
         rec.lifetimeCtx = nullptr;
     }
@@ -114,9 +114,8 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
 
     if (timeoutSecs > 0)
     {
-        auto * ctx = new LifetimeCtx{ this, key };
-        CHIP_ERROR timerErr =
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSecs), LifetimeExpiryCallback, ctx);
+        auto * ctx          = new LifetimeCtx(this, key);
+        CHIP_ERROR timerErr = mTimerDelegate.StartTimer(ctx, System::Clock::Seconds16(timeoutSecs));
         if (timerErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "BgScan: lifetime StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
@@ -241,14 +240,6 @@ void CommissioningProxyBgScanRegistry::Shutdown()
         mHardware.StopHardwareScan();
     }
     mPaused = false;
-}
-
-void CommissioningProxyBgScanRegistry::LifetimeExpiryCallback(System::Layer * /*layer*/, void * appState)
-{
-    auto * ctx                              = static_cast<LifetimeCtx *>(appState);
-    CommissioningProxyBgScanRegistry * self = ctx->registry;
-    const FabricKey key                     = ctx->key;
-    self->OnLifetimeExpiry(key);
 }
 
 void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(const FabricKey & key)

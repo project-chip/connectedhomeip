@@ -22,6 +22,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemLayer.h>
 
@@ -85,7 +86,9 @@ public:
         virtual void ClearCachedResults() = 0;
     };
 
-    explicit CommissioningProxyBgScanRegistry(HardwareControl & hardware) : mHardware(hardware) {}
+    CommissioningProxyBgScanRegistry(HardwareControl & hardware, TimerDelegate & timerDelegate) :
+        mHardware(hardware), mTimerDelegate(timerDelegate)
+    {}
     ~CommissioningProxyBgScanRegistry() { Shutdown(); }
 
     CommissioningProxyBgScanRegistry(const CommissioningProxyBgScanRegistry &)             = delete;
@@ -136,12 +139,17 @@ private:
         bool operator<(const FabricKey & o) const;
     };
 
-    // Heap context handed to the per-fabric lifetime timer so the callback can find
-    // its registry and key without a global.
-    struct LifetimeCtx
+    // Heap context handed to the per-fabric lifetime timer so the expiry can find its
+    // registry and key without a global. Each is its own TimerContext, so fabrics with
+    // different lifetimes expire independently.
+    struct LifetimeCtx : public TimerContext
     {
+        LifetimeCtx(CommissioningProxyBgScanRegistry * aRegistry, const FabricKey & aKey) : registry(aRegistry), key(aKey) {}
+
         CommissioningProxyBgScanRegistry * registry;
         FabricKey key;
+
+        void TimerFired() override { registry->OnLifetimeExpiry(key); }
     };
 
     struct Record
@@ -151,7 +159,6 @@ private:
         LifetimeCtx * lifetimeCtx = nullptr;
     };
 
-    static void LifetimeExpiryCallback(System::Layer * layer, void * appState);
     void OnLifetimeExpiry(const FabricKey & key);
     void CancelLifetime(Record & rec);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache
@@ -159,6 +166,7 @@ private:
     std::map<FabricKey, Record> mFabrics;
     bool mPaused = false;
     HardwareControl & mHardware;
+    TimerDelegate & mTimerDelegate;
 };
 
 } // namespace CommissioningProxy
