@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingRvcCleanModeDelegate.h"
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcCleanModeDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

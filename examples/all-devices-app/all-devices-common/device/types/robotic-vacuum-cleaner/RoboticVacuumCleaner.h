@@ -21,11 +21,11 @@
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/mode-base/impl/LoggingRvcCleanModeDelegate.h>
-#include <device/capabilities/mode-base/impl/LoggingRvcRunModeDelegate.h>
-#include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
-#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
-#include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcCleanModeDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <string>
 
 namespace chip::app {

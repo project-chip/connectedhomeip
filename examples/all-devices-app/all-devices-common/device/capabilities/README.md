@@ -19,7 +19,7 @@ For example:
 -   **`fan-load`** (`FanLoad`): Encapsulates shared fan control logic.
 -   **`on-off-load`** (`OnOffLoad`): Encapsulates basic on/off cluster behavior.
 -   **`operational-state`**: Implements reusable logging delegates for
-    operational state and Rvc operational state clusters.
+    operational state clusters.
 
 ## Design Rules
 

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingServiceAreaStorageDelegate.h"
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::Clusters::ServiceArea {
