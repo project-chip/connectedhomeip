@@ -51,6 +51,7 @@ public:
     bool GetOAuthLoggedIn(chip::EndpointId endpoint) override { return mOAuthLoggedIn; };
 
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override { return 0; };
 
 protected:
     static const size_t kSetupPinSize = 12;
