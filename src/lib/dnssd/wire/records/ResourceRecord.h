@@ -25,8 +25,8 @@
 
 #include <lib/support/BufferWriter.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// A generic Reply record that supports data serialization
 class ResourceRecord
@@ -87,5 +87,5 @@ private:
     QClass mClass = QClass::IN;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
