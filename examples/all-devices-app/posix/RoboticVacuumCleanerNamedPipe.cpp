@@ -136,16 +136,23 @@ public:
         {
             if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
             {
-                std::string mapName = json["MapName"].asString();
-                rvcDevice->GetServiceAreaCluster().AddSupportedMap(json["MapId"].asUInt(),
-                                                                   CharSpan(mapName.data(), mapName.size()));
+                const uint32_t mapId  = json["MapId"].asUInt();
+                std::string mapName   = json["MapName"].asString();
+                if (!rvcDevice->GetServiceAreaCluster().AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size())))
+                {
+                    ChipLogError(AppServer, "AddMap: failed to add map %u", static_cast<unsigned>(mapId));
+                }
             }
         }
         else if (mCommandName == "RemoveMap")
         {
             if (json.isMember("MapId") && json["MapId"].isUInt())
             {
-                rvcDevice->GetServiceAreaCluster().RemoveSupportedMap(json["MapId"].asUInt());
+                const uint32_t mapId = json["MapId"].asUInt();
+                if (!rvcDevice->GetServiceAreaCluster().RemoveSupportedMap(mapId))
+                {
+                    ChipLogError(AppServer, "RemoveMap: failed to remove map %u", static_cast<unsigned>(mapId));
+                }
             }
         }
         else if (mCommandName == "AddArea")
@@ -155,8 +162,9 @@ public:
                 return;
             }
 
+            const uint32_t areaId = json["AreaId"].asUInt();
             ServiceArea::AreaStructureWrapper area;
-            area.SetAreaId(json["AreaId"].asUInt());
+            area.SetAreaId(areaId);
             if (json.isMember("MapId"))
             {
                 if (!json["MapId"].isUInt())
@@ -175,13 +183,20 @@ public:
                 area.SetLocationInfo(CharSpan(locationName.data(), locationName.size()), DataModel::NullNullable,
                                      DataModel::NullNullable);
             }
-            rvcDevice->GetServiceAreaCluster().AddSupportedArea(area);
+            if (!rvcDevice->GetServiceAreaCluster().AddSupportedArea(area))
+            {
+                ChipLogError(AppServer, "AddArea: failed to add area %u", static_cast<unsigned>(areaId));
+            }
         }
         else if (mCommandName == "RemoveArea")
         {
             if (json.isMember("AreaId") && json["AreaId"].isUInt())
             {
-                rvcDevice->GetServiceAreaCluster().RemoveSupportedArea(json["AreaId"].asUInt());
+                const uint32_t areaId = json["AreaId"].asUInt();
+                if (!rvcDevice->GetServiceAreaCluster().RemoveSupportedArea(areaId))
+                {
+                    ChipLogError(AppServer, "RemoveArea: failed to remove area %u", static_cast<unsigned>(areaId));
+                }
             }
         }
         else
