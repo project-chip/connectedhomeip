@@ -57,8 +57,9 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
-    ReturnErrorOnFailure(reader.Get(x));
-    x = Clusters::EnsureKnownEnumValue(x);
+    std::underlying_type_t<X> val;
+    ReturnErrorOnFailure(reader.Get(val));
+    x = Clusters::EnsureKnownEnumValue(static_cast<X>(val));
     return CHIP_NO_ERROR;
 }
 
