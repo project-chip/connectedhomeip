@@ -46,6 +46,7 @@ extern "C" {
 #endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
+extern osMutexId_t si91x_prints_mutex;
 #else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
@@ -551,11 +552,25 @@ void uartSendBytes(UartTxStruct_t & bufferStruct)
     {
         bufferStruct.data[bufferStruct.length] = '\0';
     }
+<<<<<<< HEAD
     else
+=======
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    // Not optimal, waiting for a more efficient way to send logs over UART on SI91x
+    //
+    // Board_UARTPutSTR(data) does the exact same thing and is not compatible with
+    // the Silabs Matter console.
+    osMutexAcquire(si91x_prints_mutex, osWaitForever);
+    for (uint8_t i = 0; i < length; i++)
+>>>>>>> 2396629 ([Silabs] Serialize SI91x UART prints with si91x_prints_mutex (#73464))
     {
         bufferStruct.data[MATTER_ARRAY_SIZE(bufferStruct.data) - 1] = '\0';
     }
+<<<<<<< HEAD
     Board_UARTPutSTR(bufferStruct.data);
+=======
+    osMutexRelease(si91x_prints_mutex);
+>>>>>>> 2396629 ([Silabs] Serialize SI91x UART prints with si91x_prints_mutex (#73464))
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
