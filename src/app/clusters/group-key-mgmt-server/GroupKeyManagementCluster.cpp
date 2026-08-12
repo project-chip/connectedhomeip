@@ -141,8 +141,15 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
+
 CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and `GroupcastAdoption` is true, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && provider.IsGroupcastAdopted(aEncoder.AccessingFabricIndex()))
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
@@ -179,6 +186,12 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
 CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
+
+    // If the GCAST feature is set, and `GroupcastAdoption` is true, this attribute cannot be written
+    if (provider.IsGroupcastEnabled() && provider.IsGroupcastAdopted(fabric_index))
+    {
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
 
     if (!aPath.IsListItemOperation())
     {
@@ -236,6 +249,12 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
 
 CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, and `GroupcastAdoption` is true, this attribute SHALL be empty
+    if (provider.IsGroupcastEnabled() && provider.IsGroupcastAdopted(aEncoder.AccessingFabricIndex()))
+    {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
@@ -267,12 +286,64 @@ CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provide
 
 CHIP_ERROR ReadMaxGroupsPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
+    // If the GCAST feature is set, return 0
+    if (provider.IsGroupcastEnabled())
+    {
+        return aEncoder.Encode(static_cast<uint16_t>(0));
+    }
     return aEncoder.Encode(provider.GetMaxGroupsPerFabric());
 }
 
 CHIP_ERROR ReadMaxGroupKeysPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(provider.GetMaxGroupKeysPerFabric());
+}
+
+CHIP_ERROR ReadGroupcastAdopted(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
+{
+    auto fabric_index = aEncoder.AccessingFabricIndex();
+
+    return aEncoder.EncodeList([&provider, fabric_index](const auto & encoder) -> CHIP_ERROR {
+        GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type entry;
+        entry.groupcastAdopted = provider.IsGroupcastAdopted(fabric_index);
+        entry.SetFabricIndex(fabric_index);
+        return encoder.Encode(entry);
+    });
+}
+
+CHIP_ERROR WriteGroupcastAdopted(GroupDataProvider & provider,
+                                 const ConcreteDataAttributePath & aPath,
+                                 AttributeValueDecoder & aDecoder)
+{
+    auto fabric_index = aDecoder.AccessingFabricIndex();
+
+    if (!aPath.IsListItemOperation())
+    {
+        Attributes::GroupcastAdoption::TypeInfo::DecodableType list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            const auto & value = iter.GetValue();
+            VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+            ReturnErrorOnFailure(provider.SetGroupcastAdopted(fabric_index, value.groupcastAdopted));
+        }
+        ReturnErrorOnFailure(iter.GetStatus());
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        Structs::GroupcastAdoptionStruct::DecodableType value;
+        ReturnErrorOnFailure(aDecoder.Decode(value));
+        VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        ReturnErrorOnFailure(provider.SetGroupcastAdopted(fabric_index, value.groupcastAdopted));
+    }
+    else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 const FabricInfo * GetFabricInfoOrNull(CommandHandler * handler, FabricTable & fabricTable)
@@ -589,11 +660,18 @@ HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPat
     keysIt->Release();
     return std::nullopt;
 }
+
 } // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+GroupKeyManagementCluster::GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features) :
+    DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
+{
+    mContext.groupDataProvider.SetGroupcastEnabled(features.Has(GroupKeyManagement::Feature::kGroupcast));
+}
 
 std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                       chip::TLV::TLVReader & input_arguments,
@@ -665,6 +743,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return ReadMaxGroupsPerFabric(mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
         return ReadMaxGroupKeysPerFabric(mContext.groupDataProvider, encoder);
+    case GroupKeyManagement::Attributes::GroupcastAdoption::Id:
+        return ReadGroupcastAdopted(mContext.groupDataProvider, encoder);
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -678,6 +758,11 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
     case GroupKeyMap::Id: {
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
                                                WriteGroupKeyMap(mContext.groupDataProvider, request.path, decoder),
+                                               DataModel::AttributeChangeType::kQuiet);
+    }
+    case GroupcastAdoption::Id: {
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
+                                               WriteGroupcastAdopted(mContext.groupDataProvider, request.path, decoder),
                                                DataModel::AttributeChangeType::kQuiet);
     }
     default:
@@ -699,8 +784,12 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
         MaxGroupKeysPerFabric::kMetadataEntry,
     };
 
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mContext.groupDataProvider.IsGroupcastEnabled(), GroupcastAdoption::kMetadataEntry },
+    };
+
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryMetadataWithChangesOmitted), {});
+    return listBuilder.Append(Span(kMandatoryMetadataWithChangesOmitted), Span(optionalAttributes));
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,

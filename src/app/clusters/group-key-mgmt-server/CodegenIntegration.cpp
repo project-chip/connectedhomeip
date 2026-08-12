@@ -48,7 +48,8 @@ public:
         gServer.Create(GroupKeyManagementCluster::Context{
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .groupDataProvider = *groupDataProvider,
-        });
+        },
+        BitFlags<GroupKeyManagement::Feature>(featureMap));
         return gServer.Registration();
     }
 
