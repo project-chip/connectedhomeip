@@ -4,29 +4,29 @@ This example demonstrates the Matter Lighting application on stm32 platform.
 
 ---
 
-- [Matter STM32 Lighting Example over thread](#matter-stm32-lighting-example-over-thread)
-  - [Building and Commissioning](#building-and-commissioning)
-  - [Cluster Control](#cluster-control)
-  - [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)
-  - [OTA and `OEMiROT` application](#ota-and-oemirot-application)
-    - [Linux / Ubuntu: prepare the X-CUBE-MATTER shell scripts](#linux--ubuntu-prepare-the-x-cube-matter-shell-scripts)
-    - [Pre-compiled from X-CUBE-MATTER (STM32CubeIDE)](#pre-compiled-from-x-cube-matter-stm32cubeide)
-  - [Build Instructions](#build-instructions)
-    - [Step 1: Copy the Secure veneers (`secure_nsclib.o`)](#step-1-copy-the-secure-veneers-secure_nsclibo)
-    - [Step 2: Build with GN](#step-2-build-with-gn)
-    - [Step 3: Copy Binary](#step-3-copy-binary)
-    - [Step 4: Sign the Binary](#step-4-sign-the-binary)
-      - [Option A: Using CLI](#option-a-using-cli)
-      - [Option B: Using GUI](#option-b-using-gui)
-    - [Step 5: Flash the Board](#step-5-flash-the-board)
-  - [OTA Update (N+1 Image)](#ota-update-n1-image)
-    - [Step 1: Increment the software version](#step-1-increment-the-software-version)
-    - [Step 2: Rebuild with GN](#step-2-rebuild-with-gn)
-    - [Step 3: Copy and sign for OTA](#step-3-copy-and-sign-for-ota)
-    - [Step 4: Create Matter binary with ST header](#step-4-create-matter-binary-with-st-header)
-    - [Step 5: Create the Matter OTA file (.ota)](#step-5-create-the-matter-ota-file-ota)
-    - [Step 6: Use the OTA image](#step-6-use-the-ota-image)
-  - [Quick Reference](#quick-reference)
+-   [Matter STM32 Lighting Example over thread](#matter-stm32-lighting-example-over-thread)
+    -   [Building and Commissioning](#building-and-commissioning)
+    -   [Cluster Control](#cluster-control)
+    -   [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)
+    -   [OTA and `OEMiROT` application](#ota-and-oemirot-application)
+        -   [Linux / Ubuntu: prepare the X-CUBE-MATTER shell scripts](#linux--ubuntu-prepare-the-x-cube-matter-shell-scripts)
+        -   [Pre-compiled from X-CUBE-MATTER (STM32CubeIDE)](#pre-compiled-from-x-cube-matter-stm32cubeide)
+    -   [Build Instructions](#build-instructions)
+        -   [Step 1: Copy the Secure veneers (`secure_nsclib.o`)](#step-1-copy-the-secure-veneers-secure_nsclibo)
+        -   [Step 2: Build with GN](#step-2-build-with-gn)
+        -   [Step 3: Copy Binary](#step-3-copy-binary)
+        -   [Step 4: Sign the Binary](#step-4-sign-the-binary)
+            -   [Option A: Using CLI](#option-a-using-cli)
+            -   [Option B: Using GUI](#option-b-using-gui)
+        -   [Step 5: Flash the Board](#step-5-flash-the-board)
+    -   [OTA Update (N+1 Image)](#ota-update-n1-image)
+        -   [Step 1: Increment the software version](#step-1-increment-the-software-version)
+        -   [Step 2: Rebuild with GN](#step-2-rebuild-with-gn)
+        -   [Step 3: Copy and sign for OTA](#step-3-copy-and-sign-for-ota)
+        -   [Step 4: Create Matter binary with ST header](#step-4-create-matter-binary-with-st-header)
+        -   [Step 5: Create the Matter OTA file (.ota)](#step-5-create-the-matter-ota-file-ota)
+        -   [Step 6: Use the OTA image](#step-6-use-the-ota-image)
+    -   [Quick Reference](#quick-reference)
 
 ---
 
@@ -71,7 +71,8 @@ ON and the line is erased when the controller disable the light.
 ## OTA and `OEMiROT` application
 
 All the commands below use `XCUBE_PATH`, which points to the board folder of the
-extracted [X-CUBE-MATTER](https://www.st.com/en/embedded-software/x-cube-matter.html)
+extracted
+[X-CUBE-MATTER](https://www.st.com/en/embedded-software/x-cube-matter.html)
 package. Export it once in your shell:
 
 ```bash
@@ -121,7 +122,8 @@ compiled from the X-CUBE-MATTER package with STM32CubeIDE, in this order.
     -   Right-click the Secure project > **Build Project**
     -   Produces `secure_nsclib.o` (Secure Gateway veneers) in
         `OEMiROT_Appli_TrustZone/Secure_nsclib`, which is required by the
-        NonSecure GN build (see [Step 1](#step-1-copy-the-secure-veneers-secure_nsclibo))
+        NonSecure GN build (see
+        [Step 1](#step-1-copy-the-secure-veneers-secure_nsclibo))
 
 > On Linux, run the `dos2unix` / `chmod +x` step above **before** launching
 > these builds, otherwise the post-build scripts will fail.
