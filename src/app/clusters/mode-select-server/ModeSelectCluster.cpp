@@ -74,9 +74,9 @@ CHIP_ERROR ModeSelectCluster::Startup(ServerClusterContext & context)
 
 void ModeSelectCluster::ApplyStartupModeLogic()
 {
-    if (mContext == nullptr)
+    if (mContext == nullptr || mStartupLogicApplied)
     {
-        return; // Startup() has not run yet
+        return;
     }
 
     auto modes = mDelegate.GetSupportedModes();
@@ -129,6 +129,8 @@ void ModeSelectCluster::ApplyStartupModeLogic()
             ChipLogError(Zcl, "ModeSelect: OnMode %u not supported, ignoring.", mOnMode.Value());
         }
     }
+
+    mStartupLogicApplied = true;
 }
 
 void ModeSelectCluster::LoadPersistentAttributes(AttributePersistenceProvider & provider)
