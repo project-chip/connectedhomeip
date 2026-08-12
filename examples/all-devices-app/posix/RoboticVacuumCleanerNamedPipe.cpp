@@ -38,8 +38,8 @@ using namespace chip::app::all_devices::rvc_simulation;
 void HandleReset(RoboticVacuumCleaner & rvcDevice)
 {
     rvcDevice.RunMode().UpdateCurrentMode(Topology::kRunModeIdle);
-    LogErrorOnFailure(
-        rvcDevice.OperationalState().SetOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
+    LogErrorOnFailure(rvcDevice.OperationalState().SetOperationalState(
+        to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped)));
     rvcDevice.CleanMode().UpdateCurrentMode(Topology::kCleanModeQuick);
 
     rvcDevice.GetServiceAreaCluster().ClearSelectedAreas();
