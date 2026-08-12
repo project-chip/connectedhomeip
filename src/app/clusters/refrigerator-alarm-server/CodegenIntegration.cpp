@@ -80,11 +80,13 @@ public:
             supported = AlarmBase::AlarmMap(supportedDefault.Raw());
         }
 
-        RefrigeratorAlarmCluster::Config config(gRefrigeratorAlarmClusters[clusterInstanceIndex].integrationDelegate);
-        config.feature                     = BitFlags<AlarmBase::Feature>();
-        config.clusterRevision             = RefrigeratorAlarm::kRevision;
-        config.supported                   = supported;
-        config.supportsModifyEnabledAlarms = false;
+        RefrigeratorAlarmCluster::Config config{
+            .delegate                    = gRefrigeratorAlarmClusters[clusterInstanceIndex].integrationDelegate,
+            .feature                     = BitFlags<AlarmBase::Feature>(),
+            .clusterRevision             = RefrigeratorAlarm::kRevision,
+            .supported                   = supported,
+            .supportsModifyEnabledAlarms = false,
+        };
 
         gRefrigeratorAlarmClusters[clusterInstanceIndex].cluster.Create(endpointId, config);
 

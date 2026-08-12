@@ -76,21 +76,23 @@ struct TestAlarmBaseCluster : public ::testing::Test
             feature.Set(Feature::kReset);
         }
 
-        AlarmBaseCluster::Config config(delegate);
-        config.feature                     = feature;
-        config.clusterRevision             = DishwasherAlarm::kRevision;
-        config.supported                   = AlarmMap(0x3F);
-        config.latch                       = AlarmMap(0);
-        config.supportsModifyEnabledAlarms = withModifyCommand;
-        return config;
+        return {
+            .delegate                   = delegate,
+            .feature                    = feature,
+            .clusterRevision            = DishwasherAlarm::kRevision,
+            .supported                  = AlarmMap(0x3F),
+            .latch                      = AlarmMap(0),
+            .supportsModifyEnabledAlarms = withModifyCommand,
+        };
     }
 
     AlarmBaseCluster::Config MakeRefrigeratorConfig()
     {
-        AlarmBaseCluster::Config config(defaultDelegate);
-        config.clusterRevision = RefrigeratorAlarm::kRevision;
-        config.supported       = AlarmMap(0x1);
-        return config;
+        return {
+            .delegate        = defaultDelegate,
+            .clusterRevision = RefrigeratorAlarm::kRevision,
+            .supported       = AlarmMap(0x1),
+        };
     }
 
     TestServerClusterContext testContext;

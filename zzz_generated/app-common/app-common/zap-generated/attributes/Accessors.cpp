@@ -6183,6 +6183,26 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 
 } // namespace Supported
 
+namespace FeatureMap {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace FeatureMap
+
 } // namespace Attributes
 } // namespace RefrigeratorAlarm
 
@@ -6629,6 +6649,26 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 }
 
 } // namespace Supported
+
+namespace FeatureMap {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+} // namespace FeatureMap
 
 } // namespace Attributes
 } // namespace DishwasherAlarm

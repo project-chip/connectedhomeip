@@ -15,12 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/CodeUtils.h>
 
 using namespace chip;
-using chip::Protocols::InteractionModel::Status;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
@@ -65,27 +62,6 @@ bool DishwasherAlarmDelegate::ResetAlarmsCallback(const BitMask<AlarmMap> alarms
     return true;
 }
 
-namespace {
-
-using namespace chip::app::Clusters::DishwasherAlarm::Attributes;
-
-void VerifyDishwasherAlarmFixedAttributes(EndpointId endpoint)
-{
-    BitMask<AlarmMap> expectedSupported;
-    BitMask<AlarmMap> expectedLatch;
-    BitMask<AlarmMap> actualSupported;
-    BitMask<AlarmMap> actualLatch;
-
-    VerifyOrDie(Supported::GetDefault(endpoint, &expectedSupported) == Status::Success);
-    VerifyOrDie(Latch::GetDefault(endpoint, &expectedLatch) == Status::Success);
-    VerifyOrDie(DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &actualSupported) == Status::Success);
-    VerifyOrDie(DishwasherAlarmServer::Instance().GetLatchValue(endpoint, &actualLatch) == Status::Success);
-    VerifyOrDie(actualSupported == expectedSupported);
-    VerifyOrDie(actualLatch == expectedLatch);
-}
-
-} // namespace
-
 /*
  * An example to present device's endpointId
  */
@@ -98,8 +74,6 @@ void MatterDishwasherAlarmServerInit()
 
     static DishwasherAlarm::DishwasherAlarmDelegate delegate;
     DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
-
-    VerifyDishwasherAlarmFixedAttributes(kDemoEndpointId);
 
     // Set Mask attribute = 0x0 = 0
     // Bit Name              Value

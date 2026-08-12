@@ -1187,6 +1187,10 @@ Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
 } // namespace Supported
 
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
+} // namespace FeatureMap
+
 } // namespace Attributes
 } // namespace RefrigeratorAlarm
 
@@ -1306,6 +1310,10 @@ namespace Supported {
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
 } // namespace Supported
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
+} // namespace FeatureMap
 
 } // namespace Attributes
 } // namespace DishwasherAlarm

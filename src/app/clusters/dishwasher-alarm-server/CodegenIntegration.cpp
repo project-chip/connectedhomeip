@@ -133,12 +133,14 @@ public:
             latch = AlarmBase::AlarmMap(latchDefault.Raw());
         }
 
-        DishwasherAlarmCluster::Config config(gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper);
-        config.feature                     = features;
-        config.clusterRevision             = DishwasherAlarm::kRevision;
-        config.supported                   = supported;
-        config.latch                       = latch;
-        config.supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId);
+        DishwasherAlarmCluster::Config config{
+            .delegate                    = gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper,
+            .feature                     = features,
+            .clusterRevision             = DishwasherAlarm::kRevision,
+            .supported                   = supported,
+            .latch                       = latch,
+            .supportsModifyEnabledAlarms = EndpointHasModifyEnabledAlarmsCommand(endpointId),
+        };
 
         gDishwasherAlarmClusters[clusterInstanceIndex].integrationDelegateWrapper.Init(
             gDishwasherAlarmClusters[clusterInstanceIndex].userDelegate);
