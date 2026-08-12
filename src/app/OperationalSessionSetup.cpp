@@ -317,8 +317,8 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // explicitly configure minimumLITBackoffInterval in CASEClientInitParams (e.g., when using
         // SDK wrappers like Android where custom CASE params are not exposed), we default to 3000 ms.
         // This 3-second floor provides an adequate safety margin beyond typical ~1.1s–2.5s turnaround time.
-        config.mIdleRetransTimeout =
-            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(3000)));
+        config.mIdleRetransTimeout = std::max(config.mActiveRetransTimeout,
+                                              System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(3000)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
