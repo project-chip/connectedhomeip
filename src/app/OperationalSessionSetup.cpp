@@ -309,7 +309,7 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
         // mInitParams.minimumLITBackoffInterval
 
         config.mIdleRetransTimeout =
-            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
+            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(4000)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
