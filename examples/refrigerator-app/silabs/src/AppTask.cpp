@@ -376,3 +376,9 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(ch
 {
     AppInstance().CabinetModeClusterInit(endpointId);
 }
+
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
+                                                                                  MatterClusterShutdownType)
+{
+    AppInstance().CabinetModeClusterShutdown(endpointId);
+}
