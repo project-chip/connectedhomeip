@@ -92,11 +92,13 @@ PUSH=false
 SKIP_BUILD=false
 SQUASH=false
 CLEAR=false
+NO_CACHE=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-cache)
             BUILD_ARGS+=("$1")
+            NO_CACHE=true
             shift
             ;;
         --latest)
@@ -176,8 +178,32 @@ awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
     fi
 done
 
+BUILT=false
 if [ "$SKIP_BUILD" = false ]; then
-    docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+    # An image that already exists at this version does not need building. These
+    # images fetch SDKs and toolchains from vendor servers while they build, so
+    # a build that does not happen is also an unrelated vendor outage that
+    # cannot fail the run. --no-cache means a rebuild was asked for explicitly.
+    if [ "$NO_CACHE" = false ] && docker image inspect "$GHCR_ORG/$ORG/$IMAGE:$VERSION" >/dev/null 2>&1; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already present, not rebuilding"
+    elif [ "$NO_CACHE" = false ] && docker pull "$GHCR_ORG/$ORG/$IMAGE:$VERSION"; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already published, not rebuilding"
+    else
+        # Seed the layer cache from the previous version. Most of what changes
+        # between versions is one step, so the layers before it are often still
+        # valid. Only meaningful for numeric versions, and only once the
+        # previous image carries inline cache metadata, which is why the build
+        # below records it for next time.
+        CACHE_ARGS=()
+        if [[ $VERSION =~ ^[0-9]+$ ]]; then
+            PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((VERSION - 1))"
+            if [ "$NO_CACHE" = false ] && docker pull "$PREVIOUS"; then
+                CACHE_ARGS=(--cache-from "$PREVIOUS")
+            fi
+        fi
+        docker build "${BUILD_ARGS[@]}" "${CACHE_ARGS[@]}" --build-arg BUILDKIT_INLINE_CACHE=1 --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+        BUILT=true
+    fi
     docker image prune --force
 fi
 
