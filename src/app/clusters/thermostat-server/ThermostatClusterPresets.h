@@ -88,7 +88,7 @@ public:
 
 private:
     ThermostatCluster & mCluster;
-    Delegate * mDelegate         = nullptr;
+    Delegate * mDelegate = nullptr;
 };
 
 } // namespace Thermostat

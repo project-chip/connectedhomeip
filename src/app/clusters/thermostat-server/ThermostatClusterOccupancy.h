@@ -42,7 +42,7 @@ public:
     };
 
     ThermostatOccupancy() = default;
-    ThermostatOccupancy(ThermostatCluster & cluster) {};
+    ThermostatOccupancy(ThermostatCluster & cluster){};
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
 
@@ -58,10 +58,8 @@ public:
         return true;
     }
 
-    
-
 private:
-    Delegate * mDelegate         = nullptr;
+    Delegate * mDelegate = nullptr;
 };
 
 } // namespace Thermostat
