@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcOperationalStateDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
