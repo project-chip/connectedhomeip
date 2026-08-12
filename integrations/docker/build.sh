@@ -135,10 +135,36 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# go find and build any CHIP images this image is "FROM"
-awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
-    dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "${ORIG_ARGS[@]}")
+# go find and build any CHIP images this image is "FROM".
+# Images are referenced as ghcr.io/project-chip/<name>:<tag>, and the parent may
+# live in any stage directory, so resolve it by name under images/ rather than
+# assuming it is a sibling.
+# The script is symlinked into each image directory and has already cd'd there,
+# so images/ is two levels up. Derived from that rather than from git, so the
+# walk works on an exported tree with no repository.
+IMAGES_ROOT="$(cd ../.. && pwd)"
+# Take the image token ($2) so a trailing "AS <alias>" is excluded by
+# construction rather than by the tag strip happening to swallow it, and cut at
+# ":" or "@" so both tagged and digest references reduce to the image name.
+awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
+        ref = $2
+        sub(/.*project-chip\//, "", ref)
+        sub(/[:@].*/, "", ref)
+        print ref
+     }' Dockerfile |
+    sort -u | while read -r dep; do
+    dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
+    [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
+    # Only build the parent if it is not already present. Without this, a
+    # build-all run rebuilds the base image once per dependent image, and any
+    # --no-cache is forwarded into each of those rebuilds.
+    # $VERSION is what the parent will be tagged with too: every image reads the
+    # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
+    if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present, not rebuilding"
+    else
+        (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
+    fi
 done
 
 if [ "$SKIP_BUILD" = false ]; then
