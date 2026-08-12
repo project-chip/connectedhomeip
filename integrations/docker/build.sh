@@ -195,8 +195,11 @@ if [ "$SKIP_BUILD" = false ]; then
         # previous image carries inline cache metadata, which is why the build
         # below records it for next time.
         CACHE_ARGS=()
-        if [[ $VERSION =~ ^[0-9]+$ ]]; then
-            PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((VERSION - 1))"
+        # 10# forces base ten: bash reads a leading zero as octal, so "08" and
+        # "09" are errors and "010" would quietly mean 8. There is also no
+        # predecessor to version zero.
+        if [[ $VERSION =~ ^[0-9]+$ ]] && ((10#$VERSION > 0)); then
+            PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((10#$VERSION - 1))"
             if [ "$NO_CACHE" = false ] && docker pull "$PREVIOUS"; then
                 CACHE_ARGS=(--cache-from "$PREVIOUS")
             fi
