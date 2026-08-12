@@ -167,7 +167,6 @@ ColorControlCluster::ColorControlCluster(EndpointId endpoint, const Config & con
     DefaultServerCluster({ endpoint, ColorControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalColorControlValidator()),
     mDelegate(&config.mDelegate), mFeatures(config.mFeatures), mColorValue(config.mColorValue), mColorLoop(config.mColorLoop),
     mCT(config.ctConfig), mStaticConfig(config.sc), mOnOff(config.onOff),
-    mScenesIntegrationDelegate(config.scenesIntegrationDelegate),
     mIgnoreHueCommandsWhileColorLooping(config.ignoreHueCommandsWhileColorLooping)
 {
     // ColorCapabilities mirrors the FeatureMap 1:1 (the two bitmaps share bit positions 0x1..0x10).
@@ -993,10 +992,7 @@ ColorControlCluster::Status ColorControlCluster::StopMoveStep(OptMask optionsMas
     // owns the output, or a hue command parked it), and while the loop drives hue the saturation axis can
     // still carry an independent transition — in both cases there is a real transition that must stop.
     // Deliberately does NOT cancel the tick: OnTick self-terminates the timer only once nothing is driving.
-    if (StopTransitionAndFreeze())
-    {
-        InvalidateScenes(); // froze part-way → live color matches no stored scene (see MoveHue Stop)
-    }
+    StopTransitionAndFreeze();
     // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
     if (!LoopIsDriving())
     {
@@ -1228,18 +1224,6 @@ bool ColorControlCluster::SupportsMode(EnhancedColorModeEnum mode) const
     }
 }
 
-// Mark stored scenes stale for every fabric because the current color changed (a scene no longer
-// matches the live state). Single call site for all commands. Forwards to the injected scenes
-// integration delegate when present (null == no Scene Management coupling); the core never touches
-// Scenes/Ember. Same shared delegate (chip::scenes::ScenesIntegrationDelegate) that OnOff/LevelControl use.
-void ColorControlCluster::InvalidateScenes()
-{
-    if (mScenesIntegrationDelegate != nullptr)
-    {
-        LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
-    }
-}
-
 /**
  * @brief Configures and launches color loop for a specified endpoint
  *
@@ -1311,14 +1295,13 @@ Status ColorControlCluster::MoveToSaturation(uint8_t saturation, uint16_t transi
     const uint32_t durationMs = transitionTimeDs * 100u;  // deciseconds → ms
     auto & hs                 = EnsureHueSatTransition(); // HueSatTransition; preserves .hue if already one, replaces XY/CT
     hs.sat                    = SatTransition{
-                           .startSat    = GetSaturation(), // read AFTER the mode switch
-                           .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
-                           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-                           .durationMs  = durationMs,
+        .startSat    = GetSaturation(), // read AFTER the mode switch
+        .targetSat   = std::clamp<uint8_t>(saturation, kMinSaturationValue, kMaxSaturationValue),
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1372,7 +1355,6 @@ Status ColorControlCluster::MoveToHueAndSaturation(uint16_t hue, uint8_t saturat
         StartHueAndSatTransition(HueSatColor{ .hue = static_cast<uint8_t>(hue), .saturation = targetSat }, timeMs, moveHue);
     }
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1545,10 +1527,6 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
         if (std::holds_alternative<HueSatTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the hue/saturation the movement stopped at
-            // Freezing part-way leaves the output somewhere no stored scene describes, so scenes go stale
-            // just as they do for a moving command. Inside the guard because an idle Stop moved nothing,
-            // and invalidating anyway costs a FabricSceneInfo report per fabric for a no-op.
-            InvalidateScenes();
             // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
             if (!LoopIsDriving())
             {
@@ -1570,14 +1548,13 @@ Status ColorControlCluster::MoveHue(MoveModeEnum moveMode, uint16_t rate, bool i
 
     auto & hs = EnsureHueSatTransition(); // preserve a running sat axis (§3.2.5.2)
     hs.hue    = HueTransition{
-           .startHue    = GetEnhancedHue(), // 16-bit canonical current
-           .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
+        .startHue    = GetEnhancedHue(), // 16-bit canonical current
+        .signedDelta = signedRatePerSec, // hue-units per second; sign = up/down
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = kIndefiniteHueMoveMs, // rate move: runs until StopHueAxis
     };
     SetQuietReportRemainingTime(kMaxInt16uValue, /*isNewTransition=*/true); // indefinite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1644,7 +1621,6 @@ Status ColorControlCluster::MoveToHue(uint16_t hue, DirectionEnum dir, uint16_t 
     hs.hue    = HueTransition{ start, signedArc, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1688,7 +1664,6 @@ Status ColorControlCluster::StepHue(StepModeEnum stepMode, uint16_t stepSize, ui
         HueTransition{ GetEnhancedHue(), signedDelta, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1714,7 +1689,6 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
         if (std::holds_alternative<HueSatTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the hue/saturation the movement stopped at
-            InvalidateScenes();        // froze part-way → live color matches no stored scene (see MoveHue Stop)
             // A driving loop pins RemainingTime at its max (see OnTick), so only zero it when nothing is left.
             if (!LoopIsDriving())
             {
@@ -1739,14 +1713,13 @@ Status ColorControlCluster::MoveSaturation(MoveModeEnum moveMode, uint8_t rate, 
 
     auto & hs = EnsureHueSatTransition(); // preserve a running HUE axis (§3.2.5.2)
     hs.sat    = SatTransition{
-           .startSat    = start,
-           .targetSat   = target, // the boundary — bounded, so it stops here
-           .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
-           .durationMs  = durationMs,
+        .startSat    = start,
+        .targetSat   = target, // the boundary — bounded, so it stops here
+        .startTimeMs = SystemClock().GetMonotonicMilliseconds64().count(),
+        .durationMs  = durationMs,
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true); // finite
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1780,7 +1753,6 @@ Status ColorControlCluster::StepSaturation(StepModeEnum stepMode, uint8_t stepSi
     hs.sat    = SatTransition{ start, target, SystemClock().GetMonotonicMilliseconds64().count(), transitionTimeDs * 100u };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -1859,7 +1831,6 @@ Status ColorControlCluster::ColorLoopSet(BitMask<UpdateFlagsBitmap> updateFlags,
     // Persist the loop attrs (ColorLoopActive/Direction/Time are all NVM). Start/StopColorLoop already
     // persisted the current color when an action switched mode/hue.
     PersistColorLoop();
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -2174,7 +2145,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint> and `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
@@ -2470,10 +2441,7 @@ Status ColorControlCluster::MoveColor(int16_t rateX, int16_t rateY, BitMask<Opti
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     if (rateX == 0 && rateY == 0)
     { // both zero → stop all transitions except color loop
-        if (StopTransitionAndFreeze())
-        {
-            InvalidateScenes(); // froze part-way → live color matches no stored scene (see MoveHue Stop)
-        }
+        StopTransitionAndFreeze();
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like MoveHue Stop
         return Status::Success;
     }
@@ -2499,7 +2467,6 @@ Status ColorControlCluster::MoveColor(int16_t rateX, int16_t rateY, BitMask<Opti
     // (an idle axis contributed 0 duration, so max() is the moving axis).
     SetQuietReportRemainingTime(RemainingTenthsFromMs(std::max(durX, durY)), /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 /**
@@ -2536,7 +2503,6 @@ Status ColorControlCluster::StepColor(int16_t stepX, int16_t stepY, uint16_t tra
     };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -2559,7 +2525,6 @@ Status ColorControlCluster::MoveToColorTemp(uint16_t colorTemperature, uint16_t 
     // The builder clamps the target into the physical range and arms the transition (immediate when 0).
     StartColorTemperatureTransition(CTColor{ .mireds = colorTemperature }, transitionTimeDs * 100u);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -2584,7 +2549,6 @@ Status ColorControlCluster::MoveToColor(uint16_t colorX, uint16_t colorY, uint16
     // Targets are already range-checked above; the builder arms the transition (immediate when 0).
     StartXYTransition(XYColor{ .x = colorX, .y = colorY }, transitionTimeDs * 100u);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -2650,7 +2614,6 @@ Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
         if (std::holds_alternative<CTTransition>(mTransition))
         {
             StopTransitionAndFreeze(); // freeze: persist the mireds the movement stopped at
-            InvalidateScenes();        // froze part-way → live color matches no stored scene (see MoveHue Stop)
         }
         SetQuietReportRemainingTime(0, /*isNewTransition=*/false); // stopped → RemainingTime 0, like MoveHue Stop
         return Status::Success;
@@ -2678,7 +2641,6 @@ Status ColorControlCluster::MoveColorTemp(MoveModeEnum moveMode, uint16_t rate, 
     };
     SetQuietReportRemainingTime(RemainingTenthsFromMs(durationMs), /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 
@@ -2725,7 +2687,6 @@ Status ColorControlCluster::StepColorTemp(StepModeEnum stepMode, uint16_t stepSi
     };
     SetQuietReportRemainingTime(transitionTimeDs, /*isNewTransition=*/true);
     VerifyOrReturnValue(ArmTick() == CHIP_NO_ERROR, Status::Failure);
-    InvalidateScenes();
     return Status::Success;
 }
 

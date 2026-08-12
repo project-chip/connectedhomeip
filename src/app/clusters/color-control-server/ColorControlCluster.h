@@ -21,7 +21,6 @@
 #include "ColorControlDelegate.h"
 #include <app/CommandHandler.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -159,11 +158,6 @@ public:
         // the "execute while off" decision honors its live state; null == no coupling (always execute).
         // Ember-free: the cluster is read directly, no registry / Instance().
         OnOffCluster * onOff = nullptr;
-
-        // Optional Scene Management coupling: injected so a color change can mark stored scenes stale
-        // without the core depending on the Scenes cluster. Null == no scene coupling. Same shared delegate
-        // OnOff/LevelControl use; the app wires it to the endpoint's ScenesManagementCluster.
-        chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate = nullptr;
 
         ColorControl::ColorValue mColorValue;    // variant: XYColor | HueSatColor | EnhancedHueSatColor | CTColor
         ColorControl::ColorLoopState mColorLoop; // mode-independent; see below
@@ -341,16 +335,15 @@ private:
     // Server::Init() has already constructed this cluster. Bound to a non-null delegate at construction and
     // only ever repointed to another non-null delegate (see SetDelegate), so call sites never null-check.
     ColorControlDelegate * mDelegate;
-    BitMask<ColorControl::Feature> mFeatures{};   // advertised features
-    ColorControl::ColorValue mColorValue;         // active color; its alternative encodes the mode
-    Transition mTransition;                       // active driver (monostate == stable)
-    ColorControl::ColorLoopState mColorLoop;      // mode-independent autonomous hue driver
-    State mState;                                 // options, capabilities, numberOfPrimaries, remainingTime
-    CTConfig mCT;                                 // color-temperature limits + startup
-    const StaticConfig * mStaticConfig = nullptr; // app-owned fixed descriptors; null == none supported
-    OnOffCluster * mOnOff              = nullptr; // injected On/Off cluster for ShouldExecuteIfOff; null == no coupling
-    chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate = nullptr; // scene-invalidation hook; null == none
-    bool mIgnoreHueCommandsWhileColorLooping                             = false;   // §3.2.11 manufacturer choice; see Config
+    BitMask<ColorControl::Feature> mFeatures{};         // advertised features
+    ColorControl::ColorValue mColorValue;               // active color; its alternative encodes the mode
+    Transition mTransition;                             // active driver (monostate == stable)
+    ColorControl::ColorLoopState mColorLoop;            // mode-independent autonomous hue driver
+    State mState;                                       // options, capabilities, numberOfPrimaries, remainingTime
+    CTConfig mCT;                                       // color-temperature limits + startup
+    const StaticConfig * mStaticConfig       = nullptr; // app-owned fixed descriptors; null == none supported
+    OnOffCluster * mOnOff                    = nullptr; // injected On/Off cluster for ShouldExecuteIfOff; null == no coupling
+    bool mIgnoreHueCommandsWhileColorLooping = false;   // §3.2.11 manufacturer choice; see Config
 
     bool LoopIsDriving() const;
     // §3.2.11: true when a hue-changing command should be dropped because a color loop is active and the
@@ -384,7 +377,6 @@ private:
     HueSatTransition & EnsureHueSatTransition();
     uint8_t GetSaturation() const;
     uint16_t GetEnhancedHue() const;
-    void InvalidateScenes();
 
     // ---- Persistence (mirror of the NVM-flagged attributes restored in Startup) ----
     // Startup restores these; something has to write them back or a reboot always sees stale defaults.

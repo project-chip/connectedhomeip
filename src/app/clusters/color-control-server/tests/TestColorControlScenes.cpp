@@ -25,7 +25,6 @@
 // value, which the tick materializes).
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
@@ -43,23 +42,6 @@ using namespace chip::app::Clusters::ColorControl;
 
 using Status             = Protocols::InteractionModel::Status;
 using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
-
-// Counts the scene-invalidation calls the cluster makes. The other three methods are only reached
-// through the Scenes cluster's own command paths, which ColorControl never drives.
-class CountingScenesIntegrationDelegate : public chip::scenes::ScenesIntegrationDelegate
-{
-public:
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override
-    {
-        mInvalidateCount++;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR RecallGlobalScene(FabricIndex) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GroupWillBeRemoved(FabricIndex, GroupId) override { return CHIP_NO_ERROR; }
-
-    uint32_t mInvalidateCount = 0;
-};
 
 constexpr EndpointId kTestEndpointId = 1;
 
@@ -452,149 +434,6 @@ TEST_F(TestColorControlScenes, ApplySceneRejectsUnsupportedMode)
     ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_ERROR_INVALID_ARGUMENT);
-}
-
-// ── Stop paths invalidate scenes ────────────────────────────────────────────────────────────────
-// A Stop freezes the output part-way through a transition, so the live color no longer matches any
-// stored scene and SceneValid must not keep claiming it does. RecallScene marks the scene valid while
-// the transition it started is still in flight, so a Stop landing mid-flight is the case that would
-// otherwise leave SceneValid set on a color the device never reached.
-//
-// The counter is read as a delta around the Stop: the command that starts each transition invalidates
-// too, and that call is not what these assert.
-
-struct TestColorControlStopInvalidatesScenes : public TestColorControlScenes
-{
-    CountingScenesIntegrationDelegate scenes;
-
-    // Every stop path here is exercised on a cluster wired to the counting delegate.
-    ColorControlCluster::Config MakeConfig()
-    {
-        ColorControlCluster::Config config(delegate);
-        config.scenesIntegrationDelegate = &scenes;
-        config.mFeatures.Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kColorTemperature);
-        config.ctConfig.colorTempPhysicalMinMireds = 100;
-        config.ctConfig.colorTempPhysicalMaxMireds = 400;
-        return config;
-    }
-
-    // Runs one tick partway into the movement so the Stop lands mid-transition rather than on an
-    // already-settled one.
-    void AdvancePartway(ColorControlCluster & c)
-    {
-        clock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
-        c.OnTick();
-    }
-};
-
-TEST_F(TestColorControlStopInvalidatesScenes, MoveHueStopInvalidatesWhenItFreezesATransition)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
-}
-
-TEST_F(TestColorControlStopInvalidatesScenes, MoveSaturationStopInvalidatesWhenItFreezesATransition)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveSaturation(MoveModeEnum::kUp, 10), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
-}
-
-TEST_F(TestColorControlStopInvalidatesScenes, MoveColorWithBothRatesZeroInvalidatesWhenItFreezesATransition)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveColor(100, 100), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveColor(0, 0), Status::Success); // both rates zero == stop
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
-}
-
-TEST_F(TestColorControlStopInvalidatesScenes, MoveColorTempStopInvalidatesWhenItFreezesATransition)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 10, 0, 0), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
-}
-
-TEST_F(TestColorControlStopInvalidatesScenes, StopMoveStepInvalidatesWhenItFreezesATransition)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveToColor(30000, 40000, 100), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.StopMoveStep(), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
-}
-
-// The other half of the contract: a Stop with nothing running moved nothing, so it must not invalidate.
-// Otherwise a repeated Stop would emit a FabricSceneInfo report per fabric for a no-op.
-TEST_F(TestColorControlStopInvalidatesScenes, IdleStopDoesNotInvalidate)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
-    EXPECT_EQ(cluster.MoveSaturation(MoveModeEnum::kStop, 0), Status::Success);
-    EXPECT_EQ(cluster.MoveColor(0, 0), Status::Success);
-    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kStop, 0, 0, 0), Status::Success);
-    EXPECT_EQ(cluster.StopMoveStep(), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before);
-}
-
-// A second Stop has nothing left to freeze, so only the first one invalidates.
-TEST_F(TestColorControlStopInvalidatesScenes, RepeatedStopInvalidatesOnlyOnce)
-{
-    ColorControlCluster::Config config = MakeConfig();
-    ColorControlCluster cluster(kTestEndpointId, config);
-    Testing::ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(cluster.MoveHue(MoveModeEnum::kUp, 10, /*isEnhanced=*/false), Status::Success);
-    AdvancePartway(cluster);
-
-    const uint32_t before = scenes.mInvalidateCount;
-    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
-    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kStop, 0, /*isEnhanced=*/false), Status::Success);
-    EXPECT_EQ(scenes.mInvalidateCount, before + 1);
 }
 
 } // namespace
