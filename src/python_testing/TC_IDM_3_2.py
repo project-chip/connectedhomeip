@@ -148,12 +148,19 @@ class TC_IDM_3_2(IDMBaseTest):
             # Allow time for DUT command processing and for any rogue frames to arrive over the wire
             await asyncio.sleep(2)
 
-            # Verify that zero unexpected response packets arrived on the exchange manager
+            # Check Matter release version of the DUT (via user_param 'matter_release', default 17 for Release 1.7+)
+            # On Matter Release 1.7+, DUT must not send any response back when suppressResponse=True.
+            # On Matter Release 1.6 or earlier, DUT may either send responses or suppress them.
+            matter_release = int(self.user_params.get("matter_release", 17))
             snapshot = im_capture.GetSnapshot()
-            asserts.assert_equal(
-                snapshot.totalImResponseCount, 0,
-                f"DUT improperly sent {snapshot.totalImResponseCount} response frame(s) when WriteAttribute suppressResponse=True!"
-            )
+            if matter_release >= 17:
+                asserts.assert_equal(
+                    snapshot.totalImResponseCount, 0,
+                    f"DUT supporting Matter release 1.7+ improperly sent {snapshot.totalImResponseCount} response frame(s) when WriteAttribute suppressResponse=True!"
+                )
+            else:
+                log.info("DUT supporting Matter release <= 1.6 sent %d response frame(s) when WriteAttribute suppressResponse=True (allowed per pre-1.7 spec)",
+                         snapshot.totalImResponseCount)
 
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
