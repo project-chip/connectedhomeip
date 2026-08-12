@@ -138,7 +138,7 @@ class TC_IDM_3_2(IDMBaseTest):
             # Send write request with suppressResponse=True
             try:
                 await self.default_controller.WriteAttribute(
-                    nodeid=self.dut_node_id,
+                    nodeId=self.dut_node_id,
                     attributes=[(self.endpoint, test_attribute(test_value))],
                     suppressResponse=True
                 )
