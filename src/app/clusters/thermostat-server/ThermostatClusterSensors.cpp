@@ -68,7 +68,7 @@ bool ThermostatSensors::IsSensorHandleAvailable(const ByteSpan & sensorHandle) c
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                              AttributeValueEncoder & encoder)
+                                                                             AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -160,125 +160,221 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                               AttributeValueDecoder & decoder)
+                                                                              AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
     case Attributes::AvailableSensors::Id: {
-        Attributes::AvailableSensors::TypeInfo::DecodableType newAvailableSensorsList;
-        ReturnErrorOnFailure(decoder.Decode(newAvailableSensorsList));
-
-        ByteSpan handles[32];
-        size_t numHandles = 0;
-        auto iter         = newAvailableSensorsList.begin();
-        while (iter.Next())
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
-            if (numHandles >= 32)
+            Attributes::AvailableSensors::TypeInfo::DecodableType newAvailableSensorsList;
+            ReturnErrorOnFailure(decoder.Decode(newAvailableSensorsList));
+
+            ByteSpan handles[32];
+            size_t numHandles = 0;
+            auto iter         = newAvailableSensorsList.begin();
+            while (iter.Next())
             {
-                return Status::ConstraintError;
+                if (numHandles >= 32)
+                {
+                    return Status::ConstraintError;
+                }
+                const auto & handle = iter.GetValue();
+                if (handle.size() > 16 || !IsSensorHandleConfigured(handle))
+                {
+                    return Status::ConstraintError;
+                }
+                for (size_t k = 0; k < numHandles; k++)
+                {
+                    if (handles[k].data_equal(handle))
+                    {
+                        return Status::ConstraintError;
+                    }
+                }
+                handles[numHandles++] = handle;
             }
-            const auto & handle = iter.GetValue();
+            ReturnErrorOnFailure(iter.GetStatus());
+
+            if (mDelegate.SetAvailableSensors(Span<const ByteSpan>(handles, numHandles)))
+            {
+                mCluster.NotifyAttributeChanged(AvailableSensors::Id);
+            }
+
+            // Removing a sensor from AvailableSensors automatically removes it from EnabledSensors
+            ByteSpan filteredEnabled[32];
+            size_t numFilteredEnabled = 0;
+            bool enabledChanged       = false;
+
+            for (size_t i = 0; true; i++)
+            {
+                ByteSpan enabledHandle;
+                CHIP_ERROR err = mDelegate.GetEnabledSensorAtIndex(i, enabledHandle);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    break;
+                }
+                ReturnErrorOnFailure(err);
+
+                bool foundInAvailable = false;
+                for (size_t k = 0; k < numHandles; k++)
+                {
+                    if (handles[k].data_equal(enabledHandle))
+                    {
+                        foundInAvailable = true;
+                        break;
+                    }
+                }
+                if (foundInAvailable)
+                {
+                    if (numFilteredEnabled < 32)
+                    {
+                        filteredEnabled[numFilteredEnabled++] = enabledHandle;
+                    }
+                }
+                else
+                {
+                    enabledChanged = true;
+                }
+            }
+
+            if (enabledChanged)
+            {
+                if (mDelegate.SetEnabledSensors(Span<const ByteSpan>(filteredEnabled, numFilteredEnabled)))
+                {
+                    mCluster.NotifyAttributeChanged(EnabledSensors::Id);
+                }
+            }
+            return Status::Success;
+        }
+
+        if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            ByteSpan handle;
+            ReturnErrorOnFailure(decoder.Decode(handle));
+
             if (handle.size() > 16 || !IsSensorHandleConfigured(handle))
             {
                 return Status::ConstraintError;
             }
-            for (size_t k = 0; k < numHandles; k++)
+
+            ByteSpan currentHandles[32];
+            size_t numHandles = 0;
+            for (size_t i = 0; true; i++)
             {
-                if (handles[k].data_equal(handle))
+                ByteSpan existingHandle;
+                CHIP_ERROR err = mDelegate.GetAvailableSensorAtIndex(i, existingHandle);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    break;
+                }
+                ReturnErrorOnFailure(err);
+                if (existingHandle.data_equal(handle))
                 {
                     return Status::ConstraintError;
                 }
-            }
-            handles[numHandles++] = handle;
-        }
-        ReturnErrorOnFailure(iter.GetStatus());
-
-        if (mDelegate.SetAvailableSensors(Span<const ByteSpan>(handles, numHandles)))
-        {
-            mCluster.NotifyAttributeChanged(AvailableSensors::Id);
-        }
-
-        // Removing a sensor from AvailableSensors automatically removes it from EnabledSensors
-        ByteSpan filteredEnabled[32];
-        size_t numFilteredEnabled = 0;
-        bool enabledChanged       = false;
-
-        for (size_t i = 0; true; i++)
-        {
-            ByteSpan enabledHandle;
-            CHIP_ERROR err = mDelegate.GetEnabledSensorAtIndex(i, enabledHandle);
-            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-            {
-                break;
-            }
-            ReturnErrorOnFailure(err);
-
-            bool foundInAvailable = false;
-            for (size_t k = 0; k < numHandles; k++)
-            {
-                if (handles[k].data_equal(enabledHandle))
+                if (numHandles < 32)
                 {
-                    foundInAvailable = true;
-                    break;
+                    currentHandles[numHandles++] = existingHandle;
                 }
             }
-            if (foundInAvailable)
-            {
-                if (numFilteredEnabled < 32)
-                {
-                    filteredEnabled[numFilteredEnabled++] = enabledHandle;
-                }
-            }
-            else
-            {
-                enabledChanged = true;
-            }
-        }
 
-        if (enabledChanged)
-        {
-            if (mDelegate.SetEnabledSensors(Span<const ByteSpan>(filteredEnabled, numFilteredEnabled)))
-            {
-                mCluster.NotifyAttributeChanged(EnabledSensors::Id);
-            }
-        }
-        return Status::Success;
-    }
-    case Attributes::EnabledSensors::Id: {
-        Attributes::EnabledSensors::TypeInfo::DecodableType newEnabledSensorsList;
-        ReturnErrorOnFailure(decoder.Decode(newEnabledSensorsList));
-
-        ByteSpan handles[32];
-        size_t numHandles = 0;
-        auto iter         = newEnabledSensorsList.begin();
-        while (iter.Next())
-        {
             if (numHandles >= 32)
             {
                 return Status::ConstraintError;
             }
-            const auto & handle = iter.GetValue();
-            if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+
+            currentHandles[numHandles++] = handle;
+            if (mDelegate.SetAvailableSensors(Span<const ByteSpan>(currentHandles, numHandles)))
             {
-                // Can't enable sensors that aren't available
-                return Status::ConstraintError;
+                mCluster.NotifyAttributeChanged(AvailableSensors::Id);
             }
-            for (size_t k = 0; k < numHandles; k++)
+            return Status::Success;
+        }
+        return Status::UnsupportedWrite;
+    }
+    case Attributes::EnabledSensors::Id: {
+        if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            Attributes::EnabledSensors::TypeInfo::DecodableType newEnabledSensorsList;
+            ReturnErrorOnFailure(decoder.Decode(newEnabledSensorsList));
+
+            ByteSpan handles[32];
+            size_t numHandles = 0;
+            auto iter         = newEnabledSensorsList.begin();
+            while (iter.Next())
             {
-                if (handles[k].data_equal(handle))
+                if (numHandles >= 32)
                 {
                     return Status::ConstraintError;
                 }
+                const auto & handle = iter.GetValue();
+                if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+                {
+                    // Can't enable sensors that aren't available
+                    return Status::ConstraintError;
+                }
+                for (size_t k = 0; k < numHandles; k++)
+                {
+                    if (handles[k].data_equal(handle))
+                    {
+                        return Status::ConstraintError;
+                    }
+                }
+                handles[numHandles++] = handle;
             }
-            handles[numHandles++] = handle;
-        }
-        ReturnErrorOnFailure(iter.GetStatus());
+            ReturnErrorOnFailure(iter.GetStatus());
 
-        if (mDelegate.SetEnabledSensors(Span<const ByteSpan>(handles, numHandles)))
-        {
-            mCluster.NotifyAttributeChanged(EnabledSensors::Id);
+            if (mDelegate.SetEnabledSensors(Span<const ByteSpan>(handles, numHandles)))
+            {
+                mCluster.NotifyAttributeChanged(EnabledSensors::Id);
+            }
+            return Status::Success;
         }
-        return Status::Success;
+
+        if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            ByteSpan handle;
+            ReturnErrorOnFailure(decoder.Decode(handle));
+
+            if (handle.size() > 16 || !IsSensorHandleAvailable(handle))
+            {
+                return Status::ConstraintError;
+            }
+
+            ByteSpan currentHandles[32];
+            size_t numHandles = 0;
+            for (size_t i = 0; true; i++)
+            {
+                ByteSpan existingHandle;
+                CHIP_ERROR err = mDelegate.GetEnabledSensorAtIndex(i, existingHandle);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    break;
+                }
+                ReturnErrorOnFailure(err);
+                if (existingHandle.data_equal(handle))
+                {
+                    return Status::ConstraintError;
+                }
+                if (numHandles < 32)
+                {
+                    currentHandles[numHandles++] = existingHandle;
+                }
+            }
+
+            if (numHandles >= 32)
+            {
+                return Status::ConstraintError;
+            }
+
+            currentHandles[numHandles++] = handle;
+            if (mDelegate.SetEnabledSensors(Span<const ByteSpan>(currentHandles, numHandles)))
+            {
+                mCluster.NotifyAttributeChanged(EnabledSensors::Id);
+            }
+            return Status::Success;
+        }
+        return Status::UnsupportedWrite;
     }
     case Attributes::SensorSchedule::Id: {
         auto & subjectDescriptor  = decoder.GetSubjectDescriptor();
