@@ -170,10 +170,10 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config, Context context) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(config.delegate), mTimeSyncContext(context),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource), mDelegate(config.delegate),
+    mTimeSyncContext(context),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -1146,8 +1146,6 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
         Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(), timeSource.Value().nodeID,
                                                       timeSource.Value().endpoint };
         tts.SetNonNull(ts);
-        // TODO: schedule a utctime read from this time source and emit event only on failure to get time
-        EmitTimeFailureEvent(GetDelegate(), GetEventsGenerator());
     }
     else
     {
