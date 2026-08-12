@@ -184,6 +184,8 @@ class TC_SC_4_6(MatterBaseTest):
             service_type=MdnsServiceType.COMMISSIONER.value,
             log_output=True
         )
+        # All commissioner TXT keys are optional, so the record itself may be absent;
+        # treat that as an empty key set.
         txt = txt_record.txt if txt_record and txt_record.txt else {}
 
         # *** VP KEY ***
