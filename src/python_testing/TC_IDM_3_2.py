@@ -37,12 +37,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
+from matter import im_capture
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -129,6 +132,8 @@ class TC_IDM_3_2(IDMBaseTest):
             test_value = "SuppressResponse-Test"
 
             log.info("Testing SuppressResponse functionality with NodeLabel attribute")
+            im_capture.SetObserver(self.default_controller)
+            im_capture.Reset()
 
             # Send write request with suppressResponse=True
             try:
@@ -138,7 +143,17 @@ class TC_IDM_3_2(IDMBaseTest):
                     suppressResponse=True
                 )
             except (ChipStackError, InteractionModelError) as e:
-                log.info(f"WriteAttribute with suppressResponse=True raised exception: {e}")
+                log.info("WriteAttribute with suppressResponse=True raised exception: %s", e)
+
+            # Allow time for DUT command processing and for any rogue frames to arrive over the wire
+            await asyncio.sleep(2)
+
+            # Verify that zero unexpected response packets arrived on the exchange manager
+            snapshot = im_capture.GetSnapshot()
+            asserts.assert_equal(
+                snapshot.totalImResponseCount, 0,
+                f"DUT improperly sent {snapshot.totalImResponseCount} response frame(s) when WriteAttribute suppressResponse=True!"
+            )
 
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
