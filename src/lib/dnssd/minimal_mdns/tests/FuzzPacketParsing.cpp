@@ -7,7 +7,6 @@
 namespace {
 
 using namespace chip;
-using namespace mdns::Minimal;
 using namespace chip::Dnssd;
 
 class FuzzDelegate : public ParserDelegate

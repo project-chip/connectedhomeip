@@ -58,7 +58,6 @@ namespace {
 
 using namespace chip;
 using namespace fuzztest;
-using namespace mdns::Minimal;
 using namespace chip::Dnssd;
 
 void EnsureInitialized()
