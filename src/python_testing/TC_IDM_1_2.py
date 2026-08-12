@@ -46,8 +46,7 @@ from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_fo
 import matter.clusters as Clusters
 import matter.discovery as Discovery
 import matter.testing.matchers as matchers
-from matter import ChipUtility
-from matter import im_capture
+from matter import ChipUtility, im_capture
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
