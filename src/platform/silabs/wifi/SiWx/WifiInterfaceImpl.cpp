@@ -169,10 +169,11 @@ static chip::BitFlags<WiFiSecurityBitmap> ConvertSlWifiSecurityToBitmap(const sl
  *        If the scan network was requested for a specific SSID - wfx_rsi.scan_ssid had a valid value,
  *        the callback will only forward that specific networks information.
  *        If no ssid is provided, wfx_rsi.scan_ssid is a nullptr, we return the information of all scanned networks.
+ *
+ *        For SL_WIFI_SCAN_TYPE_EXTENDED, results are not in the callback; fetch via sl_wifi_get_stored_scan_results.
  */
 sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
-    VerifyOrReturnError(result != nullptr, SL_STATUS_NULL_POINTER);
     VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, SL_STATUS_INVALID_HANDLE);
 
     chip::ByteSpan requestedSsidSpan = {};
@@ -182,6 +183,86 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     {
         sl_wifi_ssid_t * requestedSsidPtr = static_cast<sl_wifi_ssid_t *>(arg);
         requestedSsidSpan                 = chip::ByteSpan(requestedSsidPtr->value, requestedSsidPtr->length);
+    }
+
+    // EXTENDED scan: payload is NULL; result_length is count * sizeof(sl_wifi_extended_scan_result_t)
+    if (result == nullptr)
+    {
+        sl_wifi_extended_scan_result_t * scanResults = nullptr;
+        uint16_t resultCount                         = 0;
+        sl_status_t status                           = SL_STATUS_OK;
+
+        if (result_length > 0)
+        {
+            scanResults = static_cast<sl_wifi_extended_scan_result_t *>(chip::Platform::MemoryAlloc(result_length));
+            if (scanResults == nullptr)
+            {
+                wfx_rsi.scan_cb(nullptr);
+                wfx_rsi.scan_cb = nullptr;
+                wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+                osSemaphoreRelease(sScanCompleteSemaphore);
+                return SL_STATUS_ALLOCATION_FAILED;
+            }
+
+            sl_wifi_extended_scan_result_parameters_t scanResultParameters = {
+                .scan_results         = scanResults,
+                .array_length         = static_cast<uint16_t>(result_length / sizeof(sl_wifi_extended_scan_result_t)),
+                .result_count         = &resultCount,
+                .channel_filter       = nullptr,
+                .security_mode_filter = nullptr,
+                .rssi_filter          = nullptr,
+                .network_type_filter  = nullptr,
+            };
+
+            status = sl_wifi_get_stored_scan_results(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &scanResultParameters);
+        }
+
+        if (status == SL_STATUS_OK)
+        {
+            for (uint16_t i = 0; i < resultCount; i++)
+            {
+                size_t ssidLen = strnlen(reinterpret_cast<char *>(scanResults[i].ssid), kMaxWiFiSSIDLength);
+                chip::ByteSpan ssidSpan(scanResults[i].ssid, ssidLen);
+
+                if (requestedSsidSpan.empty() || requestedSsidSpan.data_equal(ssidSpan))
+                {
+                    chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse currentScanResult = {};
+
+                    chip::MutableByteSpan responseSsidSpan(currentScanResult.ssid, kMaxWiFiSSIDLength);
+                    if (chip::CopySpanToMutableSpan(ssidSpan, responseSsidSpan) != CHIP_NO_ERROR)
+                    {
+                        status = SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT;
+                        break;
+                    }
+                    currentScanResult.ssidLen = static_cast<uint8_t>(ssidLen);
+
+                    chip::ByteSpan bssidSpan(scanResults[i].bssid, kWiFiBSSIDLength);
+                    chip::MutableByteSpan responseBssidSpan(currentScanResult.bssid, kWiFiBSSIDLength);
+                    if (chip::CopySpanToMutableSpan(bssidSpan, responseBssidSpan) != CHIP_NO_ERROR)
+                    {
+                        status = SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT;
+                        break;
+                    }
+
+                    int16_t rssi                      = std::clamp(((-1) * scanResults[i].rssi), INT8_MIN, INT8_MAX);
+                    currentScanResult.signal.strength = static_cast<int8_t>(rssi);
+                    currentScanResult.signal.type     = chip::DeviceLayer::NetworkCommissioning::WirelessSignalType::kdBm;
+                    currentScanResult.channel         = static_cast<uint16_t>(scanResults[i].rf_channel);
+                    currentScanResult.wiFiBand        = WiFiBandEnum::k2g4;
+                    currentScanResult.security =
+                        ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(scanResults[i].security_mode));
+
+                    wfx_rsi.scan_cb(&currentScanResult);
+                }
+            }
+        }
+
+        chip::Platform::MemoryFree(scanResults);
+        wfx_rsi.scan_cb(nullptr);
+        wfx_rsi.scan_cb = nullptr;
+        wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
+        osSemaphoreRelease(sScanCompleteSemaphore);
+        return status;
     }
 
     uint32_t nbreResults = result->scan_count;
@@ -414,7 +495,7 @@ sl_status_t SetWifiConfigurations()
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
         // Enabling quick-join since we have the channel and BSSID
         // TODO: Uncomment this once the quick-join issue is fixed
-        // join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
+        join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
 
     status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
@@ -864,6 +945,10 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
         /* Terminate with end of scan which is no ap sent back */
         wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
         wifi_scan_configuration.periodic_scan_interval = kAdvScanPeriodicity;
+    }
+    else
+    {
+        wifi_scan_configuration.type = SL_WIFI_SCAN_TYPE_EXTENDED;
     }
 
     sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = {
