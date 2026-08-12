@@ -33,6 +33,30 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --manual-code 10054912339
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -119,25 +143,25 @@ class TC_DA_1_1(MatterBaseTest):
         if not setupPayloadInfo:
             asserts.fail(f"Setup payload info is required for commissioning, found '{setupPayloadInfo}'")
 
-        # Vendor ID and Product ID are set to 0x0000, the pair the spec prescribes for
-        # commissioner-generated onboarding payloads not bound to a product identity.
-        vendor_id = 0
-        product_id = 0
-
-        # Build setup parameters for commissioning.
-        # - With no VID/PID claim in the QR, PASE discovery matches the DUT on long
-        #   discriminator and passcode alone instead of rejecting DUTs whose advertised
-        #   VID/PID differ from fabricated values.
-        setup_params = SetupParameters(
-            discriminator=setupPayloadInfo[0].filter_value,
-            passcode=setupPayloadInfo[0].passcode,
-            vendor_id=vendor_id,
-            product_id=product_id
-        )
-
         # Use the tester-provided setup code (QR or manual) verbatim when one exists,
         # so PASE discovery filters exactly as that code dictates.
-        setup_code = setupPayloadInfo[0].setup_code or setup_params.qr_code
+        setup_code = setupPayloadInfo[0].setup_code
+        if setup_code is None:
+            # No tester-supplied setup code, only a discriminator and passcode, so
+            # constructing a QR code from them.
+            #
+            # Vendor ID and Product ID are set to 0x0000, the pair the spec prescribes
+            # for commissioner-generated onboarding payloads not bound to a product
+            # identity. With no VID/PID claim in the QR, PASE discovery matches the DUT
+            # on long discriminator and passcode alone instead of rejecting DUTs whose
+            # advertised VID/PID differ from fabricated values.
+            setup_params = SetupParameters(
+                discriminator=setupPayloadInfo[0].filter_value,
+                passcode=setupPayloadInfo[0].passcode,
+                vendor_id=0,
+                product_id=0
+            )
+            setup_code = setup_params.qr_code
 
         # Setup
         root_node_id = 0
