@@ -97,7 +97,6 @@
         "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
-        "mode-select-extensions.xml",
         "network-identity-management-cluster.xml",
         "ota-provider-cluster.xml",
         "ota-requestor-cluster.xml",
