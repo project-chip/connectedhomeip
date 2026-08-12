@@ -68,7 +68,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
         ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
+        // Schedule directly instead of through InitiateFactoryReset(): that API returns void, so a
+        // scheduling failure would be invisible here and the pending fail-safe reset would be
+        // silently skipped. Failing Init() blocks startup while the fail-safe flag stays armed, so
+        // the reset is retried on the next boot.
+        err = PlatformMgr().ScheduleWork(DoFactoryReset);
+        SuccessOrExit(err);
     }
     err = CHIP_NO_ERROR;
 
