@@ -45,7 +45,6 @@ from TC_TSTAT_Utils import ThermostatBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
-from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body

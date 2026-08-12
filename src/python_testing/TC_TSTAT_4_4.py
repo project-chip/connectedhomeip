@@ -406,11 +406,11 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
         await self.send_atomic_request_begin(
             {cluster.Attributes.SensorSchedule.attribute_id: Status.Success}, endpoint=endpoint)
         invalid_schedule = [
-           cluster.Structs.SensorScheduleTransitionStruct(
-            dayOfWeek=cluster.Bitmaps.ScheduleDayOfWeekBitmap.kAway | cluster.Bitmaps.ScheduleDayOfWeekBitmap.kMonday,
-            transitionTime=480,
-            enabledSensors=[supported_sensor_handles[0]] if len(supported_sensor_handles) > 0 else []
-           )
+            cluster.Structs.SensorScheduleTransitionStruct(
+                dayOfWeek=cluster.Bitmaps.ScheduleDayOfWeekBitmap.kAway | cluster.Bitmaps.ScheduleDayOfWeekBitmap.kMonday,
+                transitionTime=480,
+                enabledSensors=[supported_sensor_handles[0]] if len(supported_sensor_handles) > 0 else []
+            )
         ]
         # Verify that write returns CONSTRAINT_ERROR
         await self.write_sensor_schedule(endpoint=endpoint, sensor_schedule=invalid_schedule,
