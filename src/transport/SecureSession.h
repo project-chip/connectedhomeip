@@ -219,8 +219,6 @@ public:
 
     const SessionParameters & GetRemoteSessionParameters() const override { return mRemoteSessionParams; }
 
-
-
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
 
