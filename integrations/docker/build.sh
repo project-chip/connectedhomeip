@@ -36,10 +36,8 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 if [[ $OSTYPE == 'darwin'* ]]; then
     DOCKER_VOLUME_PATH=~/Library/Containers/com.docker.docker/Data/vms/0/
-    TARGET_PLATFORM_TYPE="linux/arm64"
 else
     DOCKER_VOLUME_PATH=/var/lib/docker/
-    TARGET_PLATFORM_TYPE="linux/amd64"
 fi
 
 [[ ${*/--help//} != "${*}" ]] && {
@@ -59,6 +57,18 @@ fi
 "
     exit 0
 }
+
+if [[ -z $DOCKER_BUILD_PLATFORM ]]; then
+    case "$(uname -m)" in
+        arm64 | aarch64) DOCKER_BUILD_PLATFORM="linux/arm64" ;;
+        x86_64 | amd64) DOCKER_BUILD_PLATFORM="linux/amd64" ;;
+        *)
+            echo "$me: *** ERROR: unsupported host architecture: $(uname -m)"
+            exit 1
+            ;;
+    esac
+fi
+TARGET_PLATFORM_TYPE="$DOCKER_BUILD_PLATFORM"
 
 die() {
     echo "$me: *** ERROR: $*"
@@ -132,7 +142,7 @@ awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
 done
 
 if [ "$SKIP_BUILD" = false ]; then
-    docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+    docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
     docker image prune --force
 fi
 

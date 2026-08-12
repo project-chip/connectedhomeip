@@ -61,6 +61,7 @@ IGNORED_STALE_SUITE_APPS = {
     "SonarQubeCloud",
     "BuildJet",
     "Mergify",
+    "coderabbitai",
 }
 
 
