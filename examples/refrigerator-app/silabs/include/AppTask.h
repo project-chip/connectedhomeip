@@ -101,9 +101,15 @@ public:
 
     /**
      * @brief Constructs the ModeBase::Instance for the cabinet mode cluster on @p endpointId.
-     *        Invoked from the emberAf...CabinetModeClusterInitCallback CRTP forwarder.
+     *        Invoked from the Matter...CabinetModeClusterInitCallback CRTP forwarder.
      */
     void CabinetModeClusterInit(chip::EndpointId endpointId);
+
+    /**
+     * @brief Tears down the ModeBase::Instance for the cabinet mode cluster on @p endpointId.
+     *        Invoked from the Matter...CabinetModeClusterShutdownCallback CRTP forwarder.
+     */
+    void CabinetModeClusterShutdown(chip::EndpointId endpointId);
 
     // ModeBase::Delegate interface. Override matching *Impl() hooks in CustomerAppTask to customize.
 
