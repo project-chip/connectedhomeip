@@ -25,7 +25,6 @@ namespace mdns {
 namespace Minimal {
 using namespace chip::Dnssd;
 
-
 using chip::Platform::UniquePtr;
 
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,

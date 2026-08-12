@@ -42,11 +42,11 @@ namespace {
 
 struct Options
 {
-    bool unicastAnswers       = true;
-    uint32_t runtimeMs        = 500;
-    uint16_t querySendPort    = 5353;
-    uint16_t listenPort       = 5388;
-    const char * query        = "_services._dns-sd._udp.local";
+    bool unicastAnswers     = true;
+    uint32_t runtimeMs      = 500;
+    uint16_t querySendPort  = 5353;
+    uint16_t listenPort     = 5388;
+    const char * query      = "_services._dns-sd._udp.local";
     chip::Dnssd::QType type = chip::Dnssd::QType::ANY;
 } gOptions;
 
@@ -270,7 +270,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(query
                          .MdnsQuery()                                  //
-                         .SetClass(chip::Dnssd::QClass::IN)          //
+                         .SetClass(chip::Dnssd::QClass::IN)            //
                          .SetType(gOptions.type)                       //
                          .SetAnswerViaUnicast(gOptions.unicastAnswers) //
     );

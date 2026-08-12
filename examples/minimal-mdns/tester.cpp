@@ -178,13 +178,13 @@ System::PacketBufferHandle BuildSrvTestPacket()
 
     mdns::Minimal::ResponseBuilder builder(std::move(packet));
 
-    constexpr uint16_t kSrvPort                          = 5540;
-    constexpr const char * kNodeName                     = "ABCD1234ABCD1234";
-    constexpr const char * kNodeFabricName               = "ABCD1234ABCD1234-0000000000000001";
+    constexpr uint16_t kSrvPort                        = 5540;
+    constexpr const char * kNodeName                   = "ABCD1234ABCD1234";
+    constexpr const char * kNodeFabricName             = "ABCD1234ABCD1234-0000000000000001";
     constexpr chip::Dnssd::QNamePart kServiceName[]    = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                             Dnssd::kLocalDomain };
+                                                           Dnssd::kLocalDomain };
     constexpr chip::Dnssd::QNamePart kServerFullName[] = { kNodeFabricName, Dnssd::kOperationalServiceName,
-                                                             Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+                                                           Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
     constexpr chip::Dnssd::QNamePart kServerName[]     = { kNodeName, Dnssd::kLocalDomain };
 
     chip::Dnssd::PtrResourceRecord ptrRecord(kServiceName, kServerFullName);

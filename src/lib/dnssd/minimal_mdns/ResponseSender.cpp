@@ -26,7 +26,6 @@ namespace mdns {
 namespace Minimal {
 using namespace chip::Dnssd;
 
-
 namespace {
 
 using namespace mdns::Minimal::Internal;

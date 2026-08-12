@@ -208,7 +208,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
 
     mdns::Minimal::Server<10> server;
     chip::Dnssd::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
-                                              chip::Dnssd::kLocalDomain };
+                                            chip::Dnssd::kLocalDomain };
     mdns::Minimal::ResponseSender responseSender(&server);
 
     mdns::Minimal::QueryResponder<16> queryResponder;
@@ -217,7 +217,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     // Respond to PTR queries for _mock._udp.local
     chip::Dnssd::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart serverServiceName[] = { "INSTANCE", chip::Dnssd::kCommissionableServiceName,
-                                                     chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
+                                                   chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
     mdns::Minimal::PtrResponder ptrUdpResponder(serviceName, serverServiceName);
     queryResponder.AddResponder(&ptrUdpResponder);
 

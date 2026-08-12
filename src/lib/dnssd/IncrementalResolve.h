@@ -117,8 +117,7 @@ public:
     /// Returns CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME for non-matter service names.
     ///
     /// If this function returns with error, the object will be in an inactive state.
-    CHIP_ERROR InitializeParsing(chip::Dnssd::SerializedQNameIterator name, const uint64_t ttl,
-                                 const chip::Dnssd::SrvRecord & srv);
+    CHIP_ERROR InitializeParsing(chip::Dnssd::SerializedQNameIterator name, const uint64_t ttl, const chip::Dnssd::SrvRecord & srv);
 
     /// Notify that a new record is being processed.
     /// Will handle filtering and processing of data to determine if the entry is relevant for
@@ -130,8 +129,7 @@ public:
     ///
     /// [data] represents the record received via [interface] and [packetRange] represents the range
     /// of valid bytes within the packet for the purpose of QName parsing
-    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const chip::Dnssd::ResourceData & data,
-                        chip::Dnssd::BytesRange packetRange);
+    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const chip::Dnssd::ResourceData & data, chip::Dnssd::BytesRange packetRange);
 
     /// Return what additional data is required until the object can be extracted
     ///

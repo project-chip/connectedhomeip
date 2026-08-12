@@ -224,22 +224,21 @@ int main(int argc, char ** args)
 
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    chip::Dnssd::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                        Dnssd::kLocalDomain };
+    chip::Dnssd::QNamePart tcpServiceName[] = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
-                                                        Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+                                                      Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
-                                                        Dnssd::kLocalDomain };
+                                                      Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
-                                                        Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+                                                      Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
     // several UDP versions for discriminators
     chip::Dnssd::QNamePart udpDiscriminator1[] = { "S52", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart udpDiscriminator2[] = { "V123", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
     chip::Dnssd::QNamePart udpDiscriminator3[] = { "L840", Dnssd::kSubtypeServiceNamePart, Dnssd::kCommissionableServiceName,
-                                                     Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
+                                                   Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
     chip::Dnssd::QNamePart serverName[] = { gOptions.instanceName, Dnssd::kLocalDomain };
 
