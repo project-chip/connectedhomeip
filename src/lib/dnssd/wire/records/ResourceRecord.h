@@ -39,8 +39,21 @@ public:
     ResourceRecord & operator=(const ResourceRecord & other) = default;
 
     const FullQName & GetName() const { return mQName; }
-    QClass GetClass() const { return mCacheFlush ? QClass::IN_FLUSH : QClass::IN; }
+    QClass GetClass() const { return mClass; }
     QType GetType() const { return mType; }
+
+    /// Sets the record class.
+    /// Supported values:
+    /// - IN: internet class (default for normal records).
+    /// - NONE: DNS Update (RFC 2136) delete of a specific RR.
+    /// - ANY: in queries, matches any class; in DNS UPDATE, deletes all RRsets at a name.
+    /// - IN_UNICAST: IN with the unicast-response bit set (queries).
+    /// - IN_FLUSH: IN with the mDNS cache-flush bit set (RFC 6762 §10.2).
+    ResourceRecord & SetClass(QClass value)
+    {
+        mClass = value;
+        return *this;
+    }
 
     uint32_t GetTtl() const { return mTtl; }
     ResourceRecord & SetTtl(uint32_t ttl)
@@ -49,12 +62,13 @@ public:
         return *this;
     }
 
+    /// Sets or clears the mDNS cache-flush bit (RFC 6762 section 10.2).
     ResourceRecord & SetCacheFlush(bool set)
     {
-        mCacheFlush = set;
+        mClass = set ? QClass::IN_FLUSH : QClass::IN;
         return *this;
     }
-    bool GetCacheFlush() const { return mCacheFlush; }
+    bool GetCacheFlush() const { return mClass == QClass::IN_FLUSH; }
 
     /// Append the given record to the underlying output.
     /// Updates header item count on success, does NOT update header on failure.
@@ -70,7 +84,7 @@ private:
     QType mType;
     uint32_t mTtl = kDefaultTtl;
     FullQName mQName;
-    bool mCacheFlush = false;
+    QClass mClass = QClass::IN;
 };
 
 } // namespace Minimal

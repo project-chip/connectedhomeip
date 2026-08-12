@@ -19,7 +19,7 @@
 #include <assert.h>
 
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-#include <lib/dnssd/minimal_mdns/records/IP.h>
+#include <lib/dnssd/wire/records/IP.h>
 
 namespace mdns {
 namespace Minimal {

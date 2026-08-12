@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {
@@ -28,6 +28,8 @@ class TxtResourceRecord : public ResourceRecord
 {
 public:
     static constexpr uint64_t kDefaultTtl = 4500; // 75 minutes
+    // We cap each TXT string entry at 63 bytes (RFC 6763 allows up to 255).
+    static constexpr size_t kMaxTxtEntryLength = 63;
 
     TxtResourceRecord(const FullQName & qName, const char ** entries, size_t entryCount) :
         ResourceRecord(QType::TXT, qName), mEntries(entries), mEntryCount(entryCount)
@@ -57,7 +59,7 @@ protected:
         for (size_t i = 0; i < mEntryCount; i++)
         {
             size_t len = strlen(mEntries[i]);
-            if (len > kMaxTxtRecordLength)
+            if (len > kMaxTxtEntryLength)
             {
                 return false;
             }
@@ -70,8 +72,6 @@ protected:
 private:
     const char * const * mEntries;
     const size_t mEntryCount;
-
-    static constexpr size_t kMaxTxtRecordLength = 63;
 };
 
 } // namespace Minimal

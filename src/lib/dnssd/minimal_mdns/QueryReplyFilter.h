@@ -19,8 +19,8 @@
 
 #include <lib/dnssd/minimal_mdns/responders/ReplyFilter.h>
 
-#include "Parser.h"
-#include "Query.h"
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/Query.h>
 
 namespace mdns {
 namespace Minimal {
