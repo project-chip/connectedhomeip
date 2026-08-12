@@ -4,10 +4,29 @@ This example demonstrates the Matter Lighting application on stm32 platform.
 
 ---
 
--   [Matter STM32 Lighting Example over thread](#matter-stm32-lighting-example-over-thread)
-    -   [Building and Commissioning](#building-and-commissioning)
-    -   [Cluster Control](#cluster-control)
-    -   [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)
+- [Matter STM32 Lighting Example over thread](#matter-stm32-lighting-example-over-thread)
+  - [Building and Commissioning](#building-and-commissioning)
+  - [Cluster Control](#cluster-control)
+  - [Indicate current state of lightbulb](#indicate-current-state-of-lightbulb)
+  - [OTA and `OEMiROT` application](#ota-and-oemirot-application)
+    - [Linux / Ubuntu: prepare the X-CUBE-MATTER shell scripts](#linux--ubuntu-prepare-the-x-cube-matter-shell-scripts)
+    - [Pre-compiled from X-CUBE-MATTER (STM32CubeIDE)](#pre-compiled-from-x-cube-matter-stm32cubeide)
+  - [Build Instructions](#build-instructions)
+    - [Step 1: Copy the Secure veneers (`secure_nsclib.o`)](#step-1-copy-the-secure-veneers-secure_nsclibo)
+    - [Step 2: Build with GN](#step-2-build-with-gn)
+    - [Step 3: Copy Binary](#step-3-copy-binary)
+    - [Step 4: Sign the Binary](#step-4-sign-the-binary)
+      - [Option A: Using CLI](#option-a-using-cli)
+      - [Option B: Using GUI](#option-b-using-gui)
+    - [Step 5: Flash the Board](#step-5-flash-the-board)
+  - [OTA Update (N+1 Image)](#ota-update-n1-image)
+    - [Step 1: Increment the software version](#step-1-increment-the-software-version)
+    - [Step 2: Rebuild with GN](#step-2-rebuild-with-gn)
+    - [Step 3: Copy and sign for OTA](#step-3-copy-and-sign-for-ota)
+    - [Step 4: Create Matter binary with ST header](#step-4-create-matter-binary-with-st-header)
+    - [Step 5: Create the Matter OTA file (.ota)](#step-5-create-the-matter-ota-file-ota)
+    - [Step 6: Use the OTA image](#step-6-use-the-ota-image)
+  - [Quick Reference](#quick-reference)
 
 ---
 
@@ -51,6 +70,15 @@ ON and the line is erased when the controller disable the light.
 
 ## OTA and `OEMiROT` application
 
+All the commands below use `XCUBE_PATH`, which points to the board folder of the
+extracted [X-CUBE-MATTER](https://www.st.com/en/embedded-software/x-cube-matter.html)
+package. Export it once in your shell:
+
+```bash
+XCUBE_PATH="path/to/Projects/STM32WBA65I-DK1"
+PROV_PATH="${XCUBE_PATH}/ROT_Provisioning_Lighting_OEMiRoT"
+```
+
 ### Linux / Ubuntu: prepare the X-CUBE-MATTER shell scripts
 
 The X-CUBE-MATTER package is delivered for Windows: all `.sh` files use CRLF
@@ -74,6 +102,30 @@ find . -name "*.sh" -exec dos2unix {} \; -exec chmod +x {} \;
 
 ### Pre-compiled from X-CUBE-MATTER (STM32CubeIDE)
 
+The bootloader and the Secure application are **not** built by GN: they must be
+compiled from the X-CUBE-MATTER package with STM32CubeIDE, in this order.
+
+1.  **OEMiROT Boot** (bootloader)
+
+    -   In STM32CubeIDE: **File > Import... > Existing Projects into
+        Workspace**, then select
+        `${XCUBE_PATH}/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Boot/STM32CubeIDE`
+    -   Right-click the `OEMiROT_Boot` project > **Build Project**
+    -   Produces `bl2.bin`
+
+2.  **Secure App** (`OEMiROT_Appli_TrustZone`, Secure part)
+
+    -   Import the same way the project located in
+        `${XCUBE_PATH}/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/STM32CubeIDE`
+        and select the **Secure** configuration
+    -   Right-click the Secure project > **Build Project**
+    -   Produces `secure_nsclib.o` (Secure Gateway veneers) in
+        `OEMiROT_Appli_TrustZone/Secure_nsclib`, which is required by the
+        NonSecure GN build (see [Step 1](#step-1-copy-the-secure-veneers-secure_nsclibo))
+
+> On Linux, run the `dos2unix` / `chmod +x` step above **before** launching
+> these builds, otherwise the post-build scripts will fail.
+
 | Component    | Project Location                                             | Output                             |
 | ------------ | ------------------------------------------------------------ | ---------------------------------- |
 | OEMiROT Boot | `ROT_Lighting_OEMiRoT/OEMiROT_Boot`                          | `bl2.bin`                          |
@@ -88,8 +140,6 @@ The GN build links against the Secure Gateway veneers produced by the Secure
 project built in STM32CubeIDE. Copy the object file into the GN platform folder:
 
 ```bash
-XCUBE_PATH="path/to/Projects/STM32WBA65I-DK1"
-
 cp ${XCUBE_PATH}/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/Secure_nsclib/secure_nsclib.o \
    connectedhomeip/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Secure_nsclib/
 ```
@@ -117,8 +167,6 @@ project:
 > `oemirot_tz_ns_app.bin`
 
 ```bash
-XCUBE_PATH="path/to/Projects/STM32WBA65I-DK1"
-
 cp out/oemirot/STM32WBA65I-DK1-lighting.bin \
    ${XCUBE_PATH}/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/Binary/oemirot_tz_ns_app.bin
 ```
@@ -128,7 +176,6 @@ cp out/oemirot/STM32WBA65I-DK1-lighting.bin \
 #### Option A: Using CLI
 
 ```bash
-PROV_PATH="${XCUBE_PATH}/ROT_Provisioning_Lighting_OEMiRoT"
 TPC="path/to/STM32CubeProgrammer/bin/STM32TrustedPackageCreator_CLI"
 
 # Sign for OTA (encrypted + signed)
@@ -238,3 +285,8 @@ Use this file with your OTA provider (e.g., chip-tool, ota-provider-app).
 
 -   `oemirot_tz_ns_app_enc_sign.bin` - for OTA updates
 -   `oemirot_tz_ns_app_init_sign.bin` - for initial provisioning
+
+**Useful links:**
+
+-   [X-CUBE-MATTER | Product - STMicroelectronics](https://www.st.com/en/embedded-software/x-cube-matter.html)
+-   [Discover Matter - stm32mcu wiki](https://wiki.st.com/stm32mcu/wiki/Connectivity:Introduction_to_Matter)
