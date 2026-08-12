@@ -226,6 +226,34 @@ class IDMBaseTest(BasicCompositionTests):
         dut_acl.append(ace)
         await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
 
+    async def verify_suppress_response_message_count(self, snapshot, action_name: str = "suppressResponse"):
+        """Verify that zero unexpected response packets arrived when suppressResponse=True for Matter 1.7+.
+
+        Reads BasicInformation.SpecificationVersion from the DUT (endpoint 0) to determine
+        the supported Matter release. For Release 1.7 or later (SpecificationVersion >= 0x01070000),
+        asserts that snapshot.totalImResponseCount == 0. For Release 1.6 or earlier, logs the count.
+        """
+        try:
+            spec_ver = await self.read_single_attribute_check_success(
+                endpoint=self.ROOT_NODE_ENDPOINT_ID,
+                cluster=Clusters.BasicInformation,
+                attribute=Clusters.BasicInformation.Attributes.SpecificationVersion
+            )
+        except Exception as e:
+            log.warning("Could not read SpecificationVersion attribute from BasicInformation: %s", e)
+            spec_ver = 0
+
+        if spec_ver >= 0x01070000:
+            asserts.assert_equal(
+                snapshot.totalImResponseCount, 0,
+                f"DUT supporting Matter specification version 0x{spec_ver:08X} (1.7+) improperly sent "
+                f"{snapshot.totalImResponseCount} response frame(s) when {action_name}=True!"
+            )
+        else:
+            log.info("DUT supporting Matter specification version 0x%08X (pre-1.7) sent %d response frame(s) "
+                     "when %s=True (allowed per pre-1.7 spec)",
+                     spec_ver, snapshot.totalImResponseCount, action_name)
+
     # ========================================================================
     # Attribute Path Utilities
     # ========================================================================

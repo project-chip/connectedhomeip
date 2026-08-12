@@ -252,19 +252,8 @@ class TC_IDM_1_2(IDMBaseTest):
         # Allow time for DUT command processing and for any rogue frames to arrive over the wire
         await asyncio.sleep(2)
 
-        # Check Matter release version of the DUT (via user_param 'matter_release', default 17 for Release 1.7+)
-        # On Matter Release 1.7+, DUT must not send any response back when suppressResponse=True.
-        # On Matter Release 1.6 or earlier, DUT may either send responses or suppress them.
-        matter_release = int(self.user_params.get("matter_release", 17))
         snapshot = im_capture.GetSnapshot()
-        if matter_release >= 17:
-            asserts.assert_equal(
-                snapshot.totalImResponseCount, 0,
-                f"DUT supporting Matter release 1.7+ improperly sent {snapshot.totalImResponseCount} response frame(s) when suppressResponse=True!"
-            )
-        else:
-            log.info("DUT supporting Matter release <= 1.6 sent %d response frame(s) when suppressResponse=True (allowed per pre-1.7 spec)",
-                     snapshot.totalImResponseCount)
+        await self.verify_suppress_response_message_count(snapshot, "suppressResponse")
 
         # Verify that the command had the correct side effect on the DUT data model
         breadcrumb = await self.read_single_attribute_check_success(
