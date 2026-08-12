@@ -177,7 +177,28 @@ awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
 done
 
 if [ "$SKIP_BUILD" = false ]; then
-    docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+    # These images fetch SDKs and toolchains from vendor servers while building,
+    # and those fetches fail intermittently: a truncated download or a 5xx from
+    # a vendor leaves the build red for a reason nothing here controls. Retry
+    # instead, so that a red build means the image is actually broken.
+    #
+    # A retry is cheap even when the failure is real, because the layers before
+    # the failing one are cached and the build resumes at that step.
+    #
+    # DOCKER_BUILD_ATTEMPTS=1 fails on the first attempt, which is usually what
+    # you want locally. DOCKER_BUILD_RETRY_DELAY is the backoff base in seconds:
+    # the wait before attempt N is N-1 times that, so the default 15 waits 15s
+    # then 30s.
+    attempts=${DOCKER_BUILD_ATTEMPTS:-3}
+    retry_delay=${DOCKER_BUILD_RETRY_DELAY:-15}
+    for attempt in $(seq 1 "$attempts"); do
+        if docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .; then
+            break
+        fi
+        [[ $attempt -lt $attempts ]] || die "docker build failed after $attempts attempts"
+        echo "$me: build failed on attempt $attempt of $attempts, retrying in $((attempt * retry_delay))s"
+        sleep $((attempt * retry_delay))
+    done
     docker image prune --force
 fi
 
