@@ -66,7 +66,7 @@ public:
         }
     }
 
-    void ResetSlots()
+    void Reset()
     {
         mInvokeResponseCount  = 0;
         mStatusResponseCount  = 0;
@@ -74,12 +74,14 @@ public:
         mTotalImResponseCount = 0;
     }
 
-    void FillSnapshot(PychipImCaptureSnapshot & out) const
+    PychipImCaptureSnapshot Snapshot() const
     {
-        out.invokeResponseCount  = mInvokeResponseCount;
-        out.statusResponseCount  = mStatusResponseCount;
-        out.writeResponseCount   = mWriteResponseCount;
-        out.totalImResponseCount = mTotalImResponseCount;
+        return PychipImCaptureSnapshot{
+            .invokeResponseCount  = mInvokeResponseCount,
+            .statusResponseCount  = mStatusResponseCount,
+            .writeResponseCount   = mWriteResponseCount,
+            .totalImResponseCount = mTotalImResponseCount,
+        };
     }
 
 private:
@@ -99,18 +101,14 @@ PyChipError pychip_im_capture_set_observer(chip::Controller::DeviceCommissioner 
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    chip::MainLoopWork::ExecuteInMainLoop([devCtrl] {
-        if (devCtrl->ExchangeMgr()->GetTestOnlyReceivedMessageObserver() != &gImObserver)
-        {
-            devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gImObserver);
-        }
-    });
+    chip::MainLoopWork::ExecuteInMainLoop(
+        [devCtrl] { devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gImObserver); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_im_capture_reset(void)
 {
-    chip::MainLoopWork::ExecuteInMainLoop([] { gImObserver.ResetSlots(); });
+    chip::MainLoopWork::ExecuteInMainLoop([] { gImObserver.Reset(); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -118,8 +116,7 @@ PyChipError pychip_im_capture_get_snapshot(PychipImCaptureSnapshot * out)
 {
     VerifyOrReturnError(out != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    std::memset(out, 0, sizeof(*out));
-    chip::MainLoopWork::ExecuteInMainLoop([out] { gImObserver.FillSnapshot(*out); });
+    chip::MainLoopWork::ExecuteInMainLoop([out] { *out = gImObserver.Snapshot(); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

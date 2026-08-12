@@ -1758,7 +1758,7 @@ class ChipDeviceControllerBase:
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: int | None = None,
                                         interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                        suppressResponse: bool | None = None, remoteMaxPathsPerInvoke: int | None = None,
+                                        suppressResponse: bool = False, remoteMaxPathsPerInvoke: int | None = None,
                                         suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
         '''
         Please see SendBatchCommands for description.
@@ -1884,7 +1884,7 @@ class ChipDeviceControllerBase:
     async def SendCommand(self, nodeId: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
                           timedRequestTimeoutMs: int | None = None,
                           interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                          suppressResponse: bool | None = None,
+                          suppressResponse: bool = False,
                           payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
@@ -1929,7 +1929,7 @@ class ChipDeviceControllerBase:
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: int | None = None,
                                 interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
-                                suppressResponse: bool | None = None,
+                                suppressResponse: bool = False,
                                 payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
@@ -1997,7 +1997,7 @@ class ChipDeviceControllerBase:
                              timedRequestTimeoutMs: int | None = None,
                              interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
-                             suppressResponse: bool | None = None):
+                             suppressResponse: bool = False):
         '''
         Write a list of attributes on a target node.
 
@@ -2035,7 +2035,7 @@ class ChipDeviceControllerBase:
                               timedRequestTimeoutMs: int | None = None,
                               interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False,
-                              suppressResponse: bool | None = None):
+                              suppressResponse: bool = False):
 
         self.CheckIsActive()
 
