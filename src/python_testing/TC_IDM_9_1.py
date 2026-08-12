@@ -55,7 +55,7 @@ class TC_IDM_9_1(IDMBaseTest):
     @property
     def default_timeout(self) -> int:
         return 600
-        
+
     def steps_TC_IDM_9_1(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
