@@ -81,7 +81,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Energy Preference
     - Laundry Dryer Controls
     - Mode Select
     - Pump Configuration and Control
@@ -119,6 +118,7 @@ CodeDrivenClusters:
     - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
+    - Energy Preference
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label

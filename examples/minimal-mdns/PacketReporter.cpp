@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string>
 
-#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/RecordData.h>
 
 namespace MdnsExample {
 

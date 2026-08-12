@@ -130,6 +130,7 @@ public:
 private:
     CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadOAuthLoggedInAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 AccountLoginAttrAccess gAccountLoginAttrAccess;
@@ -145,6 +146,8 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     case app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
         return ReadOAuthLoggedInAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::FeatureMap::Id:
+        return ReadFeatureMapAttribute(endpoint, aEncoder, delegate);
     default:
         break;
     }
@@ -163,6 +166,13 @@ CHIP_ERROR AccountLoginAttrAccess::ReadOAuthLoggedInAttribute(EndpointId endpoin
                                                               Delegate * delegate)
 {
     return aEncoder.Encode(delegate->GetOAuthLoggedIn(endpoint));
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadFeatureMapAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                           Delegate * delegate)
+{
+    uint32_t featureMap = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureMap);
 }
 
 } // anonymous namespace
