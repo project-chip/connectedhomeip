@@ -84,7 +84,7 @@ class TC_SC_4_6(MatterBaseTest):
     # disable it so only the DUT's advertisement is on the network.
     enable_server_interactions = False
 
-    def steps_TC_SC_4_6(self):
+    def steps_TC_SC_4_6(self) -> list[TestStep]:
         return [
             TestStep(1, "DUT is instructed to start advertising its presence as a commissioner in the network"),
 
