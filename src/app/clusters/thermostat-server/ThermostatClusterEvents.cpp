@@ -48,8 +48,7 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
     }
 }
 
-void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode,
-                                   SystemModeEnum currentSystemMode)
+void ThermostatCluster::GenerateSystemModeChangeEvent(Optional<SystemModeEnum> previousSystemMode, SystemModeEnum currentSystemMode)
 {
     Events::SystemModeChange::Type event;
     EventNumber eventNumber;
@@ -79,7 +78,7 @@ void ThermostatCluster::GenerateLocalTemperatureChangeEvent(DataModel::Nullable<
 }
 
 void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyBitmap>> previousOccupancy,
-                                  BitMask<OccupancyBitmap> currentOccupancy)
+                                                     BitMask<OccupancyBitmap> currentOccupancy)
 {
     Events::OccupancyChange::Type event;
     EventNumber eventNumber;
@@ -95,7 +94,7 @@ void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyB
 }
 
 void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
-                                                 Optional<temperature> previousSetpoint, temperature currentSetpoint)
+                                                     Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
@@ -113,7 +112,7 @@ void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, B
 }
 
 void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelayStateBitmap>> previousRunningState,
-                                     BitMask<RelayStateBitmap> currentRunningState)
+                                                        BitMask<RelayStateBitmap> currentRunningState)
 {
     Events::RunningStateChange::Type event;
     EventNumber eventNumber;
@@ -129,7 +128,7 @@ void ThermostatCluster::GenerateRunningStateChangeEvent(Optional<BitMask<RelaySt
 }
 
 void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunningModeEnum> previousRunningMode,
-                                    ThermostatRunningModeEnum currentRunningMode)
+                                                       ThermostatRunningModeEnum currentRunningMode)
 {
     Events::RunningModeChange::Type event;
     EventNumber eventNumber;
@@ -145,7 +144,7 @@ void ThermostatCluster::GenerateRunningModeChangeEvent(Optional<ThermostatRunnin
 }
 
 void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousScheduleHandle,
-                                       DataModel::Nullable<ByteSpan> currentScheduleHandle)
+                                                          DataModel::Nullable<ByteSpan> currentScheduleHandle)
 {
     Events::ActiveScheduleChange::Type event;
     EventNumber eventNumber;
@@ -161,7 +160,7 @@ void ThermostatCluster::GenerateActiveScheduleChangeEvent(Optional<DataModel::Nu
 }
 
 void ThermostatCluster::GenerateActivePresetChangeEvent(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
-                                     DataModel::Nullable<ByteSpan> currentPresetHandle)
+                                                        DataModel::Nullable<ByteSpan> currentPresetHandle)
 {
     Events::ActivePresetChange::Type event;
     EventNumber eventNumber;
