@@ -101,8 +101,7 @@ PyChipError pychip_im_capture_set_observer(chip::Controller::DeviceCommissioner 
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    chip::MainLoopWork::ExecuteInMainLoop(
-        [devCtrl] { devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gImObserver); });
+    chip::MainLoopWork::ExecuteInMainLoop([devCtrl] { devCtrl->ExchangeMgr()->SetTestOnlyReceivedMessageObserver(&gImObserver); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
