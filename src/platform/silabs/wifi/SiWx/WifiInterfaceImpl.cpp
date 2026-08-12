@@ -39,11 +39,11 @@ extern "C" {
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
+#include "sl_utility.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
-#include "sl_utility.h"
 #if SL_MBEDTLS_USE_TINYCRYPT
 #include "sl_si91x_constants.h"
 #include "sl_si91x_trng.h"
@@ -99,8 +99,8 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
                                            .priority   = osPriorityAboveNormal7 };
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-constexpr uint32_t kTimeToFullBeaconReception     = 5000; // 5 seconds
-constexpr char kMatterMdnsIpv6McastAddress[]      = "ff02::fb";
+constexpr uint32_t kTimeToFullBeaconReception = 5000; // 5 seconds
+constexpr char kMatterMdnsIpv6McastAddress[]  = "ff02::fb";
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 wfx_wifi_scan_ext_t temp_reset;
@@ -829,29 +829,28 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
     VerifyOrReturnValue(mBroadcastFilterEnabled != enableBroadcastFilter, CHIP_NO_ERROR);
 
     sl_status_t status = sl_wifi_allowlist_mcast_remove_all();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_remove_all failed: 0x%" PRIx32,
-                                     static_cast<uint32_t>(status)));
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_remove_all failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
     if (!enableBroadcastFilter)
     {
         // Filter disabled: allowlist Matter mDNS (ff02::fb) so only that multicast is received.
         // Use sl_inet_pton6 so the address is in the endianness expected by the NWP.
-        sl_ip_address_t mdnsIpv6McastAddress                  = {};
-        uint8_t parsedAddress[SL_IPV6_ADDRESS_LENGTH]         = {};
-        const int parseStatus = sl_inet_pton6(kMatterMdnsIpv6McastAddress,
-                                              kMatterMdnsIpv6McastAddress + sizeof(kMatterMdnsIpv6McastAddress) - 1,
-                                              parsedAddress,
-                                              reinterpret_cast<unsigned int *>(mdnsIpv6McastAddress.ip.v6.value));
+        sl_ip_address_t mdnsIpv6McastAddress          = {};
+        uint8_t parsedAddress[SL_IPV6_ADDRESS_LENGTH] = {};
+        const int parseStatus =
+            sl_inet_pton6(kMatterMdnsIpv6McastAddress, kMatterMdnsIpv6McastAddress + sizeof(kMatterMdnsIpv6McastAddress) - 1,
+                          parsedAddress, reinterpret_cast<unsigned int *>(mdnsIpv6McastAddress.ip.v6.value));
         VerifyOrReturnError(parseStatus == 1, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Failed to parse Matter mDNS IPv6 multicast address"));
         mdnsIpv6McastAddress.type = SL_IPV6;
 
         sl_ip_address_handle_t allowlistHandle = UINT8_MAX;
         status                                 = sl_wifi_allowlist_mcast_add_ip(&mdnsIpv6McastAddress, &allowlistHandle);
-        VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                            ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_add_ip failed: 0x%" PRIx32,
-                                         static_cast<uint32_t>(status)));
+        VerifyOrReturnError(
+            status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+            ChipLogError(DeviceLayer, "sl_wifi_allowlist_mcast_add_ip failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
     }
 
     // Multicast filtering stays enabled in both modes; the allowlist controls what passes.
@@ -861,15 +860,15 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
     groupcastFilterConfig.filter_mode                       = 0; // default
 
     status = sl_wifi_set_groupcast_filter_config(&groupcastFilterConfig);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32,
-                                     static_cast<uint32_t>(status)));
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_set_groupcast_filter_config failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
     uint16_t beaconDropThreshold = enableBroadcastFilter ? kTimeToFullBeaconReception : 0;
     status                       = sl_wifi_set_beacon_drop_threshold(SL_WIFI_CLIENT_INTERFACE, beaconDropThreshold);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32,
-                                     static_cast<uint32_t>(status)));
+    VerifyOrReturnError(
+        status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "sl_wifi_set_beacon_drop_threshold failed: 0x%" PRIx32, static_cast<uint32_t>(status)));
 
     mBroadcastFilterEnabled = enableBroadcastFilter;
     return CHIP_NO_ERROR;
