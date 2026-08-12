@@ -327,6 +327,9 @@ void TestPASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
 
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(), 0u);
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(), 0u);
+
     if (mrpCommissionerConfig.HasValue())
     {
         EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout, mrpCommissionerConfig.Value().mIdleRetransTimeout);
