@@ -22,8 +22,8 @@
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcCleanModeDelegate.h>
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcOperationalStateDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaStorageDelegate.h>
 #include <string>
