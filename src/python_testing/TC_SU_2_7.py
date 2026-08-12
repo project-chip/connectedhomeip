@@ -188,16 +188,17 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnQuery."),
             TestStep(3, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does not respond back to DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."),
-            TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
+            TestStep(4, "If LocalConfigDisabled from BasicInformationCluster is supported writes the LocalConfigDisabled attribute as False on the DUT",),
+            TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnUserConsent."),
-            TestStep(5, "Force an error during the download of the OTA image to the DUT. Wait for the Idle timeout which should be no less than 5 minutes.", "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."
+            TestStep(6, "Force an error during the download of the OTA image to the DUT. Wait for the Idle timeout which should be no less than 5 minutes.", "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."
                      "Verify that the OTA-Subscriber receives a DownloadError event notification on BDX Idle timeout."
                      "Verify that the data in this event has the following."
                      "SoftwareVersion - Set to the value of the SoftwareVersion being downloaded."
                      "BytesDownloaded - Number of bytes that have been downloaded."
                      "ProgressPercent - Nearest Integer percent value reflecting how far within the transfer the failure occurred. IF the total length of the transfer is unknown, the value can be NULL."
                      "PlatformCode - Internal product-specific error code or NULL."),
-            TestStep(6, "After the OTA image is transferred, DUT sends ApplyUpdateRequest to the OTA-P. OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\".",
+            TestStep(7, "After the OTA image is transferred, DUT sends ApplyUpdateRequest to the OTA-P. OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"AwaitNextAction\".",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."),
         ]
 
@@ -356,12 +357,13 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         self.step(4)
         # If LocalConfigDisabled is set to True obtaining consent from the requestor Shall not be used.
-        # LocalConfigDisabled is optional, if found set it to False, if not is considered is False.
+        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test, if not is considered as False and continue.
         # OTA(SU) spec 3.4.1
         if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
             await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
             logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
 
+        self.step(5)
         # --userConsentNeeded is option -c
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -393,8 +395,8 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info("Provider response info after AnnounceOtaProvider %s", response_data)
         # Read the value of RequestorCanConsent status from the OTA-P
-        resquestor_can_consent = response_data['Payload']["RequestorCanConsent"]
-        if resquestor_can_consent:
+        requestor_can_consent = response_data['Payload']["RequestorCanConsent"]
+        if requestor_can_consent:
             # Now as the RequestorCanConsent the test can proceed.
             # Wait State Event to change to kDelayedOnUserConsent
             event_report = state_transition_event_handler.wait_for_event_report(
@@ -411,7 +413,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.terminate_provider()
         await self.request_device_reboot()
 
-        self.step(5)
+        self.step(6)
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -469,7 +471,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         error_download_event_handler.cancel()
         self.terminate_provider()
 
-        self.step(6)
+        self.step(7)
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
