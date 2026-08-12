@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <RvcSimulationLogic.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::Clusters::ServiceArea {
