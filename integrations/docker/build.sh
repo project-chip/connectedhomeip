@@ -155,14 +155,23 @@ awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
     sort -u | while read -r dep; do
     dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
     [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
-    # Only build the parent if it is not already present. Without this, a
-    # build-all run rebuilds the base image once per dependent image, and any
-    # --no-cache is forwarded into each of those rebuilds.
-    # $VERSION is what the parent will be tagged with too: every image reads the
+    # Prefer a parent that already exists over building one. Locally that avoids
+    # rebuilding the base image once per dependent image during a build-all run;
+    # in CI, where each image builds on its own runner, it avoids rebuilding the
+    # base for every image in the matrix.
+    #
+    # Building is the fallback rather than the default, since the tag is missing
+    # exactly when a change has not been published yet, which is the case on a
+    # pull request that bumps a version file.
+    #
+    # $VERSION is what the parent would be tagged with too: every image reads the
     # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
     if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
-        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present, not rebuilding"
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present"
+    elif docker pull "$GHCR_ORG/$ORG/$dep:$VERSION"; then
+        echo "$me: pulled parent $GHCR_ORG/$ORG/$dep:$VERSION"
     else
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION not published, building it"
         (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
     fi
 done
