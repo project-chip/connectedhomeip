@@ -17,6 +17,7 @@
 
 import unittest
 
+from mdns_discovery.mdns_discovery import MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_border_router_type, assert_is_commissionable_type, assert_is_commissioner_type,
                                           assert_is_operational_type, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
@@ -371,7 +372,7 @@ class TestAssertValidDKey(unittest.TestCase):
 
 
 class TestAssertValidDevtypeSubtype(unittest.TestCase):
-    FMT_MSG = "Must match format '_T<value>._sub.<commissionable-service-type>'"
+    FMT_MSG = "Must match format '_T<value>._sub.<service-type>'"
     DEC_MSG = "Value must be a decimal integer without leading zeroes"
     RNG_MSG = "Value must be within 0-4294967295 (32-bit range)"
 
@@ -388,6 +389,20 @@ class TestAssertValidDevtypeSubtype(unittest.TestCase):
         for value in self.VALID_VALUES:
             with self.subTest(value=value):
                 assert_valid_devtype_subtype(value)
+
+    def test_valid_values_commissioner_service_type(self):
+        # Valid against the commissioner service type when passed explicitly
+        for value in [v.replace("_matterc._udp", "_matterd._udp") for v in self.VALID_VALUES]:
+            with self.subTest(value=value):
+                assert_valid_devtype_subtype(value, service_type=MdnsServiceType.COMMISSIONER.value)
+
+    def test_invalid_due_to_service_type_mismatch(self):
+        # Invalid: commissionable service section while validating against the commissioner service type
+        msg = fail_msg(assert_valid_devtype_subtype, "_T35._sub._matterc._udp.local.",
+                       service_type=MdnsServiceType.COMMISSIONER.value)
+        self.assertIn(self.FMT_MSG, msg)
+        self.assertNotIn(self.DEC_MSG, msg)
+        self.assertNotIn(self.RNG_MSG, msg)
 
     def test_invalid_due_to_wrong_format(self):
         # Invalid: missing '_T' prefix
