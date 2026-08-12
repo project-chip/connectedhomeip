@@ -55,7 +55,7 @@ extern "C" {
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
 extern osMutexId_t si91x_prints_mutex;
-#else  // For EFR32
+#else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
 #include "em_usart.h"
