@@ -230,7 +230,8 @@ Status ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> local
 
 Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
 {
-    switch (runningMode) {
+    switch (runningMode)
+    {
     case ThermostatRunningModeEnum::kOff:
         break;
     case ThermostatRunningModeEnum::kCool:
@@ -268,7 +269,7 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
     {
         ChipLogDetail(Zcl, "Cooling relay state is not supported");
         return Status::ConstraintError;
-    }    
+    }
     if (!SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id))
     {
         return Status::Failure;
