@@ -56,8 +56,8 @@ class MockDelegate : public ModeSelectCluster::Delegate
 {
 public:
     static constexpr ModeOptionStructType kModes[] = {
-        { .label = "Normal"_span, .mode = 0, .semanticTags = Span<const SemanticTagStructType>() },
-        { .label = "Eco"_span, .mode = 1, .semanticTags = Span<const SemanticTagStructType>() },
+        { "Normal"_span, 0, Span<const SemanticTagStructType>() },
+        { "Eco"_span, 1, Span<const SemanticTagStructType>() },
     };
 
     Span<const ModeOptionStructType> GetSupportedModes() const override { return Span<const ModeOptionStructType>(kModes); }

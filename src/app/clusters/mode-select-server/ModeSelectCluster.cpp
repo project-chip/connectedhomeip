@@ -164,6 +164,7 @@ bool ModeSelectCluster::IsSupportedMode(uint8_t mode) const
 
 Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
 {
+    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
     VerifyOrReturnValue(IsSupportedMode(newMode), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mCurrentMode, newMode, CurrentMode::Id), Status::Success);
 
@@ -175,6 +176,7 @@ Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
 
 Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStartUpMode)
 {
+    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
     VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mStartUpMode, newStartUpMode, StartUpMode::Id), Status::Success);
 
@@ -187,6 +189,7 @@ Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStar
 
 Status ModeSelectCluster::UpdateOnMode(DataModel::Nullable<uint8_t> newOnMode)
 {
+    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
     VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mOnMode, newOnMode, OnMode::Id), Status::Success);
 
