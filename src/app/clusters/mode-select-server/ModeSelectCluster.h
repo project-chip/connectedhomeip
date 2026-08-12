@@ -105,6 +105,7 @@ private:
     uint8_t mCurrentMode = 0;
     DataModel::Nullable<uint8_t> mStartUpMode{};
     DataModel::Nullable<uint8_t> mOnMode{};
+    bool mStartupLogicApplied = false;
 };
 
 namespace ModeSelect {
