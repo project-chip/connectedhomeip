@@ -19,8 +19,6 @@ source_set("operational-state-delegate") {
   sources = [
     "impl/LoggingOperationalStateDelegate.cpp",
     "impl/LoggingOperationalStateDelegate.h",
-    "impl/LoggingRvcOperationalStateDelegate.cpp",
-    "impl/LoggingRvcOperationalStateDelegate.h",
   ]
 
   public_configs = [
@@ -28,9 +26,6 @@ source_set("operational-state-delegate") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/service-area:service-area-delegate",
-    "${chip_root}/examples/all-devices-app/all-devices-common/rvc-simulation:rvc-simulation",
-    "${chip_root}/src/app/clusters/mode-base-server",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

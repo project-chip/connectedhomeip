@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "LoggingRvcRunModeDelegate.h"
-#include <device/capabilities/service-area/impl/LoggingServiceAreaDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingRvcRunModeDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/impl/LoggingServiceAreaDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
