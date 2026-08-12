@@ -136,8 +136,8 @@ public:
         {
             if (json.isMember("MapId") && json["MapId"].isUInt() && json.isMember("MapName") && json["MapName"].isString())
             {
-                const uint32_t mapId  = json["MapId"].asUInt();
-                std::string mapName   = json["MapName"].asString();
+                const uint32_t mapId = json["MapId"].asUInt();
+                std::string mapName  = json["MapName"].asString();
                 if (!rvcDevice->GetServiceAreaCluster().AddSupportedMap(mapId, CharSpan(mapName.data(), mapName.size())))
                 {
                     ChipLogError(AppServer, "AddMap: failed to add map %u", static_cast<unsigned>(mapId));
