@@ -77,11 +77,11 @@ struct TestAlarmBaseCluster : public ::testing::Test
         }
 
         return {
-            .delegate                   = delegate,
-            .feature                    = feature,
-            .clusterRevision            = DishwasherAlarm::kRevision,
-            .supported                  = AlarmMap(0x3F),
-            .latch                      = AlarmMap(0),
+            .delegate                    = delegate,
+            .feature                     = feature,
+            .clusterRevision             = DishwasherAlarm::kRevision,
+            .supported                   = AlarmMap(0x3F),
+            .latch                       = AlarmMap(0),
             .supportsModifyEnabledAlarms = withModifyCommand,
         };
     }
