@@ -261,6 +261,7 @@ pw_python_package("matter-core-module") {
     "matter/discovery/types.py",
     "matter/exceptions/__init__.py",
     "matter/fault_injection/__init__.py",
+    "matter/im_capture/__init__.py",
     "matter/interaction_model/__init__.py",
     "matter/interaction_model/delegate.py",
     "matter/internal/__init__.py",
