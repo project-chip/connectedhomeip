@@ -115,16 +115,10 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     # These jobs run on namespace runners rather than GitHub-hosted ones. A
-    # GitHub-hosted runner guarantees only 14GB of free space and frequently
-    # provides more, so an image needing more than that does not fail cleanly,
-    # it fails depending on which runner it draws. Two images measured above
-    # that line: efr32 at 17.8GB and nxp at 14.6GB. A namespace shape gives a
-    # fixed disk size instead, which turns that class of flake into a property
-    # we can size for.
-    #
-    # Per-image peaks were measured with one build per runner, since each job
-    # here builds a single image; the figure that matters is that peak, not the
-    # total a sequential run would accumulate.
+    # GitHub-hosted runner guarantees only 14GB of free space and often supplies
+    # more, so an image needing more than the guarantee does not fail cleanly, it
+    # fails according to the runner it draws. efr32 peaks at 17.8GB and nxp at
+    # 14.6GB, so keep these on a shape with a fixed disk size.
     #
     # See https://github.com/project-chip/connectedhomeip/issues/30750
     build_images_stage_1:
@@ -179,15 +173,9 @@ jobs:
                     - "-asr"
                     - "-bouffalolab"
                     - "-doxygen"
-                    # The two largest: 17.8GB and 14.6GB peak. Both exceed what a
-                    # GitHub-hosted runner guarantees, which is why these jobs
-                    # run on a namespace shape.
                     - "-efr32"
                     - "-esp32"
                     - "-infineon"
-                    # imx was disabled for "no space left on device". Built alone
-                    # it peaks at 8.9GB, so the original failure came from sharing
-                    # a runner rather than from the image.
                     - "-imx"
                     - "-java"
                     - "-nxp"
@@ -261,12 +249,24 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
-    # NOTE: vscode stays disabled. It is an aggregator, with 28 COPY --from=
-    #       lines pulling toolchains out of 17 other images, and those bytes are
-    #       duplicated rather than shared. On a dedicated runner with 88GB free
-    #       and nothing else on it, the build did not fail: it killed the runner
-    #       outright after ~12 minutes, leaving no logs to diagnose. Nothing
-    #       depends on this image, so it does not block anything else.
+    # NOTE: vscode is not built here, because it does not fit on a runner. It is
+    #       an aggregator: 28 COPY --from= lines pull toolchains out of 17 other
+    #       images, so its layers are copies rather than shared, and the result
+    #       is around 56GB. Given a dedicated runner with 88GB free it did not
+    #       fail, it terminated the runner after roughly 12 minutes and produced
+    #       no logs.
+    #
+    #       The image is in use: integrations/cloudbuild/ runs its steps in it,
+    #       and maintainers use it locally in place of one image per platform. So
+    #       it has to be refreshed by hand, on a machine with room for it. The
+    #       images it copies from are published, and docker pulls them as needed:
+    #
+    #           cd integrations/docker/images/vscode/chip-build-vscode
+    #           ./build.sh --latest --push
+    #
+    #       TODO: give this its own job on a shape large enough to hold it. The
+    #       work is almost all file copying rather than compilation, so a large
+    #       machine should be occupied only briefly.
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
