@@ -187,6 +187,40 @@ protected:
     DataModel::ActionReturnStatus SaveSetpoints(Setpoints & setpoints, SetpointAttributes changedAttributes);
 
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp);
+
+
+    void GenerateSystemModeChangeEvent(
+                                   chip::Optional<chip::app::Clusters::Thermostat::SystemModeEnum> previousSystemMode,
+                                   chip::app::Clusters::Thermostat::SystemModeEnum currentSystemMode);
+
+    void GenerateLocalTemperatureChangeEvent(
+                                            chip::app::DataModel::Nullable<int16_t> currentLocalTemperature);
+
+    void GenerateOccupancyChangeEvent(
+                                    chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap>> previousOccupancy,
+                                    chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> currentOccupancy);
+
+    void GenerateSetpointChangeEvent(chip::app::Clusters::Thermostat::SystemModeEnum systemMode,
+                                    chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> occupancy,
+                                    chip::Optional<temperature> previousSetpoint, temperature currentSetpoint);
+
+    void GenerateRunningStateChangeEvent(
+        chip::Optional<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>> previousRunningState,
+        chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> currentRunningState);
+
+    void GenerateRunningModeChangeEvent(
+                                        chip::Optional<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum> previousRunningMode,
+                                        chip::app::Clusters::Thermostat::ThermostatRunningModeEnum currentRunningMode);
+
+    void GenerateActiveScheduleChangeEvent(
+                                        chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousScheduleHandle,
+                                        chip::app::DataModel::Nullable<chip::ByteSpan> currentScheduleHandle);
+
+    void GenerateActivePresetChangeEvent(
+                                        chip::Optional<chip::app::DataModel::Nullable<chip::ByteSpan>> previousPresetHandle,
+                                        chip::app::DataModel::Nullable<chip::ByteSpan> currentPresetHandle);
+
+    friend class ThermostatPresets;
 };
 
 } // namespace Thermostat

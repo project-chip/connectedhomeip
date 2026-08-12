@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <lib/core/Optional.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip::app::Clusters::Globals::Structs;
@@ -212,8 +213,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(co
     case Presets::Id: {
         auto & delegate          = mDelegate;
         auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mCluster != nullptr &&
-            mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+        if (mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
         {
             return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
                 for (uint8_t i = 0; true; i++)
@@ -280,11 +280,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
     }
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
-    VerifyOrReturnError(mCluster != nullptr &&
-                            mCluster->GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
+    VerifyOrReturnError(mCluster.GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
-    if (!mCluster->GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+    if (!mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
     {
         ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
         return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -357,9 +356,9 @@ std::optional<Status> ThermostatPresets::OnAtomicWriteCommit(AttributeId attribu
     if (attributeId == Presets::Id && mDelegate != nullptr)
     {
         ClusterStatusCode status(mDelegate->CommitPendingPresets());
-        if (status.IsSuccess() && mCluster != nullptr)
+        if (status.IsSuccess())
         {
-            mCluster->NotifyAttributeChanged(attributeId);
+            mCluster.NotifyAttributeChanged(attributeId);
         }
         return status.GetStatus();
     }
@@ -428,7 +427,26 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return Status::InvalidCommand;
     }
 
-    CHIP_ERROR err = mDelegate->SetActivePresetHandle(presetHandle);
+    DataModel::Nullable<MutableByteSpan> activePresetHandle;
+    Optional<DataModel::Nullable<ByteSpan>> oldPresetHandle;
+    CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        if (activePresetHandle.IsNull())
+        {
+            oldPresetHandle.SetValue(DataModel::NullNullable);
+        }
+        else
+        {
+            oldPresetHandle.SetValue(ByteSpan(activePresetHandle.Value()));
+        }
+    }
+
+    err = mDelegate->SetActivePresetHandle(presetHandle);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -436,10 +454,8 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return StatusIB(err).mStatus;
     }
 
-    if (mCluster != nullptr)
-    {
-        mCluster->NotifyAttributeChanged(ActivePresetHandle::Id);
-    }
+    mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
+    mCluster.GenerateActivePresetChangeEvent(oldPresetHandle, presetHandle);
 
     return Status::Success;
 }
@@ -610,14 +626,9 @@ Status ThermostatPresets::PrecommitPresets()
         }
     }
 
-    auto heatLimits = mCluster != nullptr
-        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kHeat)
-        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinHeatSetpointLimit),
-                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxHeatSetpointLimit));
-    auto coolLimits = mCluster != nullptr
-        ? mCluster->GetSetpoints().GetLimits(SystemModeEnum::kCool)
-        : AbsoluteSetpointLimits(AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMinCoolSetpointLimit),
-                                 AbsoluteSetpoint(kInvalidAttributeId, kDefaultAbsMaxCoolSetpointLimit));
+    auto setpoints  = mCluster.GetSetpoints();
+    auto heatLimits = setpoints.GetLimits(SystemModeEnum::kHeat);
+    auto coolLimits = setpoints.GetLimits(SystemModeEnum::kCool);
 
     for (uint8_t i = 0; true; i++)
     {
