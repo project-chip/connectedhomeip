@@ -51,7 +51,12 @@ inline constexpr uint16_t kQClassResponseFlushBit = 0x8000;
 
 enum class QClass : uint16_t
 {
-    IN  = 1,
+    IN = 1,
+
+    // Used by DNS Update to delete a specific resource record from an RRset.
+    NONE = 254,
+
+    // In a query, matches any class. In DNS Update, deletes all RRsets at a name;
     ANY = 255,
 
     // Unicast version for the class

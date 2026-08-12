@@ -84,6 +84,36 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Build-only, on a native arm64 runner. This verifies the base image still
+    # builds for linux/arm64; it deliberately does not tag or push, because how a
+    # multi-arch image should be published is a separate decision.
+    build_images_base_arm64:
+        name: Build Docker CHIP Build images - base (arm64)
+        runs-on: ubuntu-24.04-arm
+        if: github.actor != 'restyled-io[bot]'
+        # Build-only, so no packages: write here, unlike the amd64 job above.
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - ""
+                    - "-minimal"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Build images using project bash script
+              run: |
+                  cd integrations/docker/images/base/chip-build${{ matrix.img }}
+                  ./build.sh
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     # These jobs run on namespace runners rather than GitHub-hosted ones. A
     # GitHub-hosted runner guarantees only 14GB of free space and frequently
     # provides more, so an image needing more than that does not fail cleanly,

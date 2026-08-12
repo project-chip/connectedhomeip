@@ -19,7 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
 
 namespace {
 
@@ -267,5 +267,61 @@ TEST(TestResourceRecord, CacheFlushBit)
     record.SetCacheFlush(false);
     EXPECT_EQ(record.GetClass(), QClass::IN);
     EXPECT_EQ(record.GetCacheFlush(), false);
+}
+
+TEST(TestResourceRecord, SetClass)
+{
+    FakeResourceRecord record("somedata");
+    EXPECT_EQ(record.GetClass(), QClass::IN);
+
+    record.SetClass(QClass::NONE);
+    EXPECT_EQ(record.GetClass(), QClass::NONE);
+    EXPECT_EQ(record.GetCacheFlush(), false);
+
+    record.SetClass(QClass::ANY);
+    EXPECT_EQ(record.GetClass(), QClass::ANY);
+    EXPECT_EQ(record.GetCacheFlush(), false);
+}
+
+/// Models an RFC 2136 delete form: no record data, so RDLENGTH must be 0.
+class EmptyResourceRecord : public ResourceRecord
+{
+public:
+    EmptyResourceRecord() : ResourceRecord(QType::ANY, kNames) {}
+
+protected:
+    bool WriteData(RecordWriter & out) const override { return out.Fit(); }
+};
+
+TEST(TestResourceRecord, DeleteFormWritesEmptyRecordData)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[128];
+
+    HeaderRef header(headerBuffer);
+    header.Clear();
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    // "Delete all RRsets at a name": class ANY, TTL 0, no record data.
+    EmptyResourceRecord record;
+    record.SetClass(QClass::ANY).SetTtl(0);
+
+    const uint8_t expectedOutput[] = {
+        //
+        3, 'f', 'o', 'o', // QNAME part: foo
+        3, 'b', 'a', 'r', // QNAME part: bar
+        0,                // QNAME ends
+        0, 255,           // QType ANY
+        0, 255,           // QClass ANY
+        0, 0,   0,   0,   // TTL 0
+        0, 0,             // RDLENGTH 0, no data follows
+    };
+
+    EXPECT_TRUE(record.Append(header, ResourceType::kAuthority, writer));
+    EXPECT_EQ(header.GetAuthorityCount(), 1);
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 } // namespace

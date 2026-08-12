@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,27 +17,13 @@
 
 #pragma once
 
-#include <inet/IPAddress.h>
+#include "EnergyPreferenceCluster.h"
 
-#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+namespace chip::app::Clusters::EnergyPreference {
 
-namespace mdns {
-namespace Minimal {
+void SetDelegate(Delegate * delegate);
+Delegate * GetDelegate();
 
-class IPResourceRecord : public ResourceRecord
-{
-public:
-    IPResourceRecord(const FullQName & qName, const chip::Inet::IPAddress & ip) :
-        ResourceRecord(ip.IsIPv6() ? QType::AAAA : QType::A, qName), mIPAddress(ip)
-    {}
+EnergyPreferenceCluster * FindClusterOnEndpoint(EndpointId endpoint);
 
-protected:
-    bool WriteData(RecordWriter & out) const override;
-
-private:
-    const chip::Inet::IPAddress mIPAddress;
-};
-
-} // namespace Minimal
-
-} // namespace mdns
+} // namespace chip::app::Clusters::EnergyPreference

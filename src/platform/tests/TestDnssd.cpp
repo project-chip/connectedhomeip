@@ -26,14 +26,14 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CHIPMem.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
