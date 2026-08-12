@@ -98,7 +98,7 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 template <typename X>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, BitFlags<X> x)
 {
-    return writer.Put(tag, x);
+    return writer.Put(tag, x.Raw());
 }
 
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, ByteSpan x)

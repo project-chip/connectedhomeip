@@ -66,7 +66,10 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, BitFlags<X> & x)
 {
-    return reader.Get(x);
+    typename BitFlags<X>::IntegerType val;
+    ReturnErrorOnFailure(reader.Get(val));
+    x.SetRaw(val);
+    return CHIP_NO_ERROR;
 }
 
 //
