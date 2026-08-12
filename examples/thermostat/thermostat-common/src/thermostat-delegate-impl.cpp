@@ -19,6 +19,7 @@
 #include <thermostat-delegate-impl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/Span.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -116,7 +117,7 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
 
 CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
 {
-    if (mActivePresetHandleDataSize != 0)
+    if (!mActivePresetHandleIsNull)
     {
         ReturnErrorOnFailure(
             CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value()));
@@ -131,7 +132,15 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
-    if (!newActivePresetHandle.IsNull())
+    bool newIsNull = newActivePresetHandle.IsNull();
+    ByteSpan oldHandle(mActivePresetHandleData, mActivePresetHandleDataSize);
+
+    if (mActivePresetHandleIsNull == newIsNull && (newIsNull || oldHandle.data_equal(newActivePresetHandle.Value())))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (!newIsNull)
     {
         size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
         if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
@@ -152,6 +161,10 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         mActivePresetHandleDataSize = 0;
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }
+
+    mActivePresetHandleIsNull = newIsNull;
+    MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
+
     return CHIP_NO_ERROR;
 }
 
