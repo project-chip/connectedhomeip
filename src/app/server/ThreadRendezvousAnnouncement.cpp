@@ -24,8 +24,8 @@
 #include <lib/support/CodeUtils.h>
 
 #include <lib/dnssd/minimal_mdns/ResponseBuilder.h>
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
-#include <lib/dnssd/minimal_mdns/records/Txt.h>
+#include <lib/dnssd/wire/records/Srv.h>
+#include <lib/dnssd/wire/records/Txt.h>
 
 namespace chip {
 namespace app {

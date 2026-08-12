@@ -3347,6 +3347,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::Humidistat::Id: {
         switch (id)
         {
+        case chip::app::Clusters::Humidistat::Attributes::SupportedModes::Id:
+            return "SupportedModes";
         case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
             return "Mode";
         case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
@@ -3369,6 +3371,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Sleep";
         case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
             return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::CondPumpEnabled::Id:
+            return "CondPumpEnabled";
+        case chip::app::Clusters::Humidistat::Attributes::CondRunCount::Id:
+            return "CondRunCount";
         case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
@@ -7949,6 +7955,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Air Quality Sensor";
     case 0x0000002D:
         return "Air Purifier";
+    case 0x00000040:
+        return "Irrigation System";
     case 0x00000041:
         return "Water Freeze Detector";
     case 0x00000042:
@@ -8087,10 +8095,16 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Electrical Energy Tariff";
     case 0x00000514:
         return "Electrical Meter";
+    case 0x00000515:
+        return "Arc Fault Circuit Interrupter";
     case 0x00000516:
         return "Electrical Circuit Breaker";
     case 0x00000517:
         return "Electrical Distribution Enclosure";
+    case 0x00000518:
+        return "Electrical Surge Protector";
+    case 0x00000519:
+        return "Residual Current Circuit Breaker";
     case 0x00000840:
         return "Control Bridge";
     case 0x00000850:

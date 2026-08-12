@@ -19,8 +19,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include <lib/dnssd/minimal_mdns/Query.h>
-#include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
+#include <lib/dnssd/wire/DnsHeader.h>
+#include <lib/dnssd/wire/Query.h>
 
 namespace mdns {
 namespace Minimal {
