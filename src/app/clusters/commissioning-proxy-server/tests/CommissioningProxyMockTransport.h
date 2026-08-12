@@ -68,11 +68,17 @@ public:
     Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
                                                     NodeId nodeId) override
     {
+        if (mBgScanStartStatus == Protocols::InteractionModel::Status::Success)
+        {
+            mBgScanRunning = true;
+        }
         return mBgScanStartStatus;
     }
     Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
                                                    FabricIndex fabricIndex, NodeId nodeId) override
     {
+        mBgScanStopCount++;
+        mBgScanRunning = false;
         return mBgScanStopStatus;
     }
     void OnAllSessionsClosed() override { mOnAllSessionsClosedCount++; }
@@ -88,6 +94,9 @@ public:
     void SetDisconnectStatus(Protocols::InteractionModel::Status s) { mDisconnectStatus = s; }
     void SetScanStatus(Protocols::InteractionModel::Status s) { mScanStatus = s; }
     void SetBgScanStartStatus(Protocols::InteractionModel::Status s) { mBgScanStartStatus = s; }
+    /// True once BgScanStart() succeeded and no BgScanStop() has followed.
+    bool BgScanRunning() const { return mBgScanRunning; }
+    unsigned BgScanStopCount() const { return mBgScanStopCount; }
     void SetBgScanStopStatus(Protocols::InteractionModel::Status s) { mBgScanStopStatus = s; }
     void SetSendMessageError(CHIP_ERROR e) { mSendMessageError = e; }
     // When true (default), a successful SendMessage synchronously delivers a null
@@ -114,6 +123,8 @@ private:
     Protocols::InteractionModel::Status mConnectStatus     = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mDisconnectStatus  = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mScanStatus        = Protocols::InteractionModel::Status::Success;
+    bool mBgScanRunning                                    = false;
+    unsigned mBgScanStopCount                              = 0;
     Protocols::InteractionModel::Status mBgScanStartStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mBgScanStopStatus  = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mSendMessageError                           = CHIP_NO_ERROR;

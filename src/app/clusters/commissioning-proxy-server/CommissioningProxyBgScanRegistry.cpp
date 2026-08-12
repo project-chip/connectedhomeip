@@ -67,21 +67,9 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
     const FabricKey key{ fabricIndex, nodeId };
     const bool wasEmpty = mFabrics.empty();
 
-    auto it = mFabrics.find(key);
-    if (it != mFabrics.end() && it->second.lifetimeCtx != nullptr)
-    {
-        // Refreshing an existing fabric: drop its old lifetime timer before re-arming.
-        CancelLifetime(it->second);
-    }
-
-    Record & rec    = mFabrics[key];
-    rec.transport   = transport;
-    rec.wiFiBands   = wiFiBands;
-    rec.lifetimeCtx = nullptr;
-
     // Start (or resume) the hardware scan on the first fabric, or whenever we are
-    // paused/deferred. BUSY means the radio is held elsewhere; keep the fabric
-    // registered and stay paused so ResumeIfNeeded() restarts it once it frees up.
+    // paused/deferred. BUSY means the radio is held elsewhere; register the fabric
+    // anyway and stay paused so ResumeIfNeeded() restarts it once it frees up.
     if (wasEmpty || mPaused)
     {
         CHIP_ERROR err = mHardware.StartHardwareScan();
@@ -92,18 +80,7 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         }
         else if (err != CHIP_NO_ERROR)
         {
-            // Hard failure: nothing was started, so drop the fabric we optimistically
-            // added and reject. If the registry was already empty there is no state to
-            // unwind — do not stop a radio we never started or clear a cache we never
-            // filled. If instead this dropped the last of a paused set of fabrics, run
-            // the usual empty cleanup so we are not left empty-but-paused holding a
-            // stale cache.
             ChipLogError(AppServer, "BgScan: StartHardwareScan failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mFabrics.erase(key);
-            if (!wasEmpty && mFabrics.empty())
-            {
-                OnBecameEmpty();
-            }
             return Status::Failure;
         }
         else
@@ -112,25 +89,36 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         }
     }
 
+    LifetimeCtx * ctx = nullptr;
     if (timeoutSecs > 0)
     {
-        auto * ctx          = new LifetimeCtx(this, key);
+        ctx                 = new LifetimeCtx(this, key);
         CHIP_ERROR timerErr = mTimerDelegate.StartTimer(ctx, System::Clock::Seconds16(timeoutSecs));
         if (timerErr != CHIP_NO_ERROR)
         {
+            // Without a lifetime timer the hardware scan would run unbounded, so reject.
+            // If this call is what started the radio and no fabric is registered to keep
+            // it running, undo that too.
             ChipLogError(AppServer, "BgScan: lifetime StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
             delete ctx;
-            // Without a lifetime timer the hardware scan would run indefinitely for this
-            // fabric; drop it rather than leave an unbounded scan behind.
-            mFabrics.erase(key);
             if (mFabrics.empty())
             {
                 OnBecameEmpty();
             }
             return Status::Failure;
         }
-        mFabrics[key].lifetimeCtx = ctx;
     }
+
+    // Commit: Replace any previous registration for this fabric.
+    auto it = mFabrics.find(key);
+    if (it != mFabrics.end())
+    {
+        CancelLifetime(it->second);
+    }
+    Record & rec    = mFabrics[key];
+    rec.transport   = transport;
+    rec.wiFiBands   = wiFiBands;
+    rec.lifetimeCtx = ctx;
 
     return Status::Success;
 }
@@ -163,7 +151,11 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
 
     const uint8_t remainTransport = static_cast<uint8_t>(fabTransportBits & ~stopTransportBits);
     const uint16_t remainBands    = static_cast<uint16_t>(fabBandBits & ~stopBandBits);
-    const bool fabricNowEmpty     = (remainTransport == 0 || remainBands == 0);
+    // A record holds exactly one transport bit (see Start), so a stop that names this
+    // transport always drives remainTransport to 0 and the first term decides. The
+    // remainBands term therefore only ever fires on a band-only stop (transport == 0)
+    // that clears the last registered band, which does leave nothing to scan for.
+    const bool fabricNowEmpty = (remainTransport == 0 || remainBands == 0);
 
     if (fabricNowEmpty)
     {

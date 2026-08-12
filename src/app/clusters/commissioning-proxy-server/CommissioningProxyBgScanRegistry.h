@@ -98,7 +98,12 @@ public:
      * ProxyBackGroundScanStartRequest for one fabric. @p timeoutSecs == 0 means no
      * lifetime timer (scan until an explicit Stop). Re-registering an existing
      * (fabricIndex, nodeId) refreshes its transport/bands and restarts its lifetime
-     * timer.
+     * timer. A rejected Start changes nothing.
+     *
+     * @p transport SHALL carry exactly the owning transport's own bit. Each registry
+     * belongs to one transport and the cluster fans a multi-transport request out to
+     * each driver separately (drivers are never told about the others), so a record
+     * always holds a single transport bit. Stop()'s arithmetic relies on that.
      */
     Protocols::InteractionModel::Status Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                               BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs);

@@ -2268,6 +2268,37 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeout)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A ProxyBackGroundScanStartRequest naming several transports must not report failure
+// while leaving one of them scanning: the commissioner would believe nothing started.
+// Either every requested transport starts, or the command rolls back and fails.
+TEST_F(TestCommissioningProxyCluster, TestProxyBackgroundScanStart_PartialFailureRollsBack)
+{
+    TestServerClusterContext context;
+    BitMask<Feature> features(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(features), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
+    // BLE accepts the background scan; Wi-Fi PAF rejects it.
+    mockPaf.SetBgScanStartStatus(Protocols::InteractionModel::Status::Failure);
+
+    Commands::ProxyBackGroundScanStartRequest::Type cmd;
+    cmd.transport = chip::BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kBle, CapabilitiesBitmap::kWiFiPAF);
+    cmd.timeout   = 30;
+
+    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+
+    // BLE's scan must have been stopped again, so "failed" means nothing is running.
+    EXPECT_FALSE(mockBle.BgScanRunning());
+    EXPECT_EQ(mockBle.BgScanStopCount(), 1u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // A sub-scan whose completion callback never fires must not block the aggregator
 // forever: the watchdog ends the aggregation so later scans are still accepted.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WatchdogEndsStalledAggregation)

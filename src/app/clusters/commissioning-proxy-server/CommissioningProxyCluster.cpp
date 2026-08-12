@@ -454,8 +454,11 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
     const NodeId nodeId           = request.subjectDescriptor.subject;
 
     // A background scan MAY select multiple transports: start each requested,
-    // registered transport with its own transport-local per-fabric record.
+    // registered transport with its own transport-local per-fabric record. Either all
+    // of them start, or the ones that did are stopped again — a command that reports
+    // failure must not leave a scan running that the commissioner does not know about.
     auto result = Status::Success;
+    chip::BitMask<CapabilitiesBitmap> started;
     for (size_t i = 0; i < mTransportCount; i++)
     {
         CommissioningProxyTransport * transport = mTransports[i];
@@ -463,10 +466,25 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
         {
             continue;
         }
-        auto s = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
-        if (s != Status::Success && result == Status::Success)
+        result = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
+        if (result != Status::Success)
         {
-            result = s;
+            break;
+        }
+        started.Set(transport->GetTransportType());
+    }
+
+    if (result != Status::Success && started.Raw() != 0)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: background scan start failed; rolling back started transport(s)");
+        for (size_t i = 0; i < mTransportCount; i++)
+        {
+            CommissioningProxyTransport * transport = mTransports[i];
+            if (started.Has(transport->GetTransportType()))
+            {
+                transport->BgScanStop(chip::BitMask<CapabilitiesBitmap>(transport->GetTransportType()), wiFiBands, fabricIndex,
+                                      nodeId);
+            }
         }
     }
 

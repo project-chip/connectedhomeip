@@ -121,10 +121,9 @@ TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRejectsAndDropsFabric
     EXPECT_EQ(hw.clearCount, 0);
 }
 
-// A hard failure while refreshing the only registered fabric drops that record. The
-// registry must not be left empty-but-paused with the previous scan's results still
-// cached.
-TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRefreshingLastFabricClearsPausedState)
+// A failed Start SHALL be a no-op: a hard hardware failure while refreshing an
+// existing fabric must not destroy the registration that was already working.
+TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureOnRefreshKeepsExistingRegistration)
 {
     MockHardwareControl hw;
     CommissioningProxyMockTimer timers;
@@ -137,15 +136,21 @@ TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRefreshingLastFabricC
     EXPECT_TRUE(reg.IsPaused());
     EXPECT_EQ(hw.stopCount, 1);
 
-    // Refreshing that same fabric now fails hard, dropping the last record.
+    // Refreshing that same fabric now fails hard.
     hw.startResult = CHIP_ERROR_INTERNAL;
-    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Failure);
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, kNoTimeout), Status::Failure);
 
-    EXPECT_TRUE(reg.IsEmpty());
-    EXPECT_FALSE(reg.IsPaused());
-    EXPECT_EQ(hw.clearCount, 1);
-    // Already paused, so the radio is not stopped a second time.
+    // The previous registration survives, still paused and awaiting a resume; nothing
+    // extra was stopped and no cached results were thrown away.
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_TRUE(reg.IsPaused());
     EXPECT_EQ(hw.stopCount, 1);
+    EXPECT_EQ(hw.clearCount, 0);
+
+    // The old bands are intact: a stop for 2G4 still overlaps.
+    hw.startResult = CHIP_NO_ERROR;
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kNoTransport, k2g4), Status::Success);
+    EXPECT_TRUE(reg.IsEmpty());
 }
 
 TEST(TestCommissioningProxyBgScanRegistry, StopLastFabricStopsHardwareAndClears)
