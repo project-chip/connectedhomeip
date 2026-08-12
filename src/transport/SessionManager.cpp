@@ -190,7 +190,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     if (sessionHandle->AllowsLargePayload())
     {
         uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        size_t limit        = kMaxLargeAppMessageLen;
+        size_t limit        = kLegacyDefaultMaxLargeAppMessageLen;
         if (maxPayload > 0)
         {
             limit = std::min(static_cast<size_t>(maxPayload), kMaxLargeAppMessageLen);

@@ -83,6 +83,23 @@ static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
 
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
+/**
+ * Legacy default maximum large application message length.
+ *
+ * This is the default limit assumed for peers that support large messages (TCP)
+ * but do not advertise their MaxTCPPayloadSize during the handshake (legacy nodes).
+ *
+ * To ensure compatibility with older implementations that used the default 64KB buffer size,
+ * this is set to 63808 bytes, which is derived from:
+ *   64000 (Default large buffer size: CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES)
+ * -   112 (Max expected header reserve on LwIP: 14 link + 40 IP + 20 TCP + 38 system reserve)
+ * -    60 (TCP/IP headers: kMaxTCPAndIPHeaderSizeBytes)
+ * -    16 (Security Tag/MIC: kMaxTagLen)
+ *   -----
+ *   63812 -> rounded down to a multiple of 16 = 63808 bytes.
+ */
+static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 63808;
+
 typedef int PacketHeaderFlags;
 
 namespace Header {
