@@ -68,10 +68,12 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_3(self):
         """Return the PICS definitions associated with this test."""
+        # Note: MCORE.SC.S.TCP is intentionally NOT listed here. TCP support is
+        # determined dynamically at runtime (step 1a) rather than gating test
+        # selection on a manually-declared PICS value - see step 1a for details.
         return [
             "SEPR.S",
             "SEPR.F00",
-            "MCORE.SC.S.TCP",
         ]
 
     def steps_TC_SEPR_2_3(self) -> list[TestStep]:
@@ -79,8 +81,9 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
-            TestStep("1a", "Attempt to create a CASE session connection via TCP",
-                     "If the DUT declares MCORE.SC.S.TCP support, the TCP connection must be established OK."),
+            TestStep("1a", "Create CASE session connection via TCP",
+                     "TCP connection established OK, set `tcp_support` to true, otherwise set `tcp_support` to false. "
+                     "If `MCORE.SC.S.TCP` is declared, connection failure is a test failure."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
