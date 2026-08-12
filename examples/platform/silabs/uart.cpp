@@ -54,6 +54,7 @@ extern "C" {
 #endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
+extern osMutexId_t si91x_prints_mutex;
 #else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
@@ -671,10 +672,12 @@ void uartSendBytes(uint8_t * data, uint16_t length)
     //
     // Board_UARTPutSTR(data) does the exact same thing and is not compatible with
     // the Silabs Matter console.
+    osMutexAcquire(si91x_prints_mutex, osWaitForever);
     for (uint8_t i = 0; i < length; i++)
     {
         Board_UARTPutChar(data[i]);
     }
+    osMutexRelease(si91x_prints_mutex);
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
