@@ -19,6 +19,7 @@
 #include "CommissioningProxyMockTransport.h"
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockTransport.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h> // for kMaxDiscriminatorValue
 #include <pw_unit_test/framework.h>
 
@@ -44,8 +45,20 @@ namespace {
 constexpr EndpointId kTestEndpointId = 1;
 struct TestCommissioningProxyCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    // The stack is initialised so the cluster's response/watchdog timers can actually
+    // be armed: the code under test now rejects a command whose timer fails to start,
+    // rather than proceeding with no bounded resolution path. The event loop is never
+    // run, so an armed timer never fires and tests stay deterministic.
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
 
     void SetUp() override {}
 

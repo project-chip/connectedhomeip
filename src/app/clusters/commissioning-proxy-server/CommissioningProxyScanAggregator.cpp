@@ -21,6 +21,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <limits>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -32,8 +34,8 @@ namespace {
 constexpr uint16_t kScanWatchdogMarginSecs = 5;
 } // namespace
 
-void CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
-                                             uint8_t scanMaxTime)
+CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
+                                                   uint8_t scanMaxTime)
 {
     mHandle      = app::CommandHandler::Handle(commandObj);
     mPath        = path;
@@ -49,8 +51,15 @@ void CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, c
         System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs), WatchdogCallback, this);
     if (err != CHIP_NO_ERROR)
     {
+        // Without the watchdog a sub-scan that never reports would leave mInProgress
+        // set forever, making every future ProxyScanRequest return Busy. Roll the
+        // aggregation back so the caller can reject this command instead.
         ChipLogError(Zcl, "CommissioningProxy: failed to arm scan watchdog: %" CHIP_ERROR_FORMAT, err.Format());
+        Abort();
+        return err;
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void CommissioningProxyScanAggregator::AddPendingContributor()
@@ -102,6 +111,14 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
 
     for (const auto & e : results)
     {
+        // ProxyScanResponse carries the count as a uint8, so the list cannot exceed
+        // 255 entries without NumberOfResults disagreeing with the encoded list.
+        if (mResults.size() >= std::numeric_limits<uint8_t>::max())
+        {
+            ChipLogError(Zcl, "CommissioningProxy: scan result list full; dropping remaining results");
+            break;
+        }
+
         // Copy scalar fields, then rebind the address / extendedData spans to point
         // into the aggregator's stable storage so they survive until AddResponse.
         // std::deque keeps element addresses stable across growth.

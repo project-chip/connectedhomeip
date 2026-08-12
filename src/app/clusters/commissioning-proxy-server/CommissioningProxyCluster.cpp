@@ -359,7 +359,11 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     }
 
     const uint8_t scanMaxTime = mScanMaxTime;
-    mScanAggregator.Begin(handler, request.path, scanMaxTime);
+    if (CHIP_ERROR err = mScanAggregator.Begin(handler, request.path, scanMaxTime); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: could not begin scan aggregation: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
 
     // First non-success from a sub-scan that could not start; only returned if no
     // sub-scan starts at all.

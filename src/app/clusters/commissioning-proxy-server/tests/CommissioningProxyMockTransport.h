@@ -53,8 +53,14 @@ public:
         {
             return Protocols::InteractionModel::Status::InvalidInState;
         }
-        return (fabricIndex == mPendingConnectFabric) ? Protocols::InteractionModel::Status::Success
-                                                      : Protocols::InteractionModel::Status::NotFound;
+        if (fabricIndex != mPendingConnectFabric)
+        {
+            return Protocols::InteractionModel::Status::NotFound;
+        }
+
+        // The connect is no longer pending once it has been cancelled.
+        mPendingConnectFabric = kUndefinedFabricIndex;
+        return Protocols::InteractionModel::Status::Success;
     }
     Protocols::InteractionModel::Status Disconnect(uint16_t sessionId) override { return mDisconnectStatus; }
     CHIP_ERROR SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf) override;

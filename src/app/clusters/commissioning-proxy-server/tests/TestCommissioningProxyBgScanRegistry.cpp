@@ -117,6 +117,32 @@ TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRejectsAndDropsFabric
     EXPECT_EQ(hw.clearCount, 0);
 }
 
+// A hard failure while refreshing the only registered fabric drops that record. The
+// registry must not be left empty-but-paused with the previous scan's results still
+// cached.
+TEST(TestCommissioningProxyBgScanRegistry, StartHardFailureRefreshingLastFabricClearsPausedState)
+{
+    MockHardwareControl hw;
+    CommissioningProxyBgScanRegistry reg(hw);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+
+    // The radio is taken for a connect: the registry pauses (one stop so far).
+    reg.Pause();
+    EXPECT_TRUE(reg.IsPaused());
+    EXPECT_EQ(hw.stopCount, 1);
+
+    // Refreshing that same fabric now fails hard, dropping the last record.
+    hw.startResult = CHIP_ERROR_INTERNAL;
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Failure);
+
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_FALSE(reg.IsPaused());
+    EXPECT_EQ(hw.clearCount, 1);
+    // Already paused, so the radio is not stopped a second time.
+    EXPECT_EQ(hw.stopCount, 1);
+}
+
 TEST(TestCommissioningProxyBgScanRegistry, StopLastFabricStopsHardwareAndClears)
 {
     MockHardwareControl hw;

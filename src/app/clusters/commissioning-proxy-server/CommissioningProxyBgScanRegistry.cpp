@@ -92,10 +92,18 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         }
         else if (err != CHIP_NO_ERROR)
         {
-            // Hard failure: nothing was started, so do not stop the radio or clear the
-            // cache — just drop the fabric we optimistically added and reject.
+            // Hard failure: nothing was started, so drop the fabric we optimistically
+            // added and reject. If the registry was already empty there is no state to
+            // unwind — do not stop a radio we never started or clear a cache we never
+            // filled. If instead this dropped the last of a paused set of fabrics, run
+            // the usual empty cleanup so we are not left empty-but-paused holding a
+            // stale cache.
             ChipLogError(AppServer, "BgScan: StartHardwareScan failed: %" CHIP_ERROR_FORMAT, err.Format());
             mFabrics.erase(key);
+            if (!wasEmpty && mFabrics.empty())
+            {
+                OnBecameEmpty();
+            }
             return Status::Failure;
         }
         else

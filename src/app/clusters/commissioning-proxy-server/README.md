@@ -226,9 +226,8 @@ void ApplicationInit()
 }
 ```
 
-A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers) is
-under
-`examples/all-devices-app/all-devices-common/devices/commissioning-proxy/`.
+A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers)
+lands with the example-app change later in this series.
 
 ## Codegen integration
 

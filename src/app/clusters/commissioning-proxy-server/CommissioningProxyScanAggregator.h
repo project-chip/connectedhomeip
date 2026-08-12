@@ -62,8 +62,11 @@ public:
      * The number of contributors is not known up front: the caller starts each
      * requested transport's scan and calls AddPendingContributor() for every one
      * that starts successfully, then Commit() (or Abort() if none started).
+     *
+     * Returns an error (leaving InProgress() false) if the watchdog could not be
+     * armed; the caller must reject the command rather than scan unbounded.
      */
-    void Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, uint8_t scanMaxTime);
+    CHIP_ERROR Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, uint8_t scanMaxTime);
 
     /// Register one successfully-started sub-scan (increments the expected count).
     void AddPendingContributor();

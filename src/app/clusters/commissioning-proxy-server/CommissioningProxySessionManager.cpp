@@ -30,6 +30,12 @@ namespace CommissioningProxy {
 
 using Status = Protocols::InteractionModel::Status;
 
+namespace {
+// Head-room so the IM exchange outlives our own response timer and can still carry
+// the Status::Timeout back to the commissioner.
+constexpr uint16_t kResponseTimeoutMarginSecs = 5;
+} // namespace
+
 // One in-flight ProxyMessageRequest per session: keeps the IM exchange open until
 // the commissionee replies and the transport hands the bytes back.
 struct CommissioningProxySessionManager::PendingMessage
@@ -121,14 +127,21 @@ Status CommissioningProxySessionManager::BeginMessage(uint16_t sessionId, app::C
 
     if (auto * exchange = commandObj->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(System::Clock::Seconds16(responseTimeoutSeconds));
+        // The exchange must outlive our own timer, otherwise it expires first and the
+        // Status::Timeout that ResponseTimeoutCallback adds never reaches the commissioner.
+        exchange->SetResponseTimeout(
+            System::Clock::Seconds16(static_cast<uint16_t>(responseTimeoutSeconds + kResponseTimeoutMarginSecs)));
     }
 
     CHIP_ERROR err =
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(responseTimeoutSeconds), ResponseTimeoutCallback, pm);
     if (err != CHIP_NO_ERROR)
     {
+        // Nothing else would ever resolve this request: the session would stay Busy for
+        // every later ProxyMessageRequest and the commissioner would get no response.
         ChipLogError(Zcl, "CommissioningProxy: failed to start ProxyMessage response timer: %" CHIP_ERROR_FORMAT, err.Format());
+        AbortPending(sessionId);
+        return Status::Failure;
     }
 
     return Status::Success;
