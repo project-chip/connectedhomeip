@@ -576,8 +576,8 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
         log.info("Removing config/storage file, path: '%s'...", path)
         # Some apps keep storage in a directory under /tmp/chip* (e.g. the tv-app's
         # media file store at /tmp/chip-media-files), which unlink cannot remove.
-        if os.path.isdir(path):
-            shutil.rmtree(path, ignore_errors=True)
+        if os.path.isdir(path) and not os.path.islink(path):
+            shutil.rmtree(path)
         else:
             pathlib.Path(path).unlink(missing_ok=True)
 
