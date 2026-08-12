@@ -28,10 +28,6 @@
 #include <device/capabilities/service-area/impl/LoggingServiceAreaStorageDelegate.h>
 #include <string>
 
-namespace Json {
-class Value;
-} // namespace Json
-
 namespace chip::app {
 
 class RoboticVacuumCleaner : public SingleEndpoint
@@ -49,12 +45,7 @@ public:
     Clusters::ModeBaseCluster & CleanMode() { return mCleanModeCluster.Cluster(); }
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate & OperationalStateDelegate() { return mDelegate; }
 
-    // Named-pipe simulation entry point used by all-devices-app posix/AppCommandDelegate.cpp.
-    void HandleNamedPipeCommand(const Json::Value & json);
-
 private:
-    void HandleReset();
-
     Clusters::OperationalState::LoggingRvcOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::RvcOperationalState::RvcOperationalStateCluster> mOperationalStateCluster;
 
