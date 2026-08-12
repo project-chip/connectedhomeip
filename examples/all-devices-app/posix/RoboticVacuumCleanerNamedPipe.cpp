@@ -19,9 +19,9 @@
 
 #include <AllDevicesAppNamedPipeCommandHandler.h>
 #include <AppCommandDelegate.h>
+#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
-#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
