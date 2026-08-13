@@ -7,12 +7,12 @@
 namespace {
 
 using namespace chip;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 class FuzzDelegate : public ParserDelegate
 {
 public:
-    FuzzDelegate(const mdns::Minimal::BytesRange & packet) : mPacketRange(packet) {}
+    FuzzDelegate(const chip::Dnssd::BytesRange & packet) : mPacketRange(packet) {}
     virtual ~FuzzDelegate() {}
 
     void OnHeader(ConstHeaderRef & header) override {}
@@ -22,23 +22,23 @@ public:
         switch (data.GetType())
         {
         case QType::SRV: {
-            mdns::Minimal::SrvRecord srv;
+            chip::Dnssd::SrvRecord srv;
             (void) srv.Parse(data.GetData(), mPacketRange);
             break;
         }
         case QType::A: {
             chip::Inet::IPAddress addr;
-            (void) mdns::Minimal::ParseARecord(data.GetData(), &addr);
+            (void) chip::Dnssd::ParseARecord(data.GetData(), &addr);
             break;
         }
         case QType::AAAA: {
             chip::Inet::IPAddress addr;
-            (void) mdns::Minimal::ParseAAAARecord(data.GetData(), &addr);
+            (void) chip::Dnssd::ParseAAAARecord(data.GetData(), &addr);
             break;
         }
         case QType::PTR: {
-            mdns::Minimal::SerializedQNameIterator name;
-            (void) mdns::Minimal::ParsePtrRecord(data.GetData(), mPacketRange, &name);
+            chip::Dnssd::SerializedQNameIterator name;
+            (void) chip::Dnssd::ParsePtrRecord(data.GetData(), mPacketRange, &name);
             break;
         }
         default:
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    mdns::Minimal::BytesRange mPacketRange;
+    chip::Dnssd::BytesRange mPacketRange;
 };
 
 } // namespace
@@ -59,7 +59,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     BytesRange packet(data, data + len);
     FuzzDelegate delegate(packet);
 
-    mdns::Minimal::ParsePacket(packet, &delegate);
+    chip::Dnssd::ParsePacket(packet, &delegate);
 
     return 0;
 }
