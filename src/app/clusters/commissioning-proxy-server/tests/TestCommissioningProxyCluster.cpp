@@ -2048,6 +2048,51 @@ static Structs::ScanResultStruct::Type MakeScanEntry(uint16_t discriminator, Cap
     return e;
 }
 
+// As above, but on a band: only PAFTP results carry one.
+static Structs::ScanResultStruct::Type MakePafScanEntry(uint16_t discriminator, WiFiBandBitmap band)
+{
+    auto e = MakeScanEntry(discriminator, CapabilitiesBitmap::kWiFiPAF);
+    e.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(band));
+    return e;
+}
+
+// Spec § ProxyBackGroundScanStopRequest: clearing is scoped to "the transports and
+// bands on which it has stopped scanning", so a band-scoped clear SHALL leave results
+// from other bands cached. A result with no WiFiBand takes the spec's 2G4 fallback.
+TEST_F(TestCommissioningProxyCluster, TestCachedResults_ClearIsBandSelective)
+{
+    BitMask<Feature> features(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(features), mockTimer);
+    RegisterMocks(cluster);
+
+    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    auto readNum = [&]() {
+        uint8_t n = 0xFF;
+        EXPECT_EQ(tester.ReadAttribute(CPAttributes::NumCachedResults::Id, n), CHIP_NO_ERROR);
+        return n;
+    };
+
+    cluster.ScanCache().Report(MakePafScanEntry(1000, WiFiBandBitmap::k2g4));
+    cluster.ScanCache().Report(MakePafScanEntry(2000, WiFiBandBitmap::k5g));
+    cluster.ScanCache().Report(MakeScanEntry(3000, CapabilitiesBitmap::kWiFiPAF)); // no band -> 2G4
+    cluster.ScanCache().Report(MakeScanEntry(4000, CapabilitiesBitmap::kBle));
+    EXPECT_EQ(readNum(), 4u);
+
+    // Stopping 2G4 drops the 2G4 entry and the bandless one that falls back to it; the
+    // 5G entry and the BLE entry are untouched.
+    cluster.ScanCache().ClearTransport(chip::BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kWiFiPAF),
+                                       chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+    EXPECT_EQ(readNum(), 2u);
+
+    // A whole-transport clear (bands == 0) takes the remaining PAF entry, not the BLE one.
+    cluster.ScanCache().ClearTransport(chip::BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kWiFiPAF));
+    EXPECT_EQ(readNum(), 1u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // Spec § Attributes: MaxCachedResults is R V (read-only). A write SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestMaxCachedResultsAttribute_WriteRejected)
 {

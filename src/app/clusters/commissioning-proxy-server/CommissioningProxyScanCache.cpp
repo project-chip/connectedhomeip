@@ -140,12 +140,16 @@ void CommissioningProxyScanCache::Report(const ScanResultEntry & result)
     ArmSweepIfNeeded();
 }
 
-void CommissioningProxyScanCache::ClearTransport(BitMask<CapabilitiesBitmap> transport)
+void CommissioningProxyScanCache::ClearTransport(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> bands)
 {
+    // Only PAFTP results carry a band, so a BLE stop always arrives with bands == 0.
+    const BitMask<WiFiBandBitmap> kBandFallback{ WiFiBandBitmap::k2g4 };
+
     bool removed = false;
     for (auto it = mEntries.begin(); it != mEntries.end();)
     {
-        if ((it->first.transport & transport.Raw()) != 0)
+        const bool bandMatches = bands.Raw() == 0 || (it->second.wiFiBand.ValueOr(kBandFallback).Raw() & bands.Raw()) != 0;
+        if ((it->first.transport & transport.Raw()) != 0 && bandMatches)
         {
             it      = mEntries.erase(it);
             removed = true;

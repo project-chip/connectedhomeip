@@ -28,6 +28,13 @@
 #include <cstdint>
 #include <map>
 
+/// Concurrent ProxyBackGroundScanStartRequests retained per fabric. Each requesting
+/// node gets its own record (the spec identifies a Stop by NodeID + FabricID), so this
+/// bounds what one fabric can occupy.
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -78,11 +85,12 @@ public:
         virtual void StopHardwareScan() = 0;
 
         /**
-         * Drop this transport's cached scan results
-         * (host->ScanCache().ClearTransport(<this transport>)). Called whenever the
-         * last fabric is removed, whether or not the hardware scan was running.
+         * Drop cached scan results for this transport
+         * (host->ScanCache().ClearTransport(<this transport>, bands)). @p bands == 0
+         * means the transport stopped entirely, so all of its results go; otherwise
+         * only those bands stopped and only their results go. BLE always receives 0.
          */
-        virtual void ClearCachedResults() = 0;
+        virtual void ClearCachedResults(BitMask<WiFiBandBitmap> bands) = 0;
     };
 
     CommissioningProxyBgScanRegistry(HardwareControl & hardware, TimerDelegate & timerDelegate) :
@@ -94,10 +102,17 @@ public:
     CommissioningProxyBgScanRegistry & operator=(const CommissioningProxyBgScanRegistry &) = delete;
 
     /**
-     * ProxyBackGroundScanStartRequest. Spec: "keep per fabric records", with the
-     * sender's NodeID recorded to authorise the matching Stop — so a start from any
-     * node replaces that fabric's record and takes ownership. @p timeoutSecs == 0 means
-     * no lifetime timer. A rejected Start changes nothing.
+     * ProxyBackGroundScanStartRequest. Several nodes on a fabric may scan at once: the
+     * spec identifies each by NodeID + FabricID, so every node keeps its own request and
+     * the fabric scans the union of them. A repeat request from the same node replaces
+     * that node's own request only.
+     *
+     * The fabric holds one lifetime timer, set to the latest deadline of its requests;
+     * @p timeoutSecs == 0 means that node never expires, which suppresses the timer
+     * entirely. A rejected Start changes nothing.
+     *
+     * @return RESOURCE_EXHAUSTED once the fabric holds
+     *         CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC requests.
      *
      * @p transport SHALL carry only the owning transport's own bit; Stop() relies on it.
      */
@@ -105,10 +120,11 @@ public:
                                               BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs);
 
     /**
-     * ProxyBackGroundScanStopRequest. Applies the spec transport/band semantics: a
-     * transport bitmap of zero means "stop only the listed bands"; a fabric with no
-     * transports or no bands left is removed; SUCCESS is returned even when nothing
-     * overlapped, and NOT_FOUND when the fabric has no record.
+     * ProxyBackGroundScanStopRequest. Narrows or drops the requesting node's own
+     * request: a transport bitmap of zero means "stop only the listed bands". Scanning
+     * only really stops for what no remaining request still covers. SUCCESS is returned
+     * even when nothing overlapped; NOT_FOUND when this node has no request on this
+     * fabric.
      */
     Protocols::InteractionModel::Status Stop(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                              BitMask<WiFiBandBitmap> wiFiBands);
@@ -148,24 +164,43 @@ private:
         void TimerFired() override { registry->OnLifetimeExpiry(fabricIndex); }
     };
 
-    struct Record
+    // One ProxyBackGroundScanStartRequest, owned by the node that sent it.
+    struct Request
     {
-        // Who may stop this scan; not part of the record's identity.
-        NodeId ownerNodeId = kUndefinedNodeId;
         BitMask<CapabilitiesBitmap> transport;
         BitMask<WiFiBandBitmap> wiFiBands;
+        System::Clock::Timestamp expiresAt; // only meaningful when hasTimeout
+        bool hasTimeout = false;            // Timeout == 0 means "until an explicit Stop"
+    };
+
+    // Every request from one fabric, plus that fabric's single lifetime timer.
+    struct FabricState
+    {
+        std::map<NodeId, Request> requests;
         LifetimeCtx * lifetimeCtx = nullptr;
     };
 
     /// By value on purpose: the caller passes its own LifetimeCtx member, which this
     /// deletes. A reference would dangle for the rest of the body.
     void OnLifetimeExpiry(FabricIndex fabricIndex);
-    void CancelLifetime(Record & rec);
+    void CancelLifetime(FabricState & state);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache
 
-    // One record per fabric (spec: "keep per fabric records"), so this is bounded
-    // by the supported fabric count.
-    std::map<FabricIndex, Record> mFabrics;
+    /// Latest deadline among @p state's requests. Returns false when some request has no
+    /// timeout, in which case the fabric must not hold a timer at all.
+    static bool LatestDeadline(const FabricState & state, System::Clock::Timestamp & out);
+
+    /// Re-arm (or drop) @p fabricIndex's timer after its request set changed — a Stop can
+    /// shorten the fabric back to a surviving request's deadline.
+    void RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state);
+
+    /// Union of the bands every remaining request wants, across all fabrics.
+    BitMask<WiFiBandBitmap> BandsInUse() const;
+
+    /// Of @p candidates, drop the cached results for those no request still covers.
+    void ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap> candidates);
+
+    std::map<FabricIndex, FabricState> mFabrics;
     bool mPaused = false;
     HardwareControl & mHardware;
     TimerDelegate & mTimerDelegate;

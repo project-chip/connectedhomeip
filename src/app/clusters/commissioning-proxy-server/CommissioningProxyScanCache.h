@@ -85,9 +85,14 @@ public:
      */
     void Report(const ScanResultEntry & result);
 
-    /// Remove all entries whose transport bit is in @p transport (a transport
-    /// stopping its background scan). Marks dirty if anything was removed.
-    void ClearTransport(BitMask<CapabilitiesBitmap> transport);
+    /**
+     * @brief Drop cached results for a scan that has stopped. @p bands == 0 means the
+     *        transport itself stopped, so every entry on it goes; otherwise only
+     *        entries discovered on those bands go. Spec gives a ScanResultStruct with
+     *        no WiFiBand the fallback value 2G4, which is applied when matching.
+     *        Marks dirty if anything was removed.
+     */
+    void ClearTransport(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> bands = {});
 
     /// NumCachedResults: current combined entry count.
     uint8_t Count() const;
