@@ -49,7 +49,8 @@ public:
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
 
-        modeTags[0] = { .mfgCode = std::nullopt, .value = kTagValues[modeIndex] };
+        modeTags[0].mfgCode = std::nullopt;
+        modeTags[0].value   = kTagValues[modeIndex];
         modeTags.reduce_size(1);
         return CHIP_NO_ERROR;
     }
