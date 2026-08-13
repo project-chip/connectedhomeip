@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/RecordResponder.h>
+#include <lib/dnssd/wire/records/Srv.h>
 
 namespace mdns {
 namespace Minimal {
@@ -26,7 +26,9 @@ namespace Minimal {
 class SrvResponder : public RecordResponder
 {
 public:
-    SrvResponder(const SrvResourceRecord & record) : RecordResponder(QType::SRV, record.GetName()), mRecord(record) {}
+    SrvResponder(const chip::Dnssd::SrvResourceRecord & record) :
+        RecordResponder(chip::Dnssd::QType::SRV, record.GetName()), mRecord(record)
+    {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                          const ResponseConfiguration & configuration) override
@@ -36,14 +38,14 @@ public:
             return;
         }
 
-        SrvResourceRecord record = mRecord;
+        chip::Dnssd::SrvResourceRecord record = mRecord;
         configuration.Adjust(record);
         delegate->AddResponse(record);
         delegate->ResponsesAdded(*this);
     }
 
 private:
-    const SrvResourceRecord mRecord;
+    const chip::Dnssd::SrvResourceRecord mRecord;
 };
 
 } // namespace Minimal

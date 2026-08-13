@@ -335,13 +335,7 @@ void OnOffLightingCluster::UpdateTimer()
 
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
 {
-    bool wasOn = GetOnOff();
     ReturnErrorOnFailure(SetOnOffFromCommand(false));
-
-    if (wasOn && mScenesIntegrationDelegate != nullptr)
-    {
-        LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
-    }
 
     SetAttributeValue<uint16_t, uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
     UpdateTimer();
@@ -350,18 +344,12 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
 
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
 {
-    bool wasOff = !GetOnOff();
     ReturnErrorOnFailure(SetOnOffFromCommand(true));
 
     // Spec requirement:
     //   This attribute SHALL be set to TRUE after the reception of a command which
     //   causes the OnOff attribute to be set to TRUE;
     SetAttributeValue(mGlobalSceneControl, true, Attributes::GlobalSceneControl::Id);
-
-    if (wasOff && mScenesIntegrationDelegate != nullptr)
-    {
-        LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
-    }
 
     if (mOnTime == 0)
     {
