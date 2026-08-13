@@ -7,9 +7,8 @@ Breaker endpoint and the remaining electrical clusters are added by follow-up
 changes.
 
 The document will describe how to build and run the CHIP Linux Electrical
-Protection Example on Raspberry Pi. This doc is tested on **Ubuntu for Raspberry
-Pi Server 20.04 LTS (aarch64)** and **Ubuntu for Raspberry Pi Desktop 20.10
-(aarch64)**
+Protection Example on Raspberry Pi. It targets a currently supported **Ubuntu
+for Raspberry Pi Server LTS (aarch64)** release, 24.04 LTS or newer.
 
 <hr>
 
@@ -37,7 +36,7 @@ follow-up changes that add the breaker endpoint and its clusters.
 
 -   Install tool chain
 
-          $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+          $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
 -   Check out the repository and its submodules:
 
@@ -94,7 +93,7 @@ follow-up changes that add the breaker endpoint and its clusters.
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
        which will block CHIP from connecting via BLE. On Ubuntu server, you need
        to install `pi-bluetooth` via APT.
-    3. Ubuntu 20.04 or newer image for ARM64 platform.
+    3. Ubuntu 24.04 LTS or newer image for ARM64 platform.
 
 -   Building
 

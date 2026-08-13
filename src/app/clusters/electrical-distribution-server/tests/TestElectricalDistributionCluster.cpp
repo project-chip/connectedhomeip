@@ -100,20 +100,32 @@ TEST_F(TestElectricalDistributionCluster, ReadAttributeTest)
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
     ASSERT_EQ(features, 0u);
 
+    // Assert the decoded values, not just that decoding succeeded: the configured values reach a
+    // client only through the encode path, so a misrouted attribute would otherwise go unnoticed.
     MaxContinuousCurrent::TypeInfo::DecodableType maxContinuousCurrent;
     ASSERT_EQ(tester.ReadAttribute(MaxContinuousCurrent::Id, maxContinuousCurrent), CHIP_NO_ERROR);
+    ASSERT_FALSE(maxContinuousCurrent.IsNull());
+    EXPECT_EQ(maxContinuousCurrent.Value(), kDefaultConfig.maxContinuousCurrent.Value());
 
     MaxVoltage::TypeInfo::DecodableType maxVoltage;
     ASSERT_EQ(tester.ReadAttribute(MaxVoltage::Id, maxVoltage), CHIP_NO_ERROR);
+    ASSERT_FALSE(maxVoltage.IsNull());
+    EXPECT_EQ(maxVoltage.Value(), kDefaultConfig.maxVoltage.Value());
 
     NumberOfPoles::TypeInfo::DecodableType numberOfPoles;
     ASSERT_EQ(tester.ReadAttribute(NumberOfPoles::Id, numberOfPoles), CHIP_NO_ERROR);
+    ASSERT_FALSE(numberOfPoles.IsNull());
+    EXPECT_EQ(numberOfPoles.Value(), kDefaultConfig.numberOfPoles.Value());
 
     EndOfLife::TypeInfo::DecodableType endOfLife;
     ASSERT_EQ(tester.ReadAttribute(EndOfLife::Id, endOfLife), CHIP_NO_ERROR);
+    ASSERT_FALSE(endOfLife.IsNull());
+    EXPECT_EQ(endOfLife.Value(), kDefaultConfig.endOfLife.Value());
 
     ServiceEntranceRated::TypeInfo::DecodableType serviceEntranceRated;
     ASSERT_EQ(tester.ReadAttribute(ServiceEntranceRated::Id, serviceEntranceRated), CHIP_NO_ERROR);
+    ASSERT_FALSE(serviceEntranceRated.IsNull());
+    EXPECT_EQ(serviceEntranceRated.Value(), kDefaultConfig.serviceEntranceRated.Value());
 }
 
 TEST_F(TestElectricalDistributionCluster, ConfiguredValues)
