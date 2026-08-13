@@ -198,6 +198,22 @@ public:
         EncodeFn mEncodeFn;
 
         CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const { return mEncodeFn(mData, writer, tag); }
+
+        /// Adapter wrapping EncodableResponsePayload into EncodableToTLV for compatibility with EncodableToTLV APIs.
+        struct Adapter : public DataModel::EncodableToTLV
+        {
+            const EncodableResponsePayload & mPayload;
+            Adapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
+            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
+            {
+                return mPayload.EncodeTo(writer, tag);
+            }
+            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+            {
+                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
+                return mPayload.EncodeTo(fabricWriter, tag);
+            }
+        };
     };
 
     /**
@@ -224,21 +240,7 @@ public:
     virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                        const EncodableResponsePayload & aPayload)
     {
-        struct PayloadAdapter : public DataModel::EncodableToTLV
-        {
-            const EncodableResponsePayload & mPayload;
-            PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
-            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
-            {
-                return mPayload.EncodeTo(writer, tag);
-            }
-            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
-            {
-                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
-                return mPayload.EncodeTo(fabricWriter, tag);
-            }
-        };
-        PayloadAdapter adapter(aPayload);
+        EncodableResponsePayload::Adapter adapter(aPayload);
         return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
     }
 
@@ -265,21 +267,7 @@ public:
     virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                              const EncodableResponsePayload & aPayload)
     {
-        struct PayloadAdapter : public DataModel::EncodableToTLV
-        {
-            const EncodableResponsePayload & mPayload;
-            PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
-            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
-            {
-                return mPayload.EncodeTo(writer, tag);
-            }
-            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
-            {
-                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
-                return mPayload.EncodeTo(fabricWriter, tag);
-            }
-        };
-        PayloadAdapter adapter(aPayload);
+        EncodableResponsePayload::Adapter adapter(aPayload);
         AddResponse(aRequestCommandPath, aResponseCommandId, adapter);
     }
 

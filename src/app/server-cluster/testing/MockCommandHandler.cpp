@@ -66,21 +66,7 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & 
 CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const EncodableResponsePayload & aPayload)
 {
-    struct PayloadAdapter : public app::DataModel::EncodableToTLV
-    {
-        const EncodableResponsePayload & mPayload;
-        PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
-        CHIP_ERROR EncodeTo(app::DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
-        {
-            return mPayload.EncodeTo(writer, tag);
-        }
-        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
-        {
-            app::DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
-            return mPayload.EncodeTo(fabricWriter, tag);
-        }
-    };
-    PayloadAdapter adapter(aPayload);
+    EncodableResponsePayload::Adapter adapter(aPayload);
     return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
 }
 
