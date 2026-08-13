@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <ble/Ble.h>
 #include <clusters/CommissioningProxy/Commands.h>
@@ -158,11 +159,12 @@ public:
         return chip::DeviceLayer::Internal::BLEMgrImpl().StartProxyScan(OnBgScanDiscovery, nullptr);
     }
     void StopHardwareScan() override { (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan(); }
-    void ClearCachedResults() override
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
     {
+        // BLE results carry no band, so this always arrives as a whole-transport clear.
         if (sHost != nullptr)
         {
-            sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle);
+            sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle, bands);
         }
     }
 };
@@ -170,7 +172,8 @@ public:
 // Declared before the registry so it outlives it (the registry's destructor may
 // call back into these hooks).
 static BleBgScanHardware sBleBgScanHardware;
-static CommissioningProxyBgScanRegistry sBgScan(sBleBgScanHardware);
+static chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
+static CommissioningProxyBgScanRegistry sBgScan(sBleBgScanHardware, sBgScanTimerDelegate);
 
 // Suspend the background scan so a connect or foreground scan can use the single
 // BLE scanner; resume it when the scanner frees up.  Thin wrappers over the

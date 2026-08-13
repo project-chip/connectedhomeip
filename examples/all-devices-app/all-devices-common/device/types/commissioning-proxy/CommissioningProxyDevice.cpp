@@ -21,6 +21,7 @@
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip::app::Clusters::CommissioningProxy;
@@ -42,10 +43,14 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 
     BitMask<Feature> features(Feature::kBackgroundScan);
 
+    // Supplies the cluster's response-timeout, scan-watchdog and cache-sweep timers.
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+
     // MaxSessions = 1 (one device at a time across transports); MaxCachedResults = 10.
     mCluster.Create(endpoint,
                     Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features, /*aMaxSessions=*/1,
-                                                                                    /*aMaxCachedResults=*/10));
+                                                                                    /*aMaxCachedResults=*/10),
+                    sTimerDelegate);
 #if CONFIG_NETWORK_LAYER_BLE
     mCluster.Cluster().RegisterTransport(mBleTransport);
 #endif
