@@ -22,14 +22,17 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model/Encode.h>
+#include <array>
 
 #include <controller/CHIPCluster.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
+#include <controller/WriteInteraction.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace chip;
 using namespace chip::app;
@@ -62,18 +65,19 @@ public:
         Optional<uint16_t> groupKeySetId;
         Optional<T> objectToWrite;
         Optional<std::vector<T>> objectsToWrite;
+        std::vector<T> * sourceObjectsToWrite = nullptr;
         std::vector<uint64_t> aclObjectSubjectsStorage;
         std::vector<AclTargetType> aclObjectTargetsStorage;
         std::vector<std::vector<uint64_t>> aclSubjectsStorage;
         std::vector<std::vector<AclTargetType>> aclTargetsStorage;
         Optional<std::vector<chip::app::Clusters::Binding::Structs::TargetStruct::Type>> bindingTargetsToWrite;
         std::unordered_map<chip::GroupId, uint16_t> groupKeySetMap;
-        std::function<void()> onSuccess;
+        std::function<void(CHIP_ERROR)> onSuccess;
         std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchSuccess;
         std::function<void(CHIP_ERROR, const T &)> onReadEntrySuccess;
         std::function<void(CHIP_ERROR, const std::vector<uint16_t> &)> onReadListSuccess;
 
-        CallbackContext(chip::NodeId nId, const T & object, std::function<void()> onSuccessFn) :
+        CallbackContext(chip::NodeId nId, const T & object, std::function<void(CHIP_ERROR)> onSuccessFn) :
             nodeId(nId), objectToWrite(), objectsToWrite(), onSuccess(onSuccessFn)
         {
             if constexpr (std::is_same_v<T, AclEntryType>)
@@ -132,14 +136,18 @@ public:
             nodeId(nId), groupKeySetId(MakeOptional(gksId)), objectToWrite(), objectsToWrite(), onReadEntrySuccess(onReadFn)
         {}
 
-        CallbackContext(chip::NodeId nId, EndpointId eId, const std::vector<T> & objects, std::function<void()> onSuccessFn) :
-            nodeId(nId), endpointId(eId), objectToWrite(), objectsToWrite(), onSuccess(onSuccessFn)
+        CallbackContext(chip::NodeId nId, EndpointId eId, const std::vector<T> & objects,
+                        std::function<void(CHIP_ERROR)> onSuccessFn, std::vector<T> * sourceObjects = nullptr) :
+            nodeId(nId),
+            endpointId(eId), objectToWrite(), objectsToWrite(), sourceObjectsToWrite(sourceObjects), onSuccess(onSuccessFn)
         {
             objectsToWrite = MakeOptional(objects);
         }
 
-        CallbackContext(chip::NodeId nId, const std::vector<T> & objects, std::function<void()> onSuccessFn) :
-            nodeId(nId), objectToWrite(), objectsToWrite(), onSuccess(onSuccessFn)
+        CallbackContext(chip::NodeId nId, const std::vector<T> & objects, std::function<void(CHIP_ERROR)> onSuccessFn,
+                        std::vector<T> * sourceObjects = nullptr) :
+            nodeId(nId),
+            objectToWrite(), objectsToWrite(), sourceObjectsToWrite(sourceObjects), onSuccess(onSuccessFn)
         {
             if constexpr (std::is_same_v<T, AclEntryType>)
             {
@@ -194,7 +202,7 @@ public:
         }
     };
 
-    DevicePairedCommand(chip::NodeId nodeId, const T & object, std::function<void()> onSuccess,
+    DevicePairedCommand(chip::NodeId nodeId, const T & object, std::function<void(CHIP_ERROR)> onSuccess,
                         std::function<void()> removalCallback) :
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
@@ -259,8 +267,8 @@ public:
         mReadOnly = true;
     }
 
-    DevicePairedCommand(chip::NodeId nodeId, EndpointId endpointId, const std::vector<T> & objects, std::function<void()> onSuccess,
-                        std::function<void()> removalCallback) :
+    DevicePairedCommand(chip::NodeId nodeId, EndpointId endpointId, const std::vector<T> & objects,
+                        std::function<void(CHIP_ERROR)> onSuccess, std::function<void()> removalCallback) :
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
         mOnFetchGroupsConnectedCallback(OnFetchGroupsConnectedFn, this),
@@ -272,8 +280,8 @@ public:
         mReplaceExisting = true;
     }
 
-    DevicePairedCommand(chip::NodeId nodeId, const std::vector<T> & objects, std::function<void()> onSuccess,
-                        std::function<void()> removalCallback) :
+    DevicePairedCommand(chip::NodeId nodeId, const std::vector<T> & objects, std::function<void(CHIP_ERROR)> onSuccess,
+                        std::function<void()> removalCallback, std::vector<T> * sourceObjectsToWrite = nullptr) :
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
         mOnFetchGroupsConnectedCallback(OnFetchGroupsConnectedFn, this),
@@ -281,7 +289,7 @@ public:
         mOnAddGroupConnectedCallback(OnAddGroupConnectedFn, this),
         mOnAddGroupConnectionFailureCallback(OnAddGroupConnectionFailureFn, this), mRemovalCallback(removalCallback)
     {
-        mContext         = std::make_shared<CallbackContext>(nodeId, objects, onSuccess);
+        mContext         = std::make_shared<CallbackContext>(nodeId, objects, onSuccess, sourceObjectsToWrite);
         mReplaceExisting = true;
     }
 
@@ -339,48 +347,110 @@ public:
 
                         if (targetGroupKeySetId.HasValue())
                         {
-                            ChipLogProgress(Controller, "Writing GroupKeyMap for group 0x%04x with keyset %u before AddGroup",
+                            std::vector<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> mergedEntries;
+                            std::unordered_map<chip::GroupId, size_t> groupIndex;
+                            std::unordered_set<uint16_t> validKeySetIds;
+
+                            const auto & groupKeySets = Server::GetInstance().GetJointFabricDatastore().GetGroupKeySetList();
+                            for (const auto & groupKeySet : groupKeySets)
+                            {
+                                if (groupKeySet.groupKeySetID != 0)
+                                {
+                                    validKeySetIds.insert(groupKeySet.groupKeySetID);
+                                }
+                            }
+
+                            for (const auto & groupEntry : groupEntries)
+                            {
+                                if (groupEntry.groupKeySetID.IsNull())
+                                {
+                                    continue;
+                                }
+
+                                const auto entryGroupId = groupEntry.groupID;
+                                const auto entryKeySet  = groupEntry.groupKeySetID.Value();
+                                if (entryKeySet == 0 || validKeySetIds.find(entryKeySet) == validKeySetIds.end())
+                                {
+                                    continue;
+                                }
+                                auto it = groupIndex.find(entryGroupId);
+
+                                if (it == groupIndex.end())
+                                {
+                                    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type mapEntry;
+                                    mapEntry.groupId       = entryGroupId;
+                                    mapEntry.groupKeySetID = entryKeySet;
+                                    mapEntry.fabricIndex   = sessionHandle->GetFabricIndex();
+
+                                    groupIndex[entryGroupId] = mergedEntries.size();
+                                    mergedEntries.push_back(mapEntry);
+                                }
+                                else
+                                {
+                                    // Keep latest datastore mapping for duplicate group IDs.
+                                    mergedEntries[it->second].groupKeySetID = entryKeySet;
+                                }
+                            }
+
+                            const auto targetIt = groupIndex.find(targetGroupId);
+                            if (targetIt == groupIndex.end())
+                            {
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type mapEntry;
+                                mapEntry.groupId       = targetGroupId;
+                                mapEntry.groupKeySetID = targetGroupKeySetId.Value();
+                                mapEntry.fabricIndex   = sessionHandle->GetFabricIndex();
+                                mergedEntries.push_back(mapEntry);
+                            }
+                            else
+                            {
+                                mergedEntries[targetIt->second].groupKeySetID = targetGroupKeySetId.Value();
+                            }
+
+                            ChipLogProgress(Controller,
+                                            "Writing merged GroupKeyMap for group 0x%04x with keyset %u before AddGroup",
                                             targetGroupId, targetGroupKeySetId.Value());
 
-                            chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type mapEntry;
-                            mapEntry.groupId       = targetGroupId;
-                            mapEntry.groupKeySetID = targetGroupKeySetId.Value();
+                            auto mergedList = chip::app::DataModel::List<
+                                const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
+                                mergedEntries.data(), mergedEntries.size());
 
-                            chip::Controller::ClusterBase groupKeyMgmtCluster(exchangeMgr, sessionHandle, kRootEndpointId);
-                            chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::Type groupKeyMapList =
-                                chip::app::DataModel::List<
-                                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(&mapEntry, 1);
+                            err = chip::Controller::WriteAttribute<decltype(mergedList)>(
+                                sessionHandle, kRootEndpointId, chip::app::Clusters::GroupKeyManagement::Id,
+                                chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::Id, mergedList,
+                                [pairingCommand](const chip::app::ConcreteAttributePath &) {
+                                    auto lambdaCbContext = pairingCommand->mContext;
 
-                            err = groupKeyMgmtCluster
-                                      .WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
-                                          groupKeyMapList, pairingCommand,
-                                          [](void * lambdaContext) {
-                                              auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
-                                              auto lambdaCbContext = instance->mContext;
+                                    CHIP_ERROR connErr = GetDeviceCommissioner()->GetConnectedDevice(
+                                        lambdaCbContext->nodeId, &pairingCommand->mOnAddGroupConnectedCallback,
+                                        &pairingCommand->mOnAddGroupConnectionFailureCallback);
+                                    if (connErr != CHIP_NO_ERROR)
+                                    {
+                                        ChipLogError(Controller, "Failed to reconnect for AddGroup after GroupKeyMap write: %s",
+                                                     ErrorStr(connErr));
+                                        if (pairingCommand->mRemovalCallback)
+                                        {
+                                            pairingCommand->mRemovalCallback();
+                                        }
+                                    }
+                                },
+                                [pairingCommand](const chip::app::ConcreteAttributePath *, CHIP_ERROR writeError) {
+                                    ChipLogError(Controller, "Failed to write GroupKeyMap before AddGroup: %s",
+                                                 ErrorStr(writeError));
+                                    if (pairingCommand->mRemovalCallback)
+                                    {
+                                        pairingCommand->mRemovalCallback();
+                                    }
+                                },
+                                chip::NullOptional);
 
-                                              CHIP_ERROR connErr = GetDeviceCommissioner()->GetConnectedDevice(
-                                                  lambdaCbContext->nodeId, &instance->mOnAddGroupConnectedCallback,
-                                                  &instance->mOnAddGroupConnectionFailureCallback);
-                                              if (connErr != CHIP_NO_ERROR)
-                                              {
-                                                  ChipLogError(Controller,
-                                                               "Failed to reconnect for AddGroup after GroupKeyMap write: %s",
-                                                               ErrorStr(connErr));
-                                                  if (instance && instance->mRemovalCallback)
-                                                  {
-                                                      instance->mRemovalCallback();
-                                                  }
-                                              }
-                                          },
-                                          [](void * lambdaContext, CHIP_ERROR writeError) {
-                                              auto * instance = static_cast<DevicePairedCommand *>(lambdaContext);
-                                              ChipLogError(Controller, "Failed to write GroupKeyMap before AddGroup: %s",
-                                                           ErrorStr(writeError));
-                                              if (instance && instance->mRemovalCallback)
-                                              {
-                                                  instance->mRemovalCallback();
-                                              }
-                                          });
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Controller, "Failed to write merged GroupKeyMap before AddGroup: %s", ErrorStr(err));
+                                if (pairingCommand->mRemovalCallback)
+                                {
+                                    pairingCommand->mRemovalCallback();
+                                }
+                            }
                         }
                         else
                         {
@@ -1368,7 +1438,7 @@ public:
         auto cbContext        = pairingCommand->mContext;
         if (cbContext && cbContext->onSuccess)
         {
-            cbContext->onSuccess();
+            cbContext->onSuccess(CHIP_NO_ERROR);
         }
 
         // Clean up in-flight command
@@ -1409,15 +1479,18 @@ public:
                 failedEntry.statusEntry.failureCode = static_cast<uint32_t>(error.AsInteger());
                 cbContext->objectToWrite            = MakeOptional(failedEntry);
 
-                auto & endpointBindingList = Server::GetInstance().GetJointFabricDatastore().GetEndpointBindingList();
-                for (auto & entry : endpointBindingList)
+                if (cbContext->sourceObjectsToWrite != nullptr)
                 {
-                    if (entry.nodeID == failedEntry.nodeID && entry.endpointID == failedEntry.endpointID &&
-                        entry.listID == failedEntry.listID)
+                    auto & sourceEntries = *cbContext->sourceObjectsToWrite;
+                    auto sourceIt = std::find_if(sourceEntries.begin(), sourceEntries.end(), [&failedEntry](const auto & entry) {
+                        return entry.nodeID == failedEntry.nodeID && entry.endpointID == failedEntry.endpointID &&
+                            entry.listID == failedEntry.listID;
+                    });
+
+                    if (sourceIt != sourceEntries.end())
                     {
-                        entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
-                        entry.statusEntry.failureCode = failedEntry.statusEntry.failureCode;
-                        break;
+                        sourceIt->statusEntry.state       = failedEntry.statusEntry.state;
+                        sourceIt->statusEntry.failureCode = failedEntry.statusEntry.failureCode;
                     }
                 }
             }
@@ -1432,17 +1505,21 @@ public:
                 }
                 cbContext->objectsToWrite = MakeOptional(failedEntries);
 
-                auto & endpointBindingList = Server::GetInstance().GetJointFabricDatastore().GetEndpointBindingList();
-                for (auto & entry : endpointBindingList)
+                if (cbContext->sourceObjectsToWrite != nullptr)
                 {
+                    auto & sourceEntries = *cbContext->sourceObjectsToWrite;
                     for (const auto & failedEntry : failedEntries)
                     {
-                        if (entry.nodeID == failedEntry.nodeID && entry.endpointID == failedEntry.endpointID &&
-                            entry.listID == failedEntry.listID)
+                        auto sourceIt =
+                            std::find_if(sourceEntries.begin(), sourceEntries.end(), [&failedEntry](const auto & entry) {
+                                return entry.nodeID == failedEntry.nodeID && entry.endpointID == failedEntry.endpointID &&
+                                    entry.listID == failedEntry.listID;
+                            });
+
+                        if (sourceIt != sourceEntries.end())
                         {
-                            entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
-                            entry.statusEntry.failureCode = failedEntry.statusEntry.failureCode;
-                            break;
+                            sourceIt->statusEntry.state       = failedEntry.statusEntry.state;
+                            sourceIt->statusEntry.failureCode = failedEntry.statusEntry.failureCode;
                         }
                     }
                 }
@@ -1451,7 +1528,7 @@ public:
 
         if (cbContext && cbContext->onSuccess)
         {
-            cbContext->onSuccess();
+            cbContext->onSuccess(error);
         }
 
         // Clean up in-flight command
@@ -1479,10 +1556,10 @@ public:
                          static_cast<unsigned>(response.status), static_cast<unsigned>(response.groupID));
         }
 
-        // Continue state machine regardless of payload status; caller only exposes completion callback.
+        const CHIP_ERROR addGroupResult = (response.status == 0) ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(Failure);
         if (cbContext && cbContext->onSuccess)
         {
-            cbContext->onSuccess();
+            cbContext->onSuccess(addGroupResult);
         }
 
         // Clean up in-flight command
@@ -1503,7 +1580,7 @@ public:
         auto cbContext        = pairingCommand->mContext;
         if (cbContext && cbContext->onSuccess)
         {
-            cbContext->onSuccess();
+            cbContext->onSuccess(CHIP_NO_ERROR);
         }
 
         // Clean up in-flight command
@@ -1531,10 +1608,10 @@ public:
                          static_cast<unsigned>(response.status), static_cast<unsigned>(response.groupID));
         }
 
-        // Continue state machine regardless of payload status; caller only exposes completion callback.
+        const CHIP_ERROR removeGroupResult = (response.status == 0) ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(Failure);
         if (cbContext && cbContext->onSuccess)
         {
-            cbContext->onSuccess();
+            cbContext->onSuccess(removeGroupResult);
         }
 
         // Clean up in-flight command
@@ -1549,8 +1626,14 @@ public:
     {
         ChipLogProgress(Controller, "OnCommandFailure - Failed to execute Command: %s", ErrorStr(error));
 
-        // Clean up in-flight command
         auto * pairingCommand = static_cast<DevicePairedCommand *>(context);
+        auto cbContext        = pairingCommand ? pairingCommand->mContext : nullptr;
+        if (cbContext && cbContext->onSuccess)
+        {
+            cbContext->onSuccess(error);
+        }
+
+        // Clean up in-flight command
         if (pairingCommand && pairingCommand->mRemovalCallback)
         {
             pairingCommand->mRemovalCallback();
@@ -1580,7 +1663,7 @@ CHIP_ERROR JFADatastoreSync::Init(Server & server)
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId,
     const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & endpointGroupIDEntry,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1601,7 +1684,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & nodeKeySetEntry,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1622,7 +1705,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Appending binding entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1667,7 +1750,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
                 ChipLogError(DeviceLayer, "Failed to write appended binding list: %s", ErrorStr(writeErr));
                 if (onSuccess)
                 {
-                    onSuccess();
+                    onSuccess(writeErr);
                 }
             }
         });
@@ -1676,7 +1759,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId, EndpointId endpointId,
     std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1698,7 +1781,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId,
     std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1707,7 +1790,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
     std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>
         pairingCommand = std::make_shared<
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>(
-            nodeId, bindingEntries, onSuccess, [this, inFlightToken]() { RemoveInFlightCommand(inFlightToken); });
+            nodeId, bindingEntries, onSuccess, [this, inFlightToken]() { RemoveInFlightCommand(inFlightToken); }, &bindingEntries);
 
     StoreInFlightCommand(inFlightToken, pairingCommand);
 
@@ -1720,7 +1803,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 CHIP_ERROR
 JFADatastoreSync::SyncNode(NodeId nodeId,
                            const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
-                           std::function<void()> onSuccess)
+                           std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Appending ACL entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1773,7 +1856,7 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
                 ChipLogError(DeviceLayer, "Failed to fetch ACL list before append: %s", ErrorStr(fetchErr));
                 if (onSuccess)
                 {
-                    onSuccess();
+                    onSuccess(fetchErr);
                 }
                 return;
             }
@@ -1801,7 +1884,7 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
                 ChipLogError(DeviceLayer, "Failed to write appended ACL list: %s", ErrorStr(writeErr));
                 if (onSuccess)
                 {
-                    onSuccess();
+                    onSuccess(writeErr);
                 }
             }
         });
@@ -1809,7 +1892,7 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
 
 CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId, const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & aclEntries,
-    std::function<void()> onSuccess)
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
@@ -1831,7 +1914,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
 CHIP_ERROR
 JFADatastoreSync::SyncNode(NodeId nodeId,
                            const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
-                           std::function<void()> onSuccess)
+                           std::function<void(CHIP_ERROR)> onSuccess)
 {
     ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 

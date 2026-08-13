@@ -37,31 +37,31 @@ public:
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & endpointGroupIDEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & nodeKeySetEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId, EndpointId endpointId,
              std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
-                        std::function<void()> onSuccess) override;
+                        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId,
                         const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & aclEntries,
-                        std::function<void()> onSuccess) override;
+                        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId,
                         const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
-                        std::function<void()> onSuccess) override;
+                        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR FetchEndpointList(
         NodeId nodeId,
         std::function<void(CHIP_ERROR,

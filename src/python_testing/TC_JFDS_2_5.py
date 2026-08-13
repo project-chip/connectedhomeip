@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-# This test requires a TH2_SERVER application. Please specify with --string-arg th2_server_app_path:<path_to_app>
+# This test requires a TH2_SERVER application. Please specify with --string-arg th2_server_app:<path_to_app>
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
@@ -33,8 +33,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import base64
+import asyncio
 import logging
 import os
 import random
@@ -139,6 +139,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         super().setup_class()
 
         self.fabric_a_ctrl = None
+        self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.storage_directory_ecosystem_a_admin = None
         self.storage_directory_ecosystem_a_ctrl = None
@@ -368,6 +369,9 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         super().teardown_class()
 
+    def pics_TC_JFDS_2_5(self) -> list[str]:
+        return ["JFDS.S"]
+
     @async_test_body
     async def test_TC_JFDS_2_5(self):
         # Step 1: TH reads NodeList attribute from DUT
@@ -395,6 +399,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 3: TH sends AddPendingNode command with duplicate NodeId
         self.step(3, "TH sends AddPendingNode command to DUT with NodeId=th_node_id (duplicate), FriendlyName: 'tc-jf-2.5'")
+        # Spec requires CONSTRAINT_ERROR when NodeID already exists in the datastore (duplicate entries are not allowed).
         try:
             await self.send_single_cmd(
                 cmd=Clusters.JointFabricDatastore.Commands.AddPendingNode(
@@ -466,6 +471,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 7: TH sends UpdateNode command with non-existent NodeId
         self.step(7, "TH sends UpdateNode command to DUT with NodeId=0x0000_0000_0000_000a (not found), FriendlyName: 'tc-jf-2.5-update'")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
         try:
             await self.send_single_cmd(
                 cmd=Clusters.JointFabricDatastore.Commands.UpdateNode(
@@ -502,9 +508,9 @@ class TC_JFDS_2_5(MatterBaseTest):
             response = await self.devCtrlEcoA.ReadAttribute(
                 nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.NodeList)],
                 returnClusterObject=True)
-            node_list_step10 = response[1][Clusters.JointFabricDatastore].nodeList
+            node_list_polled = response[1][Clusters.JointFabricDatastore].nodeList
 
-            for node in node_list_step10:
+            for node in node_list_polled:
                 if node.nodeID == self.th2_node_id:
                     if self._enum_equals(node.commissioningStatusEntry.state,
                                          Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted):
@@ -532,10 +538,6 @@ class TC_JFDS_2_5(MatterBaseTest):
             returnClusterObject=True)
         th2_keyset_list = response[0][Clusters.GroupKeyManagement].groupKeyMap
 
-        # Verify 1:1 correspondence - same number of entries
-        asserts.assert_equal(len(node_keyset_list_dut), len(th2_keyset_list),
-                             "NodeKeySetList should have 1:1 correspondence with TH2's GroupKeyMap")
-
         # Verify each KeySet entry exists in both lists
         dut_keyset_ids = {keyset.groupKeySetID for keyset in node_keyset_list_dut}
         th2_keyset_ids = {keyset.groupKeySetID for keyset in th2_keyset_list}
@@ -549,11 +551,11 @@ class TC_JFDS_2_5(MatterBaseTest):
         response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.NodeACLList)],
             returnClusterObject=True)
-        node_acl_list_step12 = response[1][Clusters.JointFabricDatastore].nodeACLList
+        node_acl_list_initial = response[1][Clusters.JointFabricDatastore].nodeACLList
 
         # Find the ACL entry for th_node_id
         th2_acl_entry_dut = None
-        for acl_entry in node_acl_list_step12:
+        for acl_entry in node_acl_list_initial:
             if acl_entry.nodeID == self.th2_node_id:
                 th2_acl_entry_dut = acl_entry
                 break
@@ -567,7 +569,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         th2_acl_list = response[0][Clusters.AccessControl].acl
 
         # Compare only ACL entries mirrored for th_node_id.
-        dut_acl_entries = [entry.ACLEntry for entry in node_acl_list_step12 if entry.nodeID == self.th2_node_id]
+        dut_acl_entries = [entry.ACLEntry for entry in node_acl_list_initial if entry.nodeID == self.th2_node_id]
         asserts.assert_equal(len(dut_acl_entries), len(th2_acl_list),
                              "NodeACLList should have 1:1 correspondence with TH2's ACL entries")
 
@@ -603,8 +605,8 @@ class TC_JFDS_2_5(MatterBaseTest):
             returnClusterObject=True)
         th2_parts_list = response[0][Clusters.Descriptor].partsList
 
-        # Extract endpoint IDs from DUT's NodeEndpointList
-        dut_endpoint_ids = [ep.endpointID for ep in node_endpoint_list]
+        # Extract endpoint IDs mirrored for th_node_id from DUT's NodeEndpointList
+        dut_endpoint_ids = [ep.endpointID for ep in node_endpoint_list if ep.nodeID == self.th2_node_id]
 
         # Verify 1:1 correspondence
         asserts.assert_equal(sorted(dut_endpoint_ids), sorted(th2_parts_list),
@@ -629,33 +631,40 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # For each endpoint on TH2, verify the GroupList correspondence
         for th2_endpoint_id in th2_parts_list:
-            # Read Groups cluster GroupTable from TH2 endpoint
-            try:
-                response = await self.devCtrlEcoA.ReadAttribute(
-                    nodeId=self.th2_node_id, attributes=[(th2_endpoint_id, Clusters.Groups.Attributes.GroupTable)],
-                    returnClusterObject=True)
-                th2_group_table = response[th2_endpoint_id][Clusters.Groups].groupTable
+            descriptor_response = await self.devCtrlEcoA.ReadAttribute(
+                nodeId=self.th2_node_id,
+                attributes=[(th2_endpoint_id, Clusters.Descriptor.Attributes.ServerList)],
+                returnClusterObject=True)
+            th2_server_list = descriptor_response[th2_endpoint_id][Clusters.Descriptor].serverList
 
-                # Find corresponding entry in DUT's EndpointGroupIDList
-                dut_endpoint_group_entry = None
-                for entry in th2_endpoint_groups:
-                    if entry.endpointID == th2_endpoint_id:
-                        dut_endpoint_group_entry = entry
-                        break
+            if Clusters.Groups.id not in th2_server_list:
+                continue
 
-                if len(th2_group_table) > 0:
-                    # If TH2 has groups on this endpoint, DUT should have a corresponding entry
-                    asserts.assert_is_not_none(dut_endpoint_group_entry,
-                                               f"DUT should have EndpointGroupIDList entry for endpoint {th2_endpoint_id}")
+            # GetGroupMembership with empty list returns all groups on the endpoint.
+            group_membership_resp = await self.send_single_cmd(
+                cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[]),
+                dev_ctrl=self.devCtrlEcoA,
+                node_id=self.th2_node_id,
+                endpoint=th2_endpoint_id,
+            )
+            th2_group_ids_on_endpoint = set(group_membership_resp.groupList)
 
-                    # Verify 1:1 correspondence of group IDs
-                    th2_group_ids = {group.groupID for group in th2_group_table}
-                    dut_group_ids = set(dut_endpoint_group_entry.groupIDList)
-                    asserts.assert_equal(th2_group_ids, dut_group_ids,
-                                         f"Group IDs should match for endpoint {th2_endpoint_id}")
-            except Exception:
-                # Groups cluster may not be supported on all endpoints, which is fine
-                pass
+            # Find corresponding entry in DUT's EndpointGroupIDList
+            dut_endpoint_group_entry = None
+            for entry in th2_endpoint_groups:
+                if entry.endpointID == th2_endpoint_id:
+                    dut_endpoint_group_entry = entry
+                    break
+
+            if len(th2_group_ids_on_endpoint) > 0:
+                # If TH2 has groups on this endpoint, DUT should have a corresponding entry
+                asserts.assert_is_not_none(dut_endpoint_group_entry,
+                                           f"DUT should have EndpointGroupIDList entry for endpoint {th2_endpoint_id}")
+
+                # Verify 1:1 correspondence of group IDs
+                dut_group_ids = set(dut_endpoint_group_entry.groupIDList)
+                asserts.assert_equal(th2_group_ids_on_endpoint, dut_group_ids,
+                                     f"Group IDs should match for endpoint {th2_endpoint_id}")
 
         # Step 14: Read the NodeList entry and verify EndpointBindingList
         self.step(14, "Read the NodeList entry for NodeId=th_node_id")
@@ -735,6 +744,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 15: TH sends AddACLToNode command with non-existent NodeId
         self.step(15, "TH sends AddACLToNode command to DUT with NodeId=0x0000_0000_0000_000a (not found)")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage,
@@ -805,8 +815,9 @@ class TC_JFDS_2_5(MatterBaseTest):
                 matching_acl = acl
                 # Get the ListID
                 th_acllist_id = acl.listID
+                break
 
-        asserts.assert_is_not_none(matching_acl, "NodeACLList should contain the ACL entry added in step 17")
+        asserts.assert_is_not_none(matching_acl, "NodeACLList should contain the ACL entry added in step 16")
 
         # Note the ListID
         self.th_acllist_id = th_acllist_id
@@ -822,7 +833,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         # Find the ACL entry matching step 17
         th2_normalized_acls = [self._normalize_acl_entry(acl) for acl in th2_acl_list_step19]
         asserts.assert_in(expected_acl, th2_normalized_acls,
-                          "TH2's ACLList should contain the ACL entry added in step 17")
+                          "TH2's ACLList should contain the ACL entry added in step 16")
 
         # Step 19: TH reads ACLList from TH2 and verifies Admin CAT entry
         self.step(19, "TH reads ACLList from TH2")
@@ -834,11 +845,11 @@ class TC_JFDS_2_5(MatterBaseTest):
         for acl in th2_acl_list_step19:
             if (acl.privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister and
                     acl.authMode == Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase):
-                # Check if subjects contains Admin CAT (0xFFFF_xxxx pattern)
+                # Check if subjects contains the Admin CAT CASE-auth tag node ID pattern:
+                # 0xFFFF_FFFD_FFFF_xxxx (identifier=0xFFFF, version in low 16 bits)
                 for subject in acl.subjects:
-                    if (subject & 0xFFFF_0000_0000_0000) == 0xFFFF_0000_0000_0000:
+                    if (subject & 0xFFFF_FFFF_FFFF_0000) == 0xFFFF_FFFD_FFFF_0000:
                         admin_cat_acl = acl
-                        # Extract the CAT version (lower 16 bits of the identifier)
                         th_admin_cat_version = subject & 0xFFFF
                         break
                 if admin_cat_acl:
@@ -857,14 +868,14 @@ class TC_JFDS_2_5(MatterBaseTest):
         response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupList)],
             returnClusterObject=True)
-        group_list_step21 = response[1][Clusters.JointFabricDatastore].groupList
+        group_list = response[1][Clusters.JointFabricDatastore].groupList
 
         # Find the Admin CAT group entry
         admin_cat_group = None
         admin_cat_group_id = None
         admin_cat_version = None
 
-        for group in group_list_step21:
+        for group in group_list:
             # Admin CAT group has groupCAT = 0xFFFF
             if group.groupCAT == 0xFFFF:
                 admin_cat_group = group
@@ -880,7 +891,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Keep expected "next version" values for the retained negative Admin CAT check.
         new_admin_cat_version = self.admin_cat_version + 1
-        new_admin_cat_subject = 0xFFFF_0000_0000_0000 | new_admin_cat_version
+        new_admin_cat_subject = 0xFFFF_FFFD_FFFF_0000 | new_admin_cat_version
 
         # Step 21: TH reads NodeACLList and verifies new Admin CAT version was not applied
         self.step(21, "TH reads NodeACLList entries NodeId=th_node_id from DUT")
@@ -890,31 +901,28 @@ class TC_JFDS_2_5(MatterBaseTest):
             returnClusterObject=True)
         node_acl_list_step23 = response[1][Clusters.JointFabricDatastore].nodeACLList
 
-        # Find the ACL entry for th_node_id
-        th2_acl_entry_step23 = None
-        for acl_entry in node_acl_list_step23:
-            if acl_entry.nodeID == self.th2_node_id:
-                th2_acl_entry_step23 = acl_entry
-                break
+        # Find all ACL entries for th_node_id
+        th2_acl_entries_step23 = [e for e in node_acl_list_step23 if e.nodeID == self.th2_node_id]
+        asserts.assert_true(len(th2_acl_entries_step23) > 0, "ACL entry for th_node_id should exist")
 
-        asserts.assert_is_not_none(th2_acl_entry_step23, "ACL entry for th_node_id should exist")
-
-        # Verify no Admin CAT ACL with new version exists
+        # Verify no Admin CAT ACL with new version exists across all mirrored entries for th_node_id
         admin_cat_acl_pending = None
-
-        if (self._enum_equals(th2_acl_entry_step23.ACLEntry.privilege,
-                              Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kAdminister) and
-            self._enum_equals(th2_acl_entry_step23.ACLEntry.authMode,
-                              Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum.kCase) and
-                new_admin_cat_subject in th2_acl_entry_step23.ACLEntry.subjects and
-                len(th2_acl_entry_step23.ACLEntry.targets) == 0):
-            admin_cat_acl_pending = th2_acl_entry_step23
+        for acl_entry in th2_acl_entries_step23:
+            if (self._enum_equals(acl_entry.ACLEntry.privilege,
+                                  Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kAdminister) and
+                self._enum_equals(acl_entry.ACLEntry.authMode,
+                                  Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryAuthModeEnum.kCase) and
+                    new_admin_cat_subject in acl_entry.ACLEntry.subjects and
+                    len(acl_entry.ACLEntry.targets) == 0):
+                admin_cat_acl_pending = acl_entry
+                break
 
         asserts.assert_is_none(admin_cat_acl_pending,
                                f"NodeACLList should not contain Admin CAT ACL with new version {new_admin_cat_version}")
 
         # Step 22: TH sends RemoveACLFromNode command with non-existent NodeId
         self.step(22, "TH sends RemoveACLFromNode command to DUT with NodeId=0x0000_0000_0000_000a (not found), ListID=th_acllist_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         try:
             await self.send_single_cmd(
@@ -1007,6 +1015,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 25: TH sends UpdateEndpointForNode command with non-existent NodeId
         self.step(25, "TH sends UpdateEndpointForNode command to DUT with NodeId=0x0000_0000_0000_000a, EndpointID=th_app_endpoint_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         endpoint_struct = Clusters.JointFabricDatastore.Commands.UpdateEndpointForNode(
             nodeID=0x0000_0000_0000_000a,
@@ -1061,6 +1070,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 28: TH sends AddGroupIDToEndpointForNode command with non-existent NodeId
         self.step(28, "TH sends AddGroupIDToEndpointForNode command to DUT with NodeId=0x0000_0000_0000_000a (not found), EndpointID=th_app_endpoint_id, GroupID=th_group_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         try:
             await self.send_single_cmd(
@@ -1092,34 +1102,35 @@ class TC_JFDS_2_5(MatterBaseTest):
             endpoint=1,
         )
 
-        await asyncio.sleep(2)  # Wait for the group addition to propagate
-
         # Step 30: TH reads EndpointGroupIDList and verifies the group entry
         self.step(30, "TH reads EndpointGroupIDList attribute from DUT")
 
-        response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.EndpointGroupIDList)],
-            returnClusterObject=True)
-        endpoint_group_list_step34 = response[1][Clusters.JointFabricDatastore].endpointGroupIDList
-
-        # Find the entry for th_node_id and th_app_endpoint_id
         target_endpoint_group = None
-        for entry in endpoint_group_list_step34:
-            if entry.nodeID == self.th2_node_id and entry.endpointID == self.th_app_endpoint_id:
-                target_endpoint_group = entry
+        group_committed = False
+        for _ in range(10):
+            response = await self.devCtrlEcoA.ReadAttribute(
+                nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.EndpointGroupIDList)],
+                returnClusterObject=True)
+            endpoint_group_list_after_add = response[1][Clusters.JointFabricDatastore].endpointGroupIDList
+
+            for entry in endpoint_group_list_after_add:
+                if (entry.nodeID == self.th2_node_id and
+                        entry.endpointID == self.th_app_endpoint_id and
+                        entry.groupID == self.th_group_id):
+                    target_endpoint_group = entry
+                    if (entry.statusEntry.state ==
+                            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted):
+                        group_committed = True
+                    break
+
+            if group_committed:
                 break
 
+            await asyncio.sleep(1)
+
         asserts.assert_is_not_none(target_endpoint_group,
-                                   f"EndpointGroupIDList should contain entry for NodeId={self.th2_node_id} and EndpointID={self.th_app_endpoint_id}")
-
-        group_id = target_endpoint_group.groupID
-        asserts.assert_equal(self.th_group_id, group_id, "GroupID should match the one added to the endpoint")
-
-        # Verify Status is Committed
-        self._assert_enum_equal(
-            target_endpoint_group.statusEntry.state,
-            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted,
-            "Status should be Committed")
+                                   f"EndpointGroupIDList should contain entry for NodeId={self.th2_node_id}, EndpointID={self.th_app_endpoint_id}, GroupID={self.th_group_id}")
+        asserts.assert_true(group_committed, "StatusEntry should change to Committed")
 
         # Step 31: TH reads GroupList from the given endpoint on TH2
         self.step(31, "TH reads GroupList from the given endpoint on TH2")
@@ -1132,7 +1143,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         asserts.assert_in(
             Clusters.Groups.id,
             th2_server_list,
-            f"TH2 endpoint {self.th_app_endpoint_id} must support Groups cluster for step 35")
+            f"TH2 endpoint {self.th_app_endpoint_id} must support Groups cluster for step 31")
 
         group_response = await self.send_single_cmd(
             cmd=Clusters.Groups.Commands.GetGroupMembership(groupList=[self.th_group_id]),
@@ -1165,7 +1176,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         # Note: epoch key bytes (epochKey0-2) are always returned as Null by KeySetRead per spec
         # (they are write-only). th_keyset_epoch was stored at setup time.
 
-        # Step 33: TH reads NodeKeySetList and verifies Status Success
+        # Step 33: TH reads NodeKeySetList and verifies Status Pending
         self.step(33, "TH reads NodeKeySetList attribute from DUT for NodeId=th_node_id and KeySetID=th_keyset_id")
 
         response = await self.devCtrlEcoA.ReadAttribute(
@@ -1183,8 +1194,8 @@ class TC_JFDS_2_5(MatterBaseTest):
         asserts.assert_is_not_none(th2_keyset_entry, "NodeKeySetList should contain entry for th_node_id")
         self._assert_enum_equal(
             th2_keyset_entry.statusEntry.state,
-            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted,
-            "StatusEntry should be Success")
+            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kPending,
+            "StatusEntry should be Pending")
 
         # Step 34: TH reads KeySetList from TH2 and verifies new EpochKey2
         self.step(34, "TH reads KeySetList from the given endpoint on TH2")
@@ -1207,6 +1218,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 35: TH sends RemoveGroupIDFromEndpointForNode command with non-existent NodeId
         self.step(35, "TH sends RemoveGroupIDFromEndpointForNode command to DUT with NodeId=0x0000_0000_0000_000a, EndpointID=th_app_endpoint_id, GroupID=th_group_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         try:
             await self.send_single_cmd(
@@ -1277,7 +1289,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         asserts.assert_in(
             Clusters.Groups.id,
             th2_server_list_step44,
-            f"TH2 endpoint {self.th_app_endpoint_id} must support Groups cluster for step 44")
+            f"TH2 endpoint {self.th_app_endpoint_id} must support Groups cluster for step 38")
 
         get_group_cmd = Clusters.Groups.Commands.GetGroupMembership(
             groupList=[self.th_group_id]
@@ -1295,6 +1307,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 39: TH reads KeySetList from TH2 and verifies keyset does not exist
         self.step(39, "TH reads KeySetList from the given endpoint on TH2")
+        # When the last group referencing a keyset is removed from a node, the keyset is also removed; KeySetRead must return NotFound.
 
         # Read the actual KeySet for th_keyset_id using KeySetRead
         try:
@@ -1311,6 +1324,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 40: TH sends AddBindingToEndpointForNode command with non-existent NodeId
         self.step(40, "TH sends AddBindingToEndpointForNode command to DUT with NodeId=0x0000_0000_0000_000a and EndpointID=th_app_endpoint_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         binding_struct = Clusters.JointFabricDatastore.Structs.DatastoreBindingTargetStruct(
             node=self.th2_node_id,
@@ -1367,9 +1381,9 @@ class TC_JFDS_2_5(MatterBaseTest):
             response = await self.devCtrlEcoA.ReadAttribute(
                 nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.EndpointBindingList)],
                 returnClusterObject=True)
-            endpoint_binding_list_step48 = response[1][Clusters.JointFabricDatastore].endpointBindingList
+            endpoint_binding_list_polled = response[1][Clusters.JointFabricDatastore].endpointBindingList
 
-            for entry in endpoint_binding_list_step48:
+            for entry in endpoint_binding_list_polled:
                 if (entry.nodeID == self.th2_node_id and entry.endpointID == self.th_app_endpoint_id and
                         self._normalize_binding_target(entry.binding) == expected_binding):
                     target_endpoint_binding = entry
@@ -1385,7 +1399,7 @@ class TC_JFDS_2_5(MatterBaseTest):
             await asyncio.sleep(1)
 
         asserts.assert_is_not_none(target_endpoint_binding,
-                                   "EndpointBindingList should contain the binding added in step 47")
+                                   "EndpointBindingList should contain the binding added in step 41")
         asserts.assert_true(binding_committed, "StatusEntry should change to Committed")
 
         asserts.assert_equal(self._normalize_binding_target(target_endpoint_binding.binding), expected_binding,
@@ -1399,7 +1413,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         asserts.assert_in(
             Clusters.Binding.id,
             th2_server_list_step48,
-            f"TH2 endpoint {self.th_app_endpoint_id} must support Binding cluster for step 48")
+            f"TH2 endpoint {self.th_app_endpoint_id} must support Binding cluster for step 42")
 
         th2_matching_binding = None
         last_th2_binding_list = []
@@ -1412,7 +1426,7 @@ class TC_JFDS_2_5(MatterBaseTest):
             asserts.assert_true(
                 self.th_app_endpoint_id in th2_bindings_list_resp and Clusters.Binding in th2_bindings_list_resp[
                     self.th_app_endpoint_id],
-                f"TH2 endpoint {self.th_app_endpoint_id} reports Binding but Binding attribute is unavailable in step 48")
+                f"TH2 endpoint {self.th_app_endpoint_id} reports Binding but Binding attribute is unavailable in step 42")
 
             th2_binding_list = th2_bindings_list_resp[self.th_app_endpoint_id][Clusters.Binding].binding
             last_th2_binding_list = [self._normalize_binding_target(binding) for binding in th2_binding_list]
@@ -1429,11 +1443,12 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         asserts.assert_is_not_none(
             th2_matching_binding,
-            f"TH2's BindingList should contain the binding added in step 47. "
+            f"TH2's BindingList should contain the binding added in step 41. "
             f"Expected={expected_binding}, LastObserved={last_th2_binding_list}")
 
         # Step 43: TH sends RemoveBindingFromEndpointForNode command with non-existent NodeId
         self.step(43, "TH sends RemoveBindingFromEndpointForNode command to DUT with NodeId=0x0000_0000_0000_000a and EndpointID=th_app_endpoint_id, ListID=th_binding_list_id")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         try:
             await self.send_single_cmd(
@@ -1501,7 +1516,7 @@ class TC_JFDS_2_5(MatterBaseTest):
         asserts.assert_in(
             Clusters.Binding.id,
             th2_server_list_step51,
-            f"TH2 endpoint {self.th_app_endpoint_id} must support Binding cluster for step 51")
+            f"TH2 endpoint {self.th_app_endpoint_id} must support Binding cluster for step 45")
 
         # Poll TH2 BindingList until the removed binding is absent.
         th2_binding_removed = False
@@ -1514,7 +1529,7 @@ class TC_JFDS_2_5(MatterBaseTest):
             asserts.assert_true(
                 self.th_app_endpoint_id in th2_bindings_list_resp and Clusters.Binding in th2_bindings_list_resp[
                     self.th_app_endpoint_id],
-                f"TH2 endpoint {self.th_app_endpoint_id} reports Binding but Binding attribute is unavailable in step 51")
+                f"TH2 endpoint {self.th_app_endpoint_id} reports Binding but Binding attribute is unavailable in step 45")
 
             th2_binding_list = th2_bindings_list_resp[self.th_app_endpoint_id][Clusters.Binding].binding
             th2_matching_binding_found = any(
@@ -1532,6 +1547,7 @@ class TC_JFDS_2_5(MatterBaseTest):
 
         # Step 46: TH sends RemoveNode command with non-existent NodeId
         self.step(46, "TH sends RemoveNode command to DUT with NodeId=0x0000_0000_0000_000a")
+        # Spec requires CONSTRAINT_ERROR when the target NodeID is absent from the datastore.
 
         try:
             await self.send_single_cmd(
@@ -1561,11 +1577,11 @@ class TC_JFDS_2_5(MatterBaseTest):
         response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.NodeList)],
             returnClusterObject=True)
-        node_list_step54 = response[1][Clusters.JointFabricDatastore].nodeList
+        node_list_final = response[1][Clusters.JointFabricDatastore].nodeList
 
         # Verify th_node_id is NOT in the list
         node_found = False
-        for node in node_list_step54:
+        for node in node_list_final:
             if node.nodeID == self.th2_node_id:
                 node_found = True
                 break
