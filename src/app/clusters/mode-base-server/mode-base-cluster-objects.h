@@ -41,26 +41,7 @@
 
 namespace chip::app::Clusters::ModeBase {
 
-// A pair of cluster ID and revision.
-struct ClusterRevisionEntry
-{
-    ClusterId id;
-    uint32_t revision;
-};
 
-// The 10 clusters that share this attribute structure.
-static constexpr ClusterRevisionEntry kAliasedClusters[] = {
-    { DeviceEnergyManagementMode::Id, DeviceEnergyManagementMode::kRevision },
-    { DishwasherMode::Id, DishwasherMode::kRevision },
-    { EnergyEvseMode::Id, EnergyEvseMode::kRevision },
-    { LaundryWasherMode::Id, LaundryWasherMode::kRevision },
-    { MicrowaveOvenMode::Id, MicrowaveOvenMode::kRevision },
-    { OvenMode::Id, OvenMode::kRevision },
-    { RefrigeratorAndTemperatureControlledCabinetMode::Id, RefrigeratorAndTemperatureControlledCabinetMode::kRevision },
-    { RvcCleanMode::Id, RvcCleanMode::kRevision },
-    { RvcRunMode::Id, RvcRunMode::kRevision },
-    { WaterHeaterMode::Id, WaterHeaterMode::kRevision },
-};
 
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
 using Feature      = DeviceEnergyManagementMode::Feature;

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
@@ -53,11 +55,20 @@ private:
 class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
 {
 public:
+    void SetOperationalStateDelegate(Clusters::OperationalState::EmulatedOperationalStateDelegate * opStateDelegate)
+    {
+        mOpStateDelegate = opStateDelegate;
+    }
+
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
                                                                            bool startAfterSetting,
                                                                            Optional<uint8_t> powerSettingNum,
                                                                            Optional<uint8_t> wattSettingIndex) override
     {
+        if (startAfterSetting && mOpStateDelegate != nullptr)
+        {
+            mOpStateDelegate->StartEmulatedOperationTimer();
+        }
         return Protocols::InteractionModel::Status::Success;
     }
 
@@ -83,6 +94,9 @@ public:
     uint8_t GetPowerStepNum() const override { return 10; }
     uint8_t GetCurrentWattIndex() const override { return 0; }
     uint16_t GetWattRating() const override { return 1000; }
+
+private:
+    Clusters::OperationalState::EmulatedOperationalStateDelegate * mOpStateDelegate = nullptr;
 };
 
 class MicrowaveOvenModeDelegate : public Clusters::ModeBase::AppDelegate
@@ -149,7 +163,7 @@ private:
     Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    EmulatedMicrowaveOvenControlIntegrationDelegate mControlIntegrationDelegate;
+    std::optional<EmulatedMicrowaveOvenControlIntegrationDelegate> mControlIntegrationDelegate;
     EmulatedMicrowaveOvenControlDelegate mControlAppDelegate;
     LazyRegisteredServerCluster<Clusters::MicrowaveOvenControlCluster> mMicrowaveOvenControlCluster;
 

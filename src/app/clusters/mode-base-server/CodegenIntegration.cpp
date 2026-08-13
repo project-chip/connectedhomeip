@@ -22,6 +22,7 @@
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <devices/Types.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
@@ -45,6 +46,19 @@ namespace {
 // A set of pointers to all initialised ModeBase instances. It provides a way to access all ModeBase derived clusters.
 // TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 IntrusiveList<Instance> gModeBaseInstances;
+
+// The clusters that share this attribute structure.
+constexpr DataModel::DeviceTypeEntry kAliasedClusters[] = {
+    Device::Type::kDeviceEnergyManagement,
+    Device::Type::kDishwasher,
+    Device::Type::kEvse,
+    Device::Type::kLaundryWasher,
+    Device::Type::kMicrowaveOven,
+    Device::Type::kOven,
+    Device::Type::kRefrigerator,
+    Device::Type::kRoboticVacuumCleaner,
+    Device::Type::kWaterHeater,
+};
 
 } // namespace
 
@@ -83,16 +97,16 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    std::optional<uint32_t> clusterRevision;
+    std::optional<DataModel::DeviceTypeEntry> aliasedClusterEntry;
     for (const auto & entry : kAliasedClusters)
     {
-        if (entry.id == mClusterPath.mClusterId)
+        if (entry.deviceTypeId == mClusterPath.mClusterId)
         {
-            clusterRevision = entry.revision;
+            aliasedClusterEntry = entry;
             break;
         }
     }
-    VerifyOrReturnError(clusterRevision.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aliasedClusterEntry.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Although StartUpMode attribute is optional, spec says that none of the aliased clusters supports it.
     VerifyOrReturnError(!emberAfContainsAttribute(mClusterPath.mEndpointId, mClusterPath.mClusterId, StartUpMode::Id),
@@ -132,9 +146,8 @@ CHIP_ERROR Instance::Init()
                                     .optionalAttributeSet   = mOptionalAttributeSet,
                                     .appDelegate            = *mDelegate,
                                     .onOffValueForStartUp   = onOffValueForStartUp,
-                                    .diagnosticDataProvider = diagnosticDataProvider,
-                                    .clusterRevision        = clusterRevision.value() };
-    mCluster.Create(mClusterPath.mEndpointId, mClusterPath.mClusterId, config);
+                                    .diagnosticDataProvider = diagnosticDataProvider };
+    mCluster.Create(mClusterPath.mEndpointId, aliasedClusterEntry.value(), config);
     RegisterThisInstance();
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }

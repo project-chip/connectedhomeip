@@ -47,25 +47,49 @@ public:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
                                   DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
     {
-        VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-        VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kLabels), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
 
-        modeTags[0].mfgCode.ClearValue();
-        modeTags[0].value = kTagValues[modeIndex];
-        modeTags.reduce_size(1);
+        switch (modeIndex)
+        {
+        case 0: // Normal
+            VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
+            modeTags[0].mfgCode.ClearValue();
+            modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kNormal);
+            modeTags.reduce_size(1);
+            break;
+        case 1: // Heavy
+            VerifyOrReturnError(modeTags.size() >= 2, CHIP_ERROR_INVALID_ARGUMENT);
+            modeTags[0].mfgCode.ClearValue();
+            modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kHeavy);
+            modeTags[1].mfgCode.ClearValue();
+            modeTags[1].value = to_underlying(Clusters::DishwasherMode::ModeTag::kMax);
+            modeTags.reduce_size(2);
+            break;
+        case 2: // Light
+            VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
+            modeTags[0].mfgCode.ClearValue();
+            modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kLight);
+            modeTags.reduce_size(1);
+            break;
+        default:
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
         return CHIP_NO_ERROR;
     }
 
     void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
     {
+        if (newMode == 2)
+        {
+            response.status = to_underlying(Clusters::ModeBase::StatusCode::kInvalidInMode);
+            response.statusText.SetValue("Invalid in current state"_span);
+            return;
+        }
         response.status = to_underlying(Clusters::ModeBase::StatusCode::kSuccess);
     }
 
 private:
-    static constexpr CharSpan kLabels[]    = { "Normal"_span, "Heavy"_span, "Light"_span };
-    static constexpr uint16_t kTagValues[] = { to_underlying(Clusters::DishwasherMode::ModeTag::kNormal),
-                                               to_underlying(Clusters::DishwasherMode::ModeTag::kHeavy),
-                                               to_underlying(Clusters::DishwasherMode::ModeTag::kLight) };
+    static constexpr CharSpan kLabels[] = { "Normal"_span, "Heavy"_span, "Light"_span };
 };
 
 class Dishwasher : public SingleEndpoint

@@ -48,7 +48,7 @@ CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvi
             mLaundryWasherControlsDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mLaundryWasherControlsCluster.Registration()));
 
-    mLaundryWasherModeCluster.Create(endpoint, Clusters::LaundryWasherMode::Id,
+    mLaundryWasherModeCluster.Create(endpoint, Device::Type::kLaundryWasher,
                                      Clusters::ModeBaseCluster::Config{
                                          .feature                = BitFlags<Clusters::ModeBase::Feature>(),
                                          .appDelegate            = mLaundryWasherModeDelegate,

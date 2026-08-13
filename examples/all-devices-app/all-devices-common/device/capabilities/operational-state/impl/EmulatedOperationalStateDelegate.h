@@ -57,12 +57,13 @@ public:
         mCluster = cluster;
     }
 
+    void StartEmulatedOperationTimer();
+
 protected:
     static constexpr uint32_t kEmulatedOperationDurationSec = 30;
 
     static void OnOperationTimerComplete(System::Layer * systemLayer, void * appState);
     void CancelTimer();
-    void StartEmulatedOperationTimer();
 
     OperationalStateCluster * mCluster = nullptr;
     DataModel::Nullable<uint32_t> mCountdownTime;
