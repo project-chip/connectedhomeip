@@ -182,20 +182,6 @@ public:
     virtual FabricIndex GetAccessingFabricIndex() const = 0;
 
     /**
-     * API for adding a data response.  The `aEncodable` is generally expected to encode
-     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
-     *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aResponseCommandId the command whose content is being encoded.
-     * @param [in] aEncodable - an encodable that places the command data structure
-     *             for `aResponseCommandId` into a TLV Writer.
-     *
-     * If you have no great way of handling the returned CHIP_ERROR, consider
-     * using `AddResponse` which will automatically reply with `Failure` in
-     * case AddResponseData fails.
-     */
-    /**
      * Non-virtual response payload descriptor binding an untyped pointer to command data with a type-erased encoding callback.
      *
      * Using a POD struct with a standalone function pointer callback explicitly avoids compiler-generated virtual class
@@ -215,8 +201,18 @@ public:
     };
 
     /**
-     * Encodes and adds response data via the polymorphic EncodableToTLV virtual interface.
-     * Supports dynamic or custom encodables that implement EncodableToTLV.
+     * API for adding a data response.  The `aEncodable` is generally expected to encode
+     * a ClusterName::Commands::CommandName::Type struct, however any object should work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aResponseCommandId the command whose content is being encoded.
+     * @param [in] aEncodable - an encodable that places the command data structure
+     *             for `aResponseCommandId` into a TLV Writer.
+     *
+     * If you have no great way of handling the returned CHIP_ERROR, consider
+     * using `AddResponse` which will automatically reply with `Failure` in
+     * case AddResponseData fails.
      */
     virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                        const DataModel::EncodableToTLV & aEncodable) = 0;
