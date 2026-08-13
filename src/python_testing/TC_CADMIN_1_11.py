@@ -70,7 +70,7 @@ class TC_CADMIN_1_11(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster", "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
             TestStep(

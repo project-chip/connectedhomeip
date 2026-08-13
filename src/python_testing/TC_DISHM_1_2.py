@@ -58,7 +58,7 @@ class TC_DISHM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def steps_TC_DISHM_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute.")
         ]

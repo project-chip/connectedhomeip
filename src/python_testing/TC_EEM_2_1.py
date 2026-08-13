@@ -65,8 +65,7 @@ class TC_EEM_2_1(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def steps_TC_EEM_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads Accuracy attribute",
                      "Verify that the DUT response contains a MeasurementAccuracyStruct value."),
             TestStep("3", "TH reads CumulativeEnergyImported attribute",

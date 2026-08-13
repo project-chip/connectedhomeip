@@ -100,7 +100,7 @@ class TC_CLCTRL_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_CLCTRL_4_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "If the PS feature is not supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH reads TestEventTrigger attribute from the General Diagnostic Cluster."),

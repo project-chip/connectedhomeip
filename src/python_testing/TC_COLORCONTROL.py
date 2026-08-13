@@ -57,7 +57,7 @@ class TC_COLORCONTROL(MatterTestCommissionedDevice):
         return "[TC_COLORCONTROL] chef colortemperaturelight functionality test."
 
     def steps_TC_COLORCONTROL(self):
-        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done."),
                 TestStep(2, "[TC_COLORCONTROL] Test move-color-temperature command.")]
 
     @async_test_body

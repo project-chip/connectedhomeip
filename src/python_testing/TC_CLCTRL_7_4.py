@@ -89,7 +89,7 @@ class TC_CLCTRL_7_4(MatterTestCommissionedDevice):
 
     def steps_TC_CLCTRL_7_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Read the AttributeList attribute to determine supported attributes",

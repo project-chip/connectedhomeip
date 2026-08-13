@@ -72,7 +72,7 @@ class TC_PWRTL_2_1(MatterTestCommissionedDevice):
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
 
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1, "Commissioning, already done")
 
         self.step(2, "TH reads FeatureMap from DUT")
         feature_map = await self.read_single_attribute_check_success(

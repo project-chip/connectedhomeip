@@ -64,7 +64,7 @@ class TC_CC_6_5(MatterTestCommissionedDevice):
 
     def steps_TC_CC_6_5(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH writes 0x00 to the Options attribute"),
             TestStep("0b", "TH sends On command to DUT",
                      "Verify DUT responds with a successful (value 0x00) status response."),

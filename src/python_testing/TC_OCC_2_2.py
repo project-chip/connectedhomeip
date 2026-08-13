@@ -68,7 +68,7 @@ class TC_OCC_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read OccupancySensorType attribute selection based on FeatureMap Bitmap."),
             TestStep(3, "Read OccupancySensorTypeBitmap attribute selection based on FeatureMap Bitmap.")
         ]

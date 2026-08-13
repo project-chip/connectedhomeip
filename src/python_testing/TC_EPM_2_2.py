@@ -62,8 +62,7 @@ class TC_EPM_2_2(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def steps_TC_EPM_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),

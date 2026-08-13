@@ -25,14 +25,19 @@ paths, so they stay meaningful if a class is moved or renamed.
 """
 
 import ast
+import asyncio
 import importlib.util
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
+from matter.testing import matter_testing as matter_testing_module
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import (CertificationUnitTestNoDevice, MatterBaseTest, MatterTestCommissionedDevice,
                                            MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement)
+from mobly import signals
 
 _MARKERS = (
     MatterTestCommissionedDevice,
@@ -305,6 +310,83 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
         self.assertEqual(offenders, [],
                          "concrete tests must derive from a device-requirement marker, not bare "
                          f"MatterBaseTest: {offenders}")
+
+
+class TestCommissioningPreconditionChecks(unittest.TestCase):
+    """Behavioral checks for the commissioning-state precondition the device-state markers enforce.
+
+    The precondition delegates to matter.testing.commissioning.is_commissioned (a passive DNS-SD
+    probe). These tests mock it so no device or network is required, and drive the helper directly
+    (avoiding the heavy Mobly class setup) plus verify each marker's setup_class passes the right
+    expectation.
+    """
+
+    def _run_precondition(self, is_commissioned_result: bool, expect_commissioned: bool):
+        """Invoke MatterBaseTest._assert_device_commissioning_precondition against a stub self with
+        is_commissioned mocked to return is_commissioned_result. Raises signals.TestFailure if the
+        precondition fails."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(return_value=is_commissioned_result)):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=expect_commissioned)
+        finally:
+            loop.close()
+
+    def test_commissioned_precondition_passes_when_commissioned(self):
+        """MatterTestCommissionedDevice: a commissioned DUT satisfies the precondition."""
+        self._run_precondition(is_commissioned_result=True, expect_commissioned=True)
+
+    def test_commissioned_precondition_fails_when_not_commissioned(self):
+        """MatterTestCommissionedDevice: an uncommissioned DUT hard-fails class setup."""
+        with self.assertRaises(signals.TestFailure):
+            self._run_precondition(is_commissioned_result=False, expect_commissioned=True)
+
+    def test_uncommissioned_precondition_passes_when_not_commissioned(self):
+        """MatterTestUncommissionedDevice: an uncommissioned DUT satisfies the precondition."""
+        self._run_precondition(is_commissioned_result=False, expect_commissioned=False)
+
+    def test_uncommissioned_precondition_fails_when_commissioned(self):
+        """MatterTestUncommissionedDevice: a DUT already on the fabric hard-fails class setup."""
+        with self.assertRaises(signals.TestFailure):
+            self._run_precondition(is_commissioned_result=True, expect_commissioned=False)
+
+    def test_assert_dut_commissioned_helper(self):
+        """assert_dut_commissioned passes when the DUT is commissioned and fails otherwise."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                MatterBaseTest.assert_dut_commissioned(stub)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)):
+                with self.assertRaises(signals.TestFailure):
+                    MatterBaseTest.assert_dut_commissioned(stub)
+        finally:
+            loop.close()
+
+    def test_commissioned_marker_setup_class_enforces_precondition(self):
+        """MatterTestCommissionedDevice.setup_class calls super().setup_class() then asserts the
+        DUT is commissioned."""
+        stub = mock.MagicMock(spec=MatterTestCommissionedDevice)
+        with mock.patch.object(MatterBaseTest, "setup_class") as super_setup:
+            MatterTestCommissionedDevice.setup_class(stub)
+        super_setup.assert_called_once()
+        stub._assert_device_commissioning_precondition.assert_called_once_with(expect_commissioned=True)
+
+    def test_uncommissioned_marker_setup_class_enforces_precondition(self):
+        """MatterTestUncommissionedDevice.setup_class calls super().setup_class() then asserts the
+        DUT is NOT commissioned."""
+        stub = mock.MagicMock(spec=MatterTestUncommissionedDevice)
+        with mock.patch.object(MatterBaseTest, "setup_class") as super_setup:
+            MatterTestUncommissionedDevice.setup_class(stub)
+        super_setup.assert_called_once()
+        stub._assert_device_commissioning_precondition.assert_called_once_with(expect_commissioned=False)
+
+    def test_commissioner_marker_has_no_setup_class_precondition(self):
+        """MatterTestCommissioner does not enforce a setup_class precondition (its DUT is not yet
+        present at class setup); it relies on the opt-in assert_dut_commissioned instead."""
+        self.assertNotIn("setup_class", MatterTestCommissioner.__dict__)
 
 
 if __name__ == "__main__":

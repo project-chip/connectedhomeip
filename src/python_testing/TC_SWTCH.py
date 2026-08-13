@@ -299,7 +299,7 @@ class TC_SwitchTests(MatterTestCommissionedDevice):
         return False
 
     def steps_TC_SWTCH_2_2(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required(), ""),
                 TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
                 TestStep(3, "Operator sets switch to first position on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT.", "Verify that the value is 0."),
@@ -409,7 +409,7 @@ class TC_SwitchTests(MatterTestCommissionedDevice):
         attrib_listener.await_all_final_values_reported(expected_final_value, timeout_sec=post_prompt_settle_delay_seconds)
 
     def steps_TC_SWTCH_2_3(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required(), ""),
                 TestStep(2, "Set up subscription to all events of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
@@ -488,7 +488,7 @@ class TC_SwitchTests(MatterTestCommissionedDevice):
         return "[TC-SWTCH-2.4] Momentary Switch Long Press Verification"
 
     def steps_TC_SWTCH_2_4(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required(), ""),
                 TestStep(2, "Set up subscription to all events and attributes of Switch cluster on the endpoint"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep(4, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
@@ -585,7 +585,7 @@ class TC_SwitchTests(MatterTestCommissionedDevice):
                                            sequence=expected_events, timeout_sec=post_prompt_settle_delay_seconds)
 
     def steps_TC_SWTCH_2_5(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required(), ""),
                 TestStep(2, "Set up a subscription to all Switch cluster events"),
                 TestStep(3, "Operate does not operate the switch on the DUT"),
                 TestStep("4a", "Operator operates switch (press briefly) associated with position 1 on the DUT then release switch from DUT",
@@ -778,7 +778,7 @@ class TC_SwitchTests(MatterTestCommissionedDevice):
         asserts.assert_equal(event.totalNumberOfPressesCounted, 1, "Unexpected count on MultiPressComplete")
 
     def steps_TC_SWTCH_2_6(self):
-        return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required()),
                 TestStep(2, "Set up subscription to all Switch cluster events"),
                 TestStep(3, "Operator does not operate switch on the DUT"),
                 TestStep("4a", "Operator operates switch (press briefly) associated with position 1 on the DUT then release switch from DUT",

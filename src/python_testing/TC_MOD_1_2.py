@@ -62,7 +62,7 @@ class TC_MOD_1_2(MatterTestCommissionedDevice):
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
             TestStep(4, "TH reads the OnMode attribute from the DUT"),

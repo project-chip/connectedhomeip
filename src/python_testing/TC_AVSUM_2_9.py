@@ -56,7 +56,7 @@ class TC_AVSUM_2_9(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read and verify the MPTZPosition attribute."),
             TestStep(3, "Establish a subscription to MovementState"),
             TestStep(4, "If Pan is supported read and verify the PanMin attribute. Store in myPanMin."),

@@ -384,7 +384,7 @@ class TC_OPCREDS_VidVerify(MatterTestCommissionedDevice):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster
 
-        with test_step(0, description="Commission DUT in TH1's fabric. Cert chain must include ICAC.", is_commissioning=True):
+        with test_step(0, description="Commission DUT in TH1's fabric. Cert chain must include ICAC."):
             # Commissioning with ICAC was implicit due to the commissioning method passed on command line.
 
             opcreds = Clusters.OperationalCredentials

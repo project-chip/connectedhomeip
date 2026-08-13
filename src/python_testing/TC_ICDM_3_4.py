@@ -70,7 +70,7 @@ class TC_ICDM_3_4(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_3_4(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
             TestStep("2a", "Power cycle DUT."),
             TestStep("2b", "TH waits for {PIXIT.WAITTIME.REBOOT}"),

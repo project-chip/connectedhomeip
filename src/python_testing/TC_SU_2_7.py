@@ -155,7 +155,7 @@ class TC_SU_2_7(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     def steps_TC_SU_2_7(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "Perform a software update on the DUT."
                      "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."

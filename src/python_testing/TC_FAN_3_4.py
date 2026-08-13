@@ -89,7 +89,7 @@ class TC_FAN_3_4(MatterTestCommissionedDevice):
 
     def steps_TC_FAN_3_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read from the DUT the WindSupport attribute and store"),
             TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting"),
             TestStep(4, "Read from the DUT the WindSetting attribute"),

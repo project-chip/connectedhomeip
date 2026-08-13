@@ -70,7 +70,7 @@ class TC_MTRID_2_1(MatterTestCommissionedDevice, MeterIdentificationTestBaseHelp
 
     def steps_TC_MTRID_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned."),
             TestStep("2", "TH reads MeterType attribute", """
                      - DUT replies a null or a MeterTypeEnum value;
                      - Verify that value in range 0 - 2."""),

@@ -134,7 +134,7 @@ class TC_CCTRL_2_3(MatterTestCommissionedDevice):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
-        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+        return [TestStep(1, "Get number of fabrics from TH_SERVER"),
                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
                 TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),

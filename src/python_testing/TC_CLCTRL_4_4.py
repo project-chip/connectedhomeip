@@ -88,7 +88,7 @@ class TC_CLCTRL_4_4(MatterTestCommissionedDevice):
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Check if CountdownTime attribute is supported",

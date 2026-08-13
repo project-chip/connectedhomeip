@@ -176,7 +176,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_12(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "TH is commissioned", is_commissioning=True),
+            TestStep("precondition", "TH is commissioned"),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT responds with ArmFailSafeResponse to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as `NumNetworks`",

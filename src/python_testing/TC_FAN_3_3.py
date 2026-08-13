@@ -86,7 +86,7 @@ class TC_FAN_3_3(MatterTestCommissionedDevice):
 
     def steps_TC_FAN_3_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read from the DUT the RockSupport attribute and store"),
             TestStep(3, "RockLeftRight is supported, so write 0x01 to RockSetting"),
             TestStep(4, "Read from the DUT the RockSetting attribute"),

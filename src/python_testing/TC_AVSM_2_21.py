@@ -57,7 +57,7 @@ class TC_AVSM_2_21(MatterTestCommissionedDevice, AVSMTestBase):
 
     def steps_TC_AVSM_2_21(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT. Verify F_VDO is supported."),
             TestStep(3, "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT. Verify the number of allocated video streams in the list is 0."),
             TestStep(4, "TH reads SupportedStreamUsages attribute from CameraAVStreamManagement Cluster on DUT. Store this value in aSupportedStreamUsages."),

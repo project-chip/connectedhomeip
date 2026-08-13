@@ -290,7 +290,7 @@ class TC_S_2_6(MatterTestCommissionedDevice):
         self.th1 = self.default_controller
         self._fabrics_to_remove: list[int] = []
 
-        self.step(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.", is_commissioning=True)
+        self.step(0, "Commission DUT to TH1, TH2 and TH3 on distinct fabrics.")
         self._th1_fabric = typing.cast(
             int,
             await self.read_single_attribute_check_success(

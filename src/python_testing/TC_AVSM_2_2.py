@@ -57,7 +57,7 @@ class TC_AVSM_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_AVSM_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify SNP is supported"),
             TestStep(
                 2,

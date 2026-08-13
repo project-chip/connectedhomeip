@@ -71,7 +71,7 @@ class TC_CC_2_3(MatterTestCommissionedDevice):
         def entry_count_verification(reportList: str) -> str:
             return f'_{reportList}_ has 12 or less entries in the list'
 
-        return [TestStep(1, commission_if_required(), is_commissioning=True),
+        return [TestStep(1, commission_if_required()),
                 TestStep(2, read_attribute('FeatureMap')),
                 TestStep(3, read_attribute('AttributeList')),
                 TestStep(4, read_attribute('ServerList', 'Descriptor')),

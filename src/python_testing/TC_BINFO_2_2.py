@@ -78,7 +78,7 @@ class TC_BINFO_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_BINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done."),
             TestStep(1, "TH reads from the DUT the SoftwareVersion attribute.",
                      "Store value for later use."),
             TestStep(2, "TH reads the StartUp event from the DUT", """

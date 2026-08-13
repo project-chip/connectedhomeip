@@ -97,7 +97,7 @@ class TC_ACE_1_6(MatterTestCommissionedDevice):
     def steps_TC_ACE_1_6(self) -> list[TestStep]:
         return [
             # --- 1. Shared Setup ---
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("1a", "TH finds a non-root endpoint (ep~1~ or PIXIT.G.ENDPOINT) implementing Groups cluster and a server cluster with commands requiring Operate privilege (if Groupcast enabled on RootNode) or verifies PIXIT.G.ENDPOINT is a valid non-root endpoint implementing Groups cluster (if Groupcast NOT enabled)"),
             TestStep("1b", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a3"),
             TestStep("1c", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a1"),

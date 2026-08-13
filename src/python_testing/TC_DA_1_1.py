@@ -69,7 +69,7 @@ class TC_DA_1_1(MatterTestCommissionedDevice):
     def steps_TC_DA_1_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("precondition", "DUT is commissioned to TH1's fabric", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned to TH1's fabric"),
             TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1"),
             TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that TH1's fabric is present in the list

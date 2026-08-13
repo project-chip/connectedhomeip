@@ -120,7 +120,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
         return [
             # DUT DETAILS
             #
-            TestStep(1, "DUT is commissioned.", is_commissioning=True),
+            TestStep(1, "DUT is commissioned."),
 
             TestStep(2, """Check if the ICD Management cluster is present""",
                         """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0

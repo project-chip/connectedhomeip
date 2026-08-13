@@ -92,7 +92,7 @@ class TC_RVCOPSTATE_2_5(MatterTestCommissionedDevice):
 
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep(
                 "2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
             TestStep("3", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),

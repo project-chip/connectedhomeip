@@ -58,7 +58,7 @@ class TC_GC_2_6(MatterTestCommissionedDevice):
 
     def steps_TC_GC_2_6(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "Commission DUT to TH2 (can be skipped if done in a preceding test)"),
             TestStep("1c", "TH removes any existing group and KeySetID on the DUT"),
             TestStep(2, "Join group G1 generating a new key. JoinGroup (GroupID=G1, Endpoints='see notes', KeySetID=K1, Key=InputKey1)"),

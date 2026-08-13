@@ -132,7 +132,7 @@ class TC_ICDM_3_3(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_3_3(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute."),
             TestStep("1b", "TH sends UnregisterClient command with CheckInNodeID1, where CheckInNodeID1 can be any random node ID."),
             TestStep("2a", "TH sends RegisterClient command."),

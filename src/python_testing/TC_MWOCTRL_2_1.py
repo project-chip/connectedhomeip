@@ -79,7 +79,7 @@ class TC_MWOCTRL_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_MWOCTRL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the MaxCookTime attribute and check limits",
                      "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
                      ),

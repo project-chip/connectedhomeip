@@ -176,8 +176,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # update — the DUT has just applied V2 and will reject it. This means only one firmware
         # image (V2) is needed for the entire test.
         return [
-            TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
-                     is_commissioning=True),
+            TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)"),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'Busy', DelayedActionTime is set to 60 seconds.",
                      "Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec "

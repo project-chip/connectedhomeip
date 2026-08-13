@@ -56,7 +56,7 @@ class TC_CLDIM_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_CLDIM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2a", "Read feature map determine supported features"),
             TestStep(3, "Read CurrentState attribute, if supported"),
             TestStep(4, "Read TargetState attribute, if supported"),

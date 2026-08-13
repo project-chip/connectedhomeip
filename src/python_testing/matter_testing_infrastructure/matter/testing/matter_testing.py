@@ -61,7 +61,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_device,
-                                          commission_devices, get_setup_payload_info_config)
+                                          commission_devices, get_setup_payload_info_config, is_commissioned)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
@@ -1832,6 +1832,45 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
+    def _assert_device_commissioning_precondition(self, expect_commissioned: bool) -> None:
+        """Hard-fail class setup if the DUT's commissioning state does not match the marker.
+
+        Called from the device-state markers' ``setup_class``. Delegates to
+        :func:`matter.testing.commissioning.is_commissioned`, a passive DNS-SD probe (no
+        PASE/CASE side effects) that already applies its own DNS-SD discovery timeout, so no
+        additional polling is needed here.
+        """
+        commissioned = self.event_loop.run_until_complete(
+            is_commissioned(self.default_controller, self.dut_node_id))
+        if expect_commissioned:
+            asserts.assert_true(
+                commissioned,
+                f"MatterTestCommissionedDevice precondition failed: DUT node {self.dut_node_id} is not "
+                "commissioned on this fabric. This test requires an already-commissioned DUT; commission "
+                "it first (e.g. via --commissioning-method).")
+        else:
+            asserts.assert_false(
+                commissioned,
+                f"MatterTestUncommissionedDevice precondition failed: DUT node {self.dut_node_id} is already "
+                "commissioned on this fabric. This test requires an uncommissioned DUT; factory-reset it "
+                "before running.")
+
+    def assert_dut_commissioned(self) -> None:
+        """Assert the primary DUT is now commissioned on this fabric.
+
+        Opt-in check for :class:`MatterTestCommissioner` tests: call it right after driving
+        commissioning (e.g. after ``self.commission_devices()``) to confirm the DUT the test
+        just commissioned is operational. It is not run automatically from ``setup_class``
+        because a commissioner test's target device generally does not exist yet at that point.
+        Delegates to :func:`matter.testing.commissioning.is_commissioned`.
+        """
+        commissioned = self.event_loop.run_until_complete(
+            is_commissioned(self.default_controller, self.dut_node_id))
+        asserts.assert_true(
+            commissioned,
+            f"Expected DUT node {self.dut_node_id} to be commissioned on this fabric after commissioning, "
+            "but it was not detected as operational.")
+
     @property
     def first_setup_code(self) -> str | None:
         return get_first_setup_code(self.default_controller, self.matter_test_config)
@@ -3478,7 +3517,14 @@ class MatterTestCommissionedDevice(MatterBaseTest):
     Classification follows the DUT's required starting state, not incidental
     commissioning actions. A test that opens a commissioning window and commissions a
     *second* fabric, or commissions a helper/peer device, while its own DUT is already
-    commissioned is still MatterTestCommissionedDevice."""
+    commissioned is still MatterTestCommissionedDevice.
+
+    Enforces the precondition in setup_class: the DUT must be commissioned on this fabric
+    before the test runs, otherwise class setup hard-fails."""
+
+    def setup_class(self):
+        super().setup_class()
+        self._assert_device_commissioning_precondition(expect_commissioned=True)
 
 
 class MatterTestUncommissionedDevice(MatterBaseTest):
@@ -3486,7 +3532,14 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
     Used for tests whose DUT must arrive uncommissioned and that do not perform
     protocol commissioning of it (e.g. out-of-box discovery / advertising checks). Tests
-    that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner."""
+    that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner.
+
+    Enforces the precondition in setup_class: the DUT must NOT already be commissioned on
+    this fabric, otherwise class setup hard-fails."""
+
+    def setup_class(self):
+        super().setup_class()
+        self._assert_device_commissioning_precondition(expect_commissioned=False)
 
 
 class MatterTestCommissioner(MatterBaseTest):
@@ -3497,7 +3550,11 @@ class MatterTestCommissioner(MatterBaseTest):
 
     This is keyed on the primary DUT's starting state, NOT on whether the test happens to
     exercise commissioner APIs: a test that merely commissions a second fabric or a helper
-    device against an already-commissioned DUT is MatterTestCommissionedDevice, not this."""
+    device against an already-commissioned DUT is MatterTestCommissionedDevice, not this.
+
+    No setup_class precondition is enforced here: the DUT is uncommissioned at class setup and
+    the target device often does not exist yet. Tests may call the opt-in self.assert_dut_commissioned()
+    right after driving commissioning to confirm the DUT came up operational."""
 
 
 class CertificationUnitTestNoDevice(MatterBaseTest):

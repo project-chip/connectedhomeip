@@ -45,7 +45,7 @@ class TC_ACL_2_2(MatterTestCommissionedDevice):
     @async_test_body
     async def test_TC_ACL_2_2(self):
         """[TC-ACL-2.2] Cluster endpoint"""
-        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(1, "Commissioning, already done")
         self.step(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0")
         data = await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
         asserts.assert_true(Clusters.AccessControl.id in data[0][Clusters.Descriptor]

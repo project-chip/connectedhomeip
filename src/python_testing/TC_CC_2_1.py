@@ -75,7 +75,7 @@ class TC_CC_2_1(MatterTestCommissionedDevice):
     def steps_TC_CC_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep(1, 'Wait for the commissioned device to be retrieved', is_commissioning=True),
+            TestStep(1, 'Wait for the commissioned device to be retrieved'),
             TestStep(2, 'TH reads from the DUT the (0x0000) CurrentHue attribute'),
             TestStep(3, 'TH reads from the DUT the (0x0001) CurrentSaturation attribute'),
             TestStep(4, 'TH reads from the DUT the (0x0002) RemainingTime attribute'),

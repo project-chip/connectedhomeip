@@ -60,7 +60,7 @@ class TC_WHM_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_WHM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
             TestStep(4, "Send ChangeToMode command with NewMode"),

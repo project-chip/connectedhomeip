@@ -58,7 +58,7 @@ class TC_DRLK_2_5(MatterTestCommissionedDevice):
 
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done."),
             TestStep("1", "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),

@@ -73,7 +73,7 @@ class TC_OCC_2_3(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads the FeatureMap attribute on the endpoint for use in later steps."),
             TestStep(3, "TH checks DUT HoldTime attribute support in the AttributeList attribute. If DUT doesn't support HoldTime attribute, skip the rest of this test case."),
             TestStep(4, "TH writes DUT HoldTime attribute with HoldTimeMin and afterwards reads the attribute."),

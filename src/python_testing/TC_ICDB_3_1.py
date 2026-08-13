@@ -91,7 +91,7 @@ class TC_ICDB_3_1(MatterTestCommissionedDevice, ICDBaseTest):
 
     def steps_TC_ICDB_3_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute.",
                      "RegisteredClients is empty. If not empty, TH sends command UnregisterClient to clear all clients in RegisteredClients."),
             TestStep("1b", "TH reads from the DUT the OperatingMode attribute.",

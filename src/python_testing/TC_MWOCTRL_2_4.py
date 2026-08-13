@@ -63,7 +63,7 @@ class TC_MWOCTRL_2_4(MatterTestCommissionedDevice):
 
     def steps_TC_MWOCTRL_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the SupportedWatts attribute"),
             TestStep(3, "Read the SelectedWattIndex attribute"),
             TestStep(4, "Send the SetCookingParameters command"),

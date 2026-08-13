@@ -60,7 +60,7 @@ class TC_AVSM_2_12(MatterTestCommissionedDevice):
 
     def steps_TC_AVSM_2_12(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads HDRModeEnabled attribute.",
                      "Verify that the DUT response contains a bool value. Store value as aHDREnabled"),
             TestStep(3, "TH writes HDRModeEnabled attribute with value set to !aHDREnabled.",
