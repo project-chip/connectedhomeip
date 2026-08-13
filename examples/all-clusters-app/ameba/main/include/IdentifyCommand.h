@@ -92,15 +92,17 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Clust
     {
     case Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         identifyCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, identifyCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
         triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         triggerEffectCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           triggerEffectCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -116,13 +118,15 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const Cluster
     {
     case Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, identifyCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, identifyCommand));
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
         triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand));
         break;
     }
 }

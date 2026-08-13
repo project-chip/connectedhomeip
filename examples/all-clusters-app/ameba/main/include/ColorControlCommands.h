@@ -365,8 +365,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveToHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveHue::Id:
@@ -374,8 +375,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveHueCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, moveHueCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepHue::Id:
@@ -384,8 +386,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepHueCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, stepHueCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
@@ -393,8 +396,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToSaturationCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveToSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveSaturation::Id:
@@ -402,8 +406,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveSaturationCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveSaturationCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepSaturation::Id:
@@ -412,8 +417,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepSaturationCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepSaturationCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           stepSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
@@ -422,8 +428,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToHueAndSaturationCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveToHueAndSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColor::Id:
@@ -432,8 +439,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToColorCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveToColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveColor::Id:
@@ -441,8 +449,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveColorCommand.rateY           = static_cast<uint16_t>(data->args[1]);
         moveColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveColorCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepColor::Id:
@@ -451,8 +460,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         stepColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepColorCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           stepColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
@@ -460,8 +470,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
         moveToColorTemperatureCommand.optionsMask            = static_cast<OptionsBitmap>(data->args[2]);
         moveToColorTemperatureCommand.optionsOverride        = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToColorTemperatureCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveToColorTemperatureCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
@@ -470,8 +481,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveToHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           enhancedMoveToHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
@@ -479,8 +491,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveHueCommand.rate            = static_cast<uint16_t>(data->args[1]);
         enhancedMoveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         enhancedMoveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           enhancedMoveHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
@@ -489,8 +502,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedStepHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedStepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedStepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedStepHueCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           enhancedStepHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id:
@@ -499,8 +513,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveToHueAndSaturationCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           enhancedMoveToHueAndSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
@@ -512,15 +527,17 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[5]);
         colorLoopSetCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[6]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         colorLoopSetCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           colorLoopSetCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StopMoveStep::Id:
         stopMoveStepCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[0]);
         stopMoveStepCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stopMoveStepCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           stopMoveStepCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveColorTemperature::Id:
@@ -530,8 +547,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[3]);
         moveColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[4]);
         moveColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[5]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveColorTemperatureCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           moveColorTemperatureCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepColorTemperature::Id:
@@ -542,8 +560,9 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[4]);
         stepColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[5]);
         stepColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[6]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepColorTemperatureCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           stepColorTemperatureCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -582,7 +601,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveHue::Id:
@@ -590,7 +610,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveHueCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepHue::Id:
@@ -599,7 +620,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepHueCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
@@ -607,7 +629,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveSaturation::Id:
@@ -615,7 +638,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveSaturationCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveSaturationCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepSaturation::Id:
@@ -624,7 +648,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepSaturationCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepSaturationCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
@@ -633,7 +658,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueAndSaturationCommand));
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                moveToHueAndSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColor::Id:
@@ -642,7 +668,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveColor::Id:
@@ -650,7 +677,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveColorCommand.rateY           = static_cast<uint16_t>(data->args[1]);
         moveColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepColor::Id:
@@ -659,7 +687,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         stepColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
@@ -667,7 +696,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
         moveToColorTemperatureCommand.optionsMask            = static_cast<OptionsBitmap>(data->args[2]);
         moveToColorTemperatureCommand.optionsOverride        = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorTemperatureCommand));
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                moveToColorTemperatureCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
@@ -676,7 +706,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
@@ -684,7 +715,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveHueCommand.rate            = static_cast<uint16_t>(data->args[1]);
         enhancedMoveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         enhancedMoveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
@@ -693,7 +725,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedStepHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedStepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedStepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedStepHueCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedStepHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id:
@@ -703,7 +736,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
         LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
-                                              enhancedMoveToHueAndSaturationCommand));
+                                                                enhancedMoveToHueAndSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
@@ -715,13 +748,15 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[5]);
         colorLoopSetCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[6]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, colorLoopSetCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, colorLoopSetCommand));
         break;
 
     case Clusters::ColorControl::Commands::StopMoveStep::Id:
         stopMoveStepCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[0]);
         stopMoveStepCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopMoveStepCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopMoveStepCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveColorTemperature::Id:
@@ -731,7 +766,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[3]);
         moveColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[4]);
         moveColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[5]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorTemperatureCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorTemperatureCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepColorTemperature::Id:
@@ -742,7 +778,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[4]);
         stepColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[5]);
         stepColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[6]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorTemperatureCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorTemperatureCommand));
         break;
     }
 }
