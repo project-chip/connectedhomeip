@@ -21,6 +21,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <inttypes.h>
+#include <lib/support/AutoRelease.h>
 
 using namespace ::chip;
 
@@ -119,7 +120,7 @@ void ModelCommand::CheckPeerICDType()
     {
         return;
     }
-    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+    AutoRelease clientInfoIteratorWrapper(iter);
 
     while (iter->Next(info))
     {

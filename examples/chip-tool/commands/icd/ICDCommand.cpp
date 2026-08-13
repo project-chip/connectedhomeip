@@ -21,6 +21,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <lib/support/AutoRelease.h>
 #include <string>
 
 using namespace ::chip;
@@ -36,7 +37,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+    AutoRelease clientInfoIteratorWrapper(iter);
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | %-88s |\n", "Known ICDs:");
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
