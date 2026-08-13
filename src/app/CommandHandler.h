@@ -211,6 +211,7 @@ public:
 
         CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const
         {
+            VerifyOrReturnError(mEncodeFn != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             return mEncodeFn(mData, writer, tag);
         }
     };

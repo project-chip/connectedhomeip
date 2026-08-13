@@ -28,6 +28,8 @@
 #include <lib/support/attribute-storage-null-handling.h>
 #include <protocols/interaction_model/Constants.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace app {
 namespace Clusters {

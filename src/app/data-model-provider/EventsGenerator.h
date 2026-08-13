@@ -49,6 +49,7 @@ public:
 
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
+        VerifyOrReturnError(mEncodeFn != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         return mEncodeFn(mEventData, aWriter);
     }
 
