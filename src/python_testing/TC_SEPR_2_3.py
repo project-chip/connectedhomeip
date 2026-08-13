@@ -42,6 +42,7 @@
 
 """Define Matter test case TC_SEPR_2_3."""
 
+import logging
 
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
@@ -52,6 +53,8 @@ from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
 
@@ -65,10 +68,12 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
 
     def pics_TC_SEPR_2_3(self):
         """Return the PICS definitions associated with this test."""
+        # Note: MCORE.SC.S.TCP is intentionally NOT listed here. TCP support is
+        # determined dynamically at runtime (step 1a) rather than gating test
+        # selection on a manually-declared PICS value - see step 1a for details.
         return [
             "SEPR.S",
             "SEPR.F00",
-            "MCORE.SC.TCP",
         ]
 
     def steps_TC_SEPR_2_3(self) -> list[TestStep]:
@@ -76,8 +81,9 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
-            TestStep("1a", "Create CASE session connection via TCP if the DUT claims to support TCP",
-                     "TCP connection established OK"),
+            TestStep("1a", "Create CASE session connection via TCP",
+                     "TCP connection established OK, set `tcp_support` to true, otherwise set `tcp_support` to false. "
+                     "If `MCORE.SC.S.TCP` is declared, connection failure is a test failure."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends command GetDetailedForecastRequest with Details=CommodityPriceDetailBitmap.Description set to True, and Components set to False.",
@@ -139,20 +145,41 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
     async def test_TC_SEPR_2_3(self):
         """Run the test steps."""
         endpoint = self.get_endpoint()
-        tcp_support = self.check_pics("MCORE.SC.TCP")
 
         self.step("1")
         # Commission DUT - already done
 
         self.step("1a")
-        if tcp_support:
-            try:
-                device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
-                                                                          payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            except (TimeoutError, ChipStackError):
-                asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")
+        # Always attempt to establish a CASE session over TCP - this mirrors what a
+        # normal client would do to determine TCP support, rather than relying solely
+        # on the manually-declared MCORE.SC.S.TCP PICS value (which could be stale or
+        # left unset by the tester). tcp_support then drives the large-payload-only
+        # steps below (3, 4, 6, 7, 8).
+        tcp_support = False
+        try:
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+                                                                      payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            tcp_support = bool(device.sessionAllowsLargePayload)
+            if tcp_support:
+                log.info("CASE session established over TCP with large-payload support.")
+            else:
+                log.warning("CASE session established but large-payload (TCP) support was not negotiated.")
+        except (TimeoutError, ChipStackError) as e:
+            tcp_support = False
+            log.info("Unable to establish a CASE session over TCP to the DUT (%s: %s). Treating TCP as unsupported.",
+                     type(e).__name__, e)
 
-            asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
+        pics_declares_tcp = self.check_pics("MCORE.SC.S.TCP")
+        log.info("MCORE.SC.S.TCP PICS declared: %s | TCP support observed live: %s", pics_declares_tcp, tcp_support)
+
+        # If the DUT has declared TCP support via PICS, failing to actually establish
+        # a CASE session over TCP (or establishing one without large-payload support)
+        # is a spec violation, not merely "unsupported" - fail explicitly in that case.
+        if pics_declares_tcp:
+            asserts.assert_true(
+                tcp_support,
+                "DUT declares MCORE.SC.S.TCP but failed to establish a CASE session over TCP "
+                "with large-payload support.")
 
         self.step("2")
         # TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster

@@ -167,10 +167,10 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
 
         mCalendarType = newCalendar;
 
-        // Using WriteValue directly so we can check that the decoded value is in the supported list
-        // before storing it.
-        return DefaultServerCluster::mContext->attributeStorage.WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
+        // Storing directly (rather than via DecodeAndStoreNativeEndianValue) so we can check that the
+        // decoded value is in the supported list before storing it.
+        AttributePersistence persistence{ DefaultServerCluster::mContext->attributeStorage };
+        return persistence.StoreNativeEndianValue(request.path, mCalendarType);
     }
 
     return Protocols::InteractionModel::Status::UnsupportedWrite;

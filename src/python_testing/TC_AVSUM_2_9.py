@@ -254,6 +254,10 @@ class TC_AVSUM_2_9(MatterTestCommissionedDevice, AVSUMTestBase):
             # Read DPTZStreams and verify that the stream and viewport are present
             if not await self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
                 asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
+        else:
+            self.skip_step(19)
+            self.skip_step(20)
+            self.skip_step(21)
 
         self.step(22)
         # Reboot DUT

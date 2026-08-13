@@ -72,7 +72,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.TCP"
+TCP_PICS_STR = "MCORE.SC.S.TCP"
 ONE_HOUR_IN_MS = 3600000
 MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
@@ -187,9 +187,9 @@ class TC_SC_4_3(MatterTestCommissionedDevice):
     #         if self.check_pics(TCP_PICS_STR):
     #             if (T_int & 0x04 != 0):
     #                 return True, f"T value ({t_value}) represents valid TCP support info."
-    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
+    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.S.TCP PICS indicates it is required."
     #         if (T_int & 0x04 != 0):
-    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
+    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.S.TCP PICS is not set."
     #         return True, f"T value ({t_value}) is valid."
     #     except ValueError:
     #         return False, f"T value ({t_value}) is not a valid integer"
