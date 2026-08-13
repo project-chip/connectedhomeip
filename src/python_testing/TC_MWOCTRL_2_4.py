@@ -128,7 +128,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
             supportedWattsList), "SelectedWattIndex is out of range")
 
         self.step(4)
-        newWattIndex = (selectedWattIndex + 1) % (len(supportedWattsList) - 1)
+        newWattIndex = (selectedWattIndex + 1) % len(supportedWattsList)
         try:
             await self.send_single_cmd(cmd=commands.SetCookingParameters(wattSettingIndex=newWattIndex), endpoint=endpoint)
         except InteractionModelError as e:
