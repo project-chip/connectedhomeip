@@ -111,6 +111,7 @@ CHIP_ERROR WifiSleepManager::ConfigureDTIMBasedSleep()
 {
     VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "PowerSaveInterface is not initialized");
 
+    // Filter disabled: Matter mDNS (ff02::fb) remains allowlisted.
     ReturnLogErrorOnFailure(mPowerSaveInterface->ConfigureBroadcastFilter(false));
 
     // Allowing the device to go to sleep must be the last actions to avoid configuration failures.
