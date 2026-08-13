@@ -174,40 +174,21 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
 }
 
 // Encodes response command data using non-virtual EncodableResponsePayload descriptors.
-// This avoids virtual table dispatch, RTTI metadata, and virtual destructor generation
-// per command response struct type.
+// Adapts the payload to EncodableToTLV to share framing and session setup logic without duplication.
 CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                   const EncodableResponsePayload & aPayload)
 {
-    ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
-                                                aResponseCommandId };
-
-    InvokeResponseParameters prepareParams(aRequestCommandPath);
-    prepareParams.SetStartOrEndDataStruct(false);
-
+    struct PayloadAdapter : public DataModel::EncodableToTLV
     {
-        ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
-        ReturnErrorOnFailure(PrepareInvokeResponseCommand(responseCommandPath, prepareParams));
-    }
-
-    TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
-    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    auto context = TryGetExchangeContextWhenAsync();
-    FabricIndex accessingFabricIndex;
-    if (context && context->HasSessionHandle())
-    {
-        accessingFabricIndex = context->GetSessionHandle()->GetFabricIndex();
-    }
-    else
-    {
-        accessingFabricIndex = kUndefinedFabricIndex;
-    }
-
-    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
-
-    ReturnErrorOnFailure(aPayload.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
-    return FinishCommand(/* aEndDataStruct = */ false);
+        const EncodableResponsePayload & mPayload;
+        PayloadAdapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
+        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
+        {
+            return mPayload.EncodeTo(writer, tag);
+        }
+    };
+    PayloadAdapter adapter(aPayload);
+    return TryAddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
 }
 
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
