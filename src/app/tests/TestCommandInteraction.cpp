@@ -2226,5 +2226,38 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContex
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST(TestEncodableResponsePayloadAdapter, EncodeToBothWriters)
+{
+    struct TestData
+    {
+        uint32_t value = 42;
+    } data;
+
+    auto encodeFn = [](const void * aData, app::DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) -> CHIP_ERROR {
+        const auto * testData = static_cast<const TestData *>(aData);
+        return app::DataModel::Encode(aWriter, aTag, testData->value);
+    };
+
+    app::CommandHandler::EncodableResponsePayload payload{ &data, encodeFn };
+    app::CommandHandler::EncodableResponsePayload::Adapter adapter(payload);
+
+    uint8_t buffer[64];
+
+    // 1. Test encoding via FabricAwareTLVWriter
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        app::DataModel::FabricAwareTLVWriter fabricWriter(writer, 1);
+        EXPECT_EQ(adapter.EncodeTo(fabricWriter, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    }
+
+    // 2. Test encoding via standard TLVWriter (exercising fallback overload)
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        EXPECT_EQ(adapter.EncodeTo(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    }
+}
+
 } // namespace app
 } // namespace chip
