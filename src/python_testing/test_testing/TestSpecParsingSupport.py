@@ -650,6 +650,54 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
 
         asserts.assert_is_none(fields[4].constraints, "Unconstrained field should have no constraints")
 
+    def test_command_field_sibling_constraints(self):
+        # The spec XML expresses alternatives as repeated <constraint> siblings rather
+        # than one element holding several children (e.g. AudioStreamAllocate.BitDepth,
+        # SetUser.UserType). Every alternative must survive parsing, and bounds from an
+        # earlier sibling must not be lost when an <allowed> sibling follows them
+        # (ClearWeekDaySchedule.WeekDayIndex).
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory><revision revision="1" summary="Initial version"/></revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="BitDepth" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="8"/></constraint>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '        <constraint><allowed value="24"/></constraint>'
+            '        <constraint><allowed value="32"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="UserType" type="UserTypeEnum">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed><enum value="UnrestrictedUser"/></allowed></constraint>'
+            '        <constraint><allowed><enum value="NonAccessUser"/></allowed></constraint>'
+            '      </field>'
+            '      <field id="2" name="IndexOrWildcard" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to value="10"/></between></constraint>'
+            '        <constraint><allowed value="0xFE"/></constraint>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        fields = parse_cluster(command_xml).accepted_commands[0x00].fields
+
+        asserts.assert_equal(fields[0].constraints.allowed, ["8", "16", "24", "32"],
+                             "Every allowed value from the sibling constraints should be retained")
+        asserts.assert_equal(fields[1].constraints.allowed, ["UnrestrictedUser", "NonAccessUser"],
+                             "Every allowed enum value from the sibling constraints should be retained")
+
+        wildcard = fields[2]
+        asserts.assert_equal(wildcard.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(wildcard.constraints.max_value, 10, "Unexpected max_value")
+        asserts.assert_equal(wildcard.constraints.allowed, ["0xFE"],
+                             "Sentinel allowed value from the trailing sibling constraint should be retained")
+
     def test_command_field_parsing_prebuilt_data_model(self):
         # Spot-check two constraints that exist on every root node in the real
         # data model: TestEventTrigger.EnableKey (exact length 16 octstr) and
