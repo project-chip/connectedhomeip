@@ -187,8 +187,11 @@ public:
      * @pre The scheduler must be initialized and have active subscription handlers registered.
      *
      * @post For each matching subscription node:
-     *       - The node's deferral watermark (mDeferralEndTimestamp) is extended by the calculated delay.
-     *       - The delay is bounded to not exceed the subscription's maximum reporting interval.
+     *       - The node's deferral watermark (mDeferralEndTimestamp) is set to the current timestamp plus
+     *         an effective delay, which is the minimum of:
+     *           1. The newly requested delay.
+     *           2. The remaining duration of any active deferral (if already deferred).
+     *           3. The remaining time until the subscription's maximum reporting interval expires.
      *       - The next report timer is recalculated and rescheduled to fire at or after the deferral end time.
      *       - The deferral is a one-time effect: once the deferred report is successfully transmitted,
      *         subsequent reports revert back to their standard minimum/maximum intervals.

@@ -2287,7 +2287,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     uint64_t delayMs = static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
     EXPECT_GE(delayMs, 1000u);
-    EXPECT_LE(delayMs, 1500u);
+    EXPECT_LT(delayMs, 1500u);
 }
 
 } // namespace app

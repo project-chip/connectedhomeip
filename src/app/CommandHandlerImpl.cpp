@@ -434,8 +434,6 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetConcreteCommandPath(concretePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    RecordTargetedEndpoint(concretePath.mEndpointId);
-
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         DataModel::InvokeRequest request(concretePath, subjectDescriptor);
@@ -448,6 +446,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             return FallibleAddStatus(concretePath, preCheckStatus) != CHIP_NO_ERROR ? Status::Failure : Status::Success;
         }
     }
+
+    RecordTargetedEndpoint(concretePath.mEndpointId);
 
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -537,7 +537,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
-        RecordTargetedEndpoint(mapping.endpoint_id);
         // Groupcast Testing
         auto & testing = Groupcast::GetTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
@@ -561,6 +560,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                 continue;
             }
         }
+
+        RecordTargetedEndpoint(mapping.endpoint_id);
 
         if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
@@ -1044,6 +1045,9 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
             DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
+
+        RecordTargetedEndpoint(concreteResponsePath1.mEndpointId);
+        RecordTargetedEndpoint(concreteResponsePath2.mEndpointId);
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
