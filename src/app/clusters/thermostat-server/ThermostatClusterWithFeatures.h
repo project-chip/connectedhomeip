@@ -36,6 +36,8 @@ public:
     static constexpr bool kHasSuggestions = (std::is_base_of_v<ThermostatSuggestions::Delegate, Delegates> || ...);
     static constexpr bool kHasOccupancy   = (std::is_base_of_v<ThermostatOccupancy::Delegate, Delegates> || ...);
 
+    static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
+
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
                                   const OptionalAttributes & optionalAttributes,
                                   const DefaultValues & defaultValues,
