@@ -482,8 +482,15 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
             CommissioningProxyTransport * transport = mTransports[i];
             if (started.Has(transport->GetTransportType()))
             {
-                transport->BgScanStop(chip::BitMask<CapabilitiesBitmap>(transport->GetTransportType()), wiFiBands, fabricIndex,
-                                      nodeId);
+                auto stopStatus = transport->BgScanStop(chip::BitMask<CapabilitiesBitmap>(transport->GetTransportType()), wiFiBands,
+                                                        fabricIndex, nodeId);
+                if (stopStatus != Status::Success)
+                {
+                    // The scan we just started is still running and its cached results
+                    // were not cleared; the commissioner has been told nothing started.
+                    ChipLogError(Zcl, "CommissioningProxy: rollback of transport 0x%x failed with status 0x%02x",
+                                 chip::to_underlying(transport->GetTransportType()), chip::to_underlying(stopStatus));
+                }
             }
         }
     }

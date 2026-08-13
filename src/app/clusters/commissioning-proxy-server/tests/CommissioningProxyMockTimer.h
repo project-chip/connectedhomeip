@@ -48,7 +48,6 @@ public:
 
     CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
-        mStartCount++;
         if (mNextStartResult != CHIP_NO_ERROR)
         {
             // One-shot: the caller under test sees this failure, later timers succeed.
@@ -58,7 +57,9 @@ public:
         }
 
         CancelTimer(context); // re-arming replaces any existing timer for this context
-        VerifyOrReturnError(mCount < kMaxTimers, CHIP_ERROR_NO_MEMORY);
+        // Die rather than return an error: an overflow here is indistinguishable from
+        // FailNextStart(), so a test needing more timers must raise kMaxTimers.
+        VerifyOrDie(mCount < kMaxTimers);
         mTimers[mCount].context = context;
         mTimers[mCount].firesAt = mNow + aTimeout;
         mCount++;
@@ -122,7 +123,6 @@ public:
     }
 
     size_t ActiveCount() const { return mCount; }
-    unsigned StartCount() const { return mStartCount; }
 
 private:
     struct Entry
@@ -133,7 +133,6 @@ private:
 
     Entry mTimers[kMaxTimers];
     size_t mCount                 = 0;
-    unsigned mStartCount          = 0;
     CHIP_ERROR mNextStartResult   = CHIP_NO_ERROR;
     System::Clock::Timestamp mNow = System::Clock::Milliseconds64(0);
 };

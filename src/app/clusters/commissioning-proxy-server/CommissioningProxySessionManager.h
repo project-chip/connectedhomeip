@@ -25,7 +25,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemLayer.h>
 
 #include <cstdint>
 #include <map>

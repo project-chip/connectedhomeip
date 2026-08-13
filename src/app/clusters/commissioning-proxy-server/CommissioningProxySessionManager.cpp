@@ -20,7 +20,6 @@
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 #include <utility>

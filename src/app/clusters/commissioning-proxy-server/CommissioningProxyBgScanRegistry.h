@@ -24,7 +24,6 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <system/SystemLayer.h>
 
 #include <cstdint>
 #include <map>
@@ -95,15 +94,14 @@ public:
     CommissioningProxyBgScanRegistry & operator=(const CommissioningProxyBgScanRegistry &) = delete;
 
     /**
-     * ProxyBackGroundScanStartRequest for one fabric. @p timeoutSecs == 0 means no
-     * lifetime timer (scan until an explicit Stop). Re-registering an existing
-     * (fabricIndex, nodeId) refreshes its transport/bands and restarts its lifetime
-     * timer. A rejected Start changes nothing.
+     * ProxyBackGroundScanStartRequest. The spec keeps "per fabric records" and records
+     * the sender's NodeID to authorise the matching Stop, so there is one record per
+     * fabric: a start from any node replaces that fabric's record and takes ownership.
+     * @p timeoutSecs == 0 means no lifetime timer. A rejected Start changes nothing.
      *
-     * @p transport SHALL carry exactly the owning transport's own bit. Each registry
-     * belongs to one transport and the cluster fans a multi-transport request out to
-     * each driver separately (drivers are never told about the others), so a record
-     * always holds a single transport bit. Stop()'s arithmetic relies on that.
+     * @p transport SHALL carry only the owning transport's own bit — the cluster fans a
+     * multi-transport request out to each driver separately, and Stop() relies on a
+     * record holding a single bit.
      */
     Protocols::InteractionModel::Status Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                               BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs);

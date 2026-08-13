@@ -24,7 +24,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
-#include <system/SystemLayer.h>
 
 #include <cstdint>
 #include <deque>
@@ -63,7 +62,7 @@ public:
      *
      * The number of contributors is not known up front: the caller starts each
      * requested transport's scan and calls AddPendingContributor() for every one
-     * that starts successfully, then Commit() (or Abort() if none started).
+     * that starts successfully, then MaybeEmitIfComplete() (or Abort() if none started).
      *
      * Returns an error (leaving InProgress() false) if the watchdog could not be
      * armed; the caller must reject the command rather than scan unbounded.

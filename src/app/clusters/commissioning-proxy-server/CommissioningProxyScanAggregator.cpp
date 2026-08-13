@@ -19,7 +19,7 @@
 
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 
 #include <limits>
 

@@ -26,7 +26,6 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
-#include <system/SystemLayer.h>
 
 #include <cstdint>
 #include <map>

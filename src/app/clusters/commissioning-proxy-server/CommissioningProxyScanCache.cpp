@@ -18,7 +18,7 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyScanCache.h>
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {

@@ -19,7 +19,6 @@
 #include "CommissioningProxyBgScanRegistry.h"
 
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 namespace chip {
