@@ -18,3 +18,6 @@ name: connectedhomeip
 build:
     cmake: .
     kconfig: Kconfig
+    depends:
+        - mbedtls
+        - cmsis_6

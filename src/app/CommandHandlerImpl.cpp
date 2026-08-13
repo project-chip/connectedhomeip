@@ -28,6 +28,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
@@ -478,7 +479,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-    Credentials::GroupDataProvider::EndpointIterator * iterator;
 
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
@@ -510,8 +510,8 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     // always have an accessing fabric, by definition.
 
     // Find which endpoints can process the command, and dispatch to them.
-    iterator = groupDataProvider->IterateEndpoints(fabric);
-    VerifyOrReturnError(iterator != nullptr, Status::Failure);
+    AutoRelease iterator(groupDataProvider->IterateEndpoints(fabric));
+    VerifyOrReturnError(!iterator.IsNull(), Status::Failure);
 
     while (iterator->Next(mapping))
     {
@@ -564,7 +564,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
     }
-    iterator->Release();
     return Status::Success;
 }
 

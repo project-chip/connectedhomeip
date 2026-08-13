@@ -42,9 +42,7 @@
 #       --string-arg provider_app_pipe:/tmp/provider_2_7_fifo
 #       --string-arg provider_app_pipe_out:/tmp/provider_2_7_fifo_out
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
-#       --int-arg ota_image_expected_version:2
 #       --string-arg ota_image_extra:${SU_OTA_REQUESTOR_V3}
-#       --int-arg ota_image_expected_version_extra:3
 #       --int-arg ota_image_download_timeout:360
 #       --timeout 2100
 #       --PICS src/app/tests/suites/certification/ci-pics-values
@@ -100,8 +98,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         self.ota_image = self.user_params.get('ota_image')
         self.ota_image_extra = self.user_params.get('ota_image_extra')
-        self.expected_software_version = self.user_params.get('ota_image_expected_version')
-        self.expected_software_version_extra = self.user_params.get('ota_image_expected_version_extra')
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
@@ -117,13 +113,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         if self.ota_image_download_timeout <= 0:
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
-
-        if not self.expected_software_version:
-            asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
-
-        if not self.expected_software_version_extra:
-            asserts.fail(
-                "Missing OTA image software version. Speficy using --int-arg ota_image_expected_version_extra:<ota_image_expected_version>")
 
         if not self.provider_app_path:
             asserts.fail("Missing provider app path . Speficy using --string-arg provider_app_path:<provider_app_path>")
@@ -142,6 +131,13 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # before starting the test to dont allow it to fail until step 2.
         if self.is_pics_sdk_ci_only and (not self.provider_app_pipe or not self.provider_app_pipe_out):
             asserts.fail("Missing argument provider_app_pipe or provider_app_pipe_out. Specify using --string-arg provider_app_pipe:<path> and --string-arg provider_app_pipe_out:<path>")
+
+        # Check OTA image and running software version; this will fail if it is not suited to update the device, else return the version to update
+        self.expected_software_version = await self.check_ota_image_version(
+            controller=self.controller, requestor_node_id=self.requestor_node_id, ota_image_path=self.ota_image)
+
+        self.expected_software_version_extra = await self.check_ota_image_version(
+            controller=self.controller, requestor_node_id=self.requestor_node_id, ota_image_path=self.ota_image_extra)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -205,7 +201,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     @async_test_body
     async def test_TC_SU_2_7(self):
         # Requestor is the DUT
-        # Requestor has the flag --autoApply
+        # Requestor has the flag --autoApplyImage
         self.step(0)
         controller = self.default_controller
 
@@ -242,16 +238,16 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
         state_transition_event_handler.cancel()
 
-        # On Physical Devices we dont know how much time it can take to apply the update so let the user help us.
-        # This should be updated to work automatically by detecting if the session is up and then read the UpdateState attribute
-        # This will allow us to remove the AttributeEventListener for kIdle and just read the attribute
+        # On physical devices we don't know how much time it can take to apply the update, so let the user help us.
+        # This should be updated to work automatically by detecting if the session is up and then reading the UpdateState attribute
+        # This will allow us to remove the AttributeSubscriptionHandler for kIdle and just read the attribute
         if self.is_pics_sdk_ci_only:
             attribute_idle = AttributeValue(
                 endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
             update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
             update_state_attr_handler.cancel()
         else:
-            # Avoid keep listening if the device is gone.
+            # Avoid continuing to listen if the device is gone.
             update_state_attr_handler.cancel()
             self.wait_for_user_input(
                 prompt_msg="Waiting for device to Apply the Software update. Please press Enter when it is ready.\n")
@@ -274,7 +270,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             fabricFiltered=True
         )
         logger.info("Events gathered %s", events_response)
-        # Only UpdateAppliedEvent should be in the list
+        # Only VersionAppliedEvent should be in the list
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
         version_applied_event_data = None
@@ -316,7 +312,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Catch Event Report for Querying
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
-        # Catch Event for KDelayedOnQuery
+        # Catch Event for kDelayedOnQuery
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnQuery, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kDelayByProvider)
@@ -338,16 +334,16 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
-        # This step we need to Kill the provider PID before the announcement
+        # In this step we need to kill the provider process before the announcement
         logger.info("Killing the provider process")
         self.current_provider_app_proc.kill()
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         logger.info("Event response after killing app: %s", event_report)
-        # Catch the Event Querying
+        # Catch the Querying event
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kQuerying)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
-        # Change status to KIdle
+        # Change status to kIdle
         logger.info("Event response : %s", event_report)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
@@ -437,18 +433,18 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         logger.info("Event report Downloading %s", event_report)
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
-        # Once the Device is Downloading wait some time to let it download some data and then Kill the current process
-        # Create and Wait for DownloadErrorEvent
+        # Once the Device is Downloading, wait some time to let it download some data, then kill provider process
+        # Wait for DownloadErrorEvent
         error_download_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
         await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
-        # Force an DownloadError by Killing the app during the image download.
+        # Force a DownloadError by killing the provider app during the image download.
         logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
         await asyncio.sleep(3)
         self.current_provider_app_proc.kill()
         start_time = time()
         logger.info("Waiting for the StateTransitionEvent with value KIdle.")
-        # Device must wait for State kIdle in this case we wait for Idle status which should not happend in less than 5 minutes
+        # Device must wait for State kIdle; in this case, we wait for Idle status, which should not happen in less than 5 minutes
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=600)
         end_time = time()
         logger.info("Event Transition Event for kIdle Timeout: %s", event_report)
@@ -489,7 +485,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
-        # To avoid possible transiton between Querying and Idle use AttributeHandler
+        # To avoid a possible transition between Querying and Idle, use AttributeSubscriptionHandler
         attribute_idle = AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
@@ -503,7 +499,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         logger.info("Event report: %s", event_report)
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
 
-        # Verification of the testStep DelayedOnApply
+        # Verification of the test step DelayedOnApply
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
         logger.info("Event report: %s", event_report)
         self.verify_state_transition_event(event_report=event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnApply,
