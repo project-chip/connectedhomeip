@@ -44,7 +44,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
     {
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
@@ -61,12 +62,10 @@ public:
     }
 
 private:
-    static constexpr CharSpan kLabels[] = { "Normal"_span, "Heavy"_span, "Light"_span };
-    static constexpr uint16_t kTagValues[] = {
-        to_underlying(Clusters::DishwasherMode::ModeTag::kNormal),
-        to_underlying(Clusters::DishwasherMode::ModeTag::kHeavy),
-        to_underlying(Clusters::DishwasherMode::ModeTag::kLight)
-    };
+    static constexpr CharSpan kLabels[]    = { "Normal"_span, "Heavy"_span, "Light"_span };
+    static constexpr uint16_t kTagValues[] = { to_underlying(Clusters::DishwasherMode::ModeTag::kNormal),
+                                               to_underlying(Clusters::DishwasherMode::ModeTag::kHeavy),
+                                               to_underlying(Clusters::DishwasherMode::ModeTag::kLight) };
 };
 
 class Dishwasher : public SingleEndpoint

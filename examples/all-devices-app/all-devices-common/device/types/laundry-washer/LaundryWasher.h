@@ -46,8 +46,7 @@ public:
 private:
     static constexpr CharSpan kSpinSpeeds[] = { "Off"_span, "Low"_span, "Medium"_span, "High"_span };
     static constexpr Clusters::LaundryWasherControls::NumberOfRinsesEnum kRinses[] = {
-        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNone,
-        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNormal,
+        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNone, Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNormal,
         Clusters::LaundryWasherControls::NumberOfRinsesEnum::kExtra
     };
 };
@@ -70,7 +69,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
     {
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
@@ -87,12 +87,10 @@ public:
     }
 
 private:
-    static constexpr CharSpan kLabels[] = { "Normal"_span, "Delicate"_span, "Heavy"_span };
-    static constexpr uint16_t kTagValues[] = {
-        to_underlying(Clusters::LaundryWasherMode::ModeTag::kNormal),
-        to_underlying(Clusters::LaundryWasherMode::ModeTag::kDelicate),
-        to_underlying(Clusters::LaundryWasherMode::ModeTag::kHeavy)
-    };
+    static constexpr CharSpan kLabels[]    = { "Normal"_span, "Delicate"_span, "Heavy"_span };
+    static constexpr uint16_t kTagValues[] = { to_underlying(Clusters::LaundryWasherMode::ModeTag::kNormal),
+                                               to_underlying(Clusters::LaundryWasherMode::ModeTag::kDelicate),
+                                               to_underlying(Clusters::LaundryWasherMode::ModeTag::kHeavy) };
 };
 
 class LaundryWasher : public SingleEndpoint

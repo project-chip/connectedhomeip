@@ -36,7 +36,8 @@ void EmulatedOperationalStateDelegate::StartEmulatedOperationTimer()
 {
     CancelTimer();
     mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kEmulatedOperationDurationSec), OnOperationTimerComplete, this);
+    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kEmulatedOperationDurationSec),
+                                                       OnOperationTimerComplete, this));
 }
 
 void EmulatedOperationalStateDelegate::OnOperationTimerComplete(System::Layer * systemLayer, void * appState)

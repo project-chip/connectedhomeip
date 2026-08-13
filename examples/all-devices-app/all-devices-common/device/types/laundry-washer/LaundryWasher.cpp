@@ -48,13 +48,12 @@ CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvi
             mLaundryWasherControlsDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mLaundryWasherControlsCluster.Registration()));
 
-    mLaundryWasherModeCluster.Create(
-        endpoint, Clusters::LaundryWasherMode::Id,
-        Clusters::ModeBaseCluster::Config{
-            .feature                = BitFlags<Clusters::ModeBase::Feature>(),
-            .appDelegate            = mLaundryWasherModeDelegate,
-            .diagnosticDataProvider = mDiagnosticDataProvider,
-        });
+    mLaundryWasherModeCluster.Create(endpoint, Clusters::LaundryWasherMode::Id,
+                                     Clusters::ModeBaseCluster::Config{
+                                         .feature                = BitFlags<Clusters::ModeBase::Feature>(),
+                                         .appDelegate            = mLaundryWasherModeDelegate,
+                                         .diagnosticDataProvider = mDiagnosticDataProvider,
+                                     });
     ReturnErrorOnFailure(provider.AddCluster(mLaundryWasherModeCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -79,6 +78,7 @@ void LaundryWasher::Unregister(CodeDrivenDataModelProvider & provider)
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 }

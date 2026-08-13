@@ -68,6 +68,7 @@ void TemperatureControlledCabinetPart::Unregister(CodeDrivenDataModelProvider & 
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mOperationalStateDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 

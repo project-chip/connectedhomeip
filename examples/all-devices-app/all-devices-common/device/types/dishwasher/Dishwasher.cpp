@@ -35,13 +35,12 @@ CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
-    mDishwasherModeCluster.Create(
-        endpoint, Clusters::DishwasherMode::Id,
-        Clusters::ModeBaseCluster::Config{
-            .feature                = BitFlags<Clusters::ModeBase::Feature>(),
-            .appDelegate            = mDishwasherModeDelegate,
-            .diagnosticDataProvider = mDiagnosticDataProvider,
-        });
+    mDishwasherModeCluster.Create(endpoint, Clusters::DishwasherMode::Id,
+                                  Clusters::ModeBaseCluster::Config{
+                                      .feature                = BitFlags<Clusters::ModeBase::Feature>(),
+                                      .appDelegate            = mDishwasherModeDelegate,
+                                      .diagnosticDataProvider = mDiagnosticDataProvider,
+                                  });
     ReturnErrorOnFailure(provider.AddCluster(mDishwasherModeCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -61,6 +60,7 @@ void Dishwasher::Unregister(CodeDrivenDataModelProvider & provider)
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 }

@@ -30,7 +30,11 @@ namespace chip::app {
 class EmulatedMicrowaveOvenControlIntegrationDelegate : public Clusters::MicrowaveOvenControl::IntegrationDelegate
 {
 public:
-    uint8_t GetCurrentOperationalState() const override { return 0; }
+    explicit EmulatedMicrowaveOvenControlIntegrationDelegate(Clusters::OperationalState::OperationalStateCluster & opStateCluster) :
+        mOpStateCluster(opStateCluster)
+    {}
+
+    uint8_t GetCurrentOperationalState() const override { return mOpStateCluster.GetCurrentOperationalState(); }
     CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override
     {
         mode = 0;
@@ -41,15 +45,18 @@ public:
     {
         return commandId == Clusters::OperationalState::Commands::Start::Id;
     }
+
+private:
+    Clusters::OperationalState::OperationalStateCluster & mOpStateCluster;
 };
 
 class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
 {
 public:
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                            bool startAfterSetting,
-                                                                            Optional<uint8_t> powerSettingNum,
-                                                                            Optional<uint8_t> wattSettingIndex) override
+                                                                           bool startAfterSetting,
+                                                                           Optional<uint8_t> powerSettingNum,
+                                                                           Optional<uint8_t> wattSettingIndex) override
     {
         return Protocols::InteractionModel::Status::Success;
     }
@@ -96,7 +103,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
     {
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
@@ -113,11 +121,9 @@ public:
     }
 
 private:
-    static constexpr CharSpan kLabels[] = { "Normal"_span, "Defrost"_span };
-    static constexpr uint16_t kTagValues[] = {
-        to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kNormal),
-        to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kDefrost)
-    };
+    static constexpr CharSpan kLabels[]    = { "Normal"_span, "Defrost"_span };
+    static constexpr uint16_t kTagValues[] = { to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kNormal),
+                                               to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kDefrost) };
 };
 
 class MicrowaveOven : public SingleEndpoint

@@ -48,8 +48,14 @@ public:
     void HandleStartStateCallback(GenericOperationalError & err) override;
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    // Application API to bind the cluster instance to this delegate
-    void SetCluster(OperationalStateCluster * cluster) { mCluster = cluster; }
+    void SetCluster(OperationalStateCluster * cluster)
+    {
+        if (cluster == nullptr)
+        {
+            CancelTimer();
+        }
+        mCluster = cluster;
+    }
 
 protected:
     static constexpr uint32_t kEmulatedOperationDurationSec = 30;

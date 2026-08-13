@@ -44,6 +44,7 @@ void LaundryDryer::Unregister(CodeDrivenDataModelProvider & provider)
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 }
