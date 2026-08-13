@@ -43,6 +43,7 @@ target_sources(app PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-delegate-impl.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-presets-delegate-impl.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-sensors-delegate-impl.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp

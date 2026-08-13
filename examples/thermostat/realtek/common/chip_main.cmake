@@ -44,6 +44,7 @@ list(
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp
+    ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-sensors-delegate-impl.cpp
     ${chip_dir}/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
 )
 
