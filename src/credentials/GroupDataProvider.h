@@ -232,7 +232,7 @@ public:
          *
          *  @param[in] modified_group_id  ID of the modified group.
          */
-        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) {};
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
