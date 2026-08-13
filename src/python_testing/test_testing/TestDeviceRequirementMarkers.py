@@ -360,9 +360,9 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
             stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
             with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
                 MatterBaseTest.assert_dut_commissioned(stub)
-            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)):
-                with self.assertRaises(signals.TestFailure):
-                    MatterBaseTest.assert_dut_commissioned(stub)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest.assert_dut_commissioned(stub)
         finally:
             loop.close()
 
