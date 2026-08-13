@@ -474,8 +474,8 @@ tests:
                   saveAs: IsRevision2
 
     - label:
-          "Step 3e: Determine if test should run (ScenesManagement cluster revision
-          < 2)"
+          "Step 3e: Determine if test should run (ScenesManagement cluster
+          revision < 2)"
       cluster: "EqualityCommands"
       command: "BooleanEquals"
       arguments:
