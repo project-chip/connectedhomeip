@@ -504,7 +504,7 @@ tests:
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
-            
+
     - label: "Step 3g: TH reads attribute FabricSceneInfo from DUT"
       runIf: IsRevision2
       command: "readAttribute"
