@@ -137,13 +137,8 @@ if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
 static_library("minimal_mdns") {
   sources = [
     "Logging.h",
-    "Parser.cpp",
-    "Parser.h",
-    "Query.h",
     "QueryBuilder.h",
     "QueryReplyFilter.h",
-    "RecordData.cpp",
-    "RecordData.h",
     "ResponseBuilder.h",
     "ResponseSender.cpp",
     "ResponseSender.h",
@@ -162,6 +157,7 @@ static_library("minimal_mdns") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
     "${chip_root}/src/lib/dnssd/wire",
+    "${chip_root}/src/lib/dnssd/wire:reader",
     "${chip_root}/src/platform",
   ]
 

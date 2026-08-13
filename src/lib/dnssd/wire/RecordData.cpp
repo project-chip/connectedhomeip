@@ -20,8 +20,8 @@
 #include <inet/arpa-inet-compatibility.h>
 #include <stdio.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
 {
@@ -38,28 +38,36 @@ bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
             return false;
         }
 
-        // name=value string of size length
-        const uint8_t * equalPos = pos + 1;
-        while (((equalPos - pos) < length) && (*equalPos != '='))
+        // Zero-length TXT strings are valid padding (RFC 6763). Handle them
+        // before scanning for '=' so we never advanced past data.End().
+        if (length == 0)
         {
-            equalPos++;
-        }
-
-        if (pos + length == equalPos && *equalPos == '=')
-        {
-            // If there is an '=' sign with an empty value, just ignore it and position the end cursor directly onto
-            // the position of the '='
-            callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange());
-        }
-        else if (pos + length == equalPos && *equalPos != '=')
-        {
-            callback->OnRecord(BytesRange(pos + 1, equalPos + 1), BytesRange());
+            callback->OnRecord(BytesRange(), BytesRange());
         }
         else
         {
-            callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange(equalPos + 1, pos + 1 + length));
-        }
+            // name=value string of size length
+            const uint8_t * equalPos = pos + 1;
+            while (((equalPos - pos) < length) && (*equalPos != '='))
+            {
+                equalPos++;
+            }
 
+            if (pos + length == equalPos && *equalPos == '=')
+            {
+                // If there is an '=' sign with an empty value, just ignore it and position the end cursor directly onto
+                // the position of the '='
+                callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange());
+            }
+            else if (pos + length == equalPos && *equalPos != '=')
+            {
+                callback->OnRecord(BytesRange(pos + 1, equalPos + 1), BytesRange());
+            }
+            else
+            {
+                callback->OnRecord(BytesRange(pos + 1, equalPos), BytesRange(equalPos + 1, pos + 1 + length));
+            }
+        }
         pos += 1 + length;
     }
 
@@ -83,8 +91,15 @@ bool SrvRecord::Parse(const BytesRange & data, const BytesRange & packet)
     mPriority = chip::Encoding::BigEndian::Read16(p);
     mWeight   = chip::Encoding::BigEndian::Read16(p);
     mPort     = chip::Encoding::BigEndian::Read16(p);
-    mName     = SerializedQNameIterator(packet, p);
 
+    // Verify that parsed name terminates at the end of the data/was well-formed before we set it to the member variable
+    const uint8_t * nameEnd = SerializedQNameIterator(packet, p).FindDataEnd();
+    if ((nameEnd == nullptr) || (nameEnd != data.End()))
+    {
+        return false;
+    }
+
+    mName = SerializedQNameIterator(packet, p);
     return true;
 }
 
@@ -126,10 +141,16 @@ bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, Serializ
         return false;
     }
 
-    *name = SerializedQNameIterator(packet, data.Start());
+    // Verify that parsed name terminates at the end of the data/was well-formed before we provide it to the caller
+    const uint8_t * nameEnd = SerializedQNameIterator(packet, data.Start()).FindDataEnd();
+    if ((nameEnd == nullptr) || (nameEnd != data.End()))
+    {
+        return false;
+    }
 
+    *name = SerializedQNameIterator(packet, data.Start());
     return true;
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

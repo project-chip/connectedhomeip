@@ -55,8 +55,6 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/responders/IP.h>
@@ -65,6 +63,8 @@
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/dnssd/wire/records/Ptr.h>
 #include <lib/dnssd/wire/records/Srv.h>
 #include <lib/dnssd/wire/records/Txt.h>
@@ -77,6 +77,7 @@ namespace {
 using namespace chip;
 using namespace fuzztest;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 void EnsureInitialized()
 {
