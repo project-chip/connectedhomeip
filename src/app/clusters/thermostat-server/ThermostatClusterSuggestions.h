@@ -45,21 +45,21 @@ public:
          *
          * @return The max number of thermostat suggestions supported. Return 0 if not set.
          */
-        virtual uint8_t GetMaxThermostatSuggestions()                                                                        = 0;
-       
+        virtual uint8_t GetMaxThermostatSuggestions() = 0;
+
         /**
          * @brief Get the number of suggestions in the ThermostatSuggestions attribute list.
          *
          * @return The number of entries in the ThermostatSuggestions attribute list. Return 0 if not set.
          */
-        virtual uint8_t GetNumberOfThermostatSuggestions()                                                                   = 0;
-       
+        virtual uint8_t GetNumberOfThermostatSuggestions() = 0;
+
         /**
          * @brief Get the ThermostatSuggestion at a given index in the ThermostatSuggestions attribute.
          *
          * @param[in] index The index of the suggestion in the list.
-         * @param[out] thermostatSuggestion The ThermostatSuggestionStructWithOwnedMembers struct that has the data from the thermostat
-         * suggestion at the given index in the ThermostatSuggestions attribute list.
+         * @param[out] thermostatSuggestion The ThermostatSuggestionStructWithOwnedMembers struct that has the data from the
+         * thermostat suggestion at the given index in the ThermostatSuggestions attribute list.
          * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the ThermostatSuggestions list.
          */
         virtual CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
@@ -67,16 +67,17 @@ public:
         /**
          * @brief Get the CurrentThermostatSuggestion attribute value.
          *
-         * @return currentThermostatSuggestion The nullable ThermostatSuggestionStruct to copy the current thermostat suggestion into.
+         * @return currentThermostatSuggestion The nullable ThermostatSuggestionStruct to copy the current thermostat suggestion
+         * into.
          */
         virtual void GetCurrentThermostatSuggestion(
-            DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)                    = 0;
-       
+            DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) = 0;
+
         /**
          * @brief Get the nullable ThermostatSuggestionNotFollowingReason attribute value.
          */
         virtual DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() = 0;
-       
+
         /**
          * @brief Returns an unused unique ID for a thermostat suggestion.
          *
@@ -85,8 +86,8 @@ public:
          * @return CHIP_NO_ERROR if a unique ID was found
          *         CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if no uniqueID was found.
          */
-        virtual CHIP_ERROR GetUniqueID(uint8_t & uniqueID)                                                                    = 0;
-       
+        virtual CHIP_ERROR GetUniqueID(uint8_t & uniqueID) = 0;
+
         /**
          * @brief Appends a suggestion to the ThermostatSuggestions attribute list maintained by the delegate.
          *        The delegate must ensure it makes a copy of the provided thermostat suggestion and the data
@@ -101,32 +102,32 @@ public:
          */
         virtual CHIP_ERROR
         AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) = 0;
-       
+
         /**
          * @brief Removes a suggestion from the ThermostatSuggestions attribute list maintained by the delegate.
-         *        If the index being removed is the current thermostat suggestion, the server should set the CurrentThermostatSuggestion
-         *        attribute to null. This API must preserve the order of the thermostat suggestion entries that are not removed.
-         *        Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
+         *        If the index being removed is the current thermostat suggestion, the server should set the
+         * CurrentThermostatSuggestion attribute to null. This API must preserve the order of the thermostat suggestion entries that
+         * are not removed. Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
          *
          * @param[in] index The index of the thermostat suggestion to remove from the list.
          *
          * @return CHIP_NO_ERROR if the thermostat suggestion was removed from the list successfully.
          * @return CHIP_ERROR if the thermostat suggestion was not found in the list.
          */
-        virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t index)                                      = 0;
+        virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t index) = 0;
 
         /**
          * @brief Evaluates and sets the CurrentThermostatSuggestion attribute based on whether the thermostat has any state changes
-         * (like a reboot, etc) or a thermostat suggestion was added or removed. Sets the CurrentThermostatSuggestion attribute to null
-         * if the server wasn't able to determine a current suggestion, sets the ThermostatSuggestionNotFollowingReason accordingly.
-         * This API should be responsible for keeping track of ExpirationTime for the current thermostat suggestion and re-evaluating
-         * the next current suggestion when the current suggestion expires.
-         * The caller of this API must ensure that they remove all expired suggestions prior to calling this.
+         * (like a reboot, etc) or a thermostat suggestion was added or removed. Sets the CurrentThermostatSuggestion attribute to
+         * null if the server wasn't able to determine a current suggestion, sets the ThermostatSuggestionNotFollowingReason
+         * accordingly. This API should be responsible for keeping track of ExpirationTime for the current thermostat suggestion and
+         * re-evaluating the next current suggestion when the current suggestion expires. The caller of this API must ensure that
+         * they remove all expired suggestions prior to calling this.
          *
          * @return CHIP_NO_ERROR if a current thermostat suggestion was evaluated successfully.
          * @return CHIP_ERROR if there was an error evaluating the current thermostat suggestion.
          */
-        virtual CHIP_ERROR ReEvaluateCurrentSuggestion()                                                          = 0;
+        virtual CHIP_ERROR ReEvaluateCurrentSuggestion() = 0;
     };
 
     ThermostatSuggestions() = delete;

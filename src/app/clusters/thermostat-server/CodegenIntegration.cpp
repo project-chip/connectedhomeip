@@ -243,10 +243,10 @@ ThermostatCluster::DefaultValues BaseIntegrationDelegate::LoadDefaultValues(Endp
 } // namespace app
 } // namespace chip
 
-void __attribute__((weak)) MatterThermostatClusterInitCallback(EndpointId endpointId) {}
+void __attribute__((weak)) MatterThermostatClusterInitCallback(chip::EndpointId endpointId) {}
 
 void __attribute__((weak)) MatterThermostatPluginServerInitCallback() {}
 
 void __attribute__((weak))
-MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
+MatterThermostatClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {}

@@ -168,6 +168,7 @@ public:
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
 
 protected:
+    BitFlags<Thermostat::Feature> mFeatures;
     OptionalAttributes mOptionalAttributes;
     const DefaultValues mDefaultValues;
     FabricTable & mFabricTable;
