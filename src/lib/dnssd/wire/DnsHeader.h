@@ -100,16 +100,15 @@ private:
         return *this;
     }
 
-    // Mask to limit values to what RFC 6762 consideres useful
-    // 1111 1110 0000 0000 = FE0F
-    // TODO(cecille): need to better document this value. Why is the comment different than the value?
-    static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
-    static constexpr uint16_t kAuthoritativeMask  = 0x0400;
-    static constexpr uint16_t kIsResponseMask     = 0x8000;
-    static constexpr uint16_t kOpcodeMask         = 0x7800;
-    static constexpr uint16_t kOpcodeShift        = 11;
-    static constexpr uint16_t kTruncationMask     = 0x0200;
-    static constexpr uint16_t kReturnCodeMask     = 0x000F;
+    static constexpr uint16_t kAuthoritativeMask = 0x0400;
+    static constexpr uint16_t kIsResponseMask    = 0x8000;
+    static constexpr uint16_t kOpcodeMask        = 0x7800;
+    static constexpr uint16_t kOpcodeShift       = 11;
+    static constexpr uint16_t kTruncationMask    = 0x0200;
+    static constexpr uint16_t kReturnCodeMask    = 0x000F;
+
+    // Bits preserved by RawValue()/SetFlags for mDNS (RFC 6762: OPCODE/RCODE must be 0).
+    static constexpr uint16_t kMdnsNonIgnoredMask = kIsResponseMask | kAuthoritativeMask | kTruncationMask;
 };
 
 /**
@@ -168,7 +167,7 @@ public:
 
     HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
 
-    /// Writes mDNS-relevant flag bits only (OPCODE/RCODE cleared via RawValue()).
+    /// Writes QR/AA/TC only; OPCODE and RCODE are forced to 0 (RFC 6762).
     HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
 
     /// Writes the full flags word, including OPCODE and RCODE. Use for DNS Update.

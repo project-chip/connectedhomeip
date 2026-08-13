@@ -44,9 +44,10 @@ public:
     ByteSpan GetPublicKey() const { return mPublicKey; }
 
     /**
-     * @brief Copies X||Y from an uncompressed P-256 point (65 bytes, leading 0x04).
-     * @return false if @p uncompressedPoint is not a valid uncompressed point or
-     *         @p outRawKey is smaller than #kP256RawPublicKeySize.
+     * @brief Copies X||Y after checking uncompressed-point length (65) and 0x04 prefix.
+     * Does not validate coordinates or curve membership.
+     * @return false if length/prefix checks fail or @p outRawKey is smaller than
+     *         #kP256RawPublicKeySize.
      */
     static bool ExtractRawP256PublicKey(ByteSpan uncompressedPoint, MutableByteSpan outRawKey);
 
