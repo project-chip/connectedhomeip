@@ -20,9 +20,10 @@
 
 namespace chip::app {
 
-LaundryWasher::LaundryWasher(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+LaundryWasher::LaundryWasher(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryWasher, 1)),
-    mDiagnosticDataProvider(diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider != nullptr ? *config.diagnosticDataProvider
+                                                                      : DeviceLayer::GetDiagnosticDataProvider())
 {}
 
 CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

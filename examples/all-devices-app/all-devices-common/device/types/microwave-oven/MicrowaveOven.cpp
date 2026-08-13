@@ -20,9 +20,10 @@
 
 namespace chip::app {
 
-MicrowaveOven::MicrowaveOven(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+MicrowaveOven::MicrowaveOven(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMicrowaveOven, 1)),
-    mDiagnosticDataProvider(diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider != nullptr ? *config.diagnosticDataProvider
+                                                                      : DeviceLayer::GetDiagnosticDataProvider())
 {}
 
 CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

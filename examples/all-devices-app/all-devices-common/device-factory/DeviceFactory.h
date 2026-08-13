@@ -315,7 +315,8 @@ private:
         {
             RegisterCreator("dishwasher", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Dishwasher>(mContext->diagnosticDataProvider);
+                return std::make_unique<Dishwasher>(
+                    Dishwasher::Config{ .diagnosticDataProvider = &mContext->diagnosticDataProvider });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
@@ -519,7 +520,8 @@ private:
         {
             RegisterCreator("laundry-washer", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LaundryWasher>(mContext->diagnosticDataProvider);
+                return std::make_unique<LaundryWasher>(
+                    LaundryWasher::Config{ .diagnosticDataProvider = &mContext->diagnosticDataProvider });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
@@ -533,7 +535,8 @@ private:
         {
             RegisterCreator("microwave-oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<MicrowaveOven>(mContext->diagnosticDataProvider);
+                return std::make_unique<MicrowaveOven>(
+                    MicrowaveOven::Config{ .diagnosticDataProvider = &mContext->diagnosticDataProvider });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)

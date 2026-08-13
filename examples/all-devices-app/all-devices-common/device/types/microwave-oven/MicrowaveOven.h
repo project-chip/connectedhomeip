@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <functional>
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
@@ -123,7 +124,13 @@ private:
 class MicrowaveOven : public SingleEndpoint
 {
 public:
-    explicit MicrowaveOven(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
+    struct Config
+    {
+        DeviceLayer::DiagnosticDataProvider * diagnosticDataProvider = nullptr;
+    };
+
+    MicrowaveOven() : MicrowaveOven(Config{}) {}
+    explicit MicrowaveOven(const Config & config);
     ~MicrowaveOven() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

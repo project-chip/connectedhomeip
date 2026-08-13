@@ -60,5 +60,3 @@ tests:
           value: 90
           constraints:
               type: elapsed_s
-
-

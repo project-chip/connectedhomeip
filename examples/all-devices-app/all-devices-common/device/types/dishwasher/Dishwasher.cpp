@@ -15,14 +15,16 @@
  *    limitations under the License.
  */
 
+#include <functional>
 #include <device/types/dishwasher/Dishwasher.h>
 #include <devices/Types.h>
 
 namespace chip::app {
 
-Dishwasher::Dishwasher(DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+Dishwasher::Dishwasher(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDishwasher, 1)),
-    mDiagnosticDataProvider(diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider != nullptr ? *config.diagnosticDataProvider
+                                                                      : DeviceLayer::GetDiagnosticDataProvider())
 {}
 
 CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
