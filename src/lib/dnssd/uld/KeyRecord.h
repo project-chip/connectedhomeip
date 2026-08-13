@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <lib/dnssd/uld/Constants.h>
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 #include <lib/support/Span.h>
@@ -46,10 +47,11 @@ public:
     /**
      * @brief Copies X||Y after checking uncompressed-point length (65) and 0x04 prefix.
      * Does not validate coordinates or curve membership.
-     * @return false if length/prefix checks fail or @p outRawKey is smaller than
-     *         #kP256RawPublicKeySize.
+     * @return CHIP_NO_ERROR on success; CHIP_ERROR_INVALID_ARGUMENT if length/prefix
+     *         checks fail; CHIP_ERROR_BUFFER_TOO_SMALL if @p outRawKey is smaller than
+     *         kP256RawPublicKeySize.
      */
-    static bool ExtractRawP256PublicKey(ByteSpan uncompressedPoint, MutableByteSpan outRawKey);
+    static CHIP_ERROR ExtractRawP256PublicKey(ByteSpan uncompressedPoint, MutableByteSpan outRawKey);
 
 protected:
     bool WriteData(RecordWriter & out) const override;

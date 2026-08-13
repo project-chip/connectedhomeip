@@ -102,13 +102,17 @@ TEST(TestKeyRecord, ExtractRawP256PublicKeyStripsPrefix)
     }
 
     MutableByteSpan out(raw);
-    EXPECT_TRUE(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out));
+    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_NO_ERROR);
     EXPECT_EQ(out.size(), kP256RawPublicKeySize);
     EXPECT_EQ(memcmp(raw, point + 1, kP256RawPublicKeySize), 0);
 
     point[0] = 0x02; // compressed — reject
     out      = MutableByteSpan(raw);
-    EXPECT_FALSE(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out));
+    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_ERROR_INVALID_ARGUMENT);
+
+    point[0] = 0x04;
+    out      = MutableByteSpan(raw, kP256RawPublicKeySize - 1);
+    EXPECT_EQ(KeyResourceRecord::ExtractRawP256PublicKey(ByteSpan(point), out), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
 } // namespace
