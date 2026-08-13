@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -120,6 +120,7 @@ enum class Fields : uint8_t
     kThreshold         = 6,
     kLabel             = 7,
     kPredicted         = 8,
+    kExternalID        = 9,
 };
 
 struct Type
@@ -131,9 +132,10 @@ public:
     Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::Type> auxiliaryLoad;
     Optional<Structs::PeakPeriodStruct::Type> peakPeriod;
     Optional<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
-    DataModel::Nullable<uint32_t> threshold;
+    DataModel::Nullable<int64_t> threshold;
     Optional<DataModel::Nullable<chip::CharSpan>> label;
     Optional<bool> predicted;
+    Optional<chip::CharSpan> externalID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

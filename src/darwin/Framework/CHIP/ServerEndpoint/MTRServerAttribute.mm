@@ -123,6 +123,7 @@ MTR_DIRECT_MEMBERS
 {
     id serializedValue;
     id dataType = value[MTRTypeKey];
+    NSUInteger maxChunkLength = 0;
     if ([MTRArrayValueType isEqual:dataType]) {
         id dataValue = value[MTRValueKey];
         if (![dataValue isKindOfClass:NSArray.class]) {
@@ -145,6 +146,7 @@ MTR_DIRECT_MEMBERS
             if (encodedItem == nil) {
                 return NO;
             }
+            maxChunkLength = std::max(maxChunkLength, encodedItem.length);
             [listValue addObject:encodedItem];
         }
         serializedValue = listValue;
@@ -154,6 +156,7 @@ MTR_DIRECT_MEMBERS
         if (serializedValue == nil) {
             return NO;
         }
+        maxChunkLength = [serializedValue length];
     }
 
     // We serialized properly, so should be good to go on the value.  Lock
@@ -162,7 +165,7 @@ MTR_DIRECT_MEMBERS
 
     _value = [value copy];
 
-    MTR_LOG("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
+    MTR_LOG("Attribute value updated (max chunk length %lu bytes): %@", static_cast<unsigned long>(maxChunkLength), [self _descriptionWhileLocked]); // Logs new value as part of our description.
 
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {

@@ -135,6 +135,11 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
         return CHIP_NO_ERROR;
     }
 #endif
+    if (strcmp(str, "nfc") == 0)
+    {
+        *aRendezvousFlags = chip::RendezvousInformationFlag::kNFC;
+        return CHIP_NO_ERROR;
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

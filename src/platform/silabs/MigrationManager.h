@@ -30,7 +30,7 @@ public:
      * User should get the object from this getter.
      */
     static MigrationManager & GetMigrationInstance();
-    static void applyMigrations();
+    static void ApplyMigrations();
     static void MigrateUint16(uint32_t old_key, uint32_t new_key);
     static void MigrateUint32(uint32_t old_key, uint32_t new_key);
 

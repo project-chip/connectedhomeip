@@ -86,7 +86,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
         /* Schedule work for disabled case causes station mode not getting enabled */
         if (mWiFiStationMode != kWiFiStationMode_Disabled)
         {
-            DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
         }
         else
         {
@@ -116,10 +116,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         wifi_config_t stationConfig;
 
         memset(&stationConfig, 0, sizeof(stationConfig));
-        Internal::PSOC6Utils::p6_wifi_set_config(WIFI_IF_STA, &stationConfig);
+        TEMPORARY_RETURN_IGNORED Internal::PSOC6Utils::p6_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -134,7 +134,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
     }
     mWiFiAPMode = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 exit:
     return err;
 }
@@ -144,7 +144,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -153,7 +153,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -171,7 +171,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
@@ -291,11 +291,11 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
     case CY_WCM_EVENT_DISCONNECTED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_DISCONNECTED");
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Disconnecting);
-        NetworkCommissioning::P6WiFiDriver::GetInstance().SetLastDisconnectReason(WLC_E_SUP_DEAUTH);
+        TEMPORARY_RETURN_IGNORED NetworkCommissioning::P6WiFiDriver::GetInstance().SetLastDisconnectReason(WLC_E_SUP_DEAUTH);
         break;
     case CY_WCM_EVENT_IP_CHANGED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_IP_CHANGED");
-        ConnectivityMgrImpl().OnIPAddressAvailable();
+        TEMPORARY_RETURN_IGNORED ConnectivityMgrImpl().OnIPAddressAvailable();
         break;
     case CY_WCM_EVENT_STA_JOINED_SOFTAP:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_STA_JOINED_SOFTAP");
@@ -310,12 +310,12 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
 }
 void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
@@ -335,7 +335,8 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::P6WiFiDriver::GetInstance().OnNetworkStatusChange(); });
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
+            []() { NetworkCommissioning::P6WiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -384,7 +385,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     err = Internal::PSOC6Utils::p6_start_ap();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "p6_start_ap failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "p6_start_ap failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:
@@ -450,10 +451,11 @@ void ConnectivityManagerImpl::DriveAPState()
                 System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
                                 System::Clock::Milliseconds32(apTimeout).count());
-                SystemLayer().ScheduleLambda([apTimeout, this] {
+                TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([apTimeout, this] {
                     CHIP_ERROR ret = CHIP_NO_ERROR;
                     ret            = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
-                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                    VerifyOrReturn(ret == CHIP_NO_ERROR,
+                                   ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
                 });
             }
             else
@@ -507,9 +509,9 @@ void ConnectivityManagerImpl::DriveAPState()
 exit:
     if (err != CHIP_NO_ERROR && mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
     {
-        SetWiFiAPMode(kWiFiAPMode_Disabled);
-        Internal::PSOC6Utils::SetAPMode(false);
-        Internal::PSOC6Utils::p6_stop_ap();
+        TEMPORARY_RETURN_IGNORED SetWiFiAPMode(kWiFiAPMode_Disabled);
+        TEMPORARY_RETURN_IGNORED Internal::PSOC6Utils::SetAPMode(false);
+        TEMPORARY_RETURN_IGNORED Internal::PSOC6Utils::p6_stop_ap();
     }
 }
 
@@ -555,7 +557,7 @@ void ConnectivityManagerImpl::DriveStationState()
             err = Internal::PSOC6Utils::p6_wifi_disconnect();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "p6_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "p6_wifi_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
             SuccessOrExit(err);
 
@@ -599,7 +601,7 @@ void ConnectivityManagerImpl::DriveStationState()
                 err = Internal::PSOC6Utils::p6_wifi_connect();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "p6_wifi_connect() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "p6_wifi_connect() failed: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 SuccessOrExit(err);
             }
@@ -610,10 +612,11 @@ void ConnectivityManagerImpl::DriveStationState()
                 System::Clock::Timeout timeToNextConnect = (mLastStationConnectFailTime + mWiFiStationReconnectInterval) - now;
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms ",
                                 System::Clock::Milliseconds32(timeToNextConnect).count());
-                SystemLayer().ScheduleLambda([timeToNextConnect, this] {
+                TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([timeToNextConnect, this] {
                     CHIP_ERROR ret = CHIP_NO_ERROR;
                     ret            = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, this);
-                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                    VerifyOrReturn(ret == CHIP_NO_ERROR,
+                                   ChipLogError(DeviceLayer, "StartTimer failed: %" CHIP_ERROR_FORMAT, ret.Format()));
                 });
             }
         }
@@ -635,7 +638,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     struct netif * net_interface = NULL;
     IPAddress addr;
     bool stationConnected;
-    Internal::PSOC6Utils::IsStationConnected(stationConnected);
+    TEMPORARY_RETURN_IGNORED Internal::PSOC6Utils::IsStationConnected(stationConnected);
 
     ChipLogProgress(DeviceLayer, "UpdateInternetConnectivityState");
     // If the WiFi station is currently in the connected state...

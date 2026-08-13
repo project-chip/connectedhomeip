@@ -30,6 +30,28 @@ Draft
 			<status>O</status>
 			<support>true</support>
 		</picsItem>
+		<!-- This also isn't part of basic info, but I added a descriptor for checking some MCORE PICS -->
+		<picsItem>
+			<itemNumber>DESC.S</itemNumber>
+			<feature>Does the device implement the descriptor as a server?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
+		<!-- Required by the Base/MCORE consistency check (test step 10). Any
+		     device exposing standard server clusters must have MCORE.IDM.S
+		     set; this mock device does (BasicInformation, Descriptor, etc.). -->
+		<picsItem>
+			<itemNumber>MCORE.IDM.S</itemNumber>
+			<feature>Does the device support the Interaction Data Model as a server?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
+		<picsItem>
+			<itemNumber>DESC.S.A0000</itemNumber>
+			<feature>Does the device implement the device type list attribute?</feature>
+			<status>O</status>
+			<support>true</support>
+		</picsItem>
 	</usage>
 	<!--PIXIT-->
 	<pixit>

@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::SmokeCoAlarm;
 using namespace ::chip::DeviceLayer;
 
@@ -28,14 +29,22 @@ LOG_MODULE_DECLARE(COsensor, CONFIG_CHIP_APP_LOG_LEVEL);
 SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
-    ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kCOAlarm,
-    ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,     ExpressedStateEnum::kTesting,
-    ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+    ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
+    ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
+    ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    return CHIP_NO_ERROR;
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    return SmokeCoAlarmServer::Instance().Init(1, config, this);
+}
+
+void SmokeCoAlarmManager::OnSelfTestRequested()
+{
+    StartSelfTesting();
 }
 
 void SmokeCoAlarmManager::StartSelfTesting()

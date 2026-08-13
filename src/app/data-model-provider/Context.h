@@ -18,7 +18,6 @@
 
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/EventsGenerator.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 
 namespace chip {
 namespace app {
@@ -31,9 +30,8 @@ namespace DataModel {
 /// as well as fetching current state (via actionContext)
 struct InteractionModelContext
 {
-    EventsGenerator * eventsGenerator                = nullptr;
-    ProviderChangeListener * dataModelChangeListener = nullptr;
-    ActionContext * actionContext                    = nullptr;
+    EventsGenerator & eventsGenerator;
+    ActionContext & actionContext;
 };
 
 } // namespace DataModel

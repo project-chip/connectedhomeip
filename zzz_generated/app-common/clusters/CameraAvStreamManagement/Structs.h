@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -72,11 +72,10 @@ enum class Fields : uint8_t
     kMaxResolution    = 6,
     kMinBitRate       = 7,
     kMaxBitRate       = 8,
-    kMinFragmentLen   = 9,
-    kMaxFragmentLen   = 10,
-    kWatermarkEnabled = 11,
-    kOSDEnabled       = 12,
-    kReferenceCount   = 13,
+    kKeyFrameInterval = 9,
+    kWatermarkEnabled = 10,
+    kOSDEnabled       = 11,
+    kReferenceCount   = 12,
 };
 
 struct Type
@@ -89,10 +88,9 @@ public:
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
-    uint32_t minBitRate     = static_cast<uint32_t>(0);
-    uint32_t maxBitRate     = static_cast<uint32_t>(0);
-    uint16_t minFragmentLen = static_cast<uint16_t>(0);
-    uint16_t maxFragmentLen = static_cast<uint16_t>(0);
+    uint32_t minBitRate       = static_cast<uint32_t>(0);
+    uint32_t maxBitRate       = static_cast<uint32_t>(0);
+    uint16_t keyFrameInterval = static_cast<uint16_t>(0);
     Optional<bool> watermarkEnabled;
     Optional<bool> OSDEnabled;
     uint8_t referenceCount = static_cast<uint8_t>(0);
@@ -300,7 +298,6 @@ public:
 using DecodableType = Type;
 
 } // namespace VideoSensorParamsStruct
-namespace ViewportStruct = Clusters::detail::Structs::ViewportStruct;
 } // namespace Structs
 } // namespace CameraAvStreamManagement
 } // namespace Clusters

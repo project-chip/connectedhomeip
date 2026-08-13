@@ -117,11 +117,17 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  * @param[in] paaRootStore Pointer to the AttestationTrustStore instance to be used by implementation
  *                         of default DeviceAttestationVerifier. Caller must ensure storage is
  *                         always available while the DeviceAttestationVerifier could be used.
+ * @param[in] revocationDelegate Pointer to the DeviceAttestationRevocationDelegate instance to be used by
+ *                         the implementation of default DeviceAttestationVerifier to determine revoked entities.
+ *                         If nullptr, all device attestation revocation checks will be disabled.
+ *                         Caller must ensure the revocation delegate is always available while the
+ *                         DeviceAttestationVerifier could be used.
  *
  * @returns a singleton DeviceAttestationVerifier that satisfies basic device attestation procedure requirements.
  *          This has process lifetime, so the paaRootStore must also have
  *          process lifetime.  In particular, after the first call it's not
  *          possible to change which AttestationTrustStore is used by this verifier.
+ *          Same applies to DeviceAttestationRevocationDelegate.
  */
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
                                                   DeviceAttestationRevocationDelegate * revocationDelegate = nullptr);

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,89 +18,4 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ClosureDimension {
-
-/**
- * Structure represents the current state struct of a closure dimension cluster derivation instance.
- */
-struct GenericCurrentStateStruct : public Structs::CurrentStateStruct::Type
-{
-    GenericCurrentStateStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
-                              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
-    {
-        Set(positionValue, latchValue, speedValue);
-    }
-
-    GenericCurrentStateStruct(const GenericCurrentStateStruct & currentState) { *this = currentState; }
-
-    GenericCurrentStateStruct & operator=(const GenericCurrentStateStruct & current)
-    {
-        Set(current.position, current.latch, current.speed);
-        return *this;
-    }
-
-    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
-             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
-    {
-        position = positionValue;
-        latch    = latchValue;
-        speed    = speedValue;
-    }
-
-    bool operator==(const GenericCurrentStateStruct & rhs) const
-    {
-        return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
-    }
-
-    bool operator!=(const GenericCurrentStateStruct & rhs) const
-    {
-        return position != rhs.position || latch != rhs.latch || speed != rhs.speed;
-    }
-};
-
-/**
- * Structure represents the target struct of a closure dimension cluster derivation instance.
- */
-struct GenericTargetStruct : public Structs::TargetStruct::Type
-{
-    GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
-                        Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
-    {
-        Set(positionValue, latchValue, speedValue);
-    }
-
-    GenericTargetStruct(const GenericTargetStruct & target) { *this = target; }
-
-    GenericTargetStruct & operator=(const GenericTargetStruct & target)
-    {
-        Set(target.position, target.latch, target.speed);
-        return *this;
-    }
-
-    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
-             Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
-    {
-        position = positionValue;
-        latch    = latchValue;
-        speed    = speedValue;
-    }
-
-    bool operator==(const GenericTargetStruct & rhs) const
-    {
-        return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
-    }
-
-    bool operator!=(const GenericTargetStruct & rhs) const
-    {
-        return position != rhs.position || latch != rhs.latch || speed != rhs.speed;
-    }
-};
-} // namespace ClosureDimension
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app/clusters/closure-dimension-server/GenericDimensionState.h>

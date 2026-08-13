@@ -46,9 +46,11 @@ public:
     static void SubscribeHumidityAttribute(chip::AttributeId attributeId, chip::DeviceProxy * peer_device, void * context);
 
 private:
-    static void ReadTemperatureAttribute(chip::AttributeId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void ReadHumidityAttribute(chip::AttributeId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void ThermostatChangedHandler(const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void ReadTemperatureAttribute(chip::AttributeId, const chip::app::Clusters::Binding::TableEntry &, chip::DeviceProxy *,
+                                         void *);
+    static void ReadHumidityAttribute(chip::AttributeId, const chip::app::Clusters::Binding::TableEntry &, chip::DeviceProxy *,
+                                      void *);
+    static void ThermostatChangedHandler(const chip::app::Clusters::Binding::TableEntry &, chip::OperationalDeviceProxy *, void *);
     static void ThermostatContextReleaseHandler(void *);
     static void InitInternal(intptr_t);
 };

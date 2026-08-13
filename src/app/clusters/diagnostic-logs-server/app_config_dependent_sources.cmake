@@ -16,9 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.cpp"
-    "${CLUSTER_DIR}/BDXDiagnosticLogsProvider.h"
-    "${CLUSTER_DIR}/DiagnosticLogsProviderDelegate.h"
-    "${CLUSTER_DIR}/diagnostic-logs-server.cpp"
-    "${CLUSTER_DIR}/diagnostic-logs-server.h"
+  "${CLUSTER_DIR}/CodegenIntegration.cpp"
+  "${CLUSTER_DIR}/CodegenIntegration.h"
+  "${CLUSTER_DIR}/diagnostic-logs-server.h"
 )

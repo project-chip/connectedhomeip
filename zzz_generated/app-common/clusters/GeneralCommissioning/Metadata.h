@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace GeneralCommissioning {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Breadcrumb {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Breadcrumb::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kAdminister);
@@ -61,10 +63,29 @@ namespace TCUpdateDeadline {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TCUpdateDeadline::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace TCUpdateDeadline
+namespace RecoveryIdentifier {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(RecoveryIdentifier::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kManage, std::nullopt);
+} // namespace RecoveryIdentifier
+namespace NetworkRecoveryReason {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(NetworkRecoveryReason::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kManage, std::nullopt);
+} // namespace NetworkRecoveryReason
+namespace IsCommissioningWithoutPower {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IsCommissioningWithoutPower::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace IsCommissioningWithoutPower
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
+    LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ArmFailSafe::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
@@ -85,6 +106,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace SetTCAcknowledgements
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app

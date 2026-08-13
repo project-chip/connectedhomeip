@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -279,6 +279,33 @@ public:
 using DecodableType = Type;
 
 } // namespace ConstraintsStruct
+namespace PowerRangeAdjustStruct {
+enum class Fields : uint8_t
+{
+    kMinPower = 0,
+    kMaxPower = 1,
+    kCause    = 2,
+    kEndTime  = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<int64_t> minPower;
+    DataModel::Nullable<int64_t> maxPower;
+    PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
+    uint32_t endTime            = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerRangeAdjustStruct
 namespace SlotAdjustmentStruct {
 enum class Fields : uint8_t
 {

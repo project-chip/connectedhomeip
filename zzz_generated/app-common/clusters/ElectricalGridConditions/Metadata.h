@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace ElectricalGridConditions {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace LocalGenerationAvailable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalGenerationAvailable::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
@@ -34,10 +36,22 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ForecastConditions
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    LocalGenerationAvailable::kMetadataEntry,
+    CurrentConditions::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace CurrentConditionsChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace CurrentConditionsChanged
+
+} // namespace Events
 } // namespace ElectricalGridConditions
 } // namespace Clusters
 } // namespace app

@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 70;
+
 namespace Channel {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Channel

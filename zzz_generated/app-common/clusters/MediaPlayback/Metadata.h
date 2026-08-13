@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace MediaPlayback {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -67,10 +69,27 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableTextTracks
+namespace AvailableCommands {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AvailableCommands::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace AvailableCommands
+namespace ContentInfo {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ContentInfo::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace ContentInfo
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    CurrentState::kMetadataEntry,
+    AvailableCommands::kMetadataEntry,
+    ContentInfo::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Play {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Play::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -129,6 +148,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(DeactivateTextTr
 } // namespace DeactivateTextTrack
 
 } // namespace Commands
+
+namespace Events {
+namespace StateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChanged
+
+} // namespace Events
 } // namespace MediaPlayback
 } // namespace Clusters
 } // namespace app

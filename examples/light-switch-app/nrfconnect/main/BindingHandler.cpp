@@ -26,13 +26,14 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void BindingHandler::Init()
 {
 #ifdef CONFIG_CHIP_LIB_SHELL
     SwitchCommands::RegisterSwitchCommands();
 #endif
-    DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
 void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError)
@@ -51,8 +52,8 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
         *data                              = aBindingData;
 
         // Establish new CASE session and retrasmit command that was not applied.
-        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
-                                                                        static_cast<void *>(data));
+        error = Binding::Manager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                          static_cast<void *>(data));
 
         if (CHIP_NO_ERROR != error)
         {
@@ -66,7 +67,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -142,7 +143,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
                                                 OperationalDeviceProxy * aDevice, void * aContext)
 {
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
@@ -192,13 +193,13 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
     VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch handler"););
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (binding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -213,7 +214,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             break;
         }
     }
-    else if (binding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
+    else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -242,24 +243,24 @@ void BindingHandler::InitInternal(intptr_t aArg)
     LOG_INF("Initialize binding Handler");
     auto & server = Server::GetInstance();
     if (CHIP_NO_ERROR !=
-        BindingManager::GetInstance().Init(
+        Binding::Manager::GetInstance().Init(
             { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
     {
         LOG_ERR("BindingHandler::InitInternal failed");
     }
 
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     BindingHandler::GetInstance().PrintBindingTable();
 }
 
 bool BindingHandler::IsGroupBound()
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     for (auto & entry : bindingTable)
     {
-        if (MATTER_MULTICAST_BINDING == entry.type)
+        if (Binding::MATTER_MULTICAST_BINDING == entry.type)
         {
             return true;
         }
@@ -269,7 +270,7 @@ bool BindingHandler::IsGroupBound()
 
 void BindingHandler::PrintBindingTable()
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     LOG_INF("Binding Table size: [%d]:", bindingTable.Size());
     uint8_t i = 0;
@@ -277,7 +278,7 @@ void BindingHandler::PrintBindingTable()
     {
         switch (entry.type)
         {
-        case MATTER_UNICAST_BINDING:
+        case Binding::MATTER_UNICAST_BINDING:
             LOG_INF("[%d] UNICAST:", i++);
             LOG_INF("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -287,7 +288,7 @@ void BindingHandler::PrintBindingTable()
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
                     (int) entry.remote, (int) entry.nodeId);
             break;
-        case MATTER_MULTICAST_BINDING:
+        case Binding::MATTER_MULTICAST_BINDING:
             LOG_INF("[%d] GROUP:", i++);
             LOG_INF("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -295,7 +296,7 @@ void BindingHandler::PrintBindingTable()
             \t+ GroupId %d",
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case MATTER_UNUSED_BINDING:
+        case Binding::MATTER_UNUSED_BINDING:
             LOG_INF("[%d] UNUSED", i++);
             break;
         default:
@@ -310,5 +311,6 @@ void BindingHandler::SwitchWorkerHandler(intptr_t aContext)
 
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
     LOG_INF("Notify Bounded Cluster | endpoint: %d cluster: %d", data->EndpointId, data->ClusterId);
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId,
+                                                                                       static_cast<void *>(data));
 }

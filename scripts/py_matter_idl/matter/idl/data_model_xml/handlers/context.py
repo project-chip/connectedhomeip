@@ -14,9 +14,10 @@
 
 import logging
 import xml.sax.xmlreader
-from typing import List, Optional
 
 from matter.idl.matter_idl_types import Cluster, Idl, ParseMetaData
+
+log = logging.getLogger(__name__)
 
 
 class IdlPostProcessor:
@@ -39,7 +40,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: Optional[List[str]] = None):
+    def __init__(self, paths: list[str] | None = None):
         if paths is None:
             paths = []
         self.paths = paths
@@ -54,7 +55,7 @@ class ProcessingPath:
         return '::'.join(self.paths)
 
     def __repr__(self):
-        return 'ProcessingPath(%r)' % self.paths
+        return f'ProcessingPath({self.paths!r})'
 
 
 class Context:
@@ -76,7 +77,7 @@ class Context:
     needing to interact with each other.
     """
 
-    def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
+    def __init__(self, locator: xml.sax.xmlreader.Locator | None = None):
         self.path = ProcessingPath()
         self.locator = locator
         self.file_name = None
@@ -84,24 +85,28 @@ class Context:
         self._idl_post_processors: list[IdlPostProcessor] = []
         self.abstract_base_clusters: dict[str, Cluster] = {}
 
-    def AddAbstractBaseCluster(self, name: str, parse_meta: Optional[ParseMetaData] = None) -> Cluster:
+    def AddAbstractBaseCluster(self, name: str, parse_meta: ParseMetaData | None = None) -> Cluster:
         """Creates a new cluster entry for the given name in the list of known
            base clusters.
         """
-        assert name not in self.abstract_base_clusters  # be unique
+        if name in self.abstract_base_clusters:
+            # This does NOT seem unique ... this seems like a bug
+            # See this currently with Label-Cluster.xml and Label-Cluster-LabelCluster.xml ...
+            log.warning("Duplicate defined base cluster: %s", name)
+            return self.abstract_base_clusters[name]
 
         cluster = Cluster(name=name, code=-1, parse_meta=parse_meta)
         self.abstract_base_clusters[name] = cluster
 
         return cluster
 
-    def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
+    def GetCurrentLocationMeta(self) -> ParseMetaData | None:
         if not self.locator:
             return None
 
         return ParseMetaData(line=self.locator.getLineNumber(), column=self.locator.getColumnNumber())
 
-    def ParseLogLocation(self) -> Optional[str]:
+    def ParseLogLocation(self) -> str | None:
         if not self.file_name:
             return None
         meta = self.GetCurrentLocationMeta()
@@ -113,13 +118,13 @@ class Context:
     def MarkTagNotHandled(self):
         path = str(self.path)
         if path not in self._not_handled:
-            msg = "TAG %s was not handled/recognized" % path
+            msg = f"TAG {path} was not handled/recognized"
 
             where = self.ParseLogLocation()
             if where:
                 msg = msg + " at " + where
 
-            logging.warning(msg)
+            log.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

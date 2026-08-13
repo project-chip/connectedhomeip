@@ -22,7 +22,11 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
+#include <setup_payload/SetupPayload.h>
 #include <stdint.h>
+
+#include <optional>
 
 namespace chip {
 namespace Controller {
@@ -60,6 +64,30 @@ public:
 
     /**
      * @brief
+     *   Called when PASE session establishment is complete (with success or error)
+     *
+     * @param error Error cause, if any
+     *
+     * @param rendezvousParameters The RendezvousParameters that were used for PASE establishment.
+     *                             If available, this helps identify which exact commissionee PASE
+     *                             was established for. This will generally be present only when
+     *                             PASE establishment succeeds.
+     *
+     * @param setupPayload The SetupPayload that was used for PASE establishment, if one is
+     *                     available.  This will generally be present only when PASE establishment
+     *                     succeeds and the original input to commissioning was a payload string.
+     *                     If the original input represented a concatenated QR code, this will
+     *                     represent the actual payload that was used to successfully establish PASE
+     *                     with the commissionee.
+     */
+    virtual void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                                   const std::optional<SetupPayload> & setupPayload)
+    {
+        OnPairingComplete(error);
+    }
+
+    /**
+     * @brief
      *   Called when the pairing is deleted (with success or error)
      *
      * @param error Error cause, if any
@@ -74,6 +102,33 @@ public:
     virtual void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
                                         Optional<Credentials::AttestationVerificationResult> additionalErrorInfo)
     {}
+
+    /**
+     * @brief
+     *   Called when commissioning fails, with the full structured CompletionStatus from the
+     *   commissioning state machine. Provides access to detailed status that the 4-arg overload
+     *   above drops on the floor.
+     *
+     *   Default implementation forwards to the legacy 4-arg overload above, so existing
+     *   delegates keep working unchanged. The legacy form only carries `err`, `failedStage`,
+     *   and `attestationResult` — the following CompletionStatus fields are silently dropped
+     *   when the default forwarder runs:
+     *
+     *     - commissioningError                (GeneralCommissioning cluster CommissioningErrorEnum)
+     *     - networkCommissioningStatus + connectNetworkErrorValue
+     *     - operationalCertStatus             (OperationalCredentials NOCResponse status)
+     *     - commissioningDebugText            (device-supplied text from ArmFailSafe /
+     *                                          SetRegulatoryConfig / CommissioningComplete)
+     *     - networkCommissioningDebugText     (device-supplied text from NetworkConfig /
+     *                                          ConnectNetwork)
+     *
+     *   Override this overload (instead of the 4-arg one) to receive those fields.
+     */
+    virtual void OnCommissioningFailure(PeerId peerId, const CompletionStatus & completionStatus)
+    {
+        OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(CommissioningStage::kError),
+                               completionStatus.attestationResult);
+    }
 
     virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
 
@@ -148,6 +203,40 @@ public:
      *            from the time it receives the StayActiveRequest command.
      */
     virtual void OnICDStayActiveComplete(ScopedNodeId icdNodeId, uint32_t promisedActiveDurationMsec) {}
+
+    /**
+     * @brief
+     *   Called when a commissioning stage starts.
+     *
+     * @param[in] peerId an identifier for the commissioning process.  This is generally the
+     *                   client-provided commissioning identifier before AddNOC and the actual
+     *                   NodeID of the node after AddNoc, combined with the compressed fabric ID for
+     *                   the fabric doing the commissioning.
+     * @param[in] stageStarting the stage being started.
+     */
+    virtual void OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting) {}
+
+    /**
+     * @brief
+     *   Called when Wi-Fi credentials are needed.  If the call returns
+     *   CHIP_NO_ERROR, commissioning will pause until NetworkCredentialsReady()
+     *   is called on the CHIPDeviceController.  This call must happen
+     *   asynchronously, after WiFiCredentialsNeeded has returned.
+     *
+     * @param[in] endpoint the endpoint that hosts the Network Commissioning cluster the credentials are needed for.
+     */
+    virtual CHIP_ERROR WiFiCredentialsNeeded(EndpointId endpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
+     *   Called when Thread credentials are needed.  If the call returns
+     *   CHIP_NO_ERROR, commissioning will pause until NetworkCredentialsReady()
+     *   is called on the CHIPDeviceController.  This call must happen
+     *   asynchronously, after ThreadCredentialsNeeded has returned.
+     *
+     * @param[in] endpoint the endpoint that hosts the Network Commissioning cluster the credentials are needed for.
+     */
+    virtual CHIP_ERROR ThreadCredentialsNeeded(EndpointId endpoint) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 } // namespace Controller

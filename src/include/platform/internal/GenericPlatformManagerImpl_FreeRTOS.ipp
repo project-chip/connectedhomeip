@@ -455,17 +455,12 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
 {
-    if (mEventLoopTask != NULL)
+    mShouldRunEventLoop.store(false);
+    // Post a no-op event to wake up the event loop if it's blocked on queue receive
+    ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
+    if (mChipEventQueue != NULL)
     {
-        // Signal the event loop to stop
-        mShouldRunEventLoop.store(false);
-
-        // Post a no-op event to wake up the event loop if it's blocked on queue receive
-        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
-        if (mChipEventQueue != NULL)
-        {
-            xQueueSend(mChipEventQueue, &noop, 0);
-        }
+        xQueueSend(mChipEventQueue, &noop, 0);
     }
     return CHIP_NO_ERROR;
 }

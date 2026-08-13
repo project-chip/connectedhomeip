@@ -5,11 +5,13 @@
 :caption: Contents
 :hidden:
 
+GLOSSARY
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
+contributing/index
+getting_started/index
 ci-cd/index
 development_controllers/index
-getting_started/index
 ids_and_codes/index
 cluster_and_device_type_dev/index
 guides/index
@@ -21,10 +23,8 @@ testing/index
 tips_and_troubleshooting/index
 tools/index
 zap_and_codegen/index
-BUG_REPORT
 upgrading
 issue_triage
-pull_request_guidelines
 ```
 
 ```{include} README.md

@@ -4,13 +4,17 @@
 
     BL602/BL604 is combo chip-set for Wi-Fi 4 and BLE 5.0.
 
--   BL61X
+-   BL616/BL618
 
-    BL61X is combo chip-set for Wi-Fi 6, Classic Bluetooth, Bluetooth low energy
-    5.3 and IEEE 802.15.4/ZigBee/Thread.
+    BL616/BL618 is combo chip-set for Wi-Fi 6, Classic Bluetooth, Bluetooth low
+    energy 5.3 and IEEE 802.15.4/ZigBee/Thread.
 
-    BL61X has fully certified with all Thread 1.3 features, included Thread
-    `SSED` and Thread Border Router.
+    BL616/BL618 has fully certified with all Thread 1.3 features, included
+    Thread `SSED` and Thread Border Router.
+
+-   BL616CL
+
+    BL616CL is combo chip-set for Wi-Fi 6, Bluetooth low energy 5.3.
 
 -   BL70X
 
@@ -32,6 +36,7 @@
     -   BL602, Wi-Fi 4 application.
     -   BL706 + BL602, Wi-Fi 4 application.
     -   BL616, Wi-Fi 6 application
+    -   BL616CL, Wi-Fi 6 application
 -   Thread application, we have
     -   BL70X/BL616
     -   BL704L, Thread low power application.
@@ -55,7 +60,7 @@
 
     -   `BL616DK`
 
-        > Please contact `Bouffalo Lab` for BL616 SDK.
+    -   `BL616CLDK`
 
     -   `BL704LDK`
 
@@ -73,3 +78,20 @@
     -   [Lighting app](../../../examples/lighting-app/bouffalolab/README.md)
 
     -   [Contact sensor app](../../../examples/contact-sensor-app/bouffalolab/README.md)
+
+# Build system
+
+`Bouffalo Lab` Matter examples currently use different build systems based on
+the SDK family:
+
+-   `bouffalo_sdk` + Matter is used for BL61X, such as BL616/BL618. It uses the
+    CMake build system from `bouffalo_sdk`, with Matter integrated into the SDK
+    application project. Use the example CMake/Makefile flow for product
+    application development. `scripts/build/build_examples.py` is also
+    compatible and dispatches to the same CMake build for these targets.
+-   `BL_IOT_SDK` + Matter is used for BL602 and BL702/BL702L. It uses the Matter
+    ninja build system. Use `scripts/build/build_examples.py` to generate the
+    build configuration and run ninja.
+
+Please refer to [Bouffalo Lab - Getting Started](./getting_started.md) for
+detailed build commands.

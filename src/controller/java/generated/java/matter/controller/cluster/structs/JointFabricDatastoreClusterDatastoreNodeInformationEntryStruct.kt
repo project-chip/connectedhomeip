@@ -46,9 +46,9 @@ class JointFabricDatastoreClusterDatastoreNodeInformationEntryStruct(
   }
 
   companion object {
-    private const val TAG_NODE_ID = 1
-    private const val TAG_FRIENDLY_NAME = 2
-    private const val TAG_COMMISSIONING_STATUS_ENTRY = 3
+    private const val TAG_NODE_ID = 0
+    private const val TAG_FRIENDLY_NAME = 1
+    private const val TAG_COMMISSIONING_STATUS_ENTRY = 2
 
     fun fromTlv(
       tlvTag: Tag,

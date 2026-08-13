@@ -70,7 +70,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StateChanged.
+} // namespace StateChanged
 namespace ActionFailed {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -116,7 +116,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ActionFailed.
+} // namespace ActionFailed
 } // namespace Events
 } // namespace Actions
 } // namespace Clusters

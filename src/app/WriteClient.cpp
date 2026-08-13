@@ -34,6 +34,7 @@ namespace app {
 void WriteClient::Close()
 {
     MoveToState(State::AwaitingDestruction);
+    mExchangeCtx.Release();
 
     if (mpCallback)
     {
@@ -54,7 +55,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     ReturnErrorOnFailure(writeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeResponse.PrettyPrint();
 #endif
 
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
@@ -171,8 +172,11 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks.
-    VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
+    // Per the Matter specification a chunked Write Request cannot be part of a Timed Write Interaction, and it cannot
+    // suppress the response: intermediate WriteResponses are required to pace the chunks, so SuppressResponse must be
+    // false when the request is chunked.
+    VerifyOrReturnError(!((mTimedWriteTimeoutMs.HasValue() || mSuppressResponse) && !mChunks.IsNull()),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -201,7 +205,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -247,7 +251,8 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
+CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                               TestListEncodingOverride testListEncodingOverride)
 {
     ReturnErrorOnFailure(EnsureMessage());
 
@@ -269,7 +274,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // list operation.
         // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
         // enforce all clusters to support it in testing and in certification.
-        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
+        bool encodeEmptyListAsReplaceAll = (path.mClusterId != Clusters::AccessControl::Id) ||
+            (testListEncodingOverride == TestListEncodingOverride::kForceLegacyEncoding);
 
         if (encodeEmptyListAsReplaceAll)
         {
@@ -279,7 +285,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         {
 
             dataReader.Init(data);
-            dataReader.OpenContainer(valueReader);
+            TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
             bool chunkingNeeded = false;
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
@@ -300,7 +306,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         // We will restart iterating on ValueReader, only appending the items we need to append.
         dataReader.Init(data);
-        dataReader.OpenContainer(valueReader);
+        TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
 
         CHIP_ERROR err            = CHIP_NO_ERROR;
         uint16_t currentItemCount = 0;
@@ -470,7 +476,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     if (timeout == System::Clock::kZero)
     {
-        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -500,7 +506,7 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session->IsGroupSession())
+        if (session->IsGroupSession() || (mSuppressResponse && mState != State::AwaitingTimedStatus))
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");
@@ -524,16 +530,20 @@ CHIP_ERROR WriteClient::SendWriteRequest()
     System::PacketBufferHandle data = mChunks.PopHead();
 
     bool isGroupWrite = mExchangeCtx->IsGroupExchangeContext();
-    if (!mChunks.IsNull() && isGroupWrite)
+    if (!mChunks.IsNull() && (isGroupWrite || mSuppressResponse))
     {
-        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()), and this is a group
-        // exchange context.
+        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()) and either this is a
+        // group exchange context or the response is suppressed; a chunked write requires intermediate WriteResponses.
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (mSuppressResponse)
+    {
+        return mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone);
     }
 
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
-
     MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }
@@ -543,10 +553,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse &&
-        // We had sent the last chunk of data, and received all responses
-        mChunks.IsNull())
+    if (mState == State::AwaitingResponse)
     {
+        // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
+        //       SendWriteRequest() call below will move back to an AwaitingResponse state
         MoveToState(State::ResponseReceived);
     }
 
@@ -613,7 +623,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::AwaitingResponse)

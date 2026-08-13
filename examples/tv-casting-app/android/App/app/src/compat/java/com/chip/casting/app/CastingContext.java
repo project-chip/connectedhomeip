@@ -3,7 +3,7 @@ package com.chip.casting.app;
 import android.content.Context;
 import android.widget.LinearLayout;
 import androidx.fragment.app.FragmentActivity;
-import com.R;
+import com.chip.casting.R;
 
 /** @deprecated Use the APIs described in /examples/tv-casting-app/APIs.md instead. */
 @Deprecated

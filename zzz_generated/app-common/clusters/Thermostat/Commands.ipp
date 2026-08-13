@@ -61,7 +61,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetpointRaiseLower.
+} // namespace SetpointRaiseLower
 namespace GetWeeklyScheduleResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -104,7 +104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetWeeklyScheduleResponse.
+} // namespace GetWeeklyScheduleResponse
 namespace SetWeeklySchedule {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -147,7 +147,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetWeeklySchedule.
+} // namespace SetWeeklySchedule
 namespace GetWeeklySchedule {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -180,7 +180,35 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetWeeklySchedule.
+} // namespace GetWeeklySchedule
+namespace AddThermostatSuggestionResponse {
+
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUniqueID), uniqueID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUniqueID))
+        {
+            err = DataModel::Decode(reader, uniqueID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AddThermostatSuggestionResponse
 namespace ClearWeeklySchedule {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -202,7 +230,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ClearWeeklySchedule.
+} // namespace ClearWeeklySchedule
 namespace SetActiveScheduleRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -230,7 +258,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetActiveScheduleRequest.
+} // namespace SetActiveScheduleRequest
 namespace SetActivePresetRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -258,7 +286,73 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetActivePresetRequest.
+} // namespace SetActivePresetRequest
+namespace AddThermostatSuggestion {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPresetHandle), presetHandle);
+    encoder.Encode(to_underlying(Fields::kEffectiveTime), effectiveTime);
+    encoder.Encode(to_underlying(Fields::kExpirationInMinutes), expirationInMinutes);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kPresetHandle))
+        {
+            err = DataModel::Decode(reader, presetHandle);
+        }
+        else if (__context_tag == to_underlying(Fields::kEffectiveTime))
+        {
+            err = DataModel::Decode(reader, effectiveTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kExpirationInMinutes))
+        {
+            err = DataModel::Decode(reader, expirationInMinutes);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace AddThermostatSuggestion
+namespace RemoveThermostatSuggestion {
+
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kUniqueID), uniqueID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kUniqueID))
+        {
+            err = DataModel::Decode(reader, uniqueID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace RemoveThermostatSuggestion
 namespace AtomicResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -296,7 +390,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AtomicResponse.
+} // namespace AtomicResponse
 namespace AtomicRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -334,7 +428,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AtomicRequest.
+} // namespace AtomicRequest
 } // namespace Commands
 } // namespace Thermostat
 } // namespace Clusters

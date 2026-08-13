@@ -40,21 +40,34 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CHEF}/common"
+                      "${CHEF}/common/clusters/application-basic/"
+                      "${CHEF}/common/clusters/application-launch/"
                       "${CHEF}/common/clusters/audio-output/"
                       "${CHEF}/common/clusters/channel/"
+                      "${CHEF}/common/clusters/chime/"
+                      "${CHEF}/common/clusters/content-launch/"
+                      "${CHEF}/common/clusters/device-energy-management-mode/"
                       "${CHEF}/common/clusters/door-lock/"
                       "${CHEF}/common/clusters/keypad-input/"
+                      "${CHEF}/common/clusters/laundry-dryer-controls/"
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"
                       "${CHEF}/common/clusters/oven-cavity-operational-state/"
                       "${CHEF}/common/clusters/oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-control/"
+                      "${CHEF}/common/clusters/mode-base"
+                      "${CHEF}/common/clusters/mode-select/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
+                      "${CHEF}/common/clusters/smoke-co-alarm/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
+                      "${CHEF}/common/clusters/water-heater-management/"
+                      "${CHEF}/common/clusters/water-heater-mode/"
                       "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
@@ -94,12 +107,30 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CHIP_SHELL_DIR}/shell_common/"
 )
+# Exclude chef-rpc-actions-worker.cpp from compilation when RPC is disabled
+# Path to the chef-rpc-actions-worker.cpp file, which is part of ${CHEF}/common directory included in SRC_DIRS_LIST
+set(STUBS_CPP_ABSOLUTE_PATH "${CHEF}/common/chef-rpc-actions-worker.cpp")
+# Calculate the path relative to the current component directory (main/)
+file(RELATIVE_PATH STUBS_CPP_RELATIVE_TO_MAIN "${CMAKE_CURRENT_LIST_DIR}" "${STUBS_CPP_ABSOLUTE_PATH}")
+# Add it to the list of excluded sources for this component
+set(COMPONENT_EXCLUDE_SRCS "${STUBS_CPP_RELATIVE_TO_MAIN}")
+
 endif (CONFIG_ENABLE_PW_RPC)
 
+# Check if we have to exclude any sources from compilation
+if(COMPONENT_EXCLUDE_SRCS)
+idf_component_register(
+                      EXCLUDE_SRCS ${COMPONENT_EXCLUDE_SRCS}
+                      PRIV_INCLUDE_DIRS
+                      "${CHIP_SHELL_DIR}/shell_common/include"
+                      "${PRIV_INCLUDE_DIRS_LIST}"
+                      SRC_DIRS ${SRC_DIRS_LIST})
+else()
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
                       SRC_DIRS ${SRC_DIRS_LIST})
+endif()
 
 # Forces the linker to include common/stubs.cpp
 target_link_libraries(${COMPONENT_LIB} INTERFACE "-u chef_include_stubs_impl")
@@ -109,8 +140,8 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )

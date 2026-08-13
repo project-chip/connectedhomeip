@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.matter.tv.server">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permission to bind to Matter Agent service from Matter content apps-->
     <permission android:name="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION"

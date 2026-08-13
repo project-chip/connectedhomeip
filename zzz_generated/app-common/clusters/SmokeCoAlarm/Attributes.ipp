@@ -58,6 +58,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, smokeSensitivityLevel);
     case Attributes::ExpiryDate::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, expiryDate);
+    case Attributes::Unmounted::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, unmounted);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

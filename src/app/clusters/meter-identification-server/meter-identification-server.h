@@ -40,6 +40,13 @@ public:
     {}
     ~Instance() override;
 
+    // mPointOfDelivery / mMeterSerialNumber / mProtocolVersion are CharSpans bound (in the setters) to
+    // this object's own m*Buf[] buffers, so a defaulted copy would leave them aliasing the source's
+    // buffers. The instance is a single registered AttributeAccessInterface and is never copied; forbid
+    // copying so an accidental copy is a compile error rather than a dangling-span alias.
+    Instance(const Instance &)             = delete;
+    Instance & operator=(const Instance &) = delete;
+
     CHIP_ERROR Init();
     void Shutdown();
 

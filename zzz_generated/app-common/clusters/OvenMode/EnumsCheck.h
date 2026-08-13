@@ -49,6 +49,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
     case EnumType::kConvectionRoast:
     case EnumType::kWarming:
     case EnumType::kProofing:
+    case EnumType::kSteam:
+    case EnumType::kAirFry:
+    case EnumType::kAirSousVide:
+    case EnumType::kFrozenFood:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

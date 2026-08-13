@@ -90,6 +90,11 @@ public:
     ~Cancelable() { Cancel(); }
 
     Cancelable(const Cancelable &) = delete;
+    // A Cancelable links itself into intrusive cancelable lists via mNext/mPrev, so it must not be
+    // copy-assigned either: a shallow assignment would copy those list links and corrupt the lists
+    // (and silently shallow-copy any Callback subclass). Complete the rule-of-three; copy construction
+    // is already deleted above.
+    Cancelable & operator=(const Cancelable &) = delete;
 };
 
 typedef void (*CallFn)(void *);

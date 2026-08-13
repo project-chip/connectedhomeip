@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,8 +41,13 @@ class TCPEndPointImplLwIP : public TCPEndPoint, public EndPointStateLwIP
 {
 public:
     TCPEndPointImplLwIP(EndPointManager<TCPEndPoint> & endPointManager) :
-        TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr), mPreAllocatedConnectEP(nullptr)
+        TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr)
     {}
+
+    // Test-only hook used by src/inet/tests/TestTCPEndPointLwIP.cpp to simulate the
+    // post-LwIPHandleError state (mState still kConnected, but mTCP cleared) without
+    // needing a real TCP three-way handshake.
+    friend class TCPTest;
 
     // TCPEndPoint overrides.
     CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override;
@@ -84,14 +89,14 @@ private:
     tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
     // For TCP Listen endpoint, we will pre-allocate a connection endpoint to assign the incoming connection to it.
     // when there is a new TCP connection established.
-    TCPEndPoint * mPreAllocatedConnectEP;
+    TCPEndPointHandle mPreAllocatedConnectEP;
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();
     CHIP_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
     void HandleDataReceived(chip::System::PacketBufferHandle && buf);
-    void HandleIncomingConnection(TCPEndPoint * pcb);
+    void HandleIncomingConnection(const TCPEndPointHandle & pcb);
     void HandleError(CHIP_ERROR err);
 
     static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);

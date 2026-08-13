@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <cstring>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -101,9 +102,9 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                  mEndpointId, adjustedUserIndex, chip::NullTerminated(user.userName).c_str(),
                   static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
                   to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
@@ -114,14 +115,13 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    ChipLogProgress(Zcl,
-                    "Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
-                    ",userStatus=%u,userType=%u,"
-                    "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
-                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    static_cast<unsigned int>(totalCredentials));
+    ChipLogProgress(
+        Zcl,
+        "Lock App: LockEndpoint::SetUser "
+        "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
+        "credentialRule=%u,credentials=%p,totalCredentials=%u]",
+        mEndpointId, userIndex, creator, modifier, chip::NullTerminated(userName).c_str(), uniqueId, to_underlying(userStatus),
+        to_underlying(usertype), to_underlying(credentialRule), credentials, static_cast<unsigned int>(totalCredentials));
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
@@ -591,7 +591,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
             gCurrentAction.nodeId     = nodeId;
 
             // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                                 OnLockActionCompleteCallback, nullptr);
 
             return true;
         }
@@ -675,7 +676,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
     gCurrentAction.nodeId          = nodeId;
 
     // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                         OnLockActionCompleteCallback, nullptr);
 
     return true;
 }
@@ -703,7 +705,8 @@ void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * ca
         gCurrentAction.lockState = DlLockState::kUnlocked;
 
         // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                             OnLockActionCompleteCallback, nullptr);
     }
     else
     {

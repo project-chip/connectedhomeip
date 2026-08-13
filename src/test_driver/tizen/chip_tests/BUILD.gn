@@ -26,6 +26,10 @@ tizen_qemu_run("chip-tests") {
   # Share tests directory.
   share = "${root_out_dir}"
 
+  # Increase memory to 1GB to prevent guest OS swapping and VM freezes under
+  # memory pressure, which negatively impacts test execution and causes flaky timeouts.
+  memory = 1024
+
   # Runner script file name.
   runner = "runner-${target_name}.sh"
 

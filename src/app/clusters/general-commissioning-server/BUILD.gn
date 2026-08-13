@@ -11,5 +11,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("general-commissioning-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/app/common_flags.gni")
+
+source_set("bread-crumb-tracker") {
+  sources = [ "BreadCrumbTracker.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("general-commissioning-server") {
+  sources = [
+    "GeneralCommissioningCluster.cpp",
+    "GeneralCommissioningCluster.h",
+  ]
+
+  public_deps = [
+    ":bread-crumb-tracker",
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/tracing",
+    "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning",
+  ]
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
+  }
 }

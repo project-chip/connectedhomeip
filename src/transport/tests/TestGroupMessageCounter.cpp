@@ -28,6 +28,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 
@@ -64,7 +65,7 @@ public:
 
         // Always Update storage for Test purposes
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        EXPECT_SUCCESS(mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t)));
     }
 };
 
@@ -104,27 +105,44 @@ TEST(TestGroupMessageCounter, AddPeerTest)
 {
     NodeId peerNodeId                             = 1234;
     FabricIndex fabricIndex                       = 1;
-    int i                                         = 0;
     CHIP_ERROR err                                = CHIP_NO_ERROR;
     chip::Transport::PeerMessageCounter * counter = nullptr;
-    chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
+    TestGroupPeerTable mGroupPeerMsgCounter;
 
+    // Add max number of group data peers
+    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    {
+        err = mGroupPeerMsgCounter.FindOrAddPeer(fabricIndex, peerNodeId + i, false, counter);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    // Verify they are in the table in the correct LRU order (most recent at index 0)
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    {
+        EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, i, false), peerNodeId + (CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1 - i));
+    }
+
+    // Add (CHIP_CONFIG_MAX_GROUP_DATA_PEERS + 1)th peer (should trigger eviction of 1234,
+    // which was at index CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1)
+    NodeId newPeerNodeId = peerNodeId + CHIP_CONFIG_MAX_GROUP_DATA_PEERS;
+    err                  = mGroupPeerMsgCounter.FindOrAddPeer(fabricIndex, newPeerNodeId, false, counter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify the entire list ordering after eviction (newPeerNodeId at index 0, down to
+    // 1235 at index CHIP_CONFIG_MAX_GROUP_DATA_PEERS - 1)
+    for (uint8_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    {
+        EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, i, false), newPeerNodeId - i);
+    }
+
+    // Test fabric limit (fabrics do not evict, so this should still fail)
+    FabricIndex fabricCount = 1;
     do
     {
-        err = mGroupPeerMsgCounter.FindOrAddPeer(fabricIndex, peerNodeId++, false, counter);
-        i++;
-
-    } while (err != CHIP_ERROR_TOO_MANY_PEER_NODES);
-
-    EXPECT_EQ(i, CHIP_CONFIG_MAX_GROUP_DATA_PEERS + 1);
-
-    i = 1;
-    do
-    {
-        err = mGroupPeerMsgCounter.FindOrAddPeer(++fabricIndex, peerNodeId, false, counter);
-        i++;
-    } while (err != CHIP_ERROR_TOO_MANY_PEER_NODES);
-    EXPECT_EQ(i, CHIP_CONFIG_MAX_FABRICS + 1);
+        fabricCount++;
+        err = mGroupPeerMsgCounter.FindOrAddPeer(fabricCount, peerNodeId, false, counter);
+    } while (err != CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(fabricCount, CHIP_CONFIG_MAX_FABRICS + 1);
 }
 
 TEST(TestGroupMessageCounter, RemovePeerTest)
@@ -146,7 +164,7 @@ TEST(TestGroupMessageCounter, RemovePeerTest)
     }
     // Verify that table is indeed full (for control Peer)
     err = mGroupPeerMsgCounter.FindOrAddPeer(99, 99, true, counter);
-    EXPECT_EQ(err, CHIP_ERROR_TOO_MANY_PEER_NODES);
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
 
     // Clear all Peer
     fabricIndex = 1;
@@ -323,7 +341,7 @@ TEST(TestGroupMessageCounter, ReorderPeerRemovalTest)
 
     EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(0, 0, true), 2u);
 
-    // with other list
+    // with other list, add 1 to 8
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 1, false, counter);
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 2, false, counter);
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 3, false, counter);
@@ -332,19 +350,40 @@ TEST(TestGroupMessageCounter, ReorderPeerRemovalTest)
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 6, false, counter);
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 7, false, counter);
     err = mGroupPeerMsgCounter.FindOrAddPeer(2, 8, false, counter);
-    err = mGroupPeerMsgCounter.FindOrAddPeer(2, 9, false, counter);
 
+    // Initial order (MRU at 0): 8, 7, 6, 5, 4, 3, 2, 1
+
+    // Remove node id 7 (index 1). Shift left.
+    // New order: 8, 6, 5, 4, 3, 2, 1
     err = mGroupPeerMsgCounter.RemovePeer(2, 7, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 6, false), 9u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 6, false), 1u);
 
+    // Remove node id 4 (index 3). Shift left.
+    // New order: 8, 6, 5, 3, 2, 1
     err = mGroupPeerMsgCounter.RemovePeer(2, 4, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 3, false), 8u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 3, false), 3u);
 
+    // Remove node id 1 (index 5). Shift left.
+    // New order: 8, 6, 5, 3, 2
     err = mGroupPeerMsgCounter.RemovePeer(2, 1, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 0, false), 8u);
+
+    // Add node id 9 after removals. Should be inserted at index 0.
+    // New order: 9, 8, 6, 5, 3, 2
+    err = mGroupPeerMsgCounter.FindOrAddPeer(2, 9, false, counter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Verify the entire list ordering
     EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 0, false), 9u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 1, false), 8u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 2, false), 6u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 3, false), 5u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 4, false), 3u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 5, false), 2u);
+    EXPECT_EQ(mGroupPeerMsgCounter.GetNodeIdAt(1, 6, false), kUndefinedNodeId);
 }
 
 TEST(TestGroupMessageCounter, ReorderFabricRemovalTest)
@@ -398,6 +437,50 @@ TEST(TestGroupMessageCounter, ReorderFabricRemovalTest)
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
+TEST(TestGroupMessageCounter, MultipleEvictionsTest)
+{
+    chip::Transport::PeerMessageCounter * counter = nullptr;
+    TestGroupPeerTable table;
+    FabricIndex fabric = 1;
+
+    // --- Data peer path: fill table then cycle 100 more unique NodeIDs ---
+    // Fill the table to capacity
+    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    {
+        NodeId nodeId = 0x1000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric, nodeId, false, counter), CHIP_NO_ERROR);
+    }
+
+    // Cycle 100 more unique NodeIDs through the table; each should become MRU
+    for (uint32_t i = 0; i < 100; i++)
+    {
+        NodeId nodeId = 0x2000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric, nodeId, false, counter), CHIP_NO_ERROR);
+
+        // Verify the most recently added peer is always at index 0
+        EXPECT_EQ(table.GetNodeIdAt(0, 0, false), nodeId) << "iteration " << i;
+    }
+
+    // --- Control peer path: fill table then cycle a few more unique NodeIDs ---
+    // The control peer path is currently not tested for eviction.
+    FabricIndex fabric2 = 2;
+    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS; i++)
+    {
+        NodeId nodeId = 0x3000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric2, nodeId, true, counter), CHIP_NO_ERROR);
+    }
+
+    // Cycle more unique NodeIDs through the control peer table
+    for (uint32_t i = 0; i < 10; i++)
+    {
+        NodeId nodeId = 0x4000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric2, nodeId, true, counter), CHIP_NO_ERROR);
+
+        // Verify the most recently added peer is always at index 0
+        EXPECT_EQ(table.GetNodeIdAt(1, 0, true), nodeId) << "control iteration " << i;
+    }
+}
+
 TEST(TestGroupMessageCounter, GroupMessageCounterTest)
 {
 
@@ -412,7 +495,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     // Counter should be random
     controlCounter = groupCientCounter.GetCounter(true);
     dataCounter    = groupCientCounter.GetCounter(false);
-    groupCientCounter.IncrementCounter(true);
+    EXPECT_SUCCESS(groupCientCounter.IncrementCounter(true));
 
     EXPECT_EQ((groupCientCounter.GetCounter(true) - controlCounter), 1u);
 
@@ -426,7 +509,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     EXPECT_EQ((groupCientCounter2.GetCounter(false) - dataCounter), (uint32_t) GROUP_MSG_COUNTER_MIN_INCREMENT);
 
     // Test Roll over
-    groupCientCounter2.IncrementCounter(true);
+    EXPECT_SUCCESS(groupCientCounter2.IncrementCounter(true));
     EXPECT_EQ(groupCientCounter2.GetCounter(true), 0u);
 
     TestGroupOutgoingCounters groupCientCounter3(&delegate);
@@ -436,7 +519,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
 
     // Start Test with Control counter
     dataCounter = groupCientCounter.GetCounter(false);
-    groupCientCounter.IncrementCounter(false);
+    EXPECT_SUCCESS(groupCientCounter.IncrementCounter(false));
     EXPECT_EQ((groupCientCounter.GetCounter(false) - dataCounter), 1u);
 
     groupCientCounter.SetCounter(false, UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);
@@ -448,7 +531,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     EXPECT_EQ(groupCientCounter4.GetCounter(false), UINT32_MAX);
 
     // Test Roll over
-    groupCientCounter4.IncrementCounter(false);
+    EXPECT_SUCCESS(groupCientCounter4.IncrementCounter(false));
     EXPECT_EQ(groupCientCounter4.GetCounter(false), 0u);
 
     TestGroupOutgoingCounters groupCientCounter5(&delegate);

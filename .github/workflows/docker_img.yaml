@@ -39,6 +39,14 @@ jobs:
         name: Build Docker CHIP Build images - base
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            packages: write
+        env:
+            # Publish on an explicit dispatch, or automatically once a change to
+            # integrations/docker/ has landed on master. Pull requests and pushes
+            # to other branches build only.
+            PUBLISH: ${{ inputs.push_images == true || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
         strategy:
             fail-fast: false
             matrix:
@@ -47,22 +55,72 @@ jobs:
                     - "-minimal"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Log in to ghcr.io
+              if: env.PUBLISH == 'true'
+              env:
+                  GHCR_TOKEN: ${{ github.token }}
+              run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             - name: Build & Push images using project bash script
-              if: ${{ inputs.push_images == true }}
+              if: env.PUBLISH == 'true'
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest --push
             - name: Build images using project bash script
-              if: ${{ inputs.push_images == false }}
+              if: env.PUBLISH != 'true'
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Build-only, on a native arm64 runner. This verifies the base image still
+    # builds for linux/arm64; it deliberately does not tag or push, because how a
+    # multi-arch image should be published is a separate decision.
+    build_images_base_arm64:
+        name: Build Docker CHIP Build images - base (arm64)
+        runs-on: ubuntu-24.04-arm
+        if: github.actor != 'restyled-io[bot]'
+        # Build-only, so no packages: write here, unlike the amd64 job above.
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                img:
+                    - ""
+                    - "-minimal"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Build images using project bash script
+              run: |
+                  cd integrations/docker/images/base/chip-build${{ matrix.img }}
+                  ./build.sh
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+    # NOTE: docker images builds are disabled for all beyond base image because
+    #       underlying image builds fail either due to size restrictions (we only
+    #       have a few GB in github: 14GB for everything) or dependencies which
+    #       result in a "cannot find package" error.
+    #
+    # Until the above is fixed, we do not try to build things so we do not train
+    # developers to ignore CI failures.
+    #
+    # See https://github.com/project-chip/connectedhomeip/issues/30750
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -70,7 +128,7 @@ jobs:
                     - "-crosscompile"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -81,11 +139,16 @@ jobs:
               run: |
                   cd integrations/docker/images/stage-1/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_stage_2:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -104,14 +167,15 @@ jobs:
                     - "-nxp"
                     - "-nxp-zephyr"
                     - "-nrf-platform"
+                    - "-realtek-zephyr"
+                    - "-silabs-zephyr"
                     - "-telink"
                     - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
-                    - "-openiotsdk"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -123,11 +187,16 @@ jobs:
                   cd integrations/docker/images/stage-2/chip-build${{ matrix.img }}
                   ./build.sh --latest
 
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_stage_3:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -137,7 +206,7 @@ jobs:
                     - "-tizen-qemu"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -148,6 +217,11 @@ jobs:
               run: |
                   cd integrations/docker/images/stage-3/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     build_images_vscode:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2, build_images_stage_3]
         name: Build Docker CHIP Build images - vscode
@@ -160,7 +234,7 @@ jobs:
                     - "-vscode"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -171,3 +245,8 @@ jobs:
               run: |
                   cd integrations/docker/images/vscode-3/chip-build${{ matrix.img }}
                   ./build.sh --latest
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace TimeFormatLocalization {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace HourFormat {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HourFormat::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -33,10 +35,16 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedCalendarTypes
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    HourFormat::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace TimeFormatLocalization
 } // namespace Clusters
 } // namespace app

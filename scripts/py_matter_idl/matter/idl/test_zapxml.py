@@ -17,7 +17,6 @@ import io
 import sys
 import unittest
 from pathlib import Path
-from typing import List, Union
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
@@ -25,19 +24,18 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.zapxml import ParseSource, ParseXmls
 
-from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, ConstantEntry,
-                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
-                                         StructQuality, StructTag)
+from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
+                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
+                                         Idl, Struct, StructQuality, StructTag)
 
 
-def XmlToIdl(what: Union[str, List[str]]) -> Idl:
+def XmlToIdl(what: str | list[str]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 
@@ -68,6 +66,11 @@ class TestXmlParser(unittest.TestCase):
                     <description>AttributeWithAccess</description>
                     <access op="read" role="operate" />
                     <access op="write" role="manage" />
+                </attribute>
+
+                <attribute side="server" code="33" type="INT8U" min="0" max="10" \
+                   reportable="true" default="0" writable="true" readable="false" optional="true">
+                   <description>WriteOnlyAttribute</description>
                 </attribute>
 
                 <command source="client" code="33" name="GetSomeData" response="GetSomeDataResponse" optional="true">
@@ -117,7 +120,14 @@ class TestXmlParser(unittest.TestCase):
                                          qualities=FieldQuality.OPTIONAL),
                                          qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
                                          readacl=AccessPrivilege.OPERATE,
-                                         writeacl=AccessPrivilege.MANAGE)
+                                         writeacl=AccessPrivilege.MANAGE),
+
+                                     Attribute(definition=Field(
+                                         data_type=DataType(
+                                             name='INT8U', min_value=0, max_value=10),
+                                         code=33, name='WriteOnlyAttribute',
+                                         qualities=FieldQuality.OPTIONAL),
+                                         qualities=AttributeQuality.WRITABLE)
                                  ],
                                  structs=[
                                      Struct(name='GetSomeDataRequest',
@@ -141,7 +151,8 @@ class TestXmlParser(unittest.TestCase):
                                      Command(name='GetSomeData', code=33,
                                              input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
                                              description='This is just a test: client to server',
-                                             invokeacl=AccessPrivilege.ADMINISTER)
+                                             invokeacl=AccessPrivilege.ADMINISTER,
+                                             qualities=CommandQuality.OPTIONAL)
                                  ])
                          ]))
 
@@ -333,8 +344,9 @@ class TestXmlParser(unittest.TestCase):
             ])
         self.assertEqual(idl,
                          Idl(clusters=[
-                             Cluster(name='TestFeatures', code=20, bitmaps=[bitmap])
-                         ])),
+                             Cluster(name='TestFeatures',
+                                     code=20, bitmaps=[bitmap])
+                         ]))
 
     def testGlobalStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
@@ -377,7 +389,8 @@ class TestXmlParser(unittest.TestCase):
                                      attributes=[
                                          Attribute(
                                              definition=Field(
-                                                 data_type=DataType(name='int16u', min_value=4),
+                                                 data_type=DataType(
+                                                     name='int16u', min_value=4),
                                                  code=2,
                                                  name='SubjectsPerAccessControlEntry',
                                              ),
@@ -433,7 +446,7 @@ class TestXmlParser(unittest.TestCase):
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+                                             writeacl=AccessPrivilege.OPERATE)])]))
 
     def testSkipsNotProcessedFields(self):
         # Zap has extra fields that are generally not processed
@@ -483,7 +496,7 @@ Some copyright here... testing that we skip over comments
                                              ),
                                              qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
-                                             writeacl=AccessPrivilege.OPERATE)]), ]))
+                                             writeacl=AccessPrivilege.OPERATE)])]))
 
 
 if __name__ == '__main__':

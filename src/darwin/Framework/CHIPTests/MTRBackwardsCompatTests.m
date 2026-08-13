@@ -326,6 +326,28 @@ static MTRTestKeys * sTestKeys = nil;
     CHECK_ARGUMENT(sig, 1, NSNumber *);
     CHECK_ARGUMENT(sig, 2, dispatch_queue_t);
     CHECK_ARGUMENT(sig, 3, void (^)(NSNumber * _Nullable value, NSError * _Nullable error));
+
+    sig = [MTRBaseClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeWhitePointXWithValue:completion:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSNumber *);
+    CHECK_ARGUMENT(sig, 1, StatusCompletion);
+
+    sig = [MTRBaseClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeWhitePointYWithValue:params:completion:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSNumber *);
+    CHECK_ARGUMENT(sig, 1, MTRWriteParams *);
+    CHECK_ARGUMENT(sig, 2, StatusCompletion);
+
+    sig = [MTRBaseClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeColorPointGXWithValue:completion:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSNumber *);
+    CHECK_ARGUMENT(sig, 1, StatusCompletion);
+
+    sig = [MTRBaseClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeColorPointRYWithValue:params:completion:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSNumber *);
+    CHECK_ARGUMENT(sig, 1, MTRWriteParams *);
+    CHECK_ARGUMENT(sig, 2, StatusCompletion);
 }
 
 - (void)test006_MTRBaseDevice
@@ -633,6 +655,28 @@ static MTRTestKeys * sTestKeys = nil;
 
     sig = [MTRClusterOnOff instanceMethodSignatureForSelector:@selector(writeAttributeOnTimeWithValue:
                                                                                 expectedValueInterval:params:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSDictionary *);
+    CHECK_ARGUMENT(sig, 1, NSNumber *);
+    CHECK_ARGUMENT(sig, 2, MTRWriteParams *);
+
+    sig = [MTRClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeWhitePointXWithValue:expectedValueInterval:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSDictionary *);
+    CHECK_ARGUMENT(sig, 1, NSNumber *);
+
+    sig = [MTRClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeWhitePointYWithValue:expectedValueInterval:params:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSDictionary *);
+    CHECK_ARGUMENT(sig, 1, NSNumber *);
+    CHECK_ARGUMENT(sig, 2, MTRWriteParams *);
+
+    sig = [MTRClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeColorPointBXWithValue:expectedValueInterval:)];
+    CHECK_RETURN_TYPE(sig, void);
+    CHECK_ARGUMENT(sig, 0, NSDictionary *);
+    CHECK_ARGUMENT(sig, 1, NSNumber *);
+
+    sig = [MTRClusterColorControl instanceMethodSignatureForSelector:@selector(writeAttributeColorPointRYWithValue:expectedValueInterval:params:)];
     CHECK_RETURN_TYPE(sig, void);
     CHECK_ARGUMENT(sig, 0, NSDictionary *);
     CHECK_ARGUMENT(sig, 1, NSNumber *);

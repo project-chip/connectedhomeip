@@ -105,15 +105,21 @@ details.
 
 ## Trigger event using air-quality-sensor-app event named pipe
 
-You can send a command to air-quality-sensor-app to trigger specific event via
-air-quality-sensor-app event named pipe /tmp/chip_air_quality_fifo\*<PID>.
+You can send a command to air-quality-sensor-app to trigger specific event by
+adding the --app-pipe argument with the named pipe path value `<file_path>`
+
+### Example to enable named pipes
+
+```
+sudo out/debug/chip-air-quality-sensor-app --app-pipe /tmp/air_quality_named_pipe
+```
 
 ### Trigger air quality change event
 
 Generate event `AirQuality`, to change the air quality value.
 
 ```
-$ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/air_quality_named_pipe
 ```
 
 ### Trigger Temperature change event
@@ -121,7 +127,7 @@ $ echo '{"Name":"AirQuality","NewValue":3}' > /tmp/chip_air_quality_fifo_<PID>
 Generate event `TemperatureMeasurement`, to change the temperate value.
 
 ```
-$ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/air_quality_named_pipe
 ```
 
 ### Trigger Humidity change event
@@ -130,7 +136,7 @@ Generate event `RelativeHumidityMeasurement`, to change the relative humidity
 value (6000 for 60,0 %).
 
 ```
-$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":6000}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":6000}' > /tmp/air_quality_named_pipe
 ```
 
 ### Trigger concentration change event
@@ -141,43 +147,43 @@ clusters.
 Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
 
 ```
-$ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `CarbonMonoxideConcentrationMeasurement`, to change the CO value.
 
 ```
-$ echo '{"Name":"CarbonMonoxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"CarbonMonoxideConcentrationMeasurement","NewValue":1}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `NitrogenDioxideConcentrationMeasurement`, to change the NO₂
 value.
 
 ```
-$ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `Pm1ConcentrationMeasurement`, to change the PM1 value.
 
 ```
-echo '{"Name":"Pm1ConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+echo '{"Name":"Pm1ConcentrationMeasurement","NewValue":1}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `Pm25ConcentrationMeasurement`, to change the PM2.5 value.
 
 ```
-echo '{"Name":"Pm25ConcentrationMeasurement","NewValue":2.5}' > /tmp/chip_air_quality_fifo_<PID>
+echo '{"Name":"Pm25ConcentrationMeasurement","NewValue":2.5}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `Pm10ConcentrationMeasurement`, to change the PM10 value.
 
 ```
-echo '{"Name":"Pm10ConcentrationMeasurement","NewValue":10}' > /tmp/chip_air_quality_fifo_<PID>
+echo '{"Name":"Pm10ConcentrationMeasurement","NewValue":10}' > /tmp/air_quality_named_pipe
 ```
 
 Generate event `TotalVolatileOrganicCompoundsConcentrationMeasurement`, to
 change the TVOC value.
 
 ```
-$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/air_quality_named_pipe
 ```

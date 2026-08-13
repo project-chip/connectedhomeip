@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2024-2025 Project CHIP Authors
+#   Copyright (c) 2024-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ else()
 endif()
 
 # Export CHIP_ROOT as an environment variable to be recognized by Kconfig
-set(ENV{CHIP_ROOT} ${CHIP_ROOT})
+set(COMMON_KCONFIG_ENV_SETTINGS CHIP_ROOT=${CHIP_ROOT})
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
@@ -42,13 +42,16 @@ get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_m
 # Add the CHIP stack & NXP port libs as an external module
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
+# Add se05x secure element library as an external module
+list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter)
+
 # If CONF_FILE_NAME is provided, append its full path to CONF_FILE
 if (DEFINED CONF_FILE_NAME)
-    set(CONF_FILE ${CONF_FILE} ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME})
+    set(CONF_FILE ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME} ${CONF_FILE})
 endif()
 
-# Add application prj.conf & Kconfig
-set(CONF_FILE ${CONF_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf)
+# Add application prj.conf in front of CONF_FILE
+set(CONF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf ${CONF_FILE})
 
 set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
 
@@ -89,9 +92,21 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/DeviceCallbacks.cpp
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
 )
 
 if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
@@ -102,5 +117,6 @@ else()
     chip_configure_data_model(app
         INCLUDE_SERVER
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/all-clusters-app.zap
+        ZCL_PATH ${CHIP_ROOT}/src/app/zap-templates/zcl/zcl-with-test-extensions.json
     )
 endif()

@@ -36,7 +36,7 @@ static std::map<int, Instance *> gAirQualityClusterInstance{};
 void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
 {
     Instance * clusterInstance = new Instance(endpointId, airQualityFeatures);
-    clusterInstance->Init();
+    TEMPORARY_RETURN_IGNORED clusterInstance->Init();
     gAirQualityClusterInstance[endpointId] = clusterInstance;
 }
 

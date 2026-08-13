@@ -44,7 +44,8 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
+            TEMPORARY_RETURN_IGNORED mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(
+                Protocols::SecureChannel::MsgType::CASE_Sigma1);
             mExchangeManager = nullptr;
         }
 

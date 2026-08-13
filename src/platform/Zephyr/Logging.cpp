@@ -41,7 +41,8 @@ namespace Platform {
 /**
  * CHIP log output function.
  */
-
+// Suppress "stack usage might be unbounded" warning triggered by CONFIG_LOG_MODE_DEFERRED
+#pragma GCC diagnostic ignored "-Wstack-usage="
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -60,6 +61,9 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     // help, apparently.  Just turn off that warning around this switch.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wvla-cxx-extension"
+#endif
     switch (category)
     {
     case kLogCategory_Error:

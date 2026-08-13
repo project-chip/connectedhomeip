@@ -55,8 +55,16 @@ static CHIP_ERROR NFCHandler(int argc, char ** argv)
     {
         if (nfcEnabled)
         {
-            chip::DeviceLayer::NFCOnboardingPayloadMgr().StopTagEmulation();
-            streamer_printf(sout, "NFC tag emulation stopped\r\n");
+            error = chip::DeviceLayer::NFCOnboardingPayloadMgr().StopTagEmulation();
+
+            if (error != CHIP_NO_ERROR)
+            {
+                streamer_printf(sout, "Failed to stop NFC tag emulation: %s\r\n", ErrorStr(error));
+            }
+            else
+            {
+                streamer_printf(sout, "NFC tag emulation stopped\r\n");
+            }
         }
         else
         {

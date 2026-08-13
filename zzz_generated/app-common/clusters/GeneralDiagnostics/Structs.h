@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -37,6 +37,35 @@ namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
 namespace Structs {
+namespace DeviceLoadStruct {
+enum class Fields : uint8_t
+{
+    kCurrentSubscriptions                  = 0,
+    kCurrentSubscriptionsForFabric         = 1,
+    kTotalSubscriptionsEstablished         = 2,
+    kTotalInteractionModelMessagesSent     = 3,
+    kTotalInteractionModelMessagesReceived = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t currentSubscriptions                  = static_cast<uint16_t>(0);
+    uint16_t currentSubscriptionsForFabric         = static_cast<uint16_t>(0);
+    uint32_t totalSubscriptionsEstablished         = static_cast<uint32_t>(0);
+    uint32_t totalInteractionModelMessagesSent     = static_cast<uint32_t>(0);
+    uint32_t totalInteractionModelMessagesReceived = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DeviceLoadStruct
 namespace NetworkInterface {
 enum class Fields : uint8_t
 {

@@ -23,18 +23,5 @@
 
 struct AppEvent : public BaseAppEvent
 {
-    enum AppEventTypes
-    {
-        kEventType_AirQualitySensor = BaseAppEvent::kEventType_Max + 1,
-        kEventType_Install,
-    };
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } AirQualitySensorEvent;
-    };
+    // Implemented for compatibility but doesn't define any app specific events
 };

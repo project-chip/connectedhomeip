@@ -11,5 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("joint-fabric-administrator-server") {
+import("//build_overrides/chip.gni")
+
+source_set("joint-fabric-administrator-server") {
+  sources = [
+    "JCMCommissionee.cpp",
+    "JCMCommissionee.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/controller:interactions",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/credentials/jcm",
+    "${chip_root}/zzz_generated/app-common/clusters/JointFabricAdministrator",
+    "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
 }

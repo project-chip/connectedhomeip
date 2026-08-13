@@ -25,9 +25,7 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan::fromCharString("Hot"),
-                                                                              CharSpan::fromCharString("Warm"),
-                                                                              CharSpan::fromCharString("Freezing") };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Hot"_span, "Warm"_span, "Freezing"_span };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
@@ -60,7 +58,7 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
                 CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Error copying char span to mutable char span %s", ErrorStr(err));
+                    ChipLogError(Zcl, "Error copying char span to mutable char span: %" CHIP_ERROR_FORMAT, err.Format());
                     return err;
                 }
                 mIndex++;

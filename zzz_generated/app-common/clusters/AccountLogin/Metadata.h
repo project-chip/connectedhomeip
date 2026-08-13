@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,11 +17,22 @@ namespace app {
 namespace Clusters {
 namespace AccountLogin {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace OAuthLoggedIn {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OAuthLoggedIn::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace OAuthLoggedIn
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
+
 namespace GetSetupPIN {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     GetSetupPIN::Id,
@@ -39,8 +51,21 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
     BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
     Access::Privilege::kOperate);
 } // namespace Logout
+namespace GetDeviceAuthURI {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    GetDeviceAuthURI::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kAdminister);
+} // namespace GetDeviceAuthURI
 
 } // namespace Commands
+
+namespace Events {
+namespace LoggedOut {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace LoggedOut
+
+} // namespace Events
 } // namespace AccountLogin
 } // namespace Clusters
 } // namespace app

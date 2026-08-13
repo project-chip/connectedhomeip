@@ -18,6 +18,7 @@ package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
 import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +31,9 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val streamUsage: UInt,
   val videoStreamID: UInt?,
   val audioStreamID: UInt?,
-  val metadataEnabled: Optional<Boolean>,
+  val metadataEnabled: Boolean,
+  val videoStreams: Optional<List<UInt>>,
+  val audioStreams: Optional<List<UInt>>,
   val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
@@ -42,6 +45,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     append("\tvideoStreamID : $videoStreamID\n")
     append("\taudioStreamID : $audioStreamID\n")
     append("\tmetadataEnabled : $metadataEnabled\n")
+    append("\tvideoStreams : $videoStreams\n")
+    append("\taudioStreams : $audioStreams\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -63,9 +68,22 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
-      if (metadataEnabled.isPresent) {
-        val optmetadataEnabled = metadataEnabled.get()
-        put(ContextSpecificTag(TAG_METADATA_ENABLED), optmetadataEnabled)
+      put(ContextSpecificTag(TAG_METADATA_ENABLED), metadataEnabled)
+      if (videoStreams.isPresent) {
+        val optvideoStreams = videoStreams.get()
+        startArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
+        for (item in optvideoStreams.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
+      }
+      if (audioStreams.isPresent) {
+        val optaudioStreams = audioStreams.get()
+        startArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
+        for (item in optaudioStreams.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -80,6 +98,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     private const val TAG_VIDEO_STREAM_ID = 4
     private const val TAG_AUDIO_STREAM_ID = 5
     private const val TAG_METADATA_ENABLED = 6
+    private const val TAG_VIDEO_STREAMS = 7
+    private const val TAG_AUDIO_STREAMS = 8
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
@@ -105,9 +125,32 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
         }
-      val metadataEnabled =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+      val metadataEnabled = tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED))
+      val videoStreams =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAMS))) {
+          Optional.of(
+            buildList<UInt> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val audioStreams =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAMS))) {
+          Optional.of(
+            buildList<UInt> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
         } else {
           Optional.empty()
         }
@@ -123,6 +166,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
         videoStreamID,
         audioStreamID,
         metadataEnabled,
+        videoStreams,
+        audioStreams,
         fabricIndex,
       )
     }

@@ -19,6 +19,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemConfig.h>
 
@@ -45,15 +46,15 @@ static void IncrementIntCounter(chip::System::Layer *, void * state)
 
 static void StopEventLoop(chip::System::Layer *, void *)
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 }
 
 TEST_F(TestSystemScheduleWork, CheckScheduleWork)
 {
     int callCount = 0;
-    EXPECT_EQ(chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, &callCount), CHIP_NO_ERROR);
-    EXPECT_EQ(chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, &callCount), CHIP_NO_ERROR);
-    EXPECT_EQ(chip::DeviceLayer::SystemLayer().ScheduleWork(StopEventLoop, nullptr), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, &callCount));
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().ScheduleWork(IncrementIntCounter, &callCount));
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().ScheduleWork(StopEventLoop, nullptr));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     EXPECT_EQ(callCount, 2);
 }

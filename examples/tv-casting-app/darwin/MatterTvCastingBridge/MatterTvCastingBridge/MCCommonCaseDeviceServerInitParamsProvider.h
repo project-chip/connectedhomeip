@@ -39,6 +39,10 @@ public:
                             ChipLogError(AppServer, "Initialization of ServerInitParams failed %" CHIP_ERROR_FORMAT, err.Format()));
         serverInitParams.dataModelProvider =
             chip::app::CodegenDataModelProviderInstance(serverInitParams.persistentStorageDelegate);
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+        // Enable automatic port retry for casting apps to handle port conflicts
+        serverInitParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
         return &serverInitParams;
     }
 };

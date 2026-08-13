@@ -40,7 +40,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -439,7 +439,7 @@ public:
     // TODO this #if CONFIG_BUILD_FOR_HOST_UNIT_TEST is temporary. There is a change incoming soon
     // that will allow triggering NOC update directly.
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { NotifyFabricUpdated(fabricIndex); }
+    void SendUpdateFabricNotificationForTest(FabricIndex fabricIndex) { TEMPORARY_RETURN_IGNORED NotifyFabricUpdated(fabricIndex); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     /**

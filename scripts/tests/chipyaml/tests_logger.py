@@ -27,16 +27,16 @@ from matter.yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRu
 from matter.yamltests.parser import TestStep
 
 
-def _strikethrough(str):
-    return '\u0336'.join(str[i:i+1] for i in range(0, len(str), 1))
+def _strikethrough(s):
+    return '\u0336'.join(s[i:i+1] for i in range(0, len(s), 1))
 
 
-_SUCCESS = click.style(u'\N{check mark}', fg='green')
-_FAILURE = click.style(u'\N{ballot x}', fg='red')
-_WARNING = click.style(u'\N{warning sign}', fg='yellow')
+_SUCCESS = click.style('\N{check mark}', fg='green')
+_FAILURE = click.style('\N{ballot x}', fg='red')
+_WARNING = click.style('\N{warning sign}', fg='yellow')
 
 
-class TestColoredLogPrinter():
+class TestColoredLogPrinter:
     def __init__(self, log_format='[{module}] {message}'):
         self.__log_format = log_format
         self.__log_styles = {
@@ -177,7 +177,7 @@ class TestRunnerLogger(TestRunnerHooks):
         else:
             state = _SUCCESS
 
-        if self.__use_test_harness_log_format and (state == _SUCCESS or state == _WARNING):
+        if self.__use_test_harness_log_format and (state in (_SUCCESS, _WARNING)):
             print(self.__strings.test_harness_test_stop_success.format(filename=self.__filename))
 
         successes = click.style(self.__successes, bold=True)
@@ -318,9 +318,9 @@ class TestRunnerLogger(TestRunnerHooks):
     def __prepare_data_for_printing(self, data):
         if isinstance(data, bytes):
             return data.decode('unicode_escape')
-        elif isinstance(data, list):
+        if isinstance(data, list):
             return [self.__prepare_data_for_printing(entry) for entry in data]
-        elif isinstance(data, dict):
+        if isinstance(data, dict):
             result = {}
             for key, value in data.items():
                 result[key] = self.__prepare_data_for_printing(value)

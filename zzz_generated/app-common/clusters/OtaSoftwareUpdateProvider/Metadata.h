@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -18,9 +19,16 @@ namespace OtaSoftwareUpdateProvider {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
+
+} // namespace Attributes
 
 namespace Commands {
+
 namespace QueryImage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(QueryImage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -35,6 +43,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(NotifyUpdateAppl
 } // namespace NotifyUpdateApplied
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace OtaSoftwareUpdateProvider
 } // namespace Clusters
 } // namespace app

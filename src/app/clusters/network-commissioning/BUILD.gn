@@ -47,9 +47,26 @@ source_set("thread-response-encoding") {
   ]
 }
 
-group("network-commissioning") {
+source_set("network-commissioning") {
+  sources = [
+    "NetworkCommissioningCluster.cpp",
+    "NetworkCommissioningCluster.h",
+  ]
+
   public_deps = [
     ":thread-response-encoding",
     ":wifi-response-encoding",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
   ]
+
+  # TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
+  # via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
+  # GeneralCommissioning is turned into code-driven
+  #
+  # See https://github.com/project-chip/connectedhomeip/issues/39412
 }

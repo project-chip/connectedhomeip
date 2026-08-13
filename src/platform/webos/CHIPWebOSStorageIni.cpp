@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,21 +30,42 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/IniEscaping.h>
 #include <lib/support/TemporaryFileStream.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/webos/CHIPWebOSStorageIni.h>
 
+using namespace chip::IniEscaping;
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR ChipLinuxStorageIni::Init()
+CHIP_ERROR ChipWebOSStorageIni::Init()
 {
     return RemoveAll();
 }
 
-CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
+CHIP_ERROR ChipWebOSStorageIni::GetDefaultSection(std::map<std::string, std::string> & section)
+{
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+
+    auto it = mConfigStore.sections.find("DEFAULT");
+
+    if (it != mConfigStore.sections.end())
+    {
+        section = mConfigStore.sections["DEFAULT"];
+    }
+    else
+    {
+        retval = CHIP_ERROR_KEY_NOT_FOUND;
+    }
+
+    return retval;
+}
+
+CHIP_ERROR ChipWebOSStorageIni::AddConfig(const std::string & configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
     std::ifstream ifs;
@@ -69,7 +90,7 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
 // 1. Writing to a temporary file
 // 2. Sync'ing the temp file to commit updated data
 // 3. Using rename() to overwrite the existing file
-CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
+CHIP_ERROR ChipWebOSStorageIni::CommitConfig(const std::string & configFile)
 {
     TemporaryFileStream tmpFile(configFile + "-XXXXXX");
     VerifyOrReturnError(
@@ -90,20 +111,21 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
+CHIP_ERROR ChipWebOSStorageIni::GetUInt16Value(const char * key, uint16_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
+    std::map<std::string, std::string> section;
 
-    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
+    retval = GetDefaultSection(section);
 
-    if (isConfigFind != mConfigStore.sections.end())
+    if (retval == CHIP_NO_ERROR)
     {
-        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        auto it                                      = section.find(key);
+        std::string escapedKey = EscapeKey(key);
+        auto it                = section.find(escapedKey);
 
         if (it != section.end())
         {
-            if (!inipp::extract(section[key], val))
+            if (!inipp::extract(section[escapedKey], val))
             {
                 retval = CHIP_ERROR_INVALID_ARGUMENT;
             }
@@ -117,19 +139,21 @@ CHIP_ERROR ChipLinuxStorageIni::GetUInt16Value(const char * key, uint16_t & val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetUIntValue(const char * key, uint32_t & val)
+CHIP_ERROR ChipWebOSStorageIni::GetUIntValue(const char * key, uint32_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
+    std::map<std::string, std::string> section;
 
-    if (isConfigFind != mConfigStore.sections.end())
+    retval = GetDefaultSection(section);
+
+    if (retval == CHIP_NO_ERROR)
     {
-        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        auto it                                      = section.find(key);
+        std::string escapedKey = EscapeKey(key);
+        auto it                = section.find(escapedKey);
 
         if (it != section.end())
         {
-            if (!inipp::extract(section[key], val))
+            if (!inipp::extract(section[escapedKey], val))
             {
                 retval = CHIP_ERROR_INVALID_ARGUMENT;
             }
@@ -143,19 +167,21 @@ CHIP_ERROR ChipLinuxStorageIni::GetUIntValue(const char * key, uint32_t & val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetUInt64Value(const char * key, uint64_t & val)
+CHIP_ERROR ChipWebOSStorageIni::GetUInt64Value(const char * key, uint64_t & val)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
+    std::map<std::string, std::string> section;
 
-    if (isConfigFind != mConfigStore.sections.end())
+    retval = GetDefaultSection(section);
+
+    if (retval == CHIP_NO_ERROR)
     {
-        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        auto it                                      = section.find(key);
+        std::string escapedKey = EscapeKey(key);
+        auto it                = section.find(escapedKey);
 
         if (it != section.end())
         {
-            if (!inipp::extract(section[key], val))
+            if (!inipp::extract(section[escapedKey], val))
             {
                 retval = CHIP_ERROR_INVALID_ARGUMENT;
             }
@@ -169,20 +195,22 @@ CHIP_ERROR ChipLinuxStorageIni::GetUInt64Value(const char * key, uint64_t & val)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ChipWebOSStorageIni::GetStringValue(const char * key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
-    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
+    std::map<std::string, std::string> section;
 
-    if (isConfigFind != mConfigStore.sections.end())
+    retval = GetDefaultSection(section);
+
+    if (retval == CHIP_NO_ERROR)
     {
-        std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        auto it                                      = section.find(key);
+        std::string escapedKey = EscapeKey(key);
+        auto it                = section.find(escapedKey);
 
         if (it != section.end())
         {
             std::string value;
-            if (inipp::extract(section[key], value))
+            if (inipp::extract(section[escapedKey], value))
             {
                 size_t len = value.size();
 
@@ -211,20 +239,20 @@ CHIP_ERROR ChipLinuxStorageIni::GetStringValue(const char * key, char * buf, siz
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
+CHIP_ERROR ChipWebOSStorageIni::GetBinaryBlobDataAndLengths(const char * key,
                                                             chip::Platform::ScopedMemoryBuffer<char> & encodedData,
                                                             size_t & encodedDataLen, size_t & decodedDataLen)
 {
     size_t encodedDataPaddingLen = 0;
-    auto isConfigFind            = mConfigStore.sections.find("DEFAULT");
-
-    if (isConfigFind == mConfigStore.sections.end())
+    std::map<std::string, std::string> section;
+    CHIP_ERROR err = GetDefaultSection(section);
+    if (err != CHIP_NO_ERROR)
     {
-        return CHIP_ERROR_KEY_NOT_FOUND;
+        return err;
     }
-    std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
 
-    auto it = section.find(key);
+    std::string escapedKey = EscapeKey(key);
+    auto it                = section.find(escapedKey);
     if (it == section.end())
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
@@ -233,7 +261,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
     std::string value;
 
     // Compute the expectedDecodedLen
-    if (!inipp::extract(section[key], value))
+    if (!inipp::extract(section[escapedKey], value))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -259,7 +287,7 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobDataAndLengths(const char * key,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
+CHIP_ERROR ChipWebOSStorageIni::GetBinaryBlobValue(const char * key, uint8_t * decodedData, size_t bufSize, size_t & decodedDataLen)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
     chip::Platform::ScopedMemoryBuffer<char> encodedData;
@@ -297,27 +325,28 @@ CHIP_ERROR ChipLinuxStorageIni::GetBinaryBlobValue(const char * key, uint8_t * d
     return CHIP_NO_ERROR;
 }
 
-bool ChipLinuxStorageIni::HasValue(const char * key)
+bool ChipWebOSStorageIni::HasValue(const char * key)
 {
-    auto isConfigFind = mConfigStore.sections.find("DEFAULT");
+    std::map<std::string, std::string> section;
 
-    if (isConfigFind == mConfigStore.sections.end())
+    if (GetDefaultSection(section) != CHIP_NO_ERROR)
         return false;
 
-    std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-    auto it                                      = section.find(key);
+    std::string escapedKey = EscapeKey(key);
+    auto it                = section.find(escapedKey);
 
     return it != section.end();
 }
 
-CHIP_ERROR ChipLinuxStorageIni::AddEntry(const char * key, const char * value)
+CHIP_ERROR ChipWebOSStorageIni::AddEntry(const char * key, const char * value)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     if ((key != nullptr) && (value != nullptr))
     {
+        std::string escapedKey                       = EscapeKey(key);
         std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
-        section[key]                                 = std::string(value);
+        section[escapedKey]                          = std::string(value);
     }
     else
     {
@@ -328,13 +357,14 @@ CHIP_ERROR ChipLinuxStorageIni::AddEntry(const char * key, const char * value)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::RemoveEntry(const char * key)
+CHIP_ERROR ChipWebOSStorageIni::RemoveEntry(const char * key)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     std::map<std::string, std::string> & section = mConfigStore.sections["DEFAULT"];
 
-    auto it = section.find(key);
+    std::string escapedKey = EscapeKey(key);
+    auto it                = section.find(escapedKey);
 
     if (it != section.end())
     {
@@ -348,7 +378,7 @@ CHIP_ERROR ChipLinuxStorageIni::RemoveEntry(const char * key)
     return retval;
 }
 
-CHIP_ERROR ChipLinuxStorageIni::RemoveAll()
+CHIP_ERROR ChipWebOSStorageIni::RemoveAll()
 {
     mConfigStore.clear();
 

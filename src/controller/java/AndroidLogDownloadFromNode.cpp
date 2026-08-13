@@ -34,11 +34,11 @@ CharSpan toIntentCharSpan(DiagnosticLogs::IntentEnum intent)
     switch (intent)
     {
     case DiagnosticLogs::IntentEnum::kEndUserSupport:
-        return CharSpan::fromCharString("EndUser");
+        return "EndUser"_span;
     case DiagnosticLogs::IntentEnum::kNetworkDiag:
-        return CharSpan::fromCharString("Network");
+        return "Network"_span;
     case DiagnosticLogs::IntentEnum::kCrashLogs:
-        return CharSpan::fromCharString("Crash");
+        return "Crash"_span;
     default:
         return CharSpan();
     }
@@ -112,7 +112,7 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
 
     if (mTimeout > 0)
     {
-        mBdxReceiver->StartBDXTransferTimeout(mTimeout);
+        TEMPORARY_RETURN_IGNORED mBdxReceiver->StartBDXTransferTimeout(mTimeout);
     }
 
     request.transferFileDesignator = MakeOptional(mFileDesignator);

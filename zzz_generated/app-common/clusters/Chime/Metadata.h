@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace Chime {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace InstalledChimeSounds {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(InstalledChimeSounds::Id,
@@ -33,16 +35,30 @@ namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Enabled::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Enabled
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    InstalledChimeSounds::kMetadataEntry,
+    SelectedChime::kMetadataEntry,
+    Enabled::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace PlayChimeSound {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace PlayChimeSound
 
 } // namespace Commands
+
+namespace Events {
+namespace ChimeStartedPlaying {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ChimeStartedPlaying
+
+} // namespace Events
 } // namespace Chime
 } // namespace Clusters
 } // namespace app

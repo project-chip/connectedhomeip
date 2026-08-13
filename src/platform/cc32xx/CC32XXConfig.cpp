@@ -278,7 +278,7 @@ public:
 
             // add entry to LL
 
-            AddEntryByKey(key, value, valueLen);
+            TEMPORARY_RETURN_IGNORED AddEntryByKey(key, value, valueLen);
 
             // value is stored in the LL, we do not need the value variable above
 
@@ -324,7 +324,7 @@ CHIP_ERROR CC32XXConfig::Init()
 {
     cc32xxLog("[CC32XXConfig::Init] KVS List created");
     pList = new CC32XXKVSList();
-    ReadKVSFromNV();
+    TEMPORARY_RETURN_IGNORED ReadKVSFromNV();
     return CHIP_NO_ERROR;
 }
 
@@ -368,7 +368,7 @@ CHIP_ERROR CC32XXConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSi
 
     VerifyOrReturnError(pEntry != nullptr, CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-    pEntry->ReadVal(buf, bufSize);
+    TEMPORARY_RETURN_IGNORED pEntry->ReadVal(buf, bufSize);
     outLen = pEntry->Len();
     return CHIP_NO_ERROR;
 }
@@ -413,7 +413,7 @@ CHIP_ERROR CC32XXConfig::ClearConfigValue(Key key)
     cc32xxLog("[%s] %s", __FUNCTION__, key.key);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    pList->DeleteEntryByKey(key.key);
+    TEMPORARY_RETURN_IGNORED pList->DeleteEntryByKey(key.key);
     return err;
 }
 
@@ -463,7 +463,7 @@ CHIP_ERROR CC32XXConfig::WriteKVS(const char * key, const void * value, size_t v
     // Write key value pair as LL entry in RAM buffer
     char keyBuffer[40] = "";
     memcpy(keyBuffer, key, strlen(key));
-    pList->AddEntryByKey(keyBuffer, (uint8_t *) value, value_size);
+    TEMPORARY_RETURN_IGNORED pList->AddEntryByKey(keyBuffer, (uint8_t *) value, value_size);
 
     return err;
 }

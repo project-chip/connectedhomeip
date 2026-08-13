@@ -181,6 +181,44 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace FabricRestrictionReviewUpdate
+namespace AuxiliaryAccessUpdated {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kAdminNodeID = 0,
+    kFabricIndex = 254,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AuxiliaryAccessUpdated::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AuxiliaryAccessUpdated::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AuxiliaryAccessUpdated
 } // namespace Events
 } // namespace AccessControl
 } // namespace Clusters

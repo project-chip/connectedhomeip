@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster RelativeHumidityMeasurement (cluster code: 1029/0x04405)
+// Identifier constant values for cluster RelativeHumidityMeasurement (cluster code: 1029/0x0405)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

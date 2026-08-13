@@ -147,7 +147,7 @@ void ImguiUi::RunMainLoop()
 
     // Platform event loop will be on a separate thread,
     // while the event UI loop will be on the main thread.
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     // SignalSafeStopMainLoop will stop this loop below
     // or the loop exits by itself when processing a SDL
@@ -160,7 +160,7 @@ void ImguiUi::RunMainLoop()
     // We attempt to wait for finish as the event will be sent sync.
     // Since the Main loop is stopped, there will be no MRP, however at least
     // one event is attempted to be sent.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
             chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
             sem_t * semaphore = reinterpret_cast<sem_t *>(arg);
@@ -171,7 +171,7 @@ void ImguiUi::RunMainLoop()
 
     // Stop the chip main loop as well. This is expected to
     // wait for the task to finish.
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 void ImguiUi::SignalSafeStopMainLoop()

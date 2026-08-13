@@ -20,7 +20,7 @@ def read_hierified(f):
     """Read a markdown table in ‘hierified’ format."""
 
     line = f.readline()
-    header = tuple((s.strip() for s in line.split('|')[1:-1]))
+    header = tuple(s.strip() for s in line.split('|')[1:-1])
 
     _ = f.readline()  # The line under the header.
 

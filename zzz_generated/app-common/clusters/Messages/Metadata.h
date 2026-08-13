@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace Messages {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace Messages {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Messages::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -30,10 +32,28 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveMessageIDs
+namespace SupportedLanguageCodes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedLanguageCodes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedLanguageCodes
+namespace SupportedMimeTypes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedMimeTypes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedMimeTypes
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    Messages::kMetadataEntry,
+    ActiveMessageIDs::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace PresentMessagesRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(PresentMessagesRequest::Id,
@@ -48,6 +68,22 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace CancelMessagesRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace MessageQueued {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageQueued
+namespace MessagePresented {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessagePresented
+namespace MessageComplete {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageComplete
+namespace MessageNotPresented {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageNotPresented
+
+} // namespace Events
 } // namespace Messages
 } // namespace Clusters
 } // namespace app

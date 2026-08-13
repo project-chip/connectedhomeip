@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace ContentControl {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 16;
+
 namespace Enabled {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Enabled
@@ -43,6 +47,18 @@ inline constexpr AttributeId Id = 0x00000006;
 namespace BlockUnrated {
 inline constexpr AttributeId Id = 0x00000007;
 } // namespace BlockUnrated
+
+namespace BlockChannelList {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace BlockChannelList
+
+namespace BlockApplicationList {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace BlockApplicationList
+
+namespace BlockContentTimeWindow {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace BlockContentTimeWindow
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

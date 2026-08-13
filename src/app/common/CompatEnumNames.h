@@ -21,7 +21,10 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
+#ifndef CHIP_INCLUDING_FROM_CLUSTER_ENUMS
+#error "CompatEnumNames.h must only be included from cluster-enums.h"
+#endif // CHIP_INCLUDING_FROM_CLUSTER_ENUMS
+
 #include <lib/support/TypeTraits.h>
 
 namespace chip {

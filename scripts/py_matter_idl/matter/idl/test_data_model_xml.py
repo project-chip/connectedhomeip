@@ -18,7 +18,6 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import List, Optional, Union
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -28,6 +27,8 @@ except ImportError:
 
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.storage import GeneratorStorage
+from matter.idl.lint.lint_rules_parser import CreateParser as CreateLintParser
+from matter.idl.lint.lint_rules_parser import LintRulesContext
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import Idl
 
@@ -35,7 +36,7 @@ from matter.idl.matter_idl_types import Idl
 class GeneratorContentStorage(GeneratorStorage):
     def __init__(self):
         super().__init__()
-        self.content: Optional[str] = None
+        self.content: str | None = None
 
     def get_existing_data(self, relative_path: str):
         # Force re-generation each time
@@ -54,14 +55,13 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def XmlToIdl(what: Union[str, List[str]]) -> Idl:
+def XmlToIdl(what: str | list[str]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 
@@ -112,6 +112,97 @@ class TestXmlParser(unittest.TestCase):
         ''')
 
         self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testLinterAttributes(self):
+
+        linter_rules = '''
+all endpoints {
+  require global attribute featureMap = 65532;
+  require global attribute clusterRevision = 65533;
+}
+        '''
+        # Sample simulating an example app with only one cluster defined in one endpoint (the endpoint is needed
+        # for the lint rules check).
+        idlToCheck = IdlTextToIdl(
+            '''
+cluster TestCluster = 1045 {
+  revision 3;
+
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+endpoint 2 {
+  server cluster TestCluster {
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+}
+        ''')
+
+        lint_rules = []
+        lint_rules.extend(CreateLintParser().parse(linter_rules))
+
+        errors = []
+        for rule in lint_rules:
+            errors.extend(rule.LintIdl(idlToCheck))
+        # Verify that there are no errors detected in the IDL based on the linter defined rules.
+        self.assertFalse(errors)
+
+    def testLinterXMLAttributes(self):
+        xml_cluster = '''
+<configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
+  <domain name="CHIP"/>
+  <cluster>
+    <name>TestCluster</name>
+    <code>123</code>
+    <attribute side="server" code="0x0000" name="MandatoryElement" define="MANDATORY_ELEMENT" type="char">
+      <description>Tests an attribute with a mandatoryConform element</description>
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="NoElements" define="NO_ELEMENTS" type="char">
+      <description>Tests an attribute with no specific elements, mandatory by default</description>
+    </attribute>
+    <attribute side="server" code="0x0002" name="OptionalAttribute" define="OPTIONAL" type="char" optional="true">
+      <description>Tests an attribute with an optional XML attribute</description>
+    </attribute>
+    <attribute side="server" code="0x0003" name="ConditionalMandatory" define="CONDITIONAL_MANDATORY" type="char">
+      <description>Tests an attribute with a conditional mandatoryConform</description>
+      <mandatoryConform>
+        <feature name="SOME_FEATURE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0004" name="OptionalElement" define="OPTIONAL_ELEMENT" type="char">
+      <description>Tests an attribute with an optionalConform element</description>
+      <optionalConform/>
+    </attribute>
+  </cluster>
+</configurator>
+'''
+        # Use LintRulesContext directly to parse the cluster XML and avoid file handling
+        lint_context = LintRulesContext()
+        lint_context.LoadXml(io.StringIO(xml_cluster))
+
+        # Get parsed mandatory attributes from the context.
+        required_attributes = lint_context._required_attributes_rule._mandatory_attributes
+
+        # The first attribute in the XML should be mandatory since
+        # it has the mandatoryConform element not conditioned to any feature.
+        self.assertEqual(required_attributes[0].code, 0)
+        self.assertEqual(required_attributes[0].filter_cluster, 123)
+        self.assertEqual(required_attributes[0].name, "MandatoryElement")
+
+        # The second attribute in the XML also is mandatory since
+        # it doesn't have any condition to it, so mandatory by default
+        self.assertEqual(required_attributes[1].code, 1)
+        self.assertEqual(required_attributes[1].filter_cluster, 123)
+        self.assertEqual(required_attributes[1].name, "NoElements")
+
+        # Only two attributes should be added to the required
+        # list, the others should be filtered out.
+        self.assertEqual(len(required_attributes), 2)
 
     def testClusterDerivation(self):
         # This test is based on a subset of ModeBase and Mode_Dishwasher original xml files
@@ -210,7 +301,7 @@ class TestXmlParser(unittest.TestCase):
                }
 
                struct ModeOptionStruct {
-                  char_string<64> label = 0;
+                  char_string label = 0;
                   int8u mode = 1;
                   ModeTagStruct modeTags[] = 2;
                }
@@ -668,6 +759,50 @@ class TestXmlParser(unittest.TestCase):
               readonly attribute int16u clusterRevision = 65533;
             }
             ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testOptionalCommandAndEvent(self):
+        xml_idl = XmlToIdl('''
+            <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123" name="Test" revision="1">
+              <events>
+                <event id="1" name="OptionalEvent" priority="info">
+                  <optionalConform/>
+                </event>
+                <event id="2" name="OptionalEventWithFeature" priority="info">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
+                </event>
+              </events>
+              <commands>
+                <command id="10" name="OptionalCommand" source="client">
+                  <optionalConform/>
+                </command>
+                <command id="11" name="OptionalCommandWithFeature" source="client">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
+                </command>
+              </commands>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               info optional event OptionalEvent = 1 {}
+               info optional event OptionalEventWithFeature = 2 {}
+               optional command OptionalCommand(): DefaultSuccess = 10;
+               optional command OptionalCommandWithFeature(): DefaultSuccess = 11;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
 
         self.assertIdlEqual(xml_idl, expected_idl)
 

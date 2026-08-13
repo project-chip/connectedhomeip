@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace AccountLogin {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 4;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
+
 namespace GetSetupPIN {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace GetSetupPIN
@@ -23,9 +30,17 @@ namespace Logout {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace Logout
 
+namespace GetDeviceAuthURI {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace GetDeviceAuthURI
+
 namespace GetSetupPINResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace GetSetupPINResponse
+
+namespace GetDeviceAuthURIResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace GetDeviceAuthURIResponse
 
 } // namespace Commands
 } // namespace AccountLogin

@@ -44,10 +44,11 @@ public:
         }
         uint8_t ssidlenth = strlen(mpScanResults->aps[mIternum].ssid);
         item.security.SetRaw(NC_SECURITYCONVERT(mpScanResults->aps[mIternum].security));
-        item.ssidLen  = ssidlenth;
-        item.channel  = mpScanResults->aps[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults->aps[mIternum].rssi;
+        item.ssidLen         = ssidlenth;
+        item.channel         = mpScanResults->aps[mIternum].channel;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = mpScanResults->aps[mIternum].rssi;
         memcpy(item.ssid, mpScanResults->aps[mIternum].ssid, ssidlenth);
         memcpy(item.bssid, mpScanResults->aps[mIternum].bssid, 6);
 

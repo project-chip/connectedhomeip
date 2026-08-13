@@ -126,7 +126,8 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
     {
         // print to console
         fprintf(stderr, "Failed to connect to Fabric-Bridge, retry in %d seconds....\n", kRetryIntervalS);
-        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+        TEMPORARY_RETURN_IGNORED systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect,
+                                                         nullptr);
     }
 }
 
@@ -192,7 +193,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     admin::SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
     admin::InitRpcServer(mLocalServerPort.Value());
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-    DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
 #endif
 
     std::thread readCommands(ReadCommandThread);

@@ -108,14 +108,19 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s", name);
+
+                        const char * wifiIfName = ConnectivityMgrImpl().GetWiFiIfName();
+                        if (wifiIfName == nullptr)
                         {
-                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: No WiFi interface name configured");
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
+                        if (strcmp(name, wifiIfName) != 0)
                         {
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: Interface name mismatch: %s != %s", name,
+                                          wifiIfName);
                             continue;
                         }
 
@@ -199,7 +204,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     auto * context      = g_main_context_new();
     mGLibMainLoop       = g_main_loop_new(context, FALSE);
-    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    mGLibMainLoopThread = g_thread_new("gmatter", GLibMainLoopThread, mGLibMainLoop);
     g_main_context_unref(context);
 
     {
@@ -236,6 +241,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
+    // Initialize the reference time point as soon as possible, so we could
+    // use it during the CHIP stack initialization, e.g. time counters for
+    // diagnostics.
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
@@ -243,8 +253,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Now set up our device instance info provider.  We couldn't do that
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
-
-    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     return CHIP_NO_ERROR;
 }
@@ -259,7 +267,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -276,6 +285,11 @@ void PlatformManagerImpl::_Shutdown()
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
     if (mGLibMainLoop != nullptr)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+        // The wpa_supplicant GLib objects must be released while the GLib main loop is still running. Release them here, before
+        // quitting the loop, otherwise they leak when ConnectivityManager is destructed.
+        ConnectivityMgrImpl().StopWiFiManagement();
+#endif
         g_main_loop_quit(mGLibMainLoop);
         g_thread_join(mGLibMainLoopThread);
         g_main_loop_unref(mGLibMainLoop);

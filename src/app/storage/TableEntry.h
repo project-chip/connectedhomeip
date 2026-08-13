@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include <cstdint>
+#include <lib/support/CommonIterator.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {
@@ -54,6 +56,59 @@ struct TableEntry
         mStorageId   = other.mStorageId;
         mStorageData = other.mStorageData;
     }
+};
+
+/// @brief Struct combining both ID and data of a table entry
+template <class StorageId, class StorageData>
+struct TableEntryRef
+{
+    // ID
+    StorageId & mStorageId;
+
+    // DATA
+    StorageData & mStorageData;
+
+    TableEntryRef(StorageId & id, StorageData & data) : mStorageId(id), mStorageData(data) {}
+    TableEntryRef(TableEntry<StorageId, StorageData> & entry) : mStorageId(entry.mStorageId), mStorageData(entry.mStorageData) {}
+
+    bool operator==(const TableEntryRef & other) const
+    {
+        return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
+    }
+
+    void operator=(const TableEntryRef & other)
+    {
+        mStorageId   = other.mStorageId;
+        mStorageData = other.mStorageData;
+    }
+
+    void operator=(const TableEntry<StorageId, StorageData> & other)
+    {
+        mStorageId   = other.mStorageId;
+        mStorageData = other.mStorageData;
+    }
+};
+
+/// @brief a CommonIterator which allows processing of just the StorageData
+template <class StorageId, class StorageData>
+class TableEntryDataConvertingIterator : public CommonIterator<StorageData>
+{
+public:
+    TableEntryDataConvertingIterator(CommonIterator<TableEntryRef<StorageId, StorageData>> & iterator) : mIterator(iterator) {}
+
+    size_t Count() override { return mIterator.Count(); }
+
+    bool Next(StorageData & item) override
+    {
+        StorageId id;
+        TableEntryRef ref(id, item);
+        return mIterator.Next(ref);
+    }
+
+    void Release() override { return mIterator.Release(); }
+
+protected:
+    CommonIterator<TableEntryRef<StorageId, StorageData>> & mIterator;
 };
 } // namespace Data
 } // namespace Storage

@@ -17,6 +17,7 @@
  */
 
 #include "AccessControl.h"
+#include "app/data-model-provider/AttributeChangeListener.h"
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
@@ -28,11 +29,13 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -88,9 +91,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
 {
     SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path              = aPath;
-    invokeRequest.subjectDescriptor = &subjectDescriptor;
+    DataModel::InvokeRequest invokeRequest(aPath, subjectDescriptor);
 
     std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(invokeRequest, aReader, aCommandObj);
 
@@ -114,10 +115,6 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
     if (endpoint == kOtaProviderDynamicEndpointId && cluster == OtaSoftwareUpdateProvider::Id)
     {
         return 0;
-    }
-    else if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == WebRTCTransportRequestor::Id)
-    {
-        return 1;
     }
 
     return UINT16_MAX;
@@ -146,10 +143,6 @@ uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
     {
         return 0;
     }
-    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
-    {
-        return 1;
-    }
 
     return UINT16_MAX;
 }
@@ -160,10 +153,6 @@ EndpointId emberAfEndpointFromIndex(uint16_t index)
     {
         return kOtaProviderDynamicEndpointId;
     }
-    else if (index == 1)
-    {
-        return kWebRTCRequesterDynamicEndpointId;
-    }
 
     return UINT16_MAX;
 }
@@ -173,10 +162,6 @@ Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool 
     if (endpoint == kOtaProviderDynamicEndpointId && n == 0 && server)
     {
         return MakeOptional(OtaSoftwareUpdateProvider::Id);
-    }
-    else if (endpoint == kWebRTCRequesterDynamicEndpointId && n == 0 && server)
-    {
-        return MakeOptional(WebRTCTransportRequestor::Id);
     }
 
     return NullOptional;
@@ -195,11 +180,6 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
     if (endpoint == kOtaProviderDynamicEndpointId && server)
-    {
-        return 1;
-    }
-
-    if (endpoint == kWebRTCRequesterDynamicEndpointId && server)
     {
         return 1;
     }
@@ -223,12 +203,6 @@ Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, Cl
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
     if (endpoint == kOtaProviderDynamicEndpointId && clusterId == OtaSoftwareUpdateProvider::Id &&
-        (mask & MATTER_CLUSTER_FLAG_SERVER))
-    {
-        return 0;
-    }
-
-    if (endpoint == kWebRTCRequesterDynamicEndpointId && clusterId == WebRTCTransportRequestor::Id &&
         (mask & MATTER_CLUSTER_FLAG_SERVER))
     {
         return 0;
@@ -268,28 +242,6 @@ const EmberAfCluster otaProviderCluster{
 
 const EmberAfEndpointType otaProviderEndpoint{ .cluster = &otaProviderCluster, .clusterCount = 1, .endpointSize = 0 };
 
-const CommandId acceptedWebRTCRequestorCommands[] = { Clusters::WebRTCTransportRequestor::Commands::Offer::Id,
-                                                      Clusters::WebRTCTransportRequestor::Commands::Answer::Id,
-                                                      Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id,
-                                                      Clusters::WebRTCTransportRequestor::Commands::End::Id, kInvalidCommandId };
-
-const CommandId generatedWebRTCRequestorCommands[] = { kInvalidCommandId };
-
-const EmberAfCluster webRTCReqeustorCluster{
-    .clusterId            = Clusters::WebRTCTransportRequestor::Id,
-    .attributes           = nullptr,
-    .attributeCount       = 0,
-    .clusterSize          = 0,
-    .mask                 = MATTER_CLUSTER_FLAG_SERVER,
-    .functions            = nullptr,
-    .acceptedCommandList  = acceptedWebRTCRequestorCommands,
-    .generatedCommandList = generatedWebRTCRequestorCommands,
-    .eventList            = nullptr,
-    .eventCount           = 0,
-};
-
-const EmberAfEndpointType webRTCRequestorEndpoint{ .cluster = &webRTCReqeustorCluster, .clusterCount = 1, .endpointSize = 0 };
-
 } // namespace
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
@@ -297,10 +249,6 @@ const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
     if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return &otaProviderEndpoint;
-    }
-    else if (endpoint == kWebRTCRequesterDynamicEndpointId)
-    {
-        return &webRTCRequestorEndpoint;
     }
 
     return nullptr;
@@ -311,11 +259,6 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
     if (endpoint == kOtaProviderDynamicEndpointId && cluster == Clusters::OtaSoftwareUpdateProvider::Id)
     {
         return &otaProviderCluster;
-    }
-
-    if (endpoint == kWebRTCRequesterDynamicEndpointId && cluster == Clusters::WebRTCTransportRequestor::Id)
-    {
-        return &webRTCReqeustorCluster;
     }
 
     return nullptr;
@@ -337,6 +280,14 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
                                                              const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
                                                              uint16_t readLength, bool write)
 {
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength)
+{
+
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
@@ -362,16 +313,11 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     gMockDataVersion++;
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
-}
-
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
-{
-    listener->MarkDirty(AttributePathParams(endpoint));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->NotifyAttributeChanged(
+        { endpoint, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClusterPath)
@@ -399,11 +345,6 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
         return &otaProviderCluster;
     }
 
-    if ((endpointType == &webRTCRequestorEndpoint) && (clusterId == Clusters::WebRTCTransportRequestor::Id))
-    {
-        return &webRTCReqeustorCluster;
-    }
-
     return nullptr;
 }
 
@@ -411,4 +352,9 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 {
     // no known attributes even for OTA
     return nullptr;
+}
+
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    // No-op for dynamic server: no ember-style cluster init/shutdown.
 }

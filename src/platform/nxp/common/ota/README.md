@@ -17,19 +17,12 @@ applied separately?
 
 ## Default processors
 
-The default processors for K32W0 are already implemented in:
+The default processors are already implemented in:
 
 -   `OTAFirmwareProcessor` for application/SSBL update. Enabled by default.
 -   `OTAFactoryDataProcessor` for factory data update. Disabled by default, user
-    has to specify `chip_ota_enable_factory_data_processor=1` in the build args.
-
-Some SDK OTA module flags are defined to support additional features:
-
--   `gOTAAllowCustomStartAddress=1` - enable `EEPROM` offset value. Used
-    internally by SDK OTA module.
--   `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
--   `gOTACustomOtaEntryMemory=1` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by
-    default.
+    has to specify `nxp_use_factory_data=true` and
+    `nxp_enable_ota_factory_data_processor=true`in the build args.
 
 ## Implementing custom processors
 
@@ -110,13 +103,6 @@ private:
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 ```
-
-## SSBL max entries example
-
-`CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST` can be set to 1 to enable max entries test.
-There will be 8 additional processors registered in default `OtaHooks`
-implementation. The OTA image should be generated with the
-`create_ota_images.sh` script from `./scripts/tools/nxp/ota/examples`.
 
 ## Factory data restore mechanism
 

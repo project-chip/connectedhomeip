@@ -36,7 +36,6 @@ class DLL_EXPORT EndPointStateNetworkFramework
 protected:
     EndPointStateNetworkFramework() {}
 
-    nw_parameters_t mParameters;
     IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
 };
 

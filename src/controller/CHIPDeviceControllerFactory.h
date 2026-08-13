@@ -34,7 +34,11 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+
+#include <optional>
 
 namespace chip {
 
@@ -134,7 +138,7 @@ struct FactoryInitParams
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * timerDelegate     = nullptr;
+    TimerDelegate * timerDelegate                                      = nullptr;
     Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
@@ -157,6 +161,12 @@ struct FactoryInitParams
     //
     bool enableServerInteractions = false;
 
+    // Controls whether the controller factory initialization is prevented from
+    // overwriting the global DnssdServer's secured port. When running in a
+    // combined server/controller app where the server's port is primary, this
+    // must be set to true to keep DNS-SD advertising the server's port.
+    bool preventDnssdPortOverwrite = false;
+
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;
@@ -165,6 +175,16 @@ struct FactoryInitParams
     // data model it wants to use. Backwards-compatibility can use `CodegenDataModelProviderInstance`
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
+
+    std::optional<Inet::InterfaceId> interfaceId;
+
+    // The minimum backoff interval for LIT devices. This is used to calculate the sigma1
+    // retransmission timeout for LIT devices, ensuring it's at least `minimumLITBackoffInterval`.
+    // Specifically, the timeout is `max(LIT activeRetransTimeout,
+    // minimumLITBackoffInterval)`. This prevents issues with MRP retransmission in Thread
+    // networks when activeRetransTimeout is too small.
+    // Note: Setting this parameter to a nonzero value is not spec-compliant.
+    Optional<uint32_t> minimumLITBackoffInterval;
 };
 
 class DeviceControllerFactory
@@ -255,7 +275,7 @@ public:
             (void) fabricTable;
             if (mGroupDataProvider != nullptr)
             {
-                mGroupDataProvider->RemoveFabric(fabricIndex);
+                TEMPORARY_RETURN_IGNORED mGroupDataProvider->RemoveFabric(fabricIndex);
             }
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
         };
@@ -291,13 +311,17 @@ private:
     void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
+    std::optional<Inet::InterfaceId> mInterfaceId;
+
     DeviceControllerSystemState * mSystemState                          = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage               = nullptr;
     Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
+    bool mPreventDnssdPortOverwrite                                     = false;
 };
 
 } // namespace Controller

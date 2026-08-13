@@ -24,9 +24,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*****************************************************************************
+ *                    Static Function Prototypes
+ *****************************************************************************/
+
+typedef void (*gpAppFramework_ResetExpiredHandlerType)(uint8_t);
+
 void gpAppFramework_Reset_Init(void);
 uint8_t gpAppFramework_Reset_GetResetCount(void);
 void gpAppFramework_Reset_cbTriggerResetCountCompleted(void);
+void gpAppFramework_SetResetExpiredHandler(gpAppFramework_ResetExpiredHandlerType handler);
 
 #ifdef __cplusplus
 }

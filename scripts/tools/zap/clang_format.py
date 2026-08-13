@@ -56,8 +56,8 @@ def getClangFormatBinary():
         try:
             version_string = subprocess.check_output([binary, '--version']).decode('utf8')
 
-            pigweed_config = json.load(
-                open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
+            with open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')) as f:
+                pigweed_config = json.load(f)
             clang_config = [p for p in pigweed_config['packages'] if p['path'].startswith('fuchsia/third_party/clang/')][0]
 
             # Tags should be like:
@@ -66,8 +66,8 @@ def getClangFormatBinary():
 
             if sha not in version_string:
                 print('WARNING: clang-format may not be the right version:')
-                print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
-                print('   ACTUAL VERSION: %s' % version_string)
+                print(f'   PIGWEED TAG:    {clang_config["tags"][0]}')
+                print(f'   ACTUAL VERSION: {version_string}')
         except Exception:
             print("Failed to validate clang version.")
             traceback.print_last()

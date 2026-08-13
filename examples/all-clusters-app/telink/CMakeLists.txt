@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
 #    limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
-get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
@@ -31,10 +30,6 @@ project(chip-telink-all-clusters-app-example)
 target_include_directories(app PRIVATE
                            include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/common/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${TELINK_COMMON}/common/include
@@ -44,6 +39,15 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/microwave-oven-mode.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
@@ -52,18 +56,11 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/common/src/EnergyTimeUtils.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/ChargingTargetsMemMgr.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EVSEManufacturerImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src/EnergyEvseTargetsStore.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
@@ -74,7 +71,8 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 chip_configure_data_model(app
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
@@ -82,4 +80,9 @@ chip_configure_data_model(app
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
 endif()

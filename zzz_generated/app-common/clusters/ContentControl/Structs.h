@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -37,6 +37,116 @@ namespace app {
 namespace Clusters {
 namespace ContentControl {
 namespace Structs {
+namespace TimePeriodStruct {
+enum class Fields : uint8_t
+{
+    kStartHour   = 0,
+    kStartMinute = 1,
+    kEndHour     = 2,
+    kEndMinute   = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t startHour   = static_cast<uint8_t>(0);
+    uint8_t startMinute = static_cast<uint8_t>(0);
+    uint8_t endHour     = static_cast<uint8_t>(0);
+    uint8_t endMinute   = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TimePeriodStruct
+namespace TimeWindowStruct {
+enum class Fields : uint8_t
+{
+    kTimeWindowIndex = 0,
+    kDayOfWeek       = 1,
+    kTimePeriod      = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint16_t> timeWindowIndex;
+    chip::BitMask<DayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<DayOfWeekBitmap>>(0);
+    DataModel::List<const Structs::TimePeriodStruct::Type> timePeriod;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<uint16_t> timeWindowIndex;
+    chip::BitMask<DayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<DayOfWeekBitmap>>(0);
+    DataModel::DecodableList<Structs::TimePeriodStruct::DecodableType> timePeriod;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace TimeWindowStruct
+namespace AppInfoStruct {
+enum class Fields : uint8_t
+{
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AppInfoStruct
+namespace BlockChannelStruct {
+enum class Fields : uint8_t
+{
+    kBlockChannelIndex = 0,
+    kMajorNumber       = 1,
+    kMinorNumber       = 2,
+    kIdentifier        = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint16_t> blockChannelIndex;
+    uint16_t majorNumber = static_cast<uint16_t>(0);
+    uint16_t minorNumber = static_cast<uint16_t>(0);
+    Optional<chip::CharSpan> identifier;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace BlockChannelStruct
 namespace RatingNameStruct {
 enum class Fields : uint8_t
 {

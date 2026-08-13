@@ -17,7 +17,6 @@
 
 #pragma once
 
-#define MATTER_BINDING_TABLE_SIZE 20
 #define SCENES_MANAGEMENT_TABLE_SIZE 24
 
 /**** Cluster endpoint counts ****/

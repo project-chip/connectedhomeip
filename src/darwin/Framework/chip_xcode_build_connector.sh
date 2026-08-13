@@ -109,7 +109,9 @@ declare -a args=(
     'chip_build_controller_dynamic_server=false'
     'chip_build_tools=false'
     'chip_build_tests=false'
+    'chip_enable_all_clusters=false'
     'chip_enable_wifi=false'
+    'chip_enable_nfc_based_commissioning=true'
     'chip_enable_python_modules=false'
     'chip_device_config_enable_dynamic_mrp_config=true'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
@@ -236,6 +238,6 @@ find_in_ancestors() {
     # generate and build
     set -x
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
-    ninja -C out -v
+    ninja -C out -v src/lib:lib # build libCHIP
     ninja -C out -t missingdeps
 }

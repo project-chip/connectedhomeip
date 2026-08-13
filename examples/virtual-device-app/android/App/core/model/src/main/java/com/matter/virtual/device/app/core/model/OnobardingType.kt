@@ -4,6 +4,7 @@ enum class OnboardingType {
   WIFI,
   BLE,
   WIFI_BLE,
+  NFC, /* Indicates if NFC-based Commissioning is supported */
   UNKNOWN
 }
 

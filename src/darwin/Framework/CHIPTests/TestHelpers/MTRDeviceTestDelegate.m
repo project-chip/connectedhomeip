@@ -144,6 +144,30 @@
     }
 }
 
+- (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
+{
+    if (self.onUTCTimeSet != nil) {
+        self.onUTCTimeSet(error);
+    }
+}
+
+- (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device
+{
+    return self.forceTimeUpdateShortDelayToZero;
+}
+
+- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
+{
+    return self.forceTimeSynchronizationLossDetectionCadenceToZero;
+}
+
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
+{
+    if (self.onTimeSynchronizationLossDetected != nil) {
+        self.onTimeSynchronizationLossDetected();
+    }
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride

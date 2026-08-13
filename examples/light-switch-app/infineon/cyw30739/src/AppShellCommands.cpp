@@ -361,13 +361,8 @@ CHIP_ERROR GroupBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_MULTICAST_BINDING;
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->groupId                 = atoi(argv[1]);
-    entry->clusterId.emplace(atoi(argv[3]));
-
+    Binding::TableEntry * entry =
+        Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(atoi(argv[2])));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::BindingWorkerHandler, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
@@ -379,14 +374,8 @@ CHIP_ERROR UnicastBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_UNICAST_BINDING;
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->nodeId                  = atoi(argv[1]);
-    entry->remote                  = atoi(argv[2]);
-    entry->clusterId.emplace(atoi(argv[3]));
-
+    Binding::TableEntry * entry = Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]),
+                                                                     std::make_optional<ClusterId>(atoi(argv[3])));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::BindingWorkerHandler, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }

@@ -66,10 +66,10 @@ config("config") {
 
 static_library("jfc-utils") {
   sources = [
-    "${chip_root}/examples/chip-tool/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.cpp",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
@@ -93,11 +93,16 @@ static_library("jfc-utils") {
     "commands/common/CHIPCommand.cpp",
     "commands/example/ExampleOperationalCredentialsIssuer.cpp",
     "commands/example/ExampleOperationalCredentialsIssuer.h",
+    "commands/pairing/OpenJointCommissioningWindowCommand.cpp",
+    "commands/pairing/OpenJointCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/PairingCommand.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/controller/jcm:jcm",
+  ]
 
   if (config_use_interactive_mode) {
     sources += [ "${chip_root}/examples/chip-tool/commands/interactive/InteractiveCommands.cpp" ]
@@ -165,6 +170,7 @@ executable("jfc-app") {
 
   deps = [
     ":jfc-utils",
+    "${chip_root}/src/controller/jcm:jcm",
     "${chip_root}/src/platform/logging:stdio",
   ]
 

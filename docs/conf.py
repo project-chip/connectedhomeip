@@ -5,14 +5,14 @@ from pathlib import Path
 
 # -- Paths -------------------------------------------------------------------
 
-MATTER_BASE = Path(__file__).resolve().parents[1]
+MATTER_BASE = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2020-2023, Matter Contributors"
+project_copyright = "2020-2025, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -21,6 +21,7 @@ version = "1.0.0"
 extensions = [
     "myst_parser",
     "external_content",
+    "sphinxcontrib.mermaid",
 ]
 exclude_patterns = [
     "_build",
@@ -34,6 +35,9 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
+    "**/tests/*.md",
+    "examples/tv-casting-app/APK_SIZE_ANALYSIS.md",
+    "examples/tv-casting-app/DARWIN_SIZE_ANALYSIS.md",
 ]
 
 
@@ -58,9 +62,10 @@ myst_heading_anchors = 6
 suppress_warnings = [
     "myst.header",
     "myst.anchor",
+    "myst.xref_missing",
 ]
 myst_enable_extensions = ["html_image"]
-
+myst_fence_as_directive = ["mermaid"]
 
 # -- Options for external_content --------------------------------------------
 
@@ -86,3 +91,4 @@ external_content_link_prefixes = [
     "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
+external_content_keep = ['**/ChipDeviceCtrlAPI.md']

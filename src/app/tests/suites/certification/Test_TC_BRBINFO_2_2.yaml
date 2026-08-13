@@ -82,3 +82,9 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read-event shut-down  1 3
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: bridge
+      app: bridge

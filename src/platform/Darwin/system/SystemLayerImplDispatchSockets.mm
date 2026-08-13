@@ -28,6 +28,19 @@
 
 #include <lib/support/CodeUtils.h>
 
+// Note: CONFIG_BUILD_FOR_HOST_UNIT_TEST
+//
+// Certain unit tests are executed without a main dispatch queue, relying instead on a mock clock
+// to manually trigger timer callbacks at specific times.
+// Under normal conditions, the absence of a dispatch queue would cause the tests to fail. However,
+// when CONFIG_BUILD_FOR_HOST_UNIT_TEST is defined, this constraint is relaxed, allowing such tests
+// to run successfully.
+//
+// In these scenarios, timer and sockets events are explicitly triggered via calls to
+// HandleDispatchQueueEvents(), using the mock clock provided by the test environment.
+// Creating a dispatch queue in test mode does not work because dispatch_source timers always follow
+// the real system clock, not our mock clock, so we must rely on mTimerList + HandleDispatchQueueEvents() instead.
+
 namespace chip {
 namespace System {
     CHIP_ERROR LayerImplDispatch::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)

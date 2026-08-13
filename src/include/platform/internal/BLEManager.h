@@ -120,7 +120,7 @@ inline void BLEManager::Shutdown()
 #if CONFIG_NETWORK_LAYER_BLE
     GetBleLayer()->Shutdown();
 #endif
-    static_cast<ImplClass *>(this)->_Shutdown();
+    TEMPORARY_RETURN_IGNORED static_cast<ImplClass *>(this)->_Shutdown();
 }
 
 inline bool BLEManager::IsAdvertisingEnabled()

@@ -23,6 +23,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <openthread/platform/logging.h>
+#endif
+
 #if PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
@@ -118,7 +122,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 } // namespace chip
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-extern "C" void otPlatLog(int aLogLevel, int aLogRegion, const char * aFormat, ...)
+extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
     uint8_t category = chip::Logging::kLogCategory_Error;
@@ -139,6 +143,11 @@ extern "C" void otPlatLog(int aLogLevel, int aLogRegion, const char * aFormat, .
     chip::Logging::Platform::LogV("OTBR", category, aFormat, v);
 
     va_end(v);
+}
+
+extern "C" void otPlatLogLine(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aLogLine)
+{
+    otPlatLog(aLogLevel, aLogRegion, "%s", aLogLine);
 }
 #endif
 

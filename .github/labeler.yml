@@ -353,3 +353,11 @@ tizen:
       - src/platform/Tizen/**/*
       - src/test_driver/tizen/*
       - src/test_driver/tizen/**/*
+
+realtek:
+  - changed-files:
+    - any-glob-to-any-file:
+      - examples/platform/realtek/*
+      - examples/platform/realtek/**/*
+      - src/platform/realtek/*
+      - src/platform/realtek/**/*

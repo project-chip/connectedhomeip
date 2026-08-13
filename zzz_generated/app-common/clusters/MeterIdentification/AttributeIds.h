@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace MeterIdentification {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 10;
+
 namespace MeterType {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace MeterType

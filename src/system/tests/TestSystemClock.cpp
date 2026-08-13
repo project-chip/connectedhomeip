@@ -21,7 +21,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimeUtils.h>
-#include <system/SystemClock.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemConfig.h>
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
@@ -80,10 +80,7 @@ TEST(TestSystemClock, TestRealClock)
 
 TEST(TestSystemClock, TestMockClock)
 {
-    Clock::Internal::MockClock clock;
-
-    Clock::ClockBase * savedRealClock = &SystemClock();
-    Clock::Internal::SetSystemClockForTesting(&clock);
+    Clock::Internal::RAIIMockClock clock;
 
     EXPECT_EQ(SystemClock().GetMonotonicMilliseconds64(), Clock::kZero);
     EXPECT_EQ(SystemClock().GetMonotonicMicroseconds64(), Clock::kZero);
@@ -92,8 +89,6 @@ TEST(TestSystemClock, TestMockClock)
     clock.SetMonotonic(k1234);
     EXPECT_EQ(SystemClock().GetMonotonicMilliseconds64(), k1234);
     EXPECT_EQ(SystemClock().GetMonotonicMicroseconds64(), k1234);
-
-    Clock::Internal::SetSystemClockForTesting(savedRealClock);
 }
 
 } // namespace

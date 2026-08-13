@@ -145,6 +145,9 @@ void RegisterServices(pw::rpc::Server & server)
 
 #if defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
     server.RegisterService(joint_fabric_service);
+
+    JFAMgr().SetJFARpc(joint_fabric_service);
+
 #endif // defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
 }
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace PowerSource {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace Status {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Status::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -158,10 +160,30 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EndpointList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace EndpointList
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    Status::kMetadataEntry,
+    Order::kMetadataEntry,
+    Description::kMetadataEntry,
+    EndpointList::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace WiredFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace WiredFaultChange
+namespace BatFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BatFaultChange
+namespace BatChargeFaultChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace BatChargeFaultChange
+
+} // namespace Events
 } // namespace PowerSource
 } // namespace Clusters
 } // namespace app

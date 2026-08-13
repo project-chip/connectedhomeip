@@ -38,14 +38,18 @@ import logging
 import random
 import string
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from drlk_2_x_common import DRLK_COMMON
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+import matter.testing.matchers as matchers
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 drlkcluster = Clusters.DoorLock
 
@@ -53,8 +57,8 @@ drlkcluster = Clusters.DoorLock
 class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     def steps_TC_DRLK_2_9(self) -> list[TestStep]:
-        steps = [
-
+        return [
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfTotalUsersSupported attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response"),
@@ -157,9 +161,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             TestStep("36", "TH sends ClearCredential Command to DUT to clear all the credentials.",
                      "Verify that the DUT sends SUCCESS response."),
             TestStep("37", "TH sends ClearAliroReaderConfig Command to DUT.",
-                     "Verify that the DUT sends SUCCESS response."), ]
-
-        return steps
+                     "Verify that the DUT sends SUCCESS response."),
+        ]
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:
@@ -168,7 +171,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             asserts.assert_equal(expected_status, Status.Success)
             return attribute_value
         except Exception as e:
-            logging.error(e)
+            log.error(e)
             asserts.assert_equal(expected_status, Status.Success,
                                  f"Error reading attributes, response={attribute_value}")
 
@@ -207,21 +210,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                                   endpoint=self.app_cluster_endpoint,
                                                   timedRequestTimeoutMs=1000)
 
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetUserResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetUserResponse),
                                 "Unexpected return type for GetUserResponse")
             asserts.assert_true(response.userIndex == userindex,
-                                "Error when executing GetUserResponse command, userIndex={}".format(
-                                    str(response.userIndex)))
+                                f"Error when executing GetUserResponse command, userIndex={str(response.userIndex)}")
             asserts.assert_true(response.userName == username,
-                                "Error when executing GetUserResponse command, userName={}".format(
-                                    str(response.userName)))
+                                f"Error when executing GetUserResponse command, userName={str(response.userName)}")
             asserts.assert_true(response.userUniqueID == useruniqueid,
-                                "Error when executing GetUserResponse command, userUniqueID={}".format(
-                                    str(response.userUniqueID)))
-            logging.info("Credentials value is GetUserResponse Command %s" % (str(response.credentials)))
+                                f"Error when executing GetUserResponse command, userUniqueID={str(response.userUniqueID)}")
+            log.info("Credentials value is GetUserResponse Command %s", str(response.credentials))
 
-            asserts.assert_equal(len(credentiallist), len(response.credentials),  "Error mismatch in expected credential from GetUserResponse command = {}".format(
-                str(credentiallist)))
+            asserts.assert_equal(len(credentiallist), len(response.credentials),
+                                 f"Error mismatch in expected credential from GetUserResponse command = {str(credentiallist)}")
             # traverse through input credentials and match each value with the resonse credential
             for input_credential_index in range(len(credentiallist)):
                 match_found = False
@@ -229,8 +229,8 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     if (response.credentials[response_credential_index] == credentiallist[input_credential_index]):
                         match_found = True
                         break
-                asserts.assert_equal(match_found, True,  "Error mismatch in expected credential from GetUserResponse command = {}".format(
-                    str(credentiallist)))
+                asserts.assert_equal(match_found, True,
+                                     f"Error mismatch in expected credential from GetUserResponse command = {str(credentiallist)}")
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
@@ -243,21 +243,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
                                                   cmd=drlkcluster.Commands.GetCredentialStatus(
                                                       credential=credentials_struct))
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                 "Unexpected return type for GetCredentialStatus")
             asserts.assert_true(response.credentialExists == credential_exists,
-                                "Error when executing GetCredentialStatus command, credentialExists={}".format(
-                                    str(response.credentialExists)))
+                                f"Error when executing GetCredentialStatus command, credentialExists={str(response.credentialExists)}")
             if (not credential_exists):
                 asserts.assert_true(response.userIndex == NullValue,
-                                    "Error when executing GetCredentialStatus command, userIndex={}".format(
-                                        str(response.userIndex)))
+                                    f"Error when executing GetCredentialStatus command, userIndex={str(response.userIndex)}")
             asserts.assert_true(response.nextCredentialIndex == next_credential_index,
-                                "Error when executing GetCredentialStatus command, nextCredentialIndex={}".format(
-                                    str(response.nextCredentialIndex)))
+                                f"Error when executing GetCredentialStatus command, nextCredentialIndex={str(response.nextCredentialIndex)}")
             return response
         except InteractionModelError as e:
-            logging.error(e)
+            log.error(e)
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
     async def set_credential_cmd(self, credential_enum: drlkcluster.Enums.CredentialTypeEnum, statuscode, credentialIndex,
@@ -269,7 +266,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             credentialIndex=credentialIndex)
         try:
 
-            logging.info("Credential Data is %s" % (credentialData))
+            log.info("Credential Data is %s", credentialData)
             response = await self.send_single_cmd(cmd=drlkcluster.Commands.SetCredential(
                 operationType=operationType,
                 credential=credentials,
@@ -279,18 +276,18 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                 userIndex=userIndex),
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, drlkcluster.Commands.SetCredentialResponse),
+            asserts.assert_true(matchers.is_type(response, drlkcluster.Commands.SetCredentialResponse),
                                 "Unexpected return type for SetCredential")
             asserts.assert_equal(response.userIndex, NullValue)
             if (statuscode != custom_status_code):
                 asserts.assert_true(response.status == statuscode,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             else:
                 asserts.assert_true(response.status == 2 or response.status == 3,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             return response.nextCredentialIndex
         except InteractionModelError as e:
-            logging.exception(e)
+            log.exception(e)
             asserts.assert_equal(e.status, statuscode, f"Unexpected error returned: {e}")
             return -1
 
@@ -301,7 +298,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                                        endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
-            logging.exception(e)
+            log.exception(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def send_clear_aliro_reader_config_cmd(self, expected_status: Status = Status.Success):
@@ -348,8 +345,12 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            logging.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_DRLK_2_9(self):
@@ -379,7 +380,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.maxrfidcodelength = None
         self.minrfidcodelength = None
 
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         print("endpoint", self.endpoint)
 
         # Aliro Keys for setting Aliro configuration and credential
@@ -389,6 +390,9 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         aliroevictableendpointkey2 = bytes.fromhex(
             "047a4c662d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
+
+        # Commissioning
+        self.step("precondition")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A0011")):
@@ -411,7 +415,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("2b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.F00")):
@@ -520,7 +524,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("11")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
@@ -576,7 +580,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.step("14c")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("14d")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.A0012")):
@@ -607,30 +611,30 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("15c")
         if self.pics_guard(self.check_pics("DRLK.S.F00") and self.check_pics("DRLK.S.F08")
                            and self.check_pics("DRLK.S.C22.Rsp") and self.check_pics("DRLK.S.C23.Tx")):
             if (numberofcredentialsupportedperuser < num_pin_users_supported):
-                logging.info("setting 'start_credential_index' to value 1 ")
+                log.info("setting 'start_credential_index' to value 1 ")
                 start_credential_index = 1
                 nextCredentialIndex = 1
                 while 1:
                     uniquePincodeString = await self.generate_max_pincode_len(self.maxpincodelength)
                     uniquePincode = bytes(uniquePincodeString, 'ascii')
-                    logging.info("Credential Data value is %s" % (uniquePincode))
+                    log.info("Credential Data value is %s", uniquePincode)
                     if start_credential_index <= (numberofcredentialsupportedperuser):
                         nextCredentialIndex = await self.set_credential_cmd(credentialData=uniquePincode,
                                                                             operationType=drlkcluster.Enums.DataOperationTypeEnum.kAdd,
                                                                             credential_enum=drlkcluster.Enums.CredentialTypeEnum.kPin,
 
                                                                             credentialIndex=start_credential_index, userIndex=userIndex_1, userStatus=NullValue, userType=NullValue, statuscode=Status.Success)
-                        logging.info(f"The updated value of nextCredentialIndex is {nextCredentialIndex}")
+                        log.info("The updated value of nextCredentialIndex is %s", nextCredentialIndex)
                         start_credential_index += 1
                         asserts.assert_true(nextCredentialIndex == start_credential_index,
-                                            "Error mismatch in expected nextCredentialIndex={}".format(str(nextCredentialIndex)))
-                        logging.info(f"The updated value of start_credential_index is {start_credential_index}")
+                                            f"Error mismatch in expected nextCredentialIndex={str(nextCredentialIndex)}")
+                        log.info("The updated value of start_credential_index is %s", start_credential_index)
                     else:
                         break
         self.step("15d")
@@ -648,7 +652,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             await self.clear_credentials_cmd(credential=credentials)
         self.step("15f")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("16")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
@@ -664,7 +668,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("17")
         if self.pics_guard(self.check_pics("DRLK.S.F01") and self.check_pics("DRLK.S.C22.Rsp")
@@ -723,7 +727,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("25")
         if self.check_pics("DRLK.S.C29.Rsp"):

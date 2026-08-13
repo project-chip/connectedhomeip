@@ -382,6 +382,8 @@ public:
 
     FabricIndex GetFabricIndex() const { return mPeer.GetFabricIndex(); }
     NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
+    ScopedNodeId GetPeerScopedId() const { return mPeer; }
+
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 
@@ -652,6 +654,7 @@ private:
 
     bool mForceCaseOnNextResub      = true;
     bool mIsResubscriptionScheduled = false;
+    bool mSuppressResponse          = false;
 
     // mMinimalResubscribeDelay is used to store the delay returned with a BUSY
     // response to a Sigma1 message.

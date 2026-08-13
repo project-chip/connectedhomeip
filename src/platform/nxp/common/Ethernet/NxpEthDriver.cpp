@@ -64,12 +64,39 @@ void NxpEthDriver::eth_netif_ext_status_callback(struct netif * netif, netif_nsc
         {
             ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
         }
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { NxpEthDriver::Instance().OnNetworkStatusChange(); });
+    }
+}
+
+void NxpEthDriver::OnNetworkStatusChange()
+{
+    ChipLogProgress(NetworkProvisioning, "NxpEthDriver::OnNetworkStatusChange\r\n");
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+    NetworkIterator * networkIterator = GetNetworks();
+
+    if (networkIterator != nullptr)
+    {
+        EthernetNetworkIterator * ethIterator = static_cast<EthernetNetworkIterator *>(networkIterator);
+
+        if (ethIterator->interfaceNameLen)
+        {
+            mpStatusChangeCallback->OnNetworkingStatusChange(
+                Status::kSuccess, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)), NullOptional);
+        }
+        else
+        {
+            mpStatusChangeCallback->OnNetworkingStatusChange(
+                Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
+                NullOptional);
+        }
+        networkIterator->Release();
     }
 }
 
 CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     err_t err;
+    mpStatusChangeCallback          = networkStatusChangeCallback;
     ethernetif_config_t enet_config = {
         .phyHandle   = &phyHandle,
         .phyAddr     = EXAMPLE_PHY_ADDRESS,
@@ -112,6 +139,22 @@ CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     }
     ChipLogProgress(DeviceLayer, "Ethernet interface initialization done");
     return CHIP_NO_ERROR;
+}
+
+NetworkIterator * NxpEthDriver::GetNetworks()
+{
+    /* Caller is responsible for deleting this object to prevent a memory leak */
+    EthernetNetworkIterator * iterator = new EthernetNetworkIterator();
+
+    uint8_t interface_index = netif_get_index(&netif_app);
+    int len =
+        snprintf(reinterpret_cast<char *>(iterator->interfaceName), sizeof(iterator->interfaceName), "eth_%u", interface_index);
+    if (len > 0 && static_cast<size_t>(len) < sizeof(iterator->interfaceName))
+    {
+        iterator->interfaceNameLen = static_cast<uint8_t>(len);
+    }
+
+    return iterator;
 }
 
 } // namespace NetworkCommissioning

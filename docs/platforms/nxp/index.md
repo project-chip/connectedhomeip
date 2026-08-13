@@ -15,9 +15,7 @@
 -   [NXP - RW61x Platform Guide](./nxp_rw61x_guide.md)
 -   [NXP - RT1060 Platform Guide](./nxp_rt1060_guide.md)
 -   [NXP - RT1170 Platform Guide](./nxp_rt1170_guide.md)
--   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
--   [NXP - K32W0 OTA Software Update Guide](./nxp_k32w0_ota_guide.md)
--   [NXP - K32W1/MCXW71 OTA Software Update Guide](./nxp_mcxw71_ota_guide.md)
+-   [NXP - MCXW71 OTA Software Update Guide](./nxp_mcxw71_ota_guide.md)
 -   [NXP - RTs OTA Software Update Guide](./nxp_RTs_ota_software_update.md)
 -   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
 

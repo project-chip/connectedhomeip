@@ -83,13 +83,13 @@ public:
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error != nil) {
                                       LogNSError("Error writing attribute", error);
-                                      RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
+                                      TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(endpoint, cluster, attribute, error);
                                   }
                                   if (values) {
                                       for (id item in values) {
                                           NSLog(@"Response Item: %@", [item description]);
                                       }
-                                      RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
+                                      TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(endpoint, cluster, attribute, values);
                                   }
                                   SetCommandExitStatus(error);
                               }];

@@ -11,27 +11,23 @@ bouffalolab/index
 esp32/index
 infineon/index
 linux/index
-mbedos/index
 nrf/index
 nxp/index
-openiotsdk/index
 openthread/index
 silabs/index
 stm32/index
 ti/index
 ```
 
--   [Android](./android/)
--   [ASR](./asr/)
--   [Bouffalo Lab](./bouffalolab)
--   [ESP32](./esp32/)
--   [Infineon](./infineon/)
--   [Linux](./linux/)
--   [MbedOS](./mbedos/)
--   [NRF](./nrf/)
--   [NXP](./nxp/)
--   [OpenIoTSDK](./openiotsdk/)
--   [OpenThread](./openthread/)
--   [Silabs](./silabs/)
--   [STM32](./stm32/)
--   [TI](./ti/)
+-   [Android](./android/index.md)
+-   [ASR](./asr/index.md)
+-   [Bouffalo Lab](./bouffalolab/index.md)
+-   [ESP32](./esp32/index.md)
+-   [Infineon](./infineon/index.md)
+-   [Linux](./linux/index.md)
+-   [NRF](./nrf/index.md)
+-   [NXP](./nxp/index.md)
+-   [OpenThread](./openthread/index.md)
+-   [Silabs](./silabs/index.md)
+-   [STM32](./stm32/index.md)
+-   [TI](./ti/index.md)

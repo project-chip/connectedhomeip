@@ -19,8 +19,6 @@
 #include "AirQualitySensorAppAttrUpdateDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
@@ -158,6 +156,12 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
-                                                  reinterpret_cast<intptr_t>(handler));
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
+                                                                   reinterpret_cast<intptr_t>(handler));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to schedule work for AirQualitySensorAttrUpdateHandler: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        Platform::Delete(handler);
+    }
 }

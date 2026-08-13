@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,16 +58,15 @@ static_library("ESP32") {
     "ESP32Utils.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "SystemTimeSupport.h",
   ]
 
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
@@ -97,6 +96,21 @@ static_library("ESP32") {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
+
+  if (chip_with_lwip) {
+    sources += [
+      "DiagnosticDataProviderImpl_LwIP.cpp",
+      "ESP32Utils_LwIP.cpp",
+      "PlatformManagerImpl_LwIP.cpp",
+    ]
+  } else {
+    sources += [
+      "DiagnosticDataProviderImpl_OT.cpp",
+      "ESP32Utils_NoLwIP.cpp",
+      "PlatformManagerImpl_NoLwIP.cpp",
     ]
   }
 
@@ -165,7 +179,7 @@ static_library("ESP32") {
     }
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
@@ -175,6 +189,11 @@ static_library("ESP32") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    if (chip_with_lwip) {
+      sources += [ "OpenthreadLauncher_LwIP.cpp" ]
+    } else {
+      sources += [ "OpenthreadLauncher_NoLwIP.cpp" ]
+    }
     deps += [ "${chip_root}/src/app:app_config" ]
     if (chip_mdns == "platform") {
       sources += [

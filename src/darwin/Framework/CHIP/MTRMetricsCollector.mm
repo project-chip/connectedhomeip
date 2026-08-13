@@ -17,10 +17,13 @@
 
 #import "MTRMetricsCollector.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
+#include <controller/CommissioningDelegate.h>
 #import <os/lock.h>
+#include <os/signpost.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
@@ -36,6 +39,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
 @implementation MTRMetricData {
     chip::System::Clock::Microseconds64 _timePoint;
     MetricEvent::Type _type;
+    os_signpost_id_t _signpostid;
 }
 
 - (instancetype)init
@@ -81,6 +85,8 @@ using MetricEvent = chip::Tracing::MetricEvent;
         break;
     }
 
+    _signpostid = OS_SIGNPOST_ID_NULL;
+
     MTR_METRICS_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
 }
@@ -98,6 +104,14 @@ using MetricEvent = chip::Tracing::MetricEvent;
 {
     return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
                      static_cast<int>(_type), self.value, self.errorCode, self.duration];
+}
+
+- (os_signpost_id_t)signpostID
+{
+    if (_signpostid == OS_SIGNPOST_ID_NULL) {
+        _signpostid = os_signpost_id_generate(__DARWIN_MATTER_SIGNPOST_LOGGER());
+    }
+    return _signpostid;
 }
 
 @end
@@ -228,36 +242,74 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(event)];
     MTRMetricData * data = [[MTRMetricData alloc] initWithMetricEvent:event];
 
+    if (event.type() == MetricEvent::Type::kBeginEvent) {
+        os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), [data signpostID], "MetricEvent", "%s", event.key());
+    } else if (event.type() == MetricEvent::Type::kInstantEvent) {
+        os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, "MetricEvent", "%s", event.key());
+    }
+
     // If End event, compute its duration using the Begin event
     if (event.type() == MetricEvent::Type::kEndEvent) {
         auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
         MTRMetricData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
             [data setDurationFromMetricData:beginMetric];
+            os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), [beginMetric signpostID], "MetricEvent", "%s", event.key());
         } else {
             // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key());
         }
     }
 
-    // Add to the collection only if it does not exist as yet.
-    if (![_metricsDataCollection valueForKey:metricsKey]) {
-        [_metricsDataCollection setValue:data forKey:metricsKey];
+    // Add to the collection only if it does not exist as yet or pick latest value for instant event
+    if (![_metricsDataCollection valueForKey:metricsKey] || event.type() == MetricEvent::Type::kInstantEvent) {
+        // If this is the commissioning staging event, skip the cleanup to track the last stage completed in case of error
+        // For all other events, just capture the value
+        if (strcmp(event.key(), chip::Tracing::kMetricDeviceCommissionerCommissionStage) != 0 || event.ValueUInt32() != chip::Controller::CommissioningStage::kCleanup) {
+            [_metricsDataCollection setValue:data forKey:metricsKey];
+        }
     }
 }
 
-- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection
+- (MTRMetrics *)metricSnapshotForCommissioning:(BOOL)resetCollection
 {
     std::lock_guard lock(_lock);
 
+    NSMutableArray * keysToDelete = [NSMutableArray array];
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
-    for (NSString * key in _metricsDataCollection) {
-        [metrics setMetricData:_metricsDataCollection[key] forKey:key];
-    }
+    [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
+        // Commissioning metric keys predate the encoding of a category, so we need to filter out
+        // all keys that use the encoding scheme here.
+        if (![key hasPrefix:@METRICS_KEY_PREFIX]) {
+            [keysToDelete addObject:key];
+            [metrics setMetricData:obj forKey:key];
+        }
+    }];
 
     // Clear curent stats, if specified
     if (resetCollection) {
-        [_metricsDataCollection removeAllObjects];
+        [_metricsDataCollection removeObjectsForKeys:keysToDelete];
+    }
+    return metrics;
+}
+
+- (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics
+{
+    std::lock_guard lock(_lock);
+
+    NSString * keyPrefix = [NSString stringWithFormat:@METRICS_KEY_PREFIX "%@__", category];
+    NSMutableArray * keysToDelete = [NSMutableArray array];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
+    [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
+        if ([key hasPrefix:keyPrefix]) {
+            [keysToDelete addObject:key];
+            [metrics setMetricData:obj forKey:key];
+        }
+    }];
+
+    // Clear curent stats, if specified
+    if (removeMetrics) {
+        [_metricsDataCollection removeObjectsForKeys:keysToDelete];
     }
     return metrics;
 }

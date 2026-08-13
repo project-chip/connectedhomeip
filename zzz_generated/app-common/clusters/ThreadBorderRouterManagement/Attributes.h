@@ -66,7 +66,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadBorderRouterManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BorderAgentID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 254; }
+    static constexpr size_t MaxLength() { return 16; }
 };
 } // namespace BorderAgentID
 namespace ThreadVersion {

@@ -104,7 +104,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="CurrentSensitivityLevel" type="uint8" default="MS">
+    <attribute id="0x0000" name="CurrentSensitivityLevel" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -114,7 +114,7 @@ Davis, CA 95616, USA
         <max value="SupportedSensitivityLevels - 1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8" default="MS">
+    <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -137,7 +137,7 @@ Davis, CA 95616, USA
         <max value="SupportedSensitivityLevels - 1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap" default="0">
+    <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <orTerm>
@@ -146,7 +146,7 @@ Davis, CA 95616, USA
         </orTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap" default="0">
+    <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SPRS"/>
@@ -162,7 +162,7 @@ Davis, CA 95616, USA
         </orTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0006" name="AlarmsSupported" type="AlarmModeBitmap" default="0">
+    <attribute id="0x0006" name="AlarmsSupported" type="AlarmModeBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>

@@ -16,10 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.cpp"
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.h"
-    "${CLUSTER_DIR}/TimeSyncDataProvider.cpp"
-    "${CLUSTER_DIR}/time-synchronization-delegate.h"
-    "${CLUSTER_DIR}/time-synchronization-server.cpp"
-    "${CLUSTER_DIR}/time-synchronization-server.h"
+   "${CLUSTER_DIR}/CodegenIntegration.cpp"
+   "${CLUSTER_DIR}/CodegenIntegration.h"
 )

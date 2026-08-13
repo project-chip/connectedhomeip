@@ -72,6 +72,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    mSuppressResponse             = false;
 
     MoveToState(ClientState::Idle);
 }
@@ -294,7 +295,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReadRequestMessage::Builder request;
     System::PacketBufferTLVWriter writer;
 
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
     ReturnErrorOnFailure(request.Init(&writer));
 
     if (!attributePaths.empty())
@@ -355,7 +356,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -536,6 +537,14 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status  = Status::InvalidAction;
+    // Based on Matter specification (10.7.3. ReportDataMessage), SuppressResponse in ReportDataMessage is omitted if `false`.
+    // If this is a single ReportDataMessage for the current transaction, or this is the last ReportDataMessage in the
+    // transaction (i.e. there is no pending data anymore), then this ReportDataMessage should not have SuppressResponse.
+    // Otherwise, this ReportDataMessage should have SuppressResponse.
+    // For each received message, we assume mSuppressResponse to be false. If it is set true, it will be updated in
+    // ProcessReportData call below.
+    // For all other message types (e.g. SubscribeResponse, StatusResponse etc), mSuppressResponse is not relevant and always false.
+    mSuppressResponse = false;
     VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -569,7 +578,10 @@ exit:
         {
             status = Status::InvalidSubscription;
         }
-        StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
@@ -595,6 +607,8 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     //
     mReadPrepareParams.mSessionHolder.Grab(mExchange->GetSessionHandle());
 
+    mSuppressResponse = false;
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload), ReportType::kUnsolicited);
     if (err != CHIP_NO_ERROR)
     {
@@ -607,7 +621,10 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
             status = Status::InvalidAction;
         }
 
-        StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        }
         Close(err);
     }
 }
@@ -616,7 +633,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
-    bool suppressResponse         = true;
     SubscriptionId subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
@@ -628,16 +644,11 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     if (aReportType != ReportType::kUnsolicited)
     {
-        report.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED report.PrettyPrint();
     }
 #endif
 
-    err = report.GetSuppressResponse(&suppressResponse);
-    if (CHIP_END_OF_TLV == err)
-    {
-        suppressResponse = false;
-        err              = CHIP_NO_ERROR;
-    }
+    err = report.GetSuppressResponse(&mSuppressResponse);
     SuccessOrExit(err);
 
     err = report.GetSubscriptionId(&subscriptionId);
@@ -727,7 +738,7 @@ exit:
         }
     }
 
-    if (!suppressResponse && err == CHIP_NO_ERROR)
+    if (!mSuppressResponse && err == CHIP_NO_ERROR)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(Status::Success, mExchange.Get(), !noResponseExpected);
@@ -1054,7 +1065,11 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerLIT)
+    // If subscription client is able to handle check-in messages and peer operation mode is LIT,
+    // use CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT as subscriptionTerminationCause.
+    // This will cause us to wait for a check-in message before trying to re-subscribe, instead of trying
+    // (and probably failing, because we are dealing with a LIT ICD) off a timer.
+    if (_this->mIsPeerLIT && _this->mReadPrepareParams.mRegisteredCheckInToken)
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
@@ -1098,7 +1113,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED subscribeResponse.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1184,7 +1199,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
+    mIsPeerLIT                                 = aReadPrepareParams.mIsPeerLIT;
+    mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
+
+    if (aReadPrepareParams.mRegisteredCheckInToken)
+    {
+        ChipLogProgress(DataManagement, "ICD Check-In token has been registered in peer device " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(mPeer));
+    }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
@@ -1198,7 +1220,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
     SubscribeRequestMessage::Builder request;
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
 
     ReturnErrorOnFailure(request.Init(&writer));
 
@@ -1272,7 +1294,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {

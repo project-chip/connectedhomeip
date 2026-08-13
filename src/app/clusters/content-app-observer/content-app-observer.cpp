@@ -46,6 +46,10 @@ using namespace chip::AppPlatform;
 using chip::app::Clusters::ContentAppObserver::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
+#ifndef MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif
+
 static constexpr size_t kContentAppObserverDeletageTableSize =
     MATTER_DM_CONTENT_APP_OBSERVER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kContentAppObserverDeletageTableSize <= kEmberInvalidEndpointIndex, "ContentAppObserver Delegate table size error");
