@@ -26,8 +26,8 @@
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 #include <Globals.h>
-#include <lib/support/CodeUtils.h>
 #include <LEDWidget.h>
+#include <lib/support/CodeUtils.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>

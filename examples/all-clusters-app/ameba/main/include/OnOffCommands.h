@@ -110,38 +110,44 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const Clusters
     switch (data->commandId)
     {
     case Clusters::OnOff::Commands::Toggle::Id:
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         toggleCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, toggleCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::On::Id:
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, onCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote, offCommand,
+                                                           onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OffWithEffect::Id:
         offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::EffectIdentifierEnum>(data->args[0]);
         offwitheffectCommand.effectVariant    = static_cast<uint8_t>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offwitheffectCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           offwitheffectCommand, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onwithrecallglobalsceneCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           onwithrecallglobalsceneCommand, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
         onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControlBitmap>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onwithtimedoffCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           onwithtimedoffCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -174,18 +180,21 @@ void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const Clusters::
     case Clusters::OnOff::Commands::OffWithEffect::Id:
         offwitheffectCommand.effectIdentifier = static_cast<Clusters::OnOff::EffectIdentifierEnum>(data->args[0]);
         offwitheffectCommand.effectVariant    = static_cast<uint8_t>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offwitheffectCommand));
         break;
 
     case Clusters::OnOff::Commands::OnWithRecallGlobalScene::Id:
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithrecallglobalsceneCommand));
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                onwithrecallglobalsceneCommand));
         break;
 
     case Clusters::OnOff::Commands::OnWithTimedOff::Id:
         onwithtimedoffCommand.onOffControl = static_cast<chip::BitMask<Clusters::OnOff::OnOffControlBitmap>>(data->args[0]);
         onwithtimedoffCommand.onTime       = static_cast<uint16_t>(data->args[1]);
         onwithtimedoffCommand.offWaitTime  = static_cast<uint16_t>(data->args[2]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onwithtimedoffCommand));
         break;
     }
 }

@@ -157,8 +157,9 @@ void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Clu
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
         setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         setpointRaiseLowerCommand, onSuccess, onFailure));
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                           peer_device->GetSecureSession().Value(), binding.remote,
+                                                           setpointRaiseLowerCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -174,7 +175,8 @@ void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Clust
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
         setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
-        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand));
+        LogErrorOnFailure(
+            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand));
         break;
     }
 }
