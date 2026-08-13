@@ -36,6 +36,7 @@ chip_test_suite("tests") {
   # test aggregation in src/BUILD.gn references only ":tests", so
   # mock_model/mock_ember never enters the Zephyr binary.
   sources = [
+    "CommissioningProxyMockTimer.h",
     "CommissioningProxyMockTransport.cpp",
     "CommissioningProxyMockTransport.h",
   ]
@@ -59,8 +60,7 @@ chip_test_suite("tests") {
 # Host-only suite that links the codegen data-model provider (mock_model /
 # mock_ember) to exercise CodegenIntegration.cpp. It cannot join the monolithic
 # single-binary build (ember symbol collisions), so src/BUILD.gn restricts it to
-# linux/darwin. This is not a backwards-compatibility suite: CommissioningProxy is
-# a new cluster; it only shares the host-only mock_ember build constraint.
+# linux/darwin.
 chip_test_suite("tests-codegen-integration") {
   import(
       "${chip_root}/src/app/clusters/commissioning-proxy-server/app_config_dependent_sources.gni")

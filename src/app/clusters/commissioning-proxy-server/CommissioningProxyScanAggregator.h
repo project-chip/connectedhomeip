@@ -23,7 +23,7 @@
 #include <clusters/CommissioningProxy/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <system/SystemLayer.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <cstdint>
 #include <deque>
@@ -46,13 +46,14 @@ namespace CommissioningProxy {
  * Only one aggregation may be in flight at a time (matches a single outstanding
  * foreground scan). Entry points run on the Matter thread with the stack lock held.
  */
-class CommissioningProxyScanAggregator
+class CommissioningProxyScanAggregator : public TimerContext
 {
 public:
     using ScanResultEntry = Structs::ScanResultStruct::Type;
 
-    CommissioningProxyScanAggregator()  = default;
-    ~CommissioningProxyScanAggregator() = default;
+    CommissioningProxyScanAggregator() = delete;
+    explicit CommissioningProxyScanAggregator(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
+    ~CommissioningProxyScanAggregator() override = default;
 
     /**
      * @brief Start a fresh aggregation. Takes ownership of the command handle for
@@ -61,9 +62,12 @@ public:
      *
      * The number of contributors is not known up front: the caller starts each
      * requested transport's scan and calls AddPendingContributor() for every one
-     * that starts successfully, then Commit() (or Abort() if none started).
+     * that starts successfully, then MaybeEmitIfComplete() (or Abort() if none started).
+     *
+     * Returns an error (leaving InProgress() false) if the watchdog could not be
+     * armed; the caller must reject the command rather than scan unbounded.
      */
-    void Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, uint8_t scanMaxTime);
+    CHIP_ERROR Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path, uint8_t scanMaxTime);
 
     /// Register one successfully-started sub-scan (increments the expected count).
     void AddPendingContributor();
@@ -95,10 +99,14 @@ public:
     /// Abandon any in-flight aggregation (cluster teardown).
     void Shutdown() { Abort(); }
 
+    /// Watchdog expiry: a sub-scan never reported, so emit whatever did arrive rather
+    /// than leave the aggregation (and every later ProxyScanRequest) blocked.
+    void TimerFired() override;
+
 private:
-    static void WatchdogCallback(System::Layer * layer, void * appState);
     void EmitCombinedResponse();
 
+    TimerDelegate & mTimerDelegate;
     app::CommandHandler::Handle mHandle;
     app::ConcreteCommandPath mPath;
     bool mInProgress     = false;

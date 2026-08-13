@@ -22,6 +22,7 @@
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/PlatformManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -99,10 +100,14 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
+    // Supplies the cluster's response-timeout, scan-watchdog and cache-sweep timers.
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+
     // MaxSessions = 1 (one device at a time across transports); MaxCachedResults = 10.
     mCluster.Create(endpoint,
                     Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features, /*maxSessions=*/1,
-                                                                                    /*maxCachedResults=*/10, bands));
+                                                                                    /*maxCachedResults=*/10, bands),
+                    sTimerDelegate);
 #if CONFIG_NETWORK_LAYER_BLE
     mCluster.Cluster().RegisterTransport(mBleTransport);
 #endif

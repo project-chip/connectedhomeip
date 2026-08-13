@@ -63,8 +63,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
                                                                         AttributeValueDecoder & decoder)
 {
     // These writable attributes are stored by the cluster so that change-reporting is
-    // always the cluster's responsibility. Only emit a change report when the stored
-    // value actually changes, to avoid redundant reports.
+    // always the cluster's responsibility. SetAttributeValue reports only on an actual
+    // value change.
     switch (request.path.mAttributeId)
     {
     case ScanMaxTime::Id: {
@@ -72,27 +72,20 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         ReturnErrorOnFailure(decoder.Decode(time));
         // Spec: ScanMaxTime has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(time >= 1, Status::ConstraintError);
-        // No change → no write, no report.
-        VerifyOrReturnValue(time != mScanMaxTime, Status::Success);
-        mScanMaxTime = time;
-        break;
+        SetAttributeValue(mScanMaxTime, time, ScanMaxTime::Id);
+        return Status::Success;
     }
     case CacheTimeout::Id: {
         uint16_t cacheTimeout;
         ReturnErrorOnFailure(decoder.Decode(cacheTimeout));
         // Spec: CacheTimeout has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(cacheTimeout >= 1, Status::ConstraintError);
-        // No change → no write, no report.
-        VerifyOrReturnValue(cacheTimeout != mCacheTimeout, Status::Success);
-        mCacheTimeout = cacheTimeout;
-        break;
+        SetAttributeValue(mCacheTimeout, cacheTimeout, CacheTimeout::Id);
+        return Status::Success;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
-
-    NotifyAttributeChanged(request.path.mAttributeId);
-    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -366,7 +359,11 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     }
 
     const uint8_t scanMaxTime = mScanMaxTime;
-    mScanAggregator.Begin(handler, request.path, scanMaxTime);
+    if (CHIP_ERROR err = mScanAggregator.Begin(handler, request.path, scanMaxTime); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: could not begin scan aggregation: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
 
     // First non-success from a sub-scan that could not start; only returned if no
     // sub-scan starts at all.
@@ -456,9 +453,10 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
     const FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
     const NodeId nodeId           = request.subjectDescriptor.subject;
 
-    // A background scan MAY select multiple transports: start each requested,
-    // registered transport with its own transport-local per-fabric record.
+    // A background scan MAY select multiple transports. Either all of them start, or
+    // the ones that did are stopped again, so a failed command leaves nothing running.
     auto result = Status::Success;
+    chip::BitMask<CapabilitiesBitmap> started;
     for (size_t i = 0; i < mTransportCount; i++)
     {
         CommissioningProxyTransport * transport = mTransports[i];
@@ -466,10 +464,32 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
         {
             continue;
         }
-        auto s = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
-        if (s != Status::Success && result == Status::Success)
+        result = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
+        if (result != Status::Success)
         {
-            result = s;
+            break;
+        }
+        started.Set(transport->GetTransportType());
+    }
+
+    if (result != Status::Success && started.Raw() != 0)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: background scan start failed; rolling back started transport(s)");
+        for (size_t i = 0; i < mTransportCount; i++)
+        {
+            CommissioningProxyTransport * transport = mTransports[i];
+            if (started.Has(transport->GetTransportType()))
+            {
+                auto stopStatus = transport->BgScanStop(chip::BitMask<CapabilitiesBitmap>(transport->GetTransportType()), wiFiBands,
+                                                        fabricIndex, nodeId);
+                if (stopStatus != Status::Success)
+                {
+                    // The scan we just started is still running and its cached results
+                    // were not cleared; the commissioner has been told nothing started.
+                    ChipLogError(Zcl, "CommissioningProxy: rollback of transport 0x%x failed with status 0x%02x",
+                                 chip::to_underlying(transport->GetTransportType()), chip::to_underlying(stopStatus));
+                }
+            }
         }
     }
 

@@ -24,8 +24,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
-#include <system/SystemLayer.h>
 
 #include <cstdint>
 #include <map>
@@ -67,13 +67,15 @@ public:
  *
  * All entry points must run on the Matter thread with the stack lock held.
  */
-class CommissioningProxyScanCache
+class CommissioningProxyScanCache : public TimerContext
 {
 public:
     using ScanResultEntry = Structs::ScanResultStruct::Type;
 
-    explicit CommissioningProxyScanCache(ScanCacheObserver & cluster) : mCluster(cluster) {}
-    ~CommissioningProxyScanCache() = default;
+    CommissioningProxyScanCache(ScanCacheObserver & cluster, TimerDelegate & timerDelegate) :
+        mCluster(cluster), mTimerDelegate(timerDelegate)
+    {}
+    ~CommissioningProxyScanCache() override = default;
 
     /**
      * @brief Insert or refresh a discovered device. @p result.transport carries the
@@ -83,9 +85,14 @@ public:
      */
     void Report(const ScanResultEntry & result);
 
-    /// Remove all entries whose transport bit is in @p transport (a transport
-    /// stopping its background scan). Marks dirty if anything was removed.
-    void ClearTransport(BitMask<CapabilitiesBitmap> transport);
+    /**
+     * @brief Drop cached results for a scan that has stopped. @p bands == 0 means the
+     *        transport itself stopped, so every entry on it goes; otherwise only
+     *        entries discovered on those bands go. Spec gives a ScanResultStruct with
+     *        no WiFiBand the fallback value 2G4, which is applied when matching.
+     *        Marks dirty if anything was removed.
+     */
+    void ClearTransport(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> bands = {});
 
     /// NumCachedResults: current combined entry count.
     uint8_t Count() const;
@@ -95,6 +102,8 @@ public:
 
     /// Cancel the sweep timer and drop all entries (cluster teardown).
     void Shutdown();
+
+    void TimerFired() override { OnSweep(); }
 
 private:
     // A device is unique per discriminator/VendorID/ProductID/Transport (spec).
@@ -122,11 +131,13 @@ private:
         System::Clock::Timestamp expiresAt{};
     };
 
-    static void SweepTimerCallback(System::Layer * layer, void * appState);
+    /// Sweep expiry: drop every entry whose TTL has passed, then re-arm while any
+    /// entry remains.
     void OnSweep();
     void ArmSweepIfNeeded();
 
     ScanCacheObserver & mCluster;
+    TimerDelegate & mTimerDelegate;
     std::map<Key, Entry> mEntries;
     bool mSweepArmed = false;
 };

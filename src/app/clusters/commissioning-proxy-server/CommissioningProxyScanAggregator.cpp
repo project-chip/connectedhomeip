@@ -19,7 +19,9 @@
 
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
+
+#include <limits>
 
 namespace chip {
 namespace app {
@@ -32,8 +34,8 @@ namespace {
 constexpr uint16_t kScanWatchdogMarginSecs = 5;
 } // namespace
 
-void CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
-                                             uint8_t scanMaxTime)
+CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
+                                                   uint8_t scanMaxTime)
 {
     mHandle      = app::CommandHandler::Handle(commandObj);
     mPath        = path;
@@ -45,12 +47,18 @@ void CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, c
     mResults.clear();
     mInProgress = true;
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs), WatchdogCallback, this);
+    CHIP_ERROR err =
+        mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
     if (err != CHIP_NO_ERROR)
     {
+        // With no watchdog a sub-scan that never reports would leave mInProgress set
+        // forever, making every later ProxyScanRequest return Busy.
         ChipLogError(Zcl, "CommissioningProxy: failed to arm scan watchdog: %" CHIP_ERROR_FORMAT, err.Format());
+        Abort();
+        return err;
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void CommissioningProxyScanAggregator::AddPendingContributor()
@@ -58,19 +66,18 @@ void CommissioningProxyScanAggregator::AddPendingContributor()
     ++mExpected;
 }
 
-void CommissioningProxyScanAggregator::WatchdogCallback(System::Layer * /*layer*/, void * appState)
+void CommissioningProxyScanAggregator::TimerFired()
 {
-    auto * self = static_cast<CommissioningProxyScanAggregator *>(appState);
-    if (self->mInProgress)
+    if (mInProgress)
     {
         ChipLogError(Zcl, "CommissioningProxy: scan watchdog fired (a sub-scan never completed); emitting partial results");
-        self->EmitCombinedResponse();
+        EmitCombinedResponse();
     }
 }
 
 void CommissioningProxyScanAggregator::EmitCombinedResponse()
 {
-    DeviceLayer::SystemLayer().CancelTimer(WatchdogCallback, this);
+    mTimerDelegate.CancelTimer(this);
 
     if (app::CommandHandler * cmd = mHandle.Get())
     {
@@ -102,6 +109,14 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
 
     for (const auto & e : results)
     {
+        // ProxyScanResponse carries the count as a uint8, so the list cannot exceed
+        // 255 entries without NumberOfResults disagreeing with the encoded list.
+        if (mResults.size() >= std::numeric_limits<uint8_t>::max())
+        {
+            ChipLogError(Zcl, "CommissioningProxy: scan result list full; dropping remaining results");
+            break;
+        }
+
         // Copy scalar fields, then rebind the address / extendedData spans to point
         // into the aggregator's stable storage so they survive until AddResponse.
         // std::deque keeps element addresses stable across growth.
@@ -149,7 +164,7 @@ void CommissioningProxyScanAggregator::Abort()
     {
         return;
     }
-    DeviceLayer::SystemLayer().CancelTimer(WatchdogCallback, this);
+    mTimerDelegate.CancelTimer(this);
     mHandle.Release();
     mAddressStore.clear();
     mExtStore.clear();

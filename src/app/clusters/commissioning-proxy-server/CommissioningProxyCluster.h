@@ -30,6 +30,7 @@
 #include <clusters/CommissioningProxy/Events.h>
 #include <clusters/CommissioningProxy/Structs.h>
 #include <lib/core/Optional.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -75,7 +76,10 @@ public:
     // The endpoint id is supplied separately from Config: a device's cluster config is
     // typically fixed up front, but the endpoint is only known when the device is
     // registered and the clusters are created.
-    CommissioningProxyCluster(EndpointId endpointId, const Config & config) :
+    // @p timerDelegate supplies the response-timeout and scan-watchdog timers. Apps
+    // normally pass a chip::app::DefaultTimerDelegate (see CodegenIntegration.cpp);
+    // tests substitute their own to drive expiry without the event loop.
+    CommissioningProxyCluster(EndpointId endpointId, const Config & config, TimerDelegate & timerDelegate) :
         DefaultServerCluster({ endpointId, CommissioningProxy::Id }), mFeatureFlags(config.featureFlags),
         mMaxSessions(config.maxSessions), mMaxCachedResults(config.maxCachedResults),
         mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
@@ -92,7 +96,7 @@ public:
                 config.featureFlags.Has(CommissioningProxy::Feature::kWiFiNetworkInterface));
             return attrs;
         }()),
-        mScanCache(*this)
+        mSessions(timerDelegate), mScanCache(*this, timerDelegate), mScanAggregator(timerDelegate)
     {
         mMainCommissioningProxyState = kState_CPDisconnected;
     }

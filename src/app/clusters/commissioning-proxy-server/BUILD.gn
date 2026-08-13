@@ -42,6 +42,7 @@ source_set("commissioning-proxy-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/app/server-cluster:registry",
     "${chip_root}/src/data-model-providers/codegen:headers",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/CommissioningProxy",
