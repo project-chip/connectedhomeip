@@ -2048,7 +2048,7 @@ class ChipDeviceControllerBase:
             ClusterAttribute.WriteAttributes(
                 future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding,
-                suppressResponse=bool(suppressResponse)).raise_on_error()
+                suppressResponse=suppressResponse).raise_on_error()
             if suppressResponse:
                 return None
             return await future
