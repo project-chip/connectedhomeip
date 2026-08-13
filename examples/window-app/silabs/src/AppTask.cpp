@@ -63,11 +63,7 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(WindowManager::DrawUI);
     GetLCD().WriteDemoUI(false);
 #if SL_MATTER_QR_CODE_ENABLED
-#ifdef SL_WIFI
-    if (!ConnectivityMgr().IsWiFiStationProvisioned())
-#else
-    if (!ConnectivityMgr().IsThreadProvisioned())
-#endif /* !SL_WIFI */
+if (sIsProvisioned)
     {
         GetLCD().ShowQRCode(true);
     }
