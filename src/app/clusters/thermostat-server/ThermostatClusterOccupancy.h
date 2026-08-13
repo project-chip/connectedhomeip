@@ -38,7 +38,7 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual BitMask<OccupancyBitmap> GetOccupancy() const = 0;
+        virtual BitMask<OccupancyBitmap> GetOccupancy() const                                       = 0;
         virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) = 0;
     };
 

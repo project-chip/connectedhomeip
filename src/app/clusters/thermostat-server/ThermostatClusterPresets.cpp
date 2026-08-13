@@ -104,8 +104,7 @@ bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const Da
             return false;
         }
 
-        if (!matchingPreset.GetPresetHandle().IsNull() &&
-            presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        if (!matchingPreset.GetPresetHandle().IsNull() && presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
         }
@@ -281,7 +280,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
         return std::nullopt;
     }
 
-    auto & subjectDescriptor = decoder.GetSubjectDescriptor();
+    auto & subjectDescriptor  = decoder.GetSubjectDescriptor();
     auto & atomicWriteSession = mCluster.GetAtomicWriteSession();
 
     VerifyOrReturnError(atomicWriteSession.InAtomicWrite(MakeOptional(request.path.mAttributeId)),
