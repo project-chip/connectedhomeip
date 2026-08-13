@@ -84,7 +84,9 @@ public:
      */
     UpdateBuilder & Begin(uint16_t messageId)
     {
-        VerifyOrReturnValue(mBuildOk, *this);
+        // Allow restarting after a previous build failure as long as a valid buffer is bound.
+        VerifyOrReturnValue((mBuffer != nullptr) && (mSize >= HeaderRef::kSizeBytes), *this);
+        mBuildOk = true;
 
         mHeader.Clear();
         mHeader.SetMessageId(messageId);
@@ -132,8 +134,7 @@ public:
     /** @brief View of the encoded packet; empty if the builder is not Ok. */
     ByteSpan Packet() const
     {
-        VerifyOrReturnError(mBuildOk && (mBuffer != nullptr), ByteSpan());
-
+        VerifyOrReturnValue(mBuildOk && (mBuffer != nullptr), ByteSpan());
         return ByteSpan(mBuffer, mOutput.Needed());
     }
 
