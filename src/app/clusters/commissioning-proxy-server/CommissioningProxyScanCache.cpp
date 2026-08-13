@@ -18,6 +18,9 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyScanCache.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <algorithm>
+#include <cstring>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -31,26 +34,26 @@ namespace {
 constexpr System::Clock::Timeout kSweepInterval = System::Clock::Seconds16(1);
 } // namespace
 
-bool CommissioningProxyScanCache::Key::operator<(const Key & o) const
+bool CommissioningProxyScanCache::Key::operator==(const Key & o) const
 {
-    if (transport != o.transport)
+    return transport == o.transport && discriminator == o.discriminator && vid == o.vid && pid == o.pid;
+}
+
+CommissioningProxyScanCache::Entry * CommissioningProxyScanCache::FindEntry(const Key & key)
+{
+    for (auto & entry : mEntries)
     {
-        return transport < o.transport;
+        if (entry.inUse && entry.key == key)
+        {
+            return &entry;
+        }
     }
-    if (discriminator != o.discriminator)
-    {
-        return discriminator < o.discriminator;
-    }
-    if (vid != o.vid)
-    {
-        return vid < o.vid;
-    }
-    return pid < o.pid;
+    return nullptr;
 }
 
 void CommissioningProxyScanCache::ArmSweepIfNeeded()
 {
-    if (mSweepArmed || mEntries.empty())
+    if (mSweepArmed || Count() == 0)
     {
         return;
     }
@@ -66,18 +69,14 @@ void CommissioningProxyScanCache::OnSweep()
 
     auto now     = mTimerDelegate.GetCurrentMonotonicTimestamp();
     bool removed = false;
-    for (auto it = mEntries.begin(); it != mEntries.end();)
+    for (auto & entry : mEntries)
     {
-        if (it->second.expiresAt <= now)
+        if (entry.inUse && entry.expiresAt <= now)
         {
             ChipLogProgress(Zcl, "CommissioningProxyScanCache: TTL expired for discriminator %u (transport 0x%x)",
-                            it->first.discriminator, it->first.transport);
-            it      = mEntries.erase(it);
-            removed = true;
-        }
-        else
-        {
-            ++it;
+                            entry.key.discriminator, entry.key.transport);
+            entry.inUse = false;
+            removed     = true;
         }
     }
 
@@ -96,45 +95,58 @@ void CommissioningProxyScanCache::Report(const ScanResultEntry & result)
 
     auto expiresAt = mTimerDelegate.GetCurrentMonotonicTimestamp() + System::Clock::Seconds16(mCluster.GetCacheTimeout());
 
-    auto it = mEntries.find(key);
-    if (it != mEntries.end())
+    if (Entry * existing = FindEntry(key))
     {
         // Re-discovery: refresh TTL only (the visible result is unchanged, so no dirty).
-        it->second.expiresAt = expiresAt;
+        existing->expiresAt = expiresAt;
         ArmSweepIfNeeded();
         return;
     }
 
-    if (mEntries.size() >= static_cast<size_t>(mCluster.GetMaxCachedResults()))
+    Entry * slot = nullptr;
+    for (auto & candidate : mEntries)
+    {
+        if (!candidate.inUse)
+        {
+            slot = &candidate;
+            break;
+        }
+    }
+    if (slot == nullptr)
     {
         ChipLogDetail(Zcl, "CommissioningProxyScanCache: full (%u entries), dropping discriminator %u",
                       mCluster.GetMaxCachedResults(), key.discriminator);
         return;
     }
 
-    Entry e;
+    *slot           = Entry{};
+    slot->inUse     = true;
+    slot->key       = key;
+    slot->transport = result.transport;
     if (!result.address.IsNull())
     {
-        auto span = result.address.Value();
-        e.address.assign(span.data(), span.data() + span.size());
-        e.hasAddress = true;
+        auto span            = result.address.Value();
+        const size_t copyLen = std::min(span.size(), kMaxAddressBytes);
+        memcpy(slot->address, span.data(), copyLen);
+        slot->addressLen = static_cast<uint8_t>(copyLen);
+        slot->hasAddress = true;
     }
-    e.transport     = result.transport;
-    e.discriminator = result.discriminator;
-    e.vendorID      = result.vendorID;
-    e.productID     = result.productID;
+    slot->discriminator = result.discriminator;
+    slot->vendorID      = result.vendorID;
+    slot->productID     = result.productID;
     if (!result.extendedData.IsNull())
     {
-        auto span = result.extendedData.Value();
-        e.extendedData.assign(span.data(), span.data() + span.size());
-        e.hasExtendedData = true;
+        auto span            = result.extendedData.Value();
+        const size_t copyLen = std::min(span.size(), kMaxExtendedDataBytes);
+        memcpy(slot->extendedData, span.data(), copyLen);
+        slot->extendedDataLen = static_cast<uint8_t>(copyLen);
+        slot->hasExtendedData = true;
     }
-    e.wiFiBand    = result.wiFiBand;
-    e.expiresAt   = expiresAt;
-    mEntries[key] = std::move(e);
+    slot->wiFiBand  = result.wiFiBand;
+    slot->expiresAt = expiresAt;
 
-    ChipLogProgress(Zcl, "CommissioningProxyScanCache: cached discriminator %u (transport 0x%x, total=%zu)", key.discriminator,
-                    key.transport, mEntries.size());
+    ChipLogProgress(Zcl, "CommissioningProxyScanCache: cached discriminator %u (transport 0x%x, total=%u)", key.discriminator,
+                    key.transport, Count());
 
     mCluster.MarkCachedResultsDirty();
     ArmSweepIfNeeded();
@@ -146,17 +158,17 @@ void CommissioningProxyScanCache::ClearTransport(BitMask<CapabilitiesBitmap> tra
     const BitMask<WiFiBandBitmap> kBandFallback{ WiFiBandBitmap::k2g4 };
 
     bool removed = false;
-    for (auto it = mEntries.begin(); it != mEntries.end();)
+    for (auto & entry : mEntries)
     {
-        const bool bandMatches = bands.Raw() == 0 || (it->second.wiFiBand.ValueOr(kBandFallback).Raw() & bands.Raw()) != 0;
-        if ((it->first.transport & transport.Raw()) != 0 && bandMatches)
+        if (!entry.inUse)
         {
-            it      = mEntries.erase(it);
-            removed = true;
+            continue;
         }
-        else
+        const bool bandMatches = bands.Raw() == 0 || (entry.wiFiBand.ValueOr(kBandFallback).Raw() & bands.Raw()) != 0;
+        if ((entry.key.transport & transport.Raw()) != 0 && bandMatches)
         {
-            ++it;
+            entry.inUse = false;
+            removed     = true;
         }
     }
 
@@ -168,37 +180,50 @@ void CommissioningProxyScanCache::ClearTransport(BitMask<CapabilitiesBitmap> tra
 
 uint8_t CommissioningProxyScanCache::Count() const
 {
-    return static_cast<uint8_t>(mEntries.size());
+    uint8_t count = 0;
+    for (const auto & entry : mEntries)
+    {
+        count = static_cast<uint8_t>(count + (entry.inUse ? 1 : 0));
+    }
+    return count;
 }
 
 CHIP_ERROR CommissioningProxyScanCache::Encode(AttributeValueEncoder & encoder) const
 {
-    if (mEntries.empty())
+    if (Count() == 0)
     {
         DataModel::Nullable<DataModel::List<const ScanResultEntry>> nullValue;
         return encoder.Encode(nullValue);
     }
 
     return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-        for (const auto & [key, e] : mEntries)
+        for (const auto & e : mEntries)
         {
+            if (!e.inUse)
+            {
+                continue;
+            }
             ScanResultEntry r{};
             if (e.hasAddress)
             {
-                r.address.SetNonNull(ByteSpan(e.address.data(), e.address.size()));
+                r.address.SetNonNull(ByteSpan(e.address, e.addressLen));
             }
             else
+            {
                 r.address.SetNull();
+            }
             r.transport     = e.transport;
             r.discriminator = e.discriminator;
             r.vendorID      = e.vendorID;
             r.productID     = e.productID;
             if (e.hasExtendedData)
             {
-                r.extendedData.SetNonNull(ByteSpan(e.extendedData.data(), e.extendedData.size()));
+                r.extendedData.SetNonNull(ByteSpan(e.extendedData, e.extendedDataLen));
             }
             else
+            {
                 r.extendedData.SetNull();
+            }
             r.wiFiBand = e.wiFiBand;
             ReturnErrorOnFailure(listEncoder.Encode(r));
         }
@@ -213,7 +238,10 @@ void CommissioningProxyScanCache::Shutdown()
         mTimerDelegate.CancelTimer(this);
         mSweepArmed = false;
     }
-    mEntries.clear();
+    for (auto & entry : mEntries)
+    {
+        entry.inUse = false;
+    }
 }
 
 } // namespace CommissioningProxy

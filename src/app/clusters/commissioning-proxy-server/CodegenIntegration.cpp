@@ -16,6 +16,7 @@
 
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
 
+#include <app/server/Server.h>
 #include <app/util/generic-callbacks.h>
 #include <clusters/CommissioningProxy/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -35,7 +36,7 @@ DefaultTimerDelegate gDefaultTimerDelegate;
 } // namespace
 
 Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) :
-    mCluster(aEndpointId, config, gDefaultTimerDelegate)
+    mCluster(aEndpointId, config, gDefaultTimerDelegate, &Server::GetInstance().GetFabricTable())
 {}
 
 CHIP_ERROR Instance::Init()

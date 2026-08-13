@@ -158,6 +158,15 @@ public:
     virtual void OnAllSessionsClosed() {}
 
     /**
+     * @brief A fabric has been removed. Drop every background-scan request it owns
+     *        (registry.RemoveFabric(fabricIndex)); the cluster has already dealt with
+     *        its sessions and any in-flight connect. FabricIndex values are reused, so
+     *        anything left behind would be inherited by the next fabric to take this
+     *        index. Default: no-op, for drivers with no background-scan state.
+     */
+    virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
+
+    /**
      * @brief True while a connect is in flight (exchange open, awaiting
      *        success/error/timeout). The cluster sums this across transports and
      *        adds it to Sessions().ActiveCount() for the MaxSessions gate, so two
