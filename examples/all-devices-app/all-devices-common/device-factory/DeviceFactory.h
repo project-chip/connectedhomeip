@@ -62,6 +62,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 
 #include <functional>
 #include <map>
@@ -90,6 +91,7 @@ public:
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
         PersistentStorageDelegate & storageDelegate;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
     static DeviceFactory & GetInstance()
@@ -311,7 +313,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", []() { return std::make_unique<Dishwasher>(); });
+            RegisterCreator("dishwasher", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<Dishwasher>(mContext->diagnosticDataProvider);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
@@ -512,7 +517,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", []() { return std::make_unique<LaundryWasher>(); });
+            RegisterCreator("laundry-washer", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LaundryWasher>(mContext->diagnosticDataProvider);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
@@ -523,7 +531,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", []() { return std::make_unique<MicrowaveOven>(); });
+            RegisterCreator("microwave-oven", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<MicrowaveOven>(mContext->diagnosticDataProvider);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {

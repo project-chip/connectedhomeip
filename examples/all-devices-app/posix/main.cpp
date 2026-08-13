@@ -309,10 +309,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+        .groupDataProvider      = gGroupDataProvider,                     //
+        .fabricTable            = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate          = gTimerDelegate,                         //
+        .storageDelegate        = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
