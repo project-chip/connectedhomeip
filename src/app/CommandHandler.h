@@ -210,8 +210,7 @@ public:
             }
             CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
             {
-                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
-                return mPayload.EncodeTo(fabricWriter, tag);
+                return CHIP_ERROR_INCORRECT_STATE;
             }
         };
     };

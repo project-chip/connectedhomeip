@@ -2251,11 +2251,11 @@ TEST(TestEncodableResponsePayloadAdapter, EncodeToBothWriters)
         EXPECT_EQ(adapter.EncodeTo(fabricWriter, TLV::AnonymousTag()), CHIP_NO_ERROR);
     }
 
-    // 2. Test encoding via standard TLVWriter (exercising fallback overload)
+    // 2. Test encoding via standard TLVWriter (unsupported overload returning CHIP_ERROR_INCORRECT_STATE)
     {
         TLV::TLVWriter writer;
         writer.Init(buffer);
-        EXPECT_EQ(adapter.EncodeTo(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        EXPECT_EQ(adapter.EncodeTo(writer, TLV::AnonymousTag()), CHIP_ERROR_INCORRECT_STATE);
     }
 }
 
