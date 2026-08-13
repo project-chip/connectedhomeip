@@ -33,11 +33,12 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
+from mobly import signals
+
 from matter.testing import matter_testing as matter_testing_module
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import (CertificationUnitTestNoDevice, MatterBaseTest, MatterTestCommissionedDevice,
                                            MatterTestCommissioner, MatterTestUncommissionedDevice, device_requirement)
-from mobly import signals
 
 _MARKERS = (
     MatterTestCommissionedDevice,
