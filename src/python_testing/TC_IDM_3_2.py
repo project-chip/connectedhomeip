@@ -145,12 +145,6 @@ class TC_IDM_3_2(IDMBaseTest):
             except (ChipStackError, InteractionModelError) as e:
                 log.info("WriteAttribute with suppressResponse=True raised exception: %s", e)
 
-            # Allow time for DUT command processing and for any rogue frames to arrive over the wire
-            await asyncio.sleep(2)
-
-            snapshot = im_capture.GetSnapshot()
-            await self.verify_suppress_response_message_count(snapshot, "WriteAttribute suppressResponse")
-
             # Verify the write operation succeeded by reading back the value
             log.info("Verifying that the write operation succeeded")
             actual_value = await self.read_single_attribute_check_success(
@@ -161,6 +155,9 @@ class TC_IDM_3_2(IDMBaseTest):
 
             asserts.assert_equal(actual_value, test_value,
                                  f"Attribute should be written. Expected {test_value}, got {actual_value}")
+
+            snapshot = im_capture.GetSnapshot()
+            await self.verify_suppress_response_message_count(snapshot, "WriteAttribute suppressResponse")
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
         if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):

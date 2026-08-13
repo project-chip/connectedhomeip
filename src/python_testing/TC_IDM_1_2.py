@@ -249,16 +249,13 @@ class TC_IDM_1_2(IDMBaseTest):
         except ChipStackError as e:  # chipstack-ok: Safety handler for unexpected controller errors
             log.info("SendCommand with suppressResponse=True encountered local exception: %s", e)
 
-        # Allow time for DUT command processing and for any rogue frames to arrive over the wire
-        await asyncio.sleep(2)
-
-        snapshot = im_capture.GetSnapshot()
-        await self.verify_suppress_response_message_count(snapshot, "suppressResponse")
-
         # Verify that the command had the correct side effect on the DUT data model
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 2, "Breadcrumb was not correctly set on ArmFailSafe with response suppressed")
+
+        snapshot = im_capture.GetSnapshot()
+        await self.verify_suppress_response_message_count(snapshot, "suppressResponse")
 
         # Cleanup - Unset the failsafe
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
