@@ -34,10 +34,7 @@ public:
     virtual ~EncodableToTLV() = default;
 
     /// Encodes using a FabricAwareTLVWriter. Default implementation delegates to mTLVWriter.
-    virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const
-    {
-        return EncodeTo(writer.mTLVWriter, tag);
-    }
+    virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const { return EncodeTo(writer.mTLVWriter, tag); }
 
     /// Encodes to a standard TLVWriter. Must be overridden by concrete implementations.
     virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
