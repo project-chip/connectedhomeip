@@ -329,7 +329,7 @@ TEST_F(TestCommissioningProxyCluster, TestTransportAttribute_ReflectsRegisteredT
 
 // MaxSessions attribute must reflect the configured GetMaxSessions() value,
 // not a hardcoded constant.
-TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromConfig)
+TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromBuildConfig)
 {
     TestServerClusterContext context;
     BitMask<Feature> noFeatures;
@@ -340,10 +340,10 @@ TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromConfig)
 
     ClusterTester tester(cluster);
 
-    // Default mMaxSessions == 1.
+    // MaxSessions is Fixed quality: it is the build-time pool size, not per-instance config.
     uint8_t maxSessions = 0;
     ASSERT_EQ(tester.ReadAttribute(CPAttributes::MaxSessions::Id, maxSessions), CHIP_NO_ERROR);
-    EXPECT_EQ(maxSessions, 1u);
+    EXPECT_EQ(maxSessions, CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -926,11 +926,16 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // MaxSessions defaults to 1. A pending connect counts toward the active-session
-    // total, so saturating it makes the next connect hit the MaxSessions gate.
+    ClusterTester tester(cluster);
+
+    // Fill the session pool, then check the next connect is refused. A pending connect
+    // also counts toward the active-session total, so the last slot is taken that way.
+    for (uint8_t i = 0; i < CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS - 1; i++)
+    {
+        EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    }
     mockBle.SetConnectPending(true);
 
-    ClusterTester tester(cluster);
     auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::ResourceExhausted));
@@ -938,14 +943,16 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // Below MaxSessions: the cluster-level pre-check does not reject; the
 // request is forwarded to the transport driver and (for the mock) succeeds.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSucceeds)
 {
     TestServerClusterContext context;
     // MaxSessions == 2: the second concurrent connect is still below the gate.
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2),
-                                      mockTimer);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -961,6 +968,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // Per the ProxyConnectRequest Effect on Receipt: if Timeout expires, the connection
 // attempt is terminated and a TIMEOUT status SHALL be returned.
@@ -1037,14 +1045,16 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // With MaxSessions > 1, disconnecting one of several active sessions SHALL NOT
 // transition the cluster to disconnected; only the final disconnect (no sessions
 // remaining) SHALL do so.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionStateTransition)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2),
-                                      mockTimer);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -1079,6 +1089,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // When the transport fails to disconnect, the command SHALL fail and the cluster
 // state SHALL remain Connected (session not cleaned up).
@@ -2406,6 +2417,59 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimerArmFa
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A removed fabric SHALL leave nothing behind: its sessions are torn down through the
+// owning transport, and every driver is told to drop its background scans. FabricIndex
+// values are reused, so residue would be inherited by the next fabric to take the index.
+TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_DropsSessionsAndDriverState)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(1);
+    uint16_t sid = OpenSession(tester);
+    EXPECT_TRUE(cluster.Sessions().Find(sid).has_value());
+
+    // No FabricTable in unit tests, so drive the delegate callback directly.
+    cluster.OnFabricRemoved(chip::Server::GetInstance().GetFabricTable(), 1);
+
+    EXPECT_FALSE(cluster.Sessions().Find(sid).has_value());
+    EXPECT_TRUE(cluster.Sessions().IsEmpty());
+    EXPECT_EQ(mockBle.FabricRemovedCount(), 1u);
+    EXPECT_EQ(mockPaf.FabricRemovedCount(), 1u);
+    EXPECT_EQ(mockBle.LastRemovedFabric(), 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
+// Another fabric's session SHALL survive.
+TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_LeavesOtherFabricsAlone)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(1);
+    uint16_t sid1 = OpenSession(tester);
+    tester.SetFabricIndex(2);
+    uint16_t sid2 = OpenSession(tester);
+
+    cluster.OnFabricRemoved(chip::Server::GetInstance().GetFabricTable(), 1);
+
+    EXPECT_FALSE(cluster.Sessions().Find(sid1).has_value());
+    EXPECT_TRUE(cluster.Sessions().Find(sid2).has_value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
+
 // CachedResults / NumCachedResults reflect the ScanCache: null/0 when empty, unique
 // per discriminator/VID/PID/transport (spec), and cleared by ClearTransport. Change
 // reporting for both attributes is the cluster's responsibility.
@@ -2640,13 +2704,15 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WrongFabricEstabli
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // Spec: "The SessionId allows multiple commissioning sessions to be run in parallel."
 // With MaxSessions >= 2, two connects SHALL each get a distinct, non-zero SessionId.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHaveDistinctSessionIds)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2),
-                                      mockTimer);
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -2669,6 +2735,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHa
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // A ProxyDisconnectRequest SHALL remove the session: a subsequent ProxyMessageRequest
 // referencing the same SessionId SHALL be rejected with NOT_FOUND.

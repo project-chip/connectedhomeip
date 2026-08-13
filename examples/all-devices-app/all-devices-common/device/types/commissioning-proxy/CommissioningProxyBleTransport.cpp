@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <ble/Ble.h>
 #include <clusters/CommissioningProxy/Commands.h>
@@ -28,6 +27,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/Linux/BLEManagerImpl.h>
 #include <platform/PlatformManager.h>
 
@@ -852,6 +852,13 @@ chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesB
     return sBgScan.Stop(fabricIndex, nodeId, transport, chip::BitMask<WiFiBandBitmap>{});
 }
 
+void OnFabricRemoved(chip::FabricIndex fabricIndex)
+{
+    // The cluster has already dropped the fabric's sessions; this drops its background
+    // scans so nothing survives into a reused FabricIndex.
+    sBgScan.RemoveFabric(fabricIndex);
+}
+
 void OnAllSessionsClosed()
 {
     // The proxy uses a one-way peripheral→central role switch
@@ -953,6 +960,11 @@ Protocols::InteractionModel::Status CommissioningProxyBleTransport::BgScanStop(B
                                                                                FabricIndex fabricIndex, NodeId nodeId)
 {
     return Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+}
+
+void CommissioningProxyBleTransport::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    Ble::OnFabricRemoved(fabricIndex);
 }
 
 void CommissioningProxyBleTransport::OnAllSessionsClosed()

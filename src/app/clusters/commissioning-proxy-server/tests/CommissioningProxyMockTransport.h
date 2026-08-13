@@ -82,6 +82,11 @@ public:
         return mBgScanStopStatus;
     }
     void OnAllSessionsClosed() override { mOnAllSessionsClosedCount++; }
+    void OnFabricRemoved(FabricIndex fabricIndex) override
+    {
+        mFabricRemovedCount++;
+        mLastRemovedFabric = fabricIndex;
+    }
     bool IsConnectPending() const override { return mConnectPending; }
     void Shutdown() override {}
 
@@ -114,6 +119,8 @@ public:
     uint16_t LastSessionId() const { return mLastSessionId; }
     uint8_t OnAllSessionsClosedCount() const { return mOnAllSessionsClosedCount; }
     bool CancelCalled() const { return mCancelCalled; }
+    unsigned FabricRemovedCount() const { return mFabricRemovedCount; }
+    FabricIndex LastRemovedFabric() const { return mLastRemovedFabric; }
     FabricIndex LastCancelFabric() const { return mLastCancelFabric; }
 
 private:
@@ -137,6 +144,8 @@ private:
     bool mCancelCalled                                     = false;
     FabricIndex mLastCancelFabric                          = kUndefinedFabricIndex;
     FabricIndex mPendingConnectFabric                      = kUndefinedFabricIndex;
+    unsigned mFabricRemovedCount                           = 0;
+    FabricIndex mLastRemovedFabric                         = kUndefinedFabricIndex;
 };
 
 } // namespace CommissioningProxy

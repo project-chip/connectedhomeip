@@ -37,24 +37,32 @@ namespace {
 constexpr uint16_t kResponseTimeoutMarginSecs = 5;
 } // namespace
 
-// One in-flight ProxyMessageRequest per session: keeps the IM exchange open until
-// the commissionee replies and the transport hands the bytes back. Each record is its
-// own TimerContext so that concurrent sessions each get their own response timeout.
-struct CommissioningProxySessionManager::PendingMessage : public TimerContext
+CommissioningProxySessionManager::SessionSlot * CommissioningProxySessionManager::FindSlot(uint16_t sessionId)
 {
-    PendingMessage(CommissioningProxySessionManager * aOwner, app::CommandHandler::Handle && aHandle,
-                   const app::ConcreteCommandPath & aPath, uint16_t aSessionId) :
-        owner(aOwner),
-        handle(std::move(aHandle)), path(aPath), sessionId(aSessionId)
-    {}
+    for (auto & slot : mSessions)
+    {
+        if (slot.inUse && slot.sessionId == sessionId)
+        {
+            return &slot;
+        }
+    }
+    return nullptr;
+}
 
-    CommissioningProxySessionManager * owner;
-    app::CommandHandler::Handle handle;
-    app::ConcreteCommandPath path;
-    uint16_t sessionId;
+const CommissioningProxySessionManager::SessionSlot * CommissioningProxySessionManager::FindSlot(uint16_t sessionId) const
+{
+    return const_cast<CommissioningProxySessionManager *>(this)->FindSlot(sessionId);
+}
 
-    void TimerFired() override { owner->OnResponseTimeout(this); }
-};
+uint8_t CommissioningProxySessionManager::ActiveCount() const
+{
+    uint8_t count = 0;
+    for (const auto & slot : mSessions)
+    {
+        count = static_cast<uint8_t>(count + (slot.inUse ? 1 : 0));
+    }
+    return count;
+}
 
 uint16_t CommissioningProxySessionManager::AllocSessionId()
 {
@@ -66,71 +74,105 @@ uint16_t CommissioningProxySessionManager::AllocSessionId()
             mNextSessionId = 1;
         }
         id = mNextSessionId++;
-    } while (mSessions.count(id) > 0);
+    } while (FindSlot(id) != nullptr);
     return id;
 }
 
 void CommissioningProxySessionManager::RegisterSession(uint16_t sessionId, CapabilitiesBitmap transport, FabricIndex fabricIndex)
 {
-    mSessions[sessionId] = SessionInfo{ transport, fabricIndex };
+    SessionSlot * slot = FindSlot(sessionId);
+    if (slot == nullptr)
+    {
+        for (auto & candidate : mSessions)
+        {
+            if (!candidate.inUse)
+            {
+                slot = &candidate;
+                break;
+            }
+        }
+    }
+    // The cluster gates on MaxSessions before connecting, so the pool cannot be full here.
+    VerifyOrDie(slot != nullptr);
+
+    slot->inUse     = true;
+    slot->sessionId = sessionId;
+    slot->info      = SessionInfo{ transport, fabricIndex };
 }
 
 void CommissioningProxySessionManager::RemoveSession(uint16_t sessionId)
 {
     AbortPending(sessionId);
-    mSessions.erase(sessionId);
+    if (SessionSlot * slot = FindSlot(sessionId))
+    {
+        slot->inUse = false;
+    }
 }
 
 std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxySessionManager::Find(uint16_t sessionId) const
 {
-    auto it = mSessions.find(sessionId);
-    if (it == mSessions.end())
+    const SessionSlot * slot = FindSlot(sessionId);
+    if (slot == nullptr)
     {
         return std::nullopt;
     }
-    return it->second;
+    return slot->info;
+}
+
+std::optional<uint16_t> CommissioningProxySessionManager::FindAnyOnFabric(FabricIndex fabricIndex) const
+{
+    for (const auto & slot : mSessions)
+    {
+        if (slot.inUse && slot.info.fabricIndex == fabricIndex)
+        {
+            return slot.sessionId;
+        }
+    }
+    return std::nullopt;
 }
 
 void CommissioningProxySessionManager::OnResponseTimeout(PendingMessage * pm)
 {
-    auto it = mPending.find(pm->sessionId);
-    if (it == mPending.end() || it->second != pm)
+    SessionSlot * slot = FindSlot(pm->sessionId);
+    if (slot == nullptr || slot->pending != pm)
     {
         return; // Already resolved (reply arrived or session closed).
     }
 
-    mPending.erase(it);
+    slot->pending = nullptr;
     ChipLogProgress(Zcl, "CommissioningProxy: ProxyMessageRequest responseTimeout expired for session %u", pm->sessionId);
     // Per spec, an expired ProxyMessageRequest ResponseTimeout SHALL return TIMEOUT.
     if (app::CommandHandler * cmd = pm->handle.Get())
     {
         cmd->AddStatus(pm->path, Status::Timeout);
     }
-    delete pm;
+    mPendingPool.ReleaseObject(pm);
 }
 
 Status CommissioningProxySessionManager::BeginMessage(uint16_t sessionId, app::CommandHandler * commandObj,
                                                       const DataModel::InvokeRequest & request, uint8_t responseTimeoutSeconds)
 {
+    SessionSlot * slot = FindSlot(sessionId);
+    VerifyOrReturnError(slot != nullptr, Status::NotFound);
+
     // Reject if another request for this session is still live; clean up an already
     // expired one rather than blocking the session forever.
-    auto pendingIt = mPending.find(sessionId);
-    if (pendingIt != mPending.end())
+    if (slot->pending != nullptr)
     {
-        PendingMessage * existing = pendingIt->second;
-        if (existing->handle.Get() != nullptr)
+        if (slot->pending->handle.Get() != nullptr)
         {
             ChipLogError(Zcl, "CommissioningProxy: session %u already has a pending ProxyMessageRequest (BUSY)", sessionId);
             return Status::Busy;
         }
-        mTimerDelegate.CancelTimer(existing);
-        delete existing;
-        mPending.erase(pendingIt);
+        mTimerDelegate.CancelTimer(slot->pending);
+        mPendingPool.ReleaseObject(slot->pending);
+        slot->pending = nullptr;
     }
 
-    auto * pm = new PendingMessage(this, app::CommandHandler::Handle(commandObj), request.path, sessionId);
+    auto * pm = mPendingPool.CreateObject(this, app::CommandHandler::Handle(commandObj), request.path, sessionId);
+    VerifyOrReturnError(pm != nullptr, Status::ResourceExhausted);
     commandObj->FlushAcksRightAwayOnSlowCommand();
-    mPending[sessionId] = pm;
+    slot->pending = pm;
 
     if (auto * exchange = commandObj->GetExchangeContext())
     {
@@ -155,28 +197,28 @@ Status CommissioningProxySessionManager::BeginMessage(uint16_t sessionId, app::C
 
 void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
 {
-    auto it = mPending.find(sessionId);
-    if (it == mPending.end())
+    SessionSlot * slot = FindSlot(sessionId);
+    if (slot == nullptr || slot->pending == nullptr)
     {
         return;
     }
-    PendingMessage * pm = it->second;
+    PendingMessage * pm = slot->pending;
+    slot->pending       = nullptr;
     mTimerDelegate.CancelTimer(pm);
-    mPending.erase(it);
-    delete pm;
+    mPendingPool.ReleaseObject(pm);
 }
 
 void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
 {
-    auto it = mPending.find(sessionId);
-    if (it == mPending.end())
+    SessionSlot * slot = FindSlot(sessionId);
+    if (slot == nullptr || slot->pending == nullptr)
     {
         ChipLogDetail(Zcl, "CommissioningProxy: no pending request for session %u — dropping commissionee data", sessionId);
         return;
     }
 
-    PendingMessage * pm = it->second;
-    mPending.erase(it);
+    PendingMessage * pm = slot->pending;
+    slot->pending       = nullptr;
     mTimerDelegate.CancelTimer(pm);
 
     if (app::CommandHandler * cmd = pm->handle.Get())
@@ -186,37 +228,40 @@ void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionI
         response.message.SetNonNull(ByteSpan(data, length));
         cmd->AddResponse(pm->path, response);
     }
-    delete pm;
+    mPendingPool.ReleaseObject(pm);
 }
 
 void CommissioningProxySessionManager::DispatchMessageFailure(uint16_t sessionId, Status status)
 {
-    auto it = mPending.find(sessionId);
-    if (it == mPending.end())
+    SessionSlot * slot = FindSlot(sessionId);
+    if (slot == nullptr || slot->pending == nullptr)
     {
         return;
     }
 
-    PendingMessage * pm = it->second;
-    mPending.erase(it);
+    PendingMessage * pm = slot->pending;
+    slot->pending       = nullptr;
     mTimerDelegate.CancelTimer(pm);
 
     if (app::CommandHandler * cmd = pm->handle.Get())
     {
         cmd->AddStatus(pm->path, status);
     }
-    delete pm;
+    mPendingPool.ReleaseObject(pm);
 }
 
 void CommissioningProxySessionManager::Shutdown()
 {
-    for (auto & [sessionId, pm] : mPending)
+    for (auto & slot : mSessions)
     {
-        mTimerDelegate.CancelTimer(pm);
-        delete pm;
+        if (slot.pending != nullptr)
+        {
+            mTimerDelegate.CancelTimer(slot.pending);
+            mPendingPool.ReleaseObject(slot.pending);
+            slot.pending = nullptr;
+        }
+        slot.inUse = false;
     }
-    mPending.clear();
-    mSessions.clear();
 }
 
 } // namespace CommissioningProxy

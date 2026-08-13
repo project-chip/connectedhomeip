@@ -56,7 +56,40 @@ constexpr uint16_t kValidWiFiBandBits = static_cast<uint16_t>(WiFiBandBitmap::k2
 
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
-    return DefaultServerCluster::Startup(context);
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    if (mFabricTable != nullptr)
+    {
+        ReturnErrorOnFailure(mFabricTable->AddFabricDelegate(this));
+    }
+    return CHIP_NO_ERROR;
+}
+
+void CommissioningProxyCluster::OnFabricRemoved(const FabricTable & /*fabricTable*/, FabricIndex fabricIndex)
+{
+    ChipLogProgress(Zcl, "CommissioningProxy: fabricIndex=%u removed; dropping its proxy state", fabricIndex);
+
+    // An in-flight ProxyConnectRequest has no session yet, so cancel it separately.
+    (void) CancelPendingConnect(fabricIndex);
+
+    // Drain the fabric's sessions, telling the owning transport to drop each link.
+    while (auto sessionId = mSessions.FindAnyOnFabric(fabricIndex))
+    {
+        if (auto info = mSessions.Find(*sessionId))
+        {
+            if (CommissioningProxyTransport * transport = FindTransport(info->transport))
+            {
+                (void) transport->Disconnect(*sessionId);
+            }
+        }
+        mSessions.RemoveSession(*sessionId);
+    }
+
+    // Background scans live in each driver's own registry.
+    for (size_t i = 0; i < mTransportCount; i++)
+    {
+        mTransports[i]->OnFabricRemoved(fabricIndex);
+    }
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,

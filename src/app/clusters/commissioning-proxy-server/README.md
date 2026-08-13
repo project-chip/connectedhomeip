@@ -204,10 +204,11 @@ chip::BitMask<Feature> gFeatures(Feature::kBackgroundScan, Feature::kWiFiNetwork
 // Supplies the response-timeout and scan-watchdog timers.
 chip::app::DefaultTimerDelegate gTimerDelegate;
 
-// Config: featureFlags, MaxSessions, MaxCachedResults, supported Wi-Fi bands.
+// Config: featureFlags plus the supported Wi-Fi bands. MaxSessions and
+// MaxCachedResults are Fixed-quality attributes and come from
+// CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS / _MAX_CACHED_RESULTS.
 chip::app::RegisteredServerCluster<CommissioningProxyCluster> gCPCluster(
-    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures, /*aMaxSessions=*/1, /*aMaxCachedResults=*/10),
-    gTimerDelegate);
+    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures), gTimerDelegate);
 
 void SetUpProxy()
 {

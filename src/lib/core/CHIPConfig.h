@@ -2086,6 +2086,39 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
 
 /**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxSessions attribute, and the
+ *        number of concurrent proxy sessions the cluster reserves storage for. The
+ *        attribute is Fixed quality, so this is the device's advertised value.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxCachedResults attribute, and
+ *        the number of background-scan results the cache reserves storage for. Each
+ *        entry holds the spec's maximum Address (100) and ExtendedData (128) inline.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS 10
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+ *
+ * @brief Concurrent ProxyBackGroundScanStartRequests retained per fabric. Each
+ *        requesting node gets its own record (the spec identifies a Stop by NodeID and
+ *        FabricID), so this bounds what one fabric can occupy.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+
+/**
  * @def CHIP_CONFIG_MAX_NUM_ZONES
  *
  * @brief The maximum number of zones

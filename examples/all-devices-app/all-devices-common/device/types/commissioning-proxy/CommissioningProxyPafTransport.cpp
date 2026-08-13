@@ -20,11 +20,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/Linux/ConnectivityManagerImpl.h>
 #include <platform/PlatformManager.h>
 #include <wifipaf/WiFiPAFLayer.h>
@@ -42,6 +42,7 @@ namespace Paf {
 
 // Defined below; called during the receive-delegate/timeout teardown paths, which
 // appear before the definition.
+void OnFabricRemoved(chip::FabricIndex fabricIndex);
 void OnAllSessionsClosed();
 
 namespace {
@@ -782,6 +783,13 @@ static void ResumeBgScanWork(intptr_t /*arg*/)
     sBgScan.ResumeIfNeeded();
 }
 
+void OnFabricRemoved(chip::FabricIndex fabricIndex)
+{
+    // The cluster has already dropped the fabric's sessions; this drops its background
+    // scans so nothing survives into a reused FabricIndex.
+    sBgScan.RemoveFabric(fabricIndex);
+}
+
 void OnAllSessionsClosed()
 {
     if (sBgScan.IsPaused() && !sBgScan.IsEmpty())
@@ -894,6 +902,11 @@ Protocols::InteractionModel::Status CommissioningProxyPafTransport::BgScanStop(B
                                                                                FabricIndex fabricIndex, NodeId nodeId)
 {
     return Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+}
+
+void CommissioningProxyPafTransport::OnFabricRemoved(FabricIndex fabricIndex)
+{
+    Paf::OnFabricRemoved(fabricIndex);
 }
 
 void CommissioningProxyPafTransport::OnAllSessionsClosed()

@@ -39,52 +39,71 @@ System::Clock::Timeout RemainingUntil(System::Clock::Timestamp deadline, System:
 }
 } // namespace
 
+uint8_t CommissioningProxyBgScanRegistry::FabricState::RequestCount() const
+{
+    uint8_t count = 0;
+    for (const auto & slot : requests)
+    {
+        count = static_cast<uint8_t>(count + (slot.inUse ? 1 : 0));
+    }
+    return count;
+}
+
+CommissioningProxyBgScanRegistry::RequestSlot * CommissioningProxyBgScanRegistry::FabricState::Find(NodeId nodeId)
+{
+    for (auto & slot : requests)
+    {
+        if (slot.inUse && slot.nodeId == nodeId)
+        {
+            return &slot;
+        }
+    }
+    return nullptr;
+}
+
+CommissioningProxyBgScanRegistry::RequestSlot * CommissioningProxyBgScanRegistry::FabricState::FindFree()
+{
+    for (auto & slot : requests)
+    {
+        if (!slot.inUse)
+        {
+            return &slot;
+        }
+    }
+    return nullptr;
+}
+
+CommissioningProxyBgScanRegistry::FabricState * CommissioningProxyBgScanRegistry::FindFabric(FabricIndex fabricIndex)
+{
+    for (auto & fabric : mFabrics)
+    {
+        if (fabric.inUse && fabric.fabricIndex == fabricIndex)
+        {
+            return &fabric;
+        }
+    }
+    return nullptr;
+}
+
+bool CommissioningProxyBgScanRegistry::AnyFabricInUse() const
+{
+    for (const auto & fabric : mFabrics)
+    {
+        if (fabric.inUse)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void CommissioningProxyBgScanRegistry::CancelLifetime(FabricState & state)
 {
-    if (state.lifetimeCtx != nullptr)
+    if (state.lifetime.armed)
     {
-        mTimerDelegate.CancelTimer(state.lifetimeCtx);
-        delete state.lifetimeCtx;
-        state.lifetimeCtx = nullptr;
+        mTimerDelegate.CancelTimer(&state.lifetime);
+        state.lifetime.armed = false;
     }
-}
-
-bool CommissioningProxyBgScanRegistry::LatestDeadline(const FabricState & state, System::Clock::Timestamp & out)
-{
-    System::Clock::Timestamp latest{ 0 };
-    for (const auto & [nodeId, req] : state.requests)
-    {
-        if (!req.hasTimeout)
-        {
-            return false; // one request never expires, so the fabric never does
-        }
-        latest = std::max(latest, req.expiresAt);
-    }
-    out = latest;
-    return !state.requests.empty();
-}
-
-void CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state)
-{
-    CancelLifetime(state);
-
-    System::Clock::Timestamp deadline{ 0 };
-    if (!LatestDeadline(state, deadline))
-    {
-        return;
-    }
-
-    auto * ctx = new LifetimeCtx(this, fabricIndex);
-    if (mTimerDelegate.StartTimer(ctx, RemainingUntil(deadline, mTimerDelegate.GetCurrentMonotonicTimestamp())) != CHIP_NO_ERROR)
-    {
-        // The fabric would otherwise scan unbounded. Nothing here can reject the command
-        // that got us here (it has already been applied), so drop the fabric instead.
-        ChipLogError(AppServer, "BgScan: could not re-arm lifetime for fabricIndex=%u; dropping it", fabricIndex);
-        delete ctx;
-        state.requests.clear();
-        return;
-    }
-    state.lifetimeCtx = ctx;
 }
 
 void CommissioningProxyBgScanRegistry::OnBecameEmpty()
@@ -103,11 +122,18 @@ void CommissioningProxyBgScanRegistry::OnBecameEmpty()
 BitMask<WiFiBandBitmap> CommissioningProxyBgScanRegistry::BandsInUse() const
 {
     uint16_t bits = 0;
-    for (const auto & [fabricIndex, state] : mFabrics)
+    for (const auto & fabric : mFabrics)
     {
-        for (const auto & [nodeId, req] : state.requests)
+        if (!fabric.inUse)
         {
-            bits = static_cast<uint16_t>(bits | req.wiFiBands.Raw());
+            continue;
+        }
+        for (const auto & slot : fabric.requests)
+        {
+            if (slot.inUse)
+            {
+                bits = static_cast<uint16_t>(bits | slot.request.wiFiBands.Raw());
+            }
         }
     }
     return BitMask<WiFiBandBitmap>(bits);
@@ -124,20 +150,76 @@ void CommissioningProxyBgScanRegistry::ClearBandsNoLongerScanned(BitMask<WiFiBan
     }
 }
 
+bool CommissioningProxyBgScanRegistry::LatestDeadline(const FabricState & state, System::Clock::Timestamp & out)
+{
+    System::Clock::Timestamp latest{ 0 };
+    bool any = false;
+    for (const auto & slot : state.requests)
+    {
+        if (!slot.inUse)
+        {
+            continue;
+        }
+        if (!slot.request.hasTimeout)
+        {
+            return false; // one request never expires, so the fabric never does
+        }
+        latest = std::max(latest, slot.request.expiresAt);
+        any    = true;
+    }
+    out = latest;
+    return any;
+}
+
+void CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state)
+{
+    CancelLifetime(state);
+
+    System::Clock::Timestamp deadline{ 0 };
+    if (!LatestDeadline(state, deadline))
+    {
+        return;
+    }
+
+    state.lifetime.registry    = this;
+    state.lifetime.fabricIndex = fabricIndex;
+    if (mTimerDelegate.StartTimer(&state.lifetime, RemainingUntil(deadline, mTimerDelegate.GetCurrentMonotonicTimestamp())) !=
+        CHIP_NO_ERROR)
+    {
+        // The fabric would otherwise scan unbounded. Nothing here can reject the command
+        // that got us here (it has already been applied), so drop the fabric instead.
+        ChipLogError(AppServer, "BgScan: could not re-arm lifetime for fabricIndex=%u; dropping it", fabricIndex);
+        state.inUse = false;
+        return;
+    }
+    state.lifetime.armed = true;
+}
+
 Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                                BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs)
 {
-    const bool wasEmpty = mFabrics.empty();
+    const bool wasEmpty = !AnyFabricInUse();
 
     // Reject before any side effect: a fabric may only hold so many concurrent requests,
     // and a node already holding one is refreshing rather than adding.
-    auto fabricIt = mFabrics.find(fabricIndex);
-    if (fabricIt != mFabrics.end() && fabricIt->second.requests.find(nodeId) == fabricIt->second.requests.end() &&
-        fabricIt->second.requests.size() >= CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC)
+    FabricState * fabric = FindFabric(fabricIndex);
+    if (fabric != nullptr && fabric->Find(nodeId) == nullptr && fabric->FindFree() == nullptr)
     {
         ChipLogError(AppServer, "BgScan: fabricIndex=%u already has %u background scans", fabricIndex,
-                     static_cast<unsigned>(fabricIt->second.requests.size()));
+                     static_cast<unsigned>(fabric->RequestCount()));
         return Status::ResourceExhausted;
+    }
+    if (fabric == nullptr)
+    {
+        for (auto & candidate : mFabrics)
+        {
+            if (!candidate.inUse)
+            {
+                fabric = &candidate;
+                break;
+            }
+        }
+        VerifyOrReturnError(fabric != nullptr, Status::ResourceExhausted);
     }
 
     // Start (or resume) the hardware scan on the first fabric, or whenever we are
@@ -173,54 +255,75 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
 
     bool needTimer                    = incoming.hasTimeout;
     System::Clock::Timestamp deadline = incoming.expiresAt;
-    if (fabricIt != mFabrics.end())
+    if (fabric->inUse)
     {
-        for (const auto & [otherNode, req] : fabricIt->second.requests)
+        for (const auto & slot : fabric->requests)
         {
-            if (otherNode == nodeId)
+            if (!slot.inUse || slot.nodeId == nodeId)
             {
-                continue; // this request is about to be replaced
+                continue; // this node's request is about to be replaced
             }
-            if (!req.hasTimeout)
+            if (!slot.request.hasTimeout)
             {
                 needTimer = false;
                 break;
             }
-            deadline = std::max(deadline, req.expiresAt);
+            deadline = std::max(deadline, slot.request.expiresAt);
         }
     }
 
-    LifetimeCtx * ctx = nullptr;
+    // Arming can fail, so it happens before the table is touched. The old timer is
+    // cancelled only once the new one is running.
+    const bool hadTimer = fabric->inUse && fabric->lifetime.armed;
+    LifetimeCtx staged;
     if (needTimer)
     {
-        ctx                 = new LifetimeCtx(this, fabricIndex);
-        CHIP_ERROR timerErr = mTimerDelegate.StartTimer(ctx, RemainingUntil(deadline, now));
+        staged.registry    = this;
+        staged.fabricIndex = fabricIndex;
+        // Cancel first: a context can hold only one timer, and this reuses the slot's.
+        if (hadTimer)
+        {
+            mTimerDelegate.CancelTimer(&fabric->lifetime);
+        }
+        fabric->lifetime.registry    = this;
+        fabric->lifetime.fabricIndex = fabricIndex;
+        CHIP_ERROR timerErr          = mTimerDelegate.StartTimer(&fabric->lifetime, RemainingUntil(deadline, now));
         if (timerErr != CHIP_NO_ERROR)
         {
             // Without a lifetime timer the hardware scan would run unbounded, so reject.
             // If this call is what started the radio and no fabric is registered to keep
             // it running, undo that too.
             ChipLogError(AppServer, "BgScan: lifetime StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-            delete ctx;
-            if (mFabrics.empty())
+            fabric->lifetime.armed = false;
+            if (!AnyFabricInUse())
             {
                 OnBecameEmpty();
             }
             return Status::Failure;
         }
+        fabric->lifetime.armed = true;
+    }
+    else if (hadTimer)
+    {
+        CancelLifetime(*fabric);
     }
 
     // From here nothing can fail: the hardware scan is running and the fabric's new
     // timer is armed, so the table is safe to modify.
     //
     // Each node on a fabric keeps its own request and the fabric scans the union of
-    // them, so this adds a request or replaces only this node's previous one. The
-    // fabric's single timer is swapped for the one armed above, which covers the
-    // latest deadline across all of its requests.
-    FabricState & state = mFabrics[fabricIndex];
-    CancelLifetime(state);
-    state.requests[nodeId] = incoming;
-    state.lifetimeCtx      = ctx;
+    // them, so this adds a request or replaces only this node's previous one.
+    fabric->inUse       = true;
+    fabric->fabricIndex = fabricIndex;
+    RequestSlot * slot  = fabric->Find(nodeId);
+    if (slot == nullptr)
+    {
+        slot = fabric->FindFree();
+        VerifyOrDie(slot != nullptr); // capacity was checked above
+    }
+    slot->inUse   = true;
+    slot->nodeId  = nodeId;
+    slot->request = incoming;
 
     return Status::Success;
 }
@@ -228,25 +331,24 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
 Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                               BitMask<WiFiBandBitmap> wiFiBands)
 {
-    auto fabricIt = mFabrics.find(fabricIndex);
-    if (fabricIt == mFabrics.end())
+    FabricState * fabric = FindFabric(fabricIndex);
+    if (fabric == nullptr)
     {
         return Status::NotFound;
     }
 
     // Spec: if the client's NodeID and FabricID do not match those recorded when the
     // scan was started, take no action and reject with NOT_FOUND.
-    FabricState & state = fabricIt->second;
-    auto reqIt          = state.requests.find(nodeId);
-    if (reqIt == state.requests.end())
+    RequestSlot * slot = fabric->Find(nodeId);
+    if (slot == nullptr)
     {
         return Status::NotFound;
     }
 
     const uint8_t reqTransportBits = transport.Raw();
     const uint16_t reqBandBits     = wiFiBands.Raw();
-    const uint8_t ownTransportBits = reqIt->second.transport.Raw();
-    const uint16_t ownBandBits     = reqIt->second.wiFiBands.Raw();
+    const uint8_t ownTransportBits = slot->request.transport.Raw();
+    const uint16_t ownBandBits     = slot->request.wiFiBands.Raw();
 
     // A transport bitmap of zero means "stop only the given bands" (spec); otherwise
     // stop the intersection of the requested and this node's own transports/bands.
@@ -263,33 +365,33 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
     const uint16_t remainBands    = static_cast<uint16_t>(ownBandBits & ~stopBandBits);
     // A request holds one transport bit (see Start), so the first term decides whenever
     // the stop names this transport; remainBands only fires on a band-only stop that
-    // clears the last band.
-    if (remainTransport == 0 || remainBands == 0)
+    // clears the last band. A request with no bands at all is not constrained by them.
+    if (remainTransport == 0 || (ownBandBits != 0 && remainBands == 0))
     {
-        state.requests.erase(reqIt);
+        slot->inUse = false;
     }
     else
     {
-        reqIt->second.transport = BitMask<CapabilitiesBitmap>(remainTransport);
-        reqIt->second.wiFiBands = BitMask<WiFiBandBitmap>(remainBands);
+        slot->request.transport = BitMask<CapabilitiesBitmap>(remainTransport);
+        slot->request.wiFiBands = BitMask<WiFiBandBitmap>(remainBands);
     }
 
     // Dropping a request can shorten the fabric back to a surviving request's deadline,
     // so the timer is recomputed rather than left where the removed request put it.
-    if (state.requests.empty())
+    if (fabric->RequestCount() == 0)
     {
-        CancelLifetime(state);
-        mFabrics.erase(fabricIt);
+        CancelLifetime(*fabric);
+        fabric->inUse = false;
     }
     else
     {
-        RecomputeFabricLifetime(fabricIndex, state);
+        RecomputeFabricLifetime(fabricIndex, *fabric);
     }
 
     // Other requests — on this fabric or another — may still want the radio, so it is
     // only torn down once nothing is left. Short of that, results for bands nobody
     // scans any more are still dropped.
-    if (mFabrics.empty())
+    if (!AnyFabricInUse())
     {
         OnBecameEmpty();
     }
@@ -301,9 +403,41 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
     return Status::Success;
 }
 
+void CommissioningProxyBgScanRegistry::RemoveFabric(FabricIndex fabricIndex)
+{
+    FabricState * fabric = FindFabric(fabricIndex);
+    if (fabric == nullptr)
+    {
+        return;
+    }
+
+    uint16_t removedBands = 0;
+    for (auto & slot : fabric->requests)
+    {
+        if (slot.inUse)
+        {
+            removedBands = static_cast<uint16_t>(removedBands | slot.request.wiFiBands.Raw());
+            slot.inUse   = false;
+        }
+    }
+    CancelLifetime(*fabric);
+    fabric->inUse = false;
+
+    ChipLogProgress(AppServer, "BgScan: dropped background scans for removed fabricIndex=%u", fabricIndex);
+
+    if (!AnyFabricInUse())
+    {
+        OnBecameEmpty();
+    }
+    else
+    {
+        ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap>(removedBands));
+    }
+}
+
 void CommissioningProxyBgScanRegistry::Pause()
 {
-    if (!mFabrics.empty() && !mPaused)
+    if (AnyFabricInUse() && !mPaused)
     {
         mHardware.StopHardwareScan();
         mPaused = true;
@@ -313,7 +447,7 @@ void CommissioningProxyBgScanRegistry::Pause()
 
 void CommissioningProxyBgScanRegistry::ResumeIfNeeded()
 {
-    if (!mPaused || mFabrics.empty())
+    if (!mPaused || !AnyFabricInUse())
     {
         return;
     }
@@ -335,12 +469,16 @@ void CommissioningProxyBgScanRegistry::ResumeIfNeeded()
 
 void CommissioningProxyBgScanRegistry::Shutdown()
 {
-    for (auto & [key, rec] : mFabrics)
+    const bool hadFabrics = AnyFabricInUse();
+    for (auto & fabric : mFabrics)
     {
-        CancelLifetime(rec);
+        CancelLifetime(fabric);
+        for (auto & slot : fabric.requests)
+        {
+            slot.inUse = false;
+        }
+        fabric.inUse = false;
     }
-    const bool hadFabrics = !mFabrics.empty();
-    mFabrics.clear();
     if (hadFabrics && !mPaused)
     {
         mHardware.StopHardwareScan();
@@ -350,32 +488,33 @@ void CommissioningProxyBgScanRegistry::Shutdown()
 
 void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(FabricIndex fabricIndex)
 {
-    auto it = mFabrics.find(fabricIndex);
-    if (it == mFabrics.end())
+    FabricState * fabric = FindFabric(fabricIndex);
+    if (fabric == nullptr)
     {
         return;
     }
+
     // The fabric's timer sits at the latest deadline of all its requests, so when it
-    // fires every one of them has expired and the whole fabric goes. The timer that
-    // fired owns the ctx and has already been consumed, so just free it here (do not
-    // CancelTimer for the one that just fired).
-    if (it->second.lifetimeCtx != nullptr)
-    {
-        delete it->second.lifetimeCtx;
-        it->second.lifetimeCtx = nullptr;
-    }
+    // fires every one of them has expired and the whole fabric goes. The timer has
+    // already been consumed, so just mark it disarmed (do not cancel the one that fired).
+    fabric->lifetime.armed = false;
+
     // Spec: when the fabric's Timeout elapses its cached results are cleared — but only
     // for bands no surviving fabric still scans.
     uint16_t expiringBands = 0;
-    for (const auto & [nodeId, req] : it->second.requests)
+    for (auto & slot : fabric->requests)
     {
-        expiringBands = static_cast<uint16_t>(expiringBands | req.wiFiBands.Raw());
+        if (slot.inUse)
+        {
+            expiringBands = static_cast<uint16_t>(expiringBands | slot.request.wiFiBands.Raw());
+            slot.inUse    = false;
+        }
     }
-    mFabrics.erase(it);
+    fabric->inUse = false;
 
     ChipLogProgress(AppServer, "BgScan: lifetime expired for fabricIndex=%u", fabricIndex);
 
-    if (mFabrics.empty())
+    if (!AnyFabricInUse())
     {
         OnBecameEmpty();
     }

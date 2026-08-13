@@ -21,6 +21,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <clusters/CommissioningProxy/Enums.h>
 #include <clusters/CommissioningProxy/Structs.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
@@ -28,8 +29,6 @@
 #include <system/SystemClock.h>
 
 #include <cstdint>
-#include <map>
-#include <vector>
 
 namespace chip {
 namespace app {
@@ -113,20 +112,30 @@ private:
         uint16_t discriminator;
         uint16_t vid;
         uint16_t pid;
-        bool operator<(const Key & o) const;
+        bool operator==(const Key & o) const;
     };
 
+    // ScanResultStruct constrains Address to 100 bytes and ExtendedData to 128, so both
+    // are held inline rather than heap-allocated per entry.
+    static constexpr size_t kMaxAddressBytes      = 100;
+    static constexpr size_t kMaxExtendedDataBytes = 128;
+
     // Self-owned copy of a ScanResultStruct so its ByteSpans survive in the cache.
+    // `inUse` false marks a free slot; the table is small (MaxCachedResults).
     struct Entry
     {
+        bool inUse      = false;
+        Key key         = {};
         bool hasAddress = false;
-        std::vector<uint8_t> address;
+        uint8_t address[kMaxAddressBytes];
+        uint8_t addressLen = 0;
         BitMask<CapabilitiesBitmap> transport{};
         uint16_t discriminator = 0;
         VendorId vendorID      = static_cast<VendorId>(0);
         uint16_t productID     = 0;
         bool hasExtendedData   = false;
-        std::vector<uint8_t> extendedData;
+        uint8_t extendedData[kMaxExtendedDataBytes];
+        uint8_t extendedDataLen = 0;
         Optional<BitMask<WiFiBandBitmap>> wiFiBand;
         System::Clock::Timestamp expiresAt{};
     };
@@ -136,9 +145,11 @@ private:
     void OnSweep();
     void ArmSweepIfNeeded();
 
+    Entry * FindEntry(const Key & key);
+
     ScanCacheObserver & mCluster;
     TimerDelegate & mTimerDelegate;
-    std::map<Key, Entry> mEntries;
+    Entry mEntries[CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS];
     bool mSweepArmed = false;
 };
 

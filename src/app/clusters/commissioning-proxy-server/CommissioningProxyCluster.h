@@ -29,6 +29,8 @@
 #include <clusters/CommissioningProxy/Enums.h>
 #include <clusters/CommissioningProxy/Events.h>
 #include <clusters/CommissioningProxy/Structs.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/Optional.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -37,7 +39,7 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-class CommissioningProxyCluster : public DefaultServerCluster, public ScanCacheObserver
+class CommissioningProxyCluster : public DefaultServerCluster, public ScanCacheObserver, public FabricTable::Delegate
 {
 private:
     using OptionalAttributesSet =
@@ -57,17 +59,19 @@ public:
     // the cluster. There is no application delegate: all transport actions go through
     // the registered CommissioningProxyTransport drivers, and all reportable/derived
     // attribute state is owned by the cluster and its subsystems.
+    // MaxSessions and MaxCachedResults are Fixed-quality attributes, so they are build
+    // -time device characteristics rather than per-instance config: they come from
+    // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS / _MAX_CACHED_RESULTS, which also
+    // size the storage behind them.
     struct Config
     {
         BitMask<CommissioningProxy::Feature> featureFlags;
-        uint8_t maxSessions;
-        uint8_t maxCachedResults;
         BitMask<CommissioningProxy::WiFiBandBitmap> supportedWiFiBands;
 
-        Config(BitMask<CommissioningProxy::Feature> aFeatures, uint8_t aMaxSessions = 1, uint8_t aMaxCachedResults = 10,
+        Config(BitMask<CommissioningProxy::Feature> aFeatures,
                BitMask<CommissioningProxy::WiFiBandBitmap> aSupportedWiFiBands = {}) :
             featureFlags(aFeatures),
-            maxSessions(aMaxSessions), maxCachedResults(aMaxCachedResults), supportedWiFiBands(aSupportedWiFiBands)
+            supportedWiFiBands(aSupportedWiFiBands)
         {}
     };
 
@@ -79,10 +83,14 @@ public:
     // @p timerDelegate supplies the response-timeout and scan-watchdog timers. Apps
     // normally pass a chip::app::DefaultTimerDelegate (see CodegenIntegration.cpp);
     // tests substitute their own to drive expiry without the event loop.
-    CommissioningProxyCluster(EndpointId endpointId, const Config & config, TimerDelegate & timerDelegate) :
-        DefaultServerCluster({ endpointId, CommissioningProxy::Id }), mFeatureFlags(config.featureFlags),
-        mMaxSessions(config.maxSessions), mMaxCachedResults(config.maxCachedResults),
-        mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
+    //
+    // @p fabricTable is watched so a removed fabric's sessions and background scans go
+    // with it. May be nullptr where no FabricTable exists (unit tests), in which case
+    // OnFabricRemoved must be driven directly.
+    CommissioningProxyCluster(EndpointId endpointId, const Config & config, TimerDelegate & timerDelegate,
+                              FabricTable * fabricTable = nullptr) :
+        DefaultServerCluster({ endpointId, CommissioningProxy::Id }),
+        mFeatureFlags(config.featureFlags), mSupportedWiFiBands(config.supportedWiFiBands), mEnabledOptionalAttributes([&]() {
             OptionalAttributesSet attrs;
             attrs.Set<CommissioningProxy::Attributes::MaxCachedResults::Id>(
                 config.featureFlags.Has(CommissioningProxy::Feature::kBackgroundScan));
@@ -96,7 +104,7 @@ public:
                 config.featureFlags.Has(CommissioningProxy::Feature::kWiFiNetworkInterface));
             return attrs;
         }()),
-        mSessions(timerDelegate), mScanCache(*this, timerDelegate), mScanAggregator(timerDelegate)
+        mSessions(timerDelegate), mScanCache(*this, timerDelegate), mScanAggregator(timerDelegate), mFabricTable(fabricTable)
     {
         mMainCommissioningProxyState = kState_CPDisconnected;
     }
@@ -112,6 +120,10 @@ public:
     // that was passed to InvokeCommand() goes out of scope.
     void Shutdown(ClusterShutdownType type) override
     {
+        if (mFabricTable != nullptr)
+        {
+            mFabricTable->RemoveFabricDelegate(this);
+        }
         mScanCache.Shutdown();
         mScanAggregator.Shutdown();
         mSessions.Shutdown();
@@ -141,6 +153,12 @@ public:
     const BitFlags<CommissioningProxy::Feature> & Features() const { return mFeatureFlags; }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    /**
+     * @brief Tear down everything a removed fabric owned: any in-flight connect, its
+     *        proxy sessions, and its background-scan requests on every transport.
+     */
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -239,8 +257,8 @@ private:
     Protocols::InteractionModel::Status CancelPendingConnect(FabricIndex fabricIndex);
 
     const BitFlags<CommissioningProxy::Feature> mFeatureFlags;
-    const uint8_t mMaxSessions;
-    const uint8_t mMaxCachedResults;
+    static constexpr uint8_t mMaxSessions      = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS;
+    static constexpr uint8_t mMaxCachedResults = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
     BitMask<CommissioningProxy::WiFiBandBitmap> mSupportedWiFiBands;
     const OptionalAttributesSet mEnabledOptionalAttributes;
     State mMainCommissioningProxyState;
@@ -253,6 +271,8 @@ private:
     CommissioningProxySessionManager mSessions;
     CommissioningProxyScanCache mScanCache;
     CommissioningProxyScanAggregator mScanAggregator;
+
+    FabricTable * mFabricTable;
 
     // Registered platform transport drivers (BLE, Wi-Fi PAF, ...), at most one per
     // transport bit. Owned by the application, not the cluster.

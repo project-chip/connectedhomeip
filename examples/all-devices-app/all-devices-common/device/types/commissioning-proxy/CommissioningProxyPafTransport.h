@@ -56,6 +56,7 @@ public:
                                                     NodeId nodeId) override;
     Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
                                                    FabricIndex fabricIndex, NodeId nodeId) override;
+    void OnFabricRemoved(FabricIndex fabricIndex) override;
     void OnAllSessionsClosed() override;
     bool IsConnectPending() const override;
     void Shutdown() override;
