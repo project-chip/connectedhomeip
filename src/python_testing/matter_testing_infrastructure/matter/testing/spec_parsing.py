@@ -26,7 +26,7 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
 
@@ -939,18 +939,40 @@ class ClusterParser:
         return features
 
     def parse_attribute_constraints(self, element: ElementTree.Element) -> Constraints | None:
-        """Parse constraint information from an attribute element.
+        """Parse constraint information from an attribute or command field element.
+
+        An element may carry several sibling <constraint> children, each holding one
+        alternative the value may satisfy (e.g. AudioStreamAllocate.BitDepth allows 8,
+        16, 24 or 32, one <constraint><allowed> per value). All of them are parsed and
+        folded into a single Constraints object so that no alternative is dropped.
 
         Args:
-            element: The attribute XML element
+            element: The attribute or command field XML element
 
         Returns:
             Constraints object, or None if no constraints are defined
         """
-        # Find the constraint element
-        constraint_elem = element.find('./constraint')
-        if constraint_elem is None:
+        constraint_elems = element.findall('./constraint')
+        if not constraint_elems:
             return None
+
+        merged = self._parse_single_constraint(constraint_elems[0])
+        for constraint_elem in constraint_elems[1:]:
+            additional = self._parse_single_constraint(constraint_elem)
+            if additional.allowed is not None:
+                merged.allowed = (merged.allowed or []) + additional.allowed
+            # Bounds are not combined: a later <constraint> only supplies bounds the
+            # earlier ones left unset, so a single-constraint element parses exactly
+            # as it did before.
+            for constraint_field in fields(Constraints):
+                if constraint_field.name == 'allowed':
+                    continue
+                if getattr(merged, constraint_field.name) is None:
+                    setattr(merged, constraint_field.name, getattr(additional, constraint_field.name))
+        return merged
+
+    def _parse_single_constraint(self, constraint_elem: ElementTree.Element) -> Constraints:
+        """Parse one <constraint> element into a Constraints object."""
 
         # Helper to parse constraint reference from attribute value or element
         def parse_reference(elem: ElementTree.Element, value_str: str | None = None) -> ConstraintReference | None:
