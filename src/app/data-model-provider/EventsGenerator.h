@@ -49,10 +49,7 @@ public:
 
     SimpleEventPayloadWriter(const void * aData, EncodeFn aEncodeFn) : mEventData(aData), mEncodeFn(aEncodeFn) {}
 
-    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
-    {
-        return mEncodeFn(mEventData, aWriter);
-    }
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override { return mEncodeFn(mEventData, aWriter); }
 
 private:
     const void * mEventData;

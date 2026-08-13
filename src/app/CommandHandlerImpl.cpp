@@ -205,8 +205,7 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
 {
     // Return early when response should not be sent out.
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-    return TryAddingResponse(
-        [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
+    return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
 }
 
 void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,

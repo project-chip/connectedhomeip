@@ -211,10 +211,7 @@ public:
         const void * mData;
         EncodeFn mEncodeFn;
 
-        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const
-        {
-            return mEncodeFn(mData, writer, tag);
-        }
+        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const { return mEncodeFn(mData, writer, tag); }
     };
 
     /**
