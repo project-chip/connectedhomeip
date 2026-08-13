@@ -208,10 +208,7 @@ public:
             {
                 return mPayload.EncodeTo(writer, tag);
             }
-            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return CHIP_ERROR_INCORRECT_STATE; }
         };
     };
 
