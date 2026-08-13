@@ -16,6 +16,7 @@
 
 #include "ThermostatClusterSuggestions.h"
 #include "ThermostatCluster.h"
+#include "ThermostatSuggestionStructWithOwnedMembers.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -26,6 +27,7 @@
 #include <system/SystemClock.h>
 
 using namespace chip::app::Clusters::Globals::Structs;
+using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::Protocols::InteractionModel;
@@ -41,7 +43,7 @@ CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatS
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    CHIP_ERROR err                                = chip::System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     ReturnErrorOnFailure(err);
 
     size_t suggestionCount = delegate->GetNumberOfThermostatSuggestions();
@@ -190,7 +192,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
 
     // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
+    if (chip::System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
     {
         return Status::InvalidInState;
     }

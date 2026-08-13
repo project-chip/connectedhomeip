@@ -46,7 +46,7 @@ static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
 
 // For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
 // kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
-static constexpr uint8_t kMaxNumberOfPresetsSupported  = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
 
 static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
