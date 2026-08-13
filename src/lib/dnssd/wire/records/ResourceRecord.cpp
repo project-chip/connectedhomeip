@@ -17,8 +17,8 @@
 
 #include "ResourceRecord.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter & out) const
 {
@@ -70,5 +70,5 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
     return out.Fit();
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

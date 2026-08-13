@@ -4,22 +4,24 @@
  *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
- *    Licensed under the Apache License,
- * Version 2.0 (the "License");
+ *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
- *    You may obtain a copy
- * of the License at
+ *    You may obtain a copy of the License at
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to
- * in writing, software
+ *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
- *
- * limitations under the License.
+ *    limitations under the License.
+ */
+/**
+ ******************************************************************************
+ * @file    app_conf.h
+ * @author  MCD Application Team
+ * @brief   Application configuration file for STM32WPAN Middleware.
+ ******************************************************************************
  */
 /* USER CODE END Header */
 
@@ -40,15 +42,15 @@
 /******************************************************************************
  * Application Config
  ******************************************************************************/
-/**< generic parameters ******************************************************/
 
 #define APP_NAME "Lighting-app"
 /* Version */
 #define X_CUBE_MATTER_VERSION "v1.6.0"
-#define PRODUCT_NAME "Dimmable Light"
+#define PRODUCT_NAME "Dimmable Light OTA"
 #define VENDOR_NAME "STMicroelectronics"
-#define MATTER_SDK_VERSION "Master"
+#define MATTER_SDK_VERSION "1.5.0"
 
+/**< generic parameters ******************************************************/
 /* HIGHWATERMARK */
 #define HIGHWATERMARK 1
 
@@ -536,7 +538,7 @@ typedef enum
 
 #define CFG_LED_SUPPORTED (1)
 #define CFG_JOYSTICK_SUPPORTED (1)
-#define CFG_JOYSTICK_USE_TYPE (JOYSTICK_USE_AS_BUTTON_WITH_TIME)
+#define CFG_JOYSTICK_USE_TYPE (JOYSTICK_USE_AS_MATTER)
 #define CFG_JOYSTICK_MODE (JOY_MODE_POLLING)
 #define CFG_LCD_SUPPORTED (1)
 
@@ -619,10 +621,28 @@ typedef enum
 #define CONFIG_STM32_FACTORY_DATA_ENABLE (0)
 
 /******************************************************************************
+ * Matter Remote action
+ ******************************************************************************/
+#define STM32_REMOTE_ACTION_FOR_MATTER (0)
+
+/******************************************************************************
  * OTA support
  ******************************************************************************/
-#define OTA_SUPPORT (0)
-#define OTA_EXTERNAL_FLASH_ENABLE (0)
+#define OTA_SUPPORT (1)
+#define OTA_EXTERNAL_FLASH_ENABLE (1)
+
+/******************************************************************************
+ * TFM support
+ ******************************************************************************/
+#define USE_TFM_PSA                                                                                                                \
+    (0) // this flag should be in a .h file, ideally linked to TFM_COMPATIBILITY flag defined in flash_layout.h (OEMiROT_Boot
+        // project)
+        // but unfortunately, this flag is not exported to appli_flash_layout.h yet.
+
+/******************************************************************************
+ * ECDSA ITS support
+ ******************************************************************************/
+#define CONFIG_STM32_DAC_PRIVATE_KEY_PROVISIONING (0) // to ease tests, this key must be set by another app in factory
 
 /* USER CODE END Defines_2 */
 
