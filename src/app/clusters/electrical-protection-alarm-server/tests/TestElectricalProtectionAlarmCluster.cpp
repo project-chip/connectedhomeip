@@ -80,8 +80,6 @@ struct TestElectricalProtectionAlarmCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-} // namespace
-
 TEST_F(TestElectricalProtectionAlarmCluster, AttributeList_AllFeatures)
 {
     ElectricalProtectionAlarmCluster cluster(kEndpoint, AllFeaturesConfig());
@@ -214,3 +212,35 @@ TEST_F(TestElectricalProtectionAlarmCluster, DisabledAlarmBitsIgnored)
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+
+TEST_F(TestElectricalProtectionAlarmCluster, StartupStateNormalizedAgainstSupportedAndMask)
+{
+    // A startup state carrying bits the device cannot raise: ArcFault is not supported at all, and
+    // OverVoltage is supported but masked out. Only the supported and unmasked bit may survive.
+    ElectricalProtectionAlarmCluster::StartupConfiguration config;
+    config.featureMap.Set(Feature::kOverVoltage).Set(Feature::kShortCircuit);
+    config.supported.Set(AlarmBitmap::kOverVoltageFault).Set(AlarmBitmap::kShortCircuitFault);
+    config.mask.Set(AlarmBitmap::kShortCircuitFault); // OverVoltage omitted from the mask
+    config.state
+        .Set(AlarmBitmap::kArcFault)           // not supported
+        .Set(AlarmBitmap::kOverVoltageFault)   // supported but masked out
+        .Set(AlarmBitmap::kShortCircuitFault); // supported and unmasked
+
+    TestServerClusterContext context;
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, config);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(cluster.GetState().Has(AlarmBitmap::kArcFault));
+    EXPECT_FALSE(cluster.GetState().Has(AlarmBitmap::kOverVoltageFault));
+    EXPECT_TRUE(cluster.GetState().Has(AlarmBitmap::kShortCircuitFault));
+
+    // The reported attribute must agree with the accessor, since it is what a client sees.
+    ClusterTester tester(cluster);
+    State::TypeInfo::DecodableType state{};
+    ASSERT_TRUE(tester.ReadAttribute(State::Id, state).IsSuccess());
+    EXPECT_EQ(state.Raw(), BitMask<AlarmBitmap>().Set(AlarmBitmap::kShortCircuitFault).Raw());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+} // namespace

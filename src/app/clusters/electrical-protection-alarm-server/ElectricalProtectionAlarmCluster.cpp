@@ -30,7 +30,14 @@ ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId en
     mOverVoltageRating(config.overVoltageRating), mSurgeProtectionRating(config.surgeProtectionRating),
     mShortCircuitRating(config.shortCircuitRating), mResidualCurrentRating(config.residualCurrentRating),
     mArcFaultRating(config.arcFaultRating)
-{}
+{
+    // Hold the same invariant SetState() enforces, that State only ever carries bits which are both
+    // supported and unmasked. Without this an alarm the device cannot raise would read as active
+    // from the first read, and would then appear in the inactive field of the first Notify event
+    // despite never having legitimately been active. Applied in the body rather than the
+    // initialiser list because mSupported is declared after mState.
+    mState.SetRaw(static_cast<uint32_t>(mState.Raw() & mSupported.Raw() & mMask.Raw()));
+}
 
 DataModel::ActionReturnStatus ElectricalProtectionAlarmCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                               AttributeValueEncoder & encoder)
