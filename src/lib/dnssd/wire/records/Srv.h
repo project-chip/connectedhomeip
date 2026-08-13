@@ -19,8 +19,8 @@
 
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class SrvResourceRecord : public ResourceRecord
 {
@@ -52,5 +52,5 @@ private:
     uint16_t mWeight   = 0;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
