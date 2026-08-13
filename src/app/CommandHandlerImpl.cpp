@@ -231,8 +231,10 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
 void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                      const EncodableResponsePayload & aPayload)
 {
-    if (AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload) != CHIP_NO_ERROR)
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(DataManagement, "Adding response failed: %" CHIP_ERROR_FORMAT ". Returning failure instead.", err.Format());
         AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
     }
 }
