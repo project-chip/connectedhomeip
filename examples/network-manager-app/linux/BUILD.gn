@@ -53,7 +53,7 @@ executable("matter-network-manager-app") {
     libs += [
       "ubox",
       "ubus",
-      "blobmsg_json"
+      "blobmsg_json",
     ]
   } else {
     sources += [ "ThreadBRFake.h" ]
