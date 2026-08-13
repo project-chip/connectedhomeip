@@ -27,7 +27,7 @@
 
 namespace chip::app {
 
-class LoggingLaundryWasherControlsDelegate : public Clusters::LaundryWasherControls::Delegate
+class EmulatedLaundryWasherControlsDelegate : public Clusters::LaundryWasherControls::Delegate
 {
 public:
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) override
@@ -75,7 +75,7 @@ public:
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
 
-        modeTags[0].value = kTagValues[modeIndex];
+        modeTags[0] = { .mfgCode = std::nullopt, .value = kTagValues[modeIndex] };
         modeTags.reduce_size(1);
         return CHIP_NO_ERROR;
     }
@@ -112,7 +112,7 @@ private:
     Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    LoggingLaundryWasherControlsDelegate mLaundryWasherControlsDelegate;
+    EmulatedLaundryWasherControlsDelegate mLaundryWasherControlsDelegate;
     LazyRegisteredServerCluster<Clusters::LaundryWasherControlsCluster> mLaundryWasherControlsCluster;
 
     LaundryWasherModeDelegate mLaundryWasherModeDelegate;

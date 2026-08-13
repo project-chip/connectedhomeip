@@ -27,7 +27,7 @@
 
 namespace chip::app {
 
-class LoggingMicrowaveOvenControlIntegrationDelegate : public Clusters::MicrowaveOvenControl::IntegrationDelegate
+class EmulatedMicrowaveOvenControlIntegrationDelegate : public Clusters::MicrowaveOvenControl::IntegrationDelegate
 {
 public:
     uint8_t GetCurrentOperationalState() const override { return 0; }
@@ -43,7 +43,7 @@ public:
     }
 };
 
-class LoggingMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
+class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
 {
 public:
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
@@ -101,7 +101,7 @@ public:
         VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
         VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
 
-        modeTags[0].value = kTagValues[modeIndex];
+        modeTags[0] = { .mfgCode = std::nullopt, .value = kTagValues[modeIndex] };
         modeTags.reduce_size(1);
         return CHIP_NO_ERROR;
     }
@@ -137,8 +137,8 @@ private:
     Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    LoggingMicrowaveOvenControlIntegrationDelegate mControlIntegrationDelegate;
-    LoggingMicrowaveOvenControlDelegate mControlAppDelegate;
+    EmulatedMicrowaveOvenControlIntegrationDelegate mControlIntegrationDelegate;
+    EmulatedMicrowaveOvenControlDelegate mControlAppDelegate;
     LazyRegisteredServerCluster<Clusters::MicrowaveOvenControlCluster> mMicrowaveOvenControlCluster;
 
     MicrowaveOvenModeDelegate mMicrowaveOvenModeDelegate;
