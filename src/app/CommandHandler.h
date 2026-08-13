@@ -344,7 +344,7 @@ public:
      *             correct data structure for building a reply.
      */
     template <typename CommandData>
-    static CHIP_ERROR EncodeTypedCommandPayload(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag)
+    static inline CHIP_ERROR EncodeTypedCommandPayload(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag)
     {
         return DataModel::EncodeResponseCommandPayload(writer, tag, *static_cast<const CommandData *>(data));
     }

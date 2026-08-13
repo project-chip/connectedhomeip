@@ -60,7 +60,7 @@ private:
 };
 
 template <typename T>
-static CHIP_ERROR EncodeTypedEventPayload(const void * data, chip::TLV::TLVWriter & writer)
+inline CHIP_ERROR EncodeTypedEventPayload(const void * data, chip::TLV::TLVWriter & writer)
 {
     return DataModel::Encode(writer, TLV::ContextTag(EventDataIB::Tag::kData), *static_cast<const T *>(data));
 }
