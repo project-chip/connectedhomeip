@@ -64,6 +64,10 @@ CHIP_ERROR DefaultCircuitNodeStorage::Init(AttributePersistenceProvider & attrib
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "PowerTopology: failed to load ElectricalCircuitNodes: %" CHIP_ERROR_FORMAT, err.Format());
+        // Load() appends as it decodes, so a failure part way through leaves a
+        // truncated prefix of a corrupt blob behind. Startup still proceeds, but
+        // report an empty list rather than an arbitrary fraction of the stored one.
+        mCount = 0;
     }
     return CHIP_NO_ERROR;
 }

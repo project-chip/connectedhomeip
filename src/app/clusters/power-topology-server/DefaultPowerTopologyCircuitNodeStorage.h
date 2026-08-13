@@ -37,6 +37,15 @@ namespace PowerTopology {
 /// re-serialised after every mutation. A platform that cannot allocate, or that wants a different
 /// persistence strategy, should implement CircuitNodeStorage directly rather than use this class.
 /// That is the reason the interface exists.
+///
+/// The persisted value is written as a single blob, so its worst case size is bounded by
+/// Capacity(): roughly Capacity() * (kMaxNodeLabelLength + 32) bytes, which at the default
+/// capacity of 50 is about 8 kB. Some platforms cap the size of one stored value well below that
+/// (4 kB and 2 kB are both in use), and a write past the cap fails at runtime rather than at
+/// build time. Such a platform should subclass and lower Capacity() to fit its own limit; roughly
+/// 25 entries fit in 4 kB and 12 in 2 kB. Lowering it is safe at any point, including on an
+/// existing device: Load() stops at Capacity() instead of failing, so a device whose stored list
+/// is longer than a reduced capacity still starts, keeping the leading entries.
 class DefaultCircuitNodeStorage : public CircuitNodeStorage
 {
 public:

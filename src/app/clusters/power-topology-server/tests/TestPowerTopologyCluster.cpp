@@ -913,8 +913,6 @@ TEST_F(TestPowerTopologyCluster, WriteElectricalCircuitNodesResourceExhaustedTes
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-} // namespace
-
 // DefaultCircuitNodeStorage owns the persistence that used to live in the cluster, so it needs its
 // own round-trip coverage: the cluster-level tests above deliberately use a non-persisting storage.
 TEST_F(TestPowerTopologyCluster, DefaultCircuitNodeStoragePersistsAcrossInstances)
@@ -964,3 +962,44 @@ TEST_F(TestPowerTopologyCluster, DefaultCircuitNodeStoragePersistsAcrossInstance
         EXPECT_EQ(storage.Count(), 0u);
     }
 }
+
+// A stored blob that decodes part way and then fails must not leave the decoded prefix visible:
+// Init() still succeeds, since a bad value must not brick startup, but the list reads as empty.
+TEST_F(TestPowerTopologyCluster, DefaultCircuitNodeStorageDiscardsPartiallyDecodedValue)
+{
+    chip::Testing::TestServerClusterContext context;
+    const ConcreteAttributePath path(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    // Two good nodes followed by a third whose label length exceeds the maximum, so decoding
+    // fails only after the first two have already been appended.
+    uint8_t buffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(buffer, sizeof(buffer));
+
+    TLV::TLVType listType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, listType), CHIP_NO_ERROR);
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        TLV::TLVType nodeType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, nodeType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(0), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), static_cast<uint64_t>(0x1000 + i)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint16_t>(2)), CHIP_NO_ERROR);
+
+        // The third entry carries an over-long label, which Load() rejects.
+        const size_t labelLength = (i == 2) ? CircuitNodeStorage::kMaxNodeLabelLength + 1 : 4;
+        std::string label(labelLength, 'x');
+        ASSERT_EQ(writer.PutString(TLV::ContextTag(3), label.c_str(), static_cast<uint32_t>(labelLength)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(nodeType), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(listType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    ASSERT_EQ(context.Get().attributeStorage.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+    DefaultCircuitNodeStorage storage;
+    EXPECT_EQ(storage.Init(context.Get().attributeStorage, kTestEndpointId), CHIP_NO_ERROR);
+    EXPECT_EQ(storage.Count(), 0u);
+}
+
+} // namespace
