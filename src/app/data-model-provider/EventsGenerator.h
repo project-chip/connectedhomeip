@@ -56,6 +56,12 @@ private:
     EncodeFn mEncodeFn;
 };
 
+/**
+ * Type-erased TLV encoding helper for typed event payload structures.
+ *
+ * @note `data` MUST be non-null. Internal construction via GenerateEvent guarantees a valid pointer.
+ *       Omitting redundant runtime null checks avoids per-event-type template Flash code growth.
+ */
 template <typename T>
 inline CHIP_ERROR EncodeTypedEventPayload(const void * data, chip::TLV::TLVWriter & writer)
 {
