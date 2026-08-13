@@ -59,6 +59,26 @@ public:
     bool IsTruncated() const { return (mValue & kTruncationMask) != 0; }
     BitPackedFlags & SetTruncated(bool value) { return value ? SetMask(kTruncationMask) : ClearMask(kTruncationMask); }
 
+    uint8_t GetOpcode() const { return static_cast<uint8_t>((mValue & kOpcodeMask) >> kOpcodeShift); }
+    BitPackedFlags & SetOpcode(uint8_t opcode)
+    {
+        ClearMask(kOpcodeMask);
+        mValue = static_cast<uint16_t>(mValue | ((static_cast<uint16_t>(opcode) & 0x0F) << kOpcodeShift));
+        return *this;
+    }
+
+    uint8_t GetResponseCode() const { return static_cast<uint8_t>(mValue & kReturnCodeMask); }
+    BitPackedFlags & SetResponseCode(uint8_t code)
+    {
+        ClearMask(kReturnCodeMask);
+        mValue = static_cast<uint16_t>(mValue | (static_cast<uint16_t>(code) & kReturnCodeMask));
+        return *this;
+    }
+
+    /// Full 16-bit flags value, including OPCODE and RCODE.
+    /// Prefer this over RawValue() for DNS Update (RFC 2136) and other non-mDNS messages.
+    uint16_t FullValue() const { return mValue; }
+
     /// Validates that the message does not need to be ignored according to
     /// RFC 6762
     // TODO: DNS Update carries an OpCode (5) and often non-zero return code. We will need to change this for ULD/SRP support.
@@ -87,6 +107,7 @@ private:
     static constexpr uint16_t kAuthoritativeMask  = 0x0400;
     static constexpr uint16_t kIsResponseMask     = 0x8000;
     static constexpr uint16_t kOpcodeMask         = 0x7800;
+    static constexpr uint16_t kOpcodeShift        = 11;
     static constexpr uint16_t kTruncationMask     = 0x0200;
     static constexpr uint16_t kReturnCodeMask     = 0x000F;
 };
@@ -146,7 +167,13 @@ public:
     }
 
     HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
+
+    /// Writes mDNS-relevant flag bits only (OPCODE/RCODE cleared via RawValue()).
     HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
+
+    /// Writes the full flags word, including OPCODE and RCODE. Use for DNS Update.
+    HeaderRef & SetAllFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.FullValue()); }
+
     HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
     HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
     HeaderRef & SetAuthorityCount(uint16_t value) { return Set16At(kAuthorityCountOffset, value); }
