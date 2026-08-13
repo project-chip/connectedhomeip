@@ -231,13 +231,15 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
         env->ExceptionClear();
         return jMatterCastingPlayer;
     }
-    // Set the value of the _cppCastingPlayer field in the Java object to the C++ CastingPlayer pointer.
+    // Store a heap-allocated handle containing a weak_ptr so the Java long field never
+    // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
+    auto * handle = new CastingPlayerHandle{ player };
     jfieldID longFieldId = env->GetFieldID(matterCastingPlayerJavaClass, "_cppCastingPlayer", "J");
-    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(player.get()));
+    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(handle));
     return jMatterCastingPlayer;
 }
 
-core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
+matter::casting::memory::Strong<core::CastingPlayer> convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject)
 {
     ChipLogProgress(AppServer, "convertCastingPlayerFromJavaToCpp() called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -254,8 +256,13 @@ core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerOb
     jfieldID _cppCastingPlayerFieldId = env->GetFieldID(castingPlayerClass, "_cppCastingPlayer", "J");
     VerifyOrReturnValue(_cppCastingPlayerFieldId != nullptr, nullptr,
                         ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp _cppCastingPlayerFieldId == nullptr"));
-    jlong _cppCastingPlayerValue = env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId);
-    return reinterpret_cast<core::CastingPlayer *>(_cppCastingPlayerValue);
+    auto * handle = reinterpret_cast<CastingPlayerHandle *>(env->GetLongField(jCastingPlayerObject, _cppCastingPlayerFieldId));
+    VerifyOrReturnValue(handle != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() handle == nullptr"));
+    auto player = handle->player.lock();
+    VerifyOrReturnValue(player != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromJavaToCpp() CastingPlayer no longer exists"));
+    return player;
 }
 
 jobject convertClusterFromCppToJava(matter::casting::memory::Strong<core::BaseCluster> cluster, const char * className)
