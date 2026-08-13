@@ -188,22 +188,26 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::InvalidInState;
     }
 
+    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
     {
         return Status::InvalidInState;
     }
 
+    // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
     if (!mPresets.IsPresetHandlePresentInPresets(commandData.presetHandle))
     {
         return Status::NotFound;
     }
 
+    // If the thermostat suggestions list is full, return RESOURCE_EXHAUSTED.
     if (mDelegate->GetNumberOfThermostatSuggestions() >= mDelegate->GetMaxThermostatSuggestions())
     {
         return Status::ResourceExhausted;
     }
 
+    // If the effective time in UTC is greater than current time in UTC plus 24 hours, return INVALID_COMMAND.
     const uint32_t kSecondsInDay = 24 * 60 * 60;
     if (!commandData.effectiveTime.IsNull() &&
         (commandData.effectiveTime.Value() > currentMatterEpochTimestampInSeconds + kSecondsInDay))
@@ -211,6 +215,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::InvalidCommand;
     }
 
+    // Remove any expired suggestions before adding to the list.
     CHIP_ERROR err = RemoveExpiredSuggestions(mDelegate);
     if (err != CHIP_NO_ERROR)
     {
@@ -247,6 +252,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
 
     mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
 
+    // Re-evaluate the current thermostat suggestion.
     ReEvaluateCurrentSuggestion();
 
     Commands::AddThermostatSuggestionResponse::Type response;
@@ -356,6 +362,7 @@ void ThermostatSuggestions::ReEvaluateCurrentSuggestion()
             return;
         }
 
+        // If the active preset handle changed, notify the attribute changed.
         mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
     }
 }

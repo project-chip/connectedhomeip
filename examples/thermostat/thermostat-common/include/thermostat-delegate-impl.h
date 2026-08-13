@@ -33,13 +33,22 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-static constexpr uint8_t kMaxNumberOfPresetTypes           = 6;
-static constexpr uint8_t kMaxNumberOfScheduleTypes         = 2;
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType     = 1;
-static constexpr uint8_t kMaxNumberOfSchedulesOfEachType   = 1;
-static constexpr uint8_t kMaxNumberOfPresetsSupported      = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
-static constexpr uint8_t kMaxNumberOfSchedulesSupported    = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
+static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
+
 static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
+
+static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
+
+// TODO: #34556 Support multiple presets/schedules of each type.
+// We will support only one preset of each preset/schedule type.
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
+static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
+
+// For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
+// kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
+static constexpr uint8_t kMaxNumberOfPresetsSupported  = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+
+static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
 class ThermostatDelegate : public Delegate,
                            public ThermostatPresets::Delegate,
@@ -128,8 +137,14 @@ private:
     // Occupancy state
     BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };
 
-    // Presets state and private methods
+    /**
+     * @brief Initializes the presets array with some sample presets for testing.
+     */
     void InitializePresets();
+
+    /**
+     * @brief Initializes the schedules types array with example schedule types.
+     */
     void InitializeScheduleTypes();
 
     uint8_t mNumberOfPresets;
@@ -147,7 +162,12 @@ private:
     uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
     Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
 
-    // Suggestions state and private methods
+    /**
+     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
+     * field. If there are no entries or an error occurs, returns the value in the MaxThermostatSuggestions attribute as an
+     * invalid index.
+     *
+     */
     size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
     CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
     static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
@@ -162,8 +182,10 @@ private:
     uint8_t mNextFreeIndexInThermostatSuggestionsList;
     uint8_t mUniqueID;
 
+    // TODO: #39949 - This information should be stored in the cluster instance.
     size_t mIndexOfCurrentSuggestion;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
+
     bool mIsExpirationTimerRunning = false;
 };
 
