@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -149,11 +150,13 @@ public:
         return chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
     }
     void StopHardwareScan() override { chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan(); }
-    void ClearCachedResults() override
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
     {
+        // bands == 0 means the transport itself stopped; otherwise only those bands did,
+        // and only their results go. PAFTP results are the only ones carrying a band.
         if (sHost != nullptr)
         {
-            sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kWiFiPAF);
+            sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kWiFiPAF, bands);
         }
     }
 };
@@ -161,7 +164,8 @@ public:
 // Declared before the registry so it outlives it (the registry's destructor may
 // call back into these hooks).
 static PafBgScanHardware sPafBgScanHardware;
-static CommissioningProxyBgScanRegistry sBgScan(sPafBgScanHardware);
+static chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
+static CommissioningProxyBgScanRegistry sBgScan(sPafBgScanHardware, sBgScanTimerDelegate);
 
 // ------------------------------------------------------------------
 // WiFiPAFLayerDelegate wrapper.
