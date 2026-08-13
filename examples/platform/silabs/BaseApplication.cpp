@@ -174,28 +174,37 @@ BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate(
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
+<<<<<<< HEAD
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+=======
+>>>>>>> efc2cee831 ([Silabs] Remove Wi-Fi ICD high-performance request during commissioning (Auto-merged by platform-bot))
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
+<<<<<<< HEAD
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+=======
+>>>>>>> efc2cee831 ([Silabs] Remove Wi-Fi ICD high-performance request during commissioning (Auto-merged by platform-bot))
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     isComissioningStarted = false;
+<<<<<<< HEAD
 
 #if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+=======
+>>>>>>> efc2cee831 ([Silabs] Remove Wi-Fi ICD high-performance request during commissioning (Auto-merged by platform-bot))
 }
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()

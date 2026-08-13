@@ -72,10 +72,13 @@ CHIP_ERROR WifiSleepManager::HandlePowerEvent(PowerEvent event)
     {
     case PowerEvent::kCommissioningComplete:
         ChipLogProgress(AppServer, "WifiSleepManager: Handling Commissioning Complete Event");
+<<<<<<< HEAD
         mIsCommissioningInProgress = false;
 
         // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
         WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+=======
+>>>>>>> efc2cee831 ([Silabs] Remove Wi-Fi ICD high-performance request during commissioning (Auto-merged by platform-bot))
         break;
 
     case PowerEvent::kConnectivityChange:
@@ -101,13 +104,6 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
     if (mHighPerformanceRequestCounter > 0)
     {
         return ConfigureHighPerformance();
-    }
-
-    if (mIsCommissioningInProgress)
-    {
-        // During commissioning, don't let the device go to sleep
-        // This is needed to interrupt the sleep and retry joining the network
-        return CHIP_NO_ERROR;
     }
 
     if (!mWifiStateProvider->IsWifiProvisioned())
