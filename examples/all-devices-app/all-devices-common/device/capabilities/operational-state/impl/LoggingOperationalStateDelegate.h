@@ -18,13 +18,25 @@
 #pragma once
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <system/SystemLayer.h>
 
 namespace chip::app::Clusters::OperationalState {
 
+/**
+ * @brief Delegate for OperationalState cluster in example/test applications.
+ *
+ * NOTE (Test App Emulation Behavior):
+ * This delegate emulates realistic appliance cycle execution for test applications.
+ * When a Start or Resume command is received, the delegate transitions to the Running
+ * operational state, sets an emulated countdown duration (30 seconds), and starts a system timer.
+ * Upon timer expiration, it automatically reverts the operational state back to Stopped and clears
+ * the countdown duration.
+ */
 class LoggingOperationalStateDelegate : public OperationalStateCluster::Delegate
 {
 public:
     LoggingOperationalStateDelegate() = default;
+    ~LoggingOperationalStateDelegate() override;
 
     // -- Delegate Interface Implementation --
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
@@ -40,6 +52,12 @@ public:
     void SetCluster(OperationalStateCluster * cluster) { mCluster = cluster; }
 
 protected:
+    static constexpr uint32_t kEmulatedOperationDurationSec = 30;
+
+    static void OnOperationTimerComplete(System::Layer * systemLayer, void * appState);
+    void CancelTimer();
+    void StartEmulatedOperationTimer();
+
     OperationalStateCluster * mCluster = nullptr;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };
