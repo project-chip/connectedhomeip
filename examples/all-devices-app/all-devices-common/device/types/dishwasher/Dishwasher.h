@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <functional>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <clusters/DishwasherMode/Enums.h>
@@ -75,10 +74,9 @@ class Dishwasher : public SingleEndpoint
 public:
     struct Config
     {
-        DeviceLayer::DiagnosticDataProvider * diagnosticDataProvider = nullptr;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
-    Dishwasher() : Dishwasher(Config{}) {}
     explicit Dishwasher(const Config & config);
     ~Dishwasher() override = default;
 

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <functional>
 #include <app/clusters/laundry-washer-controls-server/LaundryWasherControlsCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
@@ -101,10 +100,9 @@ class LaundryWasher : public SingleEndpoint
 public:
     struct Config
     {
-        DeviceLayer::DiagnosticDataProvider * diagnosticDataProvider = nullptr;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
-    LaundryWasher() : LaundryWasher(Config{}) {}
     explicit LaundryWasher(const Config & config);
     ~LaundryWasher() override = default;
 
