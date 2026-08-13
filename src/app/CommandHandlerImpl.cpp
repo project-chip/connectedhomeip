@@ -186,6 +186,11 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
         {
             return mPayload.EncodeTo(writer, tag);
         }
+        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+        {
+            DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
+            return mPayload.EncodeTo(fabricWriter, tag);
+        }
     };
     PayloadAdapter adapter(aPayload);
     return TryAddResponseData(aRequestCommandPath, aResponseCommandId, adapter);

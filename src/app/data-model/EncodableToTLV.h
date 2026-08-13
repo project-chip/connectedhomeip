@@ -26,22 +26,21 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-/// Defines an abstract class of something that can be encoded
-/// into a TLV with a given data tag
+/// Defines an abstract class interface for objects that can be encoded
+/// into a TLV with a given data tag.
 class EncodableToTLV
 {
 public:
     virtual ~EncodableToTLV() = default;
 
+    /// Encodes using a FabricAwareTLVWriter. Default implementation delegates to mTLVWriter.
     virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const
     {
-        // By default, just ignore the fabric index.  Implementations that care
-        // about it should override as needed.
         return EncodeTo(writer.mTLVWriter, tag);
     }
-    /// Encodes to a standard TLVWriter. Implementations that only support FabricAwareTLVWriter
-    /// do not need to override this method and inherit the default error return.
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const { return CHIP_ERROR_INCORRECT_STATE; }
+
+    /// Encodes to a standard TLVWriter. Must be overridden by concrete implementations.
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
 };
 
 /// An `EncodableToTLV` that uses `DataModel::Encode` to encode things in one call.
@@ -61,6 +60,7 @@ public:
     EncodableType(const T & value) : mValue(value) {}
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const override { return EncodeTo(writer.mTLVWriter, tag); }
 
 private:
     const T & mValue;

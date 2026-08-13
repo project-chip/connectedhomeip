@@ -232,6 +232,11 @@ public:
             {
                 return mPayload.EncodeTo(writer, tag);
             }
+            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+            {
+                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
+                return mPayload.EncodeTo(fabricWriter, tag);
+            }
         };
         PayloadAdapter adapter(aPayload);
         return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
@@ -267,6 +272,11 @@ public:
             CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
             {
                 return mPayload.EncodeTo(writer, tag);
+            }
+            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+            {
+                DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
+                return mPayload.EncodeTo(fabricWriter, tag);
             }
         };
         PayloadAdapter adapter(aPayload);

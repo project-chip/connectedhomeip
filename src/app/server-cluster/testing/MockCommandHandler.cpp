@@ -74,6 +74,11 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const app::ConcreteCommandPath & 
         {
             return mPayload.EncodeTo(writer, tag);
         }
+        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override
+        {
+            app::DataModel::FabricAwareTLVWriter fabricWriter(writer, kUndefinedFabricIndex);
+            return mPayload.EncodeTo(fabricWriter, tag);
+        }
     };
     PayloadAdapter adapter(aPayload);
     return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
