@@ -21,8 +21,8 @@
 
 #include <stdio.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool QueryData::Parse(const BytesRange & validData, const uint8_t ** start)
 {
@@ -215,5 +215,5 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
     return true;
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
