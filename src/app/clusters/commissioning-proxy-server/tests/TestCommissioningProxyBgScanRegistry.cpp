@@ -613,3 +613,59 @@ TEST(TestCommissioningProxyBgScanRegistry, LastStopClearsWholeTransport)
     EXPECT_EQ(hw.lastClearedBands.Raw(), 0u);
     EXPECT_EQ(hw.stopCount, 1);
 }
+
+// FabricIndex values are reused after a fabric is removed, so a Timeout-0 request —
+// which has no timer and would otherwise never end — must not outlive its fabric.
+TEST(TestCommissioningProxyBgScanRegistry, RemoveFabricDropsItsRequestsAndStopsHardware)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, kNoTimeout), Status::Success);
+
+    reg.RemoveFabric(kFabric1);
+
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1);
+    EXPECT_EQ(hw.clearCount, 1);
+    EXPECT_EQ(hw.lastClearedBands.Raw(), 0u); // whole transport, nothing left scanning
+
+    // The reused index starts clean: a stop from the old node finds nothing.
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kNoTransport, k2g4), Status::NotFound);
+}
+
+// Removing one fabric SHALL leave another fabric's scan running, clearing only the
+// bands that nobody covers any more.
+TEST(TestCommissioningProxyBgScanRegistry, RemoveFabricLeavesOtherFabricsScanning)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k5g, kNoTimeout), Status::Success);
+
+    reg.RemoveFabric(kFabric1);
+
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+    EXPECT_EQ(hw.clearCount, 1);
+    EXPECT_EQ(hw.lastClearedBands.Raw(), k2g4.Raw());
+}
+
+// Removing a fabric with no requests is a no-op.
+TEST(TestCommissioningProxyBgScanRegistry, RemoveUnknownFabricIsNoop)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+    reg.RemoveFabric(kFabric2);
+
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+    EXPECT_EQ(hw.clearCount, 0);
+}

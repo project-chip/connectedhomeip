@@ -21,7 +21,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
-#include <limits>
+#include <algorithm>
+#include <cstring>
 
 namespace chip {
 namespace app {
@@ -42,10 +43,8 @@ CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * command
     mExpected    = 0;
     mReported    = 0;
     mScanMaxTime = scanMaxTime;
-    mAddressStore.clear();
-    mExtStore.clear();
-    mResults.clear();
-    mInProgress = true;
+    mResultCount = 0;
+    mInProgress  = true;
 
     CHIP_ERROR err =
         mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
@@ -82,20 +81,17 @@ void CommissioningProxyScanAggregator::EmitCombinedResponse()
     if (app::CommandHandler * cmd = mHandle.Get())
     {
         Commands::ProxyScanResponse::Type response;
-        response.proxyScanResult =
-            DataModel::List<const ScanResultEntry>(Span<const ScanResultEntry>(mResults.data(), mResults.size()));
-        response.numberOfResults = static_cast<uint8_t>(mResults.size());
+        response.proxyScanResult = DataModel::List<const ScanResultEntry>(Span<const ScanResultEntry>(mResults, mResultCount));
+        response.numberOfResults = mResultCount;
         cmd->AddResponse(mPath, response);
-        ChipLogProgress(Zcl, "CommissioningProxy: combined scan complete, %u result(s)", static_cast<unsigned>(mResults.size()));
+        ChipLogProgress(Zcl, "CommissioningProxy: combined scan complete, %u result(s)", mResultCount);
     }
 
     mHandle.Release();
-    mAddressStore.clear();
-    mExtStore.clear();
-    mResults.clear();
-    mExpected   = 0;
-    mReported   = 0;
-    mInProgress = false;
+    mResultCount = 0;
+    mExpected    = 0;
+    mReported    = 0;
+    mInProgress  = false;
 }
 
 void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> results)
@@ -109,33 +105,35 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
 
     for (const auto & e : results)
     {
-        // ProxyScanResponse carries the count as a uint8, so the list cannot exceed
-        // 255 entries without NumberOfResults disagreeing with the encoded list.
-        if (mResults.size() >= std::numeric_limits<uint8_t>::max())
+        // Spec: ProxyScanResult is "max MaxCachedResults" entries.
+        if (mResultCount >= kMaxResults)
         {
             ChipLogError(Zcl, "CommissioningProxy: scan result list full; dropping remaining results");
             break;
         }
 
-        // Copy scalar fields, then rebind the address / extendedData spans to point
-        // into the aggregator's stable storage so they survive until AddResponse.
-        // std::deque keeps element addresses stable across growth.
-        ScanResultEntry r = e;
+        // Copy scalar fields, then rebind the address / extendedData spans to point at
+        // this aggregator's own storage so they survive until AddResponse.
+        ResultStore & store = mStore[mResultCount];
+        ScanResultEntry r   = e;
         if (!e.address.IsNull())
         {
-            auto span = e.address.Value();
-            mAddressStore.emplace_back(span.data(), span.data() + span.size());
-            auto & addr = mAddressStore.back();
-            r.address.SetNonNull(ByteSpan(addr.data(), addr.size()));
+            auto span            = e.address.Value();
+            const size_t copyLen = std::min(span.size(), kMaxAddressBytes);
+            memcpy(store.address, span.data(), copyLen);
+            store.addressLen = static_cast<uint8_t>(copyLen);
+            r.address.SetNonNull(ByteSpan(store.address, store.addressLen));
         }
         if (!e.extendedData.IsNull())
         {
-            auto span = e.extendedData.Value();
-            mExtStore.emplace_back(span.data(), span.data() + span.size());
-            auto & ext = mExtStore.back();
-            r.extendedData.SetNonNull(ByteSpan(ext.data(), ext.size()));
+            auto span            = e.extendedData.Value();
+            const size_t copyLen = std::min(span.size(), kMaxExtendedDataBytes);
+            memcpy(store.extendedData, span.data(), copyLen);
+            store.extendedDataLen = static_cast<uint8_t>(copyLen);
+            r.extendedData.SetNonNull(ByteSpan(store.extendedData, store.extendedDataLen));
         }
-        mResults.push_back(r);
+        mResults[mResultCount] = r;
+        mResultCount++;
     }
 
     // Always count the report. A transport that reports synchronously from within
@@ -166,12 +164,10 @@ void CommissioningProxyScanAggregator::Abort()
     }
     mTimerDelegate.CancelTimer(this);
     mHandle.Release();
-    mAddressStore.clear();
-    mExtStore.clear();
-    mResults.clear();
-    mExpected   = 0;
-    mReported   = 0;
-    mInProgress = false;
+    mResultCount = 0;
+    mExpected    = 0;
+    mReported    = 0;
+    mInProgress  = false;
 }
 
 } // namespace CommissioningProxy

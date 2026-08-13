@@ -21,13 +21,12 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <clusters/CommissioningProxy/Structs.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <cstdint>
-#include <deque>
-#include <vector>
 
 namespace chip {
 namespace app {
@@ -106,6 +105,21 @@ public:
 private:
     void EmitCombinedResponse();
 
+    // Spec: ProxyScanResult is constrained to "max MaxCachedResults", so the response
+    // is bounded by the same build-time limit as the cache, with Address/ExtendedData
+    // held inline at their spec maxima.
+    static constexpr size_t kMaxResults           = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+    static constexpr size_t kMaxAddressBytes      = 100;
+    static constexpr size_t kMaxExtendedDataBytes = 128;
+
+    struct ResultStore
+    {
+        uint8_t address[kMaxAddressBytes];
+        uint8_t addressLen = 0;
+        uint8_t extendedData[kMaxExtendedDataBytes];
+        uint8_t extendedDataLen = 0;
+    };
+
     TimerDelegate & mTimerDelegate;
     app::CommandHandler::Handle mHandle;
     app::ConcreteCommandPath mPath;
@@ -113,9 +127,9 @@ private:
     uint8_t mExpected    = 0;
     uint8_t mReported    = 0;
     uint8_t mScanMaxTime = 0;
-    std::deque<std::vector<uint8_t>> mAddressStore; // keeps ByteSpan backing alive until emit
-    std::deque<std::vector<uint8_t>> mExtStore;
-    std::vector<ScanResultEntry> mResults;
+    ResultStore mStore[kMaxResults]; // keeps ByteSpan backing alive until emit
+    ScanResultEntry mResults[kMaxResults];
+    uint8_t mResultCount = 0;
 };
 
 } // namespace CommissioningProxy

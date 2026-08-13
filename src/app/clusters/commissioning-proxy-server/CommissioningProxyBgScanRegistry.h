@@ -19,6 +19,7 @@
 #pragma once
 
 #include <clusters/CommissioningProxy/Enums.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
@@ -26,14 +27,6 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <cstdint>
-#include <map>
-
-/// Concurrent ProxyBackGroundScanStartRequests retained per fabric. Each requesting
-/// node gets its own record (the spec identifies a Stop by NodeID + FabricID), so this
-/// bounds what one fabric can occupy.
-#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
-#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
-#endif
 
 namespace chip {
 namespace app {
@@ -142,24 +135,28 @@ public:
      */
     void ResumeIfNeeded();
 
-    bool IsEmpty() const { return mFabrics.empty(); }
+    bool IsEmpty() const { return !AnyFabricInUse(); }
     bool IsPaused() const { return mPaused; }
+
+    /**
+     * Drop every request @p fabricIndex owns, as though it had stopped them all. Used
+     * when the fabric is removed; results for bands nobody scans any more are cleared
+     * and the radio stops once no request is left.
+     */
+    void RemoveFabric(FabricIndex fabricIndex);
 
     /** Cancel every lifetime timer and stop the hardware scan if the registry owns it. */
     void Shutdown();
 
 private:
-    // Heap context handed to the per-fabric lifetime timer so the expiry can find its
-    // registry and fabric without a global. Each is its own TimerContext, so fabrics
-    // with different lifetimes expire independently.
+    // Context for the per-fabric lifetime timer, so the expiry can find its registry
+    // and fabric without a global. Each fabric slot owns one inline, so fabrics with
+    // different lifetimes expire independently with no allocation.
     struct LifetimeCtx : public TimerContext
     {
-        LifetimeCtx(CommissioningProxyBgScanRegistry * aRegistry, FabricIndex aFabricIndex) :
-            registry(aRegistry), fabricIndex(aFabricIndex)
-        {}
-
-        CommissioningProxyBgScanRegistry * registry;
-        FabricIndex fabricIndex;
+        CommissioningProxyBgScanRegistry * registry = nullptr;
+        FabricIndex fabricIndex                     = kUndefinedFabricIndex;
+        bool armed                                  = false;
 
         void TimerFired() override { registry->OnLifetimeExpiry(fabricIndex); }
     };
@@ -173,12 +170,29 @@ private:
         bool hasTimeout = false;            // Timeout == 0 means "until an explicit Stop"
     };
 
+    // One node's request within a fabric. `inUse` false marks a free slot.
+    struct RequestSlot
+    {
+        bool inUse = false;
+        NodeId nodeId;
+        Request request;
+    };
+
     // Every request from one fabric, plus that fabric's single lifetime timer.
     struct FabricState
     {
-        std::map<NodeId, Request> requests;
-        LifetimeCtx * lifetimeCtx = nullptr;
+        bool inUse = false;
+        FabricIndex fabricIndex;
+        RequestSlot requests[CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC];
+        LifetimeCtx lifetime;
+
+        uint8_t RequestCount() const;
+        RequestSlot * Find(NodeId nodeId);
+        RequestSlot * FindFree();
     };
+
+    FabricState * FindFabric(FabricIndex fabricIndex);
+    bool AnyFabricInUse() const;
 
     /// By value on purpose: the caller passes its own LifetimeCtx member, which this
     /// deletes. A reference would dangle for the rest of the body.
@@ -200,7 +214,7 @@ private:
     /// Of @p candidates, drop the cached results for those no request still covers.
     void ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap> candidates);
 
-    std::map<FabricIndex, FabricState> mFabrics;
+    FabricState mFabrics[CHIP_CONFIG_MAX_FABRICS];
     bool mPaused = false;
     HardwareControl & mHardware;
     TimerDelegate & mTimerDelegate;

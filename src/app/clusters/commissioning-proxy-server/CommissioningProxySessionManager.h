@@ -21,14 +21,16 @@
 #include <app/CommandHandler.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <clusters/CommissioningProxy/Enums.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <cstdint>
-#include <map>
 #include <optional>
+#include <utility>
 
 namespace chip {
 namespace app {
@@ -75,11 +77,15 @@ public:
     /// Look up a session, or std::nullopt if unknown.
     std::optional<SessionInfo> Find(uint16_t sessionId) const;
 
+    /// Id of any one session belonging to @p fabricIndex, or std::nullopt. Call
+    /// repeatedly (removing each) to drain a fabric.
+    std::optional<uint16_t> FindAnyOnFabric(FabricIndex fabricIndex) const;
+
     /// Number of established sessions (excludes in-flight connects — the cluster
     /// adds each transport's IsConnectPending() to this for the MaxSessions gate).
-    uint8_t ActiveCount() const { return static_cast<uint8_t>(mSessions.size()); }
+    uint8_t ActiveCount() const;
 
-    bool IsEmpty() const { return mSessions.empty(); }
+    bool IsEmpty() const { return ActiveCount() == 0; }
 
     // --- ProxyMessageRequest routing ----------------------------------------
 
@@ -112,17 +118,45 @@ public:
     void Shutdown();
 
 private:
-    // Each pending request is its own TimerContext, so several sessions can have a
-    // response timeout armed at once. Defined in the .cpp.
-    struct PendingMessage;
+    // One in-flight ProxyMessageRequest per session: keeps the IM exchange open until
+    // the commissionee replies and the transport hands the bytes back. Each record is its
+    // own TimerContext so that concurrent sessions each get their own response timeout.
+    struct PendingMessage : public TimerContext
+    {
+        PendingMessage(CommissioningProxySessionManager * aOwner, app::CommandHandler::Handle && aHandle,
+                       const app::ConcreteCommandPath & aPath, uint16_t aSessionId) :
+            owner(aOwner),
+            handle(std::move(aHandle)), path(aPath), sessionId(aSessionId)
+        {}
+
+        CommissioningProxySessionManager * owner;
+        app::CommandHandler::Handle handle;
+        app::ConcreteCommandPath path;
+        uint16_t sessionId;
+
+        void TimerFired() override { owner->OnResponseTimeout(this); }
+    };
 
     /// Resolve the pending request for @p sessionId with Status::Timeout (called by
     /// PendingMessage::TimerFired).
     void OnResponseTimeout(PendingMessage * pm);
 
+    /// One established session. `inUse` false marks a free slot; the table is small
+    /// (MaxSessions) so a linear scan beats any index.
+    struct SessionSlot
+    {
+        bool inUse = false;
+        uint16_t sessionId;
+        SessionInfo info;
+        PendingMessage * pending = nullptr; // at most one in-flight request per session
+    };
+
+    SessionSlot * FindSlot(uint16_t sessionId);
+    const SessionSlot * FindSlot(uint16_t sessionId) const;
+
     TimerDelegate & mTimerDelegate;
-    std::map<uint16_t, SessionInfo> mSessions;
-    std::map<uint16_t, PendingMessage *> mPending;
+    SessionSlot mSessions[CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS];
+    ObjectPool<PendingMessage, CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS> mPendingPool;
     uint16_t mNextSessionId = 1;
 };
 
