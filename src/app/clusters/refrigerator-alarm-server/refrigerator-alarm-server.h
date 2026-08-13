@@ -17,4 +17,4 @@
 
 #pragma once
 
-#include "CodegenIntegration.h"
+#include <app/clusters/refrigerator-alarm-server/CodegenIntegration.h>

@@ -22,30 +22,25 @@
 #include <app/clusters/refrigerator-alarm-server/RefrigeratorAlarmCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+namespace chip::app::Clusters::RefrigeratorAlarm {
+
+RefrigeratorAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
 class RefrigeratorAlarmServer
 {
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    chip::Protocols::InteractionModel::Status GetMaskValue(chip::EndpointId endpoint,
-                                                           chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    chip::Protocols::InteractionModel::Status
-    GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
-    chip::Protocols::InteractionModel::Status
-    GetSupportedValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
+    Protocols::InteractionModel::Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
+    Protocols::InteractionModel::Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
+    Protocols::InteractionModel::Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
 
-    chip::Protocols::InteractionModel::Status
-    SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    Protocols::InteractionModel::Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
 
-    chip::Protocols::InteractionModel::Status
-    SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+    Protocols::InteractionModel::Status SetStateValue(EndpointId endpoint, BitMask<AlarmMap> newState);
 
 private:
     static RefrigeratorAlarmServer instance;
 };
-
-namespace chip::app::Clusters::RefrigeratorAlarm {
-
-RefrigeratorAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::RefrigeratorAlarm

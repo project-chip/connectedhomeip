@@ -167,8 +167,6 @@ RefrigeratorAlarmCluster * FindClusterOnEndpoint(EndpointId endpointId)
         integrationDelegate));
 }
 
-} // namespace chip::app::Clusters::RefrigeratorAlarm
-
 RefrigeratorAlarmServer RefrigeratorAlarmServer::instance;
 
 RefrigeratorAlarmServer & RefrigeratorAlarmServer::Instance()
@@ -176,9 +174,9 @@ RefrigeratorAlarmServer & RefrigeratorAlarmServer::Instance()
     return instance;
 }
 
-Status RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<RefrigeratorAlarm::AlarmMap> * mask)
+Status RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask)
 {
-    RefrigeratorAlarmCluster * cluster = chip::app::Clusters::RefrigeratorAlarm::FindClusterOnEndpoint(endpoint);
+    RefrigeratorAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
     AlarmBase::AlarmMap value;
@@ -190,9 +188,9 @@ Status RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<Refrig
     return status;
 }
 
-Status RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMask<RefrigeratorAlarm::AlarmMap> * state)
+Status RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)
 {
-    RefrigeratorAlarmCluster * cluster = chip::app::Clusters::RefrigeratorAlarm::FindClusterOnEndpoint(endpoint);
+    RefrigeratorAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
     AlarmBase::AlarmMap value;
@@ -204,9 +202,9 @@ Status RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMask<Refri
     return status;
 }
 
-Status RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<RefrigeratorAlarm::AlarmMap> * supported)
+Status RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
 {
-    RefrigeratorAlarmCluster * cluster = chip::app::Clusters::RefrigeratorAlarm::FindClusterOnEndpoint(endpoint);
+    RefrigeratorAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
 
     AlarmBase::AlarmMap value;
@@ -218,16 +216,18 @@ Status RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<R
     return status;
 }
 
-Status RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<RefrigeratorAlarm::AlarmMap> mask)
+Status RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
 {
-    RefrigeratorAlarmCluster * cluster = chip::app::Clusters::RefrigeratorAlarm::FindClusterOnEndpoint(endpoint);
+    RefrigeratorAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
     return cluster->SetMaskValue(FromAlarmMap(mask));
 }
 
-Status RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<RefrigeratorAlarm::AlarmMap> newState)
+Status RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState)
 {
-    RefrigeratorAlarmCluster * cluster = chip::app::Clusters::RefrigeratorAlarm::FindClusterOnEndpoint(endpoint);
+    RefrigeratorAlarmCluster * cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrReturnError(cluster != nullptr, Status::UnsupportedEndpoint);
     return cluster->SetStateValue(FromAlarmMap(newState));
 }
+
+} // namespace chip::app::Clusters::RefrigeratorAlarm

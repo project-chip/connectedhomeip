@@ -320,14 +320,14 @@ void SetRefrigeratorDoorStatusHandler(Json::Value & jsonValue)
     ChipLogDetail(NotSpecified, "SetRefrigeratorDoorStatusHandler State -> %d.", doorStatus);
     if (!doorStatus)
     {
-        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarm::RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
     }
     else
     {
         ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
-        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
-        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
+        RefrigeratorAlarm::RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarm::RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
     }
 }
 
