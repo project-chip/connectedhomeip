@@ -19,6 +19,7 @@
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/bindings/BindingManager.h>
+#include <lib/support/CodeUtils.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -364,8 +365,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveHue::Id:
@@ -373,8 +374,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveHueCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepHue::Id:
@@ -383,8 +384,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepHueCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stepHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
@@ -392,8 +393,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToSaturationCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveSaturation::Id:
@@ -401,8 +402,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveSaturationCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveSaturationCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepSaturation::Id:
@@ -411,8 +412,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepSaturationCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepSaturationCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stepSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
@@ -421,8 +422,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToHueAndSaturationCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToHueAndSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColor::Id:
@@ -431,8 +432,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToColorCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveColor::Id:
@@ -440,8 +441,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveColorCommand.rateY           = static_cast<uint16_t>(data->args[1]);
         moveColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveColorCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepColor::Id:
@@ -450,8 +451,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         stepColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepColorCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stepColorCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
@@ -459,8 +460,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
         moveToColorTemperatureCommand.optionsMask            = static_cast<OptionsBitmap>(data->args[2]);
         moveToColorTemperatureCommand.optionsOverride        = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveToColorTemperatureCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveToColorTemperatureCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
@@ -469,8 +470,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveToHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         enhancedMoveToHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
@@ -478,8 +479,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveHueCommand.rate            = static_cast<uint16_t>(data->args[1]);
         enhancedMoveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         enhancedMoveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         enhancedMoveHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
@@ -488,8 +489,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedStepHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedStepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedStepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedStepHueCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         enhancedStepHueCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id:
@@ -498,8 +499,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         enhancedMoveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         enhancedMoveToHueAndSaturationCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         enhancedMoveToHueAndSaturationCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
@@ -511,15 +512,15 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[5]);
         colorLoopSetCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[6]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         colorLoopSetCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         colorLoopSetCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StopMoveStep::Id:
         stopMoveStepCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[0]);
         stopMoveStepCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[1]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stopMoveStepCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stopMoveStepCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::MoveColorTemperature::Id:
@@ -529,8 +530,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         moveColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[3]);
         moveColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[4]);
         moveColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[5]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         moveColorTemperatureCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         moveColorTemperatureCommand, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Commands::StepColorTemperature::Id:
@@ -541,8 +542,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const C
         stepColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[4]);
         stepColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[5]);
         stepColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[6]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         stepColorTemperatureCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         stepColorTemperatureCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -581,7 +582,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveHue::Id:
@@ -589,7 +590,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveHueCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepHue::Id:
@@ -598,7 +599,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepHueCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToSaturation::Id:
@@ -606,7 +607,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[1]);
         moveToSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveToSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveSaturation::Id:
@@ -614,7 +615,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveSaturationCommand.rate            = static_cast<uint8_t>(data->args[1]);
         moveSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveSaturationCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepSaturation::Id:
@@ -623,7 +624,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepSaturationCommand.transitionTime  = static_cast<uint8_t>(data->args[2]);
         stepSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepSaturationCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id:
@@ -632,7 +633,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueAndSaturationCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToHueAndSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColor::Id:
@@ -641,7 +642,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         moveToColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         moveToColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveColor::Id:
@@ -649,7 +650,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveColorCommand.rateY           = static_cast<uint16_t>(data->args[1]);
         moveColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         moveColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepColor::Id:
@@ -658,7 +659,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepColorCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         stepColorCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         stepColorCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
@@ -666,7 +667,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveToColorTemperatureCommand.transitionTime         = static_cast<uint16_t>(data->args[1]);
         moveToColorTemperatureCommand.optionsMask            = static_cast<OptionsBitmap>(data->args[2]);
         moveToColorTemperatureCommand.optionsOverride        = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorTemperatureCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorTemperatureCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id:
@@ -675,7 +676,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveToHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveToHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveHue::Id:
@@ -683,7 +684,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveHueCommand.rate            = static_cast<uint16_t>(data->args[1]);
         enhancedMoveHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[2]);
         enhancedMoveHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[3]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedMoveHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedStepHue::Id:
@@ -692,7 +693,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedStepHueCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedStepHueCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedStepHueCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedStepHueCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, enhancedStepHueCommand));
         break;
 
     case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id:
@@ -701,8 +702,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         enhancedMoveToHueAndSaturationCommand.transitionTime  = static_cast<uint16_t>(data->args[2]);
         enhancedMoveToHueAndSaturationCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[3]);
         enhancedMoveToHueAndSaturationCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[4]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
-                                              enhancedMoveToHueAndSaturationCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                              enhancedMoveToHueAndSaturationCommand));
         break;
 
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
@@ -714,13 +715,13 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[5]);
         colorLoopSetCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[6]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, colorLoopSetCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, colorLoopSetCommand));
         break;
 
     case Clusters::ColorControl::Commands::StopMoveStep::Id:
         stopMoveStepCommand.optionsMask     = static_cast<OptionsBitmap>(data->args[0]);
         stopMoveStepCommand.optionsOverride = static_cast<OptionsBitmap>(data->args[1]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopMoveStepCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopMoveStepCommand));
         break;
 
     case Clusters::ColorControl::Commands::MoveColorTemperature::Id:
@@ -730,7 +731,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         moveColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[3]);
         moveColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[4]);
         moveColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[5]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorTemperatureCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveColorTemperatureCommand));
         break;
 
     case Clusters::ColorControl::Commands::StepColorTemperature::Id:
@@ -741,7 +742,7 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clu
         stepColorTemperatureCommand.colorTemperatureMaximumMireds = static_cast<uint16_t>(data->args[4]);
         stepColorTemperatureCommand.optionsMask                   = static_cast<OptionsBitmap>(data->args[5]);
         stepColorTemperatureCommand.optionsOverride               = static_cast<OptionsBitmap>(data->args[6]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorTemperatureCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepColorTemperatureCommand));
         break;
     }
 }
@@ -783,7 +784,7 @@ CHIP_ERROR MoveToHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -802,7 +803,7 @@ CHIP_ERROR MoveHueCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -822,7 +823,7 @@ CHIP_ERROR StepHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -841,7 +842,7 @@ CHIP_ERROR MoveToSaturationCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -860,7 +861,7 @@ CHIP_ERROR MoveSaturationCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -880,7 +881,7 @@ CHIP_ERROR StepSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -900,7 +901,7 @@ CHIP_ERROR MoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -920,7 +921,7 @@ CHIP_ERROR MoveToColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -939,7 +940,7 @@ CHIP_ERROR MoveColorCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -959,7 +960,7 @@ CHIP_ERROR StepColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -978,7 +979,7 @@ CHIP_ERROR MoveToColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -998,7 +999,7 @@ CHIP_ERROR EnhancedMoveToHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1017,7 +1018,7 @@ CHIP_ERROR EnhancedMoveHueCommandHandler(int argc, char ** argv)
     data->args[2]             = atoi(argv[2]);
     data->args[3]             = atoi(argv[3]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1037,7 +1038,7 @@ CHIP_ERROR EnhancedStepHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1057,7 +1058,7 @@ CHIP_ERROR EnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->args[4]             = atoi(argv[4]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1079,7 +1080,7 @@ CHIP_ERROR ColorLoopSetCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->args[6]             = atoi(argv[6]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1096,7 +1097,7 @@ CHIP_ERROR StopMoveStepCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1117,7 +1118,7 @@ CHIP_ERROR MoveColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->args[5]             = atoi(argv[5]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1139,7 +1140,7 @@ CHIP_ERROR StepColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->args[6]             = atoi(argv[6]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1170,7 +1171,7 @@ CHIP_ERROR ColorControlReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1181,7 +1182,7 @@ CHIP_ERROR ColorControlReadCurrentHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1192,7 +1193,7 @@ CHIP_ERROR ColorControlReadCurrentSaturation(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1203,7 +1204,7 @@ CHIP_ERROR ColorControlReadRemainingTime(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1214,7 +1215,7 @@ CHIP_ERROR ColorControlReadCurrentX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1225,7 +1226,7 @@ CHIP_ERROR ColorControlReadCurrentY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1236,7 +1237,7 @@ CHIP_ERROR ColorControlReadDriftCompensation(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1247,7 +1248,7 @@ CHIP_ERROR ColorControlReadCompensationText(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1258,7 +1259,7 @@ CHIP_ERROR ColorControlReadColorTemperature(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1269,7 +1270,7 @@ CHIP_ERROR ColorControlReadColorMode(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1280,7 +1281,7 @@ CHIP_ERROR ColorControlReadOptions(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1291,7 +1292,7 @@ CHIP_ERROR ColorControlReadNumberOfPrimaries(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1302,7 +1303,7 @@ CHIP_ERROR ColorControlReadPrimary1X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1313,7 +1314,7 @@ CHIP_ERROR ColorControlReadPrimary1Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1324,7 +1325,7 @@ CHIP_ERROR ColorControlReadPrimary1Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1335,7 +1336,7 @@ CHIP_ERROR ColorControlReadPrimary2X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1346,7 +1347,7 @@ CHIP_ERROR ColorControlReadPrimary2Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1357,7 +1358,7 @@ CHIP_ERROR ColorControlReadPrimary2Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1368,7 +1369,7 @@ CHIP_ERROR ColorControlReadPrimary3X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1379,7 +1380,7 @@ CHIP_ERROR ColorControlReadPrimary3Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1390,7 +1391,7 @@ CHIP_ERROR ColorControlReadPrimary3Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1401,7 +1402,7 @@ CHIP_ERROR ColorControlReadPrimary4X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1412,7 +1413,7 @@ CHIP_ERROR ColorControlReadPrimary4Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1423,7 +1424,7 @@ CHIP_ERROR ColorControlReadPrimary4Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1434,7 +1435,7 @@ CHIP_ERROR ColorControlReadPrimary5X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1445,7 +1446,7 @@ CHIP_ERROR ColorControlReadPrimary5Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1456,7 +1457,7 @@ CHIP_ERROR ColorControlReadPrimary5Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1467,7 +1468,7 @@ CHIP_ERROR ColorControlReadPrimary6X(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1478,7 +1479,7 @@ CHIP_ERROR ColorControlReadPrimary6Y(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1489,7 +1490,7 @@ CHIP_ERROR ColorControlReadPrimary6Intensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1500,7 +1501,7 @@ CHIP_ERROR ColorControlReadWhitePointX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1511,7 +1512,7 @@ CHIP_ERROR ColorControlReadWhitePointY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1522,7 +1523,7 @@ CHIP_ERROR ColorControlReadColorPointRX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1533,7 +1534,7 @@ CHIP_ERROR ColorControlReadColorPointRY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1544,7 +1545,7 @@ CHIP_ERROR ColorControlReadColorPointRIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1555,7 +1556,7 @@ CHIP_ERROR ColorControlReadColorPointGX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1566,7 +1567,7 @@ CHIP_ERROR ColorControlReadColorPointGY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1577,7 +1578,7 @@ CHIP_ERROR ColorControlReadColorPointGIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1588,7 +1589,7 @@ CHIP_ERROR ColorControlReadColorPointBX(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1599,7 +1600,7 @@ CHIP_ERROR ColorControlReadColorPointBY(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1610,7 +1611,7 @@ CHIP_ERROR ColorControlReadColorPointBIntensity(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1621,7 +1622,7 @@ CHIP_ERROR ColorControlReadEnhancedCurrentHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1632,7 +1633,7 @@ CHIP_ERROR ColorControlReadEnhancedColorMode(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1643,7 +1644,7 @@ CHIP_ERROR ColorControlReadColorLoopActive(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1654,7 +1655,7 @@ CHIP_ERROR ColorControlReadColorLoopDirection(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1665,7 +1666,7 @@ CHIP_ERROR ColorControlReadColorLoopTime(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1676,7 +1677,7 @@ CHIP_ERROR ColorControlReadColorLoopStartEnhancedHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1687,7 +1688,7 @@ CHIP_ERROR ColorControlReadColorLoopStoredEnhancedHue(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1698,7 +1699,7 @@ CHIP_ERROR ColorControlReadColorCapabilities(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1709,7 +1710,7 @@ CHIP_ERROR ColorControlReadColorTempPhysicalMinMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1720,7 +1721,7 @@ CHIP_ERROR ColorControlReadColorTempPhysicalMaxMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1731,7 +1732,7 @@ CHIP_ERROR ColorControlReadCoupleColorTempToLevelMinMireds(int argc, char ** arg
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1742,7 +1743,7 @@ CHIP_ERROR ColorControlReadStartUpColorTemperatureMireds(int argc, char ** argv)
     data->clusterId           = Clusters::ColorControl::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1783,7 +1784,7 @@ CHIP_ERROR GroupsMoveToHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1803,7 +1804,7 @@ CHIP_ERROR GroupsMoveHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1824,7 +1825,7 @@ CHIP_ERROR GroupsStepHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1844,7 +1845,7 @@ CHIP_ERROR GroupsMoveToSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1864,7 +1865,7 @@ CHIP_ERROR GroupsMoveSaturationCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1885,7 +1886,7 @@ CHIP_ERROR GroupsStepSaturationCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1906,7 +1907,7 @@ CHIP_ERROR GroupsMoveToHueAndSaturationCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1927,7 +1928,7 @@ CHIP_ERROR GroupsMoveToColorCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1947,7 +1948,7 @@ CHIP_ERROR GroupsMoveColorCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1968,7 +1969,7 @@ CHIP_ERROR GroupsStepColorCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -1988,7 +1989,7 @@ CHIP_ERROR GroupsMoveToColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2009,7 +2010,7 @@ CHIP_ERROR GroupsEnhancedMoveToHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2029,7 +2030,7 @@ CHIP_ERROR GroupsEnhancedMoveHueCommandHandler(int argc, char ** argv)
     data->args[3]             = atoi(argv[3]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2050,7 +2051,7 @@ CHIP_ERROR GroupsEnhancedStepHueCommandHandler(int argc, char ** argv)
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2071,7 +2072,7 @@ CHIP_ERROR GroupsEnhancedMoveToHueAndSaturationCommandHandler(int argc, char ** 
     data->args[4]             = atoi(argv[4]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2094,7 +2095,7 @@ CHIP_ERROR GroupsColorLoopSetCommandHandler(int argc, char ** argv)
     data->args[6]             = atoi(argv[6]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2112,7 +2113,7 @@ CHIP_ERROR GroupsStopMoveStepCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2134,7 +2135,7 @@ CHIP_ERROR GroupsMoveColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[5]             = atoi(argv[5]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -2157,7 +2158,7 @@ CHIP_ERROR GroupsStepColorTemperatureCommandHandler(int argc, char ** argv)
     data->args[6]             = atoi(argv[6]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL

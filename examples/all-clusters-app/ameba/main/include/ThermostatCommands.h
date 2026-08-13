@@ -19,6 +19,7 @@
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/bindings/BindingManager.h>
+#include <lib/support/CodeUtils.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -156,8 +157,8 @@ void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Clu
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
         setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         setpointRaiseLowerCommand, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                         setpointRaiseLowerCommand, onSuccess, onFailure));
         break;
     }
 }
@@ -173,7 +174,7 @@ void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Clust
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
         setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand);
+        LogErrorOnFailure(Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand));
         break;
     }
 }
@@ -212,7 +213,7 @@ CHIP_ERROR SetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -243,7 +244,7 @@ CHIP_ERROR ThermostatReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -254,7 +255,7 @@ CHIP_ERROR ThermostatReadLocalTemperature(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -265,7 +266,7 @@ CHIP_ERROR ThermostatReadAbsMinHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -276,7 +277,7 @@ CHIP_ERROR ThermostatReadAbsMaxHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -287,7 +288,7 @@ CHIP_ERROR ThermostatReadAbsMinCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -298,7 +299,7 @@ CHIP_ERROR ThermostatReadAbsMaxCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -309,7 +310,7 @@ CHIP_ERROR ThermostatReadPiCoolingDemand(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -320,7 +321,7 @@ CHIP_ERROR ThermostatReadPiHeatingDemand(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -331,7 +332,7 @@ CHIP_ERROR ThermostatReadOccupiedCoolingSetpoint(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -342,7 +343,7 @@ CHIP_ERROR ThermostatReadOccupiedHeatingSetpoint(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -353,7 +354,7 @@ CHIP_ERROR ThermostatReadMinHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -364,7 +365,7 @@ CHIP_ERROR ThermostatReadMaxHeatSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -375,7 +376,7 @@ CHIP_ERROR ThermostatReadMinCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -386,7 +387,7 @@ CHIP_ERROR ThermostatReadMaxCoolSetpointLimit(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -397,7 +398,7 @@ CHIP_ERROR ThermostatReadControlSequenceOfOperation(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -408,7 +409,7 @@ CHIP_ERROR ThermostatReadSystemMode(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 
@@ -439,7 +440,7 @@ CHIP_ERROR GroupsSetpointRaiseLowerSwitchCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::Thermostat::Id;
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data)));
     return CHIP_NO_ERROR;
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL
