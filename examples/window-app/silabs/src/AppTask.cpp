@@ -63,7 +63,7 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().SetCustomUI(WindowManager::DrawUI);
     GetLCD().WriteDemoUI(false);
 #if SL_MATTER_QR_CODE_ENABLED
-    if (sIsProvisioned)
+    if (BaseApplication::sIsProvisioned != true)
     {
         GetLCD().ShowQRCode(true);
     }
