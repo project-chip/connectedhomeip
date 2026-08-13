@@ -450,7 +450,63 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
+    - label: "Step 3c: TH reads ScenesManagement ClusterRevision from DUT"
+      endpoint: endpoint
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: ScenesManagementClusterRevision
+
+    - label:
+          "Step 3d: Check if ScenesManagement cluster revision is 2 (stubbed
+          implementation)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ScenesManagementClusterRevision
+              - name: "Value2"
+                value: 2
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsRevision2
+
+    - label:
+          "Step 3e: Determine if test should run (ScenesManagement cluster revision
+          < 2)"
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: IsRevision2
+              - name: "Value2"
+                value: false
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsRevision1
+
+    - label: "Step 3f: TH reads attribute FabricSceneInfo from DUT"
+      runIf: IsRevision1
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
+            
+    - label: "Step 3g: TH reads attribute FabricSceneInfo from DUT"
+      runIf: IsRevision2
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
