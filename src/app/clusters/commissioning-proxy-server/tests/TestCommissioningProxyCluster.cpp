@@ -943,6 +943,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // Below MaxSessions: the cluster-level pre-check does not reject; the
 // request is forwarded to the transport driver and (for the mock) succeeds.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSucceeds)
@@ -965,6 +968,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // Per the ProxyConnectRequest Effect on Receipt: if Timeout expires, the connection
 // attempt is terminated and a TIMEOUT status SHALL be returned.
@@ -1041,6 +1045,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // With MaxSessions > 1, disconnecting one of several active sessions SHALL NOT
 // transition the cluster to disconnected; only the final disconnect (no sessions
 // remaining) SHALL do so.
@@ -1082,6 +1089,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // When the transport fails to disconnect, the command SHALL fail and the cluster
 // state SHALL remain Connected (session not cleaned up).
@@ -2436,6 +2444,9 @@ TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_DropsSessionsAndDriver
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // Another fabric's session SHALL survive.
 TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_LeavesOtherFabricsAlone)
 {
@@ -2457,6 +2468,7 @@ TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_LeavesOtherFabricsAlon
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // CachedResults / NumCachedResults reflect the ScanCache: null/0 when empty, unique
 // per discriminator/VID/PID/transport (spec), and cleared by ClearTransport. Change
@@ -2692,6 +2704,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WrongFabricEstabli
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Needs more than one concurrent session, so it only applies to a build whose
+// MaxSessions limit allows it.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 // Spec: "The SessionId allows multiple commissioning sessions to be run in parallel."
 // With MaxSessions >= 2, two connects SHALL each get a distinct, non-zero SessionId.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHaveDistinctSessionIds)
@@ -2720,6 +2735,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHa
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1
 
 // A ProxyDisconnectRequest SHALL remove the session: a subsequent ProxyMessageRequest
 // referencing the same SessionId SHALL be rejected with NOT_FOUND.
