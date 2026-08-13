@@ -21,12 +21,13 @@
 using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 
-BitMask<OccupancyBitmap> ThermostatDelegate::GetOccupancy()
+BitMask<OccupancyBitmap> ThermostatDelegate::GetOccupancy() const
 {
     return mOccupancy;
 }
 
-void ThermostatDelegate::SetOccupancy(BitMask<OccupancyBitmap> occupancy)
+Protocols::InteractionModel::Status ThermostatDelegate::SetOccupancy(BitMask<OccupancyBitmap> occupancy)
 {
     mOccupancy = occupancy;
+    return Protocols::InteractionModel::Status::Success;
 }

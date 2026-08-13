@@ -38,11 +38,11 @@ public:
     public:
         virtual ~Delegate() = default;
 
-        virtual BitMask<OccupancyBitmap> GetOccupancy() = 0;
+        virtual BitMask<OccupancyBitmap> GetOccupancy() const = 0;
+        virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) = 0;
     };
 
-    ThermostatOccupancy() = default;
-    ThermostatOccupancy(ThermostatCluster & cluster){};
+    explicit ThermostatOccupancy(ThermostatCluster & cluster){};
 
     void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
 
@@ -56,6 +56,15 @@ public:
             return mDelegate->GetOccupancy().Has(OccupancyBitmap::kOccupied);
         }
         return true;
+    }
+
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied)
+    {
+        if (mDelegate)
+        {
+            return mDelegate->SetOccupancy(occupied);
+        }
+        return Protocols::InteractionModel::Status::InvalidInState;
     }
 
 private:
