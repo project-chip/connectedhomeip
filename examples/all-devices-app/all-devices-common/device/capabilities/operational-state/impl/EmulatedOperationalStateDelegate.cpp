@@ -15,34 +15,34 @@
  *    limitations under the License.
  */
 
-#include "LoggingOperationalStateDelegate.h"
+#include "EmulatedOperationalStateDelegate.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app::Clusters::OperationalState {
 
-LoggingOperationalStateDelegate::~LoggingOperationalStateDelegate()
+EmulatedOperationalStateDelegate::~EmulatedOperationalStateDelegate()
 {
     CancelTimer();
 }
 
-void LoggingOperationalStateDelegate::CancelTimer()
+void EmulatedOperationalStateDelegate::CancelTimer()
 {
     DeviceLayer::SystemLayer().CancelTimer(OnOperationTimerComplete, this);
 }
 
-void LoggingOperationalStateDelegate::StartEmulatedOperationTimer()
+void EmulatedOperationalStateDelegate::StartEmulatedOperationTimer()
 {
     CancelTimer();
     mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kEmulatedOperationDurationSec), OnOperationTimerComplete, this);
 }
 
-void LoggingOperationalStateDelegate::OnOperationTimerComplete(System::Layer * systemLayer, void * appState)
+void EmulatedOperationalStateDelegate::OnOperationTimerComplete(System::Layer * systemLayer, void * appState)
 {
-    auto * self = static_cast<LoggingOperationalStateDelegate *>(appState);
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Emulated operation timer finished. Reverting state to Stopped.");
+    auto * self = static_cast<EmulatedOperationalStateDelegate *>(appState);
+    ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Emulated operation timer finished. Reverting state to Stopped.");
     self->mCountdownTime.SetNull();
     if (self->mCluster)
     {
@@ -50,7 +50,7 @@ void LoggingOperationalStateDelegate::OnOperationTimerComplete(System::Layer * s
     }
 }
 
-CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+CHIP_ERROR EmulatedOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     static const GenericOperationalState kSupportedStates[] = {
         GenericOperationalState(to_underlying(OperationalStateEnum::kStopped), MakeOptional("Stopped"_span)),
@@ -68,7 +68,7 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t in
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+CHIP_ERROR EmulatedOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     static constexpr CharSpan kSupportedPhases[] = { "Starting"_span, "Operating"_span, "Finishing"_span };
 
@@ -80,9 +80,9 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t in
     return CopyCharSpanToMutableCharSpan(kSupportedPhases[index], operationalPhase);
 }
 
-void LoggingOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
+void EmulatedOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Pause command received.");
+    ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Pause command received.");
     CancelTimer();
     if (mCluster)
     {
@@ -91,9 +91,9 @@ void LoggingOperationalStateDelegate::HandlePauseStateCallback(GenericOperationa
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
-void LoggingOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
+void EmulatedOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Resume command received.");
+    ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Resume command received.");
     if (mCluster)
     {
         LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kRunning));
@@ -102,9 +102,9 @@ void LoggingOperationalStateDelegate::HandleResumeStateCallback(GenericOperation
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
-void LoggingOperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
+void EmulatedOperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Start command received.");
+    ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Start command received.");
     if (mCluster)
     {
         LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kRunning));
@@ -113,9 +113,9 @@ void LoggingOperationalStateDelegate::HandleStartStateCallback(GenericOperationa
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
 
-void LoggingOperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
+void EmulatedOperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Stop command received.");
+    ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Stop command received.");
     CancelTimer();
     mCountdownTime.SetNull();
     if (mCluster)

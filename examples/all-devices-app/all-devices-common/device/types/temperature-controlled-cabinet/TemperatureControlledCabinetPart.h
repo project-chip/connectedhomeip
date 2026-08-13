@@ -20,7 +20,7 @@
 #include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
 #include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
@@ -61,7 +61,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureControlCluster> mTemperatureControlCluster;
 
-    Clusters::OperationalState::LoggingOperationalStateDelegate mOperationalStateDelegate;
+    Clusters::OperationalState::EmulatedOperationalStateDelegate mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster> mOperationalStateCluster;
 };
 

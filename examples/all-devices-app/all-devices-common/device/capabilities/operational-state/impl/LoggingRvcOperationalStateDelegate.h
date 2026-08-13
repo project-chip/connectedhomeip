@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "LoggingOperationalStateDelegate.h"
+#include "EmulatedOperationalStateDelegate.h"
 
 namespace chip::app::Clusters::OperationalState {
 
-class LoggingRvcOperationalStateDelegate : public LoggingOperationalStateDelegate
+class LoggingRvcOperationalStateDelegate : public EmulatedOperationalStateDelegate
 {
 public:
     LoggingRvcOperationalStateDelegate() = default;

@@ -32,11 +32,11 @@ namespace chip::app::Clusters::OperationalState {
  * Upon timer expiration, it automatically reverts the operational state back to Stopped and clears
  * the countdown duration.
  */
-class LoggingOperationalStateDelegate : public OperationalStateCluster::Delegate
+class EmulatedOperationalStateDelegate : public OperationalStateCluster::Delegate
 {
 public:
-    LoggingOperationalStateDelegate() = default;
-    ~LoggingOperationalStateDelegate() override;
+    EmulatedOperationalStateDelegate() = default;
+    ~EmulatedOperationalStateDelegate() override;
 
     // -- Delegate Interface Implementation --
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }

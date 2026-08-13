@@ -19,7 +19,7 @@
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 
 namespace chip::app {
 
@@ -35,7 +35,7 @@ public:
     Clusters::OperationalState::OperationalStateCluster & OperationalState() { return mOperationalStateCluster.Cluster(); }
 
 private:
-    Clusters::OperationalState::LoggingOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 };
 

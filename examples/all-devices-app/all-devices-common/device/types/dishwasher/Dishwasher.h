@@ -21,7 +21,7 @@
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <clusters/DishwasherMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/LoggingOperationalStateDelegate.h>
+#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -82,7 +82,7 @@ public:
 
 private:
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
-    Clusters::OperationalState::LoggingOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
     DishwasherModeDelegate mDishwasherModeDelegate;
