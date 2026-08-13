@@ -2093,7 +2093,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *        attribute is Fixed quality, so this is the device's advertised value.
  */
 #ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
-#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 4
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
 
 /**
