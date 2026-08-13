@@ -39,6 +39,8 @@ namespace internal {
 /**
  * Non-templated EventLoggingDelegate subclass binding an untyped event data pointer with a type-erased encoding callback.
  * Avoids generating separate vtables, RTTI metadata, and virtual destructors per event type.
+ *
+ * @note aEncodeFn MUST be non-null. Internal construction via EncodeTypedEventPayload guarantees a valid callback function.
  */
 class SimpleEventPayloadWriter : public EventLoggingDelegate
 {
@@ -49,7 +51,6 @@ public:
 
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
-        VerifyOrReturnError(mEncodeFn != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         return mEncodeFn(mEventData, aWriter);
     }
 

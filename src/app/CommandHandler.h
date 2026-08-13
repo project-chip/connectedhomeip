@@ -201,6 +201,8 @@ public:
      * Using a POD struct with a standalone function pointer callback explicitly avoids compiler-generated virtual class
      * constructors, destructors (both complete object and deleting destructors), vtable arrays, and RTTI metadata per
      * response command type.
+     *
+     * @note mEncodeFn MUST be non-null. Construction via EncodeTypedCommandPayload guarantees a valid function pointer callback.
      */
     struct EncodableResponsePayload
     {
@@ -211,7 +213,6 @@ public:
 
         CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const
         {
-            VerifyOrReturnError(mEncodeFn != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             return mEncodeFn(mData, writer, tag);
         }
     };
