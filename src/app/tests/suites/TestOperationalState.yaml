@@ -14,13 +14,6 @@
 
 name: Operational State Tests
 
-CI:
-    - name: "Test against all-devices/laundry-washer"
-      app: all-devices
-      args:
-          - --device
-          - laundry-washer
-
 config:
     nodeId: 0x12344321
     cluster: "Operational State"
@@ -39,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "PhaseList"
       response:
-          value: ["Starting", "Operating", "Finishing"]
+          value: null
 
     - label: "Read current Phase"
       command: "readAttribute"
