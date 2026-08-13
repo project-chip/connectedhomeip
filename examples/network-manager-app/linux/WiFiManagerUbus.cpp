@@ -143,7 +143,10 @@ void WiFiManagerUbus::Init()
             }
             ChipWifiDebug("WiFiManagerUbus: event type = '%s'", eventType.value());
             if (strcmp(eventType.value(), "netifd.wireless.done") != 0 && strcmp(eventType.value(), "config.change") != 0)
+            {
+                // Not an event type we care about
                 return;
+            }
 
             static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces();
         });
@@ -176,6 +179,7 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
         break;
     }
     VerifyOrReturn(values != nullptr, ChipLogError(AppServer, "Invalid uci return value (no 'values' table found)"));
+    mDesiredRadio.clear();
 
     blobmsg_for_each_attr(cur, values, rem)
     {
@@ -209,7 +213,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     int rem            = 0;
     int r              = 0;
 
-    ChipLogProgress(AppServer, "radios = %s", debug_blob_msg(msg).c_str());
+    // ChipLogProgress(AppServer, "radios = %s", debug_blob_msg(msg).c_str());
 
     if (!mDesiredRadio.empty())
     {
