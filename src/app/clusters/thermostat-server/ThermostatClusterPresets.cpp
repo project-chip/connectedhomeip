@@ -36,26 +36,61 @@ namespace Thermostat {
 
 namespace {
 
+/**
+ * @brief Check if a preset is valid.
+ *
+ * @param[in] preset The preset to check.
+ *
+ * @return true If the preset is valid i.e the PresetHandle (if not null) fits within size constraints and the presetScenario enum
+ *         value is valid. Otherwise, return false.
+ */
 bool IsValidPresetEntry(const PresetStructWithOwnedMembers & preset)
 {
+    // Check that the preset handle is not too long.
     if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().size() > kPresetHandleSize)
     {
         return false;
     }
+
+    // Ensure we have a valid PresetScenario.
     return (preset.GetPresetScenario() != PresetScenarioEnum::kUnknownEnumValue);
 }
 
+/**
+ * @brief Checks if the preset is built-in
+ *
+ * @param[in] preset The preset to check.
+ *
+ * @return true If the preset is built-in, false otherwise.
+ */
 bool IsBuiltIn(const PresetStructWithOwnedMembers & preset)
 {
     return preset.GetBuiltIn().ValueOr(false);
 }
 
+/**
+ * @brief Checks if the presets are matching i.e the presetHandles are the same.
+ *
+ * @param[in] preset The preset to check.
+ * @param[in] presetToMatch The preset to match with.
+ *
+ * @return true If the presets match, false otherwise. If both preset handles are null, returns false
+ */
 bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, const PresetStructWithOwnedMembers & presetToMatch)
 {
     return !preset.GetPresetHandle().IsNull() && !presetToMatch.GetPresetHandle().IsNull() &&
         preset.GetPresetHandle().Value().data_equal(presetToMatch.GetPresetHandle().Value());
 }
 
+/**
+ * @brief Finds an entry in the pending presets list that matches a preset.
+ *        The presetHandle of the two presets must match.
+ *
+ * @param[in] delegate The delegate to use.
+ * @param[in] presetToMatch The preset to match with.
+ *
+ * @return true if a matching entry was found in the pending presets list, false otherwise.
+ */
 bool MatchingPendingPresetExists(ThermostatPresets::Delegate * delegate, const PresetStructWithOwnedMembers & presetToMatch)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -84,6 +119,16 @@ bool MatchingPendingPresetExists(ThermostatPresets::Delegate * delegate, const P
     return false;
 }
 
+/**
+ * @brief Finds and returns an entry in the Presets attribute list that matches
+ *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
+ *
+ * @param[in] delegate The delegate to use.
+ * @param[in] presetToMatch The preset to match with.
+ * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
+ *
+ * @return true if a matching entry was found in the  presets attribute list, false otherwise.
+ */
 bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
@@ -112,6 +157,14 @@ bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const Da
     return false;
 }
 
+/**
+ * @brief Gets the maximum number of presets allowed for a given preset scenario.
+ *
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetScenario The presetScenario to match with.
+ * @param[out] count The maximum number of presets for the specified presetScenario
+ * @return CHIP_NO_ERROR if the maximum number was determined, or an error if not
+ */
 CHIP_ERROR MaximumPresetScenarioCount(ThermostatPresets::Delegate * delegate, PresetScenarioEnum presetScenario, size_t & count)
 {
     count = 0;
@@ -136,6 +189,13 @@ CHIP_ERROR MaximumPresetScenarioCount(ThermostatPresets::Delegate * delegate, Pr
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Returns the count of preset entries in the pending presets list that have the matching presetHandle.
+ * @param[in] delegate The delegate to use.
+ * @param[in] presetHandleToMatch The preset handle to match.
+ *
+ * @return count of the number of presets found with the matching presetHandle. Returns 0 if no matching presets were found.
+ */
 uint8_t CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate * delegate, const ByteSpan & presetHandleToMatch)
 {
     uint8_t count = 0;
@@ -159,6 +219,14 @@ uint8_t CountPresetsInPendingListWithPresetHandle(ThermostatPresets::Delegate * 
     return count;
 }
 
+/**
+ * @brief Checks if the presetType for the given preset scenario supports name in the presetTypeFeatures bitmap.
+ *
+ * @param[in] delegate The delegate to use.
+ * @param[in] presetScenario The presetScenario to match with.
+ *
+ * @return true if the presetType for the given preset scenario supports name, false otherwise.
+ */
 bool PresetTypeSupportsNames(ThermostatPresets::Delegate * delegate, PresetScenarioEnum scenario)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
@@ -283,20 +351,28 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
     auto & subjectDescriptor  = decoder.GetSubjectDescriptor();
     auto & atomicWriteSession = mCluster.GetAtomicWriteSession();
 
+    // Presets are not editable, return INVALID_IN_STATE.
     VerifyOrReturnError(atomicWriteSession.InAtomicWrite(MakeOptional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
+    // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
+    // otherwise return BUSY.
     if (!atomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
     {
         ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
         return CHIP_IM_GLOBAL_STATUS(Busy);
     }
 
+    // If the list operation is replace all, clear the existing pending list, iterate over the new presets list
+    // and add to the pending presets list.
     if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
+        // Clear the pending presets list
         mDelegate->ClearPendingPresetList();
         Presets::TypeInfo::DecodableType newPresetsList;
         ReturnErrorOnFailure(decoder.Decode(newPresetsList));
+
+        // Iterate over the presets and call the delegate to append to the list of pending presets.
         auto iter = newPresetsList.begin();
         while (iter.Next())
         {
@@ -306,6 +382,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
         return iter.GetStatus();
     }
 
+    // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.
     if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         PresetStruct::Type preset;
@@ -388,6 +465,12 @@ std::optional<System::Clock::Milliseconds16> ThermostatPresets::GetMaxAtomicWrit
     return std::nullopt;
 }
 
+/**
+ * @brief Checks if the given preset handle is present in the presets attribute
+ * @param[in] presetHandleToMatch The preset handle to match with.
+ *
+ * @return true if the given preset handle is present in the presets attribute list, false otherwise.
+ */
 bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch)
 {
     VerifyOrReturnValue(mDelegate != nullptr, false);
@@ -425,6 +508,7 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return Status::InvalidInState;
     }
 
+    // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
     if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(presetHandle.Value()))
     {
         return Status::InvalidCommand;
@@ -484,16 +568,20 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
+        // Force to be false, if passed as null
         preset.SetBuiltIn(false);
     }
     else
     {
+        // Per spec we need to check that:
+        // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
         if (!GetMatchingPresetInPresets(mDelegate, preset.GetPresetHandle().Value(), matchingPreset))
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
 
+        // (b) There is no existing pending preset with this handle.
         if (CountPresetsInPendingListWithPresetHandle(mDelegate, preset.GetPresetHandle().Value()) > 0)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
@@ -501,10 +589,12 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
 
         const auto & presetBuiltIn         = preset.GetBuiltIn();
         const auto & matchingPresetBuiltIn = matchingPreset.GetBuiltIn();
+        // (c)/(d) The built-in fields do not have a mismatch.
         if (presetBuiltIn.IsNull())
         {
             if (matchingPresetBuiltIn.IsNull())
             {
+                // This really shouldn't happen; internal presets should alway have built-in set
                 return CHIP_IM_GLOBAL_STATUS(InvalidInState);
             }
             preset.SetBuiltIn(matchingPresetBuiltIn.Value());
@@ -513,6 +603,7 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
         {
             if (matchingPresetBuiltIn.IsNull())
             {
+                // This really shouldn't happen; internal presets should alway have built-in set
                 return CHIP_IM_GLOBAL_STATUS(InvalidInState);
             }
             if (presetBuiltIn.Value() != matchingPresetBuiltIn.Value())
@@ -526,6 +617,7 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
     size_t maximumPresetScenarioCount = 0;
     if (MaximumPresetScenarioCount(mDelegate, preset.GetPresetScenario(), maximumPresetScenarioCount) != CHIP_NO_ERROR)
     {
+        // This is not a supported preset scenario
         return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
 
@@ -539,6 +631,10 @@ CHIP_ERROR ThermostatPresets::AppendPendingPreset(const PresetStruct::Type & new
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    // Before adding this preset to the pending presets, if the expected length of the pending presets' list
+    // exceeds the total number of presets supported, return RESOURCE_EXHAUSTED. Note that the preset has not been appended yet.
+
+    // We're going to append this preset, so let's assume a count as though it had already been inserted
     size_t presetCount         = 1;
     size_t presetScenarioCount = 1;
     for (uint8_t i = 0; true; i++)
@@ -588,6 +684,8 @@ Status ThermostatPresets::PrecommitPresets()
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // For each preset in the presets attribute, check that the matching preset in the pending presets list does not
+    // violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers preset;
@@ -605,12 +703,17 @@ Status ThermostatPresets::PrecommitPresets()
 
         bool found = MatchingPendingPresetExists(mDelegate, preset);
 
+        // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
+        // CONSTRAINT_ERROR.
         if (IsBuiltIn(preset) && !found)
         {
             return Status::ConstraintError;
         }
     }
 
+    // If there is an ActivePresetHandle set, find the preset in the pending presets list that matches the ActivePresetHandle
+    // attribute. If a preset is not found with the same presetHandle, return INVALID_IN_STATE. If there is no ActivePresetHandle
+    // attribute set, continue with other checks.
     uint8_t buffer[kPresetHandleSize];
     MutableByteSpan activePresetHandleSpan(buffer);
     auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
@@ -635,6 +738,7 @@ Status ThermostatPresets::PrecommitPresets()
     auto heatLimits = setpoints.GetLimits(SystemModeEnum::kHeat);
     auto coolLimits = setpoints.GetLimits(SystemModeEnum::kCool);
 
+    // For each preset in the pending presets list, check that the preset does not violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers pendingPreset;
@@ -650,6 +754,8 @@ Status ThermostatPresets::PrecommitPresets()
             return Status::InvalidInState;
         }
 
+        // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
+        // TODO: This code does not work, because it's modifying our temporary copy.
         Optional<int16_t> coolingSetpoint = pendingPreset.GetCoolingSetpoint();
         if (coolingSetpoint.HasValue())
         {

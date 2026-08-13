@@ -86,6 +86,8 @@ CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
 
 void ThermostatDelegate::SetCurrentThermostatSuggestion(size_t index)
 {
+    // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the
+    // <= check below.
     if (index <= GetMaxThermostatSuggestions())
     {
         bool hasChanged = (mIndexOfCurrentSuggestion != index);
@@ -115,6 +117,7 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(size_t indexT
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // Shift elements to the left to fill the gap.
     for (size_t index = indexToRemove; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
     {
         mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
@@ -155,6 +158,7 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
 
     uniqueID = maxUniqueId + 1;
 
+    // If overflow occurs, check for next available uniqueID.
     if (uniqueID == 0)
     {
         while (HaveSuggestionWithID(uniqueID))
@@ -169,6 +173,11 @@ CHIP_ERROR ThermostatDelegate::GetUniqueID(uint8_t & uniqueID)
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Starts a timer to wait for the expiration of the current thermostat suggestion.
+ *
+ * @param[in] timeout The timeout in seconds.
+ */
 CHIP_ERROR ThermostatDelegate::StartExpirationTimer(Seconds32 timeout)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
@@ -213,6 +222,7 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
 
     Seconds32 currentMatterEpochTimestamp = Seconds32(currentMatterEpochTimestampInSeconds);
 
+    // For the reference thermostat app, we will always choose a suggestion with the earliest effective time.
     SetCurrentThermostatSuggestion(GetThermostatSuggestionIndexWithEarliestEffectiveTime(currentMatterEpochTimestamp));
 
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> nullableCurrentThermostatSuggestion;
@@ -222,9 +232,13 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
     {
         ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
 
+        // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update
+        // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
+        // ThermostatSuggestionNotFollowingReason to null.
         TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
         TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
 
+        // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
         if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestamp)
         {
             TEMPORARY_RETURN_IGNORED StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() -
@@ -249,6 +263,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         CHIP_ERROR err = GetThermostatSuggestionAtIndex(index, suggestion);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, maxThermostatSuggestions);
 
+        // Check for the least effective time that is less than the current timestamp.
         Seconds32 effectiveTime = suggestion.GetEffectiveTime();
         if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestamp)
         {
