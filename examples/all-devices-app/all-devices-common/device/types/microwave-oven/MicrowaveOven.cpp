@@ -39,6 +39,7 @@ CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvi
         endpoint,
         Clusters::MicrowaveOvenControlCluster::Config{
             .feature             = BitFlags<Clusters::MicrowaveOvenControl::Feature>(Clusters::MicrowaveOvenControl::Feature::kPowerInWatts),
+            .supportsAddMoreTime = true,
             .integrationDelegate = mControlIntegrationDelegate,
             .appDelegate         = mControlAppDelegate,
         });
