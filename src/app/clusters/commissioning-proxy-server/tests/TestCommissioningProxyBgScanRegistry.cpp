@@ -380,3 +380,50 @@ TEST(TestCommissioningProxyBgScanRegistry, IndependentLifetimesExpireSeparately)
     EXPECT_EQ(hw.stopCount, 1);
     EXPECT_EQ(hw.clearCount, 1);
 }
+
+// Spec § ProxyBackGroundScanStopRequest: "If the NodeID and FabricID of the client do
+// not match those recorded when background scanning was started for this fabric, the
+// proxy SHALL take no action and the command SHALL be rejected with a status of
+// NOT_FOUND."
+TEST(TestCommissioningProxyBgScanRegistry, StopFromNonOwnerNodeOnSameFabricNotFound)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+
+    // A different node on the SAME fabric may not stop node 1's scan.
+    EXPECT_EQ(reg.Stop(kFabric1, kNode2, kPaf, k2g4), Status::NotFound);
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+
+    // The owner still can.
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kPaf, k2g4), Status::Success);
+    EXPECT_TRUE(reg.IsEmpty());
+}
+
+// Spec: "The proxy SHALL keep per fabric records" — one record per fabric, not one per
+// node. A start from another node on the same fabric replaces that single record and
+// takes ownership, exactly as a repeat request from the same node refreshes it.
+TEST(TestCommissioningProxyBgScanRegistry, SecondNodeOnSameFabricReplacesRecord)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, kNoTimeout), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, kNoTimeout), Status::Success);
+
+    // Still one fabric registered, and the radio was not restarted for the second.
+    EXPECT_EQ(hw.startCount, 1);
+
+    // Node 1 no longer owns the record, so its stop is rejected...
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kNoTransport, k5g), Status::NotFound);
+    EXPECT_FALSE(reg.IsEmpty());
+
+    // ...and node 2's stop clears the single record (proving the bands were replaced
+    // too: 5G is what is registered now, not 2G4).
+    EXPECT_EQ(reg.Stop(kFabric1, kNode2, kNoTransport, k5g), Status::Success);
+    EXPECT_TRUE(reg.IsEmpty());
+}

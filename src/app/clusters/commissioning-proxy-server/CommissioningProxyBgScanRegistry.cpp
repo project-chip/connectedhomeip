@@ -29,15 +29,6 @@ namespace CommissioningProxy {
 
 using Protocols::InteractionModel::Status;
 
-bool CommissioningProxyBgScanRegistry::FabricKey::operator<(const FabricKey & o) const
-{
-    if (fabricIndex != o.fabricIndex)
-    {
-        return fabricIndex < o.fabricIndex;
-    }
-    return nodeId < o.nodeId;
-}
-
 void CommissioningProxyBgScanRegistry::CancelLifetime(Record & rec)
 {
     if (rec.lifetimeCtx != nullptr)
@@ -64,7 +55,6 @@ void CommissioningProxyBgScanRegistry::OnBecameEmpty()
 Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                                BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs)
 {
-    const FabricKey key{ fabricIndex, nodeId };
     const bool wasEmpty = mFabrics.empty();
 
     // Start (or resume) the hardware scan on the first fabric, or whenever we are
@@ -92,7 +82,7 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
     LifetimeCtx * ctx = nullptr;
     if (timeoutSecs > 0)
     {
-        ctx                 = new LifetimeCtx(this, key);
+        ctx                 = new LifetimeCtx(this, fabricIndex);
         CHIP_ERROR timerErr = mTimerDelegate.StartTimer(ctx, System::Clock::Seconds16(timeoutSecs));
         if (timerErr != CHIP_NO_ERROR)
         {
@@ -109,13 +99,16 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         }
     }
 
-    // Commit: Replace any previous registration for this fabric.
-    auto it = mFabrics.find(key);
+    // Commit: replace any previous registration for this fabric. A request from a
+    // different node on the same fabric takes ownership, matching the refresh
+    // semantics of a repeat request from the same node.
+    auto it = mFabrics.find(fabricIndex);
     if (it != mFabrics.end())
     {
         CancelLifetime(it->second);
     }
-    Record & rec    = mFabrics[key];
+    Record & rec    = mFabrics[fabricIndex];
+    rec.ownerNodeId = nodeId;
     rec.transport   = transport;
     rec.wiFiBands   = wiFiBands;
     rec.lifetimeCtx = ctx;
@@ -126,9 +119,15 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
 Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                               BitMask<WiFiBandBitmap> wiFiBands)
 {
-    const FabricKey key{ fabricIndex, nodeId };
-    auto it = mFabrics.find(key);
+    auto it = mFabrics.find(fabricIndex);
     if (it == mFabrics.end())
+    {
+        return Status::NotFound;
+    }
+
+    // Spec: if the client's NodeID and FabricID do not match those recorded when the
+    // scan was started, take no action and reject with NOT_FOUND.
+    if (it->second.ownerNodeId != nodeId)
     {
         return Status::NotFound;
     }
@@ -234,9 +233,9 @@ void CommissioningProxyBgScanRegistry::Shutdown()
     mPaused = false;
 }
 
-void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(const FabricKey & key)
+void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(FabricIndex fabricIndex)
 {
-    auto it = mFabrics.find(key);
+    auto it = mFabrics.find(fabricIndex);
     if (it == mFabrics.end())
     {
         return;
@@ -250,8 +249,7 @@ void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(const FabricKey & key)
     }
     mFabrics.erase(it);
 
-    ChipLogProgress(AppServer, "BgScan: lifetime expired for fabricIndex=%u nodeId=0x" ChipLogFormatX64, key.fabricIndex,
-                    ChipLogValueX64(key.nodeId));
+    ChipLogProgress(AppServer, "BgScan: lifetime expired for fabricIndex=%u", fabricIndex);
 
     if (mFabrics.empty())
     {

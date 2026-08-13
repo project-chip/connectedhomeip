@@ -137,38 +137,42 @@ public:
     void Shutdown();
 
 private:
-    struct FabricKey
-    {
-        FabricIndex fabricIndex;
-        NodeId nodeId;
-        bool operator<(const FabricKey & o) const;
-    };
-
     // Heap context handed to the per-fabric lifetime timer so the expiry can find its
-    // registry and key without a global. Each is its own TimerContext, so fabrics with
-    // different lifetimes expire independently.
+    // registry and fabric without a global. Each is its own TimerContext, so fabrics
+    // with different lifetimes expire independently.
     struct LifetimeCtx : public TimerContext
     {
-        LifetimeCtx(CommissioningProxyBgScanRegistry * aRegistry, const FabricKey & aKey) : registry(aRegistry), key(aKey) {}
+        LifetimeCtx(CommissioningProxyBgScanRegistry * aRegistry, FabricIndex aFabricIndex) :
+            registry(aRegistry), fabricIndex(aFabricIndex)
+        {}
 
         CommissioningProxyBgScanRegistry * registry;
-        FabricKey key;
+        FabricIndex fabricIndex;
 
-        void TimerFired() override { registry->OnLifetimeExpiry(key); }
+        void TimerFired() override { registry->OnLifetimeExpiry(fabricIndex); }
     };
 
     struct Record
     {
+        // The NodeID that started this fabric's scan. Recorded so only that client can
+        // stop it; it is not part of the record's identity (there is one record per
+        // fabric, not one per node).
+        NodeId ownerNodeId = kUndefinedNodeId;
         BitMask<CapabilitiesBitmap> transport;
         BitMask<WiFiBandBitmap> wiFiBands;
         LifetimeCtx * lifetimeCtx = nullptr;
     };
 
-    void OnLifetimeExpiry(const FabricKey & key);
+    /// Handle a fired lifetime timer. @p fabricIndex is taken BY VALUE on purpose: the
+    /// caller is LifetimeCtx::TimerFired() passing its own member, and this function
+    /// deletes that ctx. A reference would dangle for the rest of the body.
+    void OnLifetimeExpiry(FabricIndex fabricIndex);
     void CancelLifetime(Record & rec);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache
 
-    std::map<FabricKey, Record> mFabrics;
+    // One record per fabric (spec: "keep per fabric records"), so this is bounded
+    // by the supported fabric count.
+    std::map<FabricIndex, Record> mFabrics;
     bool mPaused = false;
     HardwareControl & mHardware;
     TimerDelegate & mTimerDelegate;
