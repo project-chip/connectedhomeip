@@ -99,7 +99,7 @@ _GROUP_ID = 0x0000
 _TRANSITION_TIME_MS = 20000
 
 
-class TC_S_2_6(MatterBaseTest):
+class TC_S_2_6(MatterTestCommissionedDevice):
     def teardown_test(self):
         self._shutdown_subscriptions()
 

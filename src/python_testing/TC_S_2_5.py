@@ -71,7 +71,7 @@ log = logging.getLogger(__name__)
 _MIN_SCENE_TABLE_SIZE = 16
 
 
-class TC_S_2_5(MatterBaseTest):
+class TC_S_2_5(MatterTestCommissionedDevice):
     # Established in Step 4b and kept alive for the remainder of the test.
     _scene_info_subscription: typing.Any
     _scene_info_cb: AttributeSubscriptionHandler
