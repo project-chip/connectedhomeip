@@ -19,15 +19,31 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
+
+  # Suppress VLA warnings for wifi-sdk files (see SiWx917_sdk.gni)
+  cflags = [ "-Wno-vla" ]
+
   defines += [
     "SLI_SI91X_ENABLE_BLE=1",
     "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
   ]
 
   include_dirs += [
+    "${efr32_sdk_root}/platform_core/platform/service/mem_pool/inc",
     "${silabs_platform_dir}/SiWx/ble",
+    "${wifi_sdk_root}/components/common/inc",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine/inc",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sli_si91x_wifi_event_handler/inc",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sli_hal_si91x/inc",
+    "${wifi_sdk_root}/components/protocol/wifi/inc",
+    "${wifi_sdk_root}/components/sli_buffer_manager/inc",
+    "${wifi_sdk_root}/components/sli_command_engine/inc",
+    "${wifi_sdk_root}/components/sli_queue_manager/inc",
+    "${wifi_sdk_root}/components/sli_routing_utility/inc",
     "${wifi_sdk_root}/components/sli_wifi/inc",
+    "${wifi_sdk_root}/components/sli_event_engine/inc",
   ]
 }
 

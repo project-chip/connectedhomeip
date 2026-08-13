@@ -214,7 +214,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMap();
         ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap));
 
         // Initialize ElectricalSensorManager (owns both EPM and EEM)

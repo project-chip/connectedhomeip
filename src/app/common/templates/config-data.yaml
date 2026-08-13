@@ -65,7 +65,6 @@ ClustersWithAttributeChangedFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat
-    - Window Covering
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -82,7 +81,6 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Energy Preference
     - Laundry Dryer Controls
     - Mode Select
     - Pump Configuration and Control
@@ -121,6 +119,7 @@ CodeDrivenClusters:
     - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
+    - Energy Preference
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label
@@ -138,6 +137,7 @@ CodeDrivenClusters:
     - Laundry Washer Controls
     - Laundry Washer Mode
     - Localization Configuration
+    - Media File Management
     - Microwave Oven Control
     - Microwave Oven Mode
     - Network Identity Management
@@ -177,4 +177,5 @@ CodeDrivenClusters:
     - Water Heater Mode
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
+    - Window Covering
     # keep-sorted end

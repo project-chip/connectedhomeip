@@ -72,6 +72,7 @@ realtek:
   maintainers:
     - pankore
     - shensaifeng
+    - xshuqun
   paths:
     - "src/platform/realtek/**"
     - "src/platform/Ameba/**"
@@ -82,6 +83,35 @@ realtek:
     - "config/realtek/**"
     - "config/ameba/**"
     - "scripts/tools/realtek/**"
+
+mediatek:
+  maintainers:
+    - RyanHo-MTK
+    - as23999
+  paths:
+    - "src/platform/mt793x/**"
+    - "examples/lighting-app/genio/**"
+    - "third_party/mt793x_sdk/**"
+
+stm32:
+  maintainers:
+    - STYoannZamaron
+    - Pierre-B-GHub
+  paths:
+    - "src/platform/stm32/**"
+    - "examples/platform/stm32/**"
+    - "examples/**/stm32/**"
+    - "config/stm32/**"
+    - "third_party/st/**"
+
+tizen:
+  maintainers:
+    - dr-venkman
+  paths:
+    - "src/platform/Tizen/**"
+    - "examples/platform/tizen/**"
+    - "examples/**/tizen/**"
+    - "config/tizen/**"
 
 # --- Proposals / Opt-In Templates ---
 
@@ -96,15 +126,6 @@ realtek:
 #     - "examples/**/nrfconnect/**"
 #     - "config/nrfconnect/**"
 # 
-# tizen:
-#   maintainers:
-#     - enkiusz
-#     - arkq
-#   paths:
-#     - "src/platform/Tizen/**"
-#     - "examples/platform/tizen/**"
-#     - "examples/**/tizen/**"
-#     - "config/tizen/**"
 # 
 # asr:
 #   maintainers:
@@ -143,28 +164,12 @@ realtek:
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
-# 
-# stm32:
-#   maintainers:
-#     - STYoannZamaron
-#   paths:
-#     - "src/platform/stm32/**"
-#     - "examples/platform/stm32/**"
-#     - "examples/**/stm32/**"
-#     - "config/stm32/**"
-# 
+#
 # webos:
 #   maintainers:
 #     - joonhaengHeo
 #   paths:
 #     - "src/platform/webos/**"
-# 
-# mt793x:
-#   maintainers:
-#     - pakls
-#   paths:
-#     - "src/platform/mt793x/**"
-#     - "examples/platform/mt793x/**"
 # 
 # ti:
 #   maintainers:

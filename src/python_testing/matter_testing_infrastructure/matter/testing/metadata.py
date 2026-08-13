@@ -33,7 +33,9 @@ class Metadata:
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
+    timeout: float | None = None
     quiet: bool = False
+    pre_existing_fabric: bool = False
 
 
 class NamedStringIO(StringIO):
@@ -153,7 +155,9 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
+                timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
+                pre_existing_fabric=str(attr.get("pre-existing-fabric", False)).lower() == 'true',
             ))
 
         return runs_metadata

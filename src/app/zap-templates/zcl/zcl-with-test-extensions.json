@@ -888,6 +888,11 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
+        "Energy Preference": [
+            "ClusterRevision",
+            "CurrentEnergyBalance",
+            "CurrentLowPowerModeSensitivity"
+        ],
         "Power Topology": ["FeatureMap"],
         "Power Source": [
             "ClusterRevision",
@@ -1005,7 +1010,11 @@
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
-        "Window Covering": ["ClusterRevision"],
+        "Window Covering": [
+            "ClusterRevision",
+            "OperationalStatus",
+            "SafetyStatus"
+        ],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
