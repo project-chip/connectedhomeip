@@ -28,7 +28,7 @@ jobs:
         uses: tyriis/docker-image-tag-exists@v3.0.0
         with:
           registry: ghcr.io
-          repository: connectedhomeip/chip-build-arm64
+          repository: project-chip/chip-build-arm64
           tag: ${{ steps.checksum.outputs.checksum }}
       - name: Set up Docker Buildx
         if: steps.check-image.outputs.tag != 'found'
@@ -37,7 +37,7 @@ jobs:
         if: steps.check-image.outputs.tag != 'found'
         uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
         with:
-            name: connectedhomeip/chip-build-arm64
+            name: project-chip/chip-build-arm64
             tags: ${{ steps.checksum.outputs.checksum }}
             dockerfile: ./integrations/docker/images/base/chip-build/Dockerfile
             username: ${{ github.actor }}
@@ -68,7 +68,7 @@ jobs:
         target: ${{ fromJSON(needs.load-targets-as-output.outputs.targets) }}
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/connectedhomeip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -139,7 +139,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     needs: check-or-create-arm64-build-container
     container:
-      image: ghcr.io/connectedhomeip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
     steps:
       - uses: actions/checkout@v6
         with:
