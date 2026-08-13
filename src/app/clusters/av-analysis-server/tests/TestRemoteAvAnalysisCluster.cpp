@@ -386,10 +386,11 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteActivateAnalysisStreamCommandTest)
 
     auto response = mServer.GetLogic().HandleActivateAnalysisStream(commandHandler, kCommandPath, commandData);
 
-    // The response should contain an ActionReturnStatus
+    // TODO: activation is not implemented yet; no stream can leave PendingInitiation,
+    // so the placeholder responds INVALID_IN_STATE.
     if (response.has_value())
     {
-        ASSERT_TRUE(response.value().IsSuccess());
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
     }
     else
     {
@@ -406,10 +407,11 @@ TEST_F(TestRemoteAvAnalysisCluster, ExecuteDeactivateAnalysisStreamCommandTest)
 
     auto response = mServer.GetLogic().HandleDeactivateAnalysisStream(commandHandler, kCommandPath, commandData);
 
-    // The response should contain an ActionReturnStatus
+    // TODO: deactivation is not implemented yet; no stream can be in an active state,
+    // so INVALID_IN_STATE is sent as response.
     if (response.has_value())
     {
-        ASSERT_TRUE(response.value().IsSuccess());
+        ASSERT_TRUE(response->GetStatusCode() == Protocols::InteractionModel::ClusterStatusCode(Status::InvalidInState));
     }
     else
     {

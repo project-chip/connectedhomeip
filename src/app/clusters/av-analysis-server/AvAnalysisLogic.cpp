@@ -890,23 +890,25 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleEstabl
 }
 
 /**
- * Placeholder method for when the functionality for remote context detection is implemented
+ * TODO: implement WebRTC session activation (stream state machine beyond PendingInitiation).
+ * Streams cannot be activated yet, so INVALID_IN_STATE is sent as response.
  */
 std::optional<DataModel::ActionReturnStatus>
 AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                     const AvAnalysis::Commands::ActivateAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    return Status::InvalidInState;
 }
 
 /**
- * Placeholder method for when the functionality for remote context detection is implemented
+    * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
+    * so INVALID_IN_STATE is sent as response.
  */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DeactivateAnalysisStream::DecodableType & commandData)
 {
-    return Status::Success;
+    return Status::InvalidInState;
 }
 
 std::optional<DataModel::ActionReturnStatus>
