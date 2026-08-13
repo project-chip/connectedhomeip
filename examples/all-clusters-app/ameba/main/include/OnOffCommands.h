@@ -56,33 +56,33 @@ void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const Clusters::B
     switch (data->attributeId)
     {
     case Clusters::OnOff::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OnOff::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::GlobalSceneControl::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OnTime::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::OffWaitTime::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::OnOff::Attributes::StartUpOnOff::Id:
-        Controller::ReadAttribute<Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
     }
 }

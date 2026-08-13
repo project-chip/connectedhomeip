@@ -56,268 +56,268 @@ void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const Clus
     switch (data->attributeId)
     {
     case Clusters::ColorControl::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CurrentHue::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CurrentSaturation::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::RemainingTime::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CurrentX::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CurrentY::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::DriftCompensation::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CompensationText::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTemperatureMireds::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTemperatureMireds::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorMode::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Options::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Options::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Options::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::NumberOfPrimaries::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary1X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary1Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary1Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary2X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary2Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary2Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary3X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary3Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary3Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary4X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary4Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary4Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary5X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary5Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary5Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary6X::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary6Y::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::Primary6Intensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::WhitePointX::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::WhitePointY::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointRX::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointRY::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointRIntensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointGX::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointGY::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointGIntensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointBX::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointBY::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorPointBIntensity::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::EnhancedCurrentHue::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::EnhancedColorMode::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorLoopActive::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorLoopDirection::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorLoopTime::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorCapabilities::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorTempPhysicalMinMireds::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTempPhysicalMinMireds::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTempPhysicalMinMireds::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTempPhysicalMaxMireds::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::ColorTempPhysicalMaxMireds::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::Id:
-        Controller::ReadAttribute<Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
     }
 }

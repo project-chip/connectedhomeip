@@ -56,18 +56,18 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const Clusters
     switch (data->attributeId)
     {
     case Clusters::Identify::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::Identify::Attributes::IdentifyTime::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
 
     case Clusters::Identify::Attributes::IdentifyType::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
-            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
+        LogErrorOnFailure(Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
+            peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure));
         break;
     }
 }
