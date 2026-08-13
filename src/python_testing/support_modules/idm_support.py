@@ -787,6 +787,14 @@ class IDMBaseTest(BasicCompositionTests):
             # numeric types are out of scope for automated violation generation.
             return violations
         type_min, type_max = type_range
+        if field.is_nullable:
+            # Nullable numerics reserve one end of the value space for null (the type
+            # maximum when unsigned, the minimum when signed), so a violation encoded
+            # there is rejected by the null encoding rather than by the field's bound.
+            if type_min < 0:
+                type_min += 1
+            else:
+                type_max -= 1
         if constraints.max_value is not None and constraints.max_value < type_max:
             violations.append((f"value {constraints.max_value + 1} > max {constraints.max_value}",
                                constraints.max_value + 1))
