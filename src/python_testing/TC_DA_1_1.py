@@ -33,6 +33,27 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+# test-runner-runs:
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args:
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --vendor-id 0xFFF2
+#       --product-id 0x8002
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF2-8002.json
+#       --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       -q MT:86PS0KQS02-10648G00
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+
 # === END CI TEST ARGUMENTS ===
 
 import logging
