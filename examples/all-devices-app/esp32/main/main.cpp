@@ -296,10 +296,11 @@ void InitServer(intptr_t context)
     }
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+        .groupDataProvider      = gGroupDataProvider,                     //
+        .fabricTable            = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate          = gTimerDelegate,                         //
+        .storageDelegate        = *initParams.persistentStorageDelegate,  //
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT

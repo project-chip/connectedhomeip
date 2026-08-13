@@ -38,6 +38,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
@@ -190,10 +191,11 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
-        .groupDataProvider = *groupDataProvider,
-        .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
-        .timerDelegate     = sTimerDelegate,
-        .storageDelegate   = storage,
+        .groupDataProvider      = *groupDataProvider,
+        .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
+        .timerDelegate          = sTimerDelegate,
+        .storageDelegate        = storage,
+        .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
     });
 
     std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();

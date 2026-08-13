@@ -151,10 +151,11 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     ReturnErrorOnFailure(CreateAndRegisterRootNode(initParams));
 
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,
-        .fabricTable       = Server::GetInstance().GetFabricTable(),
-        .timerDelegate     = gTimerDelegate,
-        .storageDelegate   = *initParams.persistentStorageDelegate,
+        .groupDataProvider      = gGroupDataProvider,
+        .fabricTable            = Server::GetInstance().GetFabricTable(),
+        .timerDelegate          = gTimerDelegate,
+        .storageDelegate        = *initParams.persistentStorageDelegate,
+        .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
