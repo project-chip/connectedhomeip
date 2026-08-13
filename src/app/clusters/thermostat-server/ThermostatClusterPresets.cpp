@@ -88,6 +88,7 @@ bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const Da
                                 PresetStructWithOwnedMembers & matchingPreset)
 {
     VerifyOrReturnValue(delegate != nullptr, false);
+    VerifyOrReturnValue(!presetHandle.IsNull(), false);
 
     for (uint8_t i = 0; true; i++)
     {
@@ -103,7 +104,8 @@ bool GetMatchingPresetInPresets(ThermostatPresets::Delegate * delegate, const Da
             return false;
         }
 
-        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        if (!matchingPreset.GetPresetHandle().IsNull() &&
+            presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
         {
             return true;
         }
@@ -280,10 +282,12 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::WriteAttribute(c
     }
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
-    VerifyOrReturnError(mCluster.GetAtomicWriteSession().InAtomicWrite(MakeOptional(request.path.mAttributeId)),
+    auto & atomicWriteSession = mCluster.GetAtomicWriteSession();
+
+    VerifyOrReturnError(atomicWriteSession.InAtomicWrite(MakeOptional(request.path.mAttributeId)),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Presets are not editable"));
 
-    if (!mCluster.GetAtomicWriteSession().InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
+    if (!atomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
     {
         ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
         return CHIP_IM_GLOBAL_STATUS(Busy);
@@ -427,7 +431,9 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return Status::InvalidCommand;
     }
 
-    DataModel::Nullable<MutableByteSpan> activePresetHandle;
+    uint8_t buffer[kPresetHandleSize];
+    MutableByteSpan activePresetHandleSpan(buffer);
+    auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
     Optional<DataModel::Nullable<ByteSpan>> oldPresetHandle;
     CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
     if (err != CHIP_NO_ERROR)
