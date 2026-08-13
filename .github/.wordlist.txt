@@ -1176,6 +1176,7 @@ ProductID
 ProductLabel
 ProductName
 ProductURL
+proguard
 proto
 protobuf
 protos
