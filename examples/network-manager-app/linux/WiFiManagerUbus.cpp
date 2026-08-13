@@ -110,6 +110,8 @@ void WiFiManagerUbus::Init()
 {
     mUci.SetResolvedCallback(
         [](UbusWatch & /*watch*/, void * appState) { static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces(); });
+    mUci.SetNotificationCallback([](UbusWatch & /*watch*/, void * appState, ubus_request_data * /*req*/, const char * notification,
+                                    blob_attr * msg) { static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces(); });
 
     mService.SetResolvedCallback(
         [](UbusWatch & /*watch*/, void * /*appState*/) { ChipLogDetail(AppServer, "WiFiManagerUbus: service object resolved"); });
@@ -136,11 +138,11 @@ void WiFiManagerUbus::Init()
             BlobMsgRequiredField<const char *, CHIP_CTST("type")> eventType;
             if (!BlobMsgParse(msg, eventType))
             {
-                ChipLogError(AppServer, "WiFiManagerUbus: failed to parse service event");
+                // Sometimes notifications without type are received. This is normal, we should just ignore them
                 return;
             }
             ChipWifiDebug("WiFiManagerUbus: event type = '%s'", eventType.value());
-            if (strcmp(eventType.value(), "netifd.wireless.done") != 0)
+            if (strcmp(eventType.value(), "netifd.wireless.done") != 0 && strcmp(eventType.value(), "config.change") != 0)
                 return;
 
             static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces();
@@ -228,17 +230,18 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
 
     blobmsg_for_each_attr(cur, values, rem)
     {
-        bool station_mode = false;
+        bool radio_is_invalid = false;
         ChipLogProgress(AppServer, "Found radio: %s", blobmsg_name(cur));
         blobmsg_for_each_attr(i, cur, r)
         {
             if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
             {
                 ChipWifiDebug("  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
-                if (strcmp(blobmsg_name(i), "mode") == 0 && strcmp(blobmsg_get_string(i), "ap") != 0)
+                if ((strcmp(blobmsg_name(i), "mode") == 0 && strcmp(blobmsg_get_string(i), "ap") != 0) ||
+                    (strcmp(blobmsg_name(i), "disabled") == 0 && strcmp(blobmsg_get_string(i), "1") == 0))
                 {
-                    ChipLogProgress(AppServer, "Found non-AP radio, SKIPPING");
-                    station_mode = true;
+                    ChipLogProgress(AppServer, "Radio was invalid, SKIPPING");
+                    radio_is_invalid = true;
                 }
             }
             else
@@ -246,7 +249,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
                 ChipWifiDebug("  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
             }
         }
-        if (!station_mode && (mDesiredRadio.empty() || mDesiredRadio == blobmsg_name(cur)))
+        if (!radio_is_invalid && (mDesiredRadio.empty() || mDesiredRadio == blobmsg_name(cur)))
         {
             radio = cur;
             break;
