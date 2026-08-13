@@ -77,8 +77,8 @@ public:
     Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;
 
     // ThermostatOccupancy::Delegate methods
-    BitMask<OccupancyBitmap> GetOccupancy() override;
-    void SetOccupancy(BitMask<OccupancyBitmap> occupancy);
+    BitMask<OccupancyBitmap> GetOccupancy() const override;
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupancy) override;
 
     // ThermostatPresets::Delegate methods
     std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
