@@ -22,7 +22,7 @@
 
 namespace {
 
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 class AutoFreeBuffer
 {
