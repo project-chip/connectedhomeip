@@ -210,10 +210,12 @@ int InitRandomStaticAddress(bool idPresent, int & id)
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
 /**
  * Telink TLX: start a minimal BLE advertisement that carries no CHIPoBLE
- * service data. It is invisible to Matter controllers but keeps a real BLE
- * task active in the TLKSW scheduler, which is required for the shared
- * BLE/802.15.4 coexistence arbitration to work (see the workaround note in
- * BLEManagerImpl::_Init()). Returns a Zephyr errno, 0 on success.
+ * service data and is NON-connectable / non-scannable, so it is invisible to
+ * scanners and does not reserve a connection object (Telink uses
+ * CONFIG_BT_MAX_CONN=1). It keeps a real BLE task active in the TLKSW
+ * scheduler, which is required for the shared BLE/802.15.4 coexistence
+ * arbitration to work (see the workaround note in BLEManagerImpl::_Init()).
+ * Returns a Zephyr errno, 0 on success.
  */
 int StartMinimalBLEAdvertisement()
 {
@@ -221,7 +223,8 @@ int StartMinimalBLEAdvertisement()
         BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
     };
     const struct bt_le_adv_param params =
-        BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
+        BT_LE_ADV_PARAM_INIT(0 /* non-connectable, non-scannable */, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1,
+                             NULL);
     return bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
 }
 #endif // CONFIG_BT_TLX
@@ -263,7 +266,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#if defined(CONFIG_BT_TLX)
+#endif
+#endif // CONFIG_BT_BONDABLE
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
     // WORKAROUND (Telink TLX BLE + 802.15.4 coexistence):
     //
     // On Telink TLX SoCs, BLE and Thread share a single hardware radio and
@@ -285,13 +291,15 @@ CHIP_ERROR BLEManagerImpl::_Init()
     //
     // The real CHIPoBLE advertisement replaces this minimal one later, when
     // DriveBLEState() runs (StartAdvertising).
+    //
+    // NOTE: this runs after both the bondable and non-bondable init paths
+    // above, both of which have already completed bt_enable() when concurrent
+    // connection support is enabled.
     int adv_err = StartMinimalBLEAdvertisement();
     VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
 
     tlx_bt_802154_dual_mode_start();
 #endif
-#endif
-#endif // CONFIG_BT_BONDABLE
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
 

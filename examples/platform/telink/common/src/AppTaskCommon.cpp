@@ -801,6 +801,13 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // NOTE: Telink builds configure CONFIG_BT_MAX_CONN=1, so during
+        // commissioning the single BLE connection slot is always the
+        // commissioning connection. Any BLE disconnect while the fail-safe
+        // is armed therefore corresponds to the commissioning connection.
+        // If CONFIG_BT_MAX_CONN is ever raised, the disconnected connection
+        // identifier must be plumbed through kCHIPoBLEConnectionClosed and
+        // matched here before expiring the fail-safe.
         if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
         {
             // Unexpected BLE disconnect during commissioning
