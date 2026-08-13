@@ -18,8 +18,8 @@
 
 #include <lib/core/CHIPEncoding.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /**
  * Wrapper around a MDNS bit-packed flags in a DNS header as defined in
@@ -166,5 +166,5 @@ private:
     HeaderRef & SetRawFlags(uint16_t value) { return Set16At(kFlagsOffset, value); }
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

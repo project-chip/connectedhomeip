@@ -123,17 +123,17 @@ CHIP_ERROR BuildThreadRendezvousAnnouncement(const Dnssd::CommissionAdvertisingP
         builder.Header().SetFlags(builder.Header().GetFlags().SetResponse().SetAuthoritative());
 
         static const char * matterc_udp_local[] = { "_matterc", "_udp", "local" };
-        mdns::Minimal::FullQName serviceName(matterc_udp_local);
+        chip::Dnssd::FullQName serviceName(matterc_udp_local);
 
         static const char * root[] = { "" };
-        mdns::Minimal::FullQName targetName(root);
-        mdns::Minimal::SrvResourceRecord srvRecord(serviceName, targetName, params.GetPort());
-        builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, srvRecord);
+        chip::Dnssd::FullQName targetName(root);
+        chip::Dnssd::SrvResourceRecord srvRecord(serviceName, targetName, params.GetPort());
+        builder.AddRecord(chip::Dnssd::ResourceType::kAnswer, srvRecord);
 
         TxtStringsBuilder txtStringsBuilder;
         ReturnErrorOnFailure(txtStringsBuilder.Fill(params));
-        mdns::Minimal::TxtResourceRecord txtRecord(serviceName, txtStringsBuilder.GetEntries(), txtStringsBuilder.GetCount());
-        builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, txtRecord);
+        chip::Dnssd::TxtResourceRecord txtRecord(serviceName, txtStringsBuilder.GetEntries(), txtStringsBuilder.GetCount());
+        builder.AddRecord(chip::Dnssd::ResourceType::kAnswer, txtRecord);
 
         outBuffer = builder.ReleasePacket();
     }

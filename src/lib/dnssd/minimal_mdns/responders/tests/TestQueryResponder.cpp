@@ -27,6 +27,7 @@ namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 const QNamePart kDnsSdname[] = { "_services", "_dns-sd", "_udp", "local" };
 
