@@ -47,7 +47,7 @@
 #define X_CUBE_MATTER_VERSION "v1.6.0"
 #define PRODUCT_NAME "Dimmable Light"
 #define VENDOR_NAME "STMicroelectronics"
-#define MATTER_SDK_VERSION "Master"
+#define MATTER_SDK_VERSION "1.6.1"
 
 /* HIGHWATERMARK */
 #define HIGHWATERMARK 1
