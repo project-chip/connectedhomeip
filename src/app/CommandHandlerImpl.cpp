@@ -174,6 +174,15 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
+// Encodes response command data using non-virtual EncodableResponsePayload descriptors.
+// Adapts the payload to EncodableToTLV to share framing and session setup logic without duplication.
+CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                                  const EncodableResponsePayload & aPayload)
+{
+    EncodableResponsePayload::Adapter adapter(aPayload);
+    return TryAddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+}
+
 CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                                const DataModel::EncodableToTLV & aEncodable)
 {
@@ -181,6 +190,25 @@ CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequ
     VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
     return TryAddingResponse(
         [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable); });
+}
+
+CHIP_ERROR CommandHandlerImpl::AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                               const EncodableResponsePayload & aPayload)
+{
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+    return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aResponseCommandId, aPayload); });
+}
+
+void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                     const EncodableResponsePayload & aPayload)
+{
+    CHIP_ERROR err = AddResponseData(aRequestCommandPath, aResponseCommandId, aPayload);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Adding response failed: %" CHIP_ERROR_FORMAT ". Returning failure instead.", err.Format());
+        AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
+    }
 }
 
 CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
