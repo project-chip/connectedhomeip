@@ -901,8 +901,8 @@ AvAnalysisServerLogic::HandleActivateAnalysisStream(CommandHandler & handler, co
 }
 
 /**
-    * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
-    * so INVALID_IN_STATE is sent as response.
+ * TODO: implement WebRTC session deactivation. No stream can be in an active state yet,
+ * so INVALID_IN_STATE is sent as response.
  */
 std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDeactivateAnalysisStream(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
