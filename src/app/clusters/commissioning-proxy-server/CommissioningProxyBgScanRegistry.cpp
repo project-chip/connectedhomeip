@@ -98,9 +98,13 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         }
     }
 
-    // Commit: replace any previous registration for this fabric. A request from a
-    // different node on the same fabric takes ownership, matching the refresh
-    // semantics of a repeat request from the same node.
+    // From here nothing can fail: the hardware scan is running and the lifetime timer
+    // is armed, so the table is safe to modify.
+    //
+    // There is one record per fabric. A second start for a fabric that already has one
+    // — whether from the same node or a different one — overwrites that record and
+    // drops its lifetime timer, and the requesting node becomes the owner allowed to
+    // stop it. Starts from other fabrics add their own records alongside.
     auto it = mFabrics.find(fabricIndex);
     if (it != mFabrics.end())
     {
@@ -149,10 +153,9 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
 
     const uint8_t remainTransport = static_cast<uint8_t>(fabTransportBits & ~stopTransportBits);
     const uint16_t remainBands    = static_cast<uint16_t>(fabBandBits & ~stopBandBits);
-    // A record holds exactly one transport bit (see Start), so a stop that names this
-    // transport always drives remainTransport to 0 and the first term decides. The
-    // remainBands term therefore only ever fires on a band-only stop (transport == 0)
-    // that clears the last registered band, which does leave nothing to scan for.
+    // A record holds one transport bit (see Start), so the first term decides whenever
+    // the stop names this transport; remainBands only fires on a band-only stop that
+    // clears the last band.
     const bool fabricNowEmpty = (remainTransport == 0 || remainBands == 0);
 
     if (fabricNowEmpty)

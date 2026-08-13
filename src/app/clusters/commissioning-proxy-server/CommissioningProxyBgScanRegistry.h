@@ -94,14 +94,12 @@ public:
     CommissioningProxyBgScanRegistry & operator=(const CommissioningProxyBgScanRegistry &) = delete;
 
     /**
-     * ProxyBackGroundScanStartRequest. The spec keeps "per fabric records" and records
-     * the sender's NodeID to authorise the matching Stop, so there is one record per
-     * fabric: a start from any node replaces that fabric's record and takes ownership.
-     * @p timeoutSecs == 0 means no lifetime timer. A rejected Start changes nothing.
+     * ProxyBackGroundScanStartRequest. Spec: "keep per fabric records", with the
+     * sender's NodeID recorded to authorise the matching Stop — so a start from any
+     * node replaces that fabric's record and takes ownership. @p timeoutSecs == 0 means
+     * no lifetime timer. A rejected Start changes nothing.
      *
-     * @p transport SHALL carry only the owning transport's own bit — the cluster fans a
-     * multi-transport request out to each driver separately, and Stop() relies on a
-     * record holding a single bit.
+     * @p transport SHALL carry only the owning transport's own bit; Stop() relies on it.
      */
     Protocols::InteractionModel::Status Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
                                               BitMask<WiFiBandBitmap> wiFiBands, uint16_t timeoutSecs);
@@ -152,18 +150,15 @@ private:
 
     struct Record
     {
-        // The NodeID that started this fabric's scan. Recorded so only that client can
-        // stop it; it is not part of the record's identity (there is one record per
-        // fabric, not one per node).
+        // Who may stop this scan; not part of the record's identity.
         NodeId ownerNodeId = kUndefinedNodeId;
         BitMask<CapabilitiesBitmap> transport;
         BitMask<WiFiBandBitmap> wiFiBands;
         LifetimeCtx * lifetimeCtx = nullptr;
     };
 
-    /// Handle a fired lifetime timer. @p fabricIndex is taken BY VALUE on purpose: the
-    /// caller is LifetimeCtx::TimerFired() passing its own member, and this function
-    /// deletes that ctx. A reference would dangle for the rest of the body.
+    /// By value on purpose: the caller passes its own LifetimeCtx member, which this
+    /// deletes. A reference would dangle for the rest of the body.
     void OnLifetimeExpiry(FabricIndex fabricIndex);
     void CancelLifetime(Record & rec);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache

@@ -31,15 +31,10 @@ namespace Clusters {
 namespace CommissioningProxy {
 
 /**
- * @brief Test TimerDelegate giving a test control over every cluster timer.
+ * @brief Test TimerDelegate with virtual time, several concurrent timers and
+ *        StartTimer failure injection — none of which chip::TimerDelegateMock offers.
  *
- * The shared chip::TimerDelegateMock cannot serve these tests: it holds a single
- * TimerContext, while the session manager arms one timer per pending request, and it
- * always reports success, while the rollback paths only run on a StartTimer failure.
- *
- * Time is virtual: AdvanceClock() fires everything due synchronously, so a test for a
- * 300-second expiry costs no wall-clock time. Modelled on TestReportScheduler.cpp's
- * TestTimerDelegate (fixed-capacity, no heap).
+ * AdvanceClock() fires timers synchronously, so expiry costs no wall-clock time.
  */
 class CommissioningProxyMockTimer : public TimerDelegate
 {

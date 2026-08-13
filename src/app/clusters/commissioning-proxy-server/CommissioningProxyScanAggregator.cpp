@@ -51,9 +51,8 @@ CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * command
         mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
     if (err != CHIP_NO_ERROR)
     {
-        // Without the watchdog a sub-scan that never reports would leave mInProgress
-        // set forever, making every future ProxyScanRequest return Busy. Roll the
-        // aggregation back so the caller can reject this command instead.
+        // With no watchdog a sub-scan that never reports would leave mInProgress set
+        // forever, making every later ProxyScanRequest return Busy.
         ChipLogError(Zcl, "CommissioningProxy: failed to arm scan watchdog: %" CHIP_ERROR_FORMAT, err.Format());
         Abort();
         return err;

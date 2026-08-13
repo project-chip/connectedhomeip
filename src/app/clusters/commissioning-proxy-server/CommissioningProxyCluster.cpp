@@ -453,10 +453,8 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
     const FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
     const NodeId nodeId           = request.subjectDescriptor.subject;
 
-    // A background scan MAY select multiple transports: start each requested,
-    // registered transport with its own transport-local per-fabric record. Either all
-    // of them start, or the ones that did are stopped again — a command that reports
-    // failure must not leave a scan running that the commissioner does not know about.
+    // A background scan MAY select multiple transports. Either all of them start, or
+    // the ones that did are stopped again, so a failed command leaves nothing running.
     auto result = Status::Success;
     chip::BitMask<CapabilitiesBitmap> started;
     for (size_t i = 0; i < mTransportCount; i++)
