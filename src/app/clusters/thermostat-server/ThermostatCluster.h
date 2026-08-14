@@ -134,8 +134,7 @@ public:
                         DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
-    DataModel::ActionReturnStatus SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
-
+ 
     Setpoints mSetpoints;
 
 private:
