@@ -374,7 +374,7 @@ def assert_valid_vendor_subtype(vendor_subtype: str) -> None:
 
 
 @not_none_args
-def assert_valid_devtype_subtype(devtype_subtype: str, service_type: str = MdnsServiceType.COMMISSIONABLE.value) -> None:
+def assert_valid_devtype_subtype(devtype_subtype: str) -> None:
     """
     Verify that the DNS-SD commissioning device type subtype is valid.
 
@@ -382,11 +382,7 @@ def assert_valid_devtype_subtype(devtype_subtype: str, service_type: str = MdnsS
     - 32-bit Devtype ID
     - Encoded as a variable-length decimal number in ASCII (UTF-8) text
     - Omitting any leading zeroes
-    - Format: "_T<value>._sub.<service-type>"
-
-    The subtype is validated against `service_type`: the commissionable
-    service type (default) or the commissioner service type for
-    Commissioner Discovery advertisements.
+    - Format: "_T<value>._sub.<commissionable-service-type>"
 
     Example:
         "_T10._sub._matterc._udp.local."
@@ -398,7 +394,7 @@ def assert_valid_devtype_subtype(devtype_subtype: str, service_type: str = MdnsS
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#13-commissioning-subtypes
     """
     constraints = [
-        "Must match format '_T<value>._sub.<service-type>'",
+        "Must match format '_T<value>._sub.<commissionable-service-type>'",
         "Value must be a decimal integer without leading zeroes",
         "Value must be within 0-4294967295 (32-bit range)",
     ]
@@ -407,7 +403,7 @@ def assert_valid_devtype_subtype(devtype_subtype: str, service_type: str = MdnsS
 
     # Strict format check (enforces correct service type and no leading zeros)
     strict_re = re.compile(
-        rf'_T(0|[1-9]\d*)\._sub\.{re.escape(service_type)}'
+        rf'_T(0|[1-9]\d*)\._sub\.{re.escape(MdnsServiceType.COMMISSIONABLE.value)}'
     )
     format_ok = bool(strict_re.fullmatch(devtype_subtype))
     if not format_ok:

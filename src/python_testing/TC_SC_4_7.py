@@ -39,8 +39,8 @@ import time
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissioner_type, assert_valid_commissionable_instance_name,
-                                          assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_ipv6_addresses, assert_valid_vp_key)
+                                          assert_valid_dn_key, assert_valid_dt_key, assert_valid_hostname,
+                                          assert_valid_ipv6_addresses, assert_valid_vp_key)
 from mobly import asserts
 
 from matter.testing.apps import AppServerSubprocess
@@ -279,7 +279,6 @@ class TC_SC_4_7(MatterBaseTest):
     async def _verify_devtype_subtype(self, instance_name: str, dt_key: str) -> None:
         # Construct the 'Devtype Subtype' _T from the advertised device type
         devtype_subtype = f"_T{int(dt_key)}._sub.{MdnsServiceType.COMMISSIONER.value}"
-        assert_valid_devtype_subtype(devtype_subtype, service_type=MdnsServiceType.COMMISSIONER.value)
 
         # TH performs a PTR record query against the 'Devtype Subtype'
         ptr_records = await MdnsDiscovery().get_ptr_records(
