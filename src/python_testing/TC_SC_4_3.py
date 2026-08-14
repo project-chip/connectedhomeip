@@ -73,7 +73,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.TCP"
+TCP_PICS_STR = "MCORE.SC.S.TCP"
 ONE_HOUR_IN_MS = 3600000
 MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6

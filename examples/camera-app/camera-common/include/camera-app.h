@@ -55,6 +55,7 @@ private:
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagementCluster>
         mAVStreamMgmtServer;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::AvAnalysisCluster> mAVAnalysisServer;
 
     // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
     void CreateAndInitializeCameraAVStreamMgmt();

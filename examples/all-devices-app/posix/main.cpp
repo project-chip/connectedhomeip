@@ -35,12 +35,12 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <providers/AllDevicesExampleDACProvider.h>
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
@@ -346,7 +346,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     // Set the global DAC provider before server/cluster init so any integration path that
     // snapshots the provider during construction sees a valid implementation.
-    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
+    SuccessOrDie(sDacProvider.Init(AppOptions::GetConfig().dacProvider));
+    SetDeviceAttestationCredentialsProvider(&sDacProvider);
 
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
