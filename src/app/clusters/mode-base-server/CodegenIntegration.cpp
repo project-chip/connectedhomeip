@@ -49,15 +49,9 @@ IntrusiveList<Instance> gModeBaseInstances;
 
 // The clusters that share this attribute structure.
 constexpr DataModel::DeviceTypeEntry kAliasedClusters[] = {
-    Device::Type::kDeviceEnergyManagement,
-    Device::Type::kDishwasher,
-    Device::Type::kEvse,
-    Device::Type::kLaundryWasher,
-    Device::Type::kMicrowaveOven,
-    Device::Type::kOven,
-    Device::Type::kRefrigerator,
-    Device::Type::kRoboticVacuumCleaner,
-    Device::Type::kWaterHeater,
+    Device::Type::kDeviceEnergyManagement, Device::Type::kDishwasher,           Device::Type::kEvse,
+    Device::Type::kLaundryWasher,          Device::Type::kMicrowaveOven,        Device::Type::kOven,
+    Device::Type::kRefrigerator,           Device::Type::kRoboticVacuumCleaner, Device::Type::kWaterHeater,
 };
 
 } // namespace

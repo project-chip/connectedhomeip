@@ -41,8 +41,6 @@
 
 namespace chip::app::Clusters::ModeBase {
 
-
-
 // All aliased clusters share features, mandatory attributes, and commands (except MicrowaveOvenMode).
 using Feature      = DeviceEnergyManagementMode::Feature;
 namespace Commands = DeviceEnergyManagementMode::Commands;
