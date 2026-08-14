@@ -90,6 +90,12 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
     ReturnErrorOnFailure(InitContext());
     ReturnErrorOnFailure(ConvertDacKey());
     ReturnErrorOnFailure(ImportPrivateKeyBlob());
+#else
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    ReturnErrorOnFailure(ImportDacPrivateKey());
 #endif
 
     return error;
@@ -97,11 +103,11 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
 
 void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
-    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_VOLATILE)
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
     {
-        psa_set_key_lifetime(
-            &attrs,
-            PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE, PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
+        psa_set_key_lifetime(&attrs,
+                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT,
+                                                                            PSA_KEY_LOCATION_S200_KEY_STORAGE_NON_EL2GO));
     }
 }
 

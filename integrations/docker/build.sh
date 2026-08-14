@@ -36,10 +36,8 @@ VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 if [[ $OSTYPE == 'darwin'* ]]; then
     DOCKER_VOLUME_PATH=~/Library/Containers/com.docker.docker/Data/vms/0/
-    TARGET_PLATFORM_TYPE="linux/arm64"
 else
     DOCKER_VOLUME_PATH=/var/lib/docker/
-    TARGET_PLATFORM_TYPE="linux/amd64"
 fi
 
 [[ ${*/--help//} != "${*}" ]] && {
@@ -59,6 +57,18 @@ fi
 "
     exit 0
 }
+
+if [[ -z $DOCKER_BUILD_PLATFORM ]]; then
+    case "$(uname -m)" in
+        arm64 | aarch64) DOCKER_BUILD_PLATFORM="linux/arm64" ;;
+        x86_64 | amd64) DOCKER_BUILD_PLATFORM="linux/amd64" ;;
+        *)
+            echo "$me: *** ERROR: unsupported host architecture: $(uname -m)"
+            exit 1
+            ;;
+    esac
+fi
+TARGET_PLATFORM_TYPE="$DOCKER_BUILD_PLATFORM"
 
 die() {
     echo "$me: *** ERROR: $*"
@@ -82,11 +92,13 @@ PUSH=false
 SKIP_BUILD=false
 SQUASH=false
 CLEAR=false
+NO_CACHE=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-cache)
             BUILD_ARGS+=("$1")
+            NO_CACHE=true
             shift
             ;;
         --latest)
@@ -125,14 +137,76 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# go find and build any CHIP images this image is "FROM"
-awk -F/ '/^FROM project-chip/ {print $2}' Dockerfile | while read -r dep; do
-    dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "${ORIG_ARGS[@]}")
+# go find and build any CHIP images this image is "FROM".
+# Images are referenced as ghcr.io/project-chip/<name>:<tag>, and the parent may
+# live in any stage directory, so resolve it by name under images/ rather than
+# assuming it is a sibling.
+# The script is symlinked into each image directory and has already cd'd there,
+# so images/ is two levels up. Derived from that rather than from git, so the
+# walk works on an exported tree with no repository.
+IMAGES_ROOT="$(cd ../.. && pwd)"
+# Take the image token ($2) so a trailing "AS <alias>" is excluded by
+# construction rather than by the tag strip happening to swallow it, and cut at
+# ":" or "@" so both tagged and digest references reduce to the image name.
+awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
+        ref = $2
+        sub(/.*project-chip\//, "", ref)
+        sub(/[:@].*/, "", ref)
+        print ref
+     }' Dockerfile |
+    sort -u | while read -r dep; do
+    dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
+    [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
+    # Prefer a parent that already exists over building one. Locally that avoids
+    # rebuilding the base image once per dependent image during a build-all run;
+    # in CI, where each image builds on its own runner, it avoids rebuilding the
+    # base for every image in the matrix.
+    #
+    # Building is the fallback rather than the default, since the tag is missing
+    # exactly when a change has not been published yet, which is the case on a
+    # pull request that bumps a version file.
+    #
+    # $VERSION is what the parent would be tagged with too: every image reads the
+    # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
+    if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present"
+    elif docker pull "$GHCR_ORG/$ORG/$dep:$VERSION"; then
+        echo "$me: pulled parent $GHCR_ORG/$ORG/$dep:$VERSION"
+    else
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION not published, building it"
+        (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
+    fi
 done
 
+BUILT=false
 if [ "$SKIP_BUILD" = false ]; then
-    docker build "${BUILD_ARGS[@]}" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+    # An image that already exists at this version does not need building. These
+    # images fetch SDKs and toolchains from vendor servers while they build, so
+    # a build that does not happen is also an unrelated vendor outage that
+    # cannot fail the run. --no-cache means a rebuild was asked for explicitly.
+    if [ "$NO_CACHE" = false ] && docker image inspect "$GHCR_ORG/$ORG/$IMAGE:$VERSION" >/dev/null 2>&1; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already present, not rebuilding"
+    elif [ "$NO_CACHE" = false ] && docker pull "$GHCR_ORG/$ORG/$IMAGE:$VERSION"; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already published, not rebuilding"
+    else
+        # Seed the layer cache from the previous version. Most of what changes
+        # between versions is one step, so the layers before it are often still
+        # valid. Only meaningful for numeric versions, and only once the
+        # previous image carries inline cache metadata, which is why the build
+        # below records it for next time.
+        CACHE_ARGS=()
+        # 10# forces base ten: bash reads a leading zero as octal, so "08" and
+        # "09" are errors and "010" would quietly mean 8. There is also no
+        # predecessor to version zero.
+        if [[ $VERSION =~ ^[0-9]+$ ]] && ((10#$VERSION > 0)); then
+            PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((10#$VERSION - 1))"
+            if [ "$NO_CACHE" = false ] && docker pull "$PREVIOUS"; then
+                CACHE_ARGS=(--cache-from "$PREVIOUS")
+            fi
+        fi
+        docker build "${BUILD_ARGS[@]}" "${CACHE_ARGS[@]}" --build-arg BUILDKIT_INLINE_CACHE=1 --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+        BUILT=true
+    fi
     docker image prune --force
 fi
 
