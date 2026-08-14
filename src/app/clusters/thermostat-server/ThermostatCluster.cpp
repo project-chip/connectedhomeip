@@ -157,10 +157,7 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
 
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
-    if (!SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation, ControlSequenceOfOperation::Id))
-    {
-        return Status::Failure;
-    }
+    SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation, ControlSequenceOfOperation::Id);
     return Status::Success;
 }
 
@@ -213,10 +210,7 @@ Status ThermostatCluster::SetSystemMode(SystemModeEnum systemMode)
         return Status::ConstraintError;
     }
 
-    if (!SetAttributeValue(mSystemMode, systemMode, app::Clusters::Thermostat::Attributes::SystemMode::Id))
-    {
-        return Status::Failure;
-    }
+    SetAttributeValue(mSystemMode, systemMode, app::Clusters::Thermostat::Attributes::SystemMode::Id);
     return Status::Success;
 }
 
@@ -250,10 +244,7 @@ Status ThermostatCluster::SetRunningMode(ThermostatRunningModeEnum runningMode)
     default:
         return Status::ConstraintError;
     }
-    if (!SetAttributeValue(mRunningMode, runningMode, app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id))
-    {
-        return Status::Failure;
-    }
+    SetAttributeValue(mRunningMode, runningMode, app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id);
     return Status::Success;
 }
 
@@ -269,10 +260,7 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
         ChipLogDetail(Zcl, "Cooling relay state is not supported");
         return Status::ConstraintError;
     }
-    if (!SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id))
-    {
-        return Status::Failure;
-    }
+    SetAttributeValue(mRunningState, runningState, app::Clusters::Thermostat::Attributes::ThermostatRunningState::Id);
     return Status::Success;
 }
 
