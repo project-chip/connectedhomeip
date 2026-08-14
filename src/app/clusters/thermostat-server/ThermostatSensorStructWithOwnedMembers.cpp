@@ -43,12 +43,11 @@ ThermostatSensorStructWithOwnedMembers::operator=(const Structs::ThermostatSenso
 ThermostatSensorStructWithOwnedMembers &
 ThermostatSensorStructWithOwnedMembers::operator=(const ThermostatSensorStructWithOwnedMembers & other)
 {
-    SetCluster(other.GetCluster());
-    SetEndpoint(other.GetEndpoint());
-    SetNode(other.GetNode());
-    SetFabricIndex(other.GetFabricIndex());
-    TEMPORARY_RETURN_IGNORED SetName(other.GetName());
-    TEMPORARY_RETURN_IGNORED SetSensorHandle(other.GetSensorHandle());
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const ThermostatSensorStructWithOwnedMembers::Type &>(other);
     return *this;
 }
 
