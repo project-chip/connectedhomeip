@@ -888,8 +888,8 @@ CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
 CHIP_ERROR AmbientContextSensingCluster::ReadSensorFusionSupported(AttributeValueEncoder & encoder)
 {
     VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrDie(mACSDelegate != nullptr);
     VerifyOrReturnValue(!mSensorFusionSupportedList.empty(), encoder.EncodeEmptyList());
+    VerifyOrDie(mACSDelegate != nullptr);
 
     return encoder.EncodeList([this](const auto & encode) -> CHIP_ERROR {
         for (const auto & item : mSensorFusionSupportedList)

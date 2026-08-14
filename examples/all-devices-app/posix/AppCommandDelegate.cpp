@@ -462,7 +462,9 @@ public:
         const Json::Value & actArray = json["AmbientContextType"];
         if (actArray.empty())
         {
-            ChipLogError(AppServer, "AmbientContextType array is empty");
+            // Empty array is valid: clears the supported sensor fusion list
+            Span<Globals::Structs::SemanticTagStruct::Type> emptyTags;
+            LogErrorOnFailure(cluster->SetSensorFusionSupported(emptyTags));
             return;
         }
         if (actArray.size() > AmbientContextSensing::kMaxSensorFusionSupported)
@@ -483,8 +485,21 @@ public:
                              inputJson.c_str());
                 return;
             }
-            uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
-            uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+            uint32_t typeIdRaw = item["TypeId"].asUInt();
+            uint32_t tagIdRaw  = item["TagId"].asUInt();
+
+            if (typeIdRaw > std::numeric_limits<uint8_t>::max() ||
+                tagIdRaw  > std::numeric_limits<uint8_t>::max())
+            {
+                std::string inputJson = json.toStyledString();
+                ChipLogError(AppServer,
+                             "AmbientContextType[%u]: TypeId (%u) or TagId (%u) out of uint8_t range in %s",
+                             static_cast<uint16_t>(i), typeIdRaw, tagIdRaw, inputJson.c_str());
+                return;
+            }
+
+            uint8_t typeId = static_cast<uint8_t>(typeIdRaw);
+            uint8_t tagId  = static_cast<uint8_t>(tagIdRaw);
 
             ChipLogDetail(AppServer, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)", static_cast<unsigned>(i), typeId,
                           tagId);
