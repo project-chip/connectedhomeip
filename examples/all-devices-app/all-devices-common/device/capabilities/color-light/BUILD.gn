@@ -32,7 +32,6 @@ source_set("color-light") {
     "${chip_root}/src/app/clusters/groups-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",
-    "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/clusters/scenes-server",
     "${chip_root}/src/data-model-providers/codedriven",

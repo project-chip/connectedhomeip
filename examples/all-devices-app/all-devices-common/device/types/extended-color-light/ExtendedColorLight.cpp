@@ -105,7 +105,6 @@ CHIP_ERROR ExtendedColorLight::Register(chip::EndpointId endpoint, CodeDrivenDat
 #endif
 
     ReturnErrorOnFailure(RegisterDynamicLighting(endpoint, provider));
-    ReturnErrorOnFailure(RegisterOccupancySensing(endpoint, provider));
 
     // Scenes are enabled, so the scenable clusters must be registered as handlers to be able to
     // save and recall scenes.

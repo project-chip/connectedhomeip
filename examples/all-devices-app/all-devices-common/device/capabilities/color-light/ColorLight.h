@@ -22,7 +22,6 @@
 #include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
-#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
@@ -76,7 +75,6 @@ public:
     Clusters::ScenesManagementCluster & GetScenesManagementCluster();
     Clusters::ColorControlCluster & GetColorControlCluster();
     Clusters::DynamicLightingCluster & GetDynamicLightingCluster();
-    Clusters::OccupancySensingCluster & GetOccupancySensingCluster();
 
 protected:
     ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
@@ -107,7 +105,6 @@ protected:
                                     std::optional<BitMask<Clusters::ColorControl::Feature>> featureMap = std::nullopt,
                                     Clusters::ColorControl::ColorValue initialColor = Clusters::ColorControl::CTColor{});
     CHIP_ERROR RegisterDynamicLighting(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
-    CHIP_ERROR RegisterOccupancySensing(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     /// Registers the scenable clusters (On/Off, Level Control, Color Control) with the endpoint's
     /// scene table. Call after those three are registered; skips any that are not.
@@ -146,7 +143,6 @@ private:
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
     LazyRegisteredServerCluster<Clusters::ColorControlCluster> mColorControlCluster;
     LazyRegisteredServerCluster<Clusters::DynamicLightingCluster> mDynamicLightingCluster;
-    LazyRegisteredServerCluster<Clusters::OccupancySensingCluster> mOccupancySensingCluster;
 };
 
 } // namespace app

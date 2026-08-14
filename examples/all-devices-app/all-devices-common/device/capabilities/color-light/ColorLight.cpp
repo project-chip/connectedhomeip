@@ -67,12 +67,6 @@ Clusters::DynamicLightingCluster & ColorLight::GetDynamicLightingCluster()
     return mDynamicLightingCluster.Cluster();
 }
 
-Clusters::OccupancySensingCluster & ColorLight::GetOccupancySensingCluster()
-{
-    VerifyOrDie(mOccupancySensingCluster.IsConstructed());
-    return mOccupancySensingCluster.Cluster();
-}
-
 CHIP_ERROR ColorLight::RegisterIdentify(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate));
@@ -172,12 +166,6 @@ CHIP_ERROR ColorLight::RegisterDynamicLighting(EndpointId endpoint, CodeDrivenDa
     return provider.AddCluster(mDynamicLightingCluster.Registration());
 }
 
-CHIP_ERROR ColorLight::RegisterOccupancySensing(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-{
-    mOccupancySensingCluster.Create(Clusters::OccupancySensingCluster::Config(endpoint));
-    return provider.AddCluster(mOccupancySensingCluster.Registration());
-}
-
 void ColorLight::RegisterSceneHandlers()
 {
     Clusters::ScopedSceneTable table(mScenesTableProvider);
@@ -235,12 +223,6 @@ void ColorLight::UnregisterAll(CodeDrivenDataModelProvider & provider)
     }
 
     // === PHASE 2: DESTRUCTION (reverse of the helper order in a leaf's Register) ===
-
-    if (mOccupancySensingCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mOccupancySensingCluster.Cluster()));
-        mOccupancySensingCluster.Destroy();
-    }
 
     if (mDynamicLightingCluster.IsConstructed())
     {
