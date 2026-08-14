@@ -100,7 +100,7 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
-#if defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
 void EnablePostCommissioningBle(intptr_t)
 {
     CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -324,7 +324,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
-#if defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
         LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
@@ -568,7 +568,7 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 
     if (sIsNetworkProvisioned)
     {
-#if defined(CONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION)
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         // Concurrent idle mode: toggle BLE advertising on demand so that
         // BLE (e.g. Channel Sounding) becomes accessible on button press.
         if (ConnectivityMgr().IsBLEAdvertisingEnabled())
@@ -846,7 +846,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         break;
-#if defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
     case DeviceEventType::kCommissioningComplete:
         LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
         break;

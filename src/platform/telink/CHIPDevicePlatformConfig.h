@@ -126,6 +126,12 @@
 #define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
 #endif
 
+#ifdef CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 1
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
+#endif
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Zephyr platforms.
