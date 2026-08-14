@@ -173,7 +173,6 @@
 #define CHIP_CONFIG_SHA256_CONTEXT_ALIGN max_align_t
 #endif // CONFIG_CHIP_CRYPTO_PSA
 
-
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_PEER_NODES
