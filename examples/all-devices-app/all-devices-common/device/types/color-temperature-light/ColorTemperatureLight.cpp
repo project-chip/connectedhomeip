@@ -60,9 +60,8 @@ namespace ColorControlFeatureBits {
 [[maybe_unused]] uint32_t onoffFeatureMap = OnOffFeatureBits::Lighting;
 // = 0x01
 
-[[maybe_unused]] uint32_t levelFeatureMap =
-    LevelControlFeatureBits::OnOff | LevelControlFeatureBits::Lighting | LevelControlFeatureBits::Frequency;
-// = 0x07
+[[maybe_unused]] uint32_t levelFeatureMap = LevelControlFeatureBits::OnOff | LevelControlFeatureBits::Lighting;
+// = 0x03
 
 [[maybe_unused]] uint32_t colorFeatureMap = ColorControlFeatureBits::ColorTemperature;
 // = 0x10
@@ -101,7 +100,6 @@ CHIP_ERROR ColorTemperatureLight::Register(chip::EndpointId endpoint, CodeDriven
 #endif
 
     ReturnErrorOnFailure(RegisterDynamicLighting(endpoint, provider));
-    ReturnErrorOnFailure(RegisterOccupancySensing(endpoint, provider));
 
     // Scenes are enabled, so the scenable clusters must be registered as handlers to be able to
     // save and recall scenes.
