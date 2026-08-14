@@ -354,9 +354,9 @@ class TC_SC_4_7(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 prompt_msg=f"Instruct the DUT to scan for DNS-SD commissioner advertisements, "
-                           f"verify on the DUT that it discovered the TH's commissioner service "
-                           f"(instance name '{service.instance_name}', hostname '{srv_hostname}'), "
-                           f"then press Enter.")
+                f"verify on the DUT that it discovered the TH's commissioner service "
+                f"(instance name '{service.instance_name}', hostname '{srv_hostname}'), "
+                f"then press Enter.")
         # Discovery happens on the DUT and is confirmed there; in CI there is no
         # DUT-side observable for the TH to check, so the confirmation prompt is
         # cert-only and CI covers the TH-side advertisement (steps 1-6).
