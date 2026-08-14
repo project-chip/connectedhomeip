@@ -148,7 +148,7 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
         ReturnErrorOnFailure(reader.Get(next));
         // groupcast_enabled
         groupcast_enabled = false;
-        CHIP_ERROR err = reader.Next(TagGroupcastEnabled());
+        CHIP_ERROR err    = reader.Next(TagGroupcastEnabled());
         if (CHIP_NO_ERROR == err)
         {
             uint8_t value = 0;

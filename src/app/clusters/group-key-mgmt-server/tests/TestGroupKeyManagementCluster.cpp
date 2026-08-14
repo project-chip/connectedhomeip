@@ -143,7 +143,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         iterator->Release(); // ensure this frees memory or returns to pool
     }
 
-    CHIP_ERROR writeGroupcastAdoption(ClusterTester &tester, bool is_adopted)
+    CHIP_ERROR writeGroupcastAdoption(ClusterTester & tester, bool is_adopted)
     {
         // Write GroupcastAdoption with adopted=true for the test fabric
         GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type adoption;
@@ -154,8 +154,8 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
             adoptionList.data(), adoptionList.size());
 
         return tester
-                .WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, adoptionToWrite, ListWritingPattern::ReplaceAll)
-                .GetUnderlyingError();
+            .WriteAttribute(GroupKeyManagement::Attributes::GroupcastAdoption::Id, adoptionToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
     }
 };
 
@@ -198,7 +198,7 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 
     // GCAST feature
     GroupKeyManagementCluster clusterGCAST{ { fabricHelper.GetFabricTable(), mRealProvider },
-                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+                                            BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
 
     const std::vector<app::DataModel::AttributeEntry> expectedAttributesGCAST = {
         DataModel::AttributeEntry(GroupKeyManagement::Attributes::GroupKeyMap::Id,

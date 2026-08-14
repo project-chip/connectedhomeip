@@ -311,8 +311,7 @@ CHIP_ERROR ReadGroupcastAdopted(GroupDataProvider & provider, AttributeValueEnco
     });
 }
 
-CHIP_ERROR WriteGroupcastAdopted(GroupDataProvider & provider,
-                                 const ConcreteDataAttributePath & aPath,
+CHIP_ERROR WriteGroupcastAdopted(GroupDataProvider & provider, const ConcreteDataAttributePath & aPath,
                                  AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
