@@ -34,9 +34,7 @@ source_set("microwave-oven") {
 }
 
 source_set("emulated") {
-  sources = [
-    "impl/EmulatedMicrowaveOven.h",
-  ]
+  sources = [ "impl/EmulatedMicrowaveOven.h" ]
 
   public_deps = [
     ":microwave-oven",

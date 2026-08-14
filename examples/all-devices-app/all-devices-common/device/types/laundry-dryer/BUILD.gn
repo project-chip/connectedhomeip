@@ -32,9 +32,7 @@ source_set("laundry-dryer") {
 }
 
 source_set("emulated") {
-  sources = [
-    "impl/EmulatedLaundryDryer.h",
-  ]
+  sources = [ "impl/EmulatedLaundryDryer.h" ]
 
   public_deps = [
     ":laundry-dryer",

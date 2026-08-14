@@ -34,9 +34,7 @@ source_set("laundry-washer") {
 }
 
 source_set("emulated") {
-  sources = [
-    "impl/EmulatedLaundryWasher.h",
-  ]
+  sources = [ "impl/EmulatedLaundryWasher.h" ]
 
   public_deps = [
     ":laundry-washer",

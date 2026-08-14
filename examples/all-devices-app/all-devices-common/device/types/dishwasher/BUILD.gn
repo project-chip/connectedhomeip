@@ -33,9 +33,7 @@ source_set("dishwasher") {
 }
 
 source_set("emulated") {
-  sources = [
-    "impl/EmulatedDishwasher.h",
-  ]
+  sources = [ "impl/EmulatedDishwasher.h" ]
 
   public_deps = [
     ":dishwasher",
