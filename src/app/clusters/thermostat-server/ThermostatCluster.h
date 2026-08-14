@@ -96,6 +96,9 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    BitFlags<Thermostat::Feature> Features() const { return mFeatures; }
+    void SetFeatures(BitFlags<Thermostat::Feature> features) { mFeatures = features; }
+
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     EndpointId Endpoint() { return mPath.mEndpointId; }
@@ -131,11 +134,10 @@ public:
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
     DataModel::ActionReturnStatus SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
 
-    BitFlags<Thermostat::Feature> mFeatures;
-
     Setpoints mSetpoints;
 
 private:
+    BitFlags<Thermostat::Feature> mFeatures;
     OptionalAttributes mOptionalAttributes;
 
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
@@ -199,7 +201,6 @@ private:
     void ReEvaluateCurrentSuggestion();
 };
 
-ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 } // namespace Thermostat
