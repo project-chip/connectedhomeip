@@ -313,6 +313,17 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
                          f"MatterBaseTest: {offenders}")
 
 
+def _make_stub(loop):
+    """Minimal stand-in for a MatterBaseTest instance, avoiding the heavy Mobly class setup.
+
+    _is_dut_commissioned_blocking is bound through to the real implementation so the
+    running-loop detection in it is exercised rather than stubbed out.
+    """
+    stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+    stub._is_dut_commissioned_blocking = lambda: MatterBaseTest._is_dut_commissioned_blocking(stub)
+    return stub
+
+
 class TestCommissioningPreconditionChecks(unittest.TestCase):
     """Behavioral checks for the commissioning-state precondition the device-state markers enforce.
 
@@ -328,7 +339,7 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
         precondition fails."""
         loop = asyncio.new_event_loop()
         try:
-            stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+            stub = _make_stub(loop)
             with mock.patch.object(matter_testing_module, "is_commissioned",
                                    new=mock.AsyncMock(return_value=is_commissioned_result)):
                 MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=expect_commissioned)
@@ -357,12 +368,44 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
         """assert_dut_commissioned passes when the DUT is commissioned and fails otherwise."""
         loop = asyncio.new_event_loop()
         try:
-            stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+            stub = _make_stub(loop)
             with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
                 MatterBaseTest.assert_dut_commissioned(stub)
             with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
                     self.assertRaises(signals.TestFailure):
                 MatterBaseTest.assert_dut_commissioned(stub)
+        finally:
+            loop.close()
+
+    def test_precondition_works_when_event_loop_already_running(self):
+        """Regression: a setup_class override decorated with @async_test_body calls
+        super().setup_class() from inside a running event loop. The precondition must still
+        run there instead of raising "This event loop is already running"."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+
+            async def call_from_within_loop():
+                # Mirrors @async_test_body: sync framework code reached from a running loop.
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                loop.run_until_complete(call_from_within_loop())
+        finally:
+            loop.close()
+
+    def test_precondition_still_fails_when_event_loop_already_running(self):
+        """The running-loop path must report a genuine precondition failure, not swallow it."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop)
+
+            async def call_from_within_loop():
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertRaises(signals.TestFailure):
+                loop.run_until_complete(call_from_within_loop())
         finally:
             loop.close()
 

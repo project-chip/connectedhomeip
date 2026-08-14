@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import inspect
 import json
 import logging
@@ -1832,6 +1833,30 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
+    def _is_dut_commissioned_blocking(self) -> bool:
+        """Run the is_commissioned DNS-SD probe from sync code, running loop or not.
+
+        setup_class / setup_test overrides are frequently decorated with
+        @async_test_body, so a super().setup_class() call inside such an override
+        reaches this method with self.event_loop ALREADY RUNNING; calling
+        run_until_complete on it then raises "This event loop is already running".
+        Detect that case and drive the coroutine on a private loop in a worker thread
+        instead.
+
+        This is safe specifically because is_commissioned touches the device controller
+        only synchronously (GetCompressedFabricId) and awaits nothing but loop-agnostic
+        mDNS discovery. A future PASE/CASE fallback inside is_commissioned would bind
+        futures to the wrong loop and invalidate this, so keep that probe DNS-SD only.
+        """
+        coro = is_commissioned(self.default_controller, self.dut_node_id)
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return self.event_loop.run_until_complete(coro)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(asyncio.run, coro).result()
+
     def _assert_device_commissioning_precondition(self, expect_commissioned: bool) -> None:
         """Hard-fail class setup if the DUT's commissioning state does not match the marker.
 
@@ -1840,8 +1865,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         PASE/CASE side effects) that already applies its own DNS-SD discovery timeout, so no
         additional polling is needed here.
         """
-        commissioned = self.event_loop.run_until_complete(
-            is_commissioned(self.default_controller, self.dut_node_id))
+        commissioned = self._is_dut_commissioned_blocking()
         if expect_commissioned:
             asserts.assert_true(
                 commissioned,
@@ -1864,8 +1888,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         because a commissioner test's target device generally does not exist yet at that point.
         Delegates to :func:`matter.testing.commissioning.is_commissioned`.
         """
-        commissioned = self.event_loop.run_until_complete(
-            is_commissioned(self.default_controller, self.dut_node_id))
+        commissioned = self._is_dut_commissioned_blocking()
         asserts.assert_true(
             commissioned,
             f"Expected DUT node {self.dut_node_id} to be commissioned on this fabric after commissioning, "
