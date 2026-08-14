@@ -157,8 +157,7 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
 
 Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum controlSequenceOfOperation)
 {
-    if (!SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation,
-                           ControlSequenceOfOperation::Id))
+    if (!SetAttributeValue(mControlSequenceOfOperation, controlSequenceOfOperation, ControlSequenceOfOperation::Id))
     {
         return Status::Failure;
     }
