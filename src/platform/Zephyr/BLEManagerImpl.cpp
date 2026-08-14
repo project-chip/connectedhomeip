@@ -208,15 +208,7 @@ int InitRandomStaticAddress(bool idPresent, int & id)
 } // unnamed namespace
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-/**
- * Telink TLX: start a minimal BLE advertisement that carries no CHIPoBLE
- * service data and is NON-connectable / non-scannable, so it is invisible to
- * scanners and does not reserve a connection object (Telink uses
- * CONFIG_BT_MAX_CONN=1). It keeps a real BLE task active in the TLKSW
- * scheduler, which is required for the shared BLE/802.15.4 coexistence
- * arbitration to work (see the workaround note in BLEManagerImpl::_Init()).
- * Returns a Zephyr errno, 0 on success.
- */
+// Telink TLX: keep a scheduler task active for BLE/802.15.4 coexistence.
 int StartMinimalBLEAdvertisement()
 {
     static const struct bt_data minimal_ad[] = {
@@ -269,31 +261,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif // CONFIG_BT_BONDABLE
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-    // WORKAROUND (Telink TLX BLE + 802.15.4 coexistence):
-    //
-    // On Telink TLX SoCs, BLE and Thread share a single hardware radio and
-    // are arbitrated by the BLE scheduler (TLKSW SDK). Thread cannot start
-    // its radio until the BLE task has been inserted into the scheduler.
-    // ThreadStackManager calls tlx_start_radio(), which blocks forever on
-    // the ieee802154_task_ready_sem as long as tlksdk_thd_checkIsInsertTask1()
-    // returns 0 (i.e. no BLE task is active in the scheduler yet).
-    //
-    // Therefore, before calling tlx_bt_802154_dual_mode_start(), we must
-    // ensure the BLE stack is running a real scheduler task. Simply calling
-    // bt_enable() is not enough - the scheduler only becomes active once an
-    // advertisement/connection is actually started. So we launch a minimal
-    // BLE advertisement here, synchronously inside _Init(), before Thread
-    // auto-starts. On first boot Thread is not yet provisioned and would
-    // otherwise start its radio later (after DriveBLEState has already run),
-    // which masks the problem; on reboot with stored fabric data Thread
-    // tries to rejoin immediately and deadlocks without this workaround.
-    //
-    // The real CHIPoBLE advertisement replaces this minimal one later, when
-    // DriveBLEState() runs (StartAdvertising).
-    //
-    // NOTE: this runs after both the bondable and non-bondable init paths
-    // above, both of which have already completed bt_enable() when concurrent
-    // connection support is enabled.
+    // Telink TLX: start a minimal BLE advertisement before dual-mode so Thread's tlx_start_radio() does not block.
     int adv_err = StartMinimalBLEAdvertisement();
     VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
 
@@ -389,10 +357,7 @@ void BLEManagerImpl::DriveBLEState()
 
 #if defined(CONFIG_BT_TLX) && defined(CONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION) &&                                                 \
     !defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
-        // In concurrent idle mode, once Thread is attached the 802.15.4 radio
-        // has been initialised (tlx_start_radio() succeeded) so the minimal
-        // BLE advertisement from _Init is no longer needed for coexistence.
-        // Stop it to keep BLE completely silent.
+        // Telink TLX: stop the minimal advertisement once Thread is attached.
         if (ConnectivityMgr().IsThreadAttached())
         {
             bt_le_adv_stop();
@@ -730,9 +695,7 @@ exit:
 
 #if defined(CONFIG_BT_TLX) && defined(CONFIG_CHIP_ENABLE_CONCURRENT_CONNECTION) &&                                                 \
     !defined(CONFIG_CHIP_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING)
-    // On Telink TLX, bt_conn_unref() may trigger bt_le_adv_resume() which
-    // bypasses the kAdvertisingEnabled check. In BLE idle mode, force-stop
-    // advertising to keep BLE idle after disconnection.
+    // Telink TLX: keep BLE idle after disconnect (bt_conn_unref() may resume advertising).
     if (!mFlags.Has(Flags::kAdvertisingEnabled))
     {
         bt_le_adv_stop();
