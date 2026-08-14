@@ -1317,5 +1317,73 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 //     ICDConfigurationData::GetInstance().SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 // }
 
+TEST_F(TestICDManager, TestDeferredActiveModeOnThreadAttach)
+{
+    // Ensure we start in IdleMode
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Simulate Thread Connectivity Established event
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+
+    // Case 1: Post event when no network activity/subscription report was deferred
+    // Background Thread attach events should NOT wake up the ICD to ActiveMode
+    EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
+    AdvanceClockAndRunEventLoop(100_ms);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Case 2: Notify subscription report when Thread is not attached (or in test environment)
+    ICDNotifier::GetInstance().NotifySubscriptionReport();
+
+    // Event should trigger deferred ActiveMode processing once Thread connectivity is established
+    EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    // ActiveMode should now be triggered!
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+}
+
+TEST_F(TestICDManager, TestActiveModeExtensionOnThreadReattach)
+{
+    // Transition to ActiveMode via subscription report
+    ICDNotifier::GetInstance().NotifySubscriptionReport();
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+
+    // Advance clock halfway through ActiveMode duration
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() / 2);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+
+    // Simulate Thread re-attachment event arriving mid-exchange (e.g. after instant MAC failure & re-attach post Hub reboot)
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    // OperationalState should remain ActiveMode and active timer refreshed
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+}
+
+TEST_F(TestICDManager, TestDeferredCheckInWhenAlreadyInActiveMode)
+{
+    // Transition to ActiveMode via KeepActiveFlag (e.g. user activity / commissioning)
+    ICDNotifier::GetInstance().NotifyActiveRequestNotification(ICDListener::KeepActiveFlag::kCommissioningWindowOpen);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+
+    // Notify subscription report while Thread is unattached
+    ICDNotifier::GetInstance().NotifySubscriptionReport();
+
+    // Connectivity established event should process pending Check-In even though device is already in ActiveMode
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+
+    // Cleanup
+    ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCommissioningWindowOpen);
+}
+
 } // namespace app
 } // namespace chip
