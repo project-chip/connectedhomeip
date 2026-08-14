@@ -485,6 +485,13 @@ public:
                              inputJson.c_str());
                 return;
             }
+
+            if (!item["TypeId"].isUInt() || !item["TagId"].isUInt())
+            {
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId and TagId must be unsigned integers",
+                             static_cast<uint16_t>(i));
+                return;
+            }
             uint32_t typeIdRaw = item["TypeId"].asUInt();
             uint32_t tagIdRaw  = item["TagId"].asUInt();
 
