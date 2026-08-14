@@ -173,6 +173,21 @@ config CHIP_ENABLE_EL2GO_FACTORY_DATA
 	help
 		Enable DAC private key storage using El2Go provisioning.
 
+
+config CHIP_CRYPTO_PSA_KEY_ID_EL2GO_BASE
+	hex "EL2GO PSA persistent key id range base"
+	default 0x40000
+	help
+	  Base (inclusive) of the PSA persistent key id range reserved for
+	  EL2GO-provisioned keys like DAC private key.
+
+config CHIP_CRYPTO_PSA_KEY_ID_EL2GO_END
+	hex "EL2GO PSA persistent key id range end"
+	default 0x4FFFF
+	help
+	  End (inclusive) of the PSA persistent key id range reserved for
+	  EL2GO-provisioned keys like DAC private key.
+
 config CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA
 	bool "Secure whole factory data"
 	help
