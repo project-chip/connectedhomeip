@@ -71,6 +71,10 @@ _available_devices = [
     "CONTACT_SENSOR",
   ],
   [
+    "color-temperature-light",
+    "COLOR_TEMPERATURE_LIGHT",
+  ],
+  [
     "cooktop",
     "COOKTOP",
   ],
@@ -89,6 +93,10 @@ _available_devices = [
   [
     "dishwasher",
     "DISHWASHER",
+  ],
+  [
+    "extended-color-light",
+    "EXTENDED_COLOR_LIGHT",
   ],
   [
     "extractor-hood",

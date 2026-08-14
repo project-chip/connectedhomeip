@@ -160,11 +160,13 @@ foreach(_key
         bridged-node
         chime
         contact-sensor
+        color-temperature-light
         cooktop
         device-energy-management
         dimmable-light
         dimmable-plug-in-unit
         dishwasher
+        extended-color-light
         extractor-hood
         fan
         flow-sensor
