@@ -103,7 +103,7 @@ public:
 
     explicit EmulatedMicrowaveOven(const Context & context) :
         MicrowaveOven(MicrowaveOven::Config{
-            .operationalStateDelegate    = mOpStateDelegate,
+            .operationalStateDelegate   = mOpStateDelegate,
             .controlIntegrationDelegate = mControlIntegrationDelegate,
             .controlAppDelegate         = mControlAppDelegate,
             .modeDelegate               = mModeDelegate,

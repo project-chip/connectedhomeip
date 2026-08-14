@@ -32,8 +32,8 @@ public:
     explicit EmulatedDishwasher(const Context & context) :
         Dishwasher(Dishwasher::Config{
             .operationalStateDelegate = mOpStateDelegate,
-            .modeDelegate            = mModeDelegate,
-            .diagnosticDataProvider = context.diagnosticDataProvider,
+            .modeDelegate             = mModeDelegate,
+            .diagnosticDataProvider   = context.diagnosticDataProvider,
         })
     {}
 

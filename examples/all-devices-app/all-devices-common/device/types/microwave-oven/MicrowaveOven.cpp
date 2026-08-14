@@ -22,10 +22,8 @@ namespace chip::app {
 
 MicrowaveOven::MicrowaveOven(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMicrowaveOven, 1)),
-    mDiagnosticDataProvider(config.diagnosticDataProvider),
-    mOperationalStateDelegate(config.operationalStateDelegate),
-    mControlIntegrationDelegate(config.controlIntegrationDelegate),
-    mControlAppDelegate(config.controlAppDelegate),
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mOperationalStateDelegate(config.operationalStateDelegate),
+    mControlIntegrationDelegate(config.controlIntegrationDelegate), mControlAppDelegate(config.controlAppDelegate),
     mMicrowaveOvenModeDelegate(config.modeDelegate)
 {}
 

@@ -22,8 +22,7 @@ namespace chip::app {
 
 Dishwasher::Dishwasher(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDishwasher, 1)),
-    mDiagnosticDataProvider(config.diagnosticDataProvider),
-    mOperationalStateDelegate(config.operationalStateDelegate),
+    mDiagnosticDataProvider(config.diagnosticDataProvider), mOperationalStateDelegate(config.operationalStateDelegate),
     mDishwasherModeDelegate(config.modeDelegate)
 {}
 

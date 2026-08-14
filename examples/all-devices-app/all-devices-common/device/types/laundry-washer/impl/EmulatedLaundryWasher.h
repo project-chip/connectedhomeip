@@ -32,9 +32,9 @@ public:
     explicit EmulatedLaundryWasher(const Context & context) :
         LaundryWasher(LaundryWasher::Config{
             .operationalStateDelegate = mOpStateDelegate,
-            .controlsDelegate        = mControlsDelegate,
-            .modeDelegate            = mModeDelegate,
-            .diagnosticDataProvider = context.diagnosticDataProvider,
+            .controlsDelegate         = mControlsDelegate,
+            .modeDelegate             = mModeDelegate,
+            .diagnosticDataProvider   = context.diagnosticDataProvider,
         })
     {}
 
