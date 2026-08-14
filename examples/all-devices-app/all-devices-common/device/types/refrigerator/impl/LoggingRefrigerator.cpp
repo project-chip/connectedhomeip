@@ -18,10 +18,12 @@
 
 namespace chip::app {
 
-LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config::Default()) {}
+LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : LoggingRefrigerator(timerDelegate, Config{}) {}
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config) :
-    Refrigerator(timerDelegate, mLoggingCabinet, config), mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
+    Refrigerator(timerDelegate, mLoggingCabinet,
+                 Refrigerator::Config{ .operationalStateDelegate = mOpStateDelegate, .cabinetConfig = config.cabinetConfig }),
+    mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
 {}
 
 } // namespace chip::app

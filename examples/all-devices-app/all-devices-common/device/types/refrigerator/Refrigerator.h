@@ -26,26 +26,11 @@ class Refrigerator : public DeviceInterface
 public:
     struct Config
     {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
         TemperatureControlledCabinetPart::Config cabinetConfig;
-
-        // Safe food storage defaults representing a typical domestic refrigerator:
-        // - 4°C is the globally recommended safe temperature to prevent food spoilage.
-        // - 1°C to 7°C represents the typical safe operating boundaries.
-        // - 0.1°C steps provide precise temperature adjustment.
-        // Note: Temperature values are represented in 0.01°C steps.
-        static constexpr Config Default()
-        {
-            return Config{ .cabinetConfig = {
-                               .temperatureSetpoint = 400, // 4.00 °C
-                               .minTemperature      = 100, // 1.00 °C
-                               .maxTemperature      = 700, // 7.00 °C
-                               .step                = 10,  // 0.10 °C
-                           } };
-        }
     };
 
-    Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
-                 const Config & config = Config::Default());
+    Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config);
     ~Refrigerator() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

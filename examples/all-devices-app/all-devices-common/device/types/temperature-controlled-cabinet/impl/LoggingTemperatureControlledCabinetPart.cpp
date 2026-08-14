@@ -24,7 +24,7 @@ LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart
 
 LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
                                                                                  const char * name) :
-    TemperatureControlledCabinetPart(timerDelegate, config, *this),
+    TemperatureControlledCabinetPart(timerDelegate, config, mOpStateDelegate, *this),
     mName(name)
 {}
 

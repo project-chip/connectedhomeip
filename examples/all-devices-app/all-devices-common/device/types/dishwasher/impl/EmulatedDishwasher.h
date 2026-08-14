@@ -17,21 +17,31 @@
 #pragma once
 
 #include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
-#include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <device/types/dishwasher/Dishwasher.h>
 
 namespace chip::app {
 
-class LoggingTemperatureControlledCabinetPart : public TemperatureControlledCabinetPart, public Clusters::IdentifyDelegate
+class EmulatedDishwasher : public Dishwasher
 {
 public:
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name);
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config, const char * name);
-    ~LoggingTemperatureControlledCabinetPart() override = default;
+    struct Context
+    {
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+    };
+
+    explicit EmulatedDishwasher(const Context & context) :
+        Dishwasher(Dishwasher::Config{
+            .operationalStateDelegate = mOpStateDelegate,
+            .modeDelegate            = mModeDelegate,
+            .diagnosticDataProvider = context.diagnosticDataProvider,
+        })
+    {}
+
+    ~EmulatedDishwasher() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
-        ReturnErrorOnFailure(TemperatureControlledCabinetPart::Register(endpoint, provider, composition));
+        ReturnErrorOnFailure(Dishwasher::Register(endpoint, provider, composition));
         mOpStateDelegate.SetCluster(&OperationalState());
         return CHIP_NO_ERROR;
     }
@@ -39,18 +49,12 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override
     {
         mOpStateDelegate.SetCluster(nullptr);
-        TemperatureControlledCabinetPart::Unregister(provider);
+        Dishwasher::Unregister(provider);
     }
 
-    // IdentifyDelegate
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override { return true; }
-
 private:
-    const char * mName;
     Clusters::OperationalState::EmulatedOperationalStateDelegate mOpStateDelegate;
+    DishwasherModeDelegate mModeDelegate;
 };
 
 } // namespace chip::app

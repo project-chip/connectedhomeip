@@ -22,7 +22,9 @@ namespace chip::app {
 
 Dishwasher::Dishwasher(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDishwasher, 1)),
-    mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider),
+    mOperationalStateDelegate(config.operationalStateDelegate),
+    mDishwasherModeDelegate(config.modeDelegate)
 {}
 
 CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -31,8 +33,7 @@ CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
-    mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
+    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     mDishwasherModeCluster.Create(endpoint, Clusters::ModeBase::kDishwasherMode,
@@ -60,7 +61,6 @@ void Dishwasher::Unregister(CodeDrivenDataModelProvider & provider)
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
-        mDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 }

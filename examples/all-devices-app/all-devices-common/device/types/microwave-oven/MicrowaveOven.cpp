@@ -22,7 +22,11 @@ namespace chip::app {
 
 MicrowaveOven::MicrowaveOven(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMicrowaveOven, 1)),
-    mDiagnosticDataProvider(config.diagnosticDataProvider)
+    mDiagnosticDataProvider(config.diagnosticDataProvider),
+    mOperationalStateDelegate(config.operationalStateDelegate),
+    mControlIntegrationDelegate(config.controlIntegrationDelegate),
+    mControlAppDelegate(config.controlAppDelegate),
+    mMicrowaveOvenModeDelegate(config.modeDelegate)
 {}
 
 CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -31,10 +35,7 @@ CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvi
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
-    mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
-    mControlIntegrationDelegate.emplace(mOperationalStateCluster.Cluster());
-    mControlAppDelegate.SetOperationalStateDelegate(&mDelegate);
+    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     mMicrowaveOvenControlCluster.Create(
@@ -42,7 +43,7 @@ CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvi
         Clusters::MicrowaveOvenControlCluster::Config{
             .feature = BitFlags<Clusters::MicrowaveOvenControl::Feature>(Clusters::MicrowaveOvenControl::Feature::kPowerInWatts),
             .supportsAddMoreTime = true,
-            .integrationDelegate = *mControlIntegrationDelegate,
+            .integrationDelegate = mControlIntegrationDelegate,
             .appDelegate         = mControlAppDelegate,
         });
     ReturnErrorOnFailure(provider.AddCluster(mMicrowaveOvenControlCluster.Registration()));
@@ -74,11 +75,9 @@ void MicrowaveOven::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mMicrowaveOvenControlCluster.Cluster()));
         mMicrowaveOvenControlCluster.Destroy();
     }
-    mControlIntegrationDelegate.reset();
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
-        mDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 }

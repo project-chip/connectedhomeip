@@ -22,82 +22,12 @@
 #include <app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <clusters/MicrowaveOvenMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
-
-class EmulatedMicrowaveOvenControlIntegrationDelegate : public Clusters::MicrowaveOvenControl::IntegrationDelegate
-{
-public:
-    explicit EmulatedMicrowaveOvenControlIntegrationDelegate(Clusters::OperationalState::OperationalStateCluster & opStateCluster) :
-        mOpStateCluster(opStateCluster)
-    {}
-
-    uint8_t GetCurrentOperationalState() const override { return mOpStateCluster.GetCurrentOperationalState(); }
-    CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override
-    {
-        mode = 0;
-        return CHIP_NO_ERROR;
-    }
-    bool IsSupportedMode(uint8_t mode) const override { return mode == 0 || mode == 1; }
-    bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override
-    {
-        return commandId == Clusters::OperationalState::Commands::Start::Id;
-    }
-
-private:
-    Clusters::OperationalState::OperationalStateCluster & mOpStateCluster;
-};
-
-class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
-{
-public:
-    void SetOperationalStateDelegate(Clusters::OperationalState::EmulatedOperationalStateDelegate * opStateDelegate)
-    {
-        mOpStateDelegate = opStateDelegate;
-    }
-
-    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                           bool startAfterSetting,
-                                                                           Optional<uint8_t> powerSettingNum,
-                                                                           Optional<uint8_t> wattSettingIndex) override
-    {
-        if (startAfterSetting && mOpStateDelegate != nullptr)
-        {
-            mOpStateDelegate->StartEmulatedOperationTimer();
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalcookTimeSec) override
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override
-    {
-        if (index == 0)
-        {
-            wattSetting = 1000;
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    uint32_t GetMaxCookTimeSec() const override { return 3600; }
-    uint8_t GetPowerSettingNum() const override { return 100; }
-    uint8_t GetMinPowerNum() const override { return 10; }
-    uint8_t GetMaxPowerNum() const override { return 100; }
-    uint8_t GetPowerStepNum() const override { return 10; }
-    uint8_t GetCurrentWattIndex() const override { return 0; }
-    uint16_t GetWattRating() const override { return 1000; }
-
-private:
-    Clusters::OperationalState::EmulatedOperationalStateDelegate * mOpStateDelegate = nullptr;
-};
 
 class MicrowaveOvenModeDelegate : public Clusters::ModeBase::AppDelegate
 {
@@ -145,6 +75,10 @@ class MicrowaveOven : public SingleEndpoint
 public:
     struct Config
     {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::MicrowaveOvenControl::IntegrationDelegate & controlIntegrationDelegate;
+        Clusters::MicrowaveOvenControl::AppDelegate & controlAppDelegate;
+        Clusters::ModeBase::AppDelegate & modeDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -160,14 +94,14 @@ public:
 
 private:
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    std::optional<EmulatedMicrowaveOvenControlIntegrationDelegate> mControlIntegrationDelegate;
-    EmulatedMicrowaveOvenControlDelegate mControlAppDelegate;
+    Clusters::MicrowaveOvenControl::IntegrationDelegate & mControlIntegrationDelegate;
+    Clusters::MicrowaveOvenControl::AppDelegate & mControlAppDelegate;
     LazyRegisteredServerCluster<Clusters::MicrowaveOvenControlCluster> mMicrowaveOvenControlCluster;
 
-    MicrowaveOvenModeDelegate mMicrowaveOvenModeDelegate;
+    Clusters::ModeBase::AppDelegate & mMicrowaveOvenModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mMicrowaveOvenModeCluster;
 };
 

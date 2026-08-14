@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/oven/Oven.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>
@@ -25,11 +26,31 @@ namespace chip::app {
 class LoggingOven : public Oven
 {
 public:
+    struct Config
+    {
+        TemperatureControlledCabinetPart::Config cavityConfig;
+    };
+
     explicit LoggingOven(TimerDelegate & timerDelegate);
     LoggingOven(TimerDelegate & timerDelegate, Config config);
     ~LoggingOven() override = default;
 
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        ReturnErrorOnFailure(Oven::Register(allocator, provider, composition));
+        mCavityOpStateDelegate.SetCluster(&Cavity().OperationalState());
+        return CHIP_NO_ERROR;
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        mCavityOpStateDelegate.SetCluster(nullptr);
+        Oven::Unregister(provider);
+    }
+
 private:
+    Clusters::OperationalState::EmulatedOperationalStateDelegate mCavityOpStateDelegate;
     LoggingTemperatureControlledCabinetPart mLoggingCavity;
     LoggingCookSurfacePart mLoggingSurface;
 };

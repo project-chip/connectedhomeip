@@ -19,9 +19,9 @@
 
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <clusters/DishwasherMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -97,6 +97,8 @@ class Dishwasher : public SingleEndpoint
 public:
     struct Config
     {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::ModeBase::AppDelegate & modeDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -111,10 +113,10 @@ public:
 
 private:
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    DishwasherModeDelegate mDishwasherModeDelegate;
+    Clusters::ModeBase::AppDelegate & mDishwasherModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mDishwasherModeCluster;
 };
 

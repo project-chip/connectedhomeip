@@ -21,14 +21,17 @@
 namespace chip::app {
 
 TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
-                                                                   Clusters::IdentifyDelegate & identifyDelegate) :
-    TemperatureControlledCabinetPart(timerDelegate, Config{}, identifyDelegate)
+                                                                    Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
+                                                                    Clusters::IdentifyDelegate & identifyDelegate) :
+    TemperatureControlledCabinetPart(timerDelegate, Config{}, opStateDelegate, identifyDelegate)
 {}
 
 TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
-                                                                   Clusters::IdentifyDelegate & identifyDelegate) :
+                                                                    Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate,
+                                                                    Clusters::IdentifyDelegate & identifyDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureControlledCabinet, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config), mIdentifyDelegate(identifyDelegate)
+    mTimerDelegate(timerDelegate), mConfig(config), mIdentifyDelegate(identifyDelegate),
+    mOperationalStateDelegate(opStateDelegate)
 {}
 
 CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -52,7 +55,6 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureControlCluster.Registration()));
 
     mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
-    mOperationalStateDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -68,7 +70,6 @@ void TemperatureControlledCabinetPart::Unregister(CodeDrivenDataModelProvider & 
     if (mOperationalStateCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
-        mOperationalStateDelegate.SetCluster(nullptr);
         mOperationalStateCluster.Destroy();
     }
 

@@ -20,9 +20,9 @@
 #include <app/clusters/laundry-washer-controls-server/LaundryWasherControlsCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateDelegate.h>
 #include <clusters/LaundryWasherMode/Enums.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -98,6 +98,9 @@ class LaundryWasher : public SingleEndpoint
 public:
     struct Config
     {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
+        Clusters::LaundryWasherControls::Delegate & controlsDelegate;
+        Clusters::ModeBase::AppDelegate & modeDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -113,13 +116,13 @@ public:
 
 private:
     DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
 
-    EmulatedLaundryWasherControlsDelegate mLaundryWasherControlsDelegate;
+    Clusters::LaundryWasherControls::Delegate & mLaundryWasherControlsDelegate;
     LazyRegisteredServerCluster<Clusters::LaundryWasherControlsCluster> mLaundryWasherControlsCluster;
 
-    LaundryWasherModeDelegate mLaundryWasherModeDelegate;
+    Clusters::ModeBase::AppDelegate & mLaundryWasherModeDelegate;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mLaundryWasherModeCluster;
 };
 

@@ -27,26 +27,12 @@ class Oven : public DeviceInterface
 public:
     struct Config
     {
+        Clusters::OperationalState::OperationalStateCluster::Delegate & cavityOperationalStateDelegate;
         TemperatureControlledCabinetPart::Config cavityConfig;
-
-        // Sensible defaults representing a typical domestic oven:
-        // - 180°C is the standard baking temperature (equivalent to ~350°F).
-        // - 50°C to 250°C covers the typical domestic cooking range.
-        // - 5°C steps are standard for digital oven controls.
-        // Note: Temperature values are represented in 0.01°C steps.
-        static constexpr Config Default()
-        {
-            return Config{ .cavityConfig = {
-                               .temperatureSetpoint = 18000, // 180.00 °C
-                               .minTemperature      = 5000,  // 50.00 °C
-                               .maxTemperature      = 25000, // 250.00 °C
-                               .step                = 500,   // 5.00 °C
-                           } };
-        }
     };
 
     Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
-         Clusters::IdentifyDelegate & surfaceIdentify, const Config & config = Config::Default());
+         Clusters::IdentifyDelegate & surfaceIdentify, const Config & config);
     ~Oven() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

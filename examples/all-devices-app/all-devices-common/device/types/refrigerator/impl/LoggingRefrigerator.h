@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/refrigerator/Refrigerator.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>
 
@@ -24,11 +25,31 @@ namespace chip::app {
 class LoggingRefrigerator : public Refrigerator
 {
 public:
+    struct Config
+    {
+        TemperatureControlledCabinetPart::Config cabinetConfig;
+    };
+
     explicit LoggingRefrigerator(TimerDelegate & timerDelegate);
     LoggingRefrigerator(TimerDelegate & timerDelegate, Config config);
     ~LoggingRefrigerator() override = default;
 
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        ReturnErrorOnFailure(Refrigerator::Register(allocator, provider, composition));
+        mOpStateDelegate.SetCluster(&Cabinet().OperationalState());
+        return CHIP_NO_ERROR;
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        mOpStateDelegate.SetCluster(nullptr);
+        Refrigerator::Unregister(provider);
+    }
+
 private:
+    Clusters::OperationalState::EmulatedOperationalStateDelegate mOpStateDelegate;
     LoggingTemperatureControlledCabinetPart mLoggingCabinet;
 };
 
