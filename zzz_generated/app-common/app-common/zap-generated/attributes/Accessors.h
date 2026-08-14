@@ -5135,6 +5135,10 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace PushAvStreamTransport {
 namespace Attributes {
 
+namespace MaxZones {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+} // namespace MaxZones
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap

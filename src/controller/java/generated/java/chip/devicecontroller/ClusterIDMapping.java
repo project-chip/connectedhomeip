@@ -20859,6 +20859,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedFormats(0L),
             CurrentConnections(1L),
+            MaxZones(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20911,7 +20912,8 @@ public class ClusterIDMapping {
             ModifyPushTransport(3L),
             SetTransportStatus(4L),
             ManuallyTriggerTransport(5L),
-            FindTransport(6L),;
+            FindTransport(6L),
+            UpdateMotionZoneOptions(8L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -21025,6 +21027,23 @@ public class ClusterIDMapping {
                     }
                     public static FindTransportCommandField value(int id) throws NoSuchFieldError {
                         for (FindTransportCommandField field : FindTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum UpdateMotionZoneOptionsCommandField {ConnectionID(0),MotionZones(1),MotionSensitivity(2),;
+                    private final int id;
+                    UpdateMotionZoneOptionsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static UpdateMotionZoneOptionsCommandField value(int id) throws NoSuchFieldError {
+                        for (UpdateMotionZoneOptionsCommandField field : UpdateMotionZoneOptionsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

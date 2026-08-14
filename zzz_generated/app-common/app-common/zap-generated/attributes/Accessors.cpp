@@ -30682,6 +30682,29 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace PushAvStreamTransport {
 namespace Attributes {
 
+namespace MaxZones {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::PushAvStreamTransport::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (Traits::IsNullValue(temp))
+    {
+        value.SetNull();
+    }
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
+    return status;
+}
+
+} // namespace MaxZones
+
 namespace FeatureMap {
 
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value)

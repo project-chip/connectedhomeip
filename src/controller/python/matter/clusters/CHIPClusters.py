@@ -15346,6 +15346,15 @@ class ChipClusters:
                     "connectionID": "int",
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "UpdateMotionZoneOptions",
+                "args": {
+                    "connectionID": "int",
+                    "motionZones": "TransportZoneOptionsStruct",
+                    "motionSensitivity": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -15358,6 +15367,12 @@ class ChipClusters:
                 "attributeName": "CurrentConnections",
                 "attributeId": 0x00000001,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxZones",
+                "attributeId": 0x00000002,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

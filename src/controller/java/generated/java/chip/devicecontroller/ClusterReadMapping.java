@@ -20456,6 +20456,17 @@ public class ClusterReadMapping {
           readPushAvStreamTransportCurrentConnectionsCommandParams
         );
         result.put("readCurrentConnectionsAttribute", readPushAvStreamTransportCurrentConnectionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPushAvStreamTransportMaxZonesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPushAvStreamTransportMaxZonesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PushAvStreamTransportCluster) cluster).readMaxZonesAttribute(
+              (ChipClusters.PushAvStreamTransportCluster.MaxZonesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPushAvStreamTransportClusterMaxZonesAttributeCallback(),
+          readPushAvStreamTransportMaxZonesCommandParams
+        );
+        result.put("readMaxZonesAttribute", readPushAvStreamTransportMaxZonesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readPushAvStreamTransportGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readPushAvStreamTransportGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
