@@ -21,14 +21,15 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
 
 namespace {
 
@@ -246,11 +247,6 @@ bool PresetTypeSupportsNames(Delegate * delegate, PresetScenarioEnum scenario)
 }
 
 } // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
 
 Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {

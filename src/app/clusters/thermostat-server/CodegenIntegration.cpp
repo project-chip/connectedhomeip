@@ -28,17 +28,15 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-
-constexpr size_t kThermostatFixedClusterCount = Thermostat::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+using namespace chip::app::Clusters::Thermostat::Attributes;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
+
+constexpr size_t kThermostatFixedClusterCount = StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kThermostatEndpointCount     = kThermostatFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<ThermostatCluster> gClusters[kThermostatEndpointCount];
 
@@ -50,8 +48,6 @@ public:
     {
 
         const BitFlags<Thermostat::Feature> features(featureMap);
-
-        using namespace chip::app::Clusters::Thermostat::Attributes;
 
         ThermostatCluster::OptionalAttributes optionalAttributes;
 
@@ -137,9 +133,13 @@ ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId)
 } // namespace app
 } // namespace chip
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Thermostat;
+
 void MatterThermostatClusterInitCallback(EndpointId endpointId)
 {
-
     chip::app::Clusters::Thermostat::IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(

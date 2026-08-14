@@ -24,15 +24,11 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
-using namespace System::Clock;
+using namespace chip::System::Clock;
 
 namespace chip {
 namespace app {

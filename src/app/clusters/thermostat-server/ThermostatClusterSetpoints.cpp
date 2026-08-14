@@ -29,13 +29,8 @@
 
 #include "Setpoints.h"
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Thermostat;
-using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace Protocols::InteractionModel;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
