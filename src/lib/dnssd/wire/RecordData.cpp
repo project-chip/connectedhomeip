@@ -20,8 +20,8 @@
 #include <inet/arpa-inet-compatibility.h>
 #include <stdio.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
 {
@@ -152,5 +152,5 @@ bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, Serializ
     return true;
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
