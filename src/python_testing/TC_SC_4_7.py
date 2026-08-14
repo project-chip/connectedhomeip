@@ -349,17 +349,20 @@ class TC_SC_4_7(MatterBaseTest):
         await self._verify_aaaa_records(srv_hostname)
 
         # *** STEP 7 ***
-        # DUT is instructed to scan for DNS-SD commissioner advertisements
-        self.step(7)
-        if not self.is_pics_sdk_ci_only:
+        # DUT is instructed to scan for DNS-SD commissioner advertisements.
+        #   - Discovery happens on the DUT and is confirmed there by the operator; 
+        #     in CI there is no DUT and no DUT-side observable for the TH to check, 
+        #     so the step is skipped rather than reported as executed, and CI covers 
+        #     the TH-side advertisement (steps 1-6).
+        if self.is_pics_sdk_ci_only:
+            self.skip_step(7)
+        else:
+            self.step(7)
             self.wait_for_user_input(
                 prompt_msg=f"Instruct the DUT to scan for DNS-SD commissioner advertisements, "
                            f"verify on the DUT that it discovered the TH's commissioner service "
                            f"(instance name '{service.instance_name}', hostname '{srv_hostname}'), "
                            f"then press Enter.")
-        # Discovery happens on the DUT and is confirmed there; in CI there is no
-        # DUT-side observable for the TH to check, so the confirmation prompt is
-        # cert-only and CI covers the TH-side advertisement (steps 1-6).
 
 
 if __name__ == "__main__":
