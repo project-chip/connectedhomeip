@@ -19,6 +19,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
+#include <app/clusters/ambient-sensing-union-server/AmbientSensingUnionCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
@@ -123,6 +124,380 @@ public:
         uint16_t holdTime = static_cast<uint16_t>(holdTimeVal);
         cluster->SetHoldTime(holdTime);
         ChipLogProgress(AppServer, "SetHoldTime to %d on endpoint %d", holdTime, endpointId);
+    }
+};
+
+static NodeId ParseNodeId(const Json::Value & json)
+{
+    if (!json.isMember("NodeId"))
+        return kUndefinedNodeId;
+    if (json["NodeId"].isString())
+    {
+        std::string s = json["NodeId"].asString();
+        return static_cast<NodeId>(strtoull(s.c_str(), nullptr, 0));
+    }
+    if (json["NodeId"].isNumeric())
+        return static_cast<NodeId>(json["NodeId"].asUInt64());
+    return kUndefinedNodeId;
+}
+
+/**
+ * Named pipe handler for adding a Matter contributor to AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "AddAmbientSensingContributor", "EndpointId": 1,
+ *          "NodeId": "0x1234567890ABCDEF", "ContributorEndpointId": 2, "Status": 0}'
+ *        > /tmp/chip_all_devices_fifo
+ *
+ * JSON Arguments:
+ *   - "Status": 0 = Online, 1 = Offline
+ */
+class AddAmbientSensingContributorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddAmbientSensingContributor"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        NodeId nodeId = ParseNodeId(json);
+        if (nodeId == kUndefinedNodeId)
+        {
+            ChipLogError(AppServer, "Invalid or missing NodeId for AddAmbientSensingContributor");
+            return;
+        }
+
+        if (!json.isMember("ContributorEndpointId") || !json["ContributorEndpointId"].isUInt())
+        {
+            ChipLogError(AppServer, "Missing 'ContributorEndpointId' for AddAmbientSensingContributor");
+            return;
+        }
+
+        if (!json.isMember("Status") || !json["Status"].isUInt())
+        {
+            ChipLogError(AppServer, "Missing 'Status' for AddAmbientSensingContributor");
+            return;
+        }
+
+        EndpointId contributorEndpointId = static_cast<EndpointId>(json["ContributorEndpointId"].asUInt());
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
+            json["Status"].asUInt());
+
+        CHIP_ERROR err = cluster->AddMatterContributor(nodeId, contributorEndpointId, status);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "AddMatterContributor failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Added Matter contributor NodeId: 0x" ChipLogFormatX64 ", ContributorEndpoint: %d on endpoint %d",
+                            ChipLogValueX64(nodeId), contributorEndpointId, endpointId);
+        }
+    }
+};
+
+/**
+ * Named pipe handler for removing a Matter contributor from AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "RemoveAmbientSensingContributor", "EndpointId": 1,
+ *          "NodeId": "0x1234567890ABCDEF", "ContributorEndpointId": 2}'
+ *        > /tmp/chip_all_devices_fifo
+ */
+class RemoveAmbientSensingContributorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveAmbientSensingContributor"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        NodeId nodeId = ParseNodeId(json);
+        if (nodeId == kUndefinedNodeId)
+        {
+            ChipLogError(AppServer, "Invalid or missing NodeId for RemoveAmbientSensingContributor");
+            return;
+        }
+
+        if (!json.isMember("ContributorEndpointId") || !json["ContributorEndpointId"].isUInt())
+        {
+            ChipLogError(AppServer, "Missing 'ContributorEndpointId' for RemoveAmbientSensingContributor");
+            return;
+        }
+
+        EndpointId contributorEndpointId = static_cast<EndpointId>(json["ContributorEndpointId"].asUInt());
+
+        CHIP_ERROR err = cluster->RemoveMatterContributor(nodeId, contributorEndpointId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "RemoveMatterContributor failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Removed Matter contributor NodeId: 0x" ChipLogFormatX64 " on endpoint %d",
+                            ChipLogValueX64(nodeId), endpointId);
+        }
+    }
+};
+
+/**
+ * Named pipe handler for adding a non-Matter contributor to AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "AddAmbientSensingNonMatterContributor", "EndpointId": 1,
+ *          "ContributorName": "ZigbeeSensor1", "Status": 0}'
+ *        > /tmp/chip_all_devices_fifo
+ */
+class AddAmbientSensingNonMatterContributorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "AddAmbientSensingNonMatterContributor"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("ContributorName") || !json["ContributorName"].isString())
+        {
+            ChipLogError(AppServer, "Missing 'ContributorName' for AddAmbientSensingNonMatterContributor");
+            return;
+        }
+
+        if (!json.isMember("Status") || !json["Status"].isUInt())
+        {
+            ChipLogError(AppServer, "Missing 'Status' for AddAmbientSensingNonMatterContributor");
+            return;
+        }
+
+        std::string contributorName = json["ContributorName"].asString();
+        if (contributorName.empty())
+        {
+            ChipLogError(AppServer, "ContributorName cannot be empty");
+            return;
+        }
+
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
+            json["Status"].asUInt());
+
+        CHIP_ERROR err = cluster->AddNonMatterContributor(chip::CharSpan::fromCharString(contributorName.c_str()), status);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "AddNonMatterContributor failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Added non-Matter contributor '%s' on endpoint %d", contributorName.c_str(), endpointId);
+        }
+    }
+};
+
+/**
+ * Named pipe handler for removing a non-Matter contributor from AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "RemoveAmbientSensingNonMatterContributor", "EndpointId": 1,
+ *          "ContributorName": "ZigbeeSensor1"}'
+ *        > /tmp/chip_all_devices_fifo
+ */
+class RemoveAmbientSensingNonMatterContributorCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "RemoveAmbientSensingNonMatterContributor"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("ContributorName") || !json["ContributorName"].isString())
+        {
+            ChipLogError(AppServer, "Missing 'ContributorName' for RemoveAmbientSensingNonMatterContributor");
+            return;
+        }
+
+        std::string contributorName = json["ContributorName"].asString();
+        if (contributorName.empty())
+        {
+            ChipLogError(AppServer, "ContributorName cannot be empty");
+            return;
+        }
+
+        CHIP_ERROR err = cluster->RemoveNonMatterContributor(chip::CharSpan::fromCharString(contributorName.c_str()));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "RemoveNonMatterContributor failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId,
+                         err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Removed non-Matter contributor '%s' on endpoint %d", contributorName.c_str(), endpointId);
+        }
+    }
+};
+
+/**
+ * Named pipe handler for updating contributor status in AmbientSensingUnion.
+ *
+ * Usage example (Matter contributor):
+ *   echo '{"Name": "UpdateAmbientSensingContributorStatus", "EndpointId": 1,
+ *          "NodeId": "0x1234567890ABCDEF", "ContributorEndpointId": 2, "Status": 1}'
+ *        > /tmp/chip_all_devices_fifo
+ *
+ * Usage example (non-Matter contributor):
+ *   echo '{"Name": "UpdateAmbientSensingContributorStatus", "EndpointId": 1,
+ *          "ContributorName": "ZigbeeSensor1", "Status": 1}'
+ *        > /tmp/chip_all_devices_fifo
+ */
+class UpdateAmbientSensingContributorStatusCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "UpdateAmbientSensingContributorStatus"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("Status") || !json["Status"].isUInt())
+        {
+            ChipLogError(AppServer, "Missing 'Status' for UpdateAmbientSensingContributorStatus");
+            return;
+        }
+
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
+            json["Status"].asUInt());
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (json.isMember("NodeId"))
+        {
+            // Matter contributor update path
+            NodeId nodeId = ParseNodeId(json);
+            if (nodeId == kUndefinedNodeId)
+            {
+                ChipLogError(AppServer, "Invalid NodeId for UpdateAmbientSensingContributorStatus");
+                return;
+            }
+
+            if (!json.isMember("ContributorEndpointId") || !json["ContributorEndpointId"].isUInt())
+            {
+                ChipLogError(AppServer, "Missing 'ContributorEndpointId' for Matter contributor status update");
+                return;
+            }
+
+            EndpointId contributorEndpointId = static_cast<EndpointId>(json["ContributorEndpointId"].asUInt());
+            err                              = cluster->UpdateMatterContributorStatus(nodeId, contributorEndpointId, status);
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(AppServer,
+                                "Updated Matter contributor (NodeId: 0x" ChipLogFormatX64 ", ContributorEndpoint: %d) status to %u on endpoint %d",
+                                ChipLogValueX64(nodeId), contributorEndpointId, static_cast<unsigned>(status), endpointId);
+            }
+        }
+        else if (json.isMember("ContributorName") && json["ContributorName"].isString())
+        {
+            // Non-Matter contributor update path
+            std::string contributorName = json["ContributorName"].asString();
+            if (contributorName.empty())
+            {
+                ChipLogError(AppServer, "ContributorName cannot be empty");
+                return;
+            }
+
+            err = cluster->UpdateNonMatterContributorStatus(chip::CharSpan::fromCharString(contributorName.c_str()), status);
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(AppServer, "Updated non-Matter contributor '%s' status to %u on endpoint %d",
+                                contributorName.c_str(), static_cast<unsigned>(status), endpointId);
+            }
+        }
+        else
+        {
+            ChipLogError(AppServer, "Must specify either 'NodeId' or 'ContributorName' for UpdateAmbientSensingContributorStatus");
+            return;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "UpdateContributorStatus failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        }
+    }
+};
+
+/**
+ * Named pipe handler for setting the union name on AmbientSensingUnion.
+ *
+ * Usage example:
+ *   echo '{"Name": "SetAmbientSensingUnionName", "EndpointId": 1, "UnionName": "LivingRoomUnion"}'
+ *        > /tmp/chip_all_devices_fifo
+ */
+class SetAmbientSensingUnionNameCommandHandler : public AllDevicesAppNamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetAmbientSensingUnionName"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry()
+                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("UnionName") || !json["UnionName"].isString())
+        {
+            ChipLogError(AppServer, "Missing 'UnionName' for SetAmbientSensingUnionName");
+            return;
+        }
+
+        std::string unionName = json["UnionName"].asString();
+        if (unionName.empty())
+        {
+            ChipLogError(AppServer, "UnionName cannot be empty");
+            return;
+        }
+
+        CHIP_ERROR err = cluster->SetUnionName(chip::CharSpan::fromCharString(unionName.c_str()));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "SetUnionName failed on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Set union name to '%s' on endpoint %d", unionName.c_str(), endpointId);
+        }
     }
 };
 
@@ -593,4 +968,10 @@ void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
     RegisterCommandHandler(std::make_unique<SetObjCountCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
     RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+    RegisterCommandHandler(std::make_unique<AddAmbientSensingContributorCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RemoveAmbientSensingContributorCommandHandler>());
+    RegisterCommandHandler(std::make_unique<AddAmbientSensingNonMatterContributorCommandHandler>());
+    RegisterCommandHandler(std::make_unique<RemoveAmbientSensingNonMatterContributorCommandHandler>());
+    RegisterCommandHandler(std::make_unique<UpdateAmbientSensingContributorStatusCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetAmbientSensingUnionNameCommandHandler>());
 }
