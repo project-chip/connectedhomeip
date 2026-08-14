@@ -294,7 +294,6 @@ void AppTask::InitServer(intptr_t arg)
     if (status != chip::Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
-        return;
     }
 
     static RealtekObserver sRealtekObserver;

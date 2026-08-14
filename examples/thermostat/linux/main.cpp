@@ -74,8 +74,11 @@ static Identify gIdentify1 = {
 
 void ApplicationInit()
 {
-    chip::app::Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
-                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
+                                                        &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance()); status != chip::Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
+    }
 }
 
 void ApplicationShutdown() {}

@@ -38,9 +38,11 @@ CHIP_ERROR AppTask::Init(void)
 
     ReturnErrorOnFailure(InitCommonParts());
 
-    auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-        kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
-    ReturnErrorOnFailure(chip::app::StatusIB(status).ToChipError());
+    if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
+        kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance()); status != chip::Protocols::InteractionModel::Status::Success)
+    {
+        LOG_ERR("SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
+    }
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
