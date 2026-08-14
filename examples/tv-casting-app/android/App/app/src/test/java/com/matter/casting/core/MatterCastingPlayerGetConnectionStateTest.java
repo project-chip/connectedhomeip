@@ -91,7 +91,7 @@ public class MatterCastingPlayerGetConnectionStateTest {
 
   // ---------------------------------------------------------------------------
   // Invalid states — native returns a string that is not a valid enum constant.
-  // All of these caused a fatal IllegalArgumentException before the fix.
+  // getConnectionState() must not throw exception but return NOT_CONNECTED
   // ---------------------------------------------------------------------------
 
   @Test
@@ -120,7 +120,7 @@ public class MatterCastingPlayerGetConnectionStateTest {
   }
 
   // ---------------------------------------------------------------------------
-  // Null — native returns null, causing NullPointerException in valueOf(null).
+  // Null — native returns null, getConnectionState() must not throw exception but return NOT_CONNECTED
   // ---------------------------------------------------------------------------
 
   @Test
