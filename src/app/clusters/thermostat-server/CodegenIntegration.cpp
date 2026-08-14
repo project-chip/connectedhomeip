@@ -49,7 +49,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        BitFlags<Thermostat::Feature> features(featureMap);
+        const BitFlags<Thermostat::Feature> features(featureMap);
 
         using namespace chip::app::Clusters::Thermostat::Attributes;
 
@@ -92,7 +92,7 @@ public:
         optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
-        gClusters[clusterInstanceIndex].Create(endpointId, BitFlags<Thermostat::Feature>(featureMap), optionalAttributes);
+        gClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes);
         return gClusters[clusterInstanceIndex].Registration();
     }
 
