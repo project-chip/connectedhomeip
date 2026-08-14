@@ -143,13 +143,12 @@ private:
     Delegate * mDelegate = nullptr;
 
     /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
-    /// @param endpoint The associated endpoint for the AtomicRequest invocation
     /// @param attributeRequests The list of requested attributes
     /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
     /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
     /// @return Status::Success if the request is valid, an error status if it is not
     Protocols::InteractionModel::Status BuildAttributeStatuses(
-        const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+        const DataModel::DecodableList<chip::AttributeId> attributeRequests,
         Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
 };
 

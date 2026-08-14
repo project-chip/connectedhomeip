@@ -245,7 +245,7 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
     }
 
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(commandPath.mEndpointId, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         return status;
@@ -341,8 +341,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                       const Commands::AtomicRequest::DecodableType & commandData)
 {
-    EndpointId endpoint = commandPath.mEndpointId;
-
     if (mDelegate == nullptr)
     {
         ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
@@ -350,7 +348,7 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
     }
 
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         return status;
@@ -396,17 +394,14 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                         const Commands::AtomicRequest::DecodableType & commandData)
 {
-
     if (mDelegate == nullptr)
     {
         ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
         return Status::InvalidInState;
     }
 
-    EndpointId endpoint = commandPath.mEndpointId;
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         return status;
@@ -444,16 +439,13 @@ void AtomicWriteSession::OnAtomicWriteTimeout()
 }
 
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
-/// @param endpoint The associated endpoint for the AtomicRequest invocation
 /// @param attributeRequests The list of requested attributes
 /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
 /// @return Status::Success if the request is valid, an error status if it is not
-Status AtomicWriteSession::BuildAttributeStatuses(
-    const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+Status AtomicWriteSession::BuildAttributeStatuses(const DataModel::DecodableList<chip::AttributeId> attributeRequests,
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
-
     size_t attributeStatusCount = 0;
     if (!CountAttributeRequests(attributeRequests, attributeStatusCount))
     {
