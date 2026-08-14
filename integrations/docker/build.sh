@@ -244,7 +244,7 @@ if [ "$PUSH" = true ]; then
         VERSION_DIGEST=$(remote_digest "$IMAGE_REF:$VERSION")
     fi
 
-    if [ -n "$VERSION_DIGEST" ]; then
+    if [ "$VERSION_DIGEST" != "" ]; then
         echo "$me: $IMAGE_REF:$VERSION already published, not pushing"
     else
         docker push "$IMAGE_REF:$VERSION"
@@ -253,7 +253,7 @@ if [ "$PUSH" = true ]; then
     if [ "$LATEST" = true ]; then
         # latest moves, so compare digests rather than just existence: the
         # version tag can be published while latest still points at an older one.
-        if [ -n "$VERSION_DIGEST" ] && [ "$(remote_digest "$IMAGE_REF:latest")" = "$VERSION_DIGEST" ]; then
+        if [ "$VERSION_DIGEST" != "" ] && [ "$(remote_digest "$IMAGE_REF:latest")" = "$VERSION_DIGEST" ]; then
             echo "$me: $IMAGE_REF:latest already points at $VERSION, not pushing"
         else
             docker push "$IMAGE_REF:latest"
