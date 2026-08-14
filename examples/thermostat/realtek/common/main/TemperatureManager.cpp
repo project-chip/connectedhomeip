@@ -21,7 +21,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;

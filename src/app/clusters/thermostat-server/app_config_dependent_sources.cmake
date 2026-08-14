@@ -18,4 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/AttributeAccessorShim.h"
+    "${CLUSTER_DIR}/AttributeAccessorShim.cpp"
 )

@@ -26,7 +26,7 @@
 #include "platform/CHIPDeviceLayer.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 
 /**********************************************************
  * Defines and Constants

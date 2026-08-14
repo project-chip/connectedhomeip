@@ -27,8 +27,6 @@ source_set("thermostat-server") {
     "Setpoints.cpp",
     "Setpoints.h",
     "Temperature.h",
-    "ThermostatAttributeShim.cpp",
-    "ThermostatAttributeShim.h",
     "ThermostatCluster.cpp",
     "ThermostatCluster.h",
     "ThermostatClusterAtomic.cpp",

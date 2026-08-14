@@ -24,7 +24,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/clusters/thermostat-server/ThermostatAttributeShim.h>
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 
 using namespace chip;
 using namespace chip::app;
