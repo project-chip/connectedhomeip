@@ -108,10 +108,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
     async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
         received_events = []
-        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         while len(received_events) < len(expected_events):
             try:
-                event_result = events_callback.get_event_from_queue(block=True, timeout=timeout)
+                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
                 if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
                     received_events.append(event_result.Data)
             except queue.Empty:
@@ -233,44 +232,41 @@ class TC_TSTAT_2_2(MatterBaseTest):
         AbsMinHeatSetpointLimitValue = 700
         MinSetpointDeadBandValue = 200
 
-        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
-        attribute_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AttributeList)
-
         # Supports a System Mode of Auto
-        hasAutoModeFeature = bool(feature_map & cluster.Bitmaps.Feature.kAutoMode)
+        hasAutoModeFeature = self.check_pics("TSTAT.S.F05")
         # Thermostat is capable of managing a cooling device
-        hasCoolingFeature = bool(feature_map & cluster.Bitmaps.Feature.kCooling)
+        hasCoolingFeature = self.check_pics("TSTAT.S.F01")
         # Thermostat is capable of managing a heating device
-        hasHeatingFeature = bool(feature_map & cluster.Bitmaps.Feature.kHeating)
+        hasHeatingFeature = self.check_pics("TSTAT.S.F00")
         # Supports Occupied and Unoccupied setpoints
-        hasOccupancyFeature = bool(feature_map & cluster.Bitmaps.Feature.kOccupancy)
+        hasOccupancyFeature = self.check_pics("TSTAT.S.F02")
 
         # Does the device implement the AbsMaxCoolSetpointLimit attribute?
-        hasAbsMaxCoolSetpointLimitAttribute = cluster.Attributes.AbsMaxCoolSetpointLimit.attribute_id in attribute_list
+        hasAbsMaxCoolSetpointLimitAttribute = self.check_pics("TSTAT.S.A0006")
         # Does the device implement the AbsMaxHeatSetpointLimit attribute?
-        hasAbsMaxHeatSetpointLimitAttribute = cluster.Attributes.AbsMaxHeatSetpointLimit.attribute_id in attribute_list
+        hasAbsMaxHeatSetpointLimitAttribute = self.check_pics("TSTAT.S.A0004")
         # Does the device implement the AbsMinCoolSetpointLimit attribute?
-        hasAbsMinCoolSetpointLimitAttribute = cluster.Attributes.AbsMinCoolSetpointLimit.attribute_id in attribute_list
+        hasAbsMinCoolSetpointLimitAttribute = self.check_pics("TSTAT.S.A0005")
         # Does the device implement the AbsMinHeatSetpointLimit attribute?
-        hasAbsMinHeatSetpointLimitAttribute = cluster.Attributes.AbsMinHeatSetpointLimit.attribute_id in attribute_list
+        hasAbsMinHeatSetpointLimitAttribute = self.check_pics("TSTAT.S.A0003")
         # Does the device implement the MaxCoolSetpointLimit attribute?
-        hasMaxCoolSetpointLimitAttribute = cluster.Attributes.MaxCoolSetpointLimit.attribute_id in attribute_list
+        hasMaxCoolSetpointLimitAttribute = self.check_pics("TSTAT.S.A0018")
         # Does the device implement the MaxHeatSetpointLimit attribute?
-        hasMaxHeatSetpointLimitAttribute = cluster.Attributes.MaxHeatSetpointLimit.attribute_id in attribute_list
+        hasMaxHeatSetpointLimitAttribute = self.check_pics("TSTAT.S.A0016")
         # Does the device implement the MinCoolSetpointLimit attribute?
-        hasMinCoolSetpointLimitAttribute = cluster.Attributes.MinCoolSetpointLimit.attribute_id in attribute_list
+        hasMinCoolSetpointLimitAttribute = self.check_pics("TSTAT.S.A0017")
         # Does the device implement the MinHeatSetpointLimit attribute?
-        hasMinHeatSetpointLimitAttribute = cluster.Attributes.MinHeatSetpointLimit.attribute_id in attribute_list
+        hasMinHeatSetpointLimitAttribute = self.check_pics("TSTAT.S.A0015")
         # Does the device implement the MinSetpointDeadBand attribute?
-        hasMinSetpointDeadBandAttribute = cluster.Attributes.MinSetpointDeadBand.attribute_id in attribute_list
+        hasMinSetpointDeadBandAttribute = self.check_pics("TSTAT.S.A0019")
         # Does the device implement the OccupiedCoolingSetpoint attribute?
-        hasOccupiedCoolingSetpointAttribute = cluster.Attributes.OccupiedCoolingSetpoint.attribute_id in attribute_list
+        hasOccupiedCoolingSetpointAttribute = self.check_pics("TSTAT.S.A0011")
         # Does the device implement the OccupiedHeatingSetpoint attribute?
-        hasOccupiedHeatingSetpointAttribute = cluster.Attributes.OccupiedHeatingSetpoint.attribute_id in attribute_list
+        hasOccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0012")
         # Does the device implement the UnoccupiedCoolingSetpoint attribute?
-        hasUnoccupiedCoolingSetpointAttribute = cluster.Attributes.UnoccupiedCoolingSetpoint.attribute_id in attribute_list
+        hasUnoccupiedCoolingSetpointAttribute = self.check_pics("TSTAT.S.A0013")
         # Does the device implement the UnoccupiedHeatingSetpoint attribute?
-        hasUnoccupiedHeatingSetpointAttribute = cluster.Attributes.UnoccupiedHeatingSetpoint.attribute_id in attribute_list
+        hasUnoccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0014")
 
         self.step("1")
 
