@@ -17,7 +17,6 @@
 
 #include "ThermostatCluster.h"
 #include "PresetStructWithOwnedMembers.h"
-#include "ThermostatClusterSetpoints.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -34,13 +33,8 @@
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Thermostat;
-using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
-using namespace Protocols::InteractionModel;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {

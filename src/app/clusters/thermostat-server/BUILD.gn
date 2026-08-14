@@ -37,7 +37,6 @@ source_set("thermostat-server") {
     "ThermostatClusterPresets.h",
     "ThermostatClusterRead.cpp",
     "ThermostatClusterSetpoints.cpp",
-    "ThermostatClusterSetpoints.h",
     "ThermostatClusterSuggestions.cpp",
     "ThermostatClusterWrite.cpp",
     "ThermostatDelegate.h",

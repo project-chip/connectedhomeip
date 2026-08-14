@@ -26,7 +26,6 @@
 #include "Setpoint.h"
 #include "Temperature.h"
 #include "ThermostatCluster.h"
-#include "ThermostatClusterSetpoints.h"
 
 #include "Setpoints.h"
 
