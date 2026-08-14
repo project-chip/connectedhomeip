@@ -313,13 +313,31 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
                          f"MatterBaseTest: {offenders}")
 
 
-def _make_stub(loop):
+def _make_stub(loop, case_reachable: bool = False):
     """Minimal stand-in for a MatterBaseTest instance, avoiding the heavy Mobly class setup.
 
-    _is_dut_commissioned_blocking is bound through to the real implementation so the
-    running-loop detection in it is exercised rather than stubbed out.
+    The real _run_blocking / _resolve_dut_commissioned / _is_dut_commissioned_blocking are
+    bound through, so the running-loop detection and the DNS-SD-then-CASE resolution are
+    exercised rather than stubbed out.
+
+    case_reachable controls whether the simulated GetConnectedDevice succeeds, i.e. whether
+    the DUT is reachable over CASE when the DNS-SD probe comes back negative.
     """
-    stub = SimpleNamespace(event_loop=loop, default_controller=object(), dut_node_id=1)
+    controller = mock.MagicMock()
+    if case_reachable:
+        controller.GetConnectedDevice = mock.AsyncMock(return_value=object())
+    else:
+        controller.GetConnectedDevice = mock.AsyncMock(side_effect=TimeoutError("no CASE session"))
+
+    stub = SimpleNamespace(
+        event_loop=loop,
+        default_controller=controller,
+        dut_node_id=1,
+        matter_test_config=SimpleNamespace(commissioning_method=None),
+        _dut_confirmed_available=False,
+    )
+    stub._run_blocking = lambda coro: MatterBaseTest._run_blocking(stub, coro)
+    stub._resolve_dut_commissioned = lambda: MatterBaseTest._resolve_dut_commissioned(stub)
     stub._is_dut_commissioned_blocking = lambda: MatterBaseTest._is_dut_commissioned_blocking(stub)
     return stub
 
@@ -406,6 +424,47 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
             with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
                     self.assertRaises(signals.TestFailure):
                 loop.run_until_complete(call_from_within_loop())
+        finally:
+            loop.close()
+
+    def test_dnssd_miss_is_confirmed_over_case(self):
+        """Regression: the DNS-SD probe is IPv6-only and skips loopback, so a commissioned DUT on
+        the same host reads as not commissioned. A reachable CASE session must override that
+        negative rather than hard-failing an already-commissioned DUT."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)):
+                # Would raise before the CASE confirmation was added.
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            stub.default_controller.GetConnectedDevice.assert_awaited_once()
+            self.assertFalse(stub.default_controller.GetConnectedDevice.await_args.kwargs["allowPASE"],
+                             "the confirmation must not fall back to PASE, which would mask an "
+                             "uncommissioned DUT in a pairing window as commissioned")
+        finally:
+            loop.close()
+
+    def test_dnssd_hit_skips_the_case_confirmation(self):
+        """A positive DNS-SD result is conclusive, so the CASE round trip must be skipped. This is
+        what keeps the common path (334 MatterTestCommissionedDevice tests) cheap."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=True)):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            stub.default_controller.GetConnectedDevice.assert_not_awaited()
+        finally:
+            loop.close()
+
+    def test_uncommissioned_marker_rejects_a_case_reachable_dut(self):
+        """A DUT that is invisible to DNS-SD but answers CASE is commissioned, so it must fail the
+        MatterTestUncommissionedDevice precondition instead of silently passing it."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=False)
         finally:
             loop.close()
 

@@ -1833,8 +1833,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
-    def _is_dut_commissioned_blocking(self) -> bool:
-        """Run the is_commissioned DNS-SD probe from sync code, running loop or not.
+    def _run_blocking(self, coro):
+        """Drive coro to completion from sync code, whether or not the loop is running.
 
         setup_class / setup_test overrides are frequently decorated with
         @async_test_body, so a super().setup_class() call inside such an override
@@ -1843,12 +1843,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         Detect that case and drive the coroutine on a private loop in a worker thread
         instead.
 
-        This is safe specifically because is_commissioned touches the device controller
-        only synchronously (GetCompressedFabricId) and awaits nothing but loop-agnostic
-        mDNS discovery. A future PASE/CASE fallback inside is_commissioned would bind
-        futures to the wrong loop and invalidate this, so keep that probe DNS-SD only.
+        A private loop is safe for the controller calls used here: both
+        AsyncioCallableHandle and GetConnectedDevice's completion closure capture
+        asyncio.get_running_loop() at call time and signal it via call_soon_threadsafe,
+        so they bind to whichever loop drives them rather than assuming the main one.
         """
-        coro = is_commissioned(self.default_controller, self.dut_node_id)
         try:
             asyncio.get_running_loop()
         except RuntimeError:
@@ -1857,21 +1856,59 @@ class MatterBaseTest(base_test.BaseTestClass):
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             return executor.submit(asyncio.run, coro).result()
 
+    async def _resolve_dut_commissioned(self) -> bool:
+        """Whether the DUT is commissioned on this fabric: DNS-SD first, then CASE.
+
+        matter.testing.commissioning.is_commissioned is a passive DNS-SD probe, so a True
+        result is both cheap and conclusive. A False result is NOT conclusive: that probe is
+        IPv6-only and skips loopback (see mdns_discovery.utils.network.get_host_ipv6_addresses)
+        and allows only a short discovery window, so a DUT that is commissioned but
+        undiscoverable -- same-host, IPv4-only, or simply slow to answer -- also reads False.
+
+        Confirm a negative over CASE, which resolves through the chip stack's own resolver and
+        therefore covers the setups the DNS-SD probe cannot see.
+        """
+        if await is_commissioned(self.default_controller, self.dut_node_id):
+            return True
+
+        # Same evidence heuristic as _capture_dut_baseline: give a real DUT room to bring up a
+        # session, while keeping the expected-failure case (a genuinely uncommissioned DUT,
+        # which every MatterTestUncommissionedDevice test hits) cheap.
+        dut_evidence = (self.matter_test_config.commissioning_method is not None
+                        or self._dut_confirmed_available)
+        case_timeout_ms = 5000 if dut_evidence else 500
+        try:
+            await self.default_controller.GetConnectedDevice(
+                nodeId=self.dut_node_id, allowPASE=False, timeoutMs=case_timeout_ms)
+        except Exception as e:
+            LOGGER.info("DUT node %d not reachable over CASE after the DNS-SD probe came back "
+                        "negative (%dms budget): %s", self.dut_node_id, case_timeout_ms, e)
+            return False
+
+        LOGGER.warning("DUT node %d was not visible over DNS-SD but IS reachable over CASE, so it "
+                       "is commissioned. The DNS-SD probe is IPv6-only and skips loopback, so "
+                       "expect this on same-host or IPv4-only setups.", self.dut_node_id)
+        return True
+
+    def _is_dut_commissioned_blocking(self) -> bool:
+        """Sync wrapper over _resolve_dut_commissioned for the marker preconditions."""
+        return self._run_blocking(self._resolve_dut_commissioned())
+
     def _assert_device_commissioning_precondition(self, expect_commissioned: bool) -> None:
         """Hard-fail class setup if the DUT's commissioning state does not match the marker.
 
-        Called from the device-state markers' ``setup_class``. Delegates to
-        :func:`matter.testing.commissioning.is_commissioned`, a passive DNS-SD probe (no
-        PASE/CASE side effects) that already applies its own DNS-SD discovery timeout, so no
-        additional polling is needed here.
+        Called from the device-state markers' ``setup_class``. Resolves the DUT's state via
+        :meth:`_resolve_dut_commissioned` (DNS-SD, then CASE for a negative).
         """
         commissioned = self._is_dut_commissioned_blocking()
         if expect_commissioned:
             asserts.assert_true(
                 commissioned,
-                f"MatterTestCommissionedDevice precondition failed: DUT node {self.dut_node_id} is not "
-                "commissioned on this fabric. This test requires an already-commissioned DUT; commission "
-                "it first (e.g. via --commissioning-method).")
+                f"MatterTestCommissionedDevice precondition failed: DUT node {self.dut_node_id} was not "
+                "detected as commissioned on this fabric -- it did not advertise as operational over "
+                "DNS-SD and no CASE session could be established. Either it is not commissioned "
+                "(commission it first, e.g. via --commissioning-method), or it is commissioned but "
+                "unreachable from this host. See the preceding log lines for which check failed and why.")
         else:
             asserts.assert_false(
                 commissioned,
