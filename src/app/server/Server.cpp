@@ -37,6 +37,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistedCounter.h>
@@ -808,8 +809,8 @@ void Server::RejoinExistingMulticastGroups()
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
 
-        auto * iterator = mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex());
-        if (iterator)
+        AutoRelease iterator(mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex()));
+        if (!iterator.IsNull())
         {
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
@@ -833,14 +834,11 @@ void Server::RejoinExistingMulticastGroups()
 
                     // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
                     // before the next join. Exit the loop to save rescources.
-                    iterator->Release();
                     return;
                 }
                 if (use_iana_addr)
                     groupcast_joined = true;
             }
-
-            iterator->Release();
         }
     }
 }

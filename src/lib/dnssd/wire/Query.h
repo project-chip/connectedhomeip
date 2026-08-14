@@ -23,8 +23,8 @@
 #include <lib/dnssd/wire/QName.h>
 #include <lib/dnssd/wire/RecordWriter.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// Represents a MDNS Query: QName and flags
 class Query
@@ -87,6 +87,6 @@ private:
     bool mAnswerViaUnicast = true;
 };
 
-} // namespace Minimal
+} // namespace Dnssd
 
-} // namespace mdns
+} // namespace chip
