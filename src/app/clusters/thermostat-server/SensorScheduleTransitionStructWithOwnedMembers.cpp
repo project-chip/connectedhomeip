@@ -56,9 +56,11 @@ SensorScheduleTransitionStructWithOwnedMembers::operator=(const Structs::SensorS
 SensorScheduleTransitionStructWithOwnedMembers &
 SensorScheduleTransitionStructWithOwnedMembers::operator=(const SensorScheduleTransitionStructWithOwnedMembers & other)
 {
-    SetDayOfWeek(other.GetDayOfWeek());
-    SetTransitionTime(other.GetTransitionTime());
-    TEMPORARY_RETURN_IGNORED SetEnabledSensors(other.GetEnabledSensors());
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const Structs::SensorScheduleTransitionStruct::Type &>(other);
     return *this;
 }
 
