@@ -177,6 +177,29 @@ class ICDBaseTest(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
 
+    async def apply_vendor_dsls_transition(self, event_trigger: "ICDTestEventTriggerOperations", prompt_msg: str) -> None:
+        """Apply the vendor-specific DSLS SIT/LIT transition mechanism on the DUT.
+
+        The DSLS transition mechanism is vendor-specific, so by default the operator
+        is prompted to perform it on the DUT. The transition is instead simulated by
+        sending event_trigger (kDSLSForceSitMode or kDSLSWithdrawSitMode) when either:
+
+          - the run is CI (PICS_SDK_CI_ONLY), or
+          - the tester enabled the simulate_dsls_transitions script argument, for
+            runs where the DUT is an SDK reference app. Per run method:
+              * script invocation:  --bool-arg simulate_dsls_transitions:true
+              * run_python_test.py: --script-args "... --bool-arg simulate_dsls_transitions:true"
+              * TH project config:  "test_parameters": {"bool-arg": "simulate_dsls_transitions:true"}
+
+        Args:
+            event_trigger: The DSLS test event trigger simulating the transition.
+            prompt_msg: The operator prompt describing the transition to perform.
+        """
+        if self.is_pics_sdk_ci_only or self.user_params.get("simulate_dsls_transitions", False):
+            await self.send_test_event_triggers(eventTrigger=event_trigger)
+        else:
+            self.wait_for_user_input(prompt_msg=prompt_msg)
+
     def get_dut_instance_name(self) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         return f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
