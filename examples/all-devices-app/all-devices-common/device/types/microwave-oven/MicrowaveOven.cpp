@@ -47,7 +47,7 @@ CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvi
         });
     ReturnErrorOnFailure(provider.AddCluster(mMicrowaveOvenControlCluster.Registration()));
 
-    mMicrowaveOvenModeCluster.Create(endpoint, Device::Type::kMicrowaveOven,
+    mMicrowaveOvenModeCluster.Create(endpoint, Clusters::ModeBase::kMicrowaveOvenMode,
                                      Clusters::ModeBaseCluster::Config{
                                          .feature                = BitFlags<Clusters::ModeBase::Feature>(),
                                          .appDelegate            = mMicrowaveOvenModeDelegate,

@@ -22,7 +22,6 @@
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <devices/Types.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
@@ -47,11 +46,18 @@ namespace {
 // TODO: change once there is a clear public interface for the OnOff cluster data dependencies (#27508)
 IntrusiveList<Instance> gModeBaseInstances;
 
-// The clusters that share this attribute structure.
-constexpr DataModel::DeviceTypeEntry kAliasedClusters[] = {
-    Device::Type::kDeviceEnergyManagement, Device::Type::kDishwasher,           Device::Type::kEvse,
-    Device::Type::kLaundryWasher,          Device::Type::kMicrowaveOven,        Device::Type::kOven,
-    Device::Type::kRefrigerator,           Device::Type::kRoboticVacuumCleaner, Device::Type::kWaterHeater,
+// The 10 clusters that share this attribute structure.
+constexpr ClusterEntry kAliasedClusters[] = {
+    kDeviceEnergyManagementMode,                      //
+    kDishwasherMode,                                  //
+    kEnergyEvseMode,                                  //
+    kLaundryWasherMode,                               //
+    kMicrowaveOvenMode,                               //
+    kOvenMode,                                        //
+    kRefrigeratorAndTemperatureControlledCabinetMode, //
+    kRvcCleanMode,                                    //
+    kRvcRunMode,                                      //
+    kWaterHeaterMode,                                 //
 };
 
 } // namespace
@@ -91,10 +97,10 @@ CHIP_ERROR Instance::Init()
     const EmberAfCluster * cluster = emberAfFindServerCluster(mClusterPath.mEndpointId, mClusterPath.mClusterId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    std::optional<DataModel::DeviceTypeEntry> aliasedClusterEntry;
+    std::optional<ClusterEntry> aliasedClusterEntry;
     for (const auto & entry : kAliasedClusters)
     {
-        if (entry.deviceTypeId == mClusterPath.mClusterId)
+        if (entry.id == mClusterPath.mClusterId)
         {
             aliasedClusterEntry = entry;
             break;

@@ -42,7 +42,7 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
-    ModeBaseCluster(EndpointId endpointId, DataModel::DeviceTypeEntry deviceType, const Config & config);
+    ModeBaseCluster(EndpointId endpointId, ModeBase::ClusterEntry cluster, const Config & config);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

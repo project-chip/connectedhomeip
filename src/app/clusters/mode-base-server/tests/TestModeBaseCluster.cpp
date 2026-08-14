@@ -39,7 +39,7 @@ using Status = Protocols::InteractionModel::Status;
 using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType;
 
-constexpr DataModel::DeviceTypeEntry kTestCluster = { DishwasherMode::Id, DishwasherMode::kRevision };
+constexpr ClusterEntry kTestCluster = kDishwasherMode;
 
 class TestDiagnosticDataProvider : public DeviceLayer::DiagnosticDataProvider
 {

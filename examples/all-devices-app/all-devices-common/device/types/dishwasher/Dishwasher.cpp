@@ -35,7 +35,7 @@ CHIP_ERROR Dishwasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
-    mDishwasherModeCluster.Create(endpoint, Device::Type::kDishwasher,
+    mDishwasherModeCluster.Create(endpoint, Clusters::ModeBase::kDishwasherMode,
                                   Clusters::ModeBaseCluster::Config{
                                       .feature                = BitFlags<Clusters::ModeBase::Feature>(),
                                       .appDelegate            = mDishwasherModeDelegate,
