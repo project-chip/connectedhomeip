@@ -488,12 +488,10 @@ public:
             uint32_t typeIdRaw = item["TypeId"].asUInt();
             uint32_t tagIdRaw  = item["TagId"].asUInt();
 
-            if (typeIdRaw > std::numeric_limits<uint8_t>::max() ||
-                tagIdRaw  > std::numeric_limits<uint8_t>::max())
+            if (typeIdRaw > std::numeric_limits<uint8_t>::max() || tagIdRaw > std::numeric_limits<uint8_t>::max())
             {
                 std::string inputJson = json.toStyledString();
-                ChipLogError(AppServer,
-                             "AmbientContextType[%u]: TypeId (%u) or TagId (%u) out of uint8_t range in %s",
+                ChipLogError(AppServer, "AmbientContextType[%u]: TypeId (%u) or TagId (%u) out of uint8_t range in %s",
                              static_cast<uint16_t>(i), typeIdRaw, tagIdRaw, inputJson.c_str());
                 return;
             }
