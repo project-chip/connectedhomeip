@@ -576,6 +576,10 @@ class MockTestRunner:
 
         self.set_test_config(self.config)
 
+        # Honor the test class's server-interactions opt-out before the stack
+        # starts advertising, mirroring run_tests_no_exit.
+        self.config.enable_server_interactions = getattr(self.test_class, "enable_server_interactions", True)
+
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,
