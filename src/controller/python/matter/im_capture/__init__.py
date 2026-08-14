@@ -18,6 +18,10 @@
 """Capture inbound Interaction Model response messages on ExchangeManager."""
 
 import ctypes
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from matter.ChipDeviceCtrl import ChipDeviceController
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 
@@ -41,7 +45,7 @@ def _GetLibraryHandle() -> ctypes.CDLL:
     return handle
 
 
-def SetObserver(controller) -> None:
+def SetObserver(controller: "ChipDeviceController") -> None:
     """Set the IM capture observer on the given controller's ExchangeManager."""
     handle = _GetLibraryHandle()
     handle.pychip_im_capture_set_observer(controller.devCtrl).raise_on_error()

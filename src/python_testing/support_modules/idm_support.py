@@ -233,15 +233,11 @@ class IDMBaseTest(BasicCompositionTests):
         the supported Matter release. For Release 1.7 or later (SpecificationVersion >= 0x01070000),
         asserts that snapshot.totalImResponseCount == 0. For Release 1.6 or earlier, logs the count.
         """
-        try:
-            spec_ver = await self.read_single_attribute_check_success(
-                endpoint=self.ROOT_NODE_ENDPOINT_ID,
-                cluster=Clusters.BasicInformation,
-                attribute=Clusters.BasicInformation.Attributes.SpecificationVersion
-            )
-        except Exception as e:
-            log.warning("Could not read SpecificationVersion attribute from BasicInformation: %s", e)
-            spec_ver = 0
+        spec_ver = await self.read_single_attribute_check_success(
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SpecificationVersion
+        )
 
         if spec_ver >= 0x01070000:
             asserts.assert_equal(

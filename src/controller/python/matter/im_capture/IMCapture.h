@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/matter/native/PyChipError.h>

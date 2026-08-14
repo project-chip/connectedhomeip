@@ -1945,7 +1945,7 @@ class ChipDeviceControllerBase:
         suppressResponse: Do not send a response to this action
 
         Returns:
-            - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
+            - None if suppressResponse is True. Otherwise, a list of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
                       - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
@@ -1965,6 +1965,8 @@ class ChipDeviceControllerBase:
                 timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
             res.raise_on_error()
+            if suppressResponse:
+                return None
             return await future
 
         return await self._run_with_session_retry(nodeId, _batch_send_impl)
@@ -2012,7 +2014,7 @@ class ChipDeviceControllerBase:
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            [AttributeStatus] (list - one for each path).
+            [AttributeStatus] or None (list - one for each path, or None when suppressResponse is True).
 
         Raises:
             InteractionModelError on error.
