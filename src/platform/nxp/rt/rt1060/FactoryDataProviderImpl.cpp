@@ -195,6 +195,8 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kPaiCertificateId, len);
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDiscriminatorId, NULL, 0, len));
 
+    ReturnErrorOnFailure(ImportDacPrivateKey());
+
     return CHIP_NO_ERROR;
 }
 
