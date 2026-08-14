@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/BooleanState/Enums.h>
 #include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::Clusters {
@@ -31,8 +32,11 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    void SetFeatureMap(BitFlags<BooleanState::Feature> featureMap) { mFeatureMap = featureMap; }
+    BitFlags<BooleanState::Feature> GetFeatureMap() const { return mFeatureMap; }
+
     // Set a boolean value.
-    // If the boolean value was actually modified, an event will be generated.
+    // If the boolean value was actually modified and the CHGEVENT feature is enabled, an event will be generated.
     // On success, the return value is an optional containing the EventNumber of the event that was generated.
     // On error, the return value is nullopt.
     std::optional<EventNumber> SetStateValue(bool stateValue);
@@ -40,6 +44,7 @@ public:
     bool GetStateValue() const { return mStateValue; }
 
 protected:
+    BitFlags<BooleanState::Feature> mFeatureMap = BooleanState::Feature::kChangeEvent;
     bool mStateValue;
 };
 

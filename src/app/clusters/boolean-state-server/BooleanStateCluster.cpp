@@ -38,7 +38,7 @@ DataModel::ActionReturnStatus BooleanStateCluster::ReadAttribute(const DataModel
     case ClusterRevision::Id:
         return encoder.Encode(BooleanState::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(BooleanState::Feature::kChangeEvent);
+        return encoder.Encode(mFeatureMap);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -54,6 +54,7 @@ CHIP_ERROR BooleanStateCluster::Attributes(const ConcreteClusterPath & path,
 std::optional<EventNumber> BooleanStateCluster::SetStateValue(bool stateValue)
 {
     VerifyOrReturnValue(SetAttributeValue(mStateValue, stateValue, StateValue::Id), std::nullopt);
+    VerifyOrReturnValue(mFeatureMap.Has(BooleanState::Feature::kChangeEvent), std::nullopt);
     VerifyOrReturnValue(mContext != nullptr, std::nullopt);
     BooleanState::Events::StateChange::Type event{ stateValue };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
