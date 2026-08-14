@@ -47,8 +47,8 @@ namespace Controller {
  * to facilitate the transition into Matter's operational commissioning flow.
  */
 class ThreadMeshcopCommissionProxy : public ot::commissioner::CommissionerHandler,
-                                     public mdns::Minimal::ParserDelegate,
-                                     public mdns::Minimal::TxtRecordDelegate
+                                     public chip::Dnssd::ParserDelegate,
+                                     public chip::Dnssd::TxtRecordDelegate
 {
 public:
     enum class State
@@ -75,13 +75,13 @@ public:
     void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
                          const std::vector<uint8_t> & payload) override;
 
-    // mdns::Minimal::ParserDelegate
-    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override;
-    void OnQuery(const mdns::Minimal::QueryData & data) override;
-    void OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data) override;
+    // chip::Dnssd::ParserDelegate
+    void OnHeader(chip::Dnssd::ConstHeaderRef & header) override;
+    void OnQuery(const chip::Dnssd::QueryData & data) override;
+    void OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data) override;
 
-    // mdns::Minimal::TxtRecordDelegate
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override;
+    // chip::Dnssd::TxtRecordDelegate
+    void OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value) override;
 
 private:
     // Internal Helper Methods
@@ -109,7 +109,7 @@ private:
 
     // Member Variables
     chip::Dnssd::DiscoveredNodeData mNodeData;
-    mdns::Minimal::BytesRange mDnsPacket;
+    chip::Dnssd::BytesRange mDnsPacket;
 
     int mProxyFd          = -1;
     uint16_t mServicePort = 0;
