@@ -61,7 +61,9 @@ public:
     {
         if (startAfterSetting && mOpStateDelegate != nullptr)
         {
-            mOpStateDelegate->StartEmulatedOperationTimer();
+            Clusters::OperationalState::GenericOperationalError err(
+                to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+            mOpStateDelegate->HandleStartStateCallback(err);
         }
         return Protocols::InteractionModel::Status::Success;
     }
