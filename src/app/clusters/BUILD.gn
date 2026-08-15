@@ -44,6 +44,7 @@ source_set("clusters") {
     "electrical-energy-measurement-server",
     "electrical-power-measurement-server",
     "energy-evse-server",
+    "energy-preference-server",
     "ethernet-network-diagnostics-server",
     "fan-control-server",
     "fixed-label-server",

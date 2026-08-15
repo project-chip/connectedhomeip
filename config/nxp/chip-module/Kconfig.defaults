@@ -54,11 +54,11 @@ config MAX_EVENT_QUEUE_SIZE
 	default 64
 
 config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-	default 800 if NET_L2_OPENTHREAD
+	default 800 if OPENTHREAD
 	default 2000
 
 config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
-	default 800 if NET_L2_OPENTHREAD
+	default 800 if OPENTHREAD
 	default 2000
 
 config CHIP_INET_ENABLE_TCP_ENDPOINT
@@ -85,11 +85,6 @@ endif # CHIP_FACTORY_DATA
 
 config CHIP_MALLOC_SYS_HEAP
 	default y if !ARCH_POSIX
-
-# See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_SETTINGS
-	bool
-	default y
 
 config CHIP_OTA_REQUESTOR
 	bool
@@ -128,7 +123,7 @@ config LOG_RUNTIME_DEFAULT_LEVEL
 endif # LOG_MODE_DEFERRED
 
 config LOG_BUFFER_SIZE
-	default 6144 if NET_L2_OPENTHREAD
+	default 6144 if OPENTHREAD
 
 choice MATTER_LOG_LEVEL_CHOICE
 	default MATTER_LOG_LEVEL_DBG
@@ -177,7 +172,7 @@ config POSIX_MAX_FDS
 # Application stack size
 config MAIN_STACK_SIZE
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
-	default 6144 if NET_L2_OPENTHREAD
+	default 6144 if OPENTHREAD
 	default 3072
 	  
 # AEAD ITS transform module encryption key provider
@@ -253,7 +248,7 @@ config NET_BUF_TX_COUNT
 config NET_BUF_DATA_SIZE
 	default 256
 
-if NET_L2_OPENTHREAD
+if OPENTHREAD
 
 config HDLC_RCP_IF
 	default y if SOC_FAMILY_NXP_RW
@@ -350,7 +345,7 @@ config OPENTHREAD_MLE_INFORM_PREVIOUS_PARENT_ON_REATTACH
 config CHIP_USE_OT_ENDPOINT
 	default y
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
 
 # Bluetooth Low Energy configs
 
@@ -404,7 +399,7 @@ config BT_BUF_ACL_TX_SIZE
 	default 251
 
 config BT_RX_STACK_SIZE
-	default 2560 if NET_L2_OPENTHREAD
+	default 2560 if OPENTHREAD
 	default 2048 if NO_OPTIMIZATIONS && DEBUG
 	default 1700
 
@@ -583,7 +578,7 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 3072 if NET_L2_OPENTHREAD
+	default 3072 if OPENTHREAD
 	default 2048 if CHIP_WIFI
 
 choice LIBC_IMPLEMENTATION
@@ -701,6 +696,9 @@ config CHIP_SE05X
 	select SE05X_LIB
 	select I2C
 	select PINCTRL
+
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	default y
 
 endif # CHIP
 
