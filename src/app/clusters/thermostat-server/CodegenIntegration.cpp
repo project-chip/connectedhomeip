@@ -28,6 +28,7 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/server/Server.h>
 
 #include "Temperature.h"
 
@@ -94,7 +95,8 @@ public:
         const ThermostatCluster::DefaultValues defaultValues = LoadDefaultValues(endpointId, features);
 
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
-        gClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes, defaultValues);
+        gClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes, defaultValues,
+                                               Server::GetInstance().GetFabricTable());
         return gClusters[clusterInstanceIndex].Registration();
     }
 

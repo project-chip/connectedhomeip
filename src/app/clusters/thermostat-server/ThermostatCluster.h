@@ -37,6 +37,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <credentials/FabricTable.h>
 #include "lib/core/DataModelTypes.h"
 #include "lib/support/CodeUtils.h"
 
@@ -107,7 +108,8 @@ public:
 
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
                       const OptionalAttributes & optionalAttributes,
-                      const DefaultValues & defaultValues);
+                      const DefaultValues & defaultValues,
+                      FabricTable & fabricTable);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -168,6 +170,7 @@ private:
     BitFlags<Thermostat::Feature> mFeatures;
     OptionalAttributes mOptionalAttributes;
     const DefaultValues mDefaultValues;
+    FabricTable & mFabricTable;
 
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
 

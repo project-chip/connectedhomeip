@@ -29,7 +29,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/server/Server.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -43,11 +42,13 @@ namespace Thermostat {
 
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
                                      const OptionalAttributes & optionalAttributes,
-                                     const DefaultValues & defaultValues) :
+                                     const DefaultValues & defaultValues,
+                                     FabricTable & fabricTable) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
     mFeatures(features),
     mOptionalAttributes(optionalAttributes),
-    mDefaultValues(defaultValues)
+    mDefaultValues(defaultValues),
+    mFabricTable(fabricTable)
 {
     mAtomicWriteSession.SetDelegate(this);
 }
@@ -71,7 +72,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     LoadSetpoints(mSetpoints, persistence);
 
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(this));
+    ReturnErrorOnFailure(mFabricTable.AddFabricDelegate(this));
     return CHIP_NO_ERROR;
 }
 
@@ -80,7 +81,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     mAtomicWriteSession.ResetAtomicWrite();
     mAtomicWriteSession.SetDelegate(nullptr);
     DefaultServerCluster::Shutdown(type);
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mFabricTable.RemoveFabricDelegate(this);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
 
