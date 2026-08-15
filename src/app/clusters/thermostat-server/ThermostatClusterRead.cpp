@@ -50,6 +50,12 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
             return encoder.EncodeNull();
         }
         return encoder.Encode(mLocalTemperature);
+    case OutdoorTemperature::Id:
+        // TODO: implement outdoor temperature
+        return Status::UnsupportedAttribute;
+    case Occupancy::Id:
+        // TODO: implement occupancy
+        return Status::UnsupportedAttribute;
     case SystemMode::Id:
         return encoder.Encode(mSystemMode);
     case ThermostatRunningMode::Id:
@@ -100,6 +106,14 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case TemperatureSetpointHoldDuration::Id: {
         return encoder.Encode(mTemperatureSetpointHoldDuration);
     }
+    case ThermostatRunningState::Id:
+        // TODO: implement thermostat running state
+        return Status::UnsupportedAttribute;
+    case SetpointChangeSource::Id:
+    case SetpointChangeAmount::Id:
+    case SetpointChangeSourceTimestamp::Id:
+        // TODO: implement setpoint change attributes
+        return Status::UnsupportedAttribute;
     case PresetTypes::Id: {
         auto & delegate = mDelegate;
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
@@ -119,11 +133,53 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         });
     }
     break;
+        case ScheduleTypes::Id: {
+        auto & delegate = mDelegate;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(enc.Encode(scheduleType));
+            }
+        });
+    }
+    break;
     case NumberOfPresets::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfPresets()));
     }
+    break;
+    case NumberOfSchedules::Id: 
+    case NumberOfScheduleTransitions::Id: 
+    case NumberOfScheduleTransitionPerDay::Id: 
+        // TODO: implement number of schedules
+        return Status::UnsupportedAttribute;
+    break;
+    case ActivePresetHandle::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        uint8_t buffer[kPresetHandleSize];
+        MutableByteSpan activePresetHandleSpan(buffer);
+        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
+
+        CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
+    }
+    break;
+    case ActiveScheduleHandle::Id: 
+        // TODO: implement active schedule handle
+        return Status::UnsupportedAttribute;
     break;
     case Presets::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
@@ -157,38 +213,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
                 }
                 ReturnErrorOnFailure(err);
                 ReturnErrorOnFailure(enc.Encode(preset));
-            }
-        });
-    }
-    break;
-    case ActivePresetHandle::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandleSpan(buffer);
-        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
-
-        CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
-        ReturnErrorOnFailure(err);
-
-        ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
-    }
-    break;
-    case ScheduleTypes::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                ScheduleTypeStruct::Type scheduleType;
-                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(scheduleType));
             }
         });
     }

@@ -41,6 +41,9 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
 
     switch (request.path.mAttributeId)
     {
+    case LocalTemperatureCalibration::Id:
+        // TODO: implement local temperature calibration
+        return Status::UnsupportedAttribute;
     case OccupiedCoolingSetpoint::Id:
     case OccupiedHeatingSetpoint::Id:
     case UnoccupiedCoolingSetpoint::Id:
