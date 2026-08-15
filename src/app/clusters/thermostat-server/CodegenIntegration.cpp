@@ -108,7 +108,7 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].Destroy(); }
 
 private:
-    const ThermostatCluster::DefaultValues LoadDefaultValues(EndpointId endpointId, const BitFlags<Thermostat::Feature> & features)
+    ThermostatCluster::DefaultValues LoadDefaultValues(EndpointId endpointId, const BitFlags<Thermostat::Feature> & features)
     {
         ThermostatCluster::DefaultValues defaultValues;
         if (features.Has(Thermostat::Feature::kHeating))
