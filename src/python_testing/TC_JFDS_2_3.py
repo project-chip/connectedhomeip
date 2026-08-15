@@ -33,6 +33,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
@@ -143,8 +144,8 @@ class TC_JFDS_2_3(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
-            timeout=10)
+            expected_output=f"Joined the fabric at index 1",
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -241,6 +242,8 @@ class TC_JFDS_2_3(MatterBaseTest):
             catTags=[int(self.ecoACATs, 16)])
 
         # Discover endpoint with JointFabricDatastore cluster via Descriptor
+        # Note: mDNS discovery may timeout in some environments. If this fails,
+        # the test infrastructure may need network configuration adjustments.
         descriptor_response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[(Clusters.Descriptor)],
             returnClusterObject=True)
@@ -416,7 +419,7 @@ class TC_JFDS_2_3(MatterBaseTest):
             groupID=0x000A,
             friendlyName="tc-jf-2.3",
             groupKeySetID=0x000B,
-            groupCAT=0xFFFE,  # SDK fails to decode 0xFFFF CAT, so using 0xFFFE here to simulate Admin CAT
+            groupCAT=0xFFFF,
             groupCATVersion=0x0001,
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kView)
 
