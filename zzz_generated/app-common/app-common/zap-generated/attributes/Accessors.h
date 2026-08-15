@@ -2600,11 +2600,104 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace Thermostat {
 namespace Attributes {
 
+namespace LocalTemperature {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
+} // namespace LocalTemperature
+
+namespace OutdoorTemperature {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
+} // namespace OutdoorTemperature
+
+namespace Occupancy {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> * value); // OccupancyBitmap
+} // namespace Occupancy
+
+namespace AbsMinHeatSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace AbsMaxHeatSetpointLimit
+
+namespace AbsMinCoolSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace AbsMinCoolSetpointLimit
+
+namespace AbsMaxCoolSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace AbsMaxCoolSetpointLimit
+
+namespace PICoolingDemand {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
+} // namespace PICoolingDemand
+
+namespace PIHeatingDemand {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
+} // namespace PIHeatingDemand
+
 namespace HVACSystemTypeConfiguration {
 Protocols::InteractionModel::Status
 GetDefault(EndpointId endpoint,
            chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap> * value); // HVACSystemTypeBitmap
 } // namespace HVACSystemTypeConfiguration
+
+namespace LocalTemperatureCalibration {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value); // int8s
+} // namespace LocalTemperatureCalibration
+
+namespace OccupiedCoolingSetpoint {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace OccupiedCoolingSetpoint
+
+namespace OccupiedHeatingSetpoint {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace OccupiedHeatingSetpoint
+
+namespace UnoccupiedCoolingSetpoint {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace UnoccupiedCoolingSetpoint
+
+namespace UnoccupiedHeatingSetpoint {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace UnoccupiedHeatingSetpoint
+
+namespace MinHeatSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace MinHeatSetpointLimit
+
+namespace MaxHeatSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace MaxHeatSetpointLimit
+
+namespace MinCoolSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace MinCoolSetpointLimit
+
+namespace MaxCoolSetpointLimit {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int16_t * value); // temperature
+} // namespace MaxCoolSetpointLimit
+
+namespace MinSetpointDeadBand {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, int8_t * value); // int8s
+} // namespace MinSetpointDeadBand
+
+namespace RemoteSensing {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> * value); // RemoteSensingBitmap
+} // namespace RemoteSensing
+
+namespace ControlSequenceOfOperation {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint,
+           chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum * value); // ControlSequenceOfOperationEnum
+} // namespace ControlSequenceOfOperation
+
+namespace SystemMode {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Thermostat::SystemModeEnum * value); // SystemModeEnum
+} // namespace SystemMode
 
 namespace ThermostatRunningMode {
 Protocols::InteractionModel::Status
@@ -2623,6 +2716,16 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * va
 namespace NumberOfDailyTransitions {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace NumberOfDailyTransitions
+
+namespace TemperatureSetpointHold {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint,
+           chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum * value); // TemperatureSetpointHoldEnum
+} // namespace TemperatureSetpointHold
+
+namespace TemperatureSetpointHoldDuration {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
+} // namespace TemperatureSetpointHoldDuration
 
 namespace ThermostatProgrammingOperationMode {
 Protocols::InteractionModel::Status GetDefault(
@@ -2739,6 +2842,10 @@ namespace ActiveScheduleHandle {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
                                                DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 } // namespace ActiveScheduleHandle
+
+namespace SetpointHoldExpiryTimestamp {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+} // namespace SetpointHoldExpiryTimestamp
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32

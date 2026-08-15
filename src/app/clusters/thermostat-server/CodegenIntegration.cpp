@@ -27,8 +27,12 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+
+#include "Temperature.h"
 
 using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -87,8 +91,10 @@ public:
             emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id);
         optionalAttributes.OutdoorTemperature = emberAfContainsAttribute(endpointId, Thermostat::Id, OutdoorTemperature::Id);
 
+        const ThermostatCluster::DefaultValues defaultValues = LoadDefaultValues(endpointId, features);
+
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
-        gClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes);
+        gClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes, defaultValues);
         return gClusters[clusterInstanceIndex].Registration();
     }
 
@@ -98,6 +104,152 @@ public:
         return &gClusters[clusterInstanceIndex].Cluster();
     }
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].Destroy(); }
+
+private:
+    const ThermostatCluster::DefaultValues LoadDefaultValues(EndpointId endpointId, const BitFlags<Thermostat::Feature> & features)
+    {
+        ThermostatCluster::DefaultValues defaultValues;
+        if (features.Has(Thermostat::Feature::kHeating))
+        {
+            if (auto status = AbsMinHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMinHeatSetpointLimit); status != Status::Success)
+            {
+                defaultValues.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+            }
+
+            if (auto status = AbsMaxHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxHeatSetpointLimit); status != Status::Success)
+            {
+                defaultValues.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+            }
+            
+            temperature minHeatSetpointLimit;
+            if (auto status = MinHeatSetpointLimit::GetDefault(endpointId, &minHeatSetpointLimit); status == Status::Success)
+            {
+                defaultValues.minHeatSetpointLimit.SetValue(minHeatSetpointLimit);
+            }
+
+            temperature maxHeatSetpointLimit;
+            if (auto status = MaxHeatSetpointLimit::GetDefault(endpointId, &maxHeatSetpointLimit); status == Status::Success)
+            {
+                defaultValues.maxHeatSetpointLimit.SetValue(maxHeatSetpointLimit);
+            }
+
+            if (auto status = OccupiedHeatingSetpoint::GetDefault(endpointId, &defaultValues.occupiedHeatingSetpoint); status != Status::Success)
+            {
+                defaultValues.occupiedHeatingSetpoint = kDefaultHeatingSetpoint;
+            }
+
+            if (features.Has(Thermostat::Feature::kOccupancy))
+            {
+                temperature unoccupiedHeatingSetpoint;
+                if (auto status = UnoccupiedHeatingSetpoint::GetDefault(endpointId, &unoccupiedHeatingSetpoint); status != Status::Success)
+                {
+                    defaultValues.unoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
+                }
+            }
+        }
+        
+        if (features.Has(Thermostat::Feature::kCooling))
+        {
+            if (auto status = AbsMinCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMinCoolSetpointLimit); status != Status::Success)
+            {
+                defaultValues.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+            }
+
+            if (auto status = AbsMaxCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxCoolSetpointLimit); status != Status::Success)
+            {
+                defaultValues.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+            }
+
+            temperature minCoolSetpointLimit;
+            if (auto status = MinCoolSetpointLimit::GetDefault(endpointId, &minCoolSetpointLimit); status == Status::Success)
+            {
+                defaultValues.minCoolSetpointLimit.SetValue(minCoolSetpointLimit);
+            }
+
+            temperature maxCoolSetpointLimit;
+            if (auto status = MaxCoolSetpointLimit::GetDefault(endpointId, &maxCoolSetpointLimit); status == Status::Success)
+            {
+                defaultValues.maxCoolSetpointLimit.SetValue(maxCoolSetpointLimit);
+            }
+
+            if (auto status = OccupiedCoolingSetpoint::GetDefault(endpointId, &defaultValues.occupiedCoolingSetpoint); status != Status::Success)
+            {
+                defaultValues.occupiedCoolingSetpoint = kDefaultCoolingSetpoint;
+            }
+
+            if (features.Has(Thermostat::Feature::kOccupancy)) 
+            {
+                temperature unoccupiedCoolingSetpoint;
+                if (auto status = UnoccupiedCoolingSetpoint::GetDefault(endpointId, &unoccupiedCoolingSetpoint); status != Status::Success)
+                {
+                    defaultValues.unoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
+                }
+            }
+        }
+
+        if (auto status = LocalTemperatureCalibration::GetDefault(endpointId, &defaultValues.localTemperatureCalibration); status != Status::Success)
+        {
+            defaultValues.localTemperatureCalibration = kDefaultLocalTemperatureCalibration;
+        }
+
+        auto hasHeating = features.Has(Feature::kHeating);
+        auto hasCooling = features.Has(Feature::kCooling);
+    
+        if (auto status = SystemMode::GetDefault(endpointId, &defaultValues.systemMode); status != Status::Success)
+        {
+            if (hasHeating && hasCooling)
+            {
+                defaultValues.systemMode = SystemModeEnum::kAuto;
+            }
+            else if (hasHeating)
+            {
+                defaultValues.systemMode = SystemModeEnum::kHeat;
+            }
+            else if (hasCooling)
+            {
+                defaultValues.systemMode = SystemModeEnum::kCool;
+            }
+        }
+
+        if (auto status = ControlSequenceOfOperation::GetDefault(endpointId, &defaultValues.controlSequenceOfOperation); status != Status::Success)
+        {
+            if (hasHeating && hasCooling)
+            {
+                defaultValues.controlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
+            }
+            else if (hasHeating)
+            {
+                defaultValues.controlSequenceOfOperation = ControlSequenceOfOperationEnum::kHeatingOnly;
+            }
+            else if (hasCooling)
+            {
+                defaultValues.controlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
+            }
+        }
+
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id)) {
+            if (auto status = TemperatureSetpointHold::GetDefault(endpointId, &defaultValues.temperatureSetpointHold); status != Status::Success)
+            {
+                defaultValues.temperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
+            }
+        }
+
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id)) {
+            if (auto status = TemperatureSetpointHoldDuration::GetDefault(endpointId, defaultValues.temperatureSetpointHoldDuration); status != Status::Success)
+            {
+                defaultValues.temperatureSetpointHoldDuration = 0;
+            }
+        }
+
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id)) {
+            if (auto status = SetpointHoldExpiryTimestamp::GetDefault(endpointId, defaultValues.setpointHoldExpiryTimestamp); status != Status::Success)
+            {
+                defaultValues.setpointHoldExpiryTimestamp.SetNull();
+            }
+        }
+
+        return defaultValues;
+    }
 };
 
 Protocols::InteractionModel::Status SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)

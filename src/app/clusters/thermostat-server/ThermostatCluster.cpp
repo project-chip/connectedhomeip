@@ -42,24 +42,13 @@ namespace Clusters {
 namespace Thermostat {
 
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
-                                     const OptionalAttributes & optionalAttributes) :
+                                     const OptionalAttributes & optionalAttributes,
+                                     const DefaultValues & defaultValues) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes)
+    mFeatures(features),
+    mOptionalAttributes(optionalAttributes),
+    mDefaultValues(defaultValues)
 {
-    auto hasHeating = mFeatures.Has(Feature::kHeating);
-    auto hasCooling = mFeatures.Has(Feature::kCooling);
-    if (hasHeating && hasCooling)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    }
-    else if (hasHeating)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kHeatingOnly;
-    }
-    else if (hasCooling)
-    {
-        mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
-    }
     mAtomicWriteSession.SetDelegate(this);
 }
 
@@ -67,6 +56,18 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
     AttributePersistence persistence(context.attributeStorage);
+
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
+                                      mControlSequenceOfOperation, mDefaultValues.controlSequenceOfOperation);
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode,
+                                      mDefaultValues.systemMode);
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
+                                      mTemperatureSetpointHold, mDefaultValues.temperatureSetpointHold);
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+                                      mTemperatureSetpointHoldDuration, mDefaultValues.temperatureSetpointHoldDuration);
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
+                                      mSetpointHoldExpiryTimestamp, mDefaultValues.setpointHoldExpiryTimestamp);
+
     LoadSetpoints(mSetpoints, persistence);
 
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));

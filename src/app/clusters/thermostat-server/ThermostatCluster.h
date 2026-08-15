@@ -79,8 +79,35 @@ public:
         OptionalAttributes() = default;
     };
 
+    struct DefaultValues
+    {
+        temperature absMinHeatSetpointLimit;
+        temperature absMaxHeatSetpointLimit;
+        temperature absMinCoolSetpointLimit;
+        temperature absMaxCoolSetpointLimit;
+        int8_t localTemperatureCalibration;
+        temperature occupiedCoolingSetpoint;
+        temperature occupiedHeatingSetpoint;
+        temperature unoccupiedCoolingSetpoint;
+        temperature unoccupiedHeatingSetpoint;
+        Optional<temperature> minHeatSetpointLimit;
+        Optional<temperature> maxHeatSetpointLimit;
+        Optional<temperature> minCoolSetpointLimit;
+        Optional<temperature> maxCoolSetpointLimit;
+        temperature minSetpointDeadBand;
+        ControlSequenceOfOperationEnum controlSequenceOfOperation;
+        SystemModeEnum systemMode;
+
+        TemperatureSetpointHoldEnum temperatureSetpointHold;
+        DataModel::Nullable<uint16_t> temperatureSetpointHoldDuration;
+        DataModel::Nullable<uint32_t> setpointHoldExpiryTimestamp;
+
+        DefaultValues() = default;
+    };
+
     ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
-                      const OptionalAttributes & optionalAttributes);
+                      const OptionalAttributes & optionalAttributes,
+                      const DefaultValues & defaultValues);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -140,6 +167,7 @@ public:
 private:
     BitFlags<Thermostat::Feature> mFeatures;
     OptionalAttributes mOptionalAttributes;
+    const DefaultValues mDefaultValues;
 
     ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingOnly;
 

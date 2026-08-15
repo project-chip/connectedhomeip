@@ -170,24 +170,24 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
         setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
     }
 
-    int16_t absMinHeatLimit = kDefaultAbsMinHeatSetpointLimit;
+    int16_t absMinHeatLimit;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinHeatSetpointLimit::Id }, absMinHeatLimit,
-                                      static_cast<int16_t>(kDefaultAbsMinHeatSetpointLimit));
+                                      static_cast<int16_t>(mDefaultValues.absMinHeatSetpointLimit));
     setpoints.absoluteHeatLimits.minimum.SetTemperature(absMinHeatLimit);
 
-    int16_t absMaxHeatLimit = kDefaultAbsMaxHeatSetpointLimit;
+    int16_t absMaxHeatLimit;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxHeatSetpointLimit::Id }, absMaxHeatLimit,
-                                      static_cast<int16_t>(kDefaultAbsMaxHeatSetpointLimit));
+                                      static_cast<int16_t>(mDefaultValues.absMaxHeatSetpointLimit));
     setpoints.absoluteHeatLimits.maximum.SetTemperature(absMaxHeatLimit);
 
-    int16_t absMinCoolLimit = kDefaultAbsMinCoolSetpointLimit;
+    int16_t absMinCoolLimit;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinCoolSetpointLimit::Id }, absMinCoolLimit,
-                                      static_cast<int16_t>(kDefaultAbsMinCoolSetpointLimit));
+                                      static_cast<int16_t>(mDefaultValues.absMinCoolSetpointLimit));
     setpoints.absoluteCoolLimits.minimum.SetTemperature(absMinCoolLimit);
 
-    int16_t absMaxCoolLimit = kDefaultAbsMaxCoolSetpointLimit;
+    int16_t absMaxCoolLimit;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxCoolSetpointLimit::Id }, absMaxCoolLimit,
-                                      static_cast<int16_t>(kDefaultAbsMaxCoolSetpointLimit));
+                                      static_cast<int16_t>(mDefaultValues.absMaxCoolSetpointLimit));
     setpoints.absoluteCoolLimits.maximum.SetTemperature(absMaxCoolLimit);
 
     if (setpoints.heatSupported)
@@ -197,12 +197,16 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userHeatLimits.minimum.SetTemperature(minHeatLimit);
+        } else {
+            setpoints.userHeatLimits.minimum = mDefaultValues.minHeatSetpointLimit;
         }
         int16_t maxHeatLimit;
         if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id }, maxHeatLimit,
                                               static_cast<int16_t>(0)))
         {
             setpoints.userHeatLimits.maximum.SetTemperature(maxHeatLimit);
+        } else {
+            setpoints.userHeatLimits.maximum = mDefaultValues.maxHeatSetpointLimit;
         }
     }
     if (setpoints.coolSupported)
@@ -212,35 +216,39 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userCoolLimits.minimum.SetTemperature(minCoolLimit);
+        } else {
+            setpoints.userCoolLimits.minimum = mDefaultValues.minCoolSetpointLimit;
         }
         int16_t maxCoolLimit;
         if (persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id }, maxCoolLimit,
                                               static_cast<int16_t>(0)))
         {
             setpoints.userCoolLimits.maximum.SetTemperature(maxCoolLimit);
+        } else {
+            setpoints.userCoolLimits.maximum = mDefaultValues.maxCoolSetpointLimit;
         }
     }
 
     int16_t occupiedCooling;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id }, occupiedCooling,
-                                      static_cast<int16_t>(kDefaultCoolingSetpoint));
+                                      static_cast<int16_t>(mDefaultValues.occupiedCoolingSetpoint));
     setpoints.occupiedRange.cooling.SetTemperature(occupiedCooling);
 
     int16_t occupiedHeating;
     persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id }, occupiedHeating,
-                                      static_cast<int16_t>(kDefaultHeatingSetpoint));
+                                      static_cast<int16_t>(mDefaultValues.occupiedHeatingSetpoint));
     setpoints.occupiedRange.heating.SetTemperature(occupiedHeating);
 
     if (setpoints.occupancySupported)
     {
         int16_t unoccupiedCooling;
         persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, unoccupiedCooling,
-                                          static_cast<int16_t>(kDefaultCoolingSetpoint));
+                                          static_cast<int16_t>(mDefaultValues.unoccupiedCoolingSetpoint));
         setpoints.unoccupiedRange.cooling.SetTemperature(unoccupiedCooling);
 
         int16_t unoccupiedHeating;
         persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, unoccupiedHeating,
-                                          static_cast<int16_t>(kDefaultHeatingSetpoint));
+                                          static_cast<int16_t>(mDefaultValues.unoccupiedHeatingSetpoint));
         setpoints.unoccupiedRange.heating.SetTemperature(unoccupiedHeating);
     }
 

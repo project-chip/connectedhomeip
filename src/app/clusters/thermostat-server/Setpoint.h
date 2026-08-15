@@ -130,6 +130,12 @@ public:
         return *this;
     }
 
+    OptionalSetpoint & operator=(const Optional<temperature> & other)
+    {
+        mTemperature = other;
+        return *this;
+    }
+
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const;
 
     CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
