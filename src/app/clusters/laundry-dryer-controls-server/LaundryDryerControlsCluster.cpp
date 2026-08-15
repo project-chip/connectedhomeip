@@ -53,8 +53,6 @@ LaundryDryerControlsCluster::SetSelectedDrynessLevel(DataModel::Nullable<Dryness
 {
     using Status = Protocols::InteractionModel::Status;
 
-    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
-
     // A null value clears the selection and is always valid. A non-null value must be one of the levels
     // advertised by SupportedDrynessLevels. This mirrors the validation the legacy
     // MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback performed against the delegate.
@@ -66,7 +64,10 @@ LaundryDryerControlsCluster::SetSelectedDrynessLevel(DataModel::Nullable<Dryness
     // Update + notify only when the value actually changes.
     const bool changed = SetAttributeValue(mSelectedDrynessLevel, drynessLevel, SelectedDrynessLevel::Id);
 
-    if (changed)
+    // Persistence is only possible once the cluster has a context, so a set before Startup only updates
+    // the in-memory value. LoadPersistentAttributes uses the current value as its default, so such a
+    // value survives Startup when nothing is stored, and is replaced by the stored value otherwise.
+    if (changed && mContext != nullptr)
     {
         AttributePersistence attrPersistence{ mContext->attributeStorage };
         CHIP_ERROR err = attrPersistence.StoreNativeEndianValue<DrynessLevelEnum>(
