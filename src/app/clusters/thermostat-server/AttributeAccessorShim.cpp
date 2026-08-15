@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "ThermostatCluster.h"
 #include "CodegenIntegration.h"
+#include "ThermostatCluster.h"
 
 using namespace chip::Protocols::InteractionModel;
 

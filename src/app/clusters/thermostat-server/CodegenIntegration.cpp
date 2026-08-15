@@ -20,6 +20,8 @@
 #include <lib/core/CHIPEncoding.h>
 
 #include "ThermostatCluster.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/Thermostat.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -27,8 +29,6 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/server/Server.h>
 
 #include "Temperature.h"
 
@@ -113,16 +113,18 @@ private:
         ThermostatCluster::DefaultValues defaultValues;
         if (features.Has(Thermostat::Feature::kHeating))
         {
-            if (auto status = AbsMinHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMinHeatSetpointLimit); status != Status::Success)
+            if (auto status = AbsMinHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMinHeatSetpointLimit);
+                status != Status::Success)
             {
                 defaultValues.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
             }
 
-            if (auto status = AbsMaxHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxHeatSetpointLimit); status != Status::Success)
+            if (auto status = AbsMaxHeatSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxHeatSetpointLimit);
+                status != Status::Success)
             {
                 defaultValues.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
             }
-            
+
             temperature minHeatSetpointLimit;
             if (auto status = MinHeatSetpointLimit::GetDefault(endpointId, &minHeatSetpointLimit); status == Status::Success)
             {
@@ -135,7 +137,8 @@ private:
                 defaultValues.maxHeatSetpointLimit.SetValue(maxHeatSetpointLimit);
             }
 
-            if (auto status = OccupiedHeatingSetpoint::GetDefault(endpointId, &defaultValues.occupiedHeatingSetpoint); status != Status::Success)
+            if (auto status = OccupiedHeatingSetpoint::GetDefault(endpointId, &defaultValues.occupiedHeatingSetpoint);
+                status != Status::Success)
             {
                 defaultValues.occupiedHeatingSetpoint = kDefaultHeatingSetpoint;
             }
@@ -143,21 +146,24 @@ private:
             if (features.Has(Thermostat::Feature::kOccupancy))
             {
                 temperature unoccupiedHeatingSetpoint;
-                if (auto status = UnoccupiedHeatingSetpoint::GetDefault(endpointId, &unoccupiedHeatingSetpoint); status != Status::Success)
+                if (auto status = UnoccupiedHeatingSetpoint::GetDefault(endpointId, &unoccupiedHeatingSetpoint);
+                    status != Status::Success)
                 {
                     defaultValues.unoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
                 }
             }
         }
-        
+
         if (features.Has(Thermostat::Feature::kCooling))
         {
-            if (auto status = AbsMinCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMinCoolSetpointLimit); status != Status::Success)
+            if (auto status = AbsMinCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMinCoolSetpointLimit);
+                status != Status::Success)
             {
                 defaultValues.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
             }
 
-            if (auto status = AbsMaxCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxCoolSetpointLimit); status != Status::Success)
+            if (auto status = AbsMaxCoolSetpointLimit::GetDefault(endpointId, &defaultValues.absMaxCoolSetpointLimit);
+                status != Status::Success)
             {
                 defaultValues.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
             }
@@ -174,29 +180,32 @@ private:
                 defaultValues.maxCoolSetpointLimit.SetValue(maxCoolSetpointLimit);
             }
 
-            if (auto status = OccupiedCoolingSetpoint::GetDefault(endpointId, &defaultValues.occupiedCoolingSetpoint); status != Status::Success)
+            if (auto status = OccupiedCoolingSetpoint::GetDefault(endpointId, &defaultValues.occupiedCoolingSetpoint);
+                status != Status::Success)
             {
                 defaultValues.occupiedCoolingSetpoint = kDefaultCoolingSetpoint;
             }
 
-            if (features.Has(Thermostat::Feature::kOccupancy)) 
+            if (features.Has(Thermostat::Feature::kOccupancy))
             {
                 temperature unoccupiedCoolingSetpoint;
-                if (auto status = UnoccupiedCoolingSetpoint::GetDefault(endpointId, &unoccupiedCoolingSetpoint); status != Status::Success)
+                if (auto status = UnoccupiedCoolingSetpoint::GetDefault(endpointId, &unoccupiedCoolingSetpoint);
+                    status != Status::Success)
                 {
                     defaultValues.unoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
                 }
             }
         }
 
-        if (auto status = LocalTemperatureCalibration::GetDefault(endpointId, &defaultValues.localTemperatureCalibration); status != Status::Success)
+        if (auto status = LocalTemperatureCalibration::GetDefault(endpointId, &defaultValues.localTemperatureCalibration);
+            status != Status::Success)
         {
             defaultValues.localTemperatureCalibration = kDefaultLocalTemperatureCalibration;
         }
 
         auto hasHeating = features.Has(Feature::kHeating);
         auto hasCooling = features.Has(Feature::kCooling);
-    
+
         if (auto status = SystemMode::GetDefault(endpointId, &defaultValues.systemMode); status != Status::Success)
         {
             if (hasHeating && hasCooling)
@@ -213,7 +222,8 @@ private:
             }
         }
 
-        if (auto status = ControlSequenceOfOperation::GetDefault(endpointId, &defaultValues.controlSequenceOfOperation); status != Status::Success)
+        if (auto status = ControlSequenceOfOperation::GetDefault(endpointId, &defaultValues.controlSequenceOfOperation);
+            status != Status::Success)
         {
             if (hasHeating && hasCooling)
             {
@@ -229,22 +239,29 @@ private:
             }
         }
 
-        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id)) {
-            if (auto status = TemperatureSetpointHold::GetDefault(endpointId, &defaultValues.temperatureSetpointHold); status != Status::Success)
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id))
+        {
+            if (auto status = TemperatureSetpointHold::GetDefault(endpointId, &defaultValues.temperatureSetpointHold);
+                status != Status::Success)
             {
                 defaultValues.temperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
             }
         }
 
-        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id)) {
-            if (auto status = TemperatureSetpointHoldDuration::GetDefault(endpointId, defaultValues.temperatureSetpointHoldDuration); status != Status::Success)
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id))
+        {
+            if (auto status =
+                    TemperatureSetpointHoldDuration::GetDefault(endpointId, defaultValues.temperatureSetpointHoldDuration);
+                status != Status::Success)
             {
                 defaultValues.temperatureSetpointHoldDuration = 0;
             }
         }
 
-        if (emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id)) {
-            if (auto status = SetpointHoldExpiryTimestamp::GetDefault(endpointId, defaultValues.setpointHoldExpiryTimestamp); status != Status::Success)
+        if (emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id))
+        {
+            if (auto status = SetpointHoldExpiryTimestamp::GetDefault(endpointId, defaultValues.setpointHoldExpiryTimestamp);
+                status != Status::Success)
             {
                 defaultValues.setpointHoldExpiryTimestamp.SetNull();
             }

@@ -124,7 +124,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
     case TemperatureSetpointHoldDuration::Id: {
         DataModel::Nullable<uint16_t> requestedTemperatureSetpointHoldDuration;
         ReturnErrorOnFailure(decoder.Decode(requestedTemperatureSetpointHoldDuration));
-        if (!requestedTemperatureSetpointHoldDuration.IsNull() && requestedTemperatureSetpointHoldDuration.Value() > kMaxTemperatureSetpointHoldDurationSec)
+        if (!requestedTemperatureSetpointHoldDuration.IsNull() &&
+            requestedTemperatureSetpointHoldDuration.Value() > kMaxTemperatureSetpointHoldDurationSec)
         {
             return Status::InvalidValue;
         }

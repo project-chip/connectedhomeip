@@ -84,7 +84,7 @@ void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     if (auto status = Clusters::Thermostat::SetDefaultDelegate(chip::EndpointId(1),
-                                             &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+                                                               &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
         status != chip::Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));

@@ -439,7 +439,8 @@ void AtomicWriteSession::OnAtomicWriteTimeout()
 /// @param attributeStatusCount The number of attribute statuses in attributeStatuses
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
 /// @return Status::Success if the request is valid, an error status if it is not
-Status AtomicWriteSession::BuildAttributeStatuses(const DataModel::DecodableList<chip::AttributeId> attributeRequests,
+Status AtomicWriteSession::BuildAttributeStatuses(
+    const DataModel::DecodableList<chip::AttributeId> attributeRequests,
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
     size_t attributeStatusCount = 0;

@@ -30,17 +30,16 @@
 #include "ThermostatClusterAtomic.h"
 #include "ThermostatDelegate.h"
 
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
 #include "app/ConcreteAttributePath.h"
 #include "app/clusters/thermostat-server/Temperature.h"
+#include "lib/core/DataModelTypes.h"
+#include "lib/support/CodeUtils.h"
 #include <app-common/zap-generated/callback.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/CommandHandler.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <credentials/FabricTable.h>
-#include "lib/core/DataModelTypes.h"
-#include "lib/support/CodeUtils.h"
-
 
 namespace chip {
 namespace app {
@@ -106,10 +105,8 @@ public:
         DefaultValues() = default;
     };
 
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
-                      const OptionalAttributes & optionalAttributes,
-                      const DefaultValues & defaultValues,
-                      FabricTable & fabricTable);
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes,
+                      const DefaultValues & defaultValues, FabricTable & fabricTable);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -163,7 +160,7 @@ public:
                         DataModel::AttributeChangeType changeType = DataModel::AttributeChangeType::kReportable);
 
     DataModel::ActionReturnStatus ChangeSetpointAttribute(const AttributeId attributeId, temperature temp);
- 
+
     Setpoints mSetpoints;
 
 private:

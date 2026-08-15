@@ -197,7 +197,9 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userHeatLimits.minimum.SetTemperature(minHeatLimit);
-        } else {
+        }
+        else
+        {
             setpoints.userHeatLimits.minimum = mDefaultValues.minHeatSetpointLimit;
         }
         int16_t maxHeatLimit;
@@ -205,7 +207,9 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userHeatLimits.maximum.SetTemperature(maxHeatLimit);
-        } else {
+        }
+        else
+        {
             setpoints.userHeatLimits.maximum = mDefaultValues.maxHeatSetpointLimit;
         }
     }
@@ -216,7 +220,9 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userCoolLimits.minimum.SetTemperature(minCoolLimit);
-        } else {
+        }
+        else
+        {
             setpoints.userCoolLimits.minimum = mDefaultValues.minCoolSetpointLimit;
         }
         int16_t maxCoolLimit;
@@ -224,7 +230,9 @@ Protocols::InteractionModel::Status ThermostatCluster::LoadSetpoints(Setpoints &
                                               static_cast<int16_t>(0)))
         {
             setpoints.userCoolLimits.maximum.SetTemperature(maxCoolLimit);
-        } else {
+        }
+        else
+        {
             setpoints.userCoolLimits.maximum = mDefaultValues.maxCoolSetpointLimit;
         }
     }

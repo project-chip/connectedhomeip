@@ -41,14 +41,10 @@ namespace Clusters {
 namespace Thermostat {
 
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features,
-                                     const OptionalAttributes & optionalAttributes,
-                                     const DefaultValues & defaultValues,
+                                     const OptionalAttributes & optionalAttributes, const DefaultValues & defaultValues,
                                      FabricTable & fabricTable) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFeatures(features),
-    mOptionalAttributes(optionalAttributes),
-    mDefaultValues(defaultValues),
-    mFabricTable(fabricTable)
+    mFeatures(features), mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mFabricTable(fabricTable)
 {
     mAtomicWriteSession.SetDelegate(this);
 }
@@ -62,8 +58,8 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
                                       mControlSequenceOfOperation, mDefaultValues.controlSequenceOfOperation);
     persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode,
                                       mDefaultValues.systemMode);
-    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
-                                      mTemperatureSetpointHold, mDefaultValues.temperatureSetpointHold);
+    persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id }, mTemperatureSetpointHold,
+                                      mDefaultValues.temperatureSetpointHold);
     persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
                                       mTemperatureSetpointHoldDuration, mDefaultValues.temperatureSetpointHoldDuration);
     persistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },

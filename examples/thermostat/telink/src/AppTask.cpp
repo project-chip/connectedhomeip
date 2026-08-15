@@ -19,8 +19,8 @@
 #include "AppTask.h"
 
 #include <app/MessageDef/StatusIB.h>
-#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <thermostat-delegate-impl.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -39,7 +39,8 @@ CHIP_ERROR AppTask::Init(void)
     ReturnErrorOnFailure(InitCommonParts());
 
     if (auto status = chip::app::Clusters::Thermostat::SetDefaultDelegate(
-        kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance()); status != chip::Protocols::InteractionModel::Status::Success)
+            kExampleEndpointId, &chip::app::Clusters::Thermostat::ThermostatDelegate::GetInstance());
+        status != chip::Protocols::InteractionModel::Status::Success)
     {
         LOG_ERR("SetDefaultDelegate failed: 0x%02x", chip::to_underlying(status));
     }

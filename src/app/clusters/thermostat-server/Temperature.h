@@ -35,7 +35,6 @@ constexpr temperature kDefaultHeatingSetpoint = 2000;
 constexpr temperature kDefaultCoolingSetpoint = 2600;
 constexpr temperature kDefaultLocalTemperatureCalibration = 0;
 
-
 constexpr uint16_t kMaxTemperatureSetpointHoldDurationSec = 1440;
 
 } // namespace Thermostat

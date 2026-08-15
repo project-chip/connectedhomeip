@@ -133,7 +133,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         });
     }
     break;
-        case ScheduleTypes::Id: {
+    case ScheduleTypes::Id: {
         auto & delegate = mDelegate;
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -158,12 +158,12 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfPresets()));
     }
     break;
-    case NumberOfSchedules::Id: 
-    case NumberOfScheduleTransitions::Id: 
-    case NumberOfScheduleTransitionPerDay::Id: 
+    case NumberOfSchedules::Id:
+    case NumberOfScheduleTransitions::Id:
+    case NumberOfScheduleTransitionPerDay::Id:
         // TODO: implement number of schedules
         return Status::UnsupportedAttribute;
-    break;
+        break;
     case ActivePresetHandle::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -177,10 +177,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
     }
     break;
-    case ActiveScheduleHandle::Id: 
+    case ActiveScheduleHandle::Id:
         // TODO: implement active schedule handle
         return Status::UnsupportedAttribute;
-    break;
+        break;
     case Presets::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
