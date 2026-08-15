@@ -37,17 +37,7 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     LaundryDryerControlsCluster(EndpointId endpointId, LaundryDryerControls::Delegate & delegate);
-
-    /**
-     * Creates a LaundryDryerControls Cluster instance without a delegate. The codegen integration
-     * constructs the cluster before the application provides its delegate; SetDelegate must be
-     * called before SupportedDrynessLevels can be served or SelectedDrynessLevel validated.
-     */
-    explicit LaundryDryerControlsCluster(EndpointId endpointId);
     ~LaundryDryerControlsCluster();
-
-    // Delegate should be valid until the cluster is destroyed.
-    void SetDelegate(LaundryDryerControls::Delegate & delegate);
 
     // Attribute Setters and Getters
     // SelectedDrynessLevel
@@ -71,7 +61,7 @@ public:
                                                  AttributeValueDecoder & decoder) override;
 
 private:
-    LaundryDryerControls::Delegate * mDelegate;
+    LaundryDryerControls::Delegate & mDelegate;
 
     // Attribute local storage
     DataModel::Nullable<LaundryDryerControls::DrynessLevelEnum> mSelectedDrynessLevel{};

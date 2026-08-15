@@ -19,6 +19,7 @@
 
 #include <app/data-model/Nullable.h>
 #include <app/static-cluster-config/LaundryDryerControls.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -35,24 +36,57 @@ constexpr size_t kLaundryDryerControlsFixedClusterCount = LaundryDryerControls::
 constexpr size_t kLaundryDryerControlsMaxClusterCount =
     kLaundryDryerControlsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<LaundryDryerControlsCluster> gServers[kLaundryDryerControlsMaxClusterCount];
+static_assert(kLaundryDryerControlsFixedClusterCount == MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT,
+              "LaundryDryerControls static cluster config must match ZAP server endpoint count");
+static_assert(kLaundryDryerControlsMaxClusterCount <= kEmberInvalidEndpointIndex, "LaundryDryerControls cluster table size error");
+
+// Proxy delegate used only by the codegen integration layer.
+//
+// LaundryDryerControlsCluster requires a Delegate & at construction, while Ember/ZAP applications
+// register their real delegate separately via SetDefaultDelegate - possibly before the cluster is
+// created, possibly after, possibly never.
+//
+// With no application delegate, it reports an empty SupportedDrynessLevels list, which in turn makes
+// every non-null SelectedDrynessLevel write fail validation with ConstraintError.
+class IntegrationDelegateWrapper final : public LaundryDryerControls::Delegate
+{
+public:
+    void SetWrapped(LaundryDryerControls::Delegate * wrapped) { mWrapped = wrapped; }
+
+    CHIP_ERROR GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDryness) override
+    {
+        VerifyOrReturnError(mWrapped != nullptr, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+        return mWrapped->GetSupportedDrynessLevelAtIndex(index, supportedDryness);
+    }
+
+private:
+    LaundryDryerControls::Delegate * mWrapped = nullptr;
+};
+
+struct ClusterWithDelegate
+{
+    IntegrationDelegateWrapper integrationDelegateWrapper;
+    LazyRegisteredServerCluster<LaundryDryerControlsCluster> server;
+};
+
+ClusterWithDelegate gClusters[kLaundryDryerControlsMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
-        return gServers[clusterInstanceIndex].Registration();
+        gClusters[clusterInstanceIndex].server.Create(endpointId, gClusters[clusterInstanceIndex].integrationDelegateWrapper);
+        return gClusters[clusterInstanceIndex].server.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
+        VerifyOrReturnValue(gClusters[clusterInstanceIndex].server.IsConstructed(), nullptr);
+        return &gClusters[clusterInstanceIndex].server.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].server.Destroy(); }
 };
 
 } // namespace
@@ -100,17 +134,19 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     SetDelegate(endpoint, *delegate);
 }
 
+// Resolves the endpoint to its cluster slot via ember metadata rather than via FindClusterOnEndpoint,
+// so the delegate can be registered whether or not the cluster has been created yet.
 void SetDelegate(EndpointId endpoint, Delegate & delegate)
 {
-    auto cluster = FindClusterOnEndpoint(endpoint);
-    if (cluster != nullptr)
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, LaundryDryerControls::Id,
+                                                          MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (index >= kLaundryDryerControlsMaxClusterCount)
     {
-        cluster->SetDelegate(delegate);
+        ChipLogError(Zcl, "LaundryDryerControls cluster on endpoint %u not found", static_cast<unsigned>(endpoint));
+        return;
     }
-    else
-    {
-        ChipLogError(Zcl, "LaundryDryerControls cluster on endpoint %d not found", endpoint);
-    }
+
+    gClusters[index].integrationDelegateWrapper.SetWrapped(&delegate);
 }
 
 Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)

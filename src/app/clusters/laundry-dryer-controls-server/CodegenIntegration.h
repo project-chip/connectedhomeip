@@ -28,7 +28,7 @@ namespace LaundryDryerControlsServer {
  * @param endpoint ID of the endpoint
  * @param delegate The delegate at the endpoint.
  * The delegate should be valid until the cluster on the endpoint is destroyed. This will probably happen at the end of the program.
- * @note This function can be called only after Server::Init is called.
+ * @note This may be called either before or after the cluster on the endpoint has been created.
  */
 void SetDelegate(EndpointId endpoint, Delegate & delegate);
 
