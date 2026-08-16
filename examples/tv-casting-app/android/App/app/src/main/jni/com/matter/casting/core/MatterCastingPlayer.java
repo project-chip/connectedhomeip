@@ -337,7 +337,7 @@ public class MatterCastingPlayer implements CastingPlayer {
   /*
    * @brief Get the Current ConnectionState of a CastingPlayer from the native layer.
    *
-   * @returns A String representation of the CastingPlayer's current connection state.
+   * @return A String representation of the CastingPlayer's current connection state.
    *          Possible return values are
    *            - "NOT_CONNECTED"
    *            - "CONNECTING"
