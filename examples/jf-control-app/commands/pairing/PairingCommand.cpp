@@ -628,14 +628,37 @@ static void GenerateReplyWork(intptr_t arg)
         {
             ChipLogError(JointFabric, "GenerateIcacCsr failed");
         }
+        rsp.transaction_type = TransactionType::TransactionType_ICAC_CSR;
+        break;
+    }
+    case TransactionType::TransactionType_CROSS_SIGNED_ICAC: {
+        // JFC obtains the CSR for its anchor intermediate issuer keypair
+        // (same keypair used in the ICAC_CSR step) and cross-signs it under
+        // the anchor root CA with the anchor fabric ID embedded in the Subject DN.
+        uint8_t csrBuf[kMaxDERCertLength];
+        MutableByteSpan csrSpan(csrBuf, sizeof(csrBuf));
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))->GenerateIcacCsr(csrSpan);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "CROSS_SIGNED_ICAC: GenerateIcacCsr failed: %" CHIP_ERROR_FORMAT, err.Format());
+            break;
+        }
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))
+                  ->SignICAC(csrSpan, request->mAnchorFabricId, generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "CROSS_SIGNED_ICAC: SignICAC failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        rsp.transaction_type = TransactionType::TransactionType_CROSS_SIGNED_ICAC;
         break;
     }
     default: {
+        ChipLogError(JointFabric, "GenerateReplyWork: unsupported transaction type %d", request->mTransactionType);
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;
     }
     }
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: operation failed, not sending response"));
 
     memcpy(rsp.response_bytes.bytes, generatedCertificate.data(), generatedCertificate.size());
     rsp.response_bytes.size = (short unsigned int) generatedCertificate.size();
