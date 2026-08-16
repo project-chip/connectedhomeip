@@ -1,13 +1,13 @@
 # Joint Fabric Guide
 
-- [Joint Fabric Guide](#joint-fabric-guide)
-    - [Joint Fabric Example Applications](#joint-fabric-example-applications)
-        - [Building the Example Application](#building-the-example-application)
-    - [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
-        - [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
-        - [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
-    - [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
-    - [Unit Testing Joint Fabric](#unit-testing-joint-fabric)
+-   [Joint Fabric Guide](#joint-fabric-guide)
+    -   [Joint Fabric Example Applications](#joint-fabric-example-applications)
+        -   [Building the Example Application](#building-the-example-application)
+    -   [Bootstrap Joint Fabric Demo on Linux](#bootstrap-joint-fabric-demo-on-linux)
+        -   [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
+        -   [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
+    -   [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
+    -   [Unit Testing Joint Fabric](#unit-testing-joint-fabric)
 
 ## Joint Fabric Example Applications
 
@@ -41,11 +41,11 @@ jf-admin-app that finalizes the commissioning.
 
 ### Building the Example Application
 
-- Building the Joint Fabric Control Application
+-   Building the Joint Fabric Control Application
 
     [jf-control-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/jf-control-app/README.md)
 
-- Building the Joint Fabric Admin Application
+-   Building the Joint Fabric Admin Application
 
     [jf-admin-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/jf-admin-app/linux/README.md)
 
@@ -59,7 +59,7 @@ $ rm -rf /tmp/chip_*
 
 ### Initialize Ecosystem A (Vendor ID = 0xFFF1)
 
-- Start jf-admin-app
+-   Start jf-admin-app
 
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
@@ -67,7 +67,7 @@ $ rm -rf jfa_a_kvs && touch jfa_a_kvs
 $ ./jfa-app --capabilities 0x4 --passcode 11022033 --discriminator 3840  --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
 ```
 
-- Start jf-control-app
+-   Start jf-control-app
 
 ```
 $ cd ~/connectedhomeip/examples/jf-control-app/out/debug
@@ -75,7 +75,7 @@ $ rm -rf jfc_a_storage_directory && mkdir jfc_a_storage_directory
 $ ./jfc-app --rpc-server-port 33033 --storage-directory jfc_a_storage_directory --commissioner-vendor-id 0xFFF1
 ```
 
-- Commission jf-admin-app
+-   Commission jf-admin-app
 
 ```
 >>> pairing onnetwork-long 1 11022033 3840 --anchor true
@@ -124,8 +124,8 @@ Subject: 1.3.6.1.4.1.37244.1.3 = 0000000000000003, OU = jf-anchor-icac
 ...
 ```
 
-- Start the
-  [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/linux/README.md)
+-   Start the
+    [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/linux/README.md)
 
 ```
 $ cd ~/connectedhomeip/examples/lighting-app/linux/out/debug
@@ -133,7 +133,7 @@ $ rm -rf light_a_kvs && touch light_a_kvs
 $ ./chip-lighting-app --capabilities 0x4 --passcode 11022044 --KVS light_a_kvs
 ```
 
-- Commission lighting-app
+-   Commission lighting-app
 
 ```
 >>> pairing onnetwork 2 11022044 --regular 1
@@ -157,7 +157,7 @@ should be found.
 
 ### Initialize Ecosystem B (Vendor ID = 0xFFF2)
 
-- Start jf-admin-app
+-   Start jf-admin-app
 
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
@@ -165,7 +165,7 @@ $ rm -rf jfa_b_kvs && touch jfa_b_kvs
 $ ./jfa-app --capabilities 0x4 --passcode 11022055 --discriminator 3841 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
 ```
 
-- Start jf-control-app
+-   Start jf-control-app
 
 ```
 $ cd ~/connectedhomeip/examples/jf-control-app/out/debug
@@ -173,7 +173,7 @@ $ rm -rf jfc_b_storage_directory && mkdir jfc_b_storage_directory
 $ ./jfc-app --rpc-server-port 33055 --storage-directory jfc_b_storage_directory --commissioner-vendor-id 0xFFF2
 ```
 
-- Commission jf-admin-app
+-   Commission jf-admin-app
 
 ```
 >>> pairing onnetwork-long 11 11022055 3841 --anchor true
@@ -223,8 +223,8 @@ Subject: 1.3.6.1.4.1.37244.1.3 = 0000000000000003, OU = jf-anchor-icac
 ...
 ```
 
-- Start the
-  [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/linux/README.md)
+-   Start the
+    [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/linux/README.md)
 
 ```
 $ cd ~/connectedhomeip/examples/lighting-app/linux/out/debug
@@ -232,7 +232,7 @@ $ rm -rf light_b_kvs && touch light_b_kvs
 $ ./chip-lighting-app --capabilities 0x4 --passcode 11022066 --KVS light_b_kvs
 ```
 
-- Commission lighting-app
+-   Commission lighting-app
 
 ```
 >>> pairing onnetwork 22 11022066 --regular 1
@@ -285,7 +285,7 @@ the Ecosystem A anchor fabric, establishing the joint fabric relationship.
 
 On the Ecosystem B Joint Fabric Controller application
 
-- Open Joint Commissioning Window on JF Admin App of Ecosystem B
+-   Open Joint Commissioning Window on JF Admin App of Ecosystem B
 
 ```
 >>> pairing open-joint-commissioning-window 11 1 400 1000 1261

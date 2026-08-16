@@ -562,8 +562,7 @@ CHIP_ERROR JFAManager::SendAddICAC()
     return cluster.InvokeCommand(request, this, OnAddICACResponse, OnAddICACFailure);
 }
 
-void JFAManager::OnAddICACResponse(void * context,
-                                   const Commands::ICACResponse::DecodableType & response)
+void JFAManager::OnAddICACResponse(void * context, const Commands::ICACResponse::DecodableType & response)
 {
     JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
     VerifyOrDie(jfaManagerCore != nullptr);
@@ -575,8 +574,7 @@ void JFAManager::OnAddICACResponse(void * context,
 
     if (response.statusCode != app::Clusters::JointFabricAdministrator::ICACResponseStatusEnum::kOk)
     {
-        ChipLogError(JointFabric, "OnAddICACResponse: AddICAC command failed with status %u",
-                     to_underlying(response.statusCode));
+        ChipLogError(JointFabric, "OnAddICACResponse: AddICAC command failed with status %u", to_underlying(response.statusCode));
         jfaManagerCore->ReleaseSession();
         return;
     }

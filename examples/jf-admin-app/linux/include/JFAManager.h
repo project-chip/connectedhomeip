@@ -67,11 +67,11 @@ private:
     // JCM flow stage, used to prevent out-of-order invocations
     enum JCMStage
     {
-        kJCMStageIdle              = 0, ///< No JCM flow active
-        kJCMStageAnnounce          = 1, ///< Sent AnnounceJointFabricAdministrator
-        kJCMStageICACCSRRequest    = 2, ///< Sent ICACCSRRequest, waiting for response
-        kJCMStageCrossSign         = 3, ///< Cross-signing ICAC CSR via RPC
-        kJCMStageAddICAC           = 4, ///< Sent AddICAC, waiting for response
+        kJCMStageIdle               = 0, ///< No JCM flow active
+        kJCMStageAnnounce           = 1, ///< Sent AnnounceJointFabricAdministrator
+        kJCMStageICACCSRRequest     = 2, ///< Sent ICACCSRRequest, waiting for response
+        kJCMStageCrossSign          = 3, ///< Cross-signing ICAC CSR via RPC
+        kJCMStageAddICAC            = 4, ///< Sent AddICAC, waiting for response
         kJCMStageCommissionComplete = 5, ///< Sent CommissioningComplete
     };
 
@@ -133,9 +133,8 @@ private:
     OnSendICACSRRequestResponse(void * context,
                                 const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
     static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
-    static void
-    OnAddICACResponse(void * context,
-                      const app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType & response);
+    static void OnAddICACResponse(void * context,
+                                  const app::Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType & response);
     static void OnAddICACFailure(void * context, CHIP_ERROR error);
 
     void ReleaseSession();
