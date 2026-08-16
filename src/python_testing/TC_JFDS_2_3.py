@@ -142,9 +142,14 @@ class TC_JFDS_2_3(MatterBaseTest):
             timeout=10)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
+        # Wait for the JFC's commissioning-complete log rather than the earlier
+        # "Joined the fabric at index 1" message, which is emitted before
+        # CommissioningComplete is sent to the JFA. Using the later message
+        # avoids a race condition where GroupList is read before
+        # HandleCommissioningCompleteEvent has populated the Admin/Anchor CAT entries.
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output=f"Joined the fabric at index 1",
+            expected_output=f"Anchor Administrator ({self.jfadmin_fabric_a_node_id}) commissioned with success",
             timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
