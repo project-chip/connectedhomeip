@@ -971,6 +971,11 @@
             "NeutralCurrent",
             "FeatureMap"
         ],
+        "Energy Preference": [
+            "ClusterRevision",
+            "CurrentEnergyBalance",
+            "CurrentLowPowerModeSensitivity"
+        ],
         "Power Topology": [
             "FeatureMap"
         ],
