@@ -22,6 +22,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -29,8 +30,8 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Types.h>
-#include <lib/dnssd/minimal_mdns/Parser.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/wire/Parser.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -46,8 +47,8 @@ namespace Controller {
  * to facilitate the transition into Matter's operational commissioning flow.
  */
 class ThreadMeshcopCommissionProxy : public ot::commissioner::CommissionerHandler,
-                                     public mdns::Minimal::ParserDelegate,
-                                     public mdns::Minimal::TxtRecordDelegate
+                                     public chip::Dnssd::ParserDelegate,
+                                     public chip::Dnssd::TxtRecordDelegate
 {
 public:
     enum class State
@@ -68,31 +69,47 @@ public:
      */
     CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
                         chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
+    std::string GetLastDiscoveryDiagnosticJson();
 
     // ot::commissioner::CommissionerHandler
     void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
                          const std::vector<uint8_t> & payload) override;
 
-    // mdns::Minimal::ParserDelegate
-    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override;
-    void OnQuery(const mdns::Minimal::QueryData & data) override;
-    void OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data) override;
+    // chip::Dnssd::ParserDelegate
+    void OnHeader(chip::Dnssd::ConstHeaderRef & header) override;
+    void OnQuery(const chip::Dnssd::QueryData & data) override;
+    void OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data) override;
 
-    // mdns::Minimal::TxtRecordDelegate
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override;
+    // chip::Dnssd::TxtRecordDelegate
+    void OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value) override;
 
 private:
     // Internal Helper Methods
     CHIP_ERROR InitializeCommissioner(ByteSpan & pskc);
     CHIP_ERROR CreateProxySocket(Dnssd::CommissionNodeData & commissionData);
     void ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort, const std::vector<uint8_t> & payload);
+    void ResetCommissionerForDiscovery();
     void SetState(State state);
 
     ot::commissioner::CommissionerDataset MakeCommissionerDataset(Thread::DiscoveryCode code);
 
+    struct DiscoveryDiagnostic
+    {
+        bool valid                 = false;
+        bool requestedShort        = false;
+        uint16_t requestedValue    = 0;
+        uint16_t expectedLongValue = 0;
+        uint64_t discoveryCode     = 0;
+        uint64_t joinerId          = 0;
+        uint16_t joinerUdpPort     = 0;
+        uint16_t matterUdpPort     = 0;
+        std::vector<uint8_t> steeringData;
+        Dnssd::CommissionNodeData commissionData{};
+    };
+
     // Member Variables
     chip::Dnssd::DiscoveredNodeData mNodeData;
-    mdns::Minimal::BytesRange mDnsPacket;
+    chip::Dnssd::BytesRange mDnsPacket;
 
     int mProxyFd          = -1;
     uint16_t mServicePort = 0;
@@ -107,6 +124,7 @@ private:
 
     std::shared_ptr<ot::commissioner::Commissioner> mCommissioner;
     std::thread mProxyThread;
+    DiscoveryDiagnostic mLastDiscoveryDiagnostic;
 };
 
 } // namespace Controller

@@ -18,6 +18,9 @@
 
 #pragma once
 
+#ifdef CONFIG_BOARD_RTL87X3G_EVB
+#include <platform/realtek/zephyr/rtl87x3g/BlePlatformConfig.h>
+#else
 #include <zephyr/bluetooth/bluetooth.h>
 
 // ==================== Platform Adaptations ====================
@@ -25,7 +28,4 @@
 #define BLE_CONNECTION_OBJECT bt_conn *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
+#endif

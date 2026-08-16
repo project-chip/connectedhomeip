@@ -25,7 +25,7 @@ jobs:
       image: ghcr.io/project-chip/chip-build
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 2
 
@@ -75,6 +75,11 @@ jobs:
         run: |
           scripts/run_in_python_env.sh out/venv 'python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.6'
 
+      - name: Check for changes to the 1.6.1 data_model directory without a SHA update
+        if: (!contains(github.event.pull_request.labels.*.name, 'data-model-file-structural-change-dm-tt-use-only'))
+        run: |
+          scripts/run_in_python_env.sh out/venv 'python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.6.1'
+
   check-data_model-build-file:
     name: Check that all data_model files are listed in the data_model_xmls.gni build file
     runs-on: ubuntu-latest
@@ -82,7 +87,7 @@ jobs:
       image: ghcr.io/project-chip/chip-build
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup pip modules we use
         run: |
             python3 -m venv out/venv

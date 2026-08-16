@@ -18,6 +18,5 @@
 
 #pragma once
 
-// This file is used for backwards compatibility, will include the Codegen references
-// after the cluster is migrated to SCI.
-#include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
+// This include is used to keep backwards compatibility.
+#include <app/clusters/water-heater-management-server/CodegenIntegration.h>

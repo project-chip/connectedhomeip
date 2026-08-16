@@ -14,38 +14,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "DarwinBleRssiRangingAdapter.h"
 #include <DeviceFactoryPlatformOverride.h>
-#include <PosixChimeDevice.h>
+#include <PosixAudioManager.h>
+#include <PosixChime.h>
+#include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
-#include <devices/device-factory/DeviceFactory.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <device-factory/DeviceFactory.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
+                                    PosixAudioManager & audioManager)
 {
-    if constexpr (ALL_DEVICES_ENABLE_CHIME)
+    if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
-        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
-            static const ChimeDevice::Sound kDefaultSounds[] = {
-                { 0, "Ding Dong"_span },
-                { 1, "Ring Ring"_span },
-            };
-            return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+        DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
+            return std::make_unique<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
         });
     }
 
-    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
+    if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
-        static DarwinBleRssiRangingAdapter sBleAdapter;
-        LogErrorOnFailure(sBleAdapter.Init(storageDelegate));
-        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
-            return std::make_unique<ProximityRangerDevice>(timerDelegate,
-                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
-        });
+        DeviceFactory::GetInstance().RegisterCreator(
+            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChime>(timerDelegate, audioManager); });
     }
 }
 

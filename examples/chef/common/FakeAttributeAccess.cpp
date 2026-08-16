@@ -51,8 +51,32 @@
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/flow-measurement-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/pressure-measurement-server/CodegenIntegration.h>
+#endif
+
 #if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
+#endif
+
+#if (MATTER_DM_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                     \
+    (MATTER_DM_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                      \
+    (MATTER_DM_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                    \
+    (MATTER_DM_PM1_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                                 \
+    (MATTER_DM_PM10_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                                \
+    (MATTER_DM_PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                               \
+    (MATTER_DM_RADON_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                               \
+    (MATTER_DM_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                                \
+    (MATTER_DM_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) ||                                               \
+    (MATTER_DM_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+#define MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED 1
+#include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
+#include <app/clusters/concentration-measurement-server/concentration-measurement-cluster-objects.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #endif
 
 namespace chip {
@@ -326,6 +350,98 @@ public:
             }
             break;
 #endif // MATTER_DM_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case FlowMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case FlowMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = FlowMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (measuredValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %u.", measuredValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_FLOW_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case PressureMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case PressureMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<int16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = PressureMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (measuredValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %d.", measuredValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            case PressureMeasurement::Attributes::ScaledValue::Id: {
+                DataModel::Nullable<int16_t> scaledValue;
+                CHIP_ERROR err = decoder.Decode(scaledValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode scaledValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = PressureMeasurement::SetScaledValue(path.mEndpointId, scaledValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set scaledValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (scaledValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set scaledValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set scaledValue to %d.", scaledValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+#endif // MATTER_DM_PRESSURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case BooleanStateConfiguration::Id:
             switch (path.mAttributeId)
@@ -350,6 +466,136 @@ public:
             }
             break;
 #endif // MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if defined(MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED)
+        case CarbonDioxideConcentrationMeasurement::Id:
+        case CarbonMonoxideConcentrationMeasurement::Id:
+        case NitrogenDioxideConcentrationMeasurement::Id:
+        case Pm1ConcentrationMeasurement::Id:
+        case Pm10ConcentrationMeasurement::Id:
+        case Pm25ConcentrationMeasurement::Id:
+        case RadonConcentrationMeasurement::Id:
+        case TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+        case OzoneConcentrationMeasurement::Id:
+        case FormaldehydeConcentrationMeasurement::Id: {
+            auto & registry                           = CodegenDataModelProvider::Instance().Registry();
+            ServerClusterInterface * clusterInterface = registry.Get(ConcreteClusterPath(path.mEndpointId, path.mClusterId));
+            if (clusterInterface == nullptr)
+            {
+                ChipLogError(Zcl, "[Pw] Failed to find concentration measurement cluster " ChipLogFormatMEI " on endpoint %d",
+                             ChipLogValueMEI(path.mClusterId), path.mEndpointId);
+                return ::pw::Status::Internal();
+            }
+            auto * cluster = static_cast<ConcentrationMeasurement::ConcentrationMeasurementCluster *>(clusterInterface);
+
+            // Note: The following attributes are read-only/static and cannot be written at runtime
+            // because they lack setters in ConcentrationMeasurementCluster:
+            // - MinMeasuredValue
+            // - MaxMeasuredValue
+            // - Uncertainty
+            // - MeasurementUnit
+            // - MeasurementMedium
+            switch (path.mAttributeId)
+            {
+            case ConcentrationMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<float> value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode MeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetMeasuredValue(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set MeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case ConcentrationMeasurement::Attributes::PeakMeasuredValue::Id: {
+                DataModel::Nullable<float> value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode PeakMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetPeakMeasuredValue(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set PeakMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case ConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id: {
+                uint32_t value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode PeakMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetPeakMeasuredValueWindow(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set PeakMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case ConcentrationMeasurement::Attributes::AverageMeasuredValue::Id: {
+                DataModel::Nullable<float> value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode AverageMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetAverageMeasuredValue(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set AverageMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case ConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id: {
+                uint32_t value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode AverageMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetAverageMeasuredValueWindow(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set AverageMeasuredValueWindow: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case ConcentrationMeasurement::Attributes::LevelValue::Id: {
+                ConcentrationMeasurement::LevelValueEnum value;
+                CHIP_ERROR err = decoder.Decode(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode LevelValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = cluster->SetLevelValue(value);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set LevelValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            }
+            break;
+        }
+#endif // MATTER_DM_CONCENTRATION_MEASUREMENT_WANTED
         }
         return std::nullopt;
     }

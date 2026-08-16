@@ -107,13 +107,12 @@ class TestOnOffCluster(CHIPVirtualHome):
         time.sleep(1)
 
         for device_id in server_ids:
-            self.logger.info("checking device log for {}".format(
-                self.get_device_pretty_id(device_id)))
+            self.logger.info("checking device log for %s", self.get_device_pretty_id(device_id))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
                 "Thread initialized.",
                 "LightingManager::InitiateAction(ON_ACTION)",
                 "LightingManager::InitiateAction(OFF_ACTION)"
-            ]), "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+            ]), f"Datamodel test failed: cannot find matching string from device {device_id}")
 
 
 if __name__ == "__main__":

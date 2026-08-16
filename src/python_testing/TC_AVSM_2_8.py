@@ -119,7 +119,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = (aFeatureMap & cluster.Bitmaps.Feature.kVideo) > 0
         wmarkSupport = (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0
         osdSupport = (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0
@@ -129,7 +129,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
         aStreamID = aAllocatedVideoStreams[0].videoStreamID
         aWmark = aAllocatedVideoStreams[0].watermarkEnabled
@@ -190,7 +190,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         if wmarkSupport:
             asserts.assert_equal(aAllocatedVideoStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not !aWmark")
         if osdSupport:

@@ -22,15 +22,17 @@ from importlib.resources.abc import Traversable
 from jinja2 import Template
 from mobly import asserts
 
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import NamespacePathLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
                                          parse_namespace)
 
 
-class TestSpecParsingNamespace(MatterBaseTest):
+class TestSpecParsingNamespace(CertificationUnitTestNoDevice):
+
     def setup_class(self):
+        super().setup_class()
         # Test data setup
         self.namespace_id = 0x0001
         self.namespace_name = "Test Namespace"

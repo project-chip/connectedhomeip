@@ -20,6 +20,8 @@
 #include <platform/nxp/rt/rw61x/FactoryDataProviderImpl.h>
 #elif CONFIG_CHIP_NXP_PLATFORM_RT1060
 #include <platform/nxp/rt/rt1060/FactoryDataProviderImpl.h>
+#elif CONFIG_CHIP_NXP_PLATFORM_MCXW72
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h>
 #else
 #error "The selected platform is not supported for SE05x data provider"
 #endif

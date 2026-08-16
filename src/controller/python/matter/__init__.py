@@ -16,9 +16,13 @@
 #    limitations under the License.
 #
 
-#
-#    @file
-#      Provides Python APIs for CHIP.
-#
-
 """Provides Python APIs for CHIP."""
+
+# Allow Pigweed GN standalone Python tests to traverse split multi-directory PYTHONPATH packages
+# (matter-core-module, matter-clusters-module, matter-testing-module) at load time.
+#
+# Pigweed python_runner.py explicitly mandates an __init__.py file to link folders into PYTHONPATH.
+# Without extend_path, Python PEP 420 locks the namespace entirely to the first matching directory.
+#
+# TODO: Consolidate Sibling modular Python packages in BUILD.gn to avoid multi-directory namespace clobbering.
+__path__ = __import__("pkgutil").extend_path(__path__, __name__)

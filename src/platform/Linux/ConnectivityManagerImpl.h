@@ -106,6 +106,7 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
     void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
@@ -120,6 +121,8 @@ public:
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+#else
+    inline void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex) {}
 #endif
 
     void PostNetworkConnect();
@@ -155,6 +158,14 @@ public:
     void SetOneShotConnectCallback(OneShotConnectCallback * inOneShotConnectCallback) noexcept;
     void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
     void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
+
+    // Network Commissioning Action Delegation Methods
+
+    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
+    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
+    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                        Optional<int32_t> inConnectStatus) noexcept;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
@@ -217,7 +228,7 @@ private:
     bool mPafChannelAvailable = true;
 #endif
 
-    bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();
@@ -226,14 +237,8 @@ private:
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    // Network Commissioning Action Delegation Methods
 
-    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
-                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
-    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
-    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
-                        Optional<int32_t> inConnectStatus) noexcept;
-
+private:
     // ==================== ConnectivityManager Private Methods ====================
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

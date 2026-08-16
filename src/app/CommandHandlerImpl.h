@@ -137,10 +137,19 @@ public:
     void AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
                    const char * context = nullptr) override;
 
+    /// Encodes response data via the polymorphic EncodableToTLV virtual interface.
+    /// Supports dynamic or custom encodables that implement EncodableToTLV.
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                const DataModel::EncodableToTLV & aEncodable) override;
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                      const DataModel::EncodableToTLV & aEncodable) override;
+
+    /// Encodes response data via the non-virtual EncodableResponsePayload callback descriptor.
+    /// Avoids virtual table and RTTI overhead for concrete response command structs.
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                               const EncodableResponsePayload & aPayload) override;
+    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                     const EncodableResponsePayload & aPayload) override;
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
     FabricIndex GetAccessingFabricIndex() const override;
@@ -259,7 +268,12 @@ public:
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
      */
-    bool IsGroupRequest() { return mGroupRequest; }
+    bool IsGroupRequest() const { return mGroupRequest; }
+
+    /**
+     * Check whether the SuppressResponse flag is set.
+     */
+    bool IsResponseSuppressed() const { return mSuppressResponse; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
@@ -433,10 +447,12 @@ private:
      */
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                                   const DataModel::EncodableToTLV & aEncodable);
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                  const EncodableResponsePayload & aPayload);
 
     void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
-    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest; }
+    bool ResponsesAccepted() { return mpResponder != nullptr && !mGroupRequest && !mSuppressResponse; }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.

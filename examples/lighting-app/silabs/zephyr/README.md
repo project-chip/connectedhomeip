@@ -87,15 +87,17 @@ SoC and the network transport used by Matter.
 
     -   [Matter Prerequisites](../../../../docs/guides/BUILDING.md)
 
--   Install the Silicon Labs Zephyr SDK and tools:
+-   Install the Simplicity SDK for Zephyr and tools:
 
     -   Follow the
         [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
+    -   With additional instructions
+        [here](https://docs.silabs.com/zephyr/2026.6.0/zephyr-getting-started/getting-started-guide)
 
 -   Build the example application for your target:
 
     ```bash
-    cd silabs_zephyr
+    cd workspace
 
     # Wi-Fi build (SiWx917)
     west build -b siwx917_rb4338a connectedhomeip/examples/lighting-app/silabs/zephyr
@@ -136,10 +138,37 @@ SoC and the network transport used by Matter.
     west flash
     ```
 
+    For OTA-enabled (sysbuild) builds, `west flash` flashes MCUboot and the
+    application in the correct order. To flash a single domain only:
+
+    ```bash
+    west flash --domain mcuboot
+    west flash --domain zephyr
+    ```
+
 -   Or flash using Simplicity Commander:
 
     ```bash
-    commander flash build/zephyr/zephyr.hex
+    # Non-OTA / single-image build
+    commander flash build/zephyr/zephyr.hex (or .rps file if using the SiWx917)
+
+    # OTA / sysbuild build (merged MCUboot + application)
+    commander flash build/merged_<board>.hex
+    ```
+
+-   **Debugging:**
+
+    `west debug` reloads the unsigned ELF into flash and will overwrite the
+    MCUboot image header written by `west flash`, so MCUboot then reports
+    `Failed reading image headers` / `Image in the primary slot is not valid`
+    after reset. Prefer flash once, then attach:
+
+    ```bash
+    west flash
+    west attach
+
+    # Or debug MCUboot (same attach-after-flash pattern)
+    west attach --domain mcuboot
     ```
 
 -   **Bootloader and connectivity firmware:**
@@ -148,9 +177,9 @@ SoC and the network transport used by Matter.
         application image. Pre-built bootloader and connectivity firmware
         binaries are available in the Assets section of the Releases page on
         [Wiseconnect](https://github.com/SiliconLabs/wiseconnect/tree/v3.5.0/connectivity_firmware/standard).
-    -   The **EFR32MG24** boards require a Gecko bootloader. Refer to the
-        Silicon Labs documentation for the appropriate bootloader image for your
-        board.
+    -   The **EFR32MG24** / **EFR32MG26** boards require MCUboot for OTA
+        support; build with `--sysbuild` and `SB_CONFIG_BOOTLOADER_MCUBOOT=y`
+        (see [OTA Software Update](#ota-software-update)).
 
 ## Running the Complete Example
 
@@ -269,21 +298,131 @@ CONFIG_NVS_LOOKUP_CACHE_SIZE=1024
 
 ## OTA Software Update
 
-The supported Silicon Labs platforms support Over-The-Air (OTA) software
-updates. To enable OTA:
+This example supports Matter Over-The-Air (OTA) software updates via the generic
+Zephyr image processor (`src/platform/Zephyr/OTAImageProcessorImpl`) and
+MCUboot.
 
-1. Build with OTA support:
+OTA builds use
+[Zephyr Sysbuild](https://docs.zephyrproject.org/latest/build/sysbuild/index.html)
+so that MCUboot and the application are built, flashed, and debugged as
+coordinated domains. Enabling `CONFIG_CHIP_OTA_REQUESTOR` implies
+`CONFIG_BOOTLOADER_MCUBOOT` on the application; enable MCUboot in sysbuild with
+`SB_CONFIG_BOOTLOADER_MCUBOOT=y`.
 
-    ```bash
-    west build -b <board> examples/lighting-app/silabs/zephyr -- -DCONFIG_CHIP_OTA_REQUESTOR=y
-    ```
+Overwrite-only upgrade mode and ECDSA-P256 signing are the defaults when MCUboot
+is enabled (see `Kconfig.sysbuild`). The app is signed with the MCUboot
+ECDSA-P256 development key (`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE` /
+`SB_CONFIG_BOOT_SIGNATURE_KEY_FILE`); replace it with a private key for
+production.
 
-2. The device will advertise OTA capability and can receive firmware updates
-   from a Matter OTA Provider.
+### Build
 
-3. Refer to the
-   [Matter OTA guide](../../../../docs/guides/ota_software_update.md) for
-   detailed instructions on setting up an OTA Provider.
+```bash
+west build -b xg24_rb4187c -p always --sysbuild examples/lighting-app/silabs/zephyr \
+    -- -DCONFIG_CHIP_OTA_REQUESTOR=y -DCONFIG_CHIP_OTA_IMAGE_BUILD=y \
+       -DSB_CONFIG_BOOTLOADER_MCUBOOT=y
+```
+
+Build the update image with a higher software version so the provider offers it
+as a newer version:
+
+```bash
+west build -b xg24_rb4187c -p always --sysbuild examples/lighting-app/silabs/zephyr \
+    -- -DCONFIG_CHIP_OTA_REQUESTOR=y -DCONFIG_CHIP_OTA_IMAGE_BUILD=y \
+       -DSB_CONFIG_BOOTLOADER_MCUBOOT=y \
+       -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 \
+       -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"
+```
+
+Build outputs:
+
+-   `build/merged_<board>.hex` — MCUboot + signed application; flash this for
+    the initial (factory) image (`SB_CONFIG_MERGED_HEX_FILES=y` in
+    `sysbuild.conf`).
+-   `build/mcuboot/zephyr/zephyr.bin` — MCUboot image (also flashed by
+    `west flash`).
+-   `build/zephyr/zephyr/zephyr.signed.bin` — signed application image (sysbuild
+    names the main domain after the application directory base name, `zephyr`).
+-   `build/zephyr/zephyr/matter.ota` — the image to serve from a Matter OTA
+    Provider (produced by `config/silabs/app/zephyr-post-build.cmake`).
+
+### Flash the base image
+
+Prefer `west flash`, which flashes MCUboot then the application using the
+addresses from each image's runners configuration:
+
+```bash
+west flash
+```
+
+Or flash the merged hex with Simplicity Commander (addresses are embedded in the
+hex file):
+
+```bash
+commander flash build/merged_xg24_rb4187c.hex
+```
+
+### Debug
+
+`west debug` reloads the unsigned ELF and strips the MCUboot header from flash.
+Flash first, then attach:
+
+```bash
+west flash
+west attach
+
+# MCUboot
+west attach --domain mcuboot
+```
+
+### Run an update
+
+The following commands are provided as examples using a
+[Silicon Labs Matter Hub image.](https://docs.silabs.com/matter/latest/matter-thread/raspi-img)
+Refer to the [Matter OTA guide](../../../../docs/guides/ota_software_update.md)
+for detailed instructions on setting up an OTA Provider.
+
+1. Flash the base (v1) image and commission the device.
+2. Serve the candidate (v2) image with `chip-ota-provider-app`
+
+```bash
+./chip-ota-provider-app \
+    --KVS /tmp/chip_kvs_provider \
+    --filepath /tmp/lighting-v2.ota \
+    --discriminator 1111 \
+    --passcode 123456789 \
+    --secured-device-port 5541 \
+    -q updateAvailable
+
+```
+
+3. Commission the OTA provider and update ACLs
+
+```bash
+PROVIDER_NODE_ID=1
+LIGHT_NODE_ID=<your-lighting-app-node-id>
+
+mattertool pairing onnetwork ${PROVIDER_NODE_ID} 123456789
+
+mattertool accesscontrol write acl \
+    '[{"fabricIndex":1,"privilege":5,"authMode":2,"subjects":[112233],"targets":null},{"fabricIndex":1,"privilege":3,"authMode":2,"subjects":null,"targets":[{"cluster":41,"endpoint":null,"deviceType":null}]}]' \
+    ${PROVIDER_NODE_ID} 0
+
+```
+
+4. Announce the provider to the device with `chip-tool`
+
+```bash
+mattertool otasoftwareupdaterequestor announce-otaprovider \
+    ${PROVIDER_NODE_ID} 0 0 0 ${LIGHT_NODE_ID} 0
+```
+
+5. Device will download and apply the OTA.
+6. Verify the OTA was applied
+
+```bash
+mattertool basicinformation read software-version ${LIGHT_NODE_ID} 0
+```
 
 ## Limitations
 

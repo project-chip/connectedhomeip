@@ -116,7 +116,7 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
     return CHIP_NO_ERROR;
 }
 
-bool WiFiPAFBase::WiFiPAFResourceAvailable(void)
+bool WiFiPAFBase::WiFiPAFResourceAvailable()
 {
     return DeviceLayer::ConnectivityMgr().WiFiPAFResourceAvailable();
 }

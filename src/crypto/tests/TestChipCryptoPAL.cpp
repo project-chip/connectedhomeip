@@ -386,7 +386,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_ct_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -431,7 +432,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_pt_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
@@ -480,7 +482,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -532,7 +535,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {

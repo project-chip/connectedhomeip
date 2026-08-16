@@ -83,7 +83,7 @@ class TC_BooleanStateConfiguration(MatterBaseTest):
         if endpoint is None:
             endpoint = 1
 
-        logger.info(f"Testing BooleanStateConfiguration on endpoint {endpoint}")
+        logger.info("Testing BooleanStateConfiguration on endpoint %s", endpoint)
 
         self.step(1)
         # Commissioning already done.
@@ -91,7 +91,7 @@ class TC_BooleanStateConfiguration(MatterBaseTest):
         self.step(2)
         supported_sensitivity_levels = await self._read_bsc_attribute(
             endpoint, Clusters.Objects.BooleanStateConfiguration.Attributes.SupportedSensitivityLevels)
-        logger.info(f"SupportedSensitivityLevels: {supported_sensitivity_levels}")
+        logger.info("SupportedSensitivityLevels: %s", supported_sensitivity_levels)
 
         self.step(3)
         await self._write_bsc_attribute(
@@ -112,7 +112,7 @@ class TC_BooleanStateConfiguration(MatterBaseTest):
         self.step(5)
         alarms_supported = await self._read_bsc_attribute(
             endpoint, Clusters.Objects.BooleanStateConfiguration.Attributes.AlarmsSupported)
-        logger.info(f"AlarmsSupported: {alarms_supported}")
+        logger.info("AlarmsSupported: %s", alarms_supported)
 
         self.step(6)
         await self.send_single_cmd(

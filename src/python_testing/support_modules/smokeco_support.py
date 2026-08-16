@@ -98,14 +98,14 @@ class SmokeCoBaseTest(MatterBaseTest):
             events=[(self.get_endpoint(), smokeco_event, urgent)],
             fabricFiltered=True
         )
-        log.info(f"Events gathered {events_response}")
+        log.info("Events gathered %s", events_response)
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
         smoke_alarm_event_data = None
         # Read and match events
         for event in events_response:
             if event.Header.EventId == smokeco_event.event_id:
-                log.info(f"Event retrieved {event}")
+                log.info("Event retrieved %s", event)
                 smoke_alarm_event_data = event.Data
         if smoke_alarm_event_data is None:
             asserts.fail(f"Failed to retrieve event for {smokeco_event}")
@@ -125,7 +125,7 @@ class SmokeCoBaseTest(MatterBaseTest):
     async def read_attribute_check_epoch(self, attribute, check_expired: bool = False):
         """Reads an attribute from the SmokeCluster and validate is a int value represeting the seconds of matter epoch."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
-        log.info(f"Reading attribte with value {attr} and checking the matter epoch ")
+        log.info("Reading attribte with value %s and checking the matter epoch ", attr)
         # Number of seconds representing the matter epoch
         assert_valid_uint32(attr, "Attribute is not in uint range")
         if check_expired:
@@ -137,7 +137,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         # Convert the epoch time from the device into UTC to compare it to current date
         device_utc_datetime = utc_datetime_from_matter_epoch_us(matter_epoch * 1000000)
         current_date = datetime.now(tz=UTC)
-        log.info(f"Current matter epoch  {device_utc_datetime}")
+        log.info("Current matter epoch  %s", device_utc_datetime)
         asserts.assert_true(device_utc_datetime > current_date,
                             f"Current matter_epoch is lower than current date. {device_utc_datetime} is an expired date.")
 
@@ -262,7 +262,7 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(6)
         smoke_state_report = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Smoke state report {smoke_state_report} with value {smoke_state_report.value}")
+        log.info("Smoke state report %s with value %s", smoke_state_report, smoke_state_report.value)
         asserts.assert_equal(smoke_state_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(7)
@@ -271,7 +271,7 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(8)
         smoke_alarm_event_data = await self.read_smokeco_event(alarm_event)
-        log.info(f"SmokeAlarm Event {smoke_alarm_event_data}")
+        log.info("SmokeAlarm Event %s", smoke_alarm_event_data)
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)

@@ -32,9 +32,9 @@
 
 /* se05x includes */
 #include "ex_sss_boot.h"
+#include "inc/fsl_sss_api.h"
 #include "se051h_nfc_comm_prov.h"
 #include "se05x_host_gpio.h"
-#include "sss/inc/fsl_sss_api.h"
 #include <fsl_sss_se05x_apis.h>
 #include <se05x_APDU.h>
 
@@ -106,11 +106,11 @@ void se05x_delete_key(uint32_t keyid);
  * @param[in] key - Buffer with AES / EC key key.
  * @param[in] keylen - Key length.
  * @param[in] keyPart - Type of key.
- * @param[in] cipherType - kSSS_CipherType_EC_NIST_P for ecc and kSSS_CipherType_HMAC for AES key.
+ * @param[in] cipherType - kSE_SSS_CipherType_EC_NIST_P for ecc and kSE_SSS_CipherType_HMAC for AES key.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
-                                   sss_cipher_type_t cipherType);
+                                   se_sss_cipher_type_t cipherType);
 /**
  * @brief Get certificate in se05x.
  * The certificate is stored with transient option. The contents are lost on session close.
@@ -133,23 +133,13 @@ CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buf
 
 /**
  * @brief Set binary data in se05x.
- * The certificate is stored with transient option. The contents are lost on session close.
+ * The certificate is stored with Persistent option. The contents are lost on session close.
  * @param[in] keyid - Key id of the object.
  * @param[in] buf - Buffer containing binary data.
  * @param[in] buflen - Buffer length.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buflen);
-
-/**
- * @brief Set EC key in se05x.
- * The Key is stored with Persistent option.
- * @param[in] keyid - Key id of the object.
- * @param[in] buf - Buffer containing Key data.
- * @param[in] buflen - Buffer length.
- * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
- */
-CHIP_ERROR se05x_set_ec_key(uint32_t keyId, const uint8_t * buf, size_t buflen);
 
 /**
  * @brief Perform internal sign in se05x (only on SE051H).
@@ -181,6 +171,13 @@ void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 
 #endif // #if ENABLE_REENTRANCY
 
+/**
+ * @brief Read the size of a secure object in SE05x.
+ * @param[in] objid - Object identifier
+ * @param[out] psize - Pointer to store the object size
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t * psize);
 #ifdef __cplusplus
 }
 #endif

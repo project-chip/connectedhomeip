@@ -146,7 +146,10 @@ CHIP_ERROR Instance::Deinit()
         mDelegate->SetInstance(nullptr);
     }
     VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    LogErrorOnFailure(err);
+    mCluster.Destroy();
+    return err;
 }
 
 uint8_t Instance::GetCountOfSupportedWattLevels() const

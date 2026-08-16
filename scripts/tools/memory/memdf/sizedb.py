@@ -20,8 +20,9 @@ import json
 import logging
 import sqlite3
 import zipfile
+from collections.abc import Iterable
 from pathlib import Path
-from typing import IO, Iterable, Optional, Union
+from typing import IO
 
 import memdf.util.sqlite
 
@@ -98,7 +99,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             for d in kwargs['sizes']:
                 self.store('size', build_id=build, **d)
 
-    def add_sizes_from_json(self, s: Union[bytes, str], origin: dict):
+    def add_sizes_from_json(self, s: bytes | str, origin: dict):
         """Add sizes from a JSON size report."""
         r = origin.copy()
         r.update(json.loads(s))
@@ -113,7 +114,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 })
         self.add_sizes(**r)
 
-    def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: dict):
+    def add_sizes_from_zipfile(self, f: IO | Path, origin: dict):
         """Add size reports from a zip."""
         with zipfile.ZipFile(f, 'r') as zip_file:
             for i in zip_file.namelist():
@@ -137,7 +138,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             log.warning("Unknown file type '%s' ignored", filename)
 
     def select_thing_id(self, platform: str, config: str,
-                        target: str) -> Optional[str]:
+                        target: str) -> str | None:
         cur = self.execute(
             'SELECT id FROM thing WHERE platform=? AND config=? AND target=?',
             (platform, config, target))
@@ -199,7 +200,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         builds: set[int] = set()
         stale_builds: set[int] = set()
         stale_artifacts: set[int] = set()
-        previous: Optional[sqlite3.Row] = None
+        previous: sqlite3.Row | None = None
         rows = []
 
         for row in cur.fetchall():

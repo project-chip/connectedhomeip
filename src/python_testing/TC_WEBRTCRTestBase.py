@@ -54,10 +54,10 @@ class WEBRTCRTestBase(MatterBaseTest):
         """
         try:
             async with websockets.connect(SERVER_URI) as websocket:
-                log.info(f"Connected to {SERVER_URI}")
+                log.info("Connected to %s", SERVER_URI)
 
                 # Send command
-                log.info(f"Sending command: {command}")
+                log.info("Sending command: %s", command)
                 await websocket.send(command)
 
                 # Receive response
@@ -65,18 +65,17 @@ class WEBRTCRTestBase(MatterBaseTest):
                 log.info("Received command response")
 
         except ConnectionRefusedError as e:
-            log.error(f"Failed to connect to WebSocket server at {SERVER_URI}: Connection refused. "
-                      f"Is the DUT WebSocket server running? Error: {e}")
+            log.error("Failed to connect to WebSocket server at %s: Connection refused. Is the DUT WebSocket server running? Error: %s", SERVER_URI, e)
             raise
 
         except websockets.exceptions.WebSocketException as e:
-            log.error(f"WebSocket error while communicating with {SERVER_URI}: {e}")
+            log.error("WebSocket error while communicating with %s: %s", SERVER_URI, e)
             raise
 
         except OSError as e:
-            log.error(f"Network error while connecting to {SERVER_URI}: {e}")
+            log.error("Network error while connecting to %s: %s", SERVER_URI, e)
             raise
 
         except Exception as e:
-            log.error(f"Unexpected error while sending command '{command}' to {SERVER_URI}: {e}")
+            log.error("Unexpected error while sending command '%s' to %s: %s", command, SERVER_URI, e)
             raise

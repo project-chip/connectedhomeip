@@ -25,13 +25,11 @@ git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.g
     ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalolab
     ```
 
-    Checkout `bouffalo_sdk` for `BL616` platform:
+    Checkout `bouffalo_sdk` for `BL61X` platform:
 
     ```
     ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalo_sdk
     ```
-
-    > Please contact `Bouffalo Lab` for `BL616` SDK access.
 
     If you want to checkout Matter Linux example and development tools, please
     try as follows:
@@ -82,8 +80,27 @@ Please refer to section `Prerequisites` in
 
 ## Build options for `Bouffalo Lab` SoC
 
+`Bouffalo Lab` Matter platforms currently use different build systems based on
+the SDK family:
+
+| SDK integration         | Platforms                  | Build system                                                                                    | Recommended build entry                 |
+| ----------------------- | -------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `bouffalo_sdk` + Matter | BL61X, such as BL616/BL618 | CMake build system from `bouffalo_sdk`, with Matter integrated into the SDK application project | CMake/Makefile in the example directory |
+| `BL_IOT_SDK` + Matter   | BL602, BL702/BL702L        | Matter ninja build system                                                                       | `scripts/build/build_examples.py`       |
+
+For `bouffalo_sdk` + Matter, the application is built as a `bouffalo_sdk` CMake
+project. The example Makefile wraps the SDK CMake flow and is the recommended
+entry point for BL61X product application development. `build_examples.py` is
+kept compatible for these BL61X targets: it dispatches to the same CMake build
+and then exports artifacts into the standard Matter `out/<target>` directory.
+
+For `BL_IOT_SDK` + Matter, the examples use the Matter ninja build system. Use
+`build_examples.py` to select the board, application, connectivity, storage, and
+optional features; the script generates the Matter build configuration and runs
+the ninja build.
+
 With `source scripts/activate.sh -p bouffalolab` under terminal, please try the
-following command to list supports options.
+following command to list supported options.
 
 ```
 ./scripts/build/build_examples.py targets
@@ -92,13 +109,14 @@ following command to list supports options.
 The output with `bouffalolab` started likes below:
 
 ```
-bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706dk}-{contact-sensor,light}-{ethernet,thread,thread-ftd,thread-mtd,wifi}-{easyflash,littlefs}[-cdc][-coredump][-memmonitor][-mfd][-mot][-rotating_device_id][-rpc][-shell]
+bouffalolab-{bl602-night-light,bl602dk,bl616cl,bl616dk,bl704ldk,bl706-night-light,bl706dk}-{contact-sensor,light}-{ethernet,thread,thread-ftd,thread-mtd,wifi}-{easyflash,littlefs}[-cdc][-coredump][-memmonitor][-mfd][-rotating_device_id][-rpc][-shell]
 ```
 
 -   supported board options, select one of the following options to build
 
     -   `-bl602dk`
     -   `-bl616dk`
+    -   `-bl616cl`
     -   `-bl704ldk`
     -   `-bl706dk`
 
@@ -108,8 +126,9 @@ bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706d
 -   supported example options, select one of the following options to build
 
     -   `-light`
-    -   `-contact-sensor`, currently, only BL704L with Thread MTD and low power
-        supported
+    -   `-contact-sensor`, availability depends on board/connectivity. BL61X
+        supports Wi-Fi contact sensor builds; BL704L supports Thread MTD
+        low-power contact sensor builds.
 
 -   connectivity options, select one of the following options to build
 
@@ -133,6 +152,9 @@ bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706d
         > compatible. Please use the `-easyflash` flag if existing in-field
         > devices were already deployed with `easyflash`.
 
+        > BL61X `bouffalo_sdk` builds support `littlefs`. Do not use
+        > `-easyflash` with BL61X `build_examples.py` targets.
+
 -   `-rotating_device_id`, enable rotating device id
 
 -   `-mfd`, enable Matter factory data feature, which load factory data from
@@ -150,16 +172,98 @@ bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706d
     Ethernet Board
 
 > `Bouffalo Lab` Matter project uses UART `baudrate` 2000000 for logging output
-> by default. If you want other `baudrate` for your test station, please change
-> variable `baudrate` in `BUILD.gn` under example project.
+> by default. If you want another baudrate for a `BL_IOT_SDK` Matter ninja
+> build, please change variable `baudrate` in `BUILD.gn` under the example
+> project. For BL61X CMake-based builds, change the UART baudrate through the
+> `bouffalo_sdk` configuration used by the example.
 
 ## Build an example
 
-Taking lighting app with `littlefs` supported as example :
+### BL61X using CMake (recommended for product development)
+
+The BL61X `bouffalo_sdk` + Matter build uses the CMake build system through a
+Makefile wrapper. Product-side application development with `bouffalo_sdk` +
+Matter should use this CMake flow because it follows the SDK project layout and
+configuration model directly.
+
+**Activate the build environment:**
+
+```shell
+source scripts/activate.sh -p bouffalolab
+```
+
+**Lighting app:**
+
+| Command                                                                                     | Description         |
+| ------------------------------------------------------------------------------------------- | ------------------- |
+| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y`                                   | Wi-Fi (default)     |
+| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y`                                 | Thread / OpenThread |
+| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y CONFIG_OT_FTD=0 CONFIG_OT_MTD=1` | Thread MTD          |
+| `make -C examples/lighting-app/bouffalolab CONFIG_ETHERNET=y`                               | Ethernet            |
+| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_SHELL=y`                    | Wi-Fi + shell       |
+
+**Contact sensor app (Wi-Fi only):**
+
+| Command                                           | Description         |
+| ------------------------------------------------- | ------------------- |
+| `make -C examples/contact-sensor-app/bouffalolab` | Default Wi-Fi build |
+
+**Optional feature flags (both apps):**
+
+| Flag                                 | Default | Description                       |
+| ------------------------------------ | ------- | --------------------------------- |
+| `CONFIG_MFD=y/n`                     | `y`     | Enable factory/manufacturing data |
+| `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n`     | Enable rotating device ID         |
+| `CONFIG_CHIP_HEAP_MONITOR=y/n`       | `n`     | Enable heap monitoring            |
+| `CONFIG_COREDUMP=y/n`                | `n`     | Enable SDK `coredump` capture     |
+| `CONFIG_SHELL=y/n`                   | `n`     | Enable Matter interactive shell   |
+
+**Thread-specific flags (lighting-app only):**
+
+| Flag                | Default | Description                       |
+| ------------------- | ------- | --------------------------------- |
+| `CONFIG_OT_FTD=1/0` | `1`     | Enable or disable Thread FTD mode |
+| `CONFIG_OT_MTD=1/0` | `0`     | Enable or disable Thread MTD mode |
+
+**Board selection:**
+
+| Flag            | Default     | Description                                          |
+| --------------- | ----------- | ---------------------------------------------------- |
+| `CHIP=<chip>`   | `bl616`     | BL61X chip name, for example `bl616` or `bl616cl`    |
+| `BOARD=<board>` | `${CHIP}dk` | SDK board name, for example `bl616dk` or `bl616cldk` |
+
+**Clean and rebuild:**
+
+```shell
+make -C examples/<app>/bouffalolab clean
+make -C examples/<app>/bouffalolab CONFIG_WIFI=y
+```
+
+**Flash with optional MFD:**
+
+```shell
+make -C examples/<app>/bouffalolab CONFIG_WIFI=y flash MFD_FILE=/path/to/mfd.bin
+```
+
+> The CMake build for BL61X is the primary and recommended build method for
+> product application development. `build_examples.py` is compatible with BL61X
+> and dispatches to the same CMake/Makefile build internally. For the full list
+> of available build options, please refer to the `Makefile` in the example
+> directory (`examples/<app>/bouffalolab/Makefile`).
+
+### Using build_examples.py
+
+`build_examples.py` remains supported for `Bouffalo Lab` platforms. For BL61X
+`bouffalo_sdk` + Matter targets, it invokes the same CMake/Makefile build and
+then places generated artifacts and flashing scripts under the standard Matter
+output directory, `out/<target>`. For `BL_IOT_SDK` + Matter targets,
+`build_examples.py` drives the Matter ninja build system.
+
+Taking lighting app with `littlefs` supported as example:
 
 -   BL602DK with Wi-Fi
 
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl602dk-light-wifi-littlefs build
     ```
 
@@ -169,44 +273,62 @@ Taking lighting app with `littlefs` supported as example :
     ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi-littlefs build
     ```
 
--   BL706 with Wi-Fi
-
-    ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
-    ```
-
-    > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
-    > TCP/IP stack which uses SPI for communication between these two parts.
+    > Recommended product-development build:
+    > `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y`
 
 -   BL616 with Thread
 
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-thread-littlefs build
     ```
 
+    > Recommended product-development build:
+    > `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y`
+
+-   BL616 with Ethernet
+
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-ethernet-littlefs build
+    ```
+
+    > Recommended product-development build:
+    > `make -C examples/lighting-app/bouffalolab CONFIG_ETHERNET=y`
+
+-   BL616 contact sensor with Wi-Fi
+
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-contact-sensor-wifi-littlefs build
+    ```
+
+    > Recommended product-development build:
+    > `make -C examples/contact-sensor-app/bouffalolab`
+
 -   BL704L with Thread
 
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-thread-littlefs build
     ```
 
 -   BL706 with Thread
 
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-thread-littlefs build
     ```
 
 -   BL706 with Ethernet
 
-    ```
+    ```shell
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
     ```
 
--   BL616 with Ethernet
+-   BL706 with Wi-Fi
 
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-wifi-littlefs build
     ```
-    ./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-ethernet-littlefs build
-    ```
+
+    > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
+    > TCP/IP stack which uses SPI for communication between these two parts.
 
 # Partition table
 

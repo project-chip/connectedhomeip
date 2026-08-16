@@ -18,7 +18,6 @@
 import datetime
 import logging
 import re
-from typing import Optional
 
 import click
 import coloredlogs
@@ -61,7 +60,7 @@ class Canceller:
 
     def check_pr(self, pr: PullRequest, required_runs):
 
-        last_commit: Optional[Commit] = None
+        last_commit: Commit | None = None
 
         for commit in pr.get_commits():
             log.debug("  Found commit '%s'", commit.sha)

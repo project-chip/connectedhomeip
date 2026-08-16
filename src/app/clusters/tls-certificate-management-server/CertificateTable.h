@@ -48,6 +48,15 @@ public:
         // TODO(gmarcosb): We probably want to support using a handle here when the key is stored elsewhere,
         // see for example Symmetric128BitsKeyHandle
         Crypto::P256SerializedKeypair key;
+
+        // Reset to default state. key.Clear() invokes ClearSecretData on the
+        // underlying buffer; any new sensitive member added here must also be
+        // wiped explicitly.
+        void Clear()
+        {
+            detail = {};
+            key.Clear();
+        }
     };
 
     using IterateRootCertFnType   = std::function<CHIP_ERROR(CommonIterator<RootCertStruct> & iterator)>;
