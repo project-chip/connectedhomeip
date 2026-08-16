@@ -46,25 +46,25 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -87,7 +87,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -241,7 +241,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         if (NULL == imageProcessor->mNvsHandle)
         {
             ChipLogError(SoftwareUpdate, "mNvsHandle is NULL");
-            imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
+            TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
             return;
         }
     }
@@ -250,11 +250,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (!eraseExtSlot(imageProcessor->mNvsHandle))
     {
         ChipLogError(SoftwareUpdate, "eraseExtSlot failed");
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
     }
 
     imageProcessor->mFixedOtaHeader = { 0 };
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -271,7 +271,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
      * sending the full MCUBoot slot.
      */
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded");
     ChipLogProgress(SoftwareUpdate, "Total downloaded bytes: %d", (size_t) imageProcessor->mParams.downloadedBytes);
@@ -300,11 +300,11 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     if (!eraseExtHeader(imageProcessor->mNvsHandle))
     {
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_WRITE_FAILED);
     }
 
     NVS_close(imageProcessor->mNvsHandle);
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -364,21 +364,21 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
     ChipLogDetail(SoftwareUpdate, "Total downloaded bytes: %d", (size_t) imageProcessor->mParams.downloadedBytes);
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (!IsSpanUsable(block))
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
     if (mBlock.size() < block.size())
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)

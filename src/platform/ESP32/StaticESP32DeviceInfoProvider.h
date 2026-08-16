@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/support/Span.h>
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
 
 namespace chip {

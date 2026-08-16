@@ -25,9 +25,9 @@
 
 #pragma once
 
+#include "ESP32FactoryDataProvider.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <platform/ESP32/ESP32FactoryDataProvider.h>
 
 #include <esp_secure_cert_tlv_config.h>
 

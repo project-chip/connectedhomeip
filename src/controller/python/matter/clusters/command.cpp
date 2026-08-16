@@ -36,16 +36,16 @@ using PyObject = void *;
 extern "C" {
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
+                                             const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs,
                                              uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload);
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                   uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                                   uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                                    chip::python::PyInvokeRequestData * batchCommandData, size_t length);
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-    const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse);
+    const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse);
 
 PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::Controller::DeviceCommissioner * devCtrl,
                                                   chip::ClusterId clusterId, chip::CommandId commandId, const uint8_t * payload,
@@ -194,7 +194,7 @@ private:
 };
 
 PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                      uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                      uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                       python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides,
                                       python::PyInvokeRequestData * batchCommandData, size_t length)
 {
@@ -269,7 +269,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             TLV::TLVReader reader;
             reader.Init(tlvBuffer, static_cast<uint32_t>(tlvLength));
-            reader.Next();
+            TEMPORARY_RETURN_IGNORED reader.Next();
             SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
 
@@ -292,7 +292,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             // Making sure the value we used to override CommandRef was actually used.
             VerifyOrDie(finishCommandParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
             // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
-            callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
+            TEMPORARY_RETURN_IGNORED callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
         }
         else
 #endif
@@ -351,7 +351,7 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                                             const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
+                                             const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs,
                                              uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -376,7 +376,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
@@ -403,7 +403,7 @@ exit:
 }
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                   uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                                   uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                                    python::PyInvokeRequestData * batchCommandData, size_t length)
 {
     python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides = nullptr;
@@ -412,7 +412,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 }
 
 PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                           uint16_t interactionTimeoutMs, uint16_t busyWaitMs,
+                                                           uint32_t interactionTimeoutMs, uint16_t busyWaitMs,
                                                            bool suppressResponse,
                                                            python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
                                                            python::PyInvokeRequestData * batchCommandData, size_t length)
@@ -427,7 +427,7 @@ PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, De
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-    const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse)
+    const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse)
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
@@ -452,7 +452,7 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
@@ -500,7 +500,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 

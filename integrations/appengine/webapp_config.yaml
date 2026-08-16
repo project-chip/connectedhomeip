@@ -1,4 +1,4 @@
-runtime: python39
+runtime: python312
 handlers:
     - url: /
       static_files: html/index.html

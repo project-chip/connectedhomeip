@@ -25,10 +25,6 @@
 
 #pragma once
 
-#include <lib/core/CHIPConfig.h>
-
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
-
 #include <lib/support/CHIPArgParser.hpp>
 
 #include <inet/IPAddress.h>
@@ -40,5 +36,3 @@ bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
 
 } // namespace ArgParser
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

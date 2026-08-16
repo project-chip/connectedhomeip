@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "av-analysis-manager.h"
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
@@ -26,20 +27,19 @@
 #include "zone-manager.h"
 
 #include "default-media-controller.h"
+#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
+
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
-// TODO: Define a configuration flag and enable/disable during the build. Configure this after the controller/TH side UI is ready.
-// Enable to use test src instead of hardware source for testing purposes.
-// #define AV_STREAM_GST_USE_TEST_SRC
 
 // Camera Constraints set to typical values.
 // TODO: Look into ways to fetch from hardware, if required/possible.
 static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
-static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
+static constexpr uint32_t kMaxNetworkBandwidthbps    = 128000000; // 128 Mbps
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
 static constexpr uint8_t kSpeakerMinLevel            = 1;
 static constexpr uint8_t kSpeakerMaxLevel            = 254;       // Spec constraint
@@ -48,13 +48,17 @@ static constexpr uint32_t kMaxEncodedPixelRate       = 248832000; // 1080p at 12
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
-static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
-static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
+static constexpr uint16_t kMinResolutionWidth        = 640;  // Low VGA resolution
+static constexpr uint16_t kMinResolutionHeight       = 480;  // Low VGA resolution
+static constexpr uint16_t k720pResolutionWidth       = 1280; // 720p resolution
+static constexpr uint16_t k720pResolutionHeight      = 720;  // 720p resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
 static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
-static constexpr uint16_t kMinVideoFrameRate         = 30;
+static constexpr uint16_t k60fpsVideoFrameRate       = 60;
+static constexpr uint16_t k30fpsVideoFrameRate       = 30;
+static constexpr uint16_t kMinVideoFrameRate         = 15;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
 static constexpr uint32_t kKeyFrameIntervalMsec      = 4000;    // 4 sec; recommendation from Spec
@@ -65,7 +69,11 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
+static constexpr uint8_t kMaxAnalysisStreams         = 8;   // Spec max is 255
 
+// StreamIDs typically start from 0 and monotonically increase. Setting
+// Invalid value to a large and practically unused value.
+static constexpr uint16_t kInvalidStreamID = 65500;
 #define INVALID_SPKR_LEVEL (0)
 
 namespace Camera {
@@ -79,16 +87,52 @@ constexpr int16_t kMinTiltValue = -90;
 constexpr int16_t kMaxTiltValue = 90;
 constexpr uint8_t kMaxZoomValue = 75;
 
+// Camera defined set of supported detectable ambient contexts; for the purposes of the app this is limited to package
+// detection
+static const std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> kSupportedAmbientContexts = {
+    { std::nullopt, static_cast<uint8_t>(0x49), static_cast<uint8_t>(0x0B),
+      chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan::fromCharString("Object.Package"))) }
+};
+
+/**
+ * Examples of other ambient contexts for illustrative purposes only, note that _span requires that you are within the chip
+namespace
+ * Person
+    { .namespaceID = static_cast<uint8_t>(0x49),
+      .tag         = static_cast<uint8_t>(0x03),
+      .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Person"_span)) }
+ * Pet, Dog, Cat
+    {{ .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x05),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Pet"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x06),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Dog"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x49),
+       .tag         = static_cast<uint8_t>(0x07),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Object.Cat"_span)) }}
+ * Package delivery and retrieval
+    {{ .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x08),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageDelivery"_span)) },
+     { .namespaceID = static_cast<uint8_t>(0x4B),
+       .tag         = static_cast<uint8_t>(0x09),
+       .label       = MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Activity.PackageRetrieval"_span)) }}
+**/
+
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
+    chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -98,6 +142,7 @@ public:
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
     void Init();
+    void Shutdown();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -107,7 +152,7 @@ public:
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
 
-    CameraError StartVideoStream(uint16_t streamID) override;
+    CameraError StartVideoStream(const VideoStreamStruct & allocatedStream) override;
 
     // Stop video stream
     CameraError StopVideoStream(uint16_t streamID) override;
@@ -117,6 +162,11 @@ public:
 
     // Stop audio stream
     CameraError StopAudioStream(uint16_t streamID) override;
+
+    // Allocate snapshot stream
+    CameraError AllocateSnapshotStream(
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
+        uint16_t & outStreamID) override;
 
     // Start snapshot stream
     CameraError StartSnapshotStream(uint16_t streamID) override;
@@ -163,6 +213,7 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    CameraError SetHardPrivacyMode(bool hardPrivacyMode) override;
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
     CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;
@@ -171,6 +222,7 @@ public:
     std::vector<StreamUsageEnum> & GetSupportedStreamUsages() override;
 
     std::vector<StreamUsageEnum> & GetStreamUsagePriorities() override { return mStreamUsagePriorities; }
+    CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) override;
 
     // Sets the Default Camera Viewport
     CameraError SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort) override;
@@ -275,17 +327,22 @@ public:
 
     uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
 
+    size_t GetPreRollBufferSize();
+
+    int64_t GetMinKeyframeIntervalMs();
+
     CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
 
     CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
-    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+    CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
+    CameraError SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Optional<int16_t> aTilt, chip::Optional<uint8_t> aZoom) override;
 
     std::vector<VideoStream> & GetAvailableVideoStreams() override { return mVideoStreams; }
 
@@ -295,9 +352,20 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+    void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
-    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
+
+    uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
+    std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
+
+    // Audio playback pipeline methods
+    CameraError StartAudioPlaybackStream();
+    CameraError StopAudioPlaybackStream();
+
+    // Timestamp handling for video and audio streams
+    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
+    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
 private:
     int videoDeviceFd            = -1;
@@ -310,11 +378,20 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
+    bool AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs,
+                           uint16_t & outStreamID);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
-    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
+    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
+    GstElement * CreateAudioPlaybackPipeline(CameraError & error);
+
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
+
+    bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
 
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;
@@ -323,6 +400,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
+    chip::app::Clusters::AvAnalysis::AvAnalysisManager mAVAnalysisManager;
 
     DefaultMediaController mMediaController;
 
@@ -331,7 +409,7 @@ private:
     uint8_t mZoom = chip::app::Clusters::CameraAvSettingsUserLevelManagement::kDefaultZoom;
     // Use a standard 1080p aspect ratio
     chip::app::Clusters::Globals::Structs::ViewportStruct::Type mViewport = { 0, 0, 1920, 1080 };
-    uint16_t mCurrentVideoFrameRate                                       = kMinVideoFrameRate;
+    uint16_t mCurrentVideoFrameRate                                       = k30fpsVideoFrameRate;
     bool mHDREnabled                                                      = false;
     bool mSpeakerMuted                                                    = false;
     bool mMicrophoneMuted                                                 = false;
@@ -353,8 +431,12 @@ private:
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
+    uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    // Audio playback pipeline specific members
+    GstElement * mAudioPlaybackPipeline = nullptr;
 };
 
 } // namespace Camera

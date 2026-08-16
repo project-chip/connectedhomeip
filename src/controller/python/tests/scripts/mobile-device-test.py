@@ -48,6 +48,7 @@ from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
 
 import matter.logging
+from matter.setup_payload import SetupPayload
 from matter.tracing import TracingContext
 
 # The thread network dataset tlv for testing, splitted into T-L-V.
@@ -76,44 +77,37 @@ TEST_DEVICE_NODE_ID = 1
 ALL_TESTS = ['network_commissioning', 'datamodel']
 
 
-async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
+async def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, device_nodeid: int):
     logger.info("Testing discovery")
     device = await test.TestDiscovery(discriminator=discriminator)
     FailIfNot(device, "Failed to discover any devices.")
 
-    address = device.addresses[0]
-
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
-    if address_override:
-        address = address_override
+    qr = SetupPayload().GenerateQrCode(passcode=setup_pin, discriminator=discriminator)
 
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=address,
-                                           setuppin=setup_pin,
-                                           nodeid=device_nodeid),
+    FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=qr, nodeId=device_nodeid),
               "Failed to finish key exchange")
 
     logger.info("Testing multi-controller setup on the same fabric")
-    FailIfNot(await test.TestMultiControllerFabric(nodeid=device_nodeid), "Failed the multi-controller test")
+    FailIfNot(await test.TestMultiControllerFabric(nodeId=device_nodeid), "Failed the multi-controller test")
 
     logger.info("Testing CATs used on controllers")
-    FailIfNot(await test.TestControllerCATValues(nodeid=device_nodeid), "Failed the controller CAT test")
+    FailIfNot(await test.TestControllerCATValues(nodeId=device_nodeid), "Failed the controller CAT test")
 
-    ok = await test.TestMultiFabric(ip=address,
-                                    setuppin=20202021,
-                                    nodeid=1)
+    ok = await test.TestMultiFabric(setup_code=qr, nodeId=1)
     FailIfNot(ok, "Failed to commission multi-fabric")
 
-    FailIfNot(await test.TestAddUpdateRemoveFabric(nodeid=device_nodeid),
+    FailIfNot(await test.TestAddUpdateRemoveFabric(nodeId=device_nodeid),
               "Failed AddUpdateRemoveFabric test")
 
     logger.info("Testing CASE Eviction")
     FailIfNot(await test.TestCaseEviction(device_nodeid), "Failed TestCaseEviction")
 
     logger.info("Testing closing sessions")
-    FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
+    FailIfNot(test.TestCloseSession(nodeId=device_nodeid), "Failed to close sessions")
 
 
 @base.test_case
@@ -121,16 +115,16 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing datamodel functions")
 
     logger.info("Testing on off cluster")
-    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeId=device_nodeid,
                                                 endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     logger.info("Testing level control cluster")
-    FailIfNot(asyncio.run(test.TestLevelControlCluster(nodeid=device_nodeid,
+    FailIfNot(asyncio.run(test.TestLevelControlCluster(nodeId=device_nodeid,
                                                        endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to test level control cluster")
 
     logger.info("Testing sending commands to non exist endpoint")
-    FailIfNot(not asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+    FailIfNot(not asyncio.run(test.TestOnOffCluster(nodeId=device_nodeid,
                                                     endpoint=233)), "Failed to test on off cluster on non-exist endpoint")
 
     # Test experimental Python cluster objects API
@@ -139,58 +133,57 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing attribute reading")
-    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=device_nodeid,
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeId=device_nodeid,
                                                        endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(asyncio.run(test.TestWriteBasicAttributes(nodeid=device_nodeid,
+    FailIfNot(asyncio.run(test.TestWriteBasicAttributes(nodeId=device_nodeid,
                                                         endpoint=ENDPOINT_ID)),
               "Failed to test Write Basic Attributes")
 
     logger.info("Testing attribute reading basic again")
-    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=1,
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeId=1,
                                                        endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
-    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeId=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing another subscription that kills previous subscriptions")
-    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeId=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing re-subscription")
-    FailIfNot(asyncio.run(test.TestResubscription(nodeid=device_nodeid)),
+    FailIfNot(asyncio.run(test.TestResubscription(nodeId=device_nodeid)),
               "Failed to validated re-subscription")
 
     logger.info("Testing on off cluster over resolved connection")
-    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeId=device_nodeid,
                                                 endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     logger.info("Testing writing/reading fabric sensitive data")
-    asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))
+    asyncio.run(test.TestFabricSensitive(nodeId=device_nodeid))
 
 
-def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, paa_trust_store_path):
+def do_tests(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, paa_trust_store_path):
     timeoutTicker = TestTimeout(timeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=controller_nodeid,
+    test = BaseTestHelper(nodeId=controller_nodeid,
                           paaTrustStorePath=paa_trust_store_path)
 
     matter.logging.RedirectToPythonLogging()
 
-    asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, address,
-                                       device_nodeid))
+    asyncio.run(ethernet_commissioning(test, discriminator, setup_pin, device_nodeid))
 
     logger.info("Testing resolve")
-    FailIfNot(test.TestResolve(nodeid=device_nodeid),
+    FailIfNot(test.TestResolve(nodeId=device_nodeid),
               "Failed to resolve nodeid")
 
     # Still test network commissioning
-    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=device_nodeid).run()),
+    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeId=device_nodeid).run()),
               "Failed to finish network commissioning")
 
     TestDatamodel(test, device_nodeid)
@@ -216,10 +209,6 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               default=TEST_DEVICE_NODE_ID,
               type=int,
               help="NodeId of the device.")
-@click.option("--address", "-a",
-              default='',
-              type=str,
-              help="Skip commissionee discovery, commission the device with the IP directly.")
 @click.option("--timeout", "-t",
               default=240,
               type=int,
@@ -270,7 +259,7 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 @click.option('--fail-on-skipped',
               is_flag=True,
               help="Fail the test if any test cases are skipped")
-def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
+def run(controller_nodeid, device_nodeid, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
         log_format, print_test_list, paa_trust_store_path, trace_to, app_pid, fail_on_skipped):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
@@ -284,8 +273,8 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
         return
 
     logger.info("Test Parameters:")
-    logger.info(f"\tController NodeId: {controller_nodeid}")
-    logger.info(f"\tDevice NodeId:     {device_nodeid}")
+    logger.info(f"\tController NodeId: 0x{controller_nodeid:016X}")
+    logger.info(f"\tDevice NodeId:     0x{device_nodeid:016X}")
     logger.info(f"\tTest Timeout:      {timeout}s")
     logger.info(f"\tDiscriminator:     {discriminator}")
     logger.info(f"\tEnabled Tests:     {enable_test}")
@@ -295,7 +284,7 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
         for destination in trace_to:
             tracing_ctx.StartFromString(destination)
 
-        do_tests(controller_nodeid, device_nodeid, address, timeout,
+        do_tests(controller_nodeid, device_nodeid, timeout,
                  discriminator, setup_pin, paa_trust_store_path)
 
 

@@ -89,16 +89,29 @@ rt_sdk("sdk") {
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
+  # Indicate the default path to WiFiUserConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/WiFi" ]
+
   # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
-  if (chip_enable_wifi && chip_enable_openthread) {
+  # Additionally in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of mDNS packets
+  if (chip_enable_wifi && chip_enable_thread) {
     defines += [
-      "configTOTAL_HEAP_SIZE=(size_t)(170 * 1024)",
+      "configTOTAL_HEAP_SIZE=(size_t)(250 * 1024)",
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
   }
 
+  if (chip_enable_wifi) {
+    defines += [ "WIFI_USER_CONFIG_FILE=<WiFiUserConfig.h>" ]
+  }
+
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+
+    # CONFIG_CHIP_CRYPTO_PSA=1 is required to propagate the PSA crypto backend
+    # selection to the Matter port layer. It is consumed by NXP Matter port files
+    # (e.g. src/platform/nxp) to conditionally compile PSA-based crypto paths.
+    "CONFIG_CHIP_CRYPTO_PSA=1",
   ]
 }
 
@@ -115,8 +128,20 @@ rt_executable("thermostat") {
     "CONFIG_APP_FREERTOS_OS=1",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+
+    # CONFIG_CHIP_OPENTHREAD_FTD is propagated here so that it is visible to
+    # mbedtls/config/nxp_matter_mbedtls_config.h, which gates OpenThread FTD
+    # specific mbedTLS configuration on this macro.
+    defines += [ "CONFIG_CHIP_OPENTHREAD_FTD" ]
+  }
+
+  if (chip_enable_wifi) {
+    # CONFIG_CHIP_WIFI is propagated here so that it is visible to
+    # mbedtls/config/nxp_matter_mbedtls_config.h, which gates Wi-Fi specific
+    # mbedTLS configuration on this macro.
+    defines += [ "CONFIG_CHIP_WIFI" ]
   }
 
   if (chip_with_diag_logs_demo) {
@@ -146,7 +171,6 @@ rt_executable("thermostat") {
   ]
 
   if (chip_enable_ble) {
-    defines += [ "APP_BT_DEVICE_NAME=\"NXP-ThermostatApp\"" ]
     include_dirs += [ "${common_example_dir}/app_ble/include" ]
     if (ble_adv_data_custom) {
       # to customize BLE advertising data
@@ -194,7 +218,6 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/include",
     "${common_example_dir}/app_task/include",
     "${common_example_dir}/factory_data/include",
-    "${common_example_dir}/operational_keystore/include",
   ]
 
   sources += [
@@ -204,18 +227,15 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
-    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS50.cpp",
   ]
 
   deps = [
     "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
-
-  # Operational key secure storage
-  defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

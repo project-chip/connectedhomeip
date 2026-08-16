@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Thermostat (cluster code: 513/0x04201)
+// Identifier constant values for cluster Thermostat (cluster code: 513/0x0201)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

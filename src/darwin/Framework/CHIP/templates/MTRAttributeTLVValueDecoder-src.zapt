@@ -49,6 +49,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
 }
 
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -56,6 +57,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
     switch (aAttributeId) {
         {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#if clusterRef}}
+        {{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
@@ -70,6 +72,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
             return value;
         }
         {{/if}}
+        {{/unless}}
         {{/if}}
         {{/zcl_attributes_server}}
         default: {
@@ -82,6 +85,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
     return nil;
 }
 {{/if}}
+{{/unless}}
 {{/zcl_clusters}}
 
 id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
@@ -92,11 +96,13 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
 
     switch (aPath.mClusterId) {
         {{#zcl_clusters}}
+        {{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
         }
         {{/if}}
+        {{/unless}}
         {{/zcl_clusters}}
         default: {
             break;

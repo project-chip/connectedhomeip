@@ -26,6 +26,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${APP_COMMON_GEN_DIR}/attributes"
                       "${APP_COMMON_GEN_DIR}"
                       "${CHIP_ROOT}/examples/platform/esp32/common"
+                      "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
                       "${CHIP_ROOT}/examples/providers"
                       "${CHIP_ROOT}/examples/bridge-app/bridge-common/src")
 

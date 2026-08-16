@@ -21,12 +21,13 @@
 #include <pw_unit_test/framework.h>
 #include <system/SystemConfig.h>
 
-// EventLoopHandlers are only supported by a select-based LayerSocketsLoop
+// EventLoopHandlers are only supported by a select-based LayerSelectLoop
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 // The fake PlatformManagerImpl does not drive the system layer event loop
 #if !CHIP_DEVICE_LAYER_TARGET_FAKE
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -48,7 +49,7 @@ public:
         Platform::MemoryShutdown();
     }
 
-    static System::LayerSocketsLoop & SystemLayer() { return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()); }
+    static System::LayerSelectLoop & SystemLayer() { return static_cast<System::LayerSelectLoop &>(DeviceLayer::SystemLayer()); }
 
     // Schedules a call to the provided lambda and returns a cancel function.
     template <class Lambda>
@@ -60,7 +61,7 @@ public:
             delete function;
         };
         auto * function = new std::function<void()>(lambda);
-        SystemLayer().StartTimer(delay, callback, function);
+        EXPECT_SUCCESS(SystemLayer().StartTimer(delay, callback, function));
         return [=] {
             SystemLayer().CancelTimer(callback, function);
             delete function;
@@ -102,7 +103,7 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerSequence)
                 loopHandler.trace.append("R");
                 ScheduleNextTick([&] {
                     loopHandler.trace.append("4");
-                    DeviceLayer::PlatformMgr().StopEventLoopTask();
+                    EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask());
                 });
             });
         });
@@ -133,14 +134,14 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerWake)
             if (++count == 2)
             {
                 wakeTimestamp = System::SystemClock().GetMonotonicTimestamp();
-                DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask());
             }
         }
     } loopHandler;
 
     SystemLayer().AddLoopHandler(loopHandler);
     // Schedule a fallback timer to ensure the test stops.
-    auto cancelFallback = Schedule(1000_ms, [] { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+    auto cancelFallback = Schedule(1000_ms, [] { EXPECT_SUCCESS(DeviceLayer::PlatformMgr().StopEventLoopTask()); });
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     SystemLayer().RemoveLoopHandler(loopHandler);
     cancelFallback(); // avoid leaking the fallback timer

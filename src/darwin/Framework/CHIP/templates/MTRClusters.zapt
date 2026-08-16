@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 /**
  * Cluster {{name}}
  *    {{description}}
@@ -20,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
 
 {{#zcl_commands}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
@@ -46,9 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 {{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
+{{/unless}}
 {{/zcl_commands}}
 
 {{#zcl_attributes_server}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (or clusterRef
                (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
            (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)))}}
@@ -63,6 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
 {{/if}}
+{{/unless}}
 {{/zcl_attributes_server}}
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -89,11 +94,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+{{/unless}}
 {{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRCluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} : MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
@@ -101,11 +108,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/if}}
 {{/unless}}
+{{/unless}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
@@ -153,6 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_attributes_server}}
 @end
 
+{{/unless}}
 {{/if}}
 {{/zcl_clusters}}
 

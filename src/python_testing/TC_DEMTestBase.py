@@ -23,7 +23,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class DEMTestBase:
@@ -31,7 +31,7 @@ class DEMTestBase:
     async def read_dem_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         cluster = Clusters.Objects.DeviceEnergyManagement
         full_attr = getattr(cluster.Attributes, attribute)
-        logging.info(f"endpoint {endpoint} full_attr {full_attr}")
+        log.info("endpoint %s full_attr %s", endpoint, full_attr)
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
     async def check_dem_attribute(self, attribute, expected_value, endpoint: int = None):
@@ -192,20 +192,20 @@ class DEMTestBase:
 
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
-            logging.info(
-                f"   [{index}] MinDuration: {slot.minDuration} MaxDuration: {slot.maxDuration} DefaultDuration: {slot.defaultDuration}")
-            logging.info(f"       ElapseSlotTime: {slot.elapsedSlotTime} RemainingSlotTime: {slot.remainingSlotTime}")
-            logging.info(
-                f"       SlotIsPausable: {slot.slotIsPausable} MinPauseDuration: {slot.minPauseDuration} MaxPauseDuration: {slot.maxPauseDuration}")
-            logging.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
-            logging.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
-            logging.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
-            logging.info(
-                f"       MinDurationAdjustment: {slot.minDurationAdjustment} MaxDurationAdjustment: {slot.maxDurationAdjustment}")
+            log.info("   [%s] MinDuration: %s MaxDuration: %s DefaultDuration: %s",
+                     index, slot.minDuration, slot.maxDuration, slot.defaultDuration)
+            log.info("       ElapseSlotTime: %s RemainingSlotTime: %s", slot.elapsedSlotTime, slot.remainingSlotTime)
+            log.info("       SlotIsPausable: %s MinPauseDuration: %s MaxPauseDuration: %s",
+                     slot.slotIsPausable, slot.minPauseDuration, slot.maxPauseDuration)
+            log.info("       ManufacturerESAState: %s", slot.manufacturerESAState)
+            log.info("       NominalPower: %s MinPower: %s MaxPower: %s", slot.nominalPower, slot.minPower, slot.maxPower)
+            log.info("       MinPowerAdjustment: %s MaxPowerAdjustment: %s", slot.minPowerAdjustment, slot.maxPowerAdjustment)
+            log.info("       MinDurationAdjustment: %s MaxDurationAdjustment: %s",
+                     slot.minDurationAdjustment, slot.maxDurationAdjustment)
             if slot.costs is not None:
                 for cost_index, cost in enumerate(slot):
-                    logging.info(
-                        f"   Cost: [{cost_index}]  CostType:{cost.costType} Value: {cost.value} DecimalPoints: {cost.decimalPoints} Currency: {cost.currency}")
+                    log.info("   Cost: [%s]  CostType:%s Value: %s DecimalPoints: %s Currency: %s",
+                             cost_index, cost.costType, cost.value, cost.decimalPoints, cost.currency)
 
     def get_current_utc_time_in_seconds(self):
         microseconds_in_second = 1000000

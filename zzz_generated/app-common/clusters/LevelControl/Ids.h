@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster LevelControl (cluster code: 8/0x048)
+// Identifier constant values for cluster LevelControl (cluster code: 8/0x0008)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

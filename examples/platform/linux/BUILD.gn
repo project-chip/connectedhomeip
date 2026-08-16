@@ -14,11 +14,17 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (current_os != "nuttx") {
@@ -31,6 +37,7 @@ declare_args() {
   chip_enable_smoke_co_trigger = false
   chip_enable_boolean_state_configuration_trigger = false
   chip_enable_commodity_price_trigger = false
+  chip_enable_commodity_tariff_trigger = false
   chip_enable_energy_evse_trigger = false
   chip_enable_electrical_grid_conditions_trigger = false
   chip_enable_energy_reporting_trigger = false
@@ -98,6 +105,97 @@ source_set("commodity-metering-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h" ]
 }
 
+source_set("linux-commissionable-data-provider") {
+  sources = [
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commodity-tariff-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
+}
+
+source_set("app-main-loop") {
+  sources = [ "AppMainLoop.h" ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("app-options") {
+  defines = [
+    "ENABLE_TRACING=${matter_enable_tracing_support}",
+    "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
+    "CHIP_ATTESTATION_TRUSTY_OS=${chip_with_trusty_os}",
+  ]
+
+  sources = [
+    "Options.cpp",
+    "Options.h",
+    "testing/CustomCSRResponse.cpp",
+    "testing/CustomCSRResponse.h",
+    "testing/CustomCSRResponseOperationalKeyStore.cpp",
+    "testing/CustomCSRResponseOperationalKeyStore.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support:arg_parser",
+  ]
+
+  if (matter_enable_tracing_support) {
+    public_deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
+  }
+  if (current_os != "nuttx") {
+    public_deps += [ jsoncpp_root ]
+  }
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("named-pipes") {
+  sources = [
+    "NamedPipeCommands.cpp",
+    "NamedPipeCommands.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commissionable-init") {
+  sources = [
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
+  ]
+
+  public_deps = [
+    ":app-options",
+    ":linux-commissionable-data-provider",
+    "${chip_root}/src/lib",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
 source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
@@ -108,30 +206,24 @@ source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
-    "CommissionableInit.cpp",
-    "CommissionableInit.h",
-    "LinuxCommissionableDataProvider.cpp",
-    "LinuxCommissionableDataProvider.h",
-    "NamedPipeCommands.cpp",
-    "NamedPipeCommands.h",
-    "Options.cpp",
-    "Options.h",
-    "testing/CustomCSRResponse.cpp",
-    "testing/CustomCSRResponse.h",
-    "testing/CustomCSRResponseOperationalKeyStore.cpp",
-    "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
   public_deps = [
+    ":app-main-loop",
+    ":app-options",
     ":boolean-state-configuration-test-event-trigger",
+    ":commissionable-init",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
+    ":commodity-tariff-test-event-trigger",
     ":device-energy-management-test-event-trigger",
     ":electrical-grid-conditions-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
+    ":linux-commissionable-data-provider",
     ":meter-identification-test-event-trigger",
+    ":named-pipes",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
     ":water-heater-management-test-event-trigger",
@@ -144,14 +236,10 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
-
-  if (current_os != "nuttx") {
-    public_deps += [ jsoncpp_root ]
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
@@ -187,6 +275,7 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER=${chip_enable_commodity_price_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER=${chip_enable_electrical_grid_conditions_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER=${chip_enable_commodity_tariff_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
     "CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER=${chip_enable_meter_identification_trigger}",
@@ -196,6 +285,9 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER=${chip_enable_commodity_metering_trigger}",
   ]
 
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+  }
   public_configs = [ ":app-main-config" ]
 }
 
@@ -224,4 +316,40 @@ source_set("commissioner-main") {
   }
 
   public_configs = [ ":app-main-config" ]
+}
+
+config("pw_rpc_config") {
+  include_dirs = [ "${chip_root}/examples/common" ]
+}
+
+if (chip_enable_pw_rpc) {
+  # This target compiles the generic Pigweed RPC server initialization and socket/HDLC communication code.
+  # It does not compile service registrations or carry final executable link dependencies.
+  # The application target must add Rpc.cpp, specific service dependencies, and service-specific defines.
+  source_set("pw_rpc") {
+    sources = [ "system_rpc_server.cc" ]
+
+    public_deps = [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sync:mutex",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+      "${chip_root}/src/platform",
+    ]
+
+    public_configs = [
+      ":app-main-config",
+      ":pw_rpc_config",
+    ]
+  }
 }

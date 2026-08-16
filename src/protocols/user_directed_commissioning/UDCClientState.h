@@ -185,6 +185,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
+
     void SetCachedCommissionerPasscode(uint32_t newValue) { mCachedCommissionerPasscode = newValue; };
     uint32_t GetCachedCommissionerPasscode() const { return mCachedCommissionerPasscode; };
 
@@ -211,33 +214,35 @@ public:
         mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
         mCachedCommissionerPasscode = 0;
         mNumTargetAppInfos          = 0;
+        mPasscodeLength             = 0;
     }
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
-    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
-    uint16_t mLongDiscriminator = 0;
-    uint16_t mVendorId          = 0;
-    uint16_t mProductId         = 0;
-    uint16_t mCdPort            = 0;
-    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen                                         = 0;
-    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
-    uint16_t mPairingHint                                         = 0;
+    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1]                    = {};
+    uint16_t mLongDiscriminator                                       = 0;
+    uint16_t mVendorId                                                = 0;
+    uint16_t mProductId                                               = 0;
+    uint16_t mCdPort                                                  = 0;
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen]               = {};
+    size_t mRotatingIdLen                                             = 0;
+    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1]     = {};
+    uint16_t mPairingHint                                             = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
-    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
-    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+    constexpr static size_t kMaxTargetAppInfos        = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+    uint8_t mNumTargetAppInfos                        = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos] = {};
 
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
     bool mCancelPasscode            = false;
+    uint8_t mPasscodeLength         = 0;
 
-    UDCClientProcessingState mUDCClientProcessingState;
-    System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
+    UDCClientProcessingState mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
+    System::Clock::Timestamp mExpirationTime           = System::Clock::kZero;
 
     uint32_t mCachedCommissionerPasscode = 0;
 };

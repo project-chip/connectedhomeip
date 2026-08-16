@@ -340,7 +340,7 @@ void ThermostaticRadiatorValveManager::DisplayTemperature(void)
 
 void ThermostaticRadiatorValveManager::UpdateLocalTemperature(int16_t aLocalTemperature)
 {
-    SystemLayer().ScheduleLambda([aLocalTemperature] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aLocalTemperature] {
         ChipLogDetail(NotSpecified, "UpdateLocalTemperature with value (0.01 degC) %u", aLocalTemperature);
         if (Protocols::InteractionModel::Status::Success !=
             Thermostat::Attributes::LocalTemperature::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aLocalTemperature))
@@ -362,7 +362,7 @@ uint8_t ThermostaticRadiatorValveManager::GetPICoolingDemand(void)
 
 void ThermostaticRadiatorValveManager::SetPICoolingDemand(uint8_t aPI)
 {
-    SystemLayer().ScheduleLambda([aPI] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
         Thermostat::Attributes::PICoolingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
         ChipLogDetail(NotSpecified, "SetPICoolingDemand - %d", aPI);
     });
@@ -380,7 +380,7 @@ uint8_t ThermostaticRadiatorValveManager::GetPIHeatingDemand(void)
 
 void ThermostaticRadiatorValveManager::SetPIHeatingDemand(uint8_t aPI)
 {
-    SystemLayer().ScheduleLambda([aPI] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aPI] {
         Thermostat::Attributes::PIHeatingDemand::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aPI);
         ChipLogDetail(NotSpecified, "SetPIHeatingDemand - %d", aPI);
     });
@@ -399,7 +399,7 @@ int16_t ThermostaticRadiatorValveManager::GetOccupiedCoolingSetpoint(void)
 
 void ThermostaticRadiatorValveManager::SetOccupiedCoolingSetpoint(int16_t aSetpoint)
 {
-    SystemLayer().ScheduleLambda([aSetpoint] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSetpoint] {
         Thermostat::Attributes::OccupiedCoolingSetpoint::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSetpoint);
 
         ChipLogDetail(NotSpecified, "SetOccupiedCoolingSetpoint - %d", aSetpoint);
@@ -419,7 +419,7 @@ int16_t ThermostaticRadiatorValveManager::GetOccupiedHeatingSetpoint(void)
 
 void ThermostaticRadiatorValveManager::SetOccupiedHeatingSetpoint(int16_t aSetpoint)
 {
-    SystemLayer().ScheduleLambda([aSetpoint] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSetpoint] {
         Thermostat::Attributes::OccupiedHeatingSetpoint::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSetpoint);
 
         ChipLogDetail(NotSpecified, "SetOccupiedHeatingSetpoint - status %d", aSetpoint);
@@ -439,7 +439,7 @@ ThermostaticRadiatorValveManager::Operation_t ThermostaticRadiatorValveManager::
 
 void ThermostaticRadiatorValveManager::SetControlSequenceOfOperation(ThermostaticRadiatorValveManager::Operation_t aOperation)
 {
-    SystemLayer().ScheduleLambda([aOperation] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aOperation] {
         Thermostat::Attributes::ControlSequenceOfOperation::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aOperation);
 
         ChipLogDetail(NotSpecified, "SetControlSequenceOfOperation value %d", (int) aOperation);
@@ -459,7 +459,7 @@ ThermostaticRadiatorValveManager::SystemMode_t ThermostaticRadiatorValveManager:
 
 void ThermostaticRadiatorValveManager::SetSystemMode(ThermostaticRadiatorValveManager::SystemMode_t aSystemMode)
 {
-    SystemLayer().ScheduleLambda([aSystemMode] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aSystemMode] {
         Thermostat::Attributes::SystemMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aSystemMode);
 
         ChipLogProgress(NotSpecified, "SetSystemMode value %d", (uint8_t) aSystemMode);
@@ -479,7 +479,7 @@ ThermostaticRadiatorValveManager::TempDisplayMode_t ThermostaticRadiatorValveMan
 
 void ThermostaticRadiatorValveManager::SetTemperatureDisplayMode(ThermostaticRadiatorValveManager::TempDisplayMode_t aMode)
 {
-    SystemLayer().ScheduleLambda([aMode] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([aMode] {
         ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aMode);
 
         ChipLogDetail(NotSpecified, "SetTemperatureDisplayMode value %d", (uint8_t) aMode);

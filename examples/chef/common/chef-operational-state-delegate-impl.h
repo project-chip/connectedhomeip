@@ -96,6 +96,8 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
+    using Delegate::GetInstance;
+
 protected:
     Span<const GenericOperationalState> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
@@ -146,10 +148,8 @@ public:
     }
 };
 
-Instance * GetOperationalStateInstance();
-OperationalStateDelegate * GetOperationalStateDelegate();
-
-void Shutdown();
+Instance * GetOperationalStateInstance(EndpointId endpoint);
+OperationalStateDelegate * GetOperationalStateDelegate(EndpointId endpoint);
 
 } // namespace OperationalState
 } // namespace Clusters

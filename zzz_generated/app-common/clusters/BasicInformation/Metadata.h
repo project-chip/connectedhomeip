@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
 
@@ -113,11 +113,15 @@ namespace MaxPathsPerInvoke {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPathsPerInvoke::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxPathsPerInvoke
+namespace DeviceLocation {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceLocation::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kAdminister);
+} // namespace DeviceLocation
 namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
-constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
+constexpr std::array<DataModel::AttributeEntry, 12> kMandatoryMetadata = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,
     VendorID::kMetadataEntry,
@@ -129,11 +133,7 @@ constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
     HardwareVersionString::kMetadataEntry,
     SoftwareVersion::kMetadataEntry,
     SoftwareVersionString::kMetadataEntry,
-    UniqueID::kMetadataEntry,
     CapabilityMinima::kMetadataEntry,
-    SpecificationVersion::kMetadataEntry,
-    MaxPathsPerInvoke::kMetadataEntry,
-    ConfigurationVersion::kMetadataEntry,
 
 };
 

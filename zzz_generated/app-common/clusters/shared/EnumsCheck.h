@@ -118,6 +118,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnit
     case EnumType::kNgm3:
     case EnumType::kPm3:
     case EnumType::kBqm3:
+    case EnumType::kDbpm:
+    case EnumType::kPcft:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -404,6 +406,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SoftwareVersionCertificationStatusEnum val)
+{
+    using EnumType = Globals::SoftwareVersionCertificationStatusEnum;
+    switch (val)
+    {
+    case EnumType::kDevTest:
+    case EnumType::kProvisional:
+    case EnumType::kCertified:
+    case EnumType::kRevoked:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::StreamUsageEnum val)
 {
     using EnumType = Globals::StreamUsageEnum;
@@ -477,8 +493,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::WebRTCEndReaso
     using EnumType = Globals::WebRTCEndReasonEnum;
     switch (val)
     {
-    case EnumType::kIceFailed:
-    case EnumType::kIceTimeout:
+    case EnumType::kICEFailed:
+    case EnumType::kICETimeout:
     case EnumType::kUserHangup:
     case EnumType::kUserBusy:
     case EnumType::kReplaced:
@@ -488,6 +504,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::WebRTCEndReaso
     case EnumType::kOutOfResources:
     case EnumType::kMediaTimeout:
     case EnumType::kLowPower:
+    case EnumType::kPrivacyMode:
     case EnumType::kUnknownReason:
         return val;
     default:

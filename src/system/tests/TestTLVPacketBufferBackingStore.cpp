@@ -22,7 +22,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <system/TLVPacketBufferBackingStore.h>
 

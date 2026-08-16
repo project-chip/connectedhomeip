@@ -29,7 +29,7 @@ using namespace chip::DeviceLayer;
 
 Connectivity::Connectivity()
 {
-    PlatformMgr().AddEventHandler(
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t self) { reinterpret_cast<Connectivity *>(self)->ChipEventHandler(event); },
         reinterpret_cast<intptr_t>(this));
 }

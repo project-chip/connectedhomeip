@@ -28,6 +28,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -35,6 +36,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -42,6 +44,7 @@
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionStats.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
@@ -66,8 +69,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/CASESessionManager.h>
+#include <transport/MessageStats.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -92,7 +94,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
-                               public WriteHandlerDelegate
+                               public WriteHandlerDelegate,
+                               public DeviceLoadStatusProvider
 {
 public:
     /**
@@ -429,6 +432,11 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+    // DeviceLoadStatusProvider functions implementation
+    MessageStats GetMessageStats() override;
+
+    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
+
 private:
     /* DataModel::ActionContext implementation */
     Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
@@ -529,6 +537,8 @@ private:
     inline size_t GetPathPoolCapacityForReads() const
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
         return (mPathPoolCapacityForReadsOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
                                                          : static_cast<size_t>(mPathPoolCapacityForReadsOverride);
 #else
@@ -549,6 +559,8 @@ private:
     inline size_t GetPathPoolCapacityForSubscriptions() const
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
         return (mPathPoolCapacityForSubscriptionsOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
                                                                  : static_cast<size_t>(mPathPoolCapacityForSubscriptionsOverride);
 #else
@@ -560,6 +572,8 @@ private:
     {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         return (mReadHandlerCapacityForSubscriptionsOverride == -1)
+            // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+            // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
             ? CHIP_IM_MAX_NUM_SUBSCRIPTIONS
             : static_cast<size_t>(mReadHandlerCapacityForSubscriptionsOverride);
 #else
@@ -731,7 +745,11 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider      = nullptr;
+    DataModel::Provider * mDataModelProvider = nullptr;
+    // Tracks whether the provider was shut down and needs Startup() called again.
+    // We can't null mDataModelProvider on shutdown because tests and other code
+    // may still reference it between Shutdown() and the next Init().
+    bool mDataModelProviderNeedsStartup           = false;
     Messaging::ExchangeContext * mCurrentExchange = nullptr;
 
     enum class State : uint8_t

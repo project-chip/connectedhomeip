@@ -21,6 +21,7 @@
 #include <cstring>
 #include <optional>
 
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>
@@ -243,6 +244,7 @@ struct CommissionNodeData : public CommonResolutionData
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    bool threadMeshcop                                        = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     BitFlags<JointFabricMode> jointFabricMode;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -266,7 +268,8 @@ struct CommissionNodeData : public CommonResolutionData
         if (rotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString,
+                                                                         sizeof(rotatingIdString));
             ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
         }
         if (strlen(deviceName) != 0)

@@ -18,7 +18,7 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -39,7 +39,7 @@ Engine sShellSwitchColorControlReadSubCommands;
 Engine sShellSwitchGroupsColorControlSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
-void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                            OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -321,7 +321,7 @@ void ProcessColorControlUnicastBindingRead(BindingCommandData * data, const Embe
     }
 }
 
-void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                               OperationalDeviceProxy * peer_device)
 {
     using namespace Clusters::ColorControl;
@@ -547,7 +547,7 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
     }
 }
 
-void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding)
 {
     using namespace Clusters::ColorControl;
 

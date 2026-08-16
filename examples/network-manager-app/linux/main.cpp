@@ -16,11 +16,25 @@
  */
 
 #include <AppMain.h>
+#include <app/clusters/network-identity-management-server/AuthenticatorDriver.h>
+#include <app/clusters/network-identity-management-server/DefaultNetworkIdentityStorage.h>
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementCluster.h>
+#include <app/clusters/network-identity-management-server/RawKeyNetworkIdentityKeystore.h>
+#include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <app/clusters/thread-network-directory-server/thread-network-directory-server.h>
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+
+#if MATTER_ENABLE_UBUS
+#include "ThreadBROpenThreadUbus.h"
+#include "UbusManager.h"
+#else
+#include "ThreadBRFake.h"
+#endif
 
 #include <optional>
 
@@ -33,31 +47,83 @@ ByteSpan ByteSpanFromCharSpan(CharSpan span)
     return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
+#if MATTER_ENABLE_UBUS
+ubus::UbusManager gUbusManager{};
+#endif
+
 std::optional<DefaultThreadNetworkDirectoryServer> gThreadNetworkDirectoryServer;
 void emberAfThreadNetworkDirectoryClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gThreadNetworkDirectoryServer);
-    gThreadNetworkDirectoryServer.emplace(endpoint).Init();
+    TEMPORARY_RETURN_IGNORED gThreadNetworkDirectoryServer.emplace(endpoint).Init();
 }
 
 std::optional<WiFiNetworkManagementServer> gWiFiNetworkManagementServer;
 void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gWiFiNetworkManagementServer);
-    gWiFiNetworkManagementServer.emplace(endpoint).Init();
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer.emplace(endpoint).Init();
+}
+
+std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterManagementServer;
+void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrDie(!gThreadBorderRouterManagementServer);
+#if MATTER_ENABLE_UBUS
+    static OpenThreadUbusBorderRouterDelegate delegate{ gUbusManager };
+#else
+    static FakeBorderRouterDelegate delegate{};
+#endif
+    TEMPORARY_RETURN_IGNORED gThreadBorderRouterManagementServer
+        .emplace(endpoint, &delegate, Server::GetInstance().GetFailSafeContext())
+        .Init();
+}
+
+// Null AuthenticatorDriver for standalone testing (no real authenticator).
+class NullAuthenticatorDriver : public NetworkIdentityManagement::AuthenticatorDriver
+{
+public:
+    void OnStartup(NetworkIdentityManagement::AuthenticatorDriverCallback &, ReadOnlyNetworkIdentityStorage &) override {}
+};
+
+std::optional<DefaultNetworkIdentityStorage> gNetworkIdentityStorage;
+Crypto::RawKeyNetworkIdentityKeystore gNetworkIdentityKeystore;
+NullAuthenticatorDriver gNullAuthenticatorDriver;
+LazyRegisteredServerCluster<NetworkIdentityManagementCluster> gNetworkIdentityManagementCluster;
+
+void emberAfNetworkIdentityManagementClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrDie(!gNetworkIdentityManagementCluster.IsConstructed());
+    gNetworkIdentityStorage.emplace(Server::GetInstance().GetPersistentStorage());
+    gNetworkIdentityManagementCluster.Create(endpoint, *gNetworkIdentityStorage, gNetworkIdentityKeystore,
+                                             gNullAuthenticatorDriver);
+    SuccessOrDie(CodegenDataModelProvider::Instance().Registry().Register(gNetworkIdentityManagementCluster.Registration()));
+}
+
+static void ApplicationEarlyInit()
+{
+#if MATTER_ENABLE_UBUS
+    SuccessOrDie(gUbusManager.Init());
+#endif
 }
 
 void ApplicationInit()
 {
-    gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                        ByteSpanFromCharSpan("Setec Astronomy"_span));
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
+                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+#if MATTER_ENABLE_UBUS
+    gUbusManager.Shutdown();
+#endif
+}
 
 int main(int argc, char * argv[])
 {
     VerifyOrReturnValue(ChipLinuxAppInit(argc, argv) == 0, -1);
+    ApplicationEarlyInit();
     ChipLinuxAppMainLoop();
     return 0;
 }

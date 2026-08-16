@@ -37,7 +37,29 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
+namespace ApplicationStruct {
+enum class Fields : uint8_t
+{
+    kCatalogVendorID = 0,
+    kApplicationID   = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorID = static_cast<uint16_t>(0);
+    chip::CharSpan applicationID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
 } // namespace Structs
 } // namespace ApplicationBasic
 } // namespace Clusters

@@ -113,7 +113,7 @@ public:
         VerifyOrReturn(mExchangeCtx);
         auto * msgContext = mExchangeCtx->GetReliableMessageContext();
         VerifyOrReturn(msgContext != nullptr);
-        msgContext->FlushAcks();
+        TEMPORARY_RETURN_IGNORED msgContext->FlushAcks();
     }
 
     void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override
@@ -155,6 +155,8 @@ public:
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
+    friend class TestSessionRelease;
+
     enum class State : uint8_t
     {
         ReadyForInvokeResponses,       ///< Accepting InvokeResponses to send back to requester.
@@ -173,7 +175,10 @@ private:
 
     void SendStatusResponse(Protocols::InteractionModel::Status aStatus)
     {
-        StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
+        VerifyOrReturn(!mCommandHandler.IsResponseSuppressed(),
+                       ChipLogDetail(DataManagement, "Response suppressed, skipping status: " ChipLogFormatIMStatus,
+                                     ChipLogValueIMStatus(aStatus)));
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 
     CHIP_ERROR SendCommandResponse();

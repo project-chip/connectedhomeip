@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,6 +30,16 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
 
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
+#include <zephyr/version.h>
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -52,18 +62,45 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
 void ThreadStackManagerImpl::_LockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+    openthread_mutex_lock();
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    openthread_mutex_lock();
+#endif
+#else
     openthread_api_mutex_lock(openthread_get_default_context());
+#endif
 }
 
 bool ThreadStackManagerImpl::_TryLockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+    return openthread_mutex_try_lock() == 0;
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    return openthread_mutex_try_lock() == 0;
+#endif
+#else
     // There's no openthread_api_mutex_try_lock() in Zephyr, so until it's contributed we must use the low-level API
     return k_mutex_lock(&openthread_get_default_context()->api_lock, K_NO_WAIT) == 0;
+#endif
 }
 
 void ThreadStackManagerImpl::_UnlockThreadStack()
 {
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+    openthread_mutex_unlock();
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+    openthread_mutex_unlock();
+#endif
+#else
     openthread_api_mutex_unlock(openthread_get_default_context());
+#endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -77,6 +114,32 @@ void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
     k_sem_give(&mSrpClearAllSemaphore);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    /* In non-concurrent mode, BLE and Thread cannot run simultaneously.
+     *
+     * This request corresponds to a Thread prescan. If BLE is currently active,
+     * a new scan cannot be started, so the cached prescan results are returned
+     * instead. Once the device switches to Thread mode, scanning is available again.
+     */
+    if (bt_is_ready())
+    {
+        ChipLogProgress(DeviceLayer, "Thread prescan: BLE active, using cached results");
+
+        if (callback != nullptr)
+        {
+            return DeviceLayer::SystemLayer().ScheduleLambda([this, callback]() {
+                callback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+            });
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(callback);
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

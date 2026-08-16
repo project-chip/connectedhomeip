@@ -59,8 +59,13 @@ state of these changes.
 ### Bluetooth LE advertising
 
 In this example, to commission the device onto a Matter network, it must be
-discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
-LE advertising manually after powering up the device by pressing **Button 4**.
+discoverable over Bluetooth LE. The Bluetooth LE advertising is automatically
+started after powering up the device, but it may timeout and require re-starting
+by pressing:
+
+-   On nRF52840 DK and nRF5340 DK: **Button 4**.
+
+-   On nRF54L15 DK: **Button 3**.
 
 ### Bluetooth LE rendezvous
 
@@ -129,10 +134,11 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                         | Build target                 | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk/nrf52840`        | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk/nrf5340/cpuapp`   | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF54L15 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF54L15-DK) | `nrf54l15dk/nrf54l15/cpuapp` | <details><summary>nRF54L15 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF54L15_DK_info-medium.png" alt="nRF54L15 DK"/></details> |
 
 <hr>
 
@@ -142,53 +148,107 @@ This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
 platform image.
 
-**LED 1** shows the overall state of the device and its connectivity. The
-following states are possible:
+**Device UI elements by platform:**
 
--   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
-    unprovisioned (unpaired) state and is waiting for a commissioning
-    application to connect.
+#### nRF52840 DK and nRF5340 DK
 
--   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
-    unprovisioned state and a commissioning application is connected through
-    Bluetooth LE.
+-   **LED 1** shows the overall state of the device and its connectivity. The
+    following states are possible:
 
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full connectivity for Thread network.
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
 
--   _Solid On_ &mdash; The device is fully provisioned.
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
 
-**LED 2** is used for the Identify feature purpose. The LED starts blinking
-evenly (500 ms on/500 ms off) when the Identify command of the Identify cluster
-is received on the endpoint 1. The command’s argument can be used to specify the
-duration of the effect.
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread network.
 
-**Button 1** Pressing the button for more than 3 s initiates the factory reset
-of the device. Releasing the button within the 3-second window cancels the
-factory reset procedure.
+        -   _Solid On_ &mdash; The device is fully provisioned.
 
-**Button 2** Represents the Dynamic SIT LIT Support feature from the
-Intermittently Connected Devices Management cluster. Pressing it requests
-putting the ICD device in the SIT mode. Pressing the button again withdraws the
-previous request.
+-   **LED 2** is used for the Identify feature purpose. The LED starts blinking
+    evenly (500 ms on/500 ms off) when the Identify command of the Identify
+    cluster is received on the endpoint 1. The command’s argument can be used to
+    specify the duration of the effect.
 
-**Button 3** Represents the User Active Mode Trigger feature from the
-Intermittently Connected Devices Management cluster. Pressing it puts the ICD
-device in the active mode and makes it responsive.
+-   **Button 1** Pressing the button for more than 3 s initiates the factory
+    reset of the device. Releasing the button within the 3-second window cancels
+    the factory reset procedure.
 
-**Button 4** Starts the NFC tag emulation, enables Bluetooth LE advertising for
-the predefined period of time (15 minutes by default), and makes the device
-discoverable over Bluetooth LE. This button is used during the commissioning
-procedure.
+-   **Button 2** Represents the Dynamic SIT LIT Support feature from the
+    Intermittently Connected Devices Management cluster. Pressing it requests
+    putting the ICD device in the SIT mode. Pressing the button again withdraws
+    the previous request.
 
-**SEGGER J-Link USB port** can be used to get logs from the device or
-communicate with it using the
-[command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+-   **Button 3** Represents the User Active Mode Trigger feature from the
+    Intermittently Connected Devices Management cluster. Pressing it puts the
+    ICD device in the active mode and makes it responsive.
 
-**NFC port with antenna attached** can be used to start the
-[rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
-information from the Matter device in a data payload that can be shared using
-NFC.
+-   **Button 4** Starts the NFC tag emulation, enables Bluetooth LE advertising
+    for the predefined period of time (15 minutes by default), and makes the
+    device discoverable over Bluetooth LE. This button is used during the
+    commissioning procedure.
+
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
+
+#### nRF54L15 DK
+
+-   **LED 0** shows the overall state of the device and its connectivity. The
+    following states are possible:
+
+        -   _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the
+        unprovisioned (unpaired) state and is waiting for a commissioning
+        application to connect.
+
+        -   _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the
+        unprovisioned state and a commissioning application is connected through
+        Bluetooth LE.
+
+        -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
+        provisioned, but does not yet have full connectivity for Thread network.
+
+        -   _Solid On_ &mdash; The device is fully provisioned.
+
+-   **LED 1** is used for the Identify feature purpose. The LED starts blinking
+    evenly (500 ms on/500 ms off) when the Identify command of the Identify
+    cluster is received on the endpoint 1. The command’s argument can be used to
+    specify the duration of the effect.
+
+-   **Button 0** Pressing the button for more than 3 s initiates the factory
+    reset of the device. Releasing the button within the 3-second window cancels
+    the factory reset procedure.
+
+-   **Button 1** Represents the Dynamic SIT LIT Support feature from the
+    Intermittently Connected Devices Management cluster. Pressing it requests
+    putting the ICD device in the SIT mode. Pressing the button again withdraws
+    the previous request.
+
+-   **Button 2** Represents the User Active Mode Trigger feature from the
+    Intermittently Connected Devices Management cluster. Pressing it puts the
+    ICD device in the active mode and makes it responsive.
+
+-   **Button 3** Starts the NFC tag emulation, enables Bluetooth LE advertising
+    for the predefined period of time (15 minutes by default), and makes the
+    device discoverable over Bluetooth LE. This button is used during the
+    commissioning procedure.
+
+-   **SEGGER J-Link USB port** can be used to get logs from the device or
+    communicate with it using the
+    [command line interface](../../../docs/platforms/nrf/nrfconnect_examples_cli.md).
+
+-   **NFC port with antenna attached** can be used to start the
+    [rendezvous](#bluetooth-le-rendezvous) by providing the commissioning
+    information from the Matter device in a data payload that can be shared
+    using NFC.
 
 <hr>
 
@@ -305,10 +365,10 @@ Support for DFU using Matter OTA is enabled by default.
 >
 > There are two types of Device Firmware Upgrade modes: single-image DFU and
 > multi-image DFU. Single-image mode supports upgrading only one firmware image,
-> the application image, and should be used for single-core nRF52840 DK devices.
-> Multi-image mode allows to upgrade more firmware images and is suitable for
-> upgrading the application core and network core firmware in two-core nRF5340
-> DK devices.
+> the application image, and should be used for single-core nRF52840 DK and
+> nRF54L15 DK devices. Multi-image mode allows to upgrade more firmware images
+> and is suitable for upgrading the application core and network core firmware
+> in two-core nRF5340 DK devices.
 
 #### Changing bootloader configuration
 

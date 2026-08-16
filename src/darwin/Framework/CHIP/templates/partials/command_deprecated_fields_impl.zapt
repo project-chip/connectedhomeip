@@ -1,0 +1,11 @@
+{{#if (hasRenamedFields cluster command=command)}}
+
+@implementation MTR{{cluster}}Cluster{{command}}Params (Deprecated)
+{{#zcl_command_arguments}}
+{{#if (hasOldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+
+{{> renamed_struct_field_impl cluster=parent.parent.name type=type newName=label oldName=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+@end
+{{/if}}

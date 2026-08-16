@@ -55,6 +55,10 @@ extern "C" {
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
 #endif
 
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
+#error "AES blob generation is not supported"
+#endif
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -65,8 +69,6 @@ using namespace ::chip::Crypto;
 
 namespace chip {
 namespace DeviceLayer {
-
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
 
 static constexpr size_t kAesKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
@@ -143,6 +145,7 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptFactoryData(uint8_t * FactoryDataBuff
     return EncryptDecryptFactoryData(FactoryDataBuff, kDecrypt);
 }
 
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
 CHIP_ERROR FactoryDataProviderImpl::EncryptFactoryData(uint8_t * FactoryDataBuff)
 {
     uint8_t calculatedHash[chip::Crypto::kSHA256_Hash_Length];
@@ -158,6 +161,7 @@ CHIP_ERROR FactoryDataProviderImpl::EncryptFactoryData(uint8_t * FactoryDataBuff
     }
     return EncryptDecryptFactoryData(FactoryDataBuff, kEncrypt);
 }
+#endif
 
 CHIP_ERROR FactoryDataProviderImpl::EncryptDecryptFactoryData(uint8_t * FactoryDataBuff, ElsOperation operation)
 {
@@ -201,8 +205,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ImportWrappedKey(MutableByteSpan & key)
         uint8_t els_key_blob[kAesKeyBlobLength];
         size_t els_key_blob_size = sizeof(els_key_blob);
         status_t status          = STATUS_SUCCESS;
-        uint8_t public_key[64]   = { 0 };
-        size_t public_key_size   = sizeof(public_key);
 
         mcuxClEls_KeyProp_t plain_key_properties = {
             .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
@@ -225,49 +227,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ImportWrappedKey(MutableByteSpan & key)
     return CHIP_NO_ERROR;
 exit:
     return CHIP_ERROR_INVALID_SIGNATURE;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
-{
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    Crypto::P256PublicKey dacPublicKey;
-    uint16_t certificateSize = 0;
-    uint32_t certificateAddr;
-    ReturnLogErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, certificateSize, &certificateAddr));
-    MutableByteSpan dacCertSpan((uint8_t *) certificateAddr, certificateSize);
-
-    /* Extract Public Key of DAC certificate from itself */
-    ReturnLogErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
-
-    /* Get private key of DAC certificate from reserved section */
-    uint16_t keySize = 0;
-    uint32_t keyAddr;
-    ReturnLogErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
-    MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
-
-    ReturnLogErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                               ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
-
-    ReturnLogErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
-
-    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
@@ -394,7 +353,13 @@ CHIP_ERROR FactoryDataProviderImpl::DecryptAndCheckFactoryData(void)
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
     CHIP_ERROR res;
+#if !CONFIG_CHIP_CRYPTO_PSA
     els_enable();
+#else
+    /* Log ELS state to confirm it is already enabled */
+    ChipLogProgress(DeviceLayer, "DBG Init: ELS_STATUS=0x%08lx ELS_CTRL=0x%08lx", (uint32_t) ELS->ELS_STATUS,
+                    (uint32_t) ELS->ELS_CTRL);
+#endif
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     mFactoryDataDriver = &FactoryDataDrv();
@@ -407,6 +372,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     return CHIP_NO_ERROR;
 }
 
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
 CHIP_ERROR FactoryDataProviderImpl::ELS_SaveAesKeyBlob()
 {
     size_t blobSize                 = kAesKeyBlobLength;
@@ -442,7 +408,9 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_SaveAesKeyBlob()
 
     return CHIP_NO_ERROR;
 }
+#endif
 
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
 CHIP_ERROR FactoryDataProviderImpl::ELS_ExportBlob(uint8_t * data, size_t * dataLen)
 {
     status_t status                          = STATUS_SUCCESS;
@@ -464,6 +432,7 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ExportBlob(uint8_t * data, size_t * data
 exit:
     return CHIP_NO_ERROR;
 }
+#endif
 
 CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
 {
@@ -517,7 +486,9 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
         }
 
         ReturnLogErrorOnFailure(DecryptAndCheckFactoryData());
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
         ReturnLogErrorOnFailure(ELS_SaveAesKeyBlob());
+#endif
 
         memset(factoryDataRamBuffer, 0, factoryDataSize);
         memset(&mHeader, 0, sizeof(Header));
@@ -540,7 +511,7 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     }
 
     /* Calculate SHA256 value over the factory data and compare with stored value */
-    Hash_SHA256(&factoryDataRamBuffer[0], mHeader.size, &calculatedHash[0]);
+    TEMPORARY_RETURN_IGNORED Hash_SHA256(&factoryDataRamBuffer[0], mHeader.size, &calculatedHash[0]);
     if (memcmp(&calculatedHash[0], &mHeader.hash[0], HASH_LEN) != 0)
     {
         return CHIP_FACTORY_DATA_SHA_CHECK;
@@ -549,10 +520,13 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     return CHIP_NO_ERROR;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

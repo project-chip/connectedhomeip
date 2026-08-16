@@ -151,6 +151,7 @@
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
+    "editor.rulers": [132],
     "better-comments.tags": [
         {
             "tag": "!",
@@ -197,7 +198,14 @@
     "cmake.configureOnOpen": false,
     "search.followSymlinks": false,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
+        "editor.defaultFormatter": "ms-python.autopep8",
+        "editor.rulers": [132]
     },
-    "autopep8.args": ["--max-line-length", "132"]
+    "autopep8.args": ["--max-line-length", "132"],
+    "search.exclude": {
+        "**/examples/**/third_party/connectedhomeip/**": true
+    },
+    "files.exclude": {
+        "**/examples/**/third_party/connectedhomeip/**": true
+    }
 }

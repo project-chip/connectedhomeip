@@ -40,10 +40,16 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CHEF}/common"
+                      "${CHEF}/common/clusters/application-basic/"
+                      "${CHEF}/common/clusters/application-launch/"
                       "${CHEF}/common/clusters/audio-output/"
                       "${CHEF}/common/clusters/channel/"
+                      "${CHEF}/common/clusters/chime/"
+                      "${CHEF}/common/clusters/content-launch/"
+                      "${CHEF}/common/clusters/device-energy-management-mode/"
                       "${CHEF}/common/clusters/door-lock/"
                       "${CHEF}/common/clusters/keypad-input/"
+                      "${CHEF}/common/clusters/laundry-dryer-controls/"
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"
@@ -51,12 +57,17 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/oven-mode/"
                       "${CHEF}/common/clusters/microwave-oven-mode/"
                       "${CHEF}/common/clusters/microwave-oven-control/"
+                      "${CHEF}/common/clusters/mode-base"
+                      "${CHEF}/common/clusters/mode-select/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
+                      "${CHEF}/common/clusters/smoke-co-alarm/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
+                      "${CHEF}/common/clusters/water-heater-management/"
+                      "${CHEF}/common/clusters/water-heater-mode/"
                       "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
@@ -130,6 +141,7 @@ chip_configure_data_model(${COMPONENT_LIB}
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )

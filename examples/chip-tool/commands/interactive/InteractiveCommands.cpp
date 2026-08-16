@@ -107,7 +107,8 @@ struct InteractiveServerResult
 
         if (mIsAsyncReport && mTimeout)
         {
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout,
+                                                                                   reinterpret_cast<intptr_t>(this));
         }
     }
 
@@ -117,7 +118,8 @@ struct InteractiveServerResult
 
         if (mIsAsyncReport && mTimeout)
         {
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(StopAsyncTimeout, reinterpret_cast<intptr_t>(this));
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(StopAsyncTimeout,
+                                                                                   reinterpret_cast<intptr_t>(this));
         }
 
         mEnabled       = false;
@@ -231,18 +233,18 @@ struct InteractiveServerResult
     {
         auto self    = reinterpret_cast<InteractiveServerResult *>(arg);
         auto timeout = chip::System::Clock::Seconds16(self->mTimeout);
-        chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnAsyncTimeout, self);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnAsyncTimeout, self);
     }
 
     static void StopAsyncTimeout(intptr_t arg)
     {
         auto self = reinterpret_cast<InteractiveServerResult *>(arg);
-        chip::DeviceLayer::SystemLayer().CancelTimer(OnAsyncTimeout, self);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().CancelTimer(OnAsyncTimeout, self);
     }
 
     static void OnAsyncTimeout(chip::System::Layer *, void * appState)
     {
-        RemoteDataModelLogger::LogErrorAsJSON(CHIP_ERROR_TIMEOUT);
+        TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogErrorAsJSON(CHIP_ERROR_TIMEOUT);
     }
 };
 

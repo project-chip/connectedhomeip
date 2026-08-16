@@ -36,7 +36,7 @@ void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gMeterIdentificationCluster == nullptr);
     gMeterIdentificationCluster =
         std::make_unique<Instance>(endpointId, chip::BitMask<Feature, uint32_t>(Feature::kPowerThreshold));
-    gMeterIdentificationCluster->Init();
+    TEMPORARY_RETURN_IGNORED gMeterIdentificationCluster->Init();
 }
 
 void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpointId)

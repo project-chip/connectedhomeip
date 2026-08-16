@@ -35,28 +35,30 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
+import contextlib
 import queue
-import time
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_12(MatterBaseTest):
-    async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
-        return ret
+    async def send_set_time_zone_cmd(self, tz: list[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
+        return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
@@ -82,7 +84,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_event_from_queue(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.TimeZoneStatus), "Incorrect type received for event")
             asserts.assert_equal(ret.Data.offset, expected_offset, "Unexpected offset returned")
             asserts.assert_equal(ret.Data.name, expected_name, "Unexpected name returned")
@@ -105,10 +107,8 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         self.print_step(1, "Send SetUTCCommand")
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
-        try:
+        with contextlib.suppress(InteractionModelError):
             await self.send_set_utc_cmd(utc_time_in_matter_epoch())
-        except InteractionModelError:
-            pass
 
         self.print_step(2, "Send SetTimeZone command")
         tz = [tz_struct(offset=7200, validAt=0)]
@@ -119,7 +119,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         event = time_cluster.Events.TimeZoneStatus
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the TimeZoneListMaxSize")
@@ -127,10 +127,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        th_utc = utc_time_in_matter_epoch(datetime.now(tz=UTC))
         tz_first = tz_struct(offset=3600, validAt=0, name="Not/Real")
         if tz_list_size > 1:
-            valid_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+            valid_second = utc_time_in_matter_epoch(datetime.now(tz=UTC) + timedelta(seconds=10))
             tz_second = tz_struct(offset=7200, validAt=valid_second, name="Un/Real")
             tz = [tz_first, tz_second]
             await self.send_set_time_zone_cmd(tz)
@@ -152,7 +152,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(10, "If tz_list_size > 1, TH waits until th_utc + 15s")
         if tz_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(11, "If tz_list_size > 1, TH reads LocalTime")
         if tz_list_size > 1:

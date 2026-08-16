@@ -21,12 +21,14 @@ import subprocess
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -38,10 +40,9 @@ __LOG_LEVELS__ = {
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--image',
     default=[],
@@ -63,21 +64,19 @@ __LOG_LEVELS__ = {
     default=False,
     is_flag=True,
     help='More verbose output')
-def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
+def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     image = list(image)
 
     if file_image_list:
-        logging.info("Reading image list from %s", file_image_list)
+        log.info("Reading image list from %s", file_image_list)
 
         basedir = os.path.dirname(file_image_list)
 
-        with open(file_image_list, 'rt') as f:
+        with open(file_image_list) as f:
             for name in f.readlines():
                 name = name.strip()
 
@@ -85,15 +84,15 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 if not os.path.isabs(name):
                     image_path = os.path.join(basedir, name)
 
-                logging.info("    Found %s => %s", name, image_path)
+                log.info("    Found %s => %s", name, image_path)
                 image.append(image_path)
 
     # the list "image" contains all the images that need to run
     for path in image:
-        logging.info("Executing image %s", path)
+        log.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
-                                 "-drive", "file=%s,if=mtd,format=raw" % path], capture_output=True)
+                                 "-drive", f"file={path},if=mtd,format=raw"], capture_output=True)
 
         # Encoding is NOT valid, but want to not try to decode potential
         # invalid UTF-8 sequences. The strings we care about are ascii anyway
@@ -101,8 +100,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
 
         try:
             if status.returncode != 0:
-                raise Exception("Execution of %s failed with code %d" %
-                                (path, status.returncode))
+                raise Exception(f"Execution of {path} failed with code {status.returncode}")
 
             # Parse output of the unit test. Generally expect things like:
             # I (3034) CHIP-tests: Starting CHIP tests!
@@ -127,16 +125,16 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 if 'CHIP-tests: CHIP test status: 0' in line:
                     in_test = False
                 elif 'CHIP-tests: CHIP test status: ' in line:
-                    raise Exception("CHIP test status is NOT 0: %s" % line)
+                    raise Exception(f"CHIP test status is NOT 0: {line}")
 
                 # Ignore FAILED messages not in the middle of a test, to reduce
                 # the chance of false positives from other logging.
                 if in_test and re.search(r'  \[  FAILED  \] ', line):
-                    raise Exception("Step failed: %s" % line)
+                    raise Exception(f"Step failed: {line}")
 
                 # TODO: Figure out why exit(0) in man_app.cpp's tester_task is aborting and fix that.
                 if in_test and line.startswith('abort() was called at PC'):
-                    raise Exception("Unexpected crash: %s" % line)
+                    raise Exception(f"Unexpected crash: {line}")
 
             if in_test:
                 raise Exception('Not expected to be in the middle of a test when the log ends')
@@ -146,7 +144,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 print(output)
                 print("========== TEST OUTPUT END   ============")
 
-            logging.info("Image %s PASSED", path)
+            log.info("Image %s PASSED", path)
         except Exception:
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")

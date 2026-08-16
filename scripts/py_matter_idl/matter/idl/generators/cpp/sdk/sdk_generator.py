@@ -116,7 +116,7 @@ class SdkGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="AllItemsBuild.jinja",
             output_file_name="BUILD.gn",
-            vars={
+            template_vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,
             },
@@ -125,7 +125,7 @@ class SdkGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="MetadataQuery.h.jinja",
             output_file_name="MetadataQuery.h",
-            vars={
+            template_vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,
             },
@@ -152,7 +152,7 @@ class SdkGenerator(CodeGenerator):
                 self.internal_render_one_output(
                     template_path=template_path,
                     output_file_name=f"{cluster.name}/{output_file}",
-                    vars={
+                    template_vars={
                         "cluster": cluster,
                         "input_name": self.idl.parse_file_name,
                     },

@@ -17,15 +17,169 @@
  */
 
 #include "pushav-uploader.h"
+#include <algorithm>
+#include <cctype>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
+#include <openssl/bio.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+#include <sys/stat.h>
+#include <vector>
 
-PushAVUploader::PushAVUploader(PushAVCertPath certPath) : mCertPath(certPath), mIsRunning(false) {}
+PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
+    std::pair<std::string, std::string> lastUploadJob;
+    {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        while (mAvData.size() > 1)
+        {
+            mAvData.pop();
+        }
+
+        if (!mAvData.empty())
+        {
+            lastUploadJob = std::move(mAvData.front());
+            mAvData.pop();
+        }
+    }
+
+    if (!lastUploadJob.first.empty() && !lastUploadJob.second.empty())
+    {
+        const std::filesystem::path filePath(lastUploadJob.first);
+
+        if (filePath.extension() == ".mpd" || filePath.extension() == ".upload")
+        {
+            UploadData(lastUploadJob);
+        }
+    }
+
     Stop();
+}
+
+// Helper function to convert certificate from DER format to PEM format
+std::string DerCertToPem(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+    X509 * cert             = d2i_X509(nullptr, &p, derData.size());
+    if (!cert)
+    {
+        ChipLogError(Camera, "Failed to parse DER certificate of size: %zu", derData.size());
+        return "";
+    }
+
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!bio)
+    {
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
+    }
+
+    if (!PEM_write_bio_X509(bio, cert))
+    {
+        BIO_free(bio);
+        X509_free(cert);
+        ChipLogError(Camera, "Failed to write PEM certificate");
+        return "";
+    }
+
+    BUF_MEM * bptr;
+    BIO_get_mem_ptr(bio, &bptr);
+    std::string pem(bptr->data, bptr->length);
+
+    BIO_free(bio);
+    X509_free(cert);
+
+    return pem;
+}
+
+// Helper function to convert ECDSA private key from DER format to PEM format
+std::string ConvertECDSAPrivateKey_DER_to_PEM(const std::vector<uint8_t> & derData)
+{
+    const unsigned char * p = derData.data();
+
+    EVP_PKEY * pkey = d2i_AutoPrivateKey(nullptr, &p, derData.size());
+    if (!pkey)
+    {
+        ChipLogError(Camera, "Failed to parse DER ECDSA private key of size: %zu", derData.size());
+        return "";
+    }
+
+    // Write PEM to memory BIO
+    BIO * bio = BIO_new(BIO_s_mem());
+    if (!bio)
+    {
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to allocate BIO");
+        return "";
+    }
+
+    // Use PEM_write_bio_PrivateKey to write the EVP_PKEY in PEM format.
+    // This function handles the key type automatically.
+    if (!PEM_write_bio_PrivateKey(bio, pkey, nullptr, nullptr, 0, nullptr, nullptr))
+    {
+        BIO_free(bio);
+        EVP_PKEY_free(pkey);
+        ChipLogError(Camera, "Failed to convert ECDSA key to PEM format");
+        return "";
+    }
+
+    // Extract PEM string
+    char * pemData = nullptr;
+    long pemLen    = BIO_get_mem_data(bio, &pemData);
+    std::string pemStr(pemData, pemLen);
+
+    BIO_free(bio);
+    EVP_PKEY_free(pkey);
+
+    return pemStr;
+}
+
+// Helper function to read and print file content to log
+std::string readAndPrintFile(const std::string & filePath)
+{
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file.is_open())
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return "";
+    }
+
+    // Read the entire file content
+    std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    // Print the file content
+    ChipLogDetail(Camera, "File:%s", filePath.c_str());
+    ChipLogDetail(Camera, "Content:%s", fileContent.c_str());
+
+    file.close();
+    return fileContent;
+}
+
+void SaveCertToFile(const std::string & certData, const std::string & filePath)
+{
+    std::ofstream out(filePath, std::ios::binary);
+    if (!out)
+    {
+        ChipLogDetail(Camera, "Failed to open file: %s", filePath.c_str());
+        return;
+    }
+    out.write(certData.data(), certData.size());
+    out.close();
+
+    // Set file permissions to read/write for owner only (0600)
+    if (chmod(filePath.c_str(), S_IRUSR | S_IWUSR) != 0)
+    {
+        ChipLogError(Camera, "Failed to set permissions for file: %s", filePath.c_str());
+    }
 }
 
 void PushAVUploader::ProcessQueue()
@@ -73,11 +227,11 @@ void PushAVUploader::Stop()
     }
 }
 
-void PushAVUploader::AddUploadData(std::string & filename, std::string & url)
+void PushAVUploader::AddUploadData(const std::string & filename, const std::string & url)
 {
-    ChipLogError(Camera, "Added file name %s to queue", filename.c_str());
+    ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
-    auto data = make_pair(filename, url);
+    auto data = std::make_pair(filename, url);
     mAvData.push(data);
 }
 
@@ -92,7 +246,7 @@ size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
     }
     if ((size == 0) || (nmemb == 0) || ((size * nmemb) < 1))
     {
-        ChipLogError(Camera, "Zero buffer size = %ld nmemb = %ld %ld\n", size, nmemb, size * nmemb);
+        ChipLogError(Camera, "Zero buffer size = %zu nmemb = %zu %zu\n", size, nmemb, size * nmemb);
         return 0;
     }
     long remaining          = upload->mSize - upload->mBytesRead;
@@ -104,6 +258,118 @@ size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
         upload->mBytesRead += copyChunk;
     }
     return (size_t) copyChunk;
+}
+
+std::string ProcessInitUploadPath(std::string path, const std::vector<std::string> & streamIdNameMap)
+{
+    auto result = std::move(path);
+    // Replace stream ID placeholder #__X__# with stream name
+    const auto startPos = result.find("#__");
+    const auto endPos   = result.find("__#");
+    if (startPos != std::string::npos && endPos != std::string::npos && startPos + 4 == endPos)
+    {
+        const int streamId = result[startPos + 3] - '0';
+        if (streamId >= 0 && streamId < static_cast<int>(streamIdNameMap.size()))
+        {
+            // Path traversal check - reject if stream name contains dangerous characters
+            if (streamIdNameMap[streamId].find("..") != std::string::npos ||
+                streamIdNameMap[streamId].find('/') != std::string::npos)
+            {
+                ChipLogError(Camera, "Invalid stream name '%s' detected, rejecting to prevent path traversal",
+                             streamIdNameMap[streamId].c_str());
+                return path;
+            }
+            result.replace(startPos, 7, streamIdNameMap[streamId] + "/" + streamIdNameMap[streamId]);
+        }
+        else
+        {
+            ChipLogError(Camera, "Stream ID %d not found in streamIdNameMap", streamId);
+            return path;
+        }
+    }
+    ChipLogDetail(Camera, "Processed init upload path to %s", result.c_str());
+    return result;
+}
+
+std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string> & streamIdNameMap)
+{
+    auto result = std::move(path);
+
+    // Replace stream ID placeholder #__X__# with stream name
+    const auto startPos = result.find("#__");
+    const auto endPos   = result.find("__#");
+
+    if (startPos != std::string::npos && endPos != std::string::npos && startPos + 4 == endPos)
+    {
+        const int streamId = result[startPos + 3] - '0';
+
+        if (streamId >= 0 && streamId < static_cast<int>(streamIdNameMap.size()))
+        {
+            // Path traversal check - reject if stream name contains dangerous characters
+            if (streamIdNameMap[streamId].find("..") != std::string::npos ||
+                streamIdNameMap[streamId].find('/') != std::string::npos)
+            {
+                ChipLogError(Camera, "Invalid stream name '%s' detected, rejecting to prevent path traversal",
+                             streamIdNameMap[streamId].c_str());
+                return path;
+            }
+            result.replace(startPos, 7, streamIdNameMap[streamId] + "/");
+        }
+        else
+        {
+            return path;
+        }
+    }
+
+    // FFmpeg names segment files starting from 0001, but the spec requires segment
+    // numbering to start from 1001. Add offset of 1000 to convert file segment
+    // numbers to spec-compliant segment numbers in the upload path.
+    // e.g., segment_0001.m4s on disk -> segment_1001.m4s on server
+    const std::string segPrefix = "segment_";
+    const auto segPos           = result.find(segPrefix);
+    if (segPos != std::string::npos)
+    {
+        const auto numStart = segPos + segPrefix.length();
+        const auto numEnd   = result.find(".m4s", numStart);
+        if (numEnd != std::string::npos)
+        {
+            std::string numStr = result.substr(numStart, numEnd - numStart);
+            bool valid         = !numStr.empty();
+            for (char c : numStr)
+            {
+                if (!std::isdigit(static_cast<unsigned char>(c)))
+                {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid)
+            {
+                char * endPtr = nullptr;
+                long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
+                // Per spec, SegmentNumber is uint16 (range 1001-65535). In practice,
+                // SegmentNumber will never exceed 9999 due to session duration limits
+                // (5 min max / 500ms min segment duration = ~600 segments max per session).
+                // Verify the parsed value is non-negative and that adding the +1000 offset
+                // won't exceed the spec's uint16 type limit.
+                if (endPtr == numStr.c_str() || segNum < 0 || segNum > UINT16_MAX - 1000)
+                {
+                    ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
+                    return path;
+                }
+                segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
+                result.replace(numStart, numEnd - numStart, std::to_string(segNum));
+            }
+            else
+            {
+                ChipLogError(Camera, "Failed to parse segment number from path: %s", result.c_str());
+                return path;
+            }
+        }
+    }
+
+    ChipLogDetail(Camera, "Updated M4S upload path to %s", result.c_str());
+    return result;
 }
 
 void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
@@ -128,41 +394,181 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     if (!file.read(buffer.data(), static_cast<std::streamsize>(size)))
     {
         ChipLogError(Camera, "Failed to read file into buffer");
+        file.close();
         return;
     }
     file.close();
+
     PushAvUploadInfo upload;
     upload.mData = (char *) std::malloc(size);
+    if (!upload.mData)
+    {
+        ChipLogError(Camera, "Failed to allocate memory for upload data");
+        return;
+    }
     memcpy(upload.mData, buffer.data(), size);
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
-    headers                     = curl_slist_append(headers, "Content-Type: application/*");
-    std::string fullUrl         = data.second + data.first;
+
+    // Determine content type based on file extension
+    std::string contentType = "application/*"; // Default fallback
+    std::string fullPath    = data.first;
+    // Extract file extension from full path using std::filesystem
+    std::filesystem::path filePath(data.first);
+    std::filesystem::path extension = filePath.extension();
+    // .upload files are modified MPD snapshots - treat as MPD and strip .upload for remote URL
+    bool isUploadMpd    = (extension == ".upload");
+    bool isMpdExtension = (extension == ".mpd");
+    if (isUploadMpd)
+    {
+        // Check if the base filename (without .upload) is an MPD file
+        std::string baseName = filePath.stem().string();
+        if (baseName.size() >= 4 && baseName.substr(baseName.size() - 4) == ".mpd")
+        {
+            contentType = "application/dash+xml";
+            // Strip .upload suffix so remote URL uses .mpd extension
+            static constexpr size_t kUploadSuffixLen = 7; // strlen(".upload")
+            fullPath                                 = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
+        }
+    }
+    else if (isMpdExtension)
+    {
+        contentType = "application/dash+xml"; // Manifest file
+    }
+    else if (extension == ".m4s")
+    {
+        contentType = "video/iso.segment"; // Media segment
+        fullPath    = ProcessM4SUploadPath(data.first, mStreamIdNameMap);
+    }
+    else if (extension == ".init")
+    {
+        contentType = "video/mp4"; // Initialization segment
+        fullPath    = ProcessInitUploadPath(data.first, mStreamIdNameMap);
+    }
+
+    std::string contentTypeHeader = "Content-Type: " + contentType;
+    headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
+
+    // Extract the filename from the full path
+    std::string filename = "";
+    std::string baseUrl  = data.second;
+    std::string fullUrl;
+
+    // Declare all variables that are used after goto cleanup
+    std::string rootCertPEM;
+    std::string clientCertPEM;
+    std::string derKeyToPemstr;
+    std::error_code ec;
+    size_t sessionPos;
+    CURLcode res;
+
+    sessionPos = fullPath.find("/session_");
+    if (sessionPos != std::string::npos)
+    {
+        filename = fullPath.substr(sessionPos + 1);
+    }
+    else
+    {
+        ChipLogError(Camera,
+                     "Invalid file path: %s. Expected to contain "
+                     "'session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>.<SegmentExtension>' pattern. Skipping upload.",
+                     fullPath.c_str());
+        goto cleanup;
+    }
+    if (baseUrl.back() != '/')
+    {
+        baseUrl += "/";
+    }
+    fullUrl = baseUrl + filename;
+
+    ChipLogProgress(Camera, "Uploading file: %s to URL: %s", filename.c_str(), fullUrl.c_str());
+
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_URL, fullUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
+#ifndef TLS_CLUSTER_NOT_ENABLED
+
+    // TODO: The logic to provide DER-formatted certificates and keys in memory (blob) format to curl is currently unstable. As a
+    // temporary workaround, PEM-format files are being provided as input to curl.
+
+    rootCertPEM   = DerCertToPem(mCertBuffer.mRootCertBuffer);
+    clientCertPEM = DerCertToPem(mCertBuffer.mClientCertBuffer);
+    if (!mCertBuffer.mIntermediateCertBuffer.empty())
+    {
+        clientCertPEM.append("\n"); // Add newline separator between certs in PEM format
+    }
+    for (size_t i = 0; i < mCertBuffer.mIntermediateCertBuffer.size(); ++i)
+    {
+        clientCertPEM.append(DerCertToPem(mCertBuffer.mIntermediateCertBuffer[i]) + "\n");
+    }
+    derKeyToPemstr = ConvertECDSAPrivateKey_DER_to_PEM(mCertBuffer.mClientKeyBuffer);
+
+    SaveCertToFile(rootCertPEM, "/tmp/root.pem");
+    SaveCertToFile(clientCertPEM, "/tmp/dev.pem");
+
+    // Logic to save PEM format to file
+    SaveCertToFile(derKeyToPemstr, "/tmp/dev.key");
+
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "/tmp/root.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, "/tmp/dev.pem");
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, "/tmp/dev.key");
+
+    //  curl_blob rootBlob   = { mCertBuffer.mRootCertBuffer.data(), mCertBuffer.mRootCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob clientBlob = { mCertBuffer.mClientCertBuffer.data(), mCertBuffer.mClientCertBuffer.size(), CURL_BLOB_COPY };
+    //  curl_blob keyBlob    = { mCertBuffer.mClientKeyBuffer.data(), mCertBuffer.mClientKeyBuffer.size(), CURL_BLOB_COPY };
+
+    // curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &rootBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLCERT_BLOB, &clientBlob);
+    // curl_easy_setopt(curl, CURLOPT_SSLKEY_BLOB, &keyBlob);
+#else
+    // TODO: The else block is for testing purpose. It should be removed once the TLS cluster integration is stable.
     curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLCERT, mCertPath.mDevCert.c_str());
     curl_easy_setopt(curl, CURLOPT_SSLKEY, mCertPath.mDevKey.c_str());
+#endif
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);
 
-    CURLcode res = curl_easy_perform(curl);
+    res = curl_easy_perform(curl);
 
     if (res != CURLE_OK)
     {
-        ChipLogError(Camera, "CURL upload  failed [%s] %s", data.first.c_str(), curl_easy_strerror(res));
+        ChipLogError(Camera, "CURL upload failed [%s] %s, retrying...", data.first.c_str(), curl_easy_strerror(res));
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+        {
+            ChipLogError(Camera, "CURL upload failed again [%s] %s", data.first.c_str(), curl_easy_strerror(res));
+        }
     }
-    else
+
+    if (res == CURLE_OK)
     {
-        ChipLogError(Camera, "CURL uploaded file  %s size: %ld", data.first.c_str(), size);
+        ChipLogDetail(Camera, "CURL uploaded file  %s size: %zu", data.first.c_str(), static_cast<size_t>(size));
     }
+
+    // Delete file after upload, except for .mpd files which are kept (FFmpeg may still be writing).
+    // .upload files (modified MPD snapshots) are always deleted after upload.
+    if (!isMpdExtension || isUploadMpd)
+    {
+        if (!std::filesystem::remove(data.first, ec))
+        {
+            ChipLogError(Camera, "Failed to delete file: %s, error code: %d, error: %s, category: %s. May cause file accumulation.",
+                         data.first.c_str(), ec.value(), ec.message().c_str(), ec.category().name());
+        }
+        else
+        {
+            ChipLogDetail(Camera, "Successfully deleted file: %s", data.first.c_str());
+        }
+    }
+
+cleanup:
     if (upload.mData)
     {
         std::free(upload.mData);

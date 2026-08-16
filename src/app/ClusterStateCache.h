@@ -24,6 +24,7 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ReadClient.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -664,6 +665,7 @@ private:
     //
     // ReadClient::Callback
     //
+    void NotifySubscriptionStillActive(const ReadClient & aReadClient) override;
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;

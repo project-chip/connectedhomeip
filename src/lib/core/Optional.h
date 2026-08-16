@@ -43,6 +43,9 @@ inline constexpr NullOptionalType NullOptional{};
 /**
  * Pairs an object with a boolean value to determine if the object value
  * is actually valid or not.
+ *
+ * @note Despite the `constexpr` keywords throughout the class, this class is not a literal type and thus cannot be used in
+ * compile-time contexts. This is mainly because of the use of placement new.
  */
 template <class T>
 class Optional

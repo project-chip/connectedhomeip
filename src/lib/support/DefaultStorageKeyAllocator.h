@@ -18,6 +18,7 @@
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Base85.h>
 #include <lib/support/CHIPMemString.h>
 
 #include <stdio.h>
@@ -207,6 +208,33 @@ public:
                                          static_cast<uint32_t>(extendedPanId >> 32), static_cast<uint32_t>(extendedPanId));
     }
 
+    // Network Identity Management
+
+    static StorageKeyName NetworkIdentityManagementAdministratorSecret() { return StorageKeyName::FromConst("g/nim/nass"); }
+
+    static StorageKeyName NetworkIdentityManagementNetworkIdentityIndex() { return StorageKeyName::FromConst("g/nim/ni"); }
+
+    static StorageKeyName NetworkIdentityManagementNetworkIdentity(uint16_t niIndex)
+    {
+        return StorageKeyName::Formatted("g/nim/n/%04x", niIndex);
+    }
+
+    static StorageKeyName NetworkIdentityManagementClientIndex() { return StorageKeyName::FromConst("g/nim/ci"); }
+
+    static StorageKeyName NetworkIdentityManagementClient(uint16_t clientIndex)
+    {
+        return StorageKeyName::Formatted("g/nim/c/%04x", clientIndex);
+    }
+
+    // Client identifier mapping: g/nim/@<base85-encoded identifier> = 7 + 25 = 32 chars
+    // Uses FixedByteSpan<20> directly to avoid pulling in CHIPCert.h for CertificateKeyId.
+    static StorageKeyName NetworkIdentityManagementClientIdentifierMapping(FixedByteSpan<20> identifier)
+    {
+        char base85[Base85EncodedLength(identifier.size())];
+        SuccessOrDie(BytesToBase85(identifier.data(), identifier.size(), base85, sizeof(base85)));
+        return StorageKeyName::Formatted("g/nim/@%.*s", static_cast<int>(sizeof(base85)), base85);
+    }
+
     // OTA
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
@@ -214,6 +242,10 @@ public:
     static StorageKeyName OTAUpdateToken() { return StorageKeyName::FromConst("g/o/ut"); }
     static StorageKeyName OTACurrentUpdateState() { return StorageKeyName::FromConst("g/o/us"); }
     static StorageKeyName OTATargetVersion() { return StorageKeyName::FromConst("g/o/tv"); }
+
+    // Proximity Ranging
+
+    static StorageKeyName ProximityRangingBleDeviceId() { return StorageKeyName::FromConst("g/pr/bledevid"); }
 
     // Event number counter.
     static StorageKeyName IMEventNumber() { return StorageKeyName::FromConst("g/im/ec"); }
@@ -309,6 +341,30 @@ public:
     static StorageKeyName TlsEndpointGlobalDataKey(EndpointId endpoint)
     {
         return StorageKeyName::Formatted("g/tlsr/g/%x", endpoint);
+    }
+
+    // Number of tls endpoints stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsClientEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/e/%x", endpoint);
+    }
+
+    // Stores information about TLS endpoints for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse", fabric, endpoint);
+    }
+
+    // Stores the root cert payload for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse/%x", fabric, endpoint, idx);
+    }
+
+    // Stores global data about TLS endpoints, across all fabrics, used by TLS Client Management cluster
+    static StorageKeyName TlsClientEndpointGlobalDataKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/g/%x", endpoint);
     }
 };
 

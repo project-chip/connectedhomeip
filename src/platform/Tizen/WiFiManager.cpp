@@ -26,13 +26,14 @@
 #include <tizen.h>
 #include <wifi-manager.h>
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
-#include "ErrorUtils.h"
 #include "NetworkCommissioningDriver.h"
 
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
@@ -340,7 +341,7 @@ void WiFiManager::_ScanToConnectFinishedCb(wifi_manager_error_e wifiErr, void * 
         foundAp = sInstance._WiFiGetFoundAP();
         if (foundAp != nullptr)
         {
-            PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
+            TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
         }
     }
     else
@@ -417,7 +418,8 @@ bool WiFiManager::_FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData)
     wifiErr = wifi_manager_ap_get_rssi(ap, &rssi);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Fail: get rssi value [%s]", get_error_message(wifiErr)));
-    scannedAP.rssi = static_cast<int8_t>(rssi);
+    scannedAP.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+    scannedAP.signal.strength = static_cast<int8_t>(rssi);
 
     wifiErr = wifi_manager_ap_get_security_type(ap, &type);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
@@ -818,7 +820,7 @@ void WiFiManager::Init()
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
     sInstance.mConnectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
 
-    PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiInitialize, static_cast<void *>(nullptr));
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiInitialize, static_cast<void *>(nullptr));
 }
 
 void WiFiManager::Deinit()
@@ -871,8 +873,8 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
-    g_strlcpy(sInstance.mWiFiKey, key, sizeof(sInstance.mWiFiKey));
+    chip::Platform::CopyString(sInstance.mWiFiSSID, ssid);
+    chip::Platform::CopyString(sInstance.mWiFiKey, key);
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, {
@@ -905,7 +907,7 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
+    chip::Platform::CopyString(sInstance.mWiFiSSID, ssid);
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, {
@@ -1106,7 +1108,7 @@ CHIP_ERROR WiFiManager::GetBssId(MutableByteSpan & value)
 
     GAutoPtr<char> bssIdStr;
     int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr.GetReceiver());
-    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, TizenToChipError(wifiErr),
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, MATTER_PLATFORM_ERROR(wifiErr),
                         ChipLogError(DeviceLayer, "FAIL: Get AP BSSID: %s", get_error_message(wifiErr)));
 
     uint8_t * data = value.data();

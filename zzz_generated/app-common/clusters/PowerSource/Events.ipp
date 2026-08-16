@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace WiredFaultChange.
+} // namespace WiredFaultChange
 namespace BatFaultChange {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -101,7 +101,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace BatFaultChange.
+} // namespace BatFaultChange
 namespace BatChargeFaultChange {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -137,7 +137,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace BatChargeFaultChange.
+} // namespace BatChargeFaultChange
 } // namespace Events
 } // namespace PowerSource
 } // namespace Clusters

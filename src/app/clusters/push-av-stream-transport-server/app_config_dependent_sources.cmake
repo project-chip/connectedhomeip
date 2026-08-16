@@ -16,11 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/push-av-stream-transport-cluster.cpp"
-    "${CLUSTER_DIR}/push-av-stream-transport-cluster.h"
-    "${CLUSTER_DIR}/push-av-stream-transport-logic.cpp"
-    "${CLUSTER_DIR}/push-av-stream-transport-logic.h"
-    "${CLUSTER_DIR}/push-av-stream-transport-delegate.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )

@@ -54,8 +54,30 @@ void CameraAppCommandHandler::HandleCommand(intptr_t context)
 
     if (name == "ZoneTriggered")
     {
-        uint16_t zoneId = static_cast<uint16_t>(self->mJsonValue["ZoneId"].asUInt());
-        self->OnZoneTriggeredHandler(zoneId);
+        std::vector<uint16_t> zoneIds;
+        const Json::Value & zoneIdValue = self->mJsonValue["ZoneId"];
+
+        // Check if ZoneId is an array or a single value
+        if (zoneIdValue.isArray())
+        {
+            // Handle array of zone IDs
+            for (const auto & zoneId : zoneIdValue)
+            {
+                zoneIds.push_back(static_cast<uint16_t>(zoneId.asUInt()));
+            }
+        }
+        else
+        {
+            // Handle single zone ID
+            zoneIds.push_back(static_cast<uint16_t>(zoneIdValue.asUInt()));
+        }
+
+        self->OnZoneTriggeredHandler(zoneIds);
+    }
+    else if (name == "SetHardPrivacyModeOn")
+    {
+        bool value = self->mJsonValue["Value"].asBool();
+        self->OnSetHardPrivacyModeOnHandler(value);
     }
     else
     {
@@ -71,9 +93,14 @@ void CameraAppCommandHandler::SetCameraDevice(Camera::CameraDevice * aCameraDevi
     mCameraDevice = aCameraDevice;
 }
 
-void CameraAppCommandHandler::OnZoneTriggeredHandler(uint16_t zoneId)
+void CameraAppCommandHandler::OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds)
 {
-    mCameraDevice->HandleSimulatedZoneTriggeredEvent(zoneId);
+    mCameraDevice->HandleSimulatedZoneTriggeredEvent(zoneIds);
+}
+
+void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
+{
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)
@@ -91,5 +118,6 @@ void CameraAppCommandDelegate::OnEventCommandReceived(const char * json)
     }
 
     handler->SetCameraDevice(mCameraDevice);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CameraAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CameraAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -37,19 +38,13 @@
 #include <utils_list.h>
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL
-#include <ChipShellCollection.h>
-#include <lib/shell/Engine.h>
-#endif
-
 #include <plat.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 extern "C" {
-#include <bl_gpio.h>
-#include <bl_pds.h>
-#include <hal_gpio.h>
-#include <hosal_gpio.h>
+#include <pm_manager.h>
 }
+#endif
 
 #include "AppTask.h"
 #include "mboard.h"
@@ -62,26 +57,6 @@ using namespace ::chip::DeviceLayer;
 AppTask AppTask::sAppTask;
 StackType_t AppTask::appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t AppTask::appTaskStruct;
-
-#if CONFIG_ENABLE_CHIP_SHELL
-void AppTask::AppShellTask(void * args)
-{
-    Shell::Engine::Root().RunMainLoop();
-}
-
-CHIP_ERROR AppTask::StartAppShellTask()
-{
-    static TaskHandle_t shellTask;
-
-    Shell::Engine::Root().Init();
-
-    cmd_misc_init();
-
-    xTaskCreate(AppTask::AppShellTask, "chip_shell", 1024 / sizeof(configSTACK_DEPTH_TYPE), NULL, APP_TASK_PRIORITY, &shellTask);
-
-    return CHIP_NO_ERROR;
-}
-#endif
 
 void StartAppTask(void)
 {
@@ -108,16 +83,11 @@ void AppTask::PostEvent(app_event_t event)
     }
 }
 
-void AppTask::ButtonEventHandler(void * arg)
+void AppTask::ButtonEventHandler(int pin, bool is_pin_high)
 {
-    hosal_gpio_dev_t * p_gpio = (hosal_gpio_dev_t *) arg;
-    uint8_t val               = 1;
-
-    hosal_gpio_input_get(p_gpio, &val);
-
-    if (CHIP_RESET_PIN == p_gpio->port)
+    if (CHIP_RESET_PIN == pin)
     {
-        if (val)
+        if (is_pin_high)
         {
             GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
         }
@@ -141,9 +111,9 @@ void AppTask::ButtonEventHandler(void * arg)
             }
         }
     }
-    else if (CHIP_CONTACT_PIN == p_gpio->port)
+    else if (CHIP_CONTACT_PIN == pin)
     {
-        if (val)
+        if (is_pin_high)
         {
             GetAppTask().PostEvent(APP_EVENT_CONTACT_SENSOR_TRUE);
         }
@@ -171,11 +141,14 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     vTaskSuspend(NULL);
-#if CHIP_DETAIL_LOGGING
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+    pm_enable_tickless();
+#endif
+#if CHIP_DEVICE_LAYER_TARGET_BL702L && CHIP_DETAIL_LOGGING
     Server::GetInstance().GetICDManager().RegisterObserver(&sAppTask);
 #endif
 
-    DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
+    TEMPORARY_RETURN_IGNORED DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
     ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %lld left", currentHeapFree);
 
     while (true)
@@ -200,13 +173,23 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_CONTACT_SENSOR_TRUE & appEvent)
             {
                 stateValueAttrValue = 1;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+                if (booleanState != nullptr)
+                {
+                    booleanState->SetStateValue(stateValueAttrValue);
+                }
             }
 
             if (APP_EVENT_CONTACT_SENSOR_FALSE & appEvent)
             {
                 stateValueAttrValue = 0;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+                if (booleanState != nullptr)
+                {
+                    booleanState->SetStateValue(stateValueAttrValue);
+                }
             }
 
             PlatformMgr().UnlockChipStack();
@@ -214,7 +197,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-#if CHIP_DETAIL_LOGGING
+#if CHIP_DEVICE_LAYER_TARGET_BL702L && CHIP_DETAIL_LOGGING
 void AppTask::OnEnterActiveMode()
 {
     ChipLogProgress(NotSpecified, "App ICD enter active mode.");

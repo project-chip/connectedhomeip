@@ -28,6 +28,18 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kZoneNotFound = 0x02,
+    kZoneInUse    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for ZoneEventStoppedReasonEnum
 enum class ZoneEventStoppedReasonEnum : uint8_t
 {

@@ -49,7 +49,8 @@ PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 
 static k_timer sOperationalHoursSavingTimer;
 
-#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR) &&    \
+    !defined(CONFIG_MBEDTLS_PSA_DRIVER_GET_ENTROPY)
 static bool sChipStackEntropySourceAdded = false;
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -80,7 +81,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
 {
-    PlatformMgr().ScheduleWork([](intptr_t arg) {
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) {
         CHIP_ERROR error = sInstance.UpdateOperationalHours(nullptr);
         if (error != CHIP_NO_ERROR)
         {
@@ -105,7 +106,7 @@ CHIP_ERROR PlatformManagerImpl::UpdateOperationalHours(uint32_t * totalOperation
 
     if (deltaTime > 0)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalTime);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalTime);
         mSavedOperationalHoursSinceBoot = upTimeH;
     }
 
@@ -121,16 +122,19 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR) &&    \
+    !defined(CONFIG_MBEDTLS_PSA_DRIVER_GET_ENTROPY)
     // Minimum required from source before entropy is released ( with mbedtls_entropy_func() ) (in bytes)
     const size_t kThreshold = 16;
 #endif // !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR)
+       // && !defined(CONFIG_MBEDTLS_PSA_DRIVER_GET_ENTROPY)
 
     // Initialize the configuration system.
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
 
-#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR)
+#if !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR) &&    \
+    !defined(CONFIG_MBEDTLS_PSA_DRIVER_GET_ENTROPY)
     if (!sChipStackEntropySourceAdded)
     {
         // Add entropy source based on Zephyr entropy driver
@@ -139,6 +143,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         sChipStackEntropySourceAdded = true;
     }
 #endif // !defined(CONFIG_NRF_SECURITY) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY) && !defined(CONFIG_MBEDTLS_ENTROPY_POLL_ZEPHYR)
+       // && !defined(CONFIG_MBEDTLS_PSA_DRIVER_GET_ENTROPY)
 
     // Call _InitChipStack() on the generic implementation base class to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();

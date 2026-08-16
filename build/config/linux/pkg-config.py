@@ -28,7 +28,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function
 
 import json
 import os
@@ -97,7 +96,7 @@ def GetPkgConfigPrefixToStrip(options, args):
     # instead of relative to /path/to/chroot/build/x86-generic (i.e prefix=/usr).
     # To support this correctly, it's necessary to extract the prefix to strip
     # from pkg-config's |prefix| variable.
-    prefix = subprocess.check_output([options.pkg_config,
+    prefix = subprocess.check_output([options.pkg_config, "--print-errors",
                                       "--variable=prefix"] + args, env=os.environ).decode('utf-8')
     if prefix[:4] == '/usr':
         return prefix[4:]
@@ -107,10 +106,7 @@ def GetPkgConfigPrefixToStrip(options, args):
 def MatchesAnyRegexp(flag, list_of_regexps):
     """Returns true if the first argument matches any regular expression in the
     given list."""
-    for regexp in list_of_regexps:
-        if regexp.search(flag) is not None:
-            return True
-    return False
+    return any(regexp.search(flag) is not None for regexp in list_of_regexps)
 
 
 def RewritePath(path, strip_prefix, sysroot):
@@ -120,8 +116,7 @@ def RewritePath(path, strip_prefix, sysroot):
             path = path[len(strip_prefix):]
         path = path.lstrip('/')
         return os.path.join(sysroot, path)
-    else:
-        return path
+    return path
 
 
 def main():
@@ -155,7 +150,7 @@ def main():
     if options.sysroot:
         libdir = SetConfigPath(options)
         if options.debug:
-            sys.stderr.write('PKG_CONFIG_LIBDIR=%s\n' % libdir)
+            sys.stderr.write(f'PKG_CONFIG_LIBDIR={libdir}\n')
         prefix = GetPkgConfigPrefixToStrip(options, args)
     else:
         prefix = ''
@@ -184,7 +179,7 @@ def main():
     if options.libdir:
         cmd = [options.pkg_config, "--variable=libdir"] + args
         if options.debug:
-            sys.stderr.write('Running: %s\n' % cmd)
+            sys.stderr.write(f'Running: {cmd}\n')
         try:
             libdir = subprocess.check_output(cmd).decode('utf-8')
         except Exception:
@@ -196,14 +191,14 @@ def main():
     if options.dridriverdir:
         cmd = [options.pkg_config, "--variable=dridriverdir"] + args
         if options.debug:
-            sys.stderr.write('Running: %s\n' % cmd)
+            sys.stderr.write(f'Running: {cmd}\n')
         try:
             dridriverdir = subprocess.check_output(cmd).decode('utf-8')
         except Exception:
             print("Error from pkg-config.")
             return 1
         sys.stdout.write(dridriverdir.strip())
-        return
+        return None
 
     cmd = [options.pkg_config, "--cflags", "--libs"]
 
@@ -213,7 +208,7 @@ def main():
     cmd.extend(args)
 
     if options.debug:
-        sys.stderr.write('Running: %s\n' % ' '.join(cmd))
+        sys.stderr.write(f"Running: {' '.join(cmd)}\n")
 
     try:
         flag_string = subprocess.check_output(cmd).decode('utf-8')

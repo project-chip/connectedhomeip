@@ -192,7 +192,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommissioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommissioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommissioningProductId },
-    { "commissioning-mode", kNoArgument, kOptionCommissioningMode },
+    { "commissioning-mode", kArgumentRequired, kOptionCommissioningMode },
     { "device-type", kArgumentRequired, kOptionCommissioningDeviceType },
     { "device-name", kArgumentRequired, kOptionCommissioningDeviceName },
     { "rotating-id", kArgumentRequired, kOptionCommissioningRotatingId },
@@ -256,7 +256,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
 void StopSignalHandler(int signal)
 {
-    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 } // namespace

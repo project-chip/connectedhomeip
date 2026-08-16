@@ -62,7 +62,7 @@ TEST_F(TestAttributeListBuilder, Append)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 1u);
         ASSERT_EQ(result[1].attributeId, 2u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // Only optional attributes
@@ -85,7 +85,7 @@ TEST_F(TestAttributeListBuilder, Append)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 10u);
         ASSERT_EQ(result[1].attributeId, 12u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // Mix of mandatory and optional attributes
@@ -108,7 +108,7 @@ TEST_F(TestAttributeListBuilder, Append)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 1u);
         ASSERT_EQ(result[1].attributeId, 10u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // No attributes
@@ -118,7 +118,7 @@ TEST_F(TestAttributeListBuilder, Append)
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[0].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 }
 
@@ -142,7 +142,7 @@ TEST_F(TestAttributeListBuilder, AppendWithOptionalAttributeEntry)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 1u);
         ASSERT_EQ(result[1].attributeId, 2u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // Only optional attributes
@@ -163,7 +163,7 @@ TEST_F(TestAttributeListBuilder, AppendWithOptionalAttributeEntry)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 10u);
         ASSERT_EQ(result[1].attributeId, 12u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // Mix of mandatory and optional attributes
@@ -185,7 +185,7 @@ TEST_F(TestAttributeListBuilder, AppendWithOptionalAttributeEntry)
         ASSERT_EQ(result.size(), 2 + global_attribute_count);
         ASSERT_EQ(result[0].attributeId, 1u);
         ASSERT_EQ(result[1].attributeId, 10u);
-        ASSERT_EQ(result[2].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[2].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 
     // No attributes
@@ -195,6 +195,6 @@ TEST_F(TestAttributeListBuilder, AppendWithOptionalAttributeEntry)
 
         ReadOnlyBuffer<AttributeEntry> result = builder.TakeBuffer();
         ASSERT_EQ(result.size(), global_attribute_count);
-        ASSERT_EQ(result[0].attributeId, Globals::Attributes::ClusterRevision::Id);
+        ASSERT_EQ(result[0].attributeId, Globals::Attributes::FeatureMap::Id);
     }
 }

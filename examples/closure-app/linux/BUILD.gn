@@ -35,6 +35,7 @@ executable("closure-app") {
     "${chip_root}/examples/closure-app/closure-common/src/ClosureControlEndpoint.cpp",
     "${chip_root}/examples/closure-app/closure-common/src/ClosureDimensionEndpoint.cpp",
     "ClosureManager.cpp",
+    "DataModelCallbacks.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

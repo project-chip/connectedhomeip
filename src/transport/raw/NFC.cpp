@@ -86,8 +86,6 @@ bool NFCBase::CanSendToPeer(const Transport::PeerAddress & address)
 
 void NFCBase::OnNfcTagResponse(const Transport::PeerAddress & address, System::PacketBufferHandle && buffer)
 {
-    ChipLogProgress(Controller, "NFCBase::OnNfcTagResponse");
-
     HandleMessageReceived(address, std::move(buffer));
 }
 
@@ -101,9 +99,7 @@ CHIP_ERROR NFCBase::SendMessage(const Transport::PeerAddress & address, System::
     VerifyOrReturnError(address.GetTransportType() == Type::kNfc, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kConnected, CHIP_ERROR_INCORRECT_STATE);
 
-    DeviceLayer::Internal::NFCCommissioningMgrImpl().SendToNfcTag(address, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::Internal::NFCCommissioningMgrImpl().SendToNfcTag(address, std::move(msgBuf));
 }
 
 } // namespace Transport

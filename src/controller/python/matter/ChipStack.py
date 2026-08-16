@@ -24,13 +24,12 @@
 """Chip Stack interface
 """
 
-from __future__ import absolute_import, print_function
 
 import asyncio
 import builtins
 from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c_void_p, py_object, pythonapi
 from threading import Condition, Lock
-from typing import Any, Optional
+from typing import Any
 
 from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
@@ -89,7 +88,7 @@ class AsyncCallableHandle:
             self._cv.notify_all()
         pythonapi.Py_DecRef(py_object(self))
 
-    def Wait(self, timeoutMs: Optional[int] = None):
+    def Wait(self, timeoutMs: int | None = None):
         timeout = None
         if timeoutMs is not None:
             timeout = float(timeoutMs) / 1000
@@ -110,7 +109,7 @@ class AsyncioCallableHandle:
 
     def __init__(self, callback):
         self._callback = callback
-        self._loop = asyncio.get_event_loop()
+        self._loop = asyncio.get_running_loop()
         self._future = self._loop.create_future()
         self._result = None
         self._exception = None
@@ -120,6 +119,11 @@ class AsyncioCallableHandle:
         return self._future
 
     def _done(self):
+        if self._future.cancelled():
+            # If this helper is used with the asyncio.wait_for(), it might
+            # happen that the future will be cancelled before the callback
+            # is called. Do not raise an exception in this case.
+            return
         if self._exception:
             self._future.set_exception(self._exception)
         else:
@@ -138,10 +142,11 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
 @_singleton
-class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, enableServerInteractions=True):
+class ChipStack:
+    def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
+        self._persistentStorage = persistentStorage
         self._ChipStackLib: Any = None
         self._chipDLLPath = None
         self.devMgr = None
@@ -157,10 +162,6 @@ class ChipStack(object):
             callback()
 
         self.cbHandleChipThreadRun = HandleChipThreadRun
-
-        # Storage has to be initialized BEFORE initializing the stack, since the latter
-        # requires a PersistentStorageDelegate to be provided to DeviceControllerFactory.
-        self._persistentStorage = PersistentStorage(persistentStoragePath)
 
         # Initialize the chip stack.
         res = self._ChipStackLib.pychip_DeviceController_StackInit(
@@ -196,13 +197,17 @@ class ChipStack(object):
         for subscription in tuple(self._subscriptions.values()):
             subscription.Shutdown()
 
+        # Shut down the BDX server.
+        Bdx.Shutdown()
+
         # Terminate Matter thread and shutdown the stack.
         self._ChipStackLib.pychip_DeviceController_StackShutdown()
 
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,
         # since there is a possibility of interactions with the storage layer during shutdown.
+        # TODO: The storage object was passed to the stack during initialization,
+        #       maybe it should not be shut down here?
         self._persistentStorage.Shutdown()
-        self._persistentStorage = None
 
         # Stack init happens in native, but shutdown happens here unfortunately.
         # #20437 tracks consolidating these.
@@ -214,14 +219,14 @@ class ChipStack(object):
 
         delattr(builtins, "chipStack")
 
-    def Call(self, callFunct, timeoutMs: Optional[int] = None):
+    def Call(self, callFunct, timeoutMs: int | None = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
         '''
         return self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
 
-    async def CallAsyncWithResult(self, callFunct, timeoutMs: Optional[int] = None):
+    async def CallAsyncWithResult(self, callFunct, timeoutMs: int | None = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function will post a task on CHIP mainloop and waits for the call response in a asyncio friendly manner.
         '''
@@ -237,7 +242,7 @@ class ChipStack(object):
 
         return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
 
-    async def CallAsync(self, callFunct, timeoutMs: Optional[int] = None) -> None:
+    async def CallAsync(self, callFunct, timeoutMs: int | None = None) -> None:
         '''Run a Python function on CHIP stack, and wait for the response.'''
         res: PyChipError = await self.CallAsyncWithResult(callFunct, timeoutMs)
         res.raise_on_error()

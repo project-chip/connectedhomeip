@@ -77,7 +77,7 @@ void ExecuteInMainLoop(std::function<void()> f)
     //       not running.
     WorkData workdata;
     workdata.callback = f;
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(PerformWork, reinterpret_cast<intptr_t>(&workdata));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(PerformWork, reinterpret_cast<intptr_t>(&workdata));
     workdata.Wait();
 }
 

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster BooleanStateConfiguration (cluster code: 128/0x0480)
+// Identifier constant values for cluster BooleanStateConfiguration (cluster code: 128/0x0080)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

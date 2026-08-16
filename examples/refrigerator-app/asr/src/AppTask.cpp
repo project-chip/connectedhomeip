@@ -37,6 +37,7 @@
 #include "matter_shell.h"
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <static-supported-temperature-levels.h>
 
 namespace {
@@ -76,7 +77,7 @@ const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -124,16 +125,17 @@ void AppTask::AppTaskMain(void * pvParameter)
     EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
-    app::SetTreeCompositionForEndpoint(kRefEndpointId);
-    app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetTreeCompositionForEndpoint(kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
 
     // set TagList
-    SetTagList(kColdCabinetEndpointId,
-               Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(
+        kColdCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
+                                        Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 
     /* Delete task */
     lega_rtos_delete_thread(NULL);

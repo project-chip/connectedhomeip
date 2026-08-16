@@ -49,6 +49,7 @@ static_library("helpers") {
 
   public_deps = [
     "${chip_root}/src/inet",
+    "${chip_root}/src/inet:inet_arg_parser",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
   ]
@@ -80,8 +81,17 @@ if (chip_build_tests) {
     ]
     sources = []
 
+    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
+
     if (chip_system_config_use_sockets && current_os != "zephyr") {
       test_sources += [ "TestInetEndPoint.cpp" ]
+    }
+
+    # ESP32 (FreeRTOS+LwIP) regression test for the TCPEndPointImplLwIP
+    # PCB-race fix. Runs under the esp32-qemu-tests CI image.
+    if (chip_device_platform == "esp32") {
+      test_sources += [ "TestTCPEndPointLwIP.cpp" ]
+      public_deps += [ "${chip_root}/src/platform" ]
     }
 
     cflags = [ "-Wconversion" ]

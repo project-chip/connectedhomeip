@@ -51,6 +51,8 @@ qpg_sdk("sdk") {
 
 qpg_executable("lock_app") {
   output_name = "chip-${qpg_target_ic}-lock-example.out"
+  app_name = "lock"
+  project_dir = qpg_project_dir
 
   sources = [
     "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",

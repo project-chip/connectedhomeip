@@ -35,7 +35,7 @@ SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE:?}")")
 
 DEPENDENCIES=('7zip' 'cpio' 'openjdk-8-jre-headless' 'zip' 'wget')
 # Commands used to check the presence of the above dependencies
-DEPENCENCIES_CMDS=('7z' 'cpio' 'java' 'unzip' 'wget')
+DEPENDENCIES_CMDS=('7z' 'cpio' 'java' 'unzip' 'wget')
 
 # If color is available use colors
 if which tput >/dev/null 2>&1 && [[ $(tput -T $TERM colors) -ge 8 ]]; then
@@ -54,7 +54,7 @@ function show_help() {
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
-    echo "  --verbose                  Verbose output"
+    echo "  -v, --verbose              Verbose output"
     echo "  --cpu                      Comma separated list of CPU architectures. Like arm or arm64"
     echo "  --tizen-sdk-path           Set directory for Tizen SDK installation. Default is $TIZEN_SDK_ROOT"
     echo "  --tizen-sdk-data-path      Set directory for Tizen SDK runtime data. Default is $TIZEN_SDK_DATA_PATH"
@@ -75,19 +75,19 @@ function show_help() {
 # ------------------------------------------------------------------------------
 # Error print function
 function error() {
-    echo "$COLOR_RED[ERROR]: $@$COLOR_NONE"
+    echo "$COLOR_RED[ERROR]: $*$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
 # Info print function
 function info() {
-    echo "$COLOR_GREEN[INFO]: $@$COLOR_NONE"
+    echo "$COLOR_GREEN[INFO]: $*$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
 # Warning print function
 function warning() {
-    echo "$COLOR_YELLOW[WARNING]: $@$COLOR_NONE"
+    echo "$COLOR_YELLOW[WARNING]: $*$COLOR_NONE"
 }
 
 # ------------------------------------------------------------------------------
@@ -165,8 +165,8 @@ function unrpm_globs() {
 # globs. In a situation where multiple zip files matching the same glob are
 # present, for example:
 # $ ls -l cache/tizen-9.0-core-add-ons_*_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
-# -rw-rw-r-- 1 m.grela m.grela 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
+# -rw-rw-r-- 1 tizen users 461718 Nov  4  2024 cache/tizen-9.0-core-add-ons_0.0.341_ubuntu-64.zip
+# -rw-rw-r-- 1 tizen users 461722 Apr 16 01:45 cache/tizen-9.0-core-add-ons_0.0.358_ubuntu-64.zip
 #
 # the function attempts to find the most recent version of a particular zip file.
 #
@@ -220,141 +220,46 @@ function download_tizen_sdk_common() {
 
     # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${COMMON_TIZENSTUDIO_ZIPS[@]}" "${COMMON_TOOLCHAIN_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_COMMON_ZIPS[@]}"
 
     # Tizen Developer Platform Certificate
     url="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
     # Tizen site does not have this package available in version 8.0.
     # Certificates are the same for 7.0 and 8.0, though.
-    download "$url" "${IOT_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_IOT_ZIPS[@]}"
 }
 
 # ------------------------------------------------------------------------------
 # Function for installing common packages for Tizen SDK.
 function install_tizen_sdk_common() {
-
     info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
 
     info "Installing Tizen Studio CLI..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TIZENSTUDIO_ZIPS
-
-    info "Installing common toolchain files ..."
-    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TOOLCHAIN_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_COMMON_ZIPS
 
     info "Installing common IoT files ..."
-    unzip_globs "$TIZEN_SDK_ROOT" IOT_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_IOT_ZIPS
 }
-
-# Take care to provide separate globs for binary and devel RPMs
-# The "most-recent-file" detection logic will eat unsuspecting packages
-# when for example capi-network-thread-*.armv7l.rpm matches both
-# binary and devel RPM files. For example:
-# ls -l cache/capi-network-thread-*.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
-# -rw-rw-r-- 1 m.grela m.grela 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
-
-TIZEN_SDK_BASE_RPMS=(
-    'iniparser-[0-9]*'
-    'iniparser-devel-*'
-    'libblkid-devel-*'
-    'libcap-[0-9]*'
-    'libcap-devel-*'
-    'libffi-devel-*'
-    'liblzma-[0-9]*'
-    'libmount-devel-*'
-    'libncurses6-[0-9]*'
-    'libreadline-[0-9]*'
-    'libuuid-[0-9]*'
-    'libuuid-devel-*'
-    'pcre-devel-*'
-    'readline-devel-*'
-    'xdgmime-[0-9]*'
-    'xdgmime-devel-*'
-)
-
-# this could have been a function but shellharden does not allow us to
-declare -a TIZEN_SDK_ARM_BASE_RPMS TIZEN_SDK_ARM64_BASE_RPMS
-for rpm in "${TIZEN_SDK_BASE_RPMS[@]}"; do
-    TIZEN_SDK_ARM_BASE_RPMS+=("$rpm.armv7l.rpm")
-    TIZEN_SDK_ARM64_BASE_RPMS+=("$rpm.aarch64.rpm")
-done
-
-TIZEN_SDK_UNIFIED_RPMS=(
-    'app-core-common-[0-9]*'
-    'app-core-common-devel-*'
-    'aul-[0-9]*'
-    'aul-devel-*'
-    'bluetooth-frwk-0*'
-    'bluetooth-frwk-devel-*'
-    'bundle-0*'
-    'bundle-devel-*'
-    'buxton2-[0-9]*'
-    'buxton2-devel-*'
-    'capi-network-bluetooth-0*'
-    'capi-network-bluetooth-devel-*'
-    'capi-network-nsd-[0-9]*'
-    'capi-network-nsd-devel-*'
-    'capi-network-thread-[0-9]*'
-    'capi-network-thread-devel-*'
-    'capi-system-peripheral-io-[0-9]*'
-    'capi-system-peripheral-io-devel-*'
-    'capi-system-resource-1*'
-    'capi-system-resource-devel-*'
-    'cynara-devel-*'
-    'dbus-1*'
-    'dbus-devel-*'
-    'dbus-libs-1*'
-    'glib2-devel-2*'
-    'pcre2-devel-[0-9]*'
-    'hal-api-common-[0-9]*'
-    'hal-api-common-devel-*'
-    'hal-api-sensor-[0-9]*'
-    'hal-api-sensor-devel-*'
-    'json-glib-devel-*'
-    'libcynara-client-[0-9]*'
-    'libcynara-commons-[0-9]*'
-    'libdns_sd-[0-9]*'
-    'libjson-glib-[0-9]*'
-    'libnsd-dns-sd-[0-9]*'
-    'libsessiond-0*'
-    'libsystemd-[0-9]*'
-    'libtzplatform-config-[0-9]*'
-    'libtzplatform-config-devel-*'
-    'parcel-0*'
-    'parcel-devel-*'
-    'pkgmgr-info-[0-9]*'
-    'pkgmgr-info-devel-*'
-    'sensord-[0-9]*'
-    'sensord-devel-*'
-    'sensord-dummy-[0-9]*'
-    'vconf-compat-[0-9]*'
-    'vconf-compat-devel*'
-    'vconf-internal-keys-devel-*'
-)
-
-for rpm in "${TIZEN_SDK_UNIFIED_RPMS[@]}"; do
-    TIZEN_SDK_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
-    TIZEN_SDK_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
-done
 
 function download_tizen_sdk_arm() {
     # Get toolchain
     info "Downloading Tizen ARM toolchain and sysroot ..."
     local url
 
-    # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_SDK_ARM_ZIPS[@]}"
 
-    # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
     download "$url" "${TIZEN_SDK_ARM_BASE_RPMS[@]}"
 
-    # Unified packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
     download "$url" "${TIZEN_SDK_ARM_UNIFIED_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (armv7l).
@@ -363,13 +268,13 @@ function install_tizen_sdk_arm() {
     local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     info "Installing Tizen ARM SDK..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM_TIZENSTUDIO_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_SDK_ARM_ZIPS
 
     info "Installing Tizen ARM sysroot..."
-
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS
 
     fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
@@ -381,17 +286,20 @@ function download_tizen_sdk_arm64() {
     info "Downloading Tizen ARM64 toolchain and sysroot ..."
     local url
 
-    # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_SDK_ARM64_ZIPS[@]}"
 
-    # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
     download "$url" "${TIZEN_SDK_ARM64_BASE_RPMS[@]}"
 
-    # Unified packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
     download "$url" "${TIZEN_SDK_ARM64_UNIFIED_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS[@]}"
+
+    url="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (arm64).
@@ -400,13 +308,13 @@ function install_tizen_sdk_arm64() {
     local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
 
     info "Installing Tizen ARM64 SDK..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM64_TIZENSTUDIO_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_SDK_ARM64_ZIPS
 
     info "Installing Tizen ARM64 sysroot..."
-
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS
 
     fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
@@ -440,13 +348,13 @@ function install_tizen_sdk_finalize() {
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
 
     if [ "$INSTALL_ARM" = true ]; then
-        echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
+        echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-$TIZEN_STUDIO_GCC_VERSION\""
         echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
         echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     fi
 
     if [ "$INSTALL_ARM64" = true ]; then
-        echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-9.2\""
+        echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-$TIZEN_STUDIO_GCC_VERSION\""
         echo "export TIZEN_SDK_SYSROOT_ARM64=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core\""
         echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN_ARM64/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     fi
@@ -460,7 +368,7 @@ while (($#)); do
             show_help
             exit 0
             ;;
-        --verbose)
+        -v | --verbose)
             VERBOSE=true
             ;;
         --cpu)
@@ -523,7 +431,7 @@ info "Using package cache '$PKG_CACHE_PATH'"
 [ ! -d "$PKG_CACHE_PATH" ] && mkdir -p "$PKG_CACHE_PATH"
 if [ -n "$PURGE_PKG_CACHE" ]; then
     warning "Purging package cache in '$PKG_CACHE_PATH'"
-    rm -rf "${VERBOSE:+-v}" "$PKG_CACHE_PATH"/*
+    rm -rf "${VERBOSE:+-v}" "${PKG_CACHE_PATH:?}"/*
 fi
 
 # ------------------------------------------------------------------------------
@@ -537,7 +445,7 @@ if [ "$INSTALL_DEPENDENCIES" = true ]; then
 fi
 # ------------------------------------------------------------------------------
 # Checking dependencies needed to install Tizen platform
-info "Checking required tools: ${DEPENDENCIES_CMDS[@]}"
+info "Checking required tools: ${DEPENDENCIES_CMDS[*]}"
 for cmd in "${DEPENDENCIES_CMDS[@]}"; do
     if ! command -v "$cmd" &>/dev/null; then
         error "Required tool not found: $cmd"
@@ -549,34 +457,165 @@ done
 # ------------------------------------------------------------------------------
 # Generate zip and RPM lists whose names are dependent upon $TIZEN_VERSION
 
-COMMON_TIZENSTUDIO_ZIPS=(
+TIZEN_STUDIO_COMMON_ZIPS=(
     'certificate-encryptor_1.0.10_ubuntu-64.zip'
     'certificate-generator_0.1.4_ubuntu-64.zip'
-    'new-common-cli_2.5.64_ubuntu-64.zip'
-    'new-native-cli_2.5.64_ubuntu-64.zip'
-    'sdb_4.2.23_ubuntu-64.zip'
+    'new-common-cli_2.5.93_ubuntu-64.zip'
+    'new-native-cli_2.5.93_ubuntu-64.zip'
+    'sdb_4.2.36_ubuntu-64.zip'
     "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
 )
 
-IOT_ZIPS=(
+TIZEN_STUDIO_IOT_ZIPS=(
     "7.0-iot-things-add-ons_*_ubuntu-64.zip"
 )
 
-COMMON_TOOLCHAIN_ZIPS=(
-    'sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip'
-)
-
-SDK_ARM_TIZENSTUDIO_ZIPS=(
-    "cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip"
+TIZEN_STUDIO_SDK_ARM_ZIPS=(
     # Base sysroot
     "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip"
 )
 
-SDK_ARM64_TIZENSTUDIO_ZIPS=(
-    "cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip"
+TIZEN_STUDIO_SDK_ARM64_ZIPS=(
     # Base sysroot
     "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip"
 )
+
+# Since Tizen 10.0 Tizen SDK uses GCC 14.2.
+if awk -v VER="$TIZEN_VERSION" "BEGIN {exit !(VER >= 10.0)}"; then
+    TIZEN_STUDIO_GCC_VERSION=14.2
+    TIZEN_STUDIO_COMMON_ZIPS+=("sbi-toolchain-gcc-14.2.cpp.app_2.2.31_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM_ZIPS+=("cross-arm-gcc-14.2_0.2.16_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM64_ZIPS+=("cross-aarch64-gcc-14.2_0.2.16_ubuntu-64.zip")
+else
+    TIZEN_STUDIO_GCC_VERSION=9.2
+    TIZEN_STUDIO_COMMON_ZIPS+=("sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM_ZIPS+=("cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM64_ZIPS+=("cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip")
+fi
+
+# Take care to provide separate globs for binary and devel RPMs
+# The "most-recent-file" detection logic will eat unsuspecting packages
+# when for example capi-network-thread-*.armv7l.rpm matches both
+# binary and devel RPM files. For example:
+# ls -l cache/capi-network-thread-*.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 55133 Oct 30  2024 cache/capi-network-thread-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 17377 Oct 30  2024 cache/capi-network-thread-devel-0.9.0-2.armv7l.rpm
+# -rw-rw-r-- 1 tizen users 25965 Oct 30  2024 cache/capi-network-thread-test-0.9.0-2.armv7l.rpm
+
+TIZEN_SDK_BASE_RPMS=(
+    'iniparser-[0-9]*'
+    'iniparser-devel-*'
+    'libblkid-devel-*'
+    'libcap-[0-9]*'
+    'libcap-devel-*'
+    'libffi-devel-*'
+    'liblzma-[0-9]*'
+    'libmount-devel-*'
+    'libncurses6-[0-9]*'
+    'libreadline-[0-9]*'
+    'libuuid-[0-9]*'
+    'libuuid-devel-*'
+    'pcre-devel-*'
+    'readline-devel-*'
+    'xdgmime-[0-9]*'
+    'xdgmime-devel-*'
+)
+
+TIZEN_SDK_UNIFIED_RPMS=(
+    'app-core-common-[0-9]*'
+    'app-core-common-devel-*'
+    'aul-[0-9]*'
+    'aul-devel-*'
+    'bluetooth-frwk-[0-9]*'
+    'bluetooth-frwk-devel-*'
+    'bundle-[0-9]*'
+    'bundle-devel-*'
+    'buxton2-[0-9]*'
+    'buxton2-devel-*'
+    'capi-network-bluetooth-[0-9]*'
+    'capi-network-bluetooth-devel-*'
+    'capi-network-nsd-[0-9]*'
+    'capi-network-nsd-devel-*'
+    'capi-network-thread-[0-9]*'
+    'capi-network-thread-devel-*'
+    'capi-system-peripheral-io-[0-9]*'
+    'capi-system-peripheral-io-devel-*'
+    'capi-system-resource-[0-9]*'
+    'capi-system-resource-devel-*'
+    'cynara-devel-*'
+    'dbus-1*'
+    'dbus-devel-*'
+    'dbus-libs-1*'
+    'glib2-devel-2*'
+    'hal-api-common-[0-9]*'
+    'hal-api-common-devel-*'
+    'hal-api-sensor-[0-9]*'
+    'hal-api-sensor-devel-*'
+    'json-glib-devel-*'
+    'libcynara-client-[0-9]*'
+    'libcynara-commons-[0-9]*'
+    'libdns_sd-[0-9]*'
+    'libjson-glib-[0-9]*'
+    'libnsd-dns-sd-[0-9]*'
+    'libsessiond-[0-9]*'
+    'libsystemd-[0-9]*'
+    'libtzplatform-config-[0-9]*'
+    'libtzplatform-config-devel-*'
+    'parcel-[0-9]*'
+    'parcel-devel-*'
+    'pkgmgr-info-[0-9]*'
+    'pkgmgr-info-devel-*'
+    'sensord-[0-9]*'
+    'sensord-devel-*'
+    'sensord-dummy-[0-9]*'
+    'vconf-compat-[0-9]*'
+    'vconf-compat-devel*'
+    'vconf-internal-keys-devel-*'
+)
+
+# RPMs with recent bug fixes required for Matter SDK.
+TIZEN_SDK_SNAPSHOTS_BASE_RPMS=()
+TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS=()
+
+# Handle differences in Tizen SDK versions. For example, since
+# Tizen 10.0 the PCRE2 library is provided by the BASE repository.
+if awk -v VER="$TIZEN_VERSION" "BEGIN {exit !(VER >= 10.0)}"; then
+    TIZEN_SDK_BASE_RPMS+=(
+        'pcre2-devel-[0-9]*'
+        'libunwind-[0-9]*'
+    )
+    TIZEN_SDK_UNIFIED_RPMS+=(
+        'capi-appfw-service-application-devel-[0-9]*'
+        'libcynara-creds-commons-[0-9]*'
+        'libcynara-creds-self-[0-9]*'
+        'libcynara-uid-[0-9]*'
+    )
+    TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS+=(
+        'libnsd-dns-sd-[0-9]*'
+    )
+else
+    TIZEN_SDK_UNIFIED_RPMS+=('pcre2-devel-[0-9]*')
+fi
+
+for rpm in "${TIZEN_SDK_BASE_RPMS[@]}"; do
+    TIZEN_SDK_ARM_BASE_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_ARM64_BASE_RPMS+=("$rpm.aarch64.rpm")
+done
+
+for rpm in "${TIZEN_SDK_UNIFIED_RPMS[@]}"; do
+    TIZEN_SDK_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
+done
+
+for rpm in "${TIZEN_SDK_SNAPSHOTS_BASE_RPMS[@]}"; do
+    TIZEN_SDK_SNAPSHOTS_ARM_BASE_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_SNAPSHOTS_ARM64_BASE_RPMS+=("$rpm.aarch64.rpm")
+done
+
+for rpm in "${TIZEN_SDK_SNAPSHOTS_UNIFIED_RPMS[@]}"; do
+    TIZEN_SDK_SNAPSHOTS_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_SNAPSHOTS_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
+done
 
 # ------------------------------------------------------------------------------
 # Installation Tizen SDK

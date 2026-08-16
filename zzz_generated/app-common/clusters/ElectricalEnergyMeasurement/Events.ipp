@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CumulativeEnergyMeasured.
+} // namespace CumulativeEnergyMeasured
 namespace PeriodicEnergyMeasured {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -101,7 +101,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PeriodicEnergyMeasured.
+} // namespace PeriodicEnergyMeasured
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters

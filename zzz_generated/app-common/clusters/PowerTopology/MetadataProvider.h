@@ -27,6 +27,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PowerTopolog
             return AvailableEndpoints::kMetadataEntry;
         case ActiveEndpoints::Id:
             return ActiveEndpoints::kMetadataEntry;
+        case ElectricalCircuitNodes::Id:
+            return ElectricalCircuitNodes::kMetadataEntry;
         default:
             return std::nullopt;
         }

@@ -17,7 +17,6 @@
 #
 
 import sys
-import typing
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -28,9 +27,9 @@ from matter.testing.runner import MockTestRunner
 
 
 @dataclass
-class TestSpec():
-    min: typing.Optional[int]
-    max: typing.Optional[int]
+class TestSpec:
+    min: int | None
+    max: int | None
     measured: int
     tolerance: int
     expect_pass: bool
@@ -158,7 +157,7 @@ def test_spec_to_attribute_cache(test_spec: TestSpec) -> Attribute.AsyncReadTran
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
                                attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
-    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c]]
 
     return resp
 
@@ -169,7 +168,7 @@ def test_spec_to_attribute_cache_no_tolerance(test_spec: TestSpec) -> Attribute.
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
                                attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
-    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c]]
 
     return resp
 

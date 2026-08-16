@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ThreadNetworkDiagnostics (cluster code: 53/0x0435)
+// Identifier constant values for cluster ThreadNetworkDiagnostics (cluster code: 53/0x0035)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

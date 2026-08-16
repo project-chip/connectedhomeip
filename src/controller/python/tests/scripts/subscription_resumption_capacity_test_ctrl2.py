@@ -63,7 +63,7 @@ async def main():
         default=1,
         type=int,
         help="The Node ID issued to the device",
-        metavar="<nodeid>"
+        metavar="<node-id>"
     )
     optParser.add_option(
         "--discriminator",
@@ -72,7 +72,7 @@ async def main():
         default=TEST_DISCRIMINATOR,
         type=int,
         help="Discriminator of the device",
-        metavar="<nodeid>"
+        metavar="<discriminator>"
     )
     optParser.add_option(
         "--setuppin",
@@ -81,7 +81,7 @@ async def main():
         default=TEST_SETUPPIN,
         type=int,
         help="Setup PIN of the device",
-        metavar="<nodeid>"
+        metavar="<pin>"
     )
     optParser.add_option(
         "-p",
@@ -119,10 +119,10 @@ async def main():
 
     # Use a different node ID for the second controller
     test = BaseTestHelper(
-        nodeid=112244, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
+        nodeId=112244, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     FailIfNot(
-        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
+        await test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid),
         "Failed on on-network commissioning")
 
     FailIfNot(

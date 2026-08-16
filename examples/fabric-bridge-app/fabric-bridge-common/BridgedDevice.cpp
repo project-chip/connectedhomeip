@@ -40,7 +40,7 @@ void BridgedDevice::LogActiveChangeEvent(uint32_t promisedActiveDurationMs)
 {
     EndpointId endpointId = mEndpointId;
 
-    DeviceLayer::SystemLayer().ScheduleLambda([endpointId, promisedActiveDurationMs]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([endpointId, promisedActiveDurationMs]() {
         app::Clusters::BridgedDeviceBasicInformation::Events::ActiveChanged::Type event{};
         event.promisedActiveDuration = promisedActiveDurationMs;
         EventNumber eventNumber      = 0;
@@ -74,7 +74,7 @@ void BridgedDevice::ReachableChanged(bool reachable)
     if (reachableChanged)
     {
         SetReachable(reachable);
-        DeviceLayer::SystemLayer().ScheduleLambda([endpointId]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([endpointId]() {
             MatterReportingAttributeChangeCallback(endpointId, app::Clusters::BridgedDeviceBasicInformation::Id,
                                                    app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id);
 
@@ -100,23 +100,24 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
 
     mAdminCommissioningAttributes = aAdminCommissioningAttributes;
 
-    DeviceLayer::SystemLayer().ScheduleLambda([endpointId, windowChanged, fabricIndexChanged, vendorChanged]() {
-        if (windowChanged)
-        {
-            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
-                                                   app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id);
-        }
-        if (fabricIndexChanged)
-        {
-            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
-                                                   app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
-        }
-        if (vendorChanged)
-        {
-            MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
-                                                   app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
-        }
-    });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [endpointId, windowChanged, fabricIndexChanged, vendorChanged]() {
+            if (windowChanged)
+            {
+                MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                       app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::Id);
+            }
+            if (fabricIndexChanged)
+            {
+                MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                       app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
+            }
+            if (vendorChanged)
+            {
+                MatterReportingAttributeChangeCallback(endpointId, app::Clusters::AdministratorCommissioning::Id,
+                                                       app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::Id);
+            }
+        });
 }
 
 void BridgedDevice::RegisterClusters()

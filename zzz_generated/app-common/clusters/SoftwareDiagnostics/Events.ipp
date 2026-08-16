@@ -70,7 +70,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SoftwareFault.
+} // namespace SoftwareFault
 } // namespace Events
 } // namespace SoftwareDiagnostics
 } // namespace Clusters

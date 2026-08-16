@@ -46,6 +46,7 @@ extern "C" {
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PlatformError.h>
 #include <sl_bt_rtos_adaptation.h>
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -103,8 +104,6 @@ namespace {
 
 osTimerId_t sbleAdvTimeoutTimer; // SW timer
 
-const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                              0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 
 bd_addr randomizedAddr = { 0 };
@@ -125,8 +124,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // SW timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = osTimerNew(BleAdvTimeoutHandler, osTimerOnce, NULL, NULL);
 
+    // Preserve kSiLabsBLEStackInitialize so a boot event that set it before _Init() (e.g. from HandleBootEvent) is not lost.
+    bool hadBleStackInit = mFlags.Has(Flags::kSiLabsBLEStackInitialize);
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize, hadBleStackInit);
 
     // Check that an address was not already configured at boot.
     // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
@@ -142,7 +144,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
         randomizedAddr.addr[5] |= 0xC0;
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -160,6 +162,17 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     return numCons;
 }
 
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
+{
+    ChipLogProgress(DeviceLayer, "BLE Info:");
+    ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
+    ChipLogProgress(DeviceLayer, "  Device Name: %s", mDeviceName);
+    ChipLogProgress(DeviceLayer, "  Random Static Address: %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                    randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                    randomizedAddr.addr[0]);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -169,7 +182,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -190,7 +203,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -225,7 +238,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         mDeviceName[0] = 0;
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -236,7 +249,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kCHIPoBLESubscribe: {
         ChipDeviceEvent connEstEvent;
 
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
         PlatformMgr().PostEventOrDie(&connEstEvent);
@@ -244,32 +257,32 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
     }
     break;
 
     case DeviceEventType::kCHIPoBLEConnectionError: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEConnectionError");
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
     }
     break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
     }
     break;
 
     default:
-        ChipLogProgress(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
+        ChipLogDetail(DeviceLayer, "_OnPlatformEvent default:  event->Type = %d", event->Type);
         break;
     }
 }
@@ -277,14 +290,14 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
                                                    const ChipBleUUID * charId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
+    ChipLogDetail(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
                                                      const ChipBleUUID * charId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
+    ChipLogDetail(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -337,13 +350,13 @@ exit:
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                             PacketBufferHandle pBuf)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
+    ChipLogDetail(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    CloseConnection(conId);
+    TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
@@ -361,7 +374,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case SL_STATUS_NOT_SUPPORTED:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     default:
-        return CHIP_ERROR(ChipError::Range::kPlatform, bleErr + CHIP_DEVICE_CONFIG_SILABS_BLE_ERROR_MIN);
+        return MATTER_PLATFORM_ERROR(bleErr + CHIP_DEVICE_CONFIG_SILABS_BLE_ERROR_MIN);
     }
 }
 
@@ -480,9 +493,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %" CHIP_ERROR_FORMAT, err.Format());
         });
-        ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
-                      randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
-                      randomizedAddr.addr[0]);
+        ChipLogProgress(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                        randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                        randomizedAddr.addr[0]);
     }
 
     ret = sl_bt_legacy_advertiser_set_data(advertising_set_handle, sl_bt_advertiser_advertising_data_packet, index,
@@ -659,7 +672,7 @@ void BLEManagerImpl::UpdateMtu(volatile sl_bt_msg_t * evt)
 void BLEManagerImpl::HandleBootEvent(void)
 {
     mFlags.Set(Flags::kSiLabsBLEStackInitialize);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
@@ -672,7 +685,7 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
 
     AddConnection(connHandle, bondingHandle);
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
@@ -692,15 +705,13 @@ void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
                                         BLE_CONFIG_LATENCY, desiredTimeout, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 {
     sl_bt_evt_connection_closed_t * conn_evt = (sl_bt_evt_connection_closed_t *) &(evt->data);
     uint8_t connHandle                       = conn_evt->connection;
-
-    ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
 
     if (RemoveConnection(connHandle))
     {
@@ -733,7 +744,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
         // maximum connection limit being reached.
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -741,13 +752,12 @@ void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
 {
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
     bool do_provision  = chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().IsProvisionRequired();
-    ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_CHIPoBLEChar_Rx == attribute)
     {
         if (do_provision)
         {
-            chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
             chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().Step();
         }
         else
@@ -770,9 +780,9 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt)
     // Determine if the client is enabling or disabling notification/indication.
     isIndicationEnabled = (evt->data.evt_gatt_server_characteristic_status.client_config_flags == sl_bt_gatt_indication);
 
-    ChipLogProgress(DeviceLayer, "HandleTXcharCCCDWrite - Config Flags value : %d",
-                    evt->data.evt_gatt_server_characteristic_status.client_config_flags);
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", isIndicationEnabled ? "subscribe" : "unsubscribe");
+    ChipLogDetail(DeviceLayer, "HandleTXcharCCCDWrite - Config Flags value : %d",
+                  evt->data.evt_gatt_server_characteristic_status.client_config_flags);
+    ChipLogDetail(DeviceLayer, "CHIPoBLE %s received", isIndicationEnabled ? "subscribe" : "unsubscribe");
 
     if (isIndicationEnabled)
     {
@@ -839,12 +849,9 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     uint8_t timerHandle = sInstance.GetTimerHandle(conId, false);
 
-    ChipLogProgress(DeviceLayer, "Tx Confirmation received");
-
     // stop indication confirmation timer
     if (timerHandle < kMaxConnections)
     {
-        ChipLogProgress(DeviceLayer, " stop soft timer");
         sl_bt_system_set_lazy_soft_timer(0, 0, timerHandle, false);
     }
 
@@ -859,7 +866,7 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
     // If we receive a callback for unknown timer handle ignore this.
     if (evt->data.evt_system_soft_timer.handle < kMaxConnections)
     {
-        ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
+        ChipLogDetail(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
         ChipDeviceEvent event;
         event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
@@ -1015,7 +1022,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
@@ -1067,13 +1074,13 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     switch (SL_BT_MSG_ID(evt->header))
     {
     case sl_bt_evt_system_boot_id: {
-        ChipLogProgress(DeviceLayer, "Bluetooth stack booted: v%d.%d.%d-b%d", evt->data.evt_system_boot.major,
-                        evt->data.evt_system_boot.minor, evt->data.evt_system_boot.patch, evt->data.evt_system_boot.build);
+        ChipLogProgress(DeviceLayer, "BLE stack: v%d.%d.%d-b%d", evt->data.evt_system_boot.major, evt->data.evt_system_boot.minor,
+                        evt->data.evt_system_boot.patch, evt->data.evt_system_boot.build);
         chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 
         RAIL_Version_t railVer;
         RAIL_GetVersion(&railVer, true);
-        ChipLogProgress(DeviceLayer, "RAIL version:, v%d.%d.%d-b%d", railVer.major, railVer.minor, railVer.rev, railVer.build);
+        ChipLogProgress(DeviceLayer, "RAIL: v%d.%d.%d-b%d", railVer.major, railVer.minor, railVer.rev, railVer.build);
         sl_bt_connection_set_default_parameters(BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL, BLE_CONFIG_LATENCY,
                                                 BLE_CONFIG_TIMEOUT, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
     }
@@ -1144,8 +1151,8 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     break;
 
     case sl_bt_evt_gatt_server_user_read_request_id: {
-        ChipLogProgress(DeviceLayer, "GATT server user_read_request");
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+        ChipLogProgress(DeviceLayer, "GATT server user_read_request");
         if (evt->data.evt_gatt_server_user_read_request.characteristic == gattdb_CHIPoBLEChar_C3)
         {
             chip::DeviceLayer::Internal::BLEMgrImpl().HandleC3ReadRequest(evt);
@@ -1155,12 +1162,11 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     break;
 
     case sl_bt_evt_connection_remote_used_features_id: {
-        // ChipLogProgress(DeviceLayer, "link layer features supported by the remote device");
     }
     break;
 
     default:
-        ChipLogProgress(DeviceLayer, "evt_UNKNOWN id = %08" PRIx32, SL_BT_MSG_ID(evt->header));
+        ChipLogDetail(DeviceLayer, "evt_UNKNOWN id = %08" PRIx32, SL_BT_MSG_ID(evt->header));
         break;
     }
 

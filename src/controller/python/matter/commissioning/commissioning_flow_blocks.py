@@ -137,10 +137,8 @@ class CommissioningFlowBlocks:
             self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")
             raise
 
-        self._logger.info(
-            f"Commissioning FabricID: {cert_fabric_id:016X} "
-            f"Compressed FabricID: {compressed_fabric_id:016X} "
-            f"Node ID: {cert_node_id:016X}")
+        self._logger.info("Commissioning FabricID: %016X Compressed FabricID: %016X Node ID: %016X",
+                          cert_fabric_id, compressed_fabric_id, cert_node_id)
 
         self._logger.info("Adding Operational Certificate")
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AddNOC(
@@ -170,16 +168,16 @@ class CommissioningFlowBlocks:
             raise TypeError("The device requires a Thread network dataset")
 
         self._logger.info("Adding Thread network")
-        response = await self._devCtrl.SendCommand(nodeid=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+        response = await self._devCtrl.SendCommand(nodeId=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
             operationalDataset=parameter.thread_credentials))
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for adding network: {response.networkingStatus}")
 
-        network_list = (await self._devCtrl.ReadAttribute(nodeid=node_id, attributes=[(commissioning.ROOT_ENDPOINT_ID, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.NetworkCommissioning].networks
+        network_list = (await self._devCtrl.ReadAttribute(nodeId=node_id, attributes=[(commissioning.ROOT_ENDPOINT_ID, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.NetworkCommissioning].networks
         network_id = network_list[response.networkIndex].networkID
 
         self._logger.info("Enabling Thread network")
-        response = await self._devCtrl.SendCommand(nodeid=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=network_id), interactionTimeoutMs=self._devCtrl.ComputeRoundTripTimeout(node_id, upperLayerProcessingTimeoutMs=30000))
+        response = await self._devCtrl.SendCommand(nodeId=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=network_id), interactionTimeoutMs=self._devCtrl.ComputeRoundTripTimeout(node_id, upperLayerProcessingTimeoutMs=30000))
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for enabling network: {response.networkingStatus}")
 
@@ -190,46 +188,45 @@ class CommissioningFlowBlocks:
             raise TypeError("The device requires WiFi credentials")
 
         self._logger.info("Adding WiFi network")
-        response = await self._devCtrl.SendCommand(nodeid=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=parameter.wifi_credentials.ssid, credentials=parameter.wifi_credentials.passphrase))
+        response = await self._devCtrl.SendCommand(nodeId=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(ssid=parameter.wifi_credentials.ssid, credentials=parameter.wifi_credentials.passphrase))
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for adding network: {response.networkingStatus}")
 
-        network_list = (await self._devCtrl.ReadAttribute(nodeid=node_id, attributes=[(commissioning.ROOT_ENDPOINT_ID, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.NetworkCommissioning].networks
+        network_list = (await self._devCtrl.ReadAttribute(nodeId=node_id, attributes=[(commissioning.ROOT_ENDPOINT_ID, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.NetworkCommissioning].networks
         network_id = network_list[response.networkIndex].networkID
 
         self._logger.info("Enabling WiFi network")
-        response = await self._devCtrl.SendCommand(nodeid=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=network_id), interactionTimeoutMs=self._devCtrl.ComputeRoundTripTimeout(node_id, upperLayerProcessingTimeoutMs=30000))
+        response = await self._devCtrl.SendCommand(nodeId=node_id, endpoint=commissioning.ROOT_ENDPOINT_ID, payload=Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=network_id), interactionTimeoutMs=self._devCtrl.ComputeRoundTripTimeout(node_id, upperLayerProcessingTimeoutMs=30000))
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for enabling network: {response.networkingStatus}")
 
         self._logger.info("WiFi network commissioning finished")
 
     async def network_commissioning(self, parameter: commissioning.Parameters, node_id: int):
-        clusters = await self._devCtrl.ReadAttribute(nodeid=node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
+        clusters = await self._devCtrl.ReadAttribute(nodeId=node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
         if Clusters.NetworkCommissioning.id not in clusters[commissioning.ROOT_ENDPOINT_ID][Clusters.Descriptor].serverList:
-            self._logger.info(
-                f"Network commissioning cluster {commissioning.ROOT_ENDPOINT_ID} is not enabled on this device.")
-            return
+            self._logger.info("Network commissioning cluster %s is not enabled on this device.", commissioning.ROOT_ENDPOINT_ID)
+            return None
 
         network_commissioning_cluster_state = (await self._devCtrl.ReadAttribute(
-            nodeid=node_id,
+            nodeId=node_id,
             attributes=[(commissioning.ROOT_ENDPOINT_ID, Clusters.NetworkCommissioning)], returnClusterObject=True))[0][Clusters.NetworkCommissioning]
 
         if network_commissioning_cluster_state.networks:
             for networks in network_commissioning_cluster_state.networks:
                 if networks.connected:
-                    self._logger.info(
-                        f"Device already connected to {networks.networkID.hex()} skip network commissioning")
-                    return
+                    self._logger.info("Device already connected to %s skip network commissioning", networks.networkID.hex())
+                    return None
 
         if parameter.commissionee_info.is_wifi_device:
             if network_commissioning_cluster_state.featureMap != commissioning.NetworkCommissioningFeatureMap.WIFI_NETWORK_FEATURE_MAP:
                 raise AssertionError("Device is expected to be a WiFi device")
             return await self.network_commissioning_wifi(parameter=parameter, node_id=node_id)
-        elif parameter.commissionee_info.is_thread_device:
+        if parameter.commissionee_info.is_thread_device:
             if network_commissioning_cluster_state.featureMap != commissioning.NetworkCommissioningFeatureMap.THREAD_NETWORK_FEATURE_MAP:
                 raise AssertionError("Device is expected to be a Thread device")
             return await self.network_commissioning_thread(parameter=parameter, node_id=node_id)
+        return None
 
     async def send_regulatory_config(self, parameter: commissioning.Parameters, node_id: int):
         self._logger.info("Sending Regulatory Config")

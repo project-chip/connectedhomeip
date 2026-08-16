@@ -34,8 +34,24 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#     pre-existing-fabric: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import enum
 import hashlib
 import inspect
@@ -43,7 +59,6 @@ import logging
 import re
 import sys
 from binascii import hexlify, unhexlify
-from typing import Optional
 
 import nest_asyncio
 from ecdsa import NIST256p, VerifyingKey
@@ -52,19 +67,22 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_command, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
-                                           has_command, run_if_endpoint_matches)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
 from matter.testing.pics import accepted_cmd_pics_str
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 from matter.utils import CommissioningBuildingBlocks
+
+log = logging.getLogger(__name__)
 
 nest_asyncio.apply()
 
 
-def to_octet_string(input: bytes) -> str:
-    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
-    return ":".join(["%02x" % b for b in input])
+def to_octet_string(data: bytes) -> str:
+    """Takes `data` bytes and convert to a colon-separated hex octet string representation."""
+    return hexlify(data, ":")
 
 
 class MatterCertParser:
@@ -86,14 +104,13 @@ class MatterCertParser:
     def get_subject_names(self) -> dict[int, object]:
         if self.SUBJECT_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
-        return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
+        return dict(self.parsed_tlv[self.SUBJECT_TAG])
 
     def get_public_key_bytes(self) -> bytes:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
 
-        public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
-        return public_key_bytes
+        return self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
@@ -112,12 +129,12 @@ class MappingsV1(enum.IntEnum):
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
+def bytes_from_hex(s: str) -> bytes:
+    """Converts any `s` string representation including `01:ab:cd` to bytes
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify(re.sub(r'(\s|:)', "", hex))
+    return unhexlify(re.sub(r'(\s|:)', "", s))
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
@@ -153,9 +170,8 @@ def generate_vendor_fabric_binding_message(
 
     fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
     vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
-    vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(
+    return FABRIC_BINDING_VERSION_1.to_bytes(
         length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
-    return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 
@@ -165,7 +181,7 @@ def generate_vendor_id_verification_tbs(fabric_binding_version: int,
                                         client_challenge: bytes,
                                         fabric_index: int,
                                         vendor_fabric_binding_message: bytes,
-                                        vid_verification_statement: Optional[bytes] = None) -> bytes:
+                                        vid_verification_statement: bytes | None = None) -> bytes:
     assert len(attestation_challenge) == ATTESTATION_CHALLENGE_SIZE_BYTES
     assert len(client_challenge) == VID_VERIFICATION_CLIENT_CHALLENGE_SIZE_BYTES
     # Valid fabric indices are [1..254]. 255 is forbidden.
@@ -188,6 +204,7 @@ def get_unassigned_fabric_index(fabric_indices: list[int]) -> int:
             return fabric_index
     else:
         asserts.fail(f"Somehow could not find an unallocated fabric index in {fabric_indices}")
+    return None
 
 
 def get_entry_for_fabric(fabric_index: int, entries: list[object]) -> object:
@@ -204,11 +221,8 @@ def make_vid_matcher(fabric_index: int, expected_vid: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.vendorID == expected_vid:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.vendorID == expected_vid
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VendorID field set to 0x{expected_vid:04x}", matcher=predicate)
 
 
@@ -216,11 +230,8 @@ def make_vvs_matcher(fabric_index: int, expected_vvs: bytes) -> AttributeMatcher
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VIDVerificationStatement field set to correct VIDVerificationStatement value just set", matcher=predicate)
 
 
@@ -230,7 +241,7 @@ class TestStepBlockPassException(Exception):
     pass
 
 
-class test_step(object):
+class test_step:
     """Context manager for `with test_tesp(...) as step` that allows for aggregating step descriptions automatically.
 
     Use like:
@@ -251,21 +262,21 @@ class test_step(object):
     TODO: Port back to matter_testing.py once this whole test suite is complete.
     """
 
-    def __init__(self, id=None, description="", verification=None, is_commissioning=False):
+    def __init__(self, step_id=None, description="", verification=None, is_commissioning=False):
         caller = inspect.currentframe().f_back.f_locals.get('self', None)
         if isinstance(caller, MatterBaseTest):
             self._test_instance = caller
         else:
             raise RuntimeError("Can only use `test_step` inside a MatterBaseTest-derived class")
 
-        if id is None:
-            id = self._test_instance.current_step_id
+        if step_id is None:
+            step_id = self._test_instance.current_step_id
             next_step_id = self._test_instance.get_next_step_id(self._test_instance.current_step_id)
             self._test_instance.current_step_id = next_step_id
         else:
-            self._test_instance.current_step_id = id
+            self._test_instance.current_step_id = step_id
 
-        self._id = id
+        self._id = step_id
         self._description = description
         self._verification = verification
         self._is_commissioning = is_commissioning
@@ -291,9 +302,10 @@ class test_step(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         if type is None:
-            return  # No exception
+            return None  # No exception
         if isinstance(exc_value, TestStepBlockPassException):
             return True  # Suppress special exception we expect to see.
+        return None
 
     @property
     def id(self):
@@ -319,7 +331,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def get_next_step_id(self, current_step_id) -> object:
         if isinstance(current_step_id, int):
             return current_step_id + 1
-        elif isinstance(current_step_id, str):
+        if isinstance(current_step_id, str):
             match = re.search(r"^(?P<step_number>\d+)", current_step_id)
             if match:
                 return int(match.group('step_number')) + 1
@@ -353,7 +365,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             self.current_step_id = 0
             self.is_aggregating_steps = True
             self.aggregated_steps = []
-            self.test_TC_OPCREDS_3_8()
+            # Run the bare test body, not the run_if_endpoint_matches wrapper: the
+            # wrapper needs a live DUT and self.event_loop, neither of which exists
+            # at test-listing time. In aggregation mode every test_step block skips
+            # its body, so the bare coroutine completes without device interaction.
+            asyncio.run(inspect.unwrap(type(self).test_TC_OPCREDS_3_8)(self))
         finally:
             self.is_aggregating_steps = False
 
@@ -388,20 +404,25 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                 dev_ctrl=th1_dev_ctrl,
                 node_id=th1_dut_node_id,
                 cluster=opcreds,
-                attribute=opcreds.Attributes.TrustedRootCertificates,
-                fabric_filtered=True
+                attribute=opcreds.Attributes.TrustedRootCertificates
             )
-            asserts.assert_true(len(root_certs) == 1,
-                                f"Expecting exactly one root from TrustedRootCertificates (TH1's), got {len(root_certs)}")
 
-            logging.info("Parsing root certificate for TH1's fabric")
-            try:
-                th1_root_parser = MatterCertParser(root_certs[0])
-                th1_root_public_key = th1_root_parser.get_public_key_bytes()
-            except (ValueError, IndexError, KeyError, TypeError) as e:
-                asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
-            logging.info("Parsed TH1's RCAC successfully.")
-            logging.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
+            log.info("Parsing root certificate for TH1's fabric")
+            th1_root_public_key = th1_dev_ctrl.rootPublicKeyBytes
+            th1_root_cert = None
+            for cert in root_certs:
+                try:
+                    parser = MatterCertParser(cert)
+                    if parser.get_public_key_bytes() == th1_root_public_key:
+                        th1_root_cert = cert
+                        break
+                except (ValueError, IndexError, KeyError, TypeError):
+                    continue
+            asserts.assert_is_not_none(
+                th1_root_cert, "Could not find TH1's root certificate in TrustedRootCertificates")
+
+            log.info("Parsed TH1's RCAC successfully.")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th1_root_public_key))
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -425,14 +446,14 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
             th2_fabric_index = nocResp.fabricIndex
 
-            logging.info("Parsing root certificate for TH2's fabric")
+            log.info("Parsing root certificate for TH2's fabric")
             try:
                 th2_rcac = MatterCertParser(rcacResp)
                 th2_root_public_key = th2_rcac.get_public_key_bytes()
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
-            logging.info("Parsed TH2's RCAC successfully.")
-            logging.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
+            log.info("Parsed TH2's RCAC successfully.")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th2_root_public_key))
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
@@ -470,7 +491,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
-                        logging.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        log.info("Trying to parse NOC for fabric index %s", fabric_index)
                         noc_cert = MatterCertParser(noc_struct.noc)
                         for tag, value in noc_cert.get_subject_names().items():
                             if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
@@ -479,10 +500,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     except (ValueError, IndexError, KeyError, TypeError) as e:
                         asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
 
-                    logging.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
-                    logging.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
+                    log.info("Succeeded in parsing NOC for fabric index %s.", fabric_index)
+                    log.info("  -> NOC public key bytes: %s", to_octet_string(noc_public_keys_from_certs[controller_name]))
 
-            logging.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+            log.info("Fabric IDs found: %s", fabric_ids_from_certs)
 
             asserts.assert_true(th1_fabric_index in found_fabric_indices,
                                 f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")
@@ -546,7 +567,8 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
         with test_step(5, description="Send bad SignVIDVerificationRequest commands and verify failures"):
             # Must fail with correct client challenge but non-existent fabric.
-            unassigned_fabric_index = get_unassigned_fabric_index(fabric_indices.values())
+            assigned_fabric_indices = [noc_struct.fabricIndex for noc_struct in nocs_list]
+            unassigned_fabric_index = get_unassigned_fabric_index(assigned_fabric_indices)
             with asserts.assert_raises(InteractionModelError) as exception_context:
                 await self.send_single_cmd(cmd=opcreds.Commands.SignVIDVerificationRequest(fabricIndex=unassigned_fabric_index, clientChallenge=client_challenge))
 

@@ -19,6 +19,8 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRCommissioningDelegate.h>
+#import <Matter/MTRCommissioningOperation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerFactory.h>
@@ -27,16 +29,18 @@
 #import <Matter/MTROTAProviderDelegate.h>
 
 #import "MTRAsyncWorkQueue.h"
+#import "MTRCommissioningDelegate_Internal.h"
 #import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerDataStore.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRSessionParameters.h"
 
 #include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController_Concrete : MTRDeviceController
+@interface MTRDeviceController_Concrete : MTRDeviceController <MTRCommissioningDelegate, MTRCommissioningDelegate_Internal>
 
 /**
  * Init a newly created controller.
@@ -140,11 +144,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
+ * Like getSessionForNode:completion: but allows configuring what sort of session we want.
+ */
+- (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
  * Since getSessionForNode now enqueues by the subscription pool for Thread
  * devices, MTRDevice_Concrete needs a direct non-queued access because it already
  * makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Like directlyGetSessionForNode:completion: but allows configuring what sort of session we want.
+ */
+- (void)directlyGetSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may
@@ -229,6 +243,54 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)definitelyUsesThreadForDevice:(chip::NodeId)nodeID;
 
 /**
+ * Start commissioning for the given MTRCommissioningOperation.
+ */
+- (CHIP_ERROR)startCommissioning:(MTRCommissioningOperation *)commissioning withCommissioningID:(NSNumber *)commissioningID;
+
+/**
+ * Stop commissioning for the given MTRCommissioningOperation.
+ *
+ * Returns NO if this is not the current commissioning or if we can't
+ * sync-dispatch things to the Matter queue to talk to the C++ code.
+ */
+- (BOOL)stopCommissioning:(MTRCommissioningOperation *)commissioning forCommissioningID:(NSNumber *)commissioningID;
+
+/**
+ * Notification that a commissioning operation is done.
+ */
+- (void)commissioningDone:(MTRCommissioningOperation *)commissioning;
+
+/**
+ * Continue commissioning after device attestation.
+ */
+- (BOOL)continueCommissioningAfterAttestation:(MTRCommissioningOperation *)commissioning
+                              forOpaqueHandle:(void *)handle
+                                        error:(NSError * __autoreleasing *)error;
+
+/**
+ * Go ahead with the post-PASE part of commissioning.
+ */
+- (BOOL)commission:(MTRCommissioningOperation *)commissioning
+    withCommissioningID:(NSNumber *)commissioningID
+    commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                  error:(NSError * __autoreleasing *)error;
+
+/**
+ * Continue commissioning with the given credentials after a Wi-Fi scan.
+ */
+- (BOOL)continueCommissioning:(MTRCommissioningOperation *)commissioning
+                 withWiFiSSID:(NSData *)ssid
+                  credentials:(nullable NSData *)credentials
+                        error:(NSError * __autoreleasing *)error;
+
+/**
+ * Continue commissioning with the given credentials after a Thread scan.
+ */
+- (BOOL)continueCommissioning:(MTRCommissioningOperation *)commissioning
+       withOperationalDataset:(NSData *)operationalDataset
+                        error:(NSError * __autoreleasing *)error;
+
+/**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
  */
 @property (readonly) chip::FabricIndex fabricIndex;
@@ -243,6 +305,19 @@ NS_ASSUME_NONNULL_BEGIN
  * The per-controller data store this controller was initialized with, if any.
  */
 @property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
+
+/**
+ * The current commissioning this controller is doing, if there is one.
+ *
+ * Ideally we could support multiple commissionings in parallel, but right now
+ * the C++ SDK can't.  And automatically serializing them is not great because
+ * it can cause things to fail when commissioning windows close; better to let
+ * applications handle that for now.
+ *
+ * Note: This is atomic because it might get read/set from both the Matter queue
+ * and whatever queues our API clients are running on.
+ */
+@property (atomic, readonly, nullable, weak) MTRCommissioningOperation * currentCommissioning;
 
 @end
 

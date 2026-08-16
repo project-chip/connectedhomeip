@@ -45,7 +45,6 @@ enum class DatastoreAccessControlEntryAuthModeEnum : uint8_t
 enum class DatastoreAccessControlEntryPrivilegeEnum : uint8_t
 {
     kView       = 0x01,
-    kProxyView  = 0x02,
     kOperate    = 0x03,
     kManage     = 0x04,
     kAdminister = 0x05,

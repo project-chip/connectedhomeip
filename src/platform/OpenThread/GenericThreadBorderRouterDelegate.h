@@ -38,7 +38,13 @@ class GenericOpenThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kFailsafeActiveDatasetConfigured[] = "g/fs/tbradc";
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
-    ~GenericOpenThreadBorderRouterDelegate() = default;
+    ~GenericOpenThreadBorderRouterDelegate()
+    {
+        // Note: It is safe to call RemoveEventHandler here even if Init() was not called or failed.
+        // RemoveEventHandler handles unregistered handlers gracefully, allowing us to avoid adding
+        // a state flag to track initialization.
+        DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
 
@@ -46,7 +52,8 @@ public:
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        CopyCharSpanToMutableCharSpan(CharSpan(mThreadBorderRouterName, strlen(mThreadBorderRouterName)), borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan(mThreadBorderRouterName, strlen(mThreadBorderRouterName)),
+                                                               borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
@@ -71,10 +78,10 @@ public:
     void SetThreadBorderRouterName(const CharSpan & name)
     {
         MutableCharSpan borderRouterName(mThreadBorderRouterName);
-        CopyCharSpanToMutableCharSpan(name, borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(name, borderRouterName);
         if (mpAttributeChangeCallback)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda(
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderRouterName::Id); });
         }
     }
@@ -85,7 +92,7 @@ public:
         {
             // OpenThread doesn't have callback or event for BorderAgentId change, we can only change the BorderAgentId with
             // otBorderAgentSetId(). Please call this function with otBorderAgentSetId().
-            DeviceLayer::SystemLayer().ScheduleLambda(
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
                 [this]() { mpAttributeChangeCallback->ReportAttributeChanged(Attributes::BorderAgentID::Id); });
         }
     }

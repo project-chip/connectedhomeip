@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,9 @@ public:
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
+
+    static bool sIsCommissioningFailed;
+    static bool IsCommissioningFailed(void) { return sIsCommissioningFailed; }
 
 #ifdef CONFIG_TFLM_FEATURE
     void SetThreadStateChangedEventCapturedFlag(void) { mThreadStateChangedEventCaptured = true; }

@@ -51,7 +51,7 @@ using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
-class TestReportScheduler : public chip::Test::AppContext
+class TestReportScheduler : public chip::Testing::AppContext
 {
 public:
     void TestReadHandlerList();
@@ -96,7 +96,7 @@ public:
     }
 };
 
-class TestTimerDelegate : public ReportScheduler::TimerDelegate
+class TestTimerDelegate : public TimerDelegate
 {
 public:
     struct NodeTimeoutPair
@@ -156,7 +156,7 @@ public:
         context->TimerFired();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
@@ -193,7 +193,7 @@ public:
 /// on the system layer. This also simulates the system timer by verifying if the timeout expired when incrementing the mock
 /// timestamp. only one timer can be active at a time, which is the one has the earliest timeout.
 /// It is used to test the SynchronizedReportSchedulerImpl.
-class TestTimerSynchronizedDelegate : public ReportScheduler::TimerDelegate
+class TestTimerSynchronizedDelegate : public TimerDelegate
 {
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
@@ -201,7 +201,7 @@ public:
         TimerContext * context = static_cast<TimerContext *>(aAppState);
         context->TimerFired();
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         if (nullptr == context)
         {

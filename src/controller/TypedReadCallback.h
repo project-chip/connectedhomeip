@@ -219,7 +219,7 @@ private:
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrExit((aEventHeader.mPath.mEventId == value.GetEventId()) && (aEventHeader.mPath.mClusterId == value.GetClusterId()),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+                     err = CHIP_ERROR_SCHEMA_MISMATCH);
         err = app::DataModel::Decode(*apData, value);
         SuccessOrExit(err);
 

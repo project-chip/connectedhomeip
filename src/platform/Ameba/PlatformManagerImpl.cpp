@@ -32,9 +32,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-CHIP_ERROR InitLwIPCoreLock(void);
-}
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
@@ -56,30 +53,20 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-
-    CHIP_ERROR err;
-
-    // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-
-    SuccessOrExit(err);
-
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     // TODO Wi-Fi Initialzation currently done through the example app needs to be moved into here.
     // for now we will let this happen that way and assume all is OK
 
-    chip::Crypto::add_entropy_source(app_entropy_source, NULL, 1);
+    TEMPORARY_RETURN_IGNORED chip::Crypto::add_entropy_source(app_entropy_source, NULL, 1);
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    CHIP_ERROR err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
 
     SuccessOrExit(err);
 
     err = System::Clock::InitClock_RealTime();
-
-    SuccessOrExit(err);
 
 exit:
     return err;
@@ -95,7 +82,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

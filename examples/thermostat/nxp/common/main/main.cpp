@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     TaskHandle_t taskHandle;
 
     PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
+    TEMPORARY_RETURN_IGNORED chip::NXP::App::GetAppTask().Start();
     vTaskStartScheduler();
 }
 

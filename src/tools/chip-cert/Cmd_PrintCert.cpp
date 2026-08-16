@@ -151,7 +151,7 @@ void PrintEpochTime(FILE * file, const char * name, int indent, uint32_t epochTi
 {
     chip::ASN1::ASN1UniversalTime asn1Time;
 
-    ChipEpochToASN1Time(epochTime, asn1Time);
+    TEMPORARY_RETURN_IGNORED ChipEpochToASN1Time(epochTime, asn1Time);
 
     Indent(file, indent);
     fprintf(file, "%s: ", name);

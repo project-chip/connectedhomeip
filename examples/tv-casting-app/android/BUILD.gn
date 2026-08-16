@@ -18,6 +18,8 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 
 shared_library("jni") {
   output_name = "libTvCastingApp"
@@ -58,6 +60,21 @@ shared_library("jni") {
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 
   ldflags = [ "-Wl,--gc-sections" ]
+
+  if (optimize_apk_size) {
+    # Identical Code Folding: merge functions with identical machine code.
+    ldflags += [ "-Wl,--icf=safe" ]
+
+    # Thin LTO at link time (must match cflags).
+    ldflags += [ "-flto=thin" ]
+
+    # Static libc++: fold libc++ into libTvCastingApp.so so we don't ship
+    # the 7.5 MB libc++_shared.so as a separate file. The linker's
+    # --gc-sections + LTO will strip unused libc++ code.
+    if (use_static_libcxx) {
+      ldflags += [ "-static-libstdc++" ]
+    }
+  }
 }
 
 android_library("java") {
@@ -71,10 +88,12 @@ android_library("java") {
     "${chip_root}/third_party/android_deps:annotation",
   ]
 
-  data_deps = [
-    ":jni",
-    "${chip_root}/build/chip/java:shared_cpplib",
-  ]
+  data_deps = [ ":jni" ]
+
+  # When using static libc++, we don't need the shared libc++ library.
+  if (!use_static_libcxx) {
+    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+  }
 
   sources = [
     "App/app/src/compat/jni/com/chip/casting/AppParameters.java",

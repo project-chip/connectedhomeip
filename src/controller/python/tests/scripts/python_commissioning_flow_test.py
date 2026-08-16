@@ -97,7 +97,7 @@ def main():
         default=1,
         type=int,
         help="The Node ID issued to the device",
-        metavar="<nodeid>"
+        metavar="<node-id>"
     )
     optParser.add_option(
         '--paa-trust-store-path',
@@ -113,7 +113,7 @@ def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaPath, testCommissioner=True, keypair=p256keypair.TestP256Keypair())
+        nodeId=112233, paaTrustStorePath=options.paaPath, testCommissioner=True, keypair=p256keypair.TestP256Keypair())
 
     class BadCredentialProvider:
         def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController):

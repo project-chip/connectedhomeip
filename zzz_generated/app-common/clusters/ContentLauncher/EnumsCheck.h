@@ -92,6 +92,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::QueueTypeEnum val)
+{
+    using EnumType = ContentLauncher::QueueTypeEnum;
+    switch (val)
+    {
+    case EnumType::kReplace:
+    case EnumType::kNext:
+    case EnumType::kLast:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
 {
     using EnumType = ContentLauncher::StatusEnum;
@@ -102,6 +115,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Status
     case EnumType::kAuthFailed:
     case EnumType::kTextTrackNotAvailable:
     case EnumType::kAudioTrackNotAvailable:
+    case EnumType::kInvalidData:
+    case EnumType::kAccountMismatch:
+    case EnumType::kContentAppNotAvailable:
+    case EnumType::kReplicationNotAllowed:
+    case EnumType::kReplicationNotSupported:
+    case EnumType::kPresetNotFound:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

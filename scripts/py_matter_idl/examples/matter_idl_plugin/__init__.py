@@ -159,8 +159,7 @@ def toEncodedTag(tag, typeNum: EncodingDataType):
     """ Return the final encoded tag from the given field number and field encoded data type.
         The Matter field type information is encoded into the upper range of the protobuf field
         tag for stateless translation to Matter TLV. """
-    tag = (int(typeNum) << 19) | int(tag)
-    return tag
+    return (int(typeNum) << 19) | int(tag)
 
 
 def toProtobufFullType(field: Field):
@@ -177,16 +176,13 @@ def toProtobufFullType(field: Field):
 def toFieldTag(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tag = toEncodedTag(field.code, typeNum)
-    return tag
+    return toEncodedTag(field.code, typeNum)
 
 
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tagComment = "/** %s Type: %d IsList: %d FieldId: %d */" % (
-        field.data_type.name, typeNum, field.is_list, field.code)
-    return tagComment
+    return f"/** {field.data_type.name} Type: {typeNum} IsList: {field.is_list:d} FieldId: {field.code} */"
 
 
 class CustomGenerator(CodeGenerator):
@@ -232,14 +228,13 @@ class CustomGenerator(CodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
-                cluster.name)
+            filename = f"proto/{toLowerSnakeCase(cluster.name)}_cluster.proto"
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(
                 template_path="matter_cluster_proto.jinja",
                 output_file_name=filename,
-                vars={
+                template_vars={
                     'cluster': cluster,
                     'package': self.package,
                 }

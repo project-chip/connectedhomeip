@@ -182,7 +182,7 @@ public:
                     bool internalScan = false);
     CHIP_ERROR Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling);
     StationStatus GetStationStatus() const;
-    CHIP_ERROR ClearStationProvisioningData();
+    void ClearStationProvisioningData();
     CHIP_ERROR Disconnect();
     CHIP_ERROR GetWiFiInfo(WiFiInfo & info) const;
     const WiFiNetwork & GetWantedNetwork() const { return mWantedNetwork; }

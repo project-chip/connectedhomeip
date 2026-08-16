@@ -50,9 +50,10 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
-        response.channel = result->channel;
-        response.rssi    = result->rssi;
-        response.ssidLen = result->ssid_length;
+        response.channel         = result->channel;
+        response.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        response.signal.strength = result->rssi;
+        response.ssidLen         = result->ssid_length;
         memcpy(response.ssid, result->ssid, result->ssid_length);
         // TODO: MAC/BSSID is not filled by the Wi-Fi driver
         memcpy(response.bssid, result->mac, result->mac_length);
@@ -211,11 +212,10 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiManager::ClearStationProvisioningData()
+void WiFiManager::ClearStationProvisioningData()
 {
     mWiFiParams.mRssi = std::numeric_limits<int8_t>::min();
     memset(&mWiFiParams.mParams, 0, sizeof(mWiFiParams.mParams));
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling)
@@ -400,7 +400,11 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
                 auto currentTimeout = Instance().CalculateNextRecoveryTime();
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
-                DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                CHIP_ERROR error = DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                if (error != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to start recovery timer: %" CHIP_ERROR_FORMAT, error.Format());
+                }
                 return;
             }
 
@@ -557,7 +561,11 @@ void WiFiManager::Recover(System::Layer *, void *)
         return;
     }
 
-    Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+    CHIP_ERROR err = Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "WiFi scan failed during recovery: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void WiFiManager::ResetRecoveryTime()

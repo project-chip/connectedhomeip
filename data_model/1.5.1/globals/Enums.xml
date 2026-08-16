@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<enums>
+  <enum name="AtomicRequestTypeEnum">
+    <item value="0" name="BeginWrite" summary="Begin an atomic write">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="CommitWrite" summary="Commit an atomic write">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="RollbackWrite" summary="Rollback an atomic write, discarding any pending changes">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="MeasurementTypeEnum">
+    <item value="0" name="Unspecified">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="Voltage" summary="Voltage in millivolts (mV)">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="ActiveCurrent" summary="Active current in milliamps (mA)">
+      <mandatoryConform/>
+    </item>
+    <item value="3" name="ReactiveCurrent" summary="Reactive current in milliamps (mA)">
+      <mandatoryConform/>
+    </item>
+    <item value="4" name="ApparentCurrent" summary="Apparent current in milliamps (mA)">
+      <mandatoryConform/>
+    </item>
+    <item value="5" name="ActivePower" summary="Active power in milliwatts (mW)">
+      <mandatoryConform/>
+    </item>
+    <item value="6" name="ReactivePower" summary="Reactive power in millivolt-amps reactive (mVAR)">
+      <mandatoryConform/>
+    </item>
+    <item value="7" name="ApparentPower" summary="Apparent power in millivolt-amps (mVA)">
+      <mandatoryConform/>
+    </item>
+    <item value="8" name="RMSVoltage" summary="Root mean squared voltage in millivolts (mV)">
+      <mandatoryConform/>
+    </item>
+    <item value="9" name="RMSCurrent" summary="Root mean squared current in milliamps (mA)">
+      <mandatoryConform/>
+    </item>
+    <item value="10" name="RMSPower" summary="Root mean squared power in milliwatts (mW)">
+      <mandatoryConform/>
+    </item>
+    <item value="11" name="Frequency" summary="AC frequency in millihertz (mHz)">
+      <mandatoryConform/>
+    </item>
+    <item value="12" name="PowerFactor" summary="Power Factor ratio in +/- 1/100ths of a percent.">
+      <mandatoryConform/>
+    </item>
+    <item value="13" name="NeutralCurrent" summary="AC neutral current in milliamps (mA)">
+      <mandatoryConform/>
+    </item>
+    <item value="14" name="ElectricalEnergy" summary="Electrical energy in milliwatt-hours (mWh)">
+      <mandatoryConform/>
+    </item>
+    <item value="15" name="ReactiveEnergy" summary="Reactive power in millivolt-amp-hours reactive (mVARh)">
+      <mandatoryConform/>
+    </item>
+    <item value="16" name="ApparentEnergy" summary="Apparent power in millivolt-amp-hours (mVAh)">
+      <mandatoryConform/>
+    </item>
+    <item value="17" name="SoilMoisture" summary="Soil moisture in percent">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="PowerThresholdSourceEnum">
+    <item value="0x00" name="Contract" summary="The power threshold comes from a signed contract">
+      <mandatoryConform/>
+    </item>
+    <item value="0x01" name="Regulator" summary="The power threshold comes from a legal regulator">
+      <mandatoryConform/>
+    </item>
+    <item value="0x02" name="Equipment" summary="The power threshold comes from a certified limits of the meter">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="SoftwareVersionCertificationStatusEnum">
+    <item value="0" name="dev-test" summary="dev-test">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="provisional" summary="provisional">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="certified" summary="certified">
+      <mandatoryConform/>
+    </item>
+    <item value="3" name="revoked" summary="revoked">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="StreamUsageEnum">
+    <item value="0" name="Internal" summary="Internal video stream.">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="Recording" summary="Stream for recording clips.">
+      <optionalConform/>
+    </item>
+    <item value="2" name="Analysis" summary="Stream for analysis and entity detection.">
+      <optionalConform/>
+    </item>
+    <item value="3" name="LiveView" summary="Stream for liveview.">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="TariffPriceTypeEnum">
+    <item value="0x00" name="Standard" summary="Standard tariff price">
+      <mandatoryConform/>
+    </item>
+    <item value="0x01" name="Critical" summary="Price during CPP events">
+      <mandatoryConform/>
+    </item>
+    <item value="0x02" name="Virtual" summary="Price during VPP events">
+      <mandatoryConform/>
+    </item>
+    <item value="0x03" name="Incentive" summary="Price incentives">
+      <mandatoryConform/>
+    </item>
+    <item value="0x04" name="IncentiveSignal" summary="Price incentive signals">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="TariffUnitEnum">
+    <item value="0" name="kWh" summary="Kilowatt Hours">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="kVAh" summary="Kilovolt-amp Hours">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="ThreeLevelAutoEnum">
+    <item value="0" name="Auto" summary="Automatic Level">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="Low" summary="Low Level">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="Medium" summary="Medium Level">
+      <mandatoryConform/>
+    </item>
+    <item value="3" name="High" summary="High Level">
+      <mandatoryConform/>
+    </item>
+  </enum>
+  <enum name="WebRTCEndReasonEnum">
+    <item value="0" name="ICEFailed" summary="No media connection could be established to the other party">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="ICETimeout" summary="The call timed out whilst waiting for ICE candidate gathering to complete">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="UserHangup" summary="The user chose to end the call">
+      <mandatoryConform/>
+    </item>
+    <item value="3" name="UserBusy" summary="The remote party is busy">
+      <mandatoryConform/>
+    </item>
+    <item value="4" name="Replaced" summary="The call was replaced by another call">
+      <mandatoryConform/>
+    </item>
+    <item value="5" name="NoUserMedia" summary="An error code when there is no local mic/camera to use. This may be because the hardware isn&apos;t plugged in, or the user has explicitly denied access">
+      <mandatoryConform/>
+    </item>
+    <item value="6" name="InviteTimeout" summary="The call timed out whilst waiting for the offer/answer step to complete">
+      <mandatoryConform/>
+    </item>
+    <item value="7" name="AnsweredElsewhere" summary="The call was answered from a different device">
+      <mandatoryConform/>
+    </item>
+    <item value="8" name="OutOfResources" summary="The was unable to continue due to not enough resources or available streams">
+      <mandatoryConform/>
+    </item>
+    <item value="9" name="MediaTimeout" summary="The call ended due to a media timeout">
+      <mandatoryConform/>
+    </item>
+    <item value="10" name="LowPower" summary="The call ended due to hitting a low power condition">
+      <mandatoryConform/>
+    </item>
+    <item value="11" name="PrivacyMode" summary="The call ended due to the camera being set into a privacy mode.">
+      <mandatoryConform/>
+    </item>
+    <item value="12" name="UnknownReason" summary="Unknown or unspecified reason">
+      <mandatoryConform/>
+    </item>
+  </enum>
+</enums>

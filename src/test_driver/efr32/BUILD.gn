@@ -45,7 +45,7 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -59,8 +59,12 @@ efr32_sdk("sdk") {
 }
 
 config("efr32_ldflags") {
-  _ldscript =
-      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    _ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    _ldscript =
+        "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  }
 
   ldflags = [
     "-T" + rebase_path(_ldscript, root_build_dir),
@@ -96,7 +100,7 @@ source_set("efr32_test_main") {
   ]
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
@@ -107,7 +111,7 @@ source_set("efr32_test_main") {
   deps += pw_build_LINK_DEPS
 
   libs = [
-    "${matter_support_root}/provision/libs/libProvision_${silabs_family}.a",
+    "${matter_support_root}/provision/libs/libProvision-${silabs_family}.a",
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]

@@ -29,10 +29,10 @@
                         "supportUrl": "https://github.com/project-chip/connectedhomeip/",
                         "userManualUrl": "",
                         "enhancedSetupFlowOptions": 1,
-                        "enhancedSetupFlowTCUrl": "https://localhost:44538/tc/65521/32785",
+                        "enhancedSetupFlowTCUrl": "https://raw.githubusercontent.com/project-chip/connectedhomeip/refs/heads/master/integrations/mock_server/configurations/static/tc-65521-32785-v1.json",
                         "enhancedSetupFlowTCRevision": 1,
-                        "enhancedSetupFlowTCDigest": "Q+zDGwvJk+tZtBV28b/L4YLw5LIUklk46bTZfyDpJkE=",
-                        "enhancedSetupFlowTCFileSize": 2060,
+                        "enhancedSetupFlowTCDigest": "ao1LON0TobBh+ndb9lytPn9iRH2umLoTjhka8TXereA=",
+                        "enhancedSetupFlowTCFileSize": 3721,
                         "enhancedSetupFlowMaintenanceUrl": ""
                     }
                 }

@@ -41,6 +41,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kDuration), duration);
     encoder.Encode(to_underlying(Fields::kMessageText), messageText);
     encoder.Encode(to_underlying(Fields::kResponses), responses);
+    encoder.Encode(to_underlying(Fields::kLanguageCode), languageCode);
+    encoder.Encode(to_underlying(Fields::kMessageURI), messageURI);
     return encoder.Finalize();
 }
 
@@ -82,11 +84,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         {
             err = DataModel::Decode(reader, responses);
         }
+        else if (__context_tag == to_underlying(Fields::kLanguageCode))
+        {
+            err = DataModel::Decode(reader, languageCode);
+        }
+        else if (__context_tag == to_underlying(Fields::kMessageURI))
+        {
+            err = DataModel::Decode(reader, messageURI);
+        }
 
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PresentMessagesRequest.
+} // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -114,7 +124,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CancelMessagesRequest.
+} // namespace CancelMessagesRequest
 } // namespace Commands
 } // namespace Messages
 } // namespace Clusters

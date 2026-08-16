@@ -191,12 +191,13 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
     {
         if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr), Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
-                                  Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else
         {
@@ -735,7 +736,7 @@ bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
         ReportOpenSSLErrorAndExit("i2d_X509", res = false);
     }
 
-    VerifyOrReturnError(chip::CanCastTo<size_t>(derCertLen), false);
+    VerifyOrExit(chip::CanCastTo<size_t>(derCertLen), res = false);
 
     err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<size_t>(derCertLen)), chipCert);
     if (err != CHIP_NO_ERROR)

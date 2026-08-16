@@ -35,4 +35,9 @@
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
 
+// Temporary set MaxMembershipCount to 24 for all-cluster-app due to hardcoded TestGroupKeyManagementCluster.yaml
+// Where 12 group are created on a single fabric with the group clusters.
+// TODO cleanup this config #43166
+#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 24
+
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

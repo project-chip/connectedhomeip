@@ -30,9 +30,9 @@ Build vscode dev environment docker image.
 
 Options:
     -h,--help        Show this help
-    -t,--tag         Image tag - default is matter-dev-environment:local
-    -u,--uid         User UIDa - default is the current user ID
-    -v,--version     Build version - default is the version of the base chip-build docker image
+    -t,--tag         Image tag - default is $IMAGE_TAG
+    -u,--uid         User UID - default is $USER_UID
+    -v,--version     Build version - default is the version of the base chip-build docker image ($BUILD_VERSION)
 EOF
 }
 
@@ -76,10 +76,11 @@ if [ "$USER_UID" = "0" ]; then
     USER_UID=1000
 fi
 
-docker build \
+docker buildx build \
     -t "$IMAGE_TAG" \
     --pull \
     --build-arg USER_UID="$USER_UID" \
     --build-arg BUILD_VERSION="$BUILD_VERSION" \
+    --build-arg LOCAL_WORKSPACE_ROOT="$CHIP_ROOT" \
     --network=host \
     "$HERE"

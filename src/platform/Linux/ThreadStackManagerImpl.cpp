@@ -103,7 +103,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
+    GCharPtr role(openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDeviceRoleChangedHandler(role.get());
@@ -130,7 +130,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadBorderRouter * pr
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
-            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
 
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
@@ -301,9 +301,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    dataset.Init(mDataset.AsByteSpan());
-
-    return CHIP_NO_ERROR;
+    return dataset.Init(mDataset.AsByteSpan());
 }
 
 bool ThreadStackManagerImpl::_IsThreadProvisioned()
@@ -410,7 +408,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -421,7 +419,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         }
         else
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -442,7 +440,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
+    GCharPtr role(openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
@@ -514,35 +512,6 @@ CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Millisecon
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    // TODO: Remove Weave legacy APIs
-    // For a leader with a child, the child is considered to have mesh connectivity
-    // and the leader is not, which is a very confusing definition.
-    // This API is Weave legacy and should be removed.
-
-    ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
@@ -590,22 +559,10 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
     // TODO https://github.com/project-chip/connectedhomeip/issues/30602
     // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -643,7 +600,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpScanCallback != nullptr)
                 {
                     LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
@@ -719,7 +676,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         }
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
         // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
         // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
         // lambda.

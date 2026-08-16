@@ -30,7 +30,7 @@ typedef void * WebRTCClientHandle;
 typedef void (*LocalDescriptionCallback)(const char * sdp, const char * type, void * user_data);
 typedef void (*IceCandidateCallback)(const char * candidate, const char * mid, void * user_data);
 typedef void (*GatheringCompleteCallback)();
-typedef void (*OnStateChangeCallback)(int state);
+typedef void (*OnStateChangeCallback)(const char * state);
 
 /**
  * @brief Creates a new WebRTC client instance.
@@ -143,10 +143,10 @@ const char * webrtc_get_local_description(WebRTCClientHandle handle);
  * Called when latest peer connection state is required.
  *
  * @param handle The handle of the WebRTC client.
- * @return int The state of the peer connection. Possible values are defined in the libdatachannel.
+ * @return const char* The state of the peer connection. Possible values are defined in the libdatachannel.
  * @note This function returns -1 if the client is not found.
  */
-int webrtc_get_peer_connection_state(WebRTCClientHandle handle);
+const char * webrtc_get_peer_connection_state(WebRTCClientHandle handle);
 
 /**
  * @brief Sets a callback for when the gathering process for ICE candidates is complete.
@@ -165,6 +165,24 @@ void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, Ga
  * @param cb The callback function to be invoked when the peer connection state changes.
  */
 void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb);
+
+/**
+ * @brief Creates a new WebRTC provider client instance.
+ *
+ * Initializes a new WebRTC provider client and returns a handle to it.
+ *
+ * @return WebRTCClientHandle Opaque handle to the created provider client instance.
+ */
+WebRTCClientHandle webrtc_provider_client_create();
+
+/**
+ * @brief Destroys a WebRTC provider client instance.
+ *
+ * Frees all resources associated with the client. Must be called after use.
+ *
+ * @param handle The client handle to destroy.
+ */
+void webrtc_provider_client_destroy(WebRTCClientHandle handle);
 
 /**
  * @brief Initializes the WebRTC provider client handle with node ID, fabric index, and endpoint.

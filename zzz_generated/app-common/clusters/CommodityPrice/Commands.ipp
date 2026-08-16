@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetDetailedPriceRequest.
+} // namespace GetDetailedPriceRequest
 namespace GetDetailedPriceResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -84,7 +84,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetDetailedPriceResponse.
+} // namespace GetDetailedPriceResponse
 namespace GetDetailedForecastRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -112,7 +112,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetDetailedForecastRequest.
+} // namespace GetDetailedForecastRequest
 namespace GetDetailedForecastResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -140,7 +140,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetDetailedForecastResponse.
+} // namespace GetDetailedForecastResponse
 } // namespace Commands
 } // namespace CommodityPrice
 } // namespace Clusters

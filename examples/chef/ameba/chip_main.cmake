@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
@@ -29,7 +29,6 @@ if(matter_enable_ota_requestor)
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
   )
 endif(matter_enable_ota_requestor)
@@ -118,7 +117,7 @@ list(
   -std=c++17
   -fno-rtti
 )
-target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags})
+target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
 
 # move static library post build command

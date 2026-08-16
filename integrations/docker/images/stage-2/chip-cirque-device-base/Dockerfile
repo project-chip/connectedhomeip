@@ -28,6 +28,7 @@ RUN apt-get update \
   libavahi-client3 \
   libcairo2-dev \
   libdbus-1-dev \
+  libevent-dev \
   libgif-dev \
   libgirepository1.0-dev \
   libglib2.0-dev \

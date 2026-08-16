@@ -66,7 +66,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace Step.
+} // namespace Step
 } // namespace Commands
 } // namespace FanControl
 } // namespace Clusters

@@ -29,7 +29,6 @@ struct AppEvent : public BaseAppEvent
     enum AppEventTypes
     {
         kEventType_Light = BaseAppEvent::kEventType_Max + 1,
-        kEventType_Install,
     };
 
     union

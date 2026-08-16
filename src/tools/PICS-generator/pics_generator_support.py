@@ -52,7 +52,11 @@ cluster_to_pics_dict = {
 
 def pics_xml_file_list_loader(pics_xml_path: str, log_loaded_pics_files: bool) -> list:
 
-    pics_xml_file_list = os.listdir(pics_xml_path)
+    # Sort so template selection is deterministic. os.listdir order is
+    # filesystem-dependent, so without this the prefix match below could pick
+    # different templates on different machines when names share a prefix
+    # (e.g. "Access Control Cluster ..." vs "Access Control Enforcement ...").
+    pics_xml_file_list = sorted(os.listdir(pics_xml_path))
 
     if log_loaded_pics_files:
         if not pics_xml_path.endswith('/'):

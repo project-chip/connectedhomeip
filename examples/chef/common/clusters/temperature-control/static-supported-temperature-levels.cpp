@@ -20,7 +20,7 @@
 
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
-#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
@@ -86,6 +86,6 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
         chef::Configuration::TemperatureControl::EndpointPair(
             endpoint /* endpointId */, Span<const CharSpan>(chef::Configuration::TemperatureControl::kTemperatureLevelOptions)));
 
-    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER

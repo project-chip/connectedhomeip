@@ -591,7 +591,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
             gCurrentAction.nodeId     = nodeId;
 
             // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                                 OnLockActionCompleteCallback, nullptr);
 
             return true;
         }
@@ -675,7 +676,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
     gCurrentAction.nodeId          = nodeId;
 
     // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                         OnLockActionCompleteCallback, nullptr);
 
     return true;
 }
@@ -703,7 +705,8 @@ void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * ca
         gCurrentAction.lockState = DlLockState::kUnlocked;
 
         // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                             OnLockActionCompleteCallback, nullptr);
     }
     else
     {

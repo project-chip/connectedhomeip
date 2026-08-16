@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CommissionerControl (cluster code: 1873/0x04751)
+// Identifier constant values for cluster CommissionerControl (cluster code: 1873/0x0751)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -21,10 +21,14 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/CommandDataIB.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -32,162 +36,60 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 
 namespace chip {
 namespace app {
 
-class MockCommandHandler : public CommandHandler
-{
-public:
-    ~MockCommandHandler() override {}
-
-    struct ResponseRecord
-    {
-        ConcreteCommandPath path;
-        CommandId commandId;
-        chip::System::PacketBufferHandle encodedData;
-    };
-
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        mStatuses.push_back({ aRequestCommandPath, aStatus });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-    }
-
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
-    {
-        return FallibleAddStatus(aRequestCommandPath,
-                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificSuccess(aClusterStatus));
-    }
-
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
-    {
-        return FallibleAddStatus(aRequestCommandPath,
-                                 Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
-    }
-
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
-
-    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
-
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override
-    {
-        chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-
-        FabricIndex fabricIndex = 1;
-
-        DataModel::FabricAwareTLVWriter writer(baseWriter, fabricIndex);
-
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(chip::app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(containerType));
-
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-
-        mResponses.push_back({ aRequestCommandPath, aResponseCommandId, std::move(handle) });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override
-    {
-        AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-    }
-
-    bool IsTimedInvoke() const override { return mIsTimedInvoke; }
-
-    void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
-
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
-
-    Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
-
-    // Optional for test configuration
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
-    void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
-    void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
-
-private:
-    struct StatusRecord
-    {
-        ConcreteCommandPath path;
-        Protocols::InteractionModel::ClusterStatusCode status;
-    };
-
-    std::vector<ResponseRecord> mResponses;
-    std::vector<StatusRecord> mStatuses;
-
-    FabricIndex mFabricIndex                      = 0;
-    bool mIsTimedInvoke                           = false;
-    bool mAcksFlushed                             = false;
-    Messaging::ExchangeContext * mExchangeContext = nullptr;
-    Access::SubjectDescriptor mSubjectDescriptor;
-};
+using namespace Clusters;
+using namespace Clusters::PushAvStreamTransport;
 
 static uint8_t gDebugEventBuffer[120];
 static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
-static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+static CircularEventBuffer gCircularEventBuffer[3];
 
-class MockEventLogging : public chip::Test::AppContext
+class MockEventLogging : public Testing::AppContext
 {
 public:
+    MockEventLogging() : mClusterTester(mServer) {}
+
     void SetUp() override
     {
-        const chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        const LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), PriorityLevel::Critical },
         };
 
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
 
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
+                                               logStorageResources, &mEventCounter);
+
+        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
     }
 
     void TearDown() override
     {
-        chip::app::EventManagement::DestroyEventManagement();
+        app::SetSafeAttributePersistenceProvider(nullptr);
+        EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
-private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
+protected:
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1) };
+    chip::Testing::ClusterTester mClusterTester;
 };
 
-static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
-{
-    chip::TLV::TLVReader reader;
-    size_t elementCount;
-    chip::app::CircularEventBufferWrapper bufWrapper;
-    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
-
-    EXPECT_EQ(chip::TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
-
-    EXPECT_EQ(elementCount, expectedNumEvents);
-}
 } // namespace app
 } // namespace chip
 
@@ -201,7 +103,7 @@ using TransportTriggerOptionsDecodableStruct           = Structs::TransportTrigg
 using TransportMotionTriggerTimeControlDecodableStruct = Structs::TransportMotionTriggerTimeControlStruct::DecodableType;
 using TransportOptionsDecodableStruct                  = Structs::TransportOptionsStruct::DecodableType;
 
-using namespace chip::Protocols::InteractionModel;
+using namespace Protocols::InteractionModel;
 
 struct PushAvStream
 {
@@ -214,7 +116,8 @@ class TestPushAVStreamTransportDelegateImpl : public PushAvStreamTransportDelega
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override
     {
         PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive,
                              PushAvStreamTransportStatusEnum::kIdle };
@@ -282,6 +185,18 @@ public:
         return Status::Success;
     }
 
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override { return true; }
+
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override
+    {
+        return true;
+    }
+
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override
+    {
+        return true;
+    }
+
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
@@ -290,8 +205,6 @@ public:
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
-
-    bool ValidateUrl(const std::string & url) override { return true; }
 
     Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override
     {
@@ -307,18 +220,32 @@ public:
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override
     {
         // TODO: Validate videoStreamID from the allocated videoStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
     }
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override
     {
         // TODO: Validate audioStreamID from the allocated audioStreams
         // Returning Status::Success to pass through checks in the Server Implementation.
         return Status::Success;
+    }
+
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override
+    {
+        // TODO: Validate zoneId from the allocated zones
+        // Returning Status::Success to pass through checks in the Server Implementation.
+        return Status::Success;
+    }
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override
+    {
+        // TODO: Validate motion zone size
+        // Returning true to pass through checks in the Server Implementation.
+        return true;
     }
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override
@@ -331,6 +258,24 @@ public:
             }
         }
         return PushAvStreamTransportStatusEnum::kUnknown;
+    }
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
     }
 
     void OnAttributeChanged(AttributeId attributeId) override
@@ -352,29 +297,107 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // No-op implementation for tests
+    }
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
+    {
+        // No-op implementation for tests
+    }
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override
+    {
+        // Mock implementation for tests - return a simple session number
+        sessionNumber = static_cast<uint64_t>(connectionID) + 2000;
+        return true;
+    }
+
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
+};
+
+class TestTLSClientManagementDelegate : public TLSClientManagementDelegate
+{
+
+public:
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    Protocols::InteractionModel::ClusterStatusCode
+    ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
+                      const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq,
+                      uint16_t & endpointID) override
+    {
+        return ClusterStatusCode(Status::Success);
+    }
+
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                      uint16_t endpointID) override
+    {
+        return Status::Success;
+    }
+
+    CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    void RemoveFabric(FabricIndex fabric) override {}
+
+    CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                            int8_t delta) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    TestPushAVStreamTransportServerLogic() : mClusterTester(mServer) {}
+
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+    }
+
+    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+
+protected:
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
+    chip::Testing::ClusterTester mClusterTester;
 };
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -387,9 +410,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     // Create CMAFContainerOptionsStruct object
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -413,7 +433,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
@@ -463,7 +483,177 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 
     // Upadate the trigger options in the transport options
     transportOptions.triggerOptions = triggerOptions;
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions),
+              Status::ConstraintError); // ConstraintError because segmentDuration is not set
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    transportOptions.containerOptions = containerOptions;
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
+{
+    // Test that ValidateIncomingTransportOptions rejects >16 video streams
+    PushAvStreamTransportServerLogic logic(1, BitFlags<Feature>(1));
+
+    // Create valid base transport options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    // Create valid CMAF container options
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    // Create valid trigger options
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    // Create empty motion zones (valid for this test)
+    uint8_t tlvBuffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(writer.GetLengthWritten()));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    // Create valid transport options
+    transportOptions.streamUsage      = StreamUsageEnum::kAnalysis;
+    transportOptions.TLSEndpointID    = 1;
+    std::string url                   = "https://192.168.1.100:554/stream/";
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    // Test 1: Create video streams with 17 entries (>kMaxVideoStreams=16)
+    // Use std::vector<std::string> with reserve to keep CharSpan lifetimes stable
+    constexpr size_t kNumTestStreams = 17;
+    std::vector<std::string> videoStreamNames;
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    videoStreamNames.reserve(kNumTestStreams);
+    videoStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        videoStreamNames.push_back("Stream" + std::to_string(i));
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = CharSpan(videoStreamNames.back().data(), videoStreamNames.back().size());
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    uint8_t videoTlvBuffer[1024];
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer, sizeof(videoTlvBuffer));
+    TLV::TLVWriter videoArrayWriter;
+    err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer, static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.videoStreams.SetValue(videoDecodableList);
+
+    // Should return ConstraintError for >16 video streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
+
+    // Test 2: Create audio streams with 17 entries (>kMaxAudioStreams=16)
+    transportOptions.videoStreams.ClearValue();
+
+    std::vector<std::string> audioStreamNames;
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    audioStreamNames.reserve(kNumTestStreams);
+    audioStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = CharSpan(audioStreamNames.back().data(), audioStreamNames.back().size());
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    uint8_t audioTlvBuffer[1024];
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer, sizeof(audioTlvBuffer));
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer, static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.audioStreams.SetValue(audioDecodableList);
+
+    // Should return ConstraintError for >16 audio streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
 }
 
 void PrintBufHex(const uint8_t * buf, size_t size)
@@ -485,16 +675,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     /*
      * Test AllocatePushTransport
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -503,11 +689,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -568,68 +754,46 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    MockCommandHandler commandHandler;
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test AllocatePushTransportResponse
      */
 
     // Check the response
-    const auto & responses = commandHandler.GetResponses();
-    EXPECT_EQ(responses.size(), (size_t) 1);
+    EXPECT_TRUE(commandHandler.HasResponse());
+    EXPECT_EQ(commandHandler.GetResponseCount(), (size_t) 1);
 
-    // Get the encoded buffer
-    const auto & encodedBuffer = responses[0].encodedData;
-
-    PrintBufHex(encodedBuffer->Start(), encodedBuffer->DataLength());
-
-    EXPECT_FALSE(encodedBuffer.IsNull());
-
-    // Set up TLV reader
-    TLV::TLVReader responseReader;
-    responseReader.Init(encodedBuffer->Start(), static_cast<uint32_t>(encodedBuffer->DataLength()));
-
-    // Enter the top-level anonymous structure (CommandDataIB wrapper)
-    err = responseReader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::TLVReader outerContainer;
-    err = responseReader.OpenContainer(outerContainer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Read the next element inside the container: should be kFields
-    err = outerContainer.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    EXPECT_TRUE(IsContextTag(outerContainer.GetTag()));
-    EXPECT_EQ(TagNumFromTag(outerContainer.GetTag()), chip::to_underlying(CommandDataIB::Tag::kFields));
-
-    // Decode into response object
+    // Decode response using MockCommandHandler helper
     Commands::AllocatePushTransportResponse::DecodableType decodedResponse;
-    err = decodedResponse.Decode(outerContainer);
+    err = commandHandler.DecodeResponse(decodedResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Validate decoded fields
@@ -645,19 +809,19 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(respTransportOptions.videoStreamID, 1);
     EXPECT_EQ(respTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(respTransportOptions.endpointID, 1);
+    EXPECT_EQ(respTransportOptions.TLSEndpointID, 1);
     std::string respUrlStr(respTransportOptions.url.data(), respTransportOptions.url.size());
-    EXPECT_EQ(respUrlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(respUrlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType respTriggerOptions = respTransportOptions.triggerOptions;
     EXPECT_EQ(respTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
     EXPECT_TRUE(respTriggerOptions.motionZones.HasValue());
     EXPECT_FALSE(respTriggerOptions.motionZones.Value().IsNull());
 
-    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> & respMotionZonesList =
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> & motionZonesList =
         respTriggerOptions.motionZones.Value().Value();
 
-    auto respMotionZonesIter = respMotionZonesList.begin();
+    auto respMotionZonesIter = motionZonesList.begin();
 
     EXPECT_TRUE(respMotionZonesIter.Next());
     const auto & respDecodedZone1 = respMotionZonesIter.GetValue();
@@ -694,19 +858,11 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(respContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(respContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type respCMAFContainerOptions = respContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 1000);
+    EXPECT_EQ(respCMAFContainerOptions.segmentDuration, 1000);
+    EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 500);
+    std::string respTrackName(respCMAFContainerOptions.trackName.Value().data(), respCMAFContainerOptions.trackName.Value().size());
+    EXPECT_EQ(respTrackName, "video");
     EXPECT_FALSE(respCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string respCENCKeyStr(respCMAFContainerOptions.CENCKey.Value().data(),
-                               respCMAFContainerOptions.CENCKey.Value().data() + respCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(respCENCKeyStr, "1234567890ABCDEF");
-
-    std::string respCENCKeyIDStr(respCMAFContainerOptions.CENCKeyID.Value().data(),
-                                 respCMAFContainerOptions.CENCKeyID.Value().data() +
-                                     respCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(respCENCKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test ReadAttribute
@@ -718,22 +874,22 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     tlvWriter.Init(buf);
 
     AttributeReportIBs::Builder builder;
-    builder.Init(&tlvWriter);
+    EXPECT_SUCCESS(builder.Init(&tlvWriter));
 
     ConcreteAttributePath path(1, Clusters::PushAvStreamTransport::Id,
                                Clusters::PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
-    DataModel::ReadAttributeRequest request;
-    request.path = path;
-    request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
-    chip::DataVersion dataVersion(0);
     Access::SubjectDescriptor subjectDescriptor;
     FabricIndex peerFabricIndex   = 1;
     subjectDescriptor.fabricIndex = peerFabricIndex;
+
+    DataModel::ReadAttributeRequest request(path, subjectDescriptor);
+    request.readFlags.Set(DataModel::ReadFlags::kFabricFiltered);
+    DataVersion dataVersion(0);
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion, true);
 
     // Read the CurrentConnections attribute using the cluster's Read function
-    DataModel::ActionReturnStatus status = server.ReadAttribute(request, encoder);
+    DataModel::ActionReturnStatus status = mServer.ReadAttribute(request, encoder);
     EXPECT_TRUE(status.IsSuccess());
 
     TLV::TLVReader reader;
@@ -745,20 +901,20 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     TLV::TLVReader attrReportReader;
     TLV::TLVReader attrDataReader;
 
-    reader.Next();
-    reader.OpenContainer(attrReportsReader);
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(reader.OpenContainer(attrReportsReader));
 
-    attrReportsReader.Next();
-    attrReportsReader.OpenContainer(attrReportReader);
+    EXPECT_SUCCESS(attrReportsReader.Next());
+    EXPECT_SUCCESS(attrReportsReader.OpenContainer(attrReportReader));
 
-    attrReportReader.Next();
-    attrReportReader.OpenContainer(attrDataReader);
+    EXPECT_SUCCESS(attrReportReader.Next());
+    EXPECT_SUCCESS(attrReportReader.OpenContainer(attrDataReader));
 
     // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    attrDataReader.Next();
+    EXPECT_SUCCESS(attrDataReader.Next());
     for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
     {
-        attrDataReader.Next();
+        EXPECT_SUCCESS(attrDataReader.Next());
     }
     EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
     EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
@@ -777,10 +933,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(readTransportOptions.videoStreamID, 1);
     EXPECT_EQ(readTransportOptions.audioStreamID, 2);
-    EXPECT_EQ(readTransportOptions.endpointID, 1);
+    EXPECT_EQ(readTransportOptions.TLSEndpointID, 1);
 
     std::string urlStr(readTransportOptions.url.data(), readTransportOptions.url.size());
-    EXPECT_EQ(urlStr, "rtsp://192.168.1.100:554/stream");
+    EXPECT_EQ(urlStr, "https://192.168.1.100:554/stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType readTriggerOptions = readTransportOptions.triggerOptions;
     EXPECT_EQ(readTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -827,50 +983,39 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     EXPECT_EQ(readContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(readContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type readCMAFContainerOptions = readContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 1000);
+    EXPECT_EQ(readCMAFContainerOptions.segmentDuration, 1000);
+    EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 500);
+    std::string readTrackName(readCMAFContainerOptions.trackName.Value().data(), readCMAFContainerOptions.trackName.Value().size());
+    EXPECT_EQ(readTrackName, "video");
     EXPECT_FALSE(readCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string cencKeyStr(readCMAFContainerOptions.CENCKey.Value().data(),
-                           readCMAFContainerOptions.CENCKey.Value().data() + readCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
-
-    std::string cencKeyIDStr(readCMAFContainerOptions.CENCKeyID.Value().data(),
-                             readCMAFContainerOptions.CENCKeyID.Value().data() + readCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test DeallocatePushTransport
      */
-    MockCommandHandler deallocateCommandHandler;
+    Testing::MockCommandHandler deallocateCommandHandler;
     deallocateCommandHandler.SetFabricIndex(1);
     ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
     Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
     deallocateCommandData.connectionID = allocatedConnectionID;
 
     EXPECT_EQ(
-        server.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
+        mServer.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
         std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 }
 
-TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_FindTransportResponse)
+TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_DeallocateTransport)
 {
     /*
-     * Test AllocatePushTransport
+     * Test AllocatePushTransport and persistence of currentConnections list
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -879,11 +1024,11 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -944,41 +1089,256 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
-    MockCommandHandler commandHandler;
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    // Without a delegate, command is unsupported.
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    // Set the delegate to the server logic
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+
+    // Shutdown the Server
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Start the Server back up
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+    // Validate persisted fields
+    EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+    EXPECT_EQ(currentConnection.transportStatus, TransportStatusEnum::kInactive);
+
+    EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+
+    Structs::TransportOptionsStruct::Type lTransportOptions = currentConnection.transportOptions.Value();
+    EXPECT_EQ(lTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
+    EXPECT_EQ(lTransportOptions.videoStreamID, 1);
+    EXPECT_EQ(lTransportOptions.audioStreamID, 2);
+    EXPECT_EQ(lTransportOptions.TLSEndpointID, 1);
+    std::string respUrlStr(lTransportOptions.url.data(), lTransportOptions.url.size());
+    EXPECT_EQ(respUrlStr, "https://192.168.1.100:554/stream/");
+
+    Structs::TransportTriggerOptionsStruct::Type lTriggerOptions = lTransportOptions.triggerOptions;
+    EXPECT_EQ(lTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
+    EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+    EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+
+    const auto & motionZonesList = lTriggerOptions.motionZones.Value().Value();
+
+    size_t i = 0;
+    for (const auto & zone : motionZonesList)
+    {
+        if (i == 0)
+        {
+            EXPECT_TRUE(!zone.zone.IsNull());
+            EXPECT_EQ(zone.zone.Value(), 1);
+            EXPECT_TRUE(zone.sensitivity.HasValue());
+            EXPECT_EQ(zone.sensitivity.Value(), 5);
+        }
+        else if (i == 1)
+        {
+            EXPECT_TRUE(!zone.zone.IsNull());
+            EXPECT_EQ(zone.zone.Value(), 2);
+            EXPECT_TRUE(zone.sensitivity.HasValue());
+            EXPECT_EQ(zone.sensitivity.Value(), 10);
+        }
+        i++;
+    }
+    EXPECT_EQ(static_cast<int>(i), 2);
+
+    EXPECT_FALSE(lTriggerOptions.motionSensitivity.HasValue());
+    EXPECT_TRUE(lTriggerOptions.maxPreRollLen.HasValue());
+    EXPECT_EQ(lTriggerOptions.maxPreRollLen.Value(), 1000);
+
+    EXPECT_TRUE(lTriggerOptions.motionTimeControl.HasValue());
+    motionTimeControl = lTriggerOptions.motionTimeControl.Value();
+    EXPECT_EQ(motionTimeControl.initialDuration, 5000);
+    EXPECT_EQ(motionTimeControl.augmentationDuration, 2000);
+    EXPECT_EQ(motionTimeControl.maxDuration, (uint32_t) 30000);
+    EXPECT_EQ(motionTimeControl.blindDuration, 1000);
+
+    EXPECT_EQ(lTransportOptions.ingestMethod, IngestMethodsEnum::kCMAFIngest);
+
+    containerOptions = lTransportOptions.containerOptions;
+    EXPECT_EQ(containerOptions.containerType, ContainerFormatEnum::kCmaf);
+    EXPECT_TRUE(containerOptions.CMAFContainerOptions.HasValue());
+    Structs::CMAFContainerOptionsStruct::Type lCMAFContainerOptions = containerOptions.CMAFContainerOptions.Value();
+    EXPECT_EQ(lCMAFContainerOptions.segmentDuration, 1000);
+    EXPECT_EQ(lCMAFContainerOptions.chunkDuration, 500);
+    std::string lTrackName(lCMAFContainerOptions.trackName.Value().data(), lCMAFContainerOptions.trackName.Value().size());
+    EXPECT_EQ(lTrackName, "video");
+    EXPECT_FALSE(lCMAFContainerOptions.metadataEnabled.HasValue());
+
+    /*
+     * Test DeallocatePushTransport; This should remove from the in-memory
+     * currentConnections list and the persisted store
+     */
+    Testing::MockCommandHandler deallocateCommandHandler;
+    deallocateCommandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+    Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
+    deallocateCommandData.connectionID = allocatedConnectionID;
+
+    EXPECT_EQ(
+        mServer.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
+        std::nullopt);
+
+    // Restart the server once again to read currentConnections from persisted
+    // storage
+    // Shutdown the Server
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Start the Server back up
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    // The number of currentConnections in persisted storage should be 0.
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+}
+
+TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_FindTransportResponse)
+{
+    /*
+     * Test AllocatePushTransport
+     */
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+
+    std::string url = "https://192.168.1.100:554/stream/";
+    TransportOptionsDecodableStruct transportOptions;
+
+    uint8_t tlvBuffer[512];
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    Structs::TransportZoneOptionsStruct::Type zone2;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+
+    // Create CMAFContainerOptionsStruct object
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    // Create ContainerOptionsStruct object
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    // Create a TransportMotionTriggerTimeControlStruct object
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    // Create transport zone options structs
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.SetValue(5);
+
+    zone2.zone.SetNonNull(2);
+    zone2.sensitivity.SetValue(10);
+
+    // Encode them into a TLV buffer
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err;
+
+    err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    // Decode the TLV into a DecodableList
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    // Create TransportOptionsStruct object
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Set the delegate to the server logic
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test ModifyPushTransport
      */
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 500;
+    cmafContainerOptions.segmentDuration = 30000;
+    cmafContainerOptions.chunkDuration   = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cencKey   = "ABCDEF1234567890";
-    cencKeyID = "ABCDEF1234567890";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1040,14 +1400,14 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(11);
     transportOptions.audioStreamID.SetValue(22);
-    transportOptions.endpointID       = 1;
-    url                               = "rtsp://192.168.1.100:554/modify-stream";
+    transportOptions.TLSEndpointID    = 1;
+    url                               = "https://192.168.1.100:554/modify-stream/";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    MockCommandHandler modifyCommandHandler;
+    Testing::MockCommandHandler modifyCommandHandler;
     modifyCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kModifyCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
@@ -1055,15 +1415,15 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     modifyCommandData.connectionID     = allocatedConnectionID;
     modifyCommandData.transportOptions = transportOptions;
 
-    server.GetLogic().HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
+    mServer.GetLogic().HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
 
     /*
      * Test FindPushTransport
      */
 
-    MockCommandHandler findCommandHandler;
+    Testing::MockCommandHandler findCommandHandler;
     findCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kFindCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::FindTransport::Id };
@@ -1071,41 +1431,15 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     // As connectionID is static, the new allocated connectionID will be 2.
     findCommandData.connectionID.SetNonNull(allocatedConnectionID);
 
-    server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
+    mServer.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
     // Check the response
-    const auto & responses = findCommandHandler.GetResponses();
-    EXPECT_EQ(responses.size(), (size_t) 1);
+    EXPECT_TRUE(findCommandHandler.HasResponse());
+    EXPECT_EQ(findCommandHandler.GetResponseCount(), (size_t) 1);
 
-    // Get the encoded buffer
-    const auto & encodedBuffer = responses[0].encodedData;
-
-    PrintBufHex(encodedBuffer->Start(), encodedBuffer->DataLength());
-
-    EXPECT_FALSE(encodedBuffer.IsNull());
-
-    // Set up TLV reader
-    TLV::TLVReader responseReader;
-    responseReader.Init(encodedBuffer->Start(), static_cast<uint32_t>(encodedBuffer->DataLength()));
-
-    // Enter the top-level anonymous structure (CommandDataIB wrapper)
-    err = responseReader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::TLVReader outerContainer;
-    err = responseReader.OpenContainer(outerContainer);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Read the next element inside the container: should be kFields
-    err = outerContainer.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    EXPECT_TRUE(IsContextTag(outerContainer.GetTag()));
-    EXPECT_EQ(TagNumFromTag(outerContainer.GetTag()), chip::to_underlying(CommandDataIB::Tag::kFields));
-
-    // Decode into response object
+    // Decode response using MockCommandHandler helper
     Commands::FindTransportResponse::DecodableType decodedResponse;
-    err = decodedResponse.Decode(outerContainer);
+    err = findCommandHandler.DecodeResponse(decodedResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     auto iter = decodedResponse.transportConfigurations.begin();
@@ -1121,10 +1455,10 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(findTransportOptions.videoStreamID, 11);
     EXPECT_EQ(findTransportOptions.audioStreamID, 22);
-    EXPECT_EQ(findTransportOptions.endpointID, 1);
+    EXPECT_EQ(findTransportOptions.TLSEndpointID, 1);
 
     std::string findUrlStr(findTransportOptions.url.data(), findTransportOptions.url.size());
-    EXPECT_EQ(findUrlStr, "rtsp://192.168.1.100:554/modify-stream");
+    EXPECT_EQ(findUrlStr, "https://192.168.1.100:554/modify-stream/");
 
     Structs::TransportTriggerOptionsStruct::DecodableType findTriggerOptions = findTransportOptions.triggerOptions;
     EXPECT_EQ(findTriggerOptions.triggerType, TransportTriggerTypeEnum::kMotion);
@@ -1171,34 +1505,21 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findContainerOptions.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(findContainerOptions.CMAFContainerOptions.HasValue());
     Structs::CMAFContainerOptionsStruct::Type findCMAFContainerOptions = findContainerOptions.CMAFContainerOptions.Value();
-    EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 500);
+    EXPECT_EQ(findCMAFContainerOptions.segmentDuration, 30000);
+    EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_FALSE(findCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string cencKeyStr(findCMAFContainerOptions.CENCKey.Value().data(),
-                           findCMAFContainerOptions.CENCKey.Value().data() + findCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "ABCDEF1234567890");
-
-    std::string cencKeyIDStr(findCMAFContainerOptions.CENCKeyID.Value().data(),
-                             findCMAFContainerOptions.CENCKeyID.Value().data() + findCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "ABCDEF1234567890");
 
     EXPECT_FALSE(iter.Next());
 }
 
 TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTriggerTransport)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
-    std::vector<TransportZoneOptionsDecodableStruct> mTransportZoneOptions;
     TransportTriggerOptionsDecodableStruct triggerOptions;
 
-    std::string url = "rtsp://192.168.1.100:554/stream";
+    std::string url = "https://192.168.1.100:554/stream/";
     TransportOptionsDecodableStruct transportOptions;
 
     uint8_t tlvBuffer[512];
@@ -1207,11 +1528,11 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
     // Create CMAFContainerOptionsStruct object
-    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1272,32 +1593,37 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
-    MockCommandHandler commandHandler;
+    Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    server.GetLogic().SetDelegate(1, &mockDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test SetTransportStatus
      */
 
-    MockCommandHandler setCommandHandler;
+    Testing::MockCommandHandler setCommandHandler;
     setCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kSetCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::SetTransportStatus::Id };
@@ -1305,11 +1631,11 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     setCommandData.connectionID.SetNonNull(allocatedConnectionID);
     setCommandData.transportStatus = TransportStatusEnum::kActive;
-    server.GetLogic().HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
+    mServer.GetLogic().HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
 
-    MockCommandHandler triggerCommandHandler;
+    Testing::MockCommandHandler triggerCommandHandler;
     triggerCommandHandler.SetFabricIndex(1);
 
     ConcreteCommandPath kTriggerCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ManuallyTriggerTransport::Id };
@@ -1317,11 +1643,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.connectionID     = allocatedConnectionID;
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
-    server.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
-
-    chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-
-    CheckLogState(logMgmt, 1, chip::app::PriorityLevel::Info);
+    mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
 }
 
 } // namespace PushAvStreamTransport

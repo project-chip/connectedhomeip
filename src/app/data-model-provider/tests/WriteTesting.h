@@ -20,11 +20,13 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
+#include <type_traits>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
 /// Contains support for setting up a WriteAttributeRequest and underlying data.
@@ -44,47 +46,63 @@ namespace Testing {
 class WriteOperation
 {
 public:
-    WriteOperation(const ConcreteDataAttributePath & path)
+    WriteOperation(const app::ConcreteDataAttributePath & path)
     {
-        mRequest.path              = path;
-        mRequest.subjectDescriptor = &kDenySubjectDescriptor;
+        mRequest.emplace(app::DataModel::WriteAttributeRequest(path, kDenySubjectDescriptor));
     }
 
     WriteOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
-        WriteOperation(ConcreteAttributePath(endpoint, cluster, attribute))
+        WriteOperation(app::ConcreteAttributePath(endpoint, cluster, attribute))
     {}
 
     WriteOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
     {
-        mRequest.subjectDescriptor = &descriptor;
+        auto path  = mRequest->path;
+        auto flags = mRequest->writeFlags;
+        mRequest.emplace(app::DataModel::WriteAttributeRequest(path, descriptor));
+        mRequest->writeFlags = flags;
         return *this;
     }
 
     WriteOperation & SetDataVersion(Optional<DataVersion> version)
     {
-        mRequest.path.mDataVersion = version;
+        mRequest->path.mDataVersion = version;
         return *this;
     }
 
-    WriteOperation & SetWriteFlags(const BitFlags<DataModel::WriteFlags> & flags)
+    WriteOperation & SetWriteFlags(const BitFlags<app::DataModel::WriteFlags> & flags)
     {
-        mRequest.writeFlags = flags;
-        return *this;
-    }
-
-    WriteOperation & SetOperationFlags(const BitFlags<DataModel::OperationFlags> & flags)
-    {
-        mRequest.operationFlags = flags;
+        mRequest->writeFlags = flags;
         return *this;
     }
 
     WriteOperation & SetPathExpanded(bool value)
     {
-        mRequest.path.mExpanded = value;
+        mRequest->path.mExpanded = value;
         return *this;
     }
 
-    const DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
+    WriteOperation & SetListOperation(app::ConcreteDataAttributePath::ListOperation listOp)
+    {
+        mRequest->path.mListOp = listOp;
+        return *this;
+    }
+
+    const app::DataModel::WriteAttributeRequest & GetRequest() const { return *mRequest; }
+
+    // Helper to encode a value, using EncodeForWrite for fabric-scoped types
+    template <typename T>
+    CHIP_ERROR EncodeValue(TLV::TLVWriter & writer, TLV::Tag tag, const T & value)
+    {
+        if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
+        {
+            return chip::app::DataModel::EncodeForWrite(writer, tag, value);
+        }
+        else
+        {
+            return chip::app::DataModel::Encode(writer, tag, value);
+        }
+    }
 
     template <typename T>
     TLV::TLVReader ReadEncodedValue(const T & value)
@@ -97,37 +115,32 @@ public:
         //     - 1: .....
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
-        VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
-        VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
+        SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+        SuccessOrDie(EncodeValue(writer, TLV::ContextTag(1), value));
+        SuccessOrDie(writer.EndContainer(outerContainerType));
+        SuccessOrDie(writer.Finalize());
 
         TLV::TLVReader reader;
         reader.Init(mTLVBuffer);
 
-        // position the reader inside the buffer, on the encoded value
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
-        VerifyOrDie(reader.EnterContainer(outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+        SuccessOrDie(reader.Next());
+        SuccessOrDie(reader.EnterContainer(outerContainerType));
+        SuccessOrDie(reader.Next());
 
         return reader;
     }
 
     template <class T>
-    AttributeValueDecoder DecoderFor(const T & value)
+    app::AttributeValueDecoder DecoderFor(const T & value)
     {
         mTLVReader = ReadEncodedValue(value);
-        if (mRequest.subjectDescriptor == nullptr)
-        {
-            AttributeValueDecoder(mTLVReader, kDenySubjectDescriptor);
-        }
-        return AttributeValueDecoder(mTLVReader, *mRequest.subjectDescriptor);
+        return app::AttributeValueDecoder(mTLVReader, mRequest->subjectDescriptor);
     }
 
 private:
     constexpr static size_t kMaxTLVBufferSize = 1024;
 
-    DataModel::WriteAttributeRequest mRequest;
+    std::optional<app::DataModel::WriteAttributeRequest> mRequest;
 
     // where data is being written
     uint8_t mTLVBuffer[kMaxTLVBufferSize] = { 0 };
@@ -137,5 +150,4 @@ private:
 };
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

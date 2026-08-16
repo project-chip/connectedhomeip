@@ -114,11 +114,12 @@ public:
 
     CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout)
     {
-        CHIP_ERROR err = mScanner.StartScan();
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(mScanner.StartScan());
 
-        err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, HandleScannerTimer, this);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err, mScanner.StopScan());
+        auto scannerCleanup = chip::ScopeExit([this]() { RETURN_SAFELY_IGNORED mScanner.StopScan(); });
+
+        ReturnErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(timeout, HandleScannerTimer, this));
+        scannerCleanup.release();
 
         return CHIP_NO_ERROR;
     }
@@ -133,7 +134,7 @@ public:
     {
         auto * delegate = static_cast<ScannerDelegateImpl *>(appState);
         delegate->OnScanError(CHIP_ERROR_TIMEOUT);
-        delegate->mScanner.StopScan();
+        TEMPORARY_RETURN_IGNORED delegate->mScanner.StopScan();
     }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
@@ -196,7 +197,7 @@ extern "C" void pychip_ble_scanner_delete(void * scanner)
     auto * delegate = static_cast<ScannerDelegateImpl *>(scanner);
     chip::DeviceLayer::StackLock lock;
     // Make sure that the scanner is stopped before deleting the delegate.
-    delegate->ScannerStopScan();
+    TEMPORARY_RETURN_IGNORED delegate->ScannerStopScan();
     delegate->ScannerShutdown();
     delete delegate;
 }

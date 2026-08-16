@@ -88,12 +88,13 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+    static int _WlanEventCallback(enum wlan_event_reason event, void * data);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_ENABLE_OPENTHREAD
-    Inet::InterfaceId GetExternalInterface();
-    Inet::InterfaceId GetThreadInterface();
+    Inet::InterfaceId _GetExternalInterface();
+    Inet::InterfaceId _GetThreadInterface();
     const char * GetHostName() { return sInstance.mHostname; }
 #endif
 
@@ -147,13 +148,18 @@ private:
     void UpdateInternetConnectivityState(void);
 #endif
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    void UpdateLwipDefaultNetIf();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
-    ConnectivityManager::WiFiStationState mWiFiStationState;
+    ConnectivityManager::WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
     bool mWifiManagerInit   = false;
     bool mWifiIsProvisioned = false;
+    bool mIsWifiRecovering  = false;
 
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
@@ -170,7 +176,6 @@ private:
     char mHostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
 #endif
 
-    static int _WlanEventCallback(enum wlan_event_reason event, void * data);
     static void _NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
 
     void OnStationConnected(void);
