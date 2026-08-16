@@ -54,9 +54,9 @@ public:
     }
 
     uint8_t mStoredICACBuf[Credentials::kMaxDERCertLength] = { 0 };
-    size_t mStoredICACLen                                   = 0;
-    int mStoreCallCount                                     = 0;
-    CHIP_ERROR mReturnError                                 = CHIP_NO_ERROR;
+    size_t mStoredICACLen                                  = 0;
+    int mStoreCallCount                                    = 0;
+    CHIP_ERROR mReturnError                                = CHIP_NO_ERROR;
 };
 
 /**

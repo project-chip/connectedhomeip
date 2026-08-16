@@ -144,13 +144,13 @@ CHIP_ERROR JointFabric::GetCrossSignedICAC(FabricId anchorFabricId, ByteSpan ica
     {
         if (lastResponseTransactionType != TransactionType::TransactionType_CROSS_SIGNED_ICAC)
         {
-            ChipLogError(JointFabric, "GetCrossSignedICAC: unexpected response transaction type %d",
-                         lastResponseTransactionType);
+            ChipLogError(JointFabric, "GetCrossSignedICAC: unexpected response transaction type %d", lastResponseTransactionType);
             responseReceived = false;
             return CHIP_ERROR_WRONG_ORDER;
         }
 
-        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(crossSignedICACSpan.data(), crossSignedICACSpan.size()), crossSignedICAC));
+        ReturnErrorOnFailure(
+            CopySpanToMutableSpan(ByteSpan(crossSignedICACSpan.data(), crossSignedICACSpan.size()), crossSignedICAC));
         responseReceived = false;
 
         ChipLogProgress(JointFabric, "GetCrossSignedICAC: received cross-signed ICAC (%u bytes)",
