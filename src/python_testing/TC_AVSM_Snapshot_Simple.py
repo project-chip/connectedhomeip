@@ -118,6 +118,11 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             log.info("CaptureSnapshotResponse codec: %s", capture_response.imageCodec)
             log.info("CaptureSnapshotResponse data size: %d", len(capture_response.data))
             asserts.assert_greater(len(capture_response.data), 0, "Captured image data is empty")
+            asserts.assert_equal(capture_response.imageCodec, selected_cap.imageCodec, "Image codec mismatch")
+            asserts.assert_equal(capture_response.resolution, selected_cap.resolution, "Image resolution mismatch")
+            if capture_response.imageCodec == cluster.Enums.ImageCodecEnum.kJpeg:
+                asserts.assert_true(capture_response.data.startswith(b'\xff\xd8'), "Captured image does not start with JPEG SOI marker")
+                asserts.assert_true(capture_response.data.endswith(b'\xff\xd9'), "Captured image does not end with JPEG EOI marker")
         except InteractionModelError as e:
             asserts.fail(f"CaptureSnapshot failed: {e}")
         finally:
@@ -129,7 +134,7 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
                         cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id),
                     )
                 except Exception as e:
-                    log.warning("Failed to deallocate snapshot stream %s: %s", stream_id, e)
+                    asserts.fail(f"Failed to deallocate snapshot stream {stream_id}: {e}")
 
 
 if __name__ == "__main__":

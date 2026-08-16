@@ -67,6 +67,7 @@ struct AudioAppSinkContext
 
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
+constexpr int kBallAnimationPattern = 18;
 
 // Callback function for GStreamer app sink
 GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
@@ -289,7 +290,6 @@ struct SnapshotPipelineConfig
     int height;
     int quality;
     int framerate;
-    std::string filename;
 };
 
 GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, CameraError & error)
@@ -446,8 +446,8 @@ GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & c
         return nullptr;
     }
 
-    // Configure videotestsrc: pattern=18 (ball animation), live=true
-    g_object_set(source, "pattern", 18, "is-live", TRUE, nullptr);
+    // Configure videotestsrc: pattern=kBallAnimationPattern (ball animation), live=true
+    g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
 
     // Set resolution and framerate caps
     GstCaps * caps = gst_caps_new_simple(                    //
@@ -574,7 +574,7 @@ CameraError CameraDevice::InitializeStreams()
 
 // Function to create the GStreamer pipeline
 GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
-                                                  const std::string & filename, CameraError & error)
+                                                  CameraError & error)
 {
     const GstreamerPipepline::Snapshot::SnapshotPipelineConfig config = {
         .device    = device,
@@ -582,7 +582,6 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
         .height    = height,
         .quality   = quality,
         .framerate = framerate,
-        .filename  = filename,
     };
 
     if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
@@ -631,8 +630,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
     {
-        const int kBallAnimationPattern = 18;
-        source                          = gst_element_factory_make("videotestsrc", "source");
+        source = gst_element_factory_make("videotestsrc", "source");
         g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
         ChipLogProgress(Camera, "Video piepline: using test video source");
     }
@@ -972,15 +970,23 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
+    auto stopOnDemandStream = [this, streamId, startedOnDemand]() {
+        if (startedOnDemand)
+        {
+            ChipLogProgress(Camera, "Stopping snapshot stream that was started on demand");
+            if (StopSnapshotStream(streamId) != CameraError::SUCCESS)
+            {
+                ChipLogError(Camera, "Failed to stop snapshot stream %u that was started on demand", streamId);
+            }
+        }
+    };
+
     // Get the appsink
     GstElement * appsink = gst_bin_get_by_name(GST_BIN(snapshotPipeline), "sink");
     if (!appsink)
     {
         ChipLogError(Camera, "Failed to get appsink from snapshot pipeline");
-        if (startedOnDemand)
-        {
-            StopSnapshotStream(streamId);
-        }
+        stopOnDemandStream();
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -992,10 +998,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     if (!sample)
     {
         ChipLogError(Camera, "Failed to pull sample from appsink (timeout or error)");
-        if (startedOnDemand)
-        {
-            StopSnapshotStream(streamId);
-        }
+        stopOnDemandStream();
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -1004,10 +1007,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     {
         ChipLogError(Camera, "Failed to get buffer from sample");
         gst_sample_unref(sample);
-        if (startedOnDemand)
-        {
-            StopSnapshotStream(streamId);
-        }
+        stopOnDemandStream();
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -1023,20 +1023,13 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     {
         ChipLogError(Camera, "Failed to map buffer");
         gst_sample_unref(sample);
-        if (startedOnDemand)
-        {
-            StopSnapshotStream(streamId);
-        }
+        stopOnDemandStream();
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
     gst_sample_unref(sample);
 
-    if (startedOnDemand)
-    {
-        ChipLogProgress(Camera, "Stopping snapshot stream that was started on demand");
-        StopSnapshotStream(streamId);
-    }
+    stopOnDemandStream();
 
     outImageSnapshot.imageRes   = matchedRes;
     outImageSnapshot.imageCodec = matchedCodec;
@@ -1392,7 +1385,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     CameraError error             = CameraError::SUCCESS;
     GstElement * snapshotPipeline = CreateSnapshotPipeline(
         mVideoDevicePath, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
-        it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, "capture_snapshot.jpg", error);
+        it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, error);
     if (snapshotPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create snapshot pipeline.");
@@ -1435,9 +1428,18 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
                     {
                         ChipLogError(Camera, "Debug info: %s", debug_info);
                     }
-                    g_error_free(err);
-                    g_free(debug_info);
                 }
+                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
+                {
+                    gst_message_parse_warning(msg, &err, &debug_info);
+                    ChipLogProgress(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogProgress(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                g_clear_error(&err);
+                g_free(debug_info);
                 gst_message_unref(msg);
             }
             gst_object_unref(bus);
