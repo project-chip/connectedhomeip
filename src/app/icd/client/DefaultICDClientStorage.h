@@ -117,8 +117,7 @@ public:
      */
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
-                                     Protocols::SecureChannel::CounterType & counter) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
 
     /**
      * Shut down DefaultICDClientStorage

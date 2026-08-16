@@ -131,7 +131,7 @@ CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckI
     // Create payload byte span
     ByteSpan payload(payloadBuffer, vector.payload_len);
 
-    CounterType decryptedCounter = 0;
+    CounterType decryptedOffset = 0;
 
     // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
     Symmetric128BitsKeyByteArray aesKeyMaterial;
@@ -147,8 +147,8 @@ CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckI
     EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
 
     // Verify that the Parsing succeeded
-    CHIP_ERROR err =
-        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData);
+    CHIP_ERROR err = CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, 0, 0, payload, decryptedOffset,
+                                                                applicationData);
     if (err != CHIP_NO_ERROR)
     {
         keystore.DestroyKey(aes128KeyHandle);
@@ -157,8 +157,8 @@ CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckI
         return err;
     }
 
-    // Verify decrypted counter value
-    EXPECT_EQ(vector.counter, decryptedCounter);
+    // Verify decrypted offset value (with startCounter=0, offset equals the raw counter)
+    EXPECT_EQ(vector.counter, decryptedOffset);
 
     // Verify application data
     EXPECT_EQ(vector.application_data_len, applicationData.size());
@@ -369,9 +369,9 @@ TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
     // Create payload byte span
     ByteSpan payload(vector.payload, vector.payload_len);
 
-    CounterType decryptedCounter = 0;
+    CounterType decryptedOffset = 0;
     //
-    (void) decryptedCounter;
+    (void) decryptedOffset;
 
     // Empty AES Key handle
     Aes128KeyHandle aes128KeyHandle;
@@ -390,7 +390,7 @@ TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
     // Verify that the generation fails with an empty key handle
     EXPECT_NE(
         CHIP_NO_ERROR,
-        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, 0, 0, payload, decryptedOffset, applicationData));
 #endif
 
     // Clean up
@@ -413,9 +413,9 @@ TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
     // Create payload byte span
     ByteSpan payload(vector.payload, vector.payload_len);
 
-    CounterType decryptedCounter = 0;
+    CounterType decryptedOffset = 0;
     //
-    (void) decryptedCounter;
+    (void) decryptedOffset;
 
     // Empty Hmac Key handle
     Hmac128KeyHandle hmac128KeyHandle;
@@ -434,7 +434,7 @@ TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
     // Verify that the generation fails with an empty key handle
     EXPECT_NE(
         CHIP_NO_ERROR,
-        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, 0, 0, payload, decryptedOffset, applicationData));
 #endif
 
     // Clean up
