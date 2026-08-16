@@ -19,6 +19,7 @@ package com.matter.casting.core;
 import android.util.Log;
 import com.matter.casting.support.ConnectionCallbacks;
 import com.matter.casting.support.IdentificationDeclarationOptions;
+import com.matter.casting.support.MatterCleaner;
 import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
@@ -144,6 +145,23 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   @Override
   public native List<Endpoint> getEndpoints();
+
+  /**
+   * Sets the native pointer backing this casting player and registers a cleanup action to free it
+   * when this object becomes phantom-reachable.
+   *
+   * <p>Called by JNI immediately after the Java object is constructed. The cleanup action captures
+   * {@code nativePtr} as a primitive to avoid retaining a reference to {@code this}, which would
+   * prevent GC from ever collecting this object.
+   *
+   * @param nativePtr pointer to the native heap allocation backing this casting player
+   */
+  void setNativeCastingPlayer(long nativePtr) {
+    this._cppCastingPlayer = nativePtr;
+    MatterCleaner.getInstance().register(this, () -> nativeReleaseCastingPlayer(nativePtr));
+  }
+
+  private static native void nativeReleaseCastingPlayer(long nativePtr);
 
   @Override
   public String toString() {

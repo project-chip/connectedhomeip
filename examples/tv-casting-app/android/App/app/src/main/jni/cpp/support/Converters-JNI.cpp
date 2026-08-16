@@ -231,11 +231,18 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
         env->ExceptionClear();
         return jMatterCastingPlayer;
     }
+    
+    jmethodID setNativeCastingPlayerId =
+        env->GetMethodID(matterCastingPlayerJavaClass, "setNativeCastingPlayer", "(J)V");
+    VerifyOrReturnValue(setNativeCastingPlayerId != nullptr, nullptr,
+                        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not get setNativeCastingPlayer method ID"));
+
     // Store a heap-allocated handle containing a weak_ptr so the Java long field never
     // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
-    auto * handle = new CastingPlayerHandle{ player };
-    jfieldID longFieldId = env->GetFieldID(matterCastingPlayerJavaClass, "_cppCastingPlayer", "J");
-    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(handle));
+    auto handle = std::unique_ptr<CastingPlayerHandle>(new CastingPlayerHandle{ player });
+    env->CallVoidMethod(jMatterCastingPlayer, setNativeCastingPlayerId, reinterpret_cast<jlong>(handle.get()));
+    handle.release();
+
     return jMatterCastingPlayer;
 }
 
