@@ -40,7 +40,7 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
         break;
     }
     case UnoccupiedHeatingSetpoint::Id: {
-        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
         break;
     }
     case OccupiedCoolingSetpoint::Id: {
@@ -49,7 +49,7 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
         break;
     }
     case UnoccupiedCoolingSetpoint::Id: {
-        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, OccupancyBitmap(0), MakeOptional(oldTemp), newTemp);
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
         break;
     }
     }
@@ -101,14 +101,14 @@ void GenerateOccupancyChangeEvent(EndpointId endpoint, Optional<BitMask<Occupanc
     }
 }
 
-void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, OccupancyBitmap occupancy,
+void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
                                  Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
 
     event.systemMode       = systemMode;
-    event.occupancy        = MakeOptional(chip::BitMask<OccupancyBitmap>(occupancy));
+    event.occupancy        = MakeOptional(occupancy);
     event.previousSetpoint = previousSetpoint;
     event.currentSetpoint  = currentSetpoint;
 

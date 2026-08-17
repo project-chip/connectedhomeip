@@ -53,10 +53,9 @@ namespace {
  * @param[in] session The atomic write session that owns the timer.
  * @param[in] timeout The timeout in milliseconds.
  */
-void ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
+CHIP_ERROR ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
-                                                                   reinterpret_cast<void *>(session));
+    return DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(session));
 }
 
 /**
@@ -323,9 +322,31 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
             {
                 auto & attributeStatus = attributeStatuses[i];
-                mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
+                auto beginStatus       = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
+                attributeStatus.statusCode = to_underlying(beginStatus);
+                if (beginStatus != Status::Success)
+                {
+                    status = Status::Failure;
+                }
             }
-            ScheduleTimer(this, timeout);
+            if (status == Status::Success)
+            {
+                if (ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
+                {
+                    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+                    {
+                        auto & attributeStatus = attributeStatuses[i];
+                        mDelegate->OnAtomicWriteRollback(attributeStatus.attributeID);
+                        attributeStatus.statusCode = to_underlying(Status::Failure);
+                    }
+                    ResetAtomicWrite();
+                    status = Status::Failure;
+                }
+            }
+            else
+            {
+                ResetAtomicWrite();
+            }
         }
     }
 

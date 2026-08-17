@@ -145,8 +145,7 @@ private:
 
             if (features.Has(Thermostat::Feature::kOccupancy))
             {
-                temperature unoccupiedHeatingSetpoint;
-                if (auto status = UnoccupiedHeatingSetpoint::GetDefault(endpointId, &unoccupiedHeatingSetpoint);
+                if (auto status = UnoccupiedHeatingSetpoint::GetDefault(endpointId, &defaultValues.unoccupiedHeatingSetpoint);
                     status != Status::Success)
                 {
                     defaultValues.unoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
@@ -188,8 +187,7 @@ private:
 
             if (features.Has(Thermostat::Feature::kOccupancy))
             {
-                temperature unoccupiedCoolingSetpoint;
-                if (auto status = UnoccupiedCoolingSetpoint::GetDefault(endpointId, &unoccupiedCoolingSetpoint);
+                if (auto status = UnoccupiedCoolingSetpoint::GetDefault(endpointId, &defaultValues.unoccupiedCoolingSetpoint);
                     status != Status::Success)
                 {
                     defaultValues.unoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
