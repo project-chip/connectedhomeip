@@ -192,7 +192,8 @@ LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
-static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint, gThermostatPresetsDelegate);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
+                                                                                          gThermostatPresetsDelegate);
 
 } // namespace
 

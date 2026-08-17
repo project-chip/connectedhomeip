@@ -27,13 +27,12 @@ using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-ThermostatPresetsDelegate::ThermostatPresetsDelegate(EndpointId endpoint)
-    : mEndpointId(endpoint)
+ThermostatPresetsDelegate::ThermostatPresetsDelegate(EndpointId endpoint) : mEndpointId(endpoint)
 {
     // Initialize Presets state
-    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList                 = 0;
-    mNextFreeIndexInPendingPresetsList          = 0;
+    mNumberOfPresets                   = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList        = 0;
+    mNextFreeIndexInPendingPresetsList = 0;
 
     InitializePresets();
 

@@ -32,9 +32,8 @@ using namespace System::Clock;
 
 // Suggestions Implementation
 
-ThermostatSuggestionsDelegate::ThermostatSuggestionsDelegate(EndpointId endpoint, ThermostatPresetsDelegate & presetsDelegate)
-    : mEndpointId(endpoint)
-    , mPresetsDelegate(presetsDelegate)
+ThermostatSuggestionsDelegate::ThermostatSuggestionsDelegate(EndpointId endpoint, ThermostatPresetsDelegate & presetsDelegate) :
+    mEndpointId(endpoint), mPresetsDelegate(presetsDelegate)
 {
     // Initialize Suggestions state
     mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
@@ -58,7 +57,8 @@ uint8_t ThermostatSuggestionsDelegate::GetNumberOfThermostatSuggestions()
     return mNextFreeIndexInThermostatSuggestionsList;
 }
 
-CHIP_ERROR ThermostatSuggestionsDelegate::GetThermostatSuggestionAtIndex(size_t index,
+CHIP_ERROR
+ThermostatSuggestionsDelegate::GetThermostatSuggestionAtIndex(size_t index,
                                                               ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
 {
     if (index < mNextFreeIndexInThermostatSuggestionsList)
@@ -82,7 +82,8 @@ void ThermostatSuggestionsDelegate::GetCurrentThermostatSuggestion(
     }
 }
 
-DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> ThermostatSuggestionsDelegate::GetThermostatSuggestionNotFollowingReason()
+DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap>
+ThermostatSuggestionsDelegate::GetThermostatSuggestionNotFollowingReason()
 {
     return mThermostatSuggestionNotFollowingReason;
 }
@@ -117,7 +118,8 @@ void ThermostatSuggestionsDelegate::SetCurrentThermostatSuggestion(size_t index)
 }
 
 CHIP_ERROR
-ThermostatSuggestionsDelegate::AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion)
+ThermostatSuggestionsDelegate::AppendToThermostatSuggestionsList(
+    const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion)
 {
     if (mNextFreeIndexInThermostatSuggestionsList < MATTER_ARRAY_SIZE(mThermostatSuggestions))
     {
