@@ -156,6 +156,10 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .timerDelegate          = gTimerDelegate,
         .storageDelegate        = *initParams.persistentStorageDelegate,
         .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
     });
 
     VerifyOrReturnError(!gDeviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);

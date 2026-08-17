@@ -301,6 +301,10 @@ void InitServer(intptr_t context)
         .timerDelegate          = gTimerDelegate,                         //
         .storageDelegate        = *initParams.persistentStorageDelegate,  //
         .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = Clusters::Binding::Manager::GetInstance(),
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT

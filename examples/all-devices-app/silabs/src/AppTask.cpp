@@ -196,6 +196,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .timerDelegate          = sTimerDelegate,
         .storageDelegate        = storage,
         .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = chip::DeviceLayer::PlatformMgr(),
+        .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
     });
 
     std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();
