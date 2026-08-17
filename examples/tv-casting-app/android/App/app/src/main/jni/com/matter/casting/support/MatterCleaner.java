@@ -18,9 +18,13 @@
 package com.matter.casting.support;
 
 import android.os.Build;
-import android.util.Log;
 import androidx.annotation.RequiresApi;
 import java.lang.ref.Cleaner;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages native resource cleanup for Matter Java objects that wrap native pointers.
@@ -30,12 +34,10 @@ import java.lang.ref.Cleaner;
  * freeing the associated native memory without requiring explicit {@code close()} calls from
  * callers.
  *
- * <p>On API 33 and above, delegates to {@link java.lang.ref.Cleaner}. Support for earlier API
- * levels via {@code PhantomReference} is not yet implemented.
+ * <p>On API 33 and above, delegates to {@link java.lang.ref.Cleaner}. On API 26–32, uses a {@link
+ * PhantomReference} and {@link ReferenceQueue} with a dedicated daemon thread.
  */
 public final class MatterCleaner {
-
-  private static final String TAG = MatterCleaner.class.getSimpleName();
 
   private static final MatterCleaner INSTANCE = new MatterCleaner();
 
@@ -48,8 +50,8 @@ public final class MatterCleaner {
   /**
    * Registers a cleanup action to run when {@code obj} becomes phantom-reachable.
    *
-   * <p>The {@code action} must not hold a reference to {@code obj}, directly or indirectly, as this
-   * would prevent the object from ever becoming phantom-reachable.
+   * <p>The {@code action} must not hold a reference to {@code obj}, directly or indirectly, as
+   * this would prevent the object from ever becoming phantom-reachable.
    *
    * @param obj the object whose reachability triggers the action
    * @param action the cleanup action; must not capture {@code obj}
@@ -58,9 +60,7 @@ public final class MatterCleaner {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       CleanerHolder.CLEANER.register(obj, action);
     } else {
-      // TODO: Implement PhantomReference-based cleanup for API < 33.
-      // On API 26-32, native handle memory is reclaimed at process exit.
-      Log.d(TAG, "register(): native resource cleanup not available below API 33");
+      LegacyCleanerHolder.LIVE_REFS.add(new LegacyCleanerHolder.CleanupRef(obj, action));
     }
   }
 
@@ -71,5 +71,48 @@ public final class MatterCleaner {
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   private static final class CleanerHolder {
     static final Cleaner CLEANER = Cleaner.create();
+  }
+
+  /**
+   * Holder initialized on first access, which only occurs on API 26–32.
+   *
+   * <p>A strong reference to each {@link CleanupRef} is kept in {@link #LIVE_REFS} until the
+   * referent is collected. Without this, the phantom reference itself could be collected before its
+   * referent and never enqueued.
+   */
+  static final class LegacyCleanerHolder {
+    static final ReferenceQueue<Object> QUEUE = new ReferenceQueue<>();
+    static final Set<CleanupRef> LIVE_REFS =
+        Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    static final class CleanupRef extends PhantomReference<Object> {
+      final Runnable action;
+
+      CleanupRef(Object referent, Runnable action) {
+        super(referent, QUEUE);
+        this.action = action;
+      }
+    }
+
+    static {
+      Thread t =
+          new Thread(
+              () -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                  try {
+                    CleanupRef ref = (CleanupRef) QUEUE.remove();
+                    LIVE_REFS.remove(ref);
+                    ref.action.run();
+                  } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                  } catch (Throwable ignored) {
+                    // Matches Cleaner convention: exceptions from cleanup actions are ignored.
+                  }
+                }
+              },
+              "MatterCleaner");
+      t.setDaemon(true);
+      t.start();
+    }
   }
 }
