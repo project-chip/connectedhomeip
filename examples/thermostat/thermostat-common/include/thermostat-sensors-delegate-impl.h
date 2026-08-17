@@ -26,7 +26,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-static constexpr uint8_t kMaxNumberOfSensors                    = 10;
+static constexpr uint8_t kMaxNumberOfSensors                   = 10;
 static constexpr uint8_t kMaxNumberOfSensorScheduleTransitions = 10;
 
 class ThermostatSensorsDelegate : public ThermostatSensors::Delegate
@@ -58,11 +58,11 @@ private:
     ThermostatSensorStructWithOwnedMembers mSensors[kMaxNumberOfSensors];
     uint8_t mAvailableSensorsData[kMaxNumberOfSensors][kMaxSensorHandleSize] = { { 0 } };
     size_t mAvailableSensorsLen[kMaxNumberOfSensors]                         = { 0 };
-    size_t mNumAvailableSensors                                             = 0;
+    size_t mNumAvailableSensors                                              = 0;
 
     uint8_t mEnabledSensorsData[kMaxNumberOfSensors][kMaxSensorHandleSize] = { { 0 } };
     size_t mEnabledSensorsLen[kMaxNumberOfSensors]                         = { 0 };
-    size_t mNumEnabledSensors                                             = 0;
+    size_t mNumEnabledSensors                                              = 0;
 
     uint8_t mNumberOfSensorScheduleTransitions = kMaxNumberOfSensorScheduleTransitions;
     SensorScheduleTransitionStructWithOwnedMembers mSensorScheduleTransitions[kMaxNumberOfSensorScheduleTransitions];

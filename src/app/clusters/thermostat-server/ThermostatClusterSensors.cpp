@@ -70,7 +70,7 @@ bool ThermostatSensors::IsSensorHandleAvailable(const ByteSpan & sensorHandle) c
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                             AttributeValueEncoder & encoder)
+                                                                              AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -162,7 +162,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSensors::ReadAttribute(co
 }
 
 std::optional<DataModel::ActionReturnStatus> ThermostatSensors::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                              AttributeValueDecoder & decoder)
+                                                                               AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
