@@ -1868,8 +1868,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         Confirm a negative over CASE, which resolves through the chip stack's own resolver and
         therefore covers the setups the DNS-SD probe cannot see.
         """
-        if await is_commissioned(self.default_controller, self.dut_node_id):
-            return True
+        try:
+            if await is_commissioned(self.default_controller, self.dut_node_id):
+                return True
+        except Exception as e:
+            # Any failure of the DNS-SD stage is inconclusive by definition, so it must not fail
+            # the precondition -- fall through and let CASE decide. Notably is_commissioned
+            # reaches for mdns_discovery, which ships in src/python_testing rather than in the
+            # matter package, so it is importable only when that directory is on sys.path. Tests
+            # in subdirectories (test_testing/) raise ModuleNotFoundError here.
+            LOGGER.info("DNS-SD commissioning probe unavailable for DUT node %d, relying on CASE "
+                        "instead: %s", self.dut_node_id, e)
 
         # Same evidence heuristic as _capture_dut_baseline: give a real DUT room to bring up a
         # session, while keeping the expected-failure case (a genuinely uncommissioned DUT,
