@@ -44,9 +44,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static constexpr uint8_t kModeNormal = 0;
-    static constexpr uint8_t kModeHeavy  = 1;
-    static constexpr uint8_t kModeLight  = 2;
+    static constexpr uint8_t kModeIndexNormal = 0;
+    static constexpr uint8_t kModeIndexHeavy  = 1;
+    static constexpr uint8_t kModeIndexLight  = 2;
 
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
                                   DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
@@ -55,13 +55,13 @@ public:
 
         switch (modeIndex)
         {
-        case kModeNormal:
+        case kModeIndexNormal:
             VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
             modeTags[0].mfgCode.ClearValue();
             modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kNormal);
             modeTags.reduce_size(1);
             break;
-        case kModeHeavy:
+        case kModeIndexHeavy:
             VerifyOrReturnError(modeTags.size() >= 2, CHIP_ERROR_INVALID_ARGUMENT);
             modeTags[0].mfgCode.ClearValue();
             modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kHeavy);
@@ -69,7 +69,7 @@ public:
             modeTags[1].value = to_underlying(Clusters::DishwasherMode::ModeTag::kMax);
             modeTags.reduce_size(2);
             break;
-        case kModeLight:
+        case kModeIndexLight:
             VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
             modeTags[0].mfgCode.ClearValue();
             modeTags[0].value = to_underlying(Clusters::DishwasherMode::ModeTag::kLight);
@@ -83,7 +83,7 @@ public:
 
     void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
     {
-        if (newMode == kModeLight)
+        if (newMode == kModeIndexLight)
         {
             response.status = to_underlying(Clusters::ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue("Invalid in current state"_span);
