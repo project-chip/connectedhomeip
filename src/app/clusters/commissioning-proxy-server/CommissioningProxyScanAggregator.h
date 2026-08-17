@@ -82,10 +82,10 @@ public:
      */
     void Contribute(Span<const ScanResultEntry> results);
 
-    /// Emit the combined response if every registered contributor has already
-    /// reported. Call once after starting all sub-scans, to cover transports that
-    /// contribute synchronously from within Scan() (real transports report later,
-    /// via Contribute()).
+    /// Marks the expected count final and emits the combined response if every
+    /// registered contributor has already reported. Call once after starting all
+    /// sub-scans, to cover transports that contribute synchronously from within
+    /// Scan() (real transports report later, via Contribute()).
     void MaybeEmitIfComplete();
 
     /// True while an aggregation is in flight.
@@ -123,10 +123,14 @@ private:
     TimerDelegate & mTimerDelegate;
     app::CommandHandler::Handle mHandle;
     app::ConcreteCommandPath mPath;
-    bool mInProgress     = false;
-    uint8_t mExpected    = 0;
-    uint8_t mReported    = 0;
-    uint8_t mScanMaxTime = 0;
+    bool mInProgress = false;
+    // Set by MaybeEmitIfComplete() once the caller has started every requested sub-scan.
+    // Until then mExpected is still growing, so a contributor reporting synchronously
+    // from within Scan() must not be allowed to satisfy it and emit early.
+    bool mAllContributorsRegistered = false;
+    uint8_t mExpected               = 0;
+    uint8_t mReported               = 0;
+    uint8_t mScanMaxTime            = 0;
     ResultStore mStore[kMaxResults]; // keeps ByteSpan backing alive until emit
     ScanResultEntry mResults[kMaxResults];
     uint8_t mResultCount = 0;

@@ -2091,9 +2091,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The value of the CommissioningProxy cluster's MaxSessions attribute, and the
  *        number of concurrent proxy sessions the cluster reserves storage for. The
  *        attribute is Fixed quality, so this is the device's advertised value.
+ *
+ *        The spec makes supporting a single session mandatory and multiple sessions
+ *        optional, so a product may set this to 1. The default stays above 1 because the
+ *        unit tests must exercise the whole cluster: the session-id allocator, the
+ *        per-session fabric checks and the "state stays Connected until the last session
+ *        closes" transition only exist above 1, and a default of 1 would compile that
+ *        coverage out rather than run it. Keep it above 1 unless a product overrides it.
  */
 #ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
-#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 4
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
 
 /**

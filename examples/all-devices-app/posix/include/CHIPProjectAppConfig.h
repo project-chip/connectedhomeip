@@ -29,5 +29,14 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
 
+// This proxy serves one commissioning session at a time, shared across every transport.
+// It is not merely a preference: the transport drivers track a single in-flight connect in
+// one static (sPendingConnect in CommissioningProxyBleTransport.cpp) and rely on
+// MaxSessions == 1 to make it unique, so a larger value here would let the cluster accept
+// a second concurrent connect the driver cannot represent. The SDK default is deliberately
+// higher so the cluster's own unit tests exercise its multi-session paths; a product that
+// wants those paths must raise this and give its drivers per-session connect state.
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>

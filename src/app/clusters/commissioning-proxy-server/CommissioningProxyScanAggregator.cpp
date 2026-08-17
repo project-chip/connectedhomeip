@@ -38,13 +38,14 @@ constexpr uint16_t kScanWatchdogMarginSecs = 5;
 CHIP_ERROR CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path,
                                                    uint8_t scanMaxTime)
 {
-    mHandle      = app::CommandHandler::Handle(commandObj);
-    mPath        = path;
-    mExpected    = 0;
-    mReported    = 0;
-    mScanMaxTime = scanMaxTime;
-    mResultCount = 0;
-    mInProgress  = true;
+    mHandle                    = app::CommandHandler::Handle(commandObj);
+    mPath                      = path;
+    mExpected                  = 0;
+    mReported                  = 0;
+    mScanMaxTime               = scanMaxTime;
+    mResultCount               = 0;
+    mInProgress                = true;
+    mAllContributorsRegistered = false;
 
     CHIP_ERROR err =
         mTimerDelegate.StartTimer(this, System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs));
@@ -88,10 +89,11 @@ void CommissioningProxyScanAggregator::EmitCombinedResponse()
     }
 
     mHandle.Release();
-    mResultCount = 0;
-    mExpected    = 0;
-    mReported    = 0;
-    mInProgress  = false;
+    mResultCount               = 0;
+    mExpected                  = 0;
+    mReported                  = 0;
+    mInProgress                = false;
+    mAllContributorsRegistered = false;
 }
 
 void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> results)
@@ -136,13 +138,12 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
         mResultCount++;
     }
 
-    // Always count the report. A transport that reports synchronously from within
-    // Scan() (e.g. a test double) contributes before the cluster has finished
-    // registering all contributors, so emit is gated on the count being known and
-    // reached — either here (async transports) or via MaybeEmitIfComplete() once the
-    // cluster has started every sub-scan.
+    // Always count the report. A transport that reports synchronously from within Scan()
+    // contributes while mExpected is still growing, so emitting here would drop every
+    // later transport's results; MaybeEmitIfComplete() finishes those aggregations once
+    // the cluster has started all of the sub-scans.
     ++mReported;
-    if (mExpected > 0 && mReported >= mExpected)
+    if (mAllContributorsRegistered && mExpected > 0 && mReported >= mExpected)
     {
         EmitCombinedResponse();
     }
@@ -150,6 +151,8 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
 
 void CommissioningProxyScanAggregator::MaybeEmitIfComplete()
 {
+    // The cluster has started every requested sub-scan, so mExpected is final now.
+    mAllContributorsRegistered = true;
     if (mInProgress && mExpected > 0 && mReported >= mExpected)
     {
         EmitCombinedResponse();
@@ -164,10 +167,11 @@ void CommissioningProxyScanAggregator::Abort()
     }
     mTimerDelegate.CancelTimer(this);
     mHandle.Release();
-    mResultCount = 0;
-    mExpected    = 0;
-    mReported    = 0;
-    mInProgress  = false;
+    mResultCount               = 0;
+    mExpected                  = 0;
+    mReported                  = 0;
+    mInProgress                = false;
+    mAllContributorsRegistered = false;
 }
 
 } // namespace CommissioningProxy

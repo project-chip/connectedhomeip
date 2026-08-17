@@ -74,7 +74,9 @@ public:
     CommissioningProxyScanCache(ScanCacheObserver & cluster, TimerDelegate & timerDelegate) :
         mCluster(cluster), mTimerDelegate(timerDelegate)
     {}
-    ~CommissioningProxyScanCache() override = default;
+    /// Idempotent if Shutdown() has already run, and required if it has not: the sweep
+    /// timer would otherwise be left holding a pointer to this destroyed TimerContext.
+    ~CommissioningProxyScanCache() override { Shutdown(); }
 
     /**
      * @brief Insert or refresh a discovered device. @p result.transport carries the
