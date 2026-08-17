@@ -98,13 +98,13 @@ void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatPresetsDelegate,
-                                                           gThermostatSuggestionsDelegate);
+                                                            gThermostatSuggestionsDelegate);
 }
 
 void ApplicationShutdown()
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(
-        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                           MatterClusterShutdownType::kClusterShutdown);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

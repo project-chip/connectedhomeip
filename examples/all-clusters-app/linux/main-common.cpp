@@ -284,8 +284,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
-    Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
-                                                                MatterClusterShutdownType::kClusterShutdown);
+    Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
