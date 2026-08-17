@@ -876,6 +876,17 @@ bool IsConnectPending()
 
 void Shutdown()
 {
+    // Stop any foreground scan first. Its timer outlives the cluster otherwise, and
+    // OnScanTimer would then hand results to sHost — a cluster that no longer exists —
+    // and call ResumeBleBgScanIfNeeded(), restarting the radio after teardown.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnScanTimer, nullptr);
+    if (sScanInProgress)
+    {
+        (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+        sScanInProgress = false;
+    }
+    sScanResults.clear();
+
     // Move the map out first so sEndpoints is empty when Close() fires
     // OnEndPointConnectionClosed synchronously — FindSessionId returns false and
     // the callbacks are no-ops rather than erasing the iterator mid-iteration.
@@ -909,6 +920,11 @@ void Shutdown()
     // Tear down the background scan: cancel every per-fabric lifetime timer and stop
     // the hardware scan if the registry currently owns it.
     sBgScan.Shutdown();
+
+    // Last: the cluster is going away, so drop the pointer to it. Every callback above
+    // null-checks sHost, and any that still reaches the platform (a scan result already
+    // queued through ScheduleWork) must find null rather than a destroyed cluster.
+    sHost = nullptr;
 }
 
 } // namespace Ble

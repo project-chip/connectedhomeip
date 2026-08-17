@@ -886,8 +886,14 @@ CHIP_ERROR BLEManagerImpl::SwitchToCentralMode()
 
     // Stop advertising and tear down advertising state so the radio is free for
     // central scans / connects.  mBLEAdvertisement.Shutdown() also unregisters
-    // the BlueZ LEAdvertisement1 D-Bus object.
+    // the BlueZ LEAdvertisement1 D-Bus object.  Shutting the advertisement down
+    // directly bypasses the async stop whose completion event normally cancels the
+    // advertising timer, so cancel it here: a timer left armed would fire into
+    // _SetAdvertisingMode, set kAdvertisingRefreshNeeded and re-enter DriveBLEState
+    // after the role switch (and with CHIP_DEVICE_CONFIG_EXT_ADVERTISING it re-arms
+    // itself, so it would keep doing so for the life of the process).
     mBLEAdvertisement.Shutdown();
+    DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
     mFlags.Clear(Flags::kAdvertisingEnabled);
     mFlags.Clear(Flags::kAdvertising);
     mFlags.Clear(Flags::kAdvertisingConfigured);

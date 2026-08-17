@@ -69,8 +69,9 @@ device advertises on uses the proxy as a tunnel. The flow is:
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
 registered `CommissioningProxyTransport` driver whose `GetTransportType()`
-matches the request's transport bit. Today drivers exist for **BLE** (BTP) and
-**Wi-Fi PAF** (PAFTP) — see the transport integration sections below.
+matches the request's transport bit. A **BLE** (BTP) driver ships today; the
+**Wi-Fi PAF** (PAFTP) driver follows in a later PR. See the transport integration
+sections below.
 
 ## Features
 
@@ -231,8 +232,9 @@ void ApplicationInit()
 }
 ```
 
-A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers)
-lands with the example-app change later in this series.
+For a complete working example of the device wiring plus the BLE driver, see
+`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
+The Wi-Fi PAF driver joins it in a later PR.
 
 ## Codegen integration
 
@@ -415,7 +417,11 @@ Incoming BTP messages are routed back to the cluster via a `BleProxyDelegate`
 matches the connection against the active session map, and calls
 `host->Sessions().DispatchMessageResponse()`.
 
-## Wi-Fi PAF Transport Integration
+## Wi-Fi PAF Transport Integration (planned)
+
+No Wi-Fi PAF driver ships yet; this section describes the shape the one landing in
+a later PR takes, and is the reference for anyone writing a PAF driver against
+this cluster in the meantime.
 
 When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
 driver (`CommissioningProxyPafTransport`) interacts with
@@ -444,7 +450,7 @@ The cluster tracks proxy state internally:
 
 State transitions:
 
-```
+```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
 ```
