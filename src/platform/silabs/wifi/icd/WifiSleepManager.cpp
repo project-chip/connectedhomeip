@@ -72,10 +72,6 @@ CHIP_ERROR WifiSleepManager::HandlePowerEvent(PowerEvent event)
     {
     case PowerEvent::kCommissioningComplete:
         ChipLogProgress(AppServer, "WifiSleepManager: Handling Commissioning Complete Event");
-        mIsCommissioningInProgress = false;
-
-        // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-        TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
         break;
 
     case PowerEvent::kConnectivityChange:
@@ -101,13 +97,6 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
     if (mHighPerformanceRequestCounter > 0)
     {
         return ConfigureHighPerformance();
-    }
-
-    if (mIsCommissioningInProgress)
-    {
-        // During commissioning, don't let the device go to sleep
-        // This is needed to interrupt the sleep and retry joining the network
-        return CHIP_NO_ERROR;
     }
 
     if (!mWifiStateProvider->IsWifiProvisioned())
