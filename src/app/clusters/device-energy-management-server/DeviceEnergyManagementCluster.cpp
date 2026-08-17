@@ -108,6 +108,14 @@ CHIP_ERROR DeviceEnergyManagementCluster::Startup(ServerClusterContext & context
                      mPath.mEndpointId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Validate that PowerAdjustment and PowerRangeAdjustment features are mutually exclusive
+    if (mFeatureFlags.Has(Feature::kPowerAdjustment) && mFeatureFlags.Has(Feature::kPowerRangeAdjustment))
+    {
+        ChipLogError(Zcl, "DEM: PowerAdjustment and PowerRangeAdjustment features are mutually exclusive");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return DefaultServerCluster::Startup(context);
 }
 
