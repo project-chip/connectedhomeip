@@ -307,9 +307,6 @@ private:
     // Have a pointer to partner instance object
     DeviceEnergyManagement::Instance * mpDEMInstance;
 
-    // The endpoint that this delegate is associated with
-    chip::EndpointId mEndpointId;
-
     // The DEMManufacturerDelegate object knows how to handle
     // manufacturer/product specific operations
     DEMManufacturerDelegate * mpDEMManufacturerDelegate;
