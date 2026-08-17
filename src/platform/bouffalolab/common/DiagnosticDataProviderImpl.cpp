@@ -23,7 +23,7 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #include <FreeRTOS.h>
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <mm.h>
 #endif
 
@@ -32,7 +32,7 @@ namespace DeviceLayer {
 
 extern "C" struct netif * deviceInterface_getNetif(void);
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 void get_usage_info(uint64_t & used_size, uint64_t & free_size)
 {
     uintptr_t irq_flags     = mm_lock_save();
@@ -86,7 +86,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     uint64_t used_size;
     get_usage_info(used_size, currentHeapFree);
 #else
@@ -102,7 +102,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     uint64_t free_size;
     get_usage_info(currentHeapUsed, free_size);
 #else
@@ -118,7 +118,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #else
 #ifdef CFG_USE_PSRAM

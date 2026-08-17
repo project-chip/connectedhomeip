@@ -175,6 +175,9 @@ private:
 
     void SendStatusResponse(Protocols::InteractionModel::Status aStatus)
     {
+        VerifyOrReturn(!mCommandHandler.IsResponseSuppressed(),
+                       ChipLogDetail(DataManagement, "Response suppressed, skipping status: " ChipLogFormatIMStatus,
+                                     ChipLogValueIMStatus(aStatus)));
         TEMPORARY_RETURN_IGNORED StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 

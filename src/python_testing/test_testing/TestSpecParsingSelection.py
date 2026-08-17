@@ -57,6 +57,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.5.1")
         asserts.assert_equal(dm_from_spec_version(0x01060000), PrebuiltDataModelDirectory.k1_6,
                              "Incorrect directory selected for 1.6")
+        asserts.assert_equal(dm_from_spec_version(0x01060100), PrebuiltDataModelDirectory.k1_6_1,
+                             "Incorrect directory selected for 1.6.1")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -75,6 +77,12 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.FF"):
             dm_from_spec_version(0x0105FF00)
 
+        # Any dot release above .1 should error for 1.6
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.6.2"):
+            dm_from_spec_version(0x01060200)
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.6.FF"):
+            dm_from_spec_version(0x0106FF00)
+
         # Any value with stuff in reserved should error
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01030001)
@@ -86,6 +94,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             dm_from_spec_version(0x01050001)
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01060001)
+        with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
+            dm_from_spec_version(0x01060101)
 
     def _create_device(self, spec_version: uint, tc_enabled: bool):
         if spec_version is None:

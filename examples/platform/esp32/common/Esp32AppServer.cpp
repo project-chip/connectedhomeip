@@ -185,39 +185,39 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
     static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
     static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
     static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
     static CommodityMeteringTestEventTriggerHandler sCommodityMeteringTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
     static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR

@@ -198,6 +198,9 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::Init()
     return CHIP_NO_ERROR;
 }
 
+void MatterOperationalStateClusterInitCallback(EndpointId endpointId) {}
+void MatterOperationalStateClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType) {}
+
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void ExampleMicrowaveOvenDevice::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {

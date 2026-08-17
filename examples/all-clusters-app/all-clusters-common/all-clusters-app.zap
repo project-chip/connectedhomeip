@@ -62,7 +62,7 @@
       ],
       "deviceVersions": [
         1,
-        4
+        5
       ],
       "deviceIdentifiers": [
         17,
@@ -6429,7 +6429,7 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [
@@ -14577,8 +14577,24 @@
           ],
           "attributes": [
             {
-              "name": "Mode",
+              "name": "SupportedModes",
               "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Mode",
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "ModeEnum",
@@ -14594,7 +14610,7 @@
             },
             {
               "name": "SystemState",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "side": "server",
               "type": "SystemStateEnum",
@@ -14602,7 +14618,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -14610,22 +14626,6 @@
             },
             {
               "name": "UserSetpoint",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "percent",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "40",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "MinSetpoint",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -14641,8 +14641,24 @@
               "reportableChange": 0
             },
             {
-              "name": "MaxSetpoint",
+              "name": "MinSetpoint",
               "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "percent",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "30",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxSetpoint",
+              "code": 5,
               "mfgCode": null,
               "side": "server",
               "type": "percent",
@@ -14658,7 +14674,7 @@
             },
             {
               "name": "Step",
-              "code": 5,
+              "code": 6,
               "mfgCode": null,
               "side": "server",
               "type": "percent",
@@ -14674,7 +14690,7 @@
             },
             {
               "name": "TargetSetpoint",
-              "code": 6,
+              "code": 7,
               "mfgCode": null,
               "side": "server",
               "type": "percent",
@@ -14682,7 +14698,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "40",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -14690,7 +14706,7 @@
             },
             {
               "name": "MistType",
-              "code": 7,
+              "code": 8,
               "mfgCode": null,
               "side": "server",
               "type": "MistTypeBitmap",
@@ -14698,7 +14714,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -14706,22 +14722,6 @@
             },
             {
               "name": "Continuous",
-              "code": 8,
-              "mfgCode": null,
-              "side": "server",
-              "type": "boolean",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "Sleep",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -14737,11 +14737,59 @@
               "reportableChange": 0
             },
             {
-              "name": "Optimal",
+              "name": "Sleep",
               "code": 10,
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Optimal",
+              "code": 11,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CondPumpEnabled",
+              "code": 12,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CondRunCount",
+              "code": 13,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -14810,7 +14858,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "511",
+              "defaultValue": "1023",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -16295,6 +16343,162 @@
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Dynamic Lighting",
+          "code": 773,
+          "mfgCode": null,
+          "define": "DYNAMIC_LIGHTING_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "StartEffect",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StopEffect",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "AvailableEffects",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentEffectID",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentSpeed",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
               "reportableChange": 0
             }
           ]
@@ -21778,7 +21982,7 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [

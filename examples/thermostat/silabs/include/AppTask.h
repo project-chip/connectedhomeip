@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <cstdint>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 struct AppEvent;
 
@@ -65,11 +66,21 @@ public:
     static void TemperatureUpdateEventHandler(AppEvent * aEvent);
 
     /**
-     * @brief Thermostat-cluster post-attribute-change callback. Logs per-attribute info and
-     *        triggers a UI refresh. Also fans out to the AWS hook when SL_MATTER_ENABLE_AWS is set.
+     * @brief Matter stack callback after a server attribute change, logs Thermostat attributes and
+     *        refreshes the UI.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
      */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+    /**
+     * @brief Thermostat cluster init hook. Registers ThermostatDelegate for preset-related attributes.
+     */
+    void DMThermostatClusterInit(chip::EndpointId endpoint);
 
     /**
      * @brief Initialize the temperature sensor backing this thermostat.
@@ -91,9 +102,13 @@ public:
     CHIP_ERROR GetTemperature(int16_t & temperature);
 
 protected:
-    /** Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
 
-    /** Bring up the thermostat app: sensor timer, sensor driver, first UI paint. */
+    /**
+     * @brief Bring up the thermostat app: sensor timer, sensor driver, first UI paint.
+     *
+     * @return CHIP_NO_ERROR on success, otherwise APP_ERROR_CREATE_TIMER_FAILED if the sensor timer
+     *         could not be created, or an error propagated from InitSensor().
+     */
     CHIP_ERROR InitThermostat();
 };

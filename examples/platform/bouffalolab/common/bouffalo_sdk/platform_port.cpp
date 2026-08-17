@@ -19,30 +19,40 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#include <eth_phy_port.h>
+#endif
+
 extern "C" {
 #include <bflb_mtd.h>
-#include <bl616dk/board.h>
+#include <bl_sys.h>
+#include <board.h>
 }
 #include <plat.h>
 
 extern "C" void __libc_init_array(void);
 extern "C" void shell_init_with_task(struct bflb_device_s * shell);
+extern "C" void app_pre_matter_init(void) __attribute__((weak));
+extern "C" void app_pre_matter_init(void) {}
 
 void platform_port_init(void)
 {
-    /*if need use xtal 32k please enable next API */
+    bl_sys_rstinfo_init();
+
     board_init();
 #if CONFIG_ENABLE_CHIP_SHELL
     struct bflb_device_s * uart0 = bflb_device_get_by_name("uart0");
     shell_init_with_task(uart0);
 #endif
+    bflb_mtd_init();
+
+    app_pre_matter_init();
 
     __libc_init_array();
 
-    bflb_mtd_init();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    board_emac_gpio_init();
+    board_emac_rmii_gpio_init(BSP_EMAC_RMII_DEFAULT_PORT);
+    board_emac_mdio_gpio_init(BSP_EMAC_MDIO_DEFAULT_PORT);
 #endif
 }
 

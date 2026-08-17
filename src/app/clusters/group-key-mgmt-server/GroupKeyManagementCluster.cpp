@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
+#include <lib/support/AutoRelease.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -79,22 +80,20 @@ struct GroupTableCodec
         TLV::TLVType inner;
         ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
-        auto iter = mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id));
-        if (nullptr != iter)
+        AutoRelease iter(mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id)));
+        if (!iter.IsNull())
         {
             while (iter->Next(mapping))
             {
                 ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
             }
-            iter->Release();
         }
         ReturnErrorOnFailure(writer.EndContainer(inner));
         // GroupName
         uint32_t name_size = static_cast<uint32_t>(strnlen(mInfo.name, GroupDataProvider::GroupInfo::kGroupNameMax));
         ReturnErrorOnFailure(writer.PutString(TagGroupName(), mInfo.name, name_size));
 
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
+        return writer.EndContainer(outer);
     }
 };
 
@@ -139,13 +138,11 @@ struct KeySetReadAllIndicesResponse
 CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
-        CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
-
         for (auto & fabric : fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
-            auto iter         = provider.IterateGroupKeys(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+            AutoRelease iter(provider.IterateGroupKeys(fabric_index));
+            VerifyOrReturnError(!iter.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             GroupDataProvider::GroupKey mapping;
             while (iter->Next(mapping))
@@ -155,19 +152,10 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provid
                     .groupKeySetID = mapping.keyset_id,
                     .fabricIndex   = fabric_index,
                 };
-                encodeStatus = encoder.Encode(key);
-                if (encodeStatus != CHIP_NO_ERROR)
-                {
-                    break;
-                }
-            }
-            iter->Release();
-            if (encodeStatus != CHIP_NO_ERROR)
-            {
-                break;
+                ReturnErrorOnFailure(encoder.Encode(key));
             }
         }
-        return encodeStatus;
+        return CHIP_NO_ERROR;
     });
 }
 
@@ -211,11 +199,10 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         {
-            auto iter = provider.IterateGroupKeys(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+            AutoRelease iter(provider.IterateGroupKeys(fabric_index));
+            VerifyOrReturnError(!iter.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             current_count = iter->Count();
-            iter->Release();
         }
 
         ReturnErrorOnFailure(provider.SetGroupKeyAt(value.fabricIndex, current_count,
@@ -232,31 +219,20 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
 CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
-        CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
-
         for (auto & fabric : fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
-            auto iter         = provider.IterateGroupInfo(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+            AutoRelease iter(provider.IterateGroupInfo(fabric_index));
+            VerifyOrReturnError(!iter.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             GroupDataProvider::GroupInfo info;
             while (iter->Next(info))
             {
-                encodeStatus = encoder.Encode(GroupTableCodec(&provider, fabric_index, info));
-                if (encodeStatus != CHIP_NO_ERROR)
-                {
-                    break;
-                }
-            }
-            iter->Release();
-            if (encodeStatus != CHIP_NO_ERROR)
-            {
-                break;
+                ReturnErrorOnFailure(encoder.Encode(GroupTableCodec(&provider, fabric_index, info)));
             }
         }
 
-        return encodeStatus;
+        return CHIP_NO_ERROR;
     });
 }
 
@@ -573,15 +549,14 @@ HandleKeySetReadAllIndices(CommandHandler * commandObj, const ConcreteCommandPat
                            Credentials::GroupDataProvider * provider, const FabricInfo * fabric)
 {
     FabricIndex fabricIndex = fabric->GetFabricIndex();
-    auto keysIt             = provider->IterateKeySets(fabricIndex);
-    if (nullptr == keysIt)
+    AutoRelease keysIt(provider->IterateKeySets(fabricIndex));
+    if (keysIt.IsNull())
     {
         commandObj->AddStatus(commandPath, Status::Failure, "Failed iteration of key set indices!");
         return std::nullopt;
     }
 
-    commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(keysIt));
-    keysIt->Release();
+    commandObj->AddResponse(commandPath, KeySetReadAllIndicesResponse(&*keysIt));
     return std::nullopt;
 }
 } // namespace
@@ -672,7 +647,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
     {
     case GroupKeyMap::Id: {
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
-                                               WriteGroupKeyMap(mContext.groupDataProvider, request.path, decoder));
+                                               WriteGroupKeyMap(mContext.groupDataProvider, request.path, decoder),
+                                               DataModel::AttributeChangeType::kQuiet);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
@@ -682,8 +658,19 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
 CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & path,
                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    // TODO(#72714): remove this override once the AttributeQualityFlags::kChangesOmitted quality is honored by the generator.
+    static constexpr DataModel::AttributeEntry kMandatoryMetadataWithChangesOmitted[] = {
+        DataModel::AttributeEntry(GroupKeyMap::Id,
+                                  BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                                             DataModel::AttributeQualityFlags::kChangesOmitted),
+                                  Access::Privilege::kView, Access::Privilege::kManage),
+        GroupTable::kMetadataEntry,
+        MaxGroupsPerFabric::kMetadataEntry,
+        MaxGroupKeysPerFabric::kMetadataEntry,
+    };
+
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), {});
+    return listBuilder.Append(Span(kMandatoryMetadataWithChangesOmitted), {});
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,

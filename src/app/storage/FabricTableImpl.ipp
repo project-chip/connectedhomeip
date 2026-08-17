@@ -310,6 +310,7 @@ struct FabricEntryData : public PersistableData<kFabricMaxBytes>
     /// @return CHIP_NO_ERROR if managed to find the target entry, CHIP_ERROR_NOT_FOUND if not found
     CHIP_ERROR FindByIndex(PersistentStorageDelegate & storage, EntryIndex index, StorageId & entry_id)
     {
+        VerifyOrReturnError(index < max_per_fabric, CHIP_ERROR_NOT_FOUND);
         VerifyOrReturnError(entry_map[index].IsValid(), CHIP_ERROR_NOT_FOUND);
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);

@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <app/EventLogging.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/ProximityRanging/Events.h>
 #include <clusters/ProximityRanging/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedMemoryBuffer.h>
@@ -39,65 +40,66 @@ static constexpr uint8_t kInvalidSessionId = 0;
 CHIP_ERROR ProximityRangingCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = mDriver->Init(*this);
+    CHIP_ERROR err = mDriver.Init(*this);
     if (err != CHIP_NO_ERROR)
     {
         DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
+        return err;
     }
-    return err;
+    mDriverInitialized = true;
+    return CHIP_NO_ERROR;
 }
 
 void ProximityRangingCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     DefaultServerCluster::Shutdown(shutdownType);
-    if (mDriver != nullptr)
+    if (mDriverInitialized)
     {
-        mDriver->Shutdown();
+        mDriver.Shutdown();
+        mDriverInitialized = false;
     }
 }
 
 DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     switch (request.path.mAttributeId)
     {
     case Attributes::RangingCapabilities::Id:
-        return mDriver->GetRangingCapabilities(encoder);
+        return mDriver.GetRangingCapabilities(encoder);
 
     case Attributes::BLEDeviceID::Id: {
-        auto config = mDriver->GetBleRbcConfig();
+        auto config = mDriver.GetBleRbcConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->deviceId);
     }
 
     case Attributes::WiFiDevIK::Id: {
-        auto config = mDriver->GetWiFiUsdConfig();
+        auto config = mDriver.GetWiFiUsdConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTDevIK::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(ByteSpan(config->deviceIdentityKey));
     }
 
     case Attributes::BLTCSSecurityLevel::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->securityLevel);
     }
 
     case Attributes::BLTCSModeCapability::Id: {
-        auto config = mDriver->GetBltcsConfig();
+        auto config = mDriver.GetBltcsConfig();
         VerifyOrReturnError(config.has_value(), Status::UnsupportedAttribute);
         return encoder.Encode(config->modeCapability);
     }
 
     case Attributes::SessionIDList::Id: {
-        const size_t numSessions = mDriver->GetNumActiveSessionIds();
+        const size_t numSessions = mDriver.GetNumActiveSessionIds();
         if (numSessions == 0)
         {
             return encoder.EncodeEmptyList();
@@ -105,7 +107,7 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
         Platform::ScopedMemoryBuffer<uint8_t> buf;
         VerifyOrReturnError(buf.Calloc(numSessions), Status::ResourceExhausted);
         Span<uint8_t> sessionIds(buf.Get(), numSessions);
-        ReturnErrorOnFailure(mDriver->GetActiveSessionIds(sessionIds));
+        ReturnErrorOnFailure(mDriver.GetActiveSessionIds(sessionIds));
         return encoder.EncodeList([&sessionIds](const auto & listEncoder) -> CHIP_ERROR {
             for (size_t i = 0; i < sessionIds.size(); i++)
             {
@@ -129,8 +131,8 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
 CHIP_ERROR ProximityRangingCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    using OptionalEntry               = AttributeListBuilder::OptionalAttributeEntry;
-    OptionalEntry featureAttributes[] = {
+    using OptionalEntry                     = AttributeListBuilder::OptionalAttributeEntry;
+    const OptionalEntry featureAttributes[] = {
         { mFeatureMap.Has(Feature::kWiFiUsdProximityDetection), Attributes::WiFiDevIK::kMetadataEntry },
         { mFeatureMap.Has(Feature::kBleBeaconRssi), Attributes::BLEDeviceID::kMetadataEntry },
         { mFeatureMap.Has(Feature::kBluetoothChannelSounding), Attributes::BLTDevIK::kMetadataEntry },
@@ -177,32 +179,27 @@ std::optional<DataModel::ActionReturnStatus>
 ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & reader,
                                                    CommandHandler * handler)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StartRangingRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(reader));
 
     Commands::StartRangingResponse::Type response;
-    ResultCodeEnum resultCode;
-    uint8_t sessionId = GenerateSessionId();
-    if (sessionId == kInvalidSessionId)
+    response.resultCode = ValidateStartRangingRequest(commandData);
+    response.sessionID.SetNull();
+    if (response.resultCode == ResultCodeEnum::kAccepted)
     {
-        // Failed to generate session ID without collision
-        resultCode = ResultCodeEnum::kBusySessionCapacityReached;
-    }
-    else
-    {
-        resultCode = mDriver->HandleStartRanging(sessionId, commandData);
-    }
-
-    response.resultCode = resultCode;
-
-    if (resultCode == ResultCodeEnum::kAccepted)
-    {
-        response.sessionID.SetNonNull(sessionId);
-    }
-    else
-    {
-        response.sessionID.SetNull();
+        uint8_t sessionId = GenerateSessionId();
+        if (sessionId == kInvalidSessionId)
+        {
+            response.resultCode = ResultCodeEnum::kBusySessionCapacityReached;
+        }
+        else
+        {
+            response.resultCode = mDriver.HandleStartRanging(sessionId, commandData);
+            if (response.resultCode == ResultCodeEnum::kAccepted)
+            {
+                response.sessionID.SetNonNull(sessionId);
+            }
+        }
     }
 
     handler->AddResponse(request.path, response);
@@ -212,11 +209,10 @@ ProximityRangingCluster::HandleStartRangingRequest(const DataModel::InvokeReques
 DataModel::ActionReturnStatus ProximityRangingCluster::HandleStopRangingRequest(const DataModel::InvokeRequest & request,
                                                                                 TLV::TLVReader & reader)
 {
-    VerifyOrReturnError(mDriver != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Commands::StopRangingRequest::DecodableType commandData;
     VerifyOrReturnValue(commandData.Decode(reader) == CHIP_NO_ERROR, Status::InvalidCommand);
 
-    CHIP_ERROR err = mDriver->HandleStopRanging(commandData.sessionID);
+    CHIP_ERROR err = mDriver.HandleStopRanging(commandData.sessionID);
     if (err == CHIP_ERROR_NOT_FOUND)
     {
         // If SessionID does not match any active ranging session, the Server SHALL response with the status code INVALID_IN_STATE
@@ -245,10 +241,89 @@ void ProximityRangingCluster::OnSessionStopped(uint8_t sessionId, RangingSession
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
+ResultCodeEnum
+ProximityRangingCluster::ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const
+{
+    const bool hasWiFi = request.wiFiRangingDeviceRoleConfig.HasValue();
+    const bool hasBle  = request.BLERangingDeviceRoleConfig.HasValue();
+    const bool hasBlt  = request.BLTChannelSoundingDeviceRoleConfig.HasValue();
+
+    switch (request.technology)
+    {
+    case RangingTechEnum::kBluetoothChannelSounding: {
+        if (!mFeatureMap.Has(Feature::kBluetoothChannelSounding) || !hasBlt || hasWiFi || hasBle)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        auto role = request.BLTChannelSoundingDeviceRoleConfig.Value().role;
+        if (role != RangingRoleEnum::kBLTInitiatorRole && role != RangingRoleEnum::kBLTReflectorRole)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        break;
+    }
+    case RangingTechEnum::kWiFiRoundTripTimeRanging:
+    case RangingTechEnum::kWiFiNextGenerationRanging: {
+        if (!mFeatureMap.Has(Feature::kWiFiUsdProximityDetection) || !hasWiFi || hasBle || hasBlt)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        auto role = request.wiFiRangingDeviceRoleConfig.Value().role;
+        if (role != RangingRoleEnum::kWiFiSubscriberRole && role != RangingRoleEnum::kWiFiPublisherRole)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        break;
+    }
+    case RangingTechEnum::kBLEBeaconRSSIRanging: {
+        if (!mFeatureMap.Has(Feature::kBleBeaconRssi) || !hasBle || hasWiFi || hasBlt)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        auto role = request.BLERangingDeviceRoleConfig.Value().role;
+        if (role != RangingRoleEnum::kBLEScanningRole && role != RangingRoleEnum::kBLEBeaconRole)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        break;
+    }
+    default:
+        return ResultCodeEnum::kRejectedInfeasibleRanging;
+    }
+
+    if (request.trigger.endTime <= request.trigger.startTime)
+    {
+        return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
+    }
+    if (request.trigger.rangingInstanceInterval.HasValue() && request.trigger.rangingInstanceInterval.Value() == 0)
+    {
+        return ResultCodeEnum::kRejectedInfeasibleRangingTriggers;
+    }
+
+    if (request.reportingCondition.HasValue())
+    {
+        const auto & rc = request.reportingCondition.Value();
+        if (rc.minDistanceCondition.HasValue() && rc.minDistanceCondition.Value() == 0)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        if (rc.maxDistanceCondition.HasValue() && rc.maxDistanceCondition.Value() == 0)
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+        if (rc.minDistanceCondition.HasValue() && rc.maxDistanceCondition.HasValue() &&
+            rc.minDistanceCondition.Value() > rc.maxDistanceCondition.Value())
+        {
+            return ResultCodeEnum::kRejectedInfeasibleRanging;
+        }
+    }
+
+    return ResultCodeEnum::kAccepted;
+}
+
 uint8_t ProximityRangingCluster::GenerateSessionId()
 {
-    VerifyOrReturnValue(mDriver != nullptr, kInvalidSessionId);
-    const size_t numSessions = mDriver->GetNumActiveSessionIds();
+    const size_t numSessions = mDriver.GetNumActiveSessionIds();
     if (numSessions == 0)
     {
         uint8_t candidate = mNextSessionId++;
@@ -261,7 +336,7 @@ uint8_t ProximityRangingCluster::GenerateSessionId()
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     VerifyOrReturnValue(buf.Calloc(numSessions), kInvalidSessionId);
     Span<uint8_t> activeSessions(buf.Get(), numSessions);
-    if (mDriver->GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
+    if (mDriver.GetActiveSessionIds(activeSessions) != CHIP_NO_ERROR)
     {
         return kInvalidSessionId;
     }

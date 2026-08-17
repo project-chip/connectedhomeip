@@ -25,6 +25,16 @@ CI:
       args:
           - --device
           - water-freeze-detector
+    - name: "Test against all-devices/contact-sensor"
+      app: all-devices
+      args:
+          - --device
+          - contact-sensor
+    - name: "Test against all-devices/water-leak-detector"
+      app: all-devices
+      args:
+          - --device
+          - water-leak-detector
 
 PICS:
     - BOOL.S

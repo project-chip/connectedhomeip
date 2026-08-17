@@ -36,6 +36,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, messages);
     case Attributes::ActiveMessageIDs::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeMessageIDs);
+    case Attributes::SupportedLanguageCodes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedLanguageCodes);
+    case Attributes::SupportedMimeTypes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedMimeTypes);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

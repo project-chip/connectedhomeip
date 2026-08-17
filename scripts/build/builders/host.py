@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 from enum import Enum, auto
 from platform import uname
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -93,7 +92,7 @@ class HostCryptoLibrary(Enum):
             # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
             # one-shot implementation (as ESP32 does).
             return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
-        raise ValueError("Unknown host crypto library: %r" % self)
+        raise ValueError(f"Unknown host crypto library: {self!r}")
 
 
 class HostFuzzingType(Enum):
@@ -267,7 +266,7 @@ class HostApp(Enum):
             return 'jf-admin-app/linux'
         if self == HostApp.CLOSURE:
             return 'closure-app/linux'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -413,7 +412,7 @@ class HostApp(Enum):
             yield 'closure-app'
             yield 'closure-app.map'
         else:
-            raise Exception('Unknown app type: %r' % self)
+            raise Exception(f'Unknown app type: {self!r}')
 
 
 class HostBoard(Enum):
@@ -446,7 +445,7 @@ class HostBoard(Enum):
             return 'arm'
         if self == HostBoard.FAKE:
             return 'fake'
-        raise Exception('Unknown host board type: %r' % self)
+        raise Exception(f'Unknown host board type: {self!r}')
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
@@ -468,15 +467,15 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None,
-                 enable_dnssd_tests: Optional[bool] = None,
-                 chip_casting_simplified: Optional[bool] = None,
+                 enable_dnssd_tests: bool | None = None,
+                 chip_casting_simplified: bool | None = None,
                  disable_shell=False,
                  use_googletest=False,
                  enable_webrtc=False,
-                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
                  unified=False,
-                 chip_enable_endpoint_unique_id: Optional[bool] = None,
+                 chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
                  ):
         """
@@ -550,7 +549,13 @@ class HostBuilder(GnBuilder):
         if use_msan:
             if not runner.dry_run:
                 _msan_validate_sysroot(chip_root)
-            self.extra_gn_options.append('is_msan=true')
+            if fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+                # pw_fuzzer FuzzTest targets build in the chip_pw_fuzztest secondary toolchain,
+                # which does not consume chip's global is_msan/sanitize_default. Drive MSAN via
+                # the toolchain arg instead (it swaps pigweed's ASan for chip's sanitize_memory).
+                self.extra_gn_options.append('chip_pw_fuzz_msan=true')
+            else:
+                self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
             self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
@@ -602,7 +607,7 @@ class HostBuilder(GnBuilder):
         if minmdns_address_policy:
             if use_platform_mdns:
                 raise Exception('Address policy applies to minmdns only')
-            self.extra_gn_options.append('chip_minmdns_default_policy="%s"' % minmdns_address_policy)
+            self.extra_gn_options.append(f'chip_minmdns_default_policy="{minmdns_address_policy}"')
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -731,12 +736,12 @@ class HostBuilder(GnBuilder):
             case HostBoard.ARM64:
                 args.extend([
                     'target_cpu="arm64"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
+                    f'sysroot="{self.SysRootPath("SYSROOT_AARCH64")}"'
                 ])
             case HostBoard.ARM:
                 args.extend([
                     'target_cpu="arm"',
-                    'sysroot="%s"' % self.SysRootPath('SYSROOT_ARMHF'),
+                    f'sysroot="{self.SysRootPath("SYSROOT_ARMHF")}"',
                 ])
             case HostBoard.FAKE:
                 args.extend([
@@ -753,7 +758,7 @@ class HostBuilder(GnBuilder):
             [
                 "chmod",
                 "+x",
-                "%s/bin/%s" % (self.output_dir, java_program),
+                f"{self.output_dir}/bin/{java_program}",
             ],
             title="Make Java program executable",
         )
@@ -785,7 +790,7 @@ class HostBuilder(GnBuilder):
 
     def SysRootPath(self, name):
         if name not in os.environ:
-            raise Exception('Missing environment variable "%s"' % name)
+            raise Exception(f'Missing environment variable "{name}"')
         return os.environ[name]
 
     @lock_output_dir

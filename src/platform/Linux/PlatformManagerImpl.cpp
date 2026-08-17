@@ -241,6 +241,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
+    // Initialize the reference time point as soon as possible, so we could
+    // use it during the CHIP stack initialization, e.g. time counters for
+    // diagnostics.
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
@@ -248,8 +253,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Now set up our device instance info provider.  We couldn't do that
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
-
-    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     return CHIP_NO_ERROR;
 }

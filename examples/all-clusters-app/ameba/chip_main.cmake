@@ -167,11 +167,16 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/soil-measurement-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/all-clusters-energy-mode-stubs.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp
