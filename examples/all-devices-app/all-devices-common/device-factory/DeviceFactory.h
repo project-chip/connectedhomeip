@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include <app/FailSafeContext.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <app_config/enabled_devices.h>
 #include <platform/PlatformManager.h>
 #include <device/types/aggregator/Aggregator.h>
@@ -94,6 +97,9 @@ public:
         PersistentStorageDelegate & storageDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         DeviceLayer::PlatformManager & platformManager;
+        FailSafeContext & failSafeContext;
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
     };
 
     static DeviceFactory & GetInstance()
@@ -352,7 +358,7 @@ private:
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                      mContext->platformManager);
+                                                                      mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -370,7 +376,8 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager);
+                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager,
+                                                           mContext->bindingTable, mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)

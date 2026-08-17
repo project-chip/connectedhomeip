@@ -37,11 +37,13 @@ constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
 
 NetworkInfrastructureManager::NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                                             DeviceLayer::PlatformManager & platformManager) :
+                                                             DeviceLayer::PlatformManager & platformManager,
+                                                             FailSafeContext & failSafeContext) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
     mThreadNetworkDirectoryStorage(storage),
     mTimerDelegate(timerDelegate),
-    mPlatformManager(platformManager)
+    mPlatformManager(platformManager),
+    mFailSafeContext(failSafeContext)
 {}
 
 NetworkInfrastructureManager::~NetworkInfrastructureManager()
@@ -59,8 +61,7 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // 1. Thread Border Router Management
-    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(), mBreadCrumbTracker,
-                                                          mPlatformManager);
+    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, mFailSafeContext, mBreadCrumbTracker, mPlatformManager);
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 

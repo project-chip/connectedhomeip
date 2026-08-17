@@ -128,6 +128,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
+        uint16_t minGuaranteedSubscriptionsPerFabric;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -155,6 +156,7 @@ public:
                     .dacProvider                = mContext.dacProvider,                //
                     .eventManagement            = mContext.eventManagement,            //
                     .timerDelegate              = mContext.timerDelegate,              //
+                    .minGuaranteedSubscriptionsPerFabric = mContext.minGuaranteedSubscriptionsPerFabric,
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -315,6 +317,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .storageDelegate        = *initParams.persistentStorageDelegate,  //
         .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager        = DeviceLayer::PlatformMgr(),
+        .failSafeContext        = Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = Binding::Table::GetInstance(),
+        .bindingManager         = Binding::Manager::GetInstance(),
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
@@ -372,6 +377,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
+            .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

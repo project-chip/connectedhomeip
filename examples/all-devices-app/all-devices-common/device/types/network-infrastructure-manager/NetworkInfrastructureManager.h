@@ -47,7 +47,7 @@ class NetworkInfrastructureManager : public SingleEndpoint, public Clusters::Thr
 {
 public:
     NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                 DeviceLayer::PlatformManager & platformManager);
+                                 DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext);
     ~NetworkInfrastructureManager() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -116,6 +116,7 @@ private:
 
     TimerDelegate & mTimerDelegate;
     DeviceLayer::PlatformManager & mPlatformManager;
+    FailSafeContext & mFailSafeContext;
 
     ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };
     PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };
