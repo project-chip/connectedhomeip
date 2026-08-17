@@ -42,33 +42,23 @@ public:
         virtual Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) = 0;
     };
 
-    explicit ThermostatOccupancy(ThermostatCluster & cluster){};
-
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
+    ThermostatOccupancy(Delegate & delegate) : mDelegate(delegate) {}
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
 
     bool IsOccupied() const
     {
-        if (mDelegate)
-        {
-            return mDelegate->GetOccupancy().Has(OccupancyBitmap::kOccupied);
-        }
-        return true;
+        return mDelegate.GetOccupancy().Has(OccupancyBitmap::kOccupied);
     }
 
     Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied)
     {
-        if (mDelegate)
-        {
-            return mDelegate->SetOccupancy(occupied);
-        }
-        return Protocols::InteractionModel::Status::InvalidInState;
+        return mDelegate.SetOccupancy(occupied);
     }
 
 private:
-    Delegate * mDelegate = nullptr;
+    Delegate & mDelegate;
 };
 
 } // namespace Thermostat

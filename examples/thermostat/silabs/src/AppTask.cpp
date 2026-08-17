@@ -107,7 +107,7 @@ CHIP_ERROR AppTask::AppInit()
 #endif
 
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        kThermostatEndpoint, &kThermostatDelegate);
+        kThermostatEndpoint, kThermostatDelegate);
 
     err = AppInstance().InitThermostat();
     if (err != CHIP_NO_ERROR)

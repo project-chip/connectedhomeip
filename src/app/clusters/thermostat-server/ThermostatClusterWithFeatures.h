@@ -28,6 +28,45 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+namespace  {
+
+template <typename TargetDelegate, typename First, typename... Rest>
+constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
+{
+    if constexpr (std::is_base_of_v<TargetDelegate, std::decay_t<First>>)
+    {
+        return std::forward<First>(first);
+    }
+    else if constexpr (sizeof...(Rest) > 0)
+    {
+        return FindDelegate<TargetDelegate>(std::forward<Rest>(rest)...);
+    }
+    else
+    {
+        static_assert(std::is_base_of_v<TargetDelegate, std::decay_t<First>>,
+                      "Exhausted list of delegates without finding target delegate");
+    }
+}
+
+template <bool Enabled, typename FeatureType, typename... DelegateArgs, typename... ExtraArgs>
+static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraArgs &&... extraArgs)
+{
+    if constexpr (Enabled)
+    {
+        return std::apply(
+            [&](auto &... dels) {
+                return FeatureType(std::forward<ExtraArgs>(extraArgs)..., FindDelegate<typename FeatureType::Delegate>(dels...));
+            },
+            delegates);
+    }
+    else
+    {
+        return std::monostate{};
+    }
+}
+
+} // namespace 
+
 template <typename... Delegates>
 class ThermostatClusterWithFeatures : public ThermostatCluster
 {
@@ -38,45 +77,14 @@ public:
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
 
-    ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features,
-                                  const OptionalAttributes & optionalAttributes,
-                                  const DefaultValues & defaultValues,
-                                  FabricTable & fabricTable) :
-        ThermostatCluster(aEndpointId, features, optionalAttributes, defaultValues, fabricTable),
-        mPresets(MakeFeature<kHasPresets, ThermostatPresets>(*this)),
-        mSuggestions(MakeFeature<kHasSuggestions, ThermostatSuggestions>(*this, mPresets)),
-        mOccupancy(MakeFeature<kHasOccupancy, ThermostatOccupancy>(*this))
+    template <typename... DelegateArgs>
+    ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                                  DelegateArgs &... delegates) :
+        ThermostatCluster(aEndpointId, features, config, FindDelegate<Thermostat::Delegate>(delegates...)),
+        mPresets(MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
+        mSuggestions(MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
+        mOccupancy(MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
     {}
-
-    template <typename DelegateT>
-    void SetDelegate(DelegateT * delegate)
-    {
-        if constexpr (std::is_base_of_v<Thermostat::Delegate, DelegateT>)
-        {
-            mDelegate = delegate;
-        }
-        if constexpr (kHasPresets)
-        {
-            if constexpr (std::is_base_of_v<ThermostatPresets::Delegate, DelegateT>)
-            {
-                mPresets.SetDelegate(delegate);
-            }
-        }
-        if constexpr (kHasSuggestions)
-        {
-            if constexpr (std::is_base_of_v<ThermostatSuggestions::Delegate, DelegateT>)
-            {
-                mSuggestions.SetDelegate(delegate);
-            }
-        }
-        if constexpr (kHasOccupancy)
-        {
-            if constexpr (std::is_base_of_v<ThermostatOccupancy::Delegate, DelegateT>)
-            {
-                mOccupancy.SetDelegate(delegate);
-            }
-        }
-    }
 
     bool IsOccupied() const override
     {
@@ -231,19 +239,6 @@ private:
     [[no_unique_address]] std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
     [[no_unique_address]] std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
     [[no_unique_address]] std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
-
-    template <bool Enabled, typename FeatureType, typename... Args>
-    static auto MakeFeature(Args &&... args)
-    {
-        if constexpr (Enabled)
-        {
-            return FeatureType(std::forward<Args>(args)...);
-        }
-        else
-        {
-            return std::monostate{};
-        }
-    }
 };
 
 using DefaultThermostatCluster =

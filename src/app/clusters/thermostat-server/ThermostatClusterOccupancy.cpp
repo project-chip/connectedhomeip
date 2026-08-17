@@ -34,14 +34,9 @@ namespace Thermostat {
 std::optional<DataModel::ActionReturnStatus> ThermostatOccupancy::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                                 AttributeValueEncoder & encoder)
 {
-    if (mDelegate == nullptr)
-    {
-        return std::nullopt;
-    }
-
     if (request.path.mAttributeId == Occupancy::Id)
     {
-        return encoder.Encode(mDelegate->GetOccupancy());
+        return encoder.Encode(mDelegate.GetOccupancy());
     }
 
     return std::nullopt;

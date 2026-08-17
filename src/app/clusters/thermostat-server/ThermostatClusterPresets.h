@@ -152,10 +152,9 @@ public:
     };
 
     ThermostatPresets() = delete;
-    ThermostatPresets(ThermostatCluster & cluster) : mCluster(cluster) {}
+    ThermostatPresets(ThermostatCluster & cluster, Delegate & delegate) : mCluster(cluster), mDelegate(delegate) {}
 
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
-    Delegate * GetDelegate() const { return mDelegate; }
+    Delegate & GetDelegate() { return mDelegate; }
 
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
@@ -193,7 +192,7 @@ public:
 
 private:
     ThermostatCluster & mCluster;
-    Delegate * mDelegate = nullptr;
+    Delegate & mDelegate;
 };
 
 } // namespace Thermostat

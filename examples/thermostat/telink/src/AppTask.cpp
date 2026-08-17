@@ -43,7 +43,7 @@ CHIP_ERROR AppTask::Init(void)
     ReturnErrorOnFailure(InitCommonParts());
 
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, &gThermostatDelegate);
+        gThermostatEndpoint, gThermostatDelegate);
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)

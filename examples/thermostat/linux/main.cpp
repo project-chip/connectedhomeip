@@ -79,7 +79,7 @@ void ApplicationInit()
     ChipLogProgress(Zcl, "Thermostat application init");
 
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, &gThermostatDelegate);
+        gThermostatEndpoint, gThermostatDelegate);
 }
 
 void ApplicationShutdown()
