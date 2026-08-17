@@ -39,6 +39,8 @@ public:
     // WindowCoveringDelegate implementation
     CHIP_ERROR HandleMovement(Clusters::WindowCovering::WindowCoveringType type) override;
     CHIP_ERROR HandleStopMotion() override;
+    void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) override;
+    void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) override;
 };
 
 } // namespace app
