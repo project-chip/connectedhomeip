@@ -159,8 +159,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
@@ -187,8 +187,7 @@ public:
         }
 
         EndpointId contributorEndpointId = static_cast<EndpointId>(json["ContributorEndpointId"].asUInt());
-        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
-            json["Status"].asUInt());
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(json["Status"].asUInt());
 
         CHIP_ERROR err = cluster->AddMatterContributor(nodeId, contributorEndpointId, status);
         if (err != CHIP_NO_ERROR)
@@ -197,7 +196,8 @@ public:
         }
         else
         {
-            ChipLogProgress(AppServer, "Added Matter contributor NodeId: 0x" ChipLogFormatX64 ", ContributorEndpoint: %d on endpoint %d",
+            ChipLogProgress(AppServer,
+                            "Added Matter contributor NodeId: 0x" ChipLogFormatX64 ", ContributorEndpoint: %d on endpoint %d",
                             ChipLogValueX64(nodeId), contributorEndpointId, endpointId);
         }
     }
@@ -218,8 +218,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
@@ -269,8 +269,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
@@ -296,8 +296,7 @@ public:
             return;
         }
 
-        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
-            json["Status"].asUInt());
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(json["Status"].asUInt());
 
         CHIP_ERROR err = cluster->AddNonMatterContributor(chip::CharSpan::fromCharString(contributorName.c_str()), status);
         if (err != CHIP_NO_ERROR)
@@ -326,8 +325,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
@@ -380,8 +379,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
@@ -394,8 +393,7 @@ public:
             return;
         }
 
-        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(
-            json["Status"].asUInt());
+        auto status = static_cast<chip::app::Clusters::AmbientSensingUnion::UnionContributorStatusEnum>(json["Status"].asUInt());
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -420,7 +418,8 @@ public:
             if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(AppServer,
-                                "Updated Matter contributor (NodeId: 0x" ChipLogFormatX64 ", ContributorEndpoint: %d) status to %u on endpoint %d",
+                                "Updated Matter contributor (NodeId: 0x" ChipLogFormatX64
+                                ", ContributorEndpoint: %d) status to %u on endpoint %d",
                                 ChipLogValueX64(nodeId), contributorEndpointId, static_cast<unsigned>(status), endpointId);
             }
         }
@@ -468,8 +467,8 @@ public:
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
-            delegate->GetClusterImplementationRegistry()
-                .GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(endpointId);
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::AmbientSensingUnionCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "AmbientSensingUnionCluster not found on endpoint %d", endpointId);
