@@ -47,6 +47,14 @@ Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
+                                                                                          gThermostatPresetsDelegate);
+
+using ThermostatClusterType =
+    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
+                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
+                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 } // namespace
 
 void OnIdentifyStart(::Identify *)
@@ -89,13 +97,13 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, gThermostatDelegate);
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatPresetsDelegate,
+                                                           gThermostatSuggestionsDelegate);
 }
 
 void ApplicationShutdown()
 {
-    chip::app::Clusters::Thermostat::ServerShutdown<chip::app::Clusters::Thermostat::DefaultThermostatCluster>(
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(
         gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
 }
 

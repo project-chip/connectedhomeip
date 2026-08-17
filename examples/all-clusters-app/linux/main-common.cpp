@@ -194,6 +194,11 @@ static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegat
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
                                                                                           gThermostatPresetsDelegate);
 
+using ThermostatClusterType =
+    Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
+                                                        Clusters::Thermostat::ThermostatPresetsDelegate,
+                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -279,8 +284,8 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
-    Clusters::Thermostat::ServerShutdown<Clusters::Thermostat::DefaultThermostatCluster>(
-        gThermostatEndpoint, MatterClusterShutdownType::kClusterShutdown);
+    Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                MatterClusterShutdownType::kClusterShutdown);
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
