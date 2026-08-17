@@ -200,13 +200,21 @@ private:
     void CancelLifetime(FabricState & state);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache
 
+    /// Drop every request @p state holds along with its lifetime timer, freeing the slot.
+    /// A freed slot must carry no request, or the next fabric to claim it inherits them.
+    /// @return the union of the bands the dropped requests covered, so the caller can
+    ///         settle the cache (OnBecameEmpty / ClearBandsNoLongerScanned).
+    BitMask<WiFiBandBitmap> ReleaseFabric(FabricState & state);
+
     /// Latest deadline among @p state's requests. Returns false when some request has no
     /// timeout, in which case the fabric must not hold a timer at all.
     static bool LatestDeadline(const FabricState & state, System::Clock::Timestamp & out);
 
     /// Re-arm (or drop) @p fabricIndex's timer after its request set changed — a Stop can
-    /// shorten the fabric back to a surviving request's deadline.
-    void RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state);
+    /// shorten the fabric back to a surviving request's deadline. A timer that cannot be
+    /// armed releases the fabric rather than leaving it scanning unbounded.
+    /// @return the bands the released requests covered, or none if the timer was armed.
+    BitMask<WiFiBandBitmap> RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state);
 
     /// Union of the bands every remaining request wants, across all fabrics.
     BitMask<WiFiBandBitmap> BandsInUse() const;

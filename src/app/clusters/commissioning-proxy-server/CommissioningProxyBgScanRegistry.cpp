@@ -171,14 +171,30 @@ bool CommissioningProxyBgScanRegistry::LatestDeadline(const FabricState & state,
     return any;
 }
 
-void CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state)
+BitMask<WiFiBandBitmap> CommissioningProxyBgScanRegistry::ReleaseFabric(FabricState & state)
+{
+    uint16_t releasedBands = 0;
+    for (auto & slot : state.requests)
+    {
+        if (slot.inUse)
+        {
+            releasedBands = static_cast<uint16_t>(releasedBands | slot.request.wiFiBands.Raw());
+            slot.inUse    = false;
+        }
+    }
+    CancelLifetime(state);
+    state.inUse = false;
+    return BitMask<WiFiBandBitmap>(releasedBands);
+}
+
+BitMask<WiFiBandBitmap> CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabricIndex, FabricState & state)
 {
     CancelLifetime(state);
 
     System::Clock::Timestamp deadline{ 0 };
     if (!LatestDeadline(state, deadline))
     {
-        return;
+        return {};
     }
 
     state.lifetime.registry    = this;
@@ -187,18 +203,13 @@ void CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabri
         CHIP_NO_ERROR)
     {
         // The fabric would otherwise scan unbounded. Nothing here can reject the command
-        // that got us here (it has already been applied), so drop the fabric instead.
-        // The requests go with it: a freed slot must carry no request, or the next fabric
-        // to claim it inherits them.
+        // that got us here (it has already been applied), so drop the fabric instead and
+        // let the caller settle the radio and the cached results.
         ChipLogError(AppServer, "BgScan: could not re-arm lifetime for fabricIndex=%u; dropping it", fabricIndex);
-        for (auto & slot : state.requests)
-        {
-            slot.inUse = false;
-        }
-        state.inUse = false;
-        return;
+        return ReleaseFabric(state);
     }
     state.lifetime.armed = true;
+    return {};
 }
 
 Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId nodeId, BitMask<CapabilitiesBitmap> transport,
@@ -294,13 +305,20 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         if (timerErr != CHIP_NO_ERROR)
         {
             // Without a lifetime timer the hardware scan would run unbounded, so reject.
-            // If this call is what started the radio and no fabric is registered to keep
-            // it running, undo that too.
+            // Any requests the fabric already held go with it: the old timer was cancelled
+            // just above and cannot be put back, so keeping them would scan unbounded too.
+            // If this call is what started the radio and nothing is left to keep it
+            // running, undo that as well.
             ChipLogError(AppServer, "BgScan: lifetime StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-            fabric->lifetime.armed = false;
+            fabric->lifetime.armed                      = false;
+            const BitMask<WiFiBandBitmap> releasedBands = ReleaseFabric(*fabric);
             if (!AnyFabricInUse())
             {
                 OnBecameEmpty();
+            }
+            else
+            {
+                ClearBandsNoLongerScanned(releasedBands);
             }
             return Status::Failure;
         }
@@ -380,15 +398,16 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
     }
 
     // Dropping a request can shorten the fabric back to a surviving request's deadline,
-    // so the timer is recomputed rather than left where the removed request put it.
+    // so the timer is recomputed rather than left where the removed request put it. A
+    // timer that cannot be re-armed releases the fabric, whose bands then go too.
+    uint16_t releasedBands = stopBandBits;
     if (fabric->RequestCount() == 0)
     {
-        CancelLifetime(*fabric);
-        fabric->inUse = false;
+        ReleaseFabric(*fabric);
     }
     else
     {
-        RecomputeFabricLifetime(fabricIndex, *fabric);
+        releasedBands = static_cast<uint16_t>(releasedBands | RecomputeFabricLifetime(fabricIndex, *fabric).Raw());
     }
 
     // Other requests — on this fabric or another — may still want the radio, so it is
@@ -400,7 +419,7 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
     }
     else
     {
-        ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap>(stopBandBits));
+        ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap>(releasedBands));
     }
 
     return Status::Success;
@@ -414,17 +433,7 @@ void CommissioningProxyBgScanRegistry::RemoveFabric(FabricIndex fabricIndex)
         return;
     }
 
-    uint16_t removedBands = 0;
-    for (auto & slot : fabric->requests)
-    {
-        if (slot.inUse)
-        {
-            removedBands = static_cast<uint16_t>(removedBands | slot.request.wiFiBands.Raw());
-            slot.inUse   = false;
-        }
-    }
-    CancelLifetime(*fabric);
-    fabric->inUse = false;
+    const BitMask<WiFiBandBitmap> removedBands = ReleaseFabric(*fabric);
 
     ChipLogProgress(AppServer, "BgScan: dropped background scans for removed fabricIndex=%u", fabricIndex);
 
@@ -434,7 +443,7 @@ void CommissioningProxyBgScanRegistry::RemoveFabric(FabricIndex fabricIndex)
     }
     else
     {
-        ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap>(removedBands));
+        ClearBandsNoLongerScanned(removedBands);
     }
 }
 
@@ -475,12 +484,7 @@ void CommissioningProxyBgScanRegistry::Shutdown()
     const bool hadFabrics = AnyFabricInUse();
     for (auto & fabric : mFabrics)
     {
-        CancelLifetime(fabric);
-        for (auto & slot : fabric.requests)
-        {
-            slot.inUse = false;
-        }
-        fabric.inUse = false;
+        ReleaseFabric(fabric);
     }
     if (hadFabrics && !mPaused)
     {
@@ -504,16 +508,7 @@ void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(FabricIndex fabricIndex)
 
     // Spec: when the fabric's Timeout elapses its cached results are cleared — but only
     // for bands no surviving fabric still scans.
-    uint16_t expiringBands = 0;
-    for (auto & slot : fabric->requests)
-    {
-        if (slot.inUse)
-        {
-            expiringBands = static_cast<uint16_t>(expiringBands | slot.request.wiFiBands.Raw());
-            slot.inUse    = false;
-        }
-    }
-    fabric->inUse = false;
+    const BitMask<WiFiBandBitmap> expiringBands = ReleaseFabric(*fabric);
 
     ChipLogProgress(AppServer, "BgScan: lifetime expired for fabricIndex=%u", fabricIndex);
 
@@ -523,7 +518,7 @@ void CommissioningProxyBgScanRegistry::OnLifetimeExpiry(FabricIndex fabricIndex)
     }
     else
     {
-        ClearBandsNoLongerScanned(BitMask<WiFiBandBitmap>(expiringBands));
+        ClearBandsNoLongerScanned(expiringBands);
     }
 }
 

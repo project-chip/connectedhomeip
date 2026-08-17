@@ -690,10 +690,12 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DiscriminatorOutOf
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// A single reserved bit in transport (a bit outside the spec-defined kBle /
-// kWiFiPAF set) SHALL be rejected.  The cluster currently rejects this via
-// HasExactlyOneBitSet → kValidTransportBits check (returns InvalidCommand or
-// InvalidTransportType; either is spec-conforming for a malformed request).
+// A single reserved bit in transport (a bit outside the spec-defined kBle / kWiFiPAF /
+// kNtl set) SHALL be rejected as a malformed field, not reported as a transport the
+// proxy happens not to support: the ProxyConnectRequest Effect on Receipt reserves
+// InvalidTransportType for a Transport "the proxy cannot support", and gives
+// InvalidCommand for any other invalid field. This is also what the scan commands
+// already return for a reserved bit.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedTransportBitOnly)
 {
     TestServerClusterContext context;
@@ -703,11 +705,32 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedTransportB
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    // 0x01 is a reserved bit (kBle=0x02, kWiFiPAF=0x08).
+    // 0x01 is a reserved bit (kBle=0x02, kWiFiPAF=0x08, kNtl=0x10).
     Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(static_cast<CapabilitiesBitmap>(0x01));
     auto result                             = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
-    // Per the ProxyConnectRequest Effect on Receipt: an invalid/unsupported Transport → InvalidTransportType
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The distinction the two statuses draw: a spec-defined transport this build has no
+// driver for is InvalidTransportType, while an undefined bit is a malformed field. The
+// certification tests rely on it to pick a bit for their negative steps.
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DefinedButUnsupportedTransport)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    // kNtl is spec-defined but no driver is registered for it, so it is unsupported
+    // rather than malformed.
+    ASSERT_FALSE(ReadSupportedTransports(tester).Has(CapabilitiesBitmap::kNtl));
+    Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kNtl);
+    auto result                             = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidTransportType));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -905,8 +928,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_StateUnchangedOnFa
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    // A reserved transport bit (0x01) is never supported → InvalidTransportType,
-    // a build-independent connect failure that must not transition state.
+    // A reserved transport bit (0x01) is always rejected, whatever transports the build
+    // registers, so this is a build-independent connect failure that must not transition
+    // state.
     EXPECT_FALSE(tester.Invoke(MakeConnectRequest(static_cast<CapabilitiesBitmap>(0x01))).IsSuccess());
 
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
@@ -1323,6 +1347,45 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleAndWiFiPAFTogether
         EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
         EXPECT_EQ(listCount, 4u);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The cluster registers each sub-scan only after starting it, so a transport reporting
+// synchronously from inside its own Scan() satisfies the expected count while later
+// transports have yet to be counted. Emitting there would answer the commissioner with a
+// ProxyScanResponse missing every transport the cluster had not reached yet.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_SyncContributorWaitsForRemainingSubScans)
+{
+    TestServerClusterContext context;
+
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
+    // BLE is scanned first and reports later, as a real driver does from its own scan
+    // timer; PAF then reports synchronously from inside Scan().
+    mockBle.SetAutoContribute(false);
+    mockPaf.SetAutoContribute(true);
+
+    Commands::ProxyScanRequest::Type command;
+    command.transport.Set(CapabilitiesBitmap::kBle);
+    command.transport.Set(CapabilitiesBitmap::kWiFiPAF);
+    [[maybe_unused]] auto pending = tester.Invoke(command);
+
+    // PAF's synchronous report must not have closed the aggregation on its own.
+    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+
+    // BLE reports; with every sub-scan in, the response carries both transports' results.
+    mockBle.ContributeScanResults();
+    ASSERT_TRUE(tester.GetCommandHandler().HasResponse());
+    Commands::ProxyScanResponse::DecodableType response;
+    ASSERT_EQ(tester.GetCommandHandler().DecodeResponse(response), CHIP_NO_ERROR);
+    EXPECT_EQ(response.numberOfResults, 4u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2262,6 +2325,41 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WatchdogArmFailureRej
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A driver whose transport connection drops mid-exchange reports it through the session
+// manager rather than leaving the commissioner waiting for the response timer. The
+// pending request SHALL be answered with the reported status and its timer released.
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_TransportFailureAnswersPending)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    uint16_t sid = OpenSession(tester);
+
+    mockBle.SetAutoRespond(false);
+
+    static const uint8_t kMsg[] = { 0xAB };
+    Commands::ProxyMessageRequest::Type cmd;
+    cmd.sessionID       = sid;
+    cmd.responseTimeout = 5;
+    cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
+
+    [[maybe_unused]] auto pending = tester.Invoke(cmd);
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(mockTimer.ActiveCount(), 1u); // the response timer is armed
+
+    // The BTP/PAFTP link drops: the driver reports the failure for this session.
+    mockBle.FailPendingMessage(sid, Protocols::InteractionModel::Status::Failure);
+
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Protocols::InteractionModel::Status::Failure));
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u); // ... and the response timer went with it
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // Regression guard for the rollback: a rejected ProxyScanRequest must not leave the
 // aggregator marked in-progress, which would answer every later scan with BUSY for the
 // lifetime of the process.
@@ -2299,9 +2397,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeout)
     ClusterTester tester(cluster);
     uint16_t sid = OpenSession(tester);
 
-    // The commissionee never replies; the response timeout fires and resolves the
-    // pending request with TIMEOUT.
-    mockBle.SetSendMessageTimeout(true);
+    // The commissionee never replies, so the request stays pending and only the session's
+    // response timer can resolve it.
+    mockBle.SetAutoRespond(false);
 
     static const uint8_t kMsg[] = { 0xAB };
     Commands::ProxyMessageRequest::Type cmd;
@@ -2309,9 +2407,22 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeout)
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
-    auto result = tester.Invoke(cmd);
-    EXPECT_FALSE(result.IsSuccess());
-    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::Timeout));
+    // No answer yet: the cluster holds the handle open waiting for the commissionee.
+    // (Invoke() reports its own error for a command that answers asynchronously, so the
+    // handler is what says whether the commissioner has been answered.)
+    [[maybe_unused]] auto pending = tester.Invoke(cmd);
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+
+    // Advancing past ResponseTimeout fires the timer, which answers with TIMEOUT.
+    mockTimer.AdvanceClock(System::Clock::Seconds16(5));
+    ASSERT_TRUE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(tester.GetCommandHandler().GetLastStatus().status, ClusterStatusCode(Protocols::InteractionModel::Status::Timeout));
+
+    // The expired request no longer holds the session, so the next one is accepted
+    // rather than rejected with BUSY.
+    mockBle.SetAutoRespond(true);
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2392,7 +2503,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimerArmFa
     uint16_t sid = OpenSession(tester);
 
     // The commissionee would not reply on its own, so only the timer could resolve this.
-    mockBle.SetSendMessageTimeout(true);
+    mockBle.SetAutoRespond(false);
 
     static const uint8_t kMsg[] = { 0xAB };
     Commands::ProxyMessageRequest::Type cmd;
@@ -2624,6 +2735,30 @@ TEST_F(TestCommissioningProxyCluster, TestCachedResults_SweepExpiresOnlyDueEntri
     EXPECT_EQ(mockTimer.ActiveCount(), 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A cache destroyed while its TTL sweep is armed must cancel the timer on the way out:
+// the TimerDelegate holds a pointer to the cache as its TimerContext, and would
+// dereference freed memory when the sweep came due.
+TEST_F(TestCommissioningProxyCluster, TestScanCache_DestructorCancelsSweepTimer)
+{
+    class CacheObserver : public ScanCacheObserver
+    {
+    public:
+        void MarkCachedResultsDirty() override {}
+        uint16_t GetCacheTimeout() const override { return 60; }
+        uint8_t GetMaxCachedResults() const override { return 10; }
+    };
+
+    CacheObserver observer;
+    {
+        CommissioningProxyScanCache cache(observer, mockTimer);
+        cache.Report(MakeScanEntry(1000, CapabilitiesBitmap::kBle));
+        EXPECT_EQ(mockTimer.ActiveCount(), 1u); // the sweep is armed
+    }
+
+    // Shutdown() was never called, so only the destructor can have cancelled it.
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
 }
 
 // =============================================================================

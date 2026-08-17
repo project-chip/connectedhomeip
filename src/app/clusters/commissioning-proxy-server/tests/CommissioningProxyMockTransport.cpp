@@ -60,16 +60,10 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
         return mSendMessageError;
     }
 
-    // Simulate the commissionee never replying: the response timeout fires and the
-    // pending ProxyMessageRequest resolves with TIMEOUT.
-    if (mSendMessageTimeout)
-    {
-        mHost->Sessions().DispatchMessageFailure(sessionId, Status::Timeout);
-        return CHIP_NO_ERROR;
-    }
-
     // Simulate an immediate commissionee reply (null message) so a pending
-    // ProxyMessageRequest completes synchronously.
+    // ProxyMessageRequest completes synchronously. With auto-respond off the request
+    // stays pending, as it would against a commissionee that never replies — only the
+    // session's response timer can resolve it.
     if (mAutoRespond)
     {
         mHost->Sessions().DispatchMessageResponse(sessionId, nullptr, 0);
@@ -85,6 +79,23 @@ Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
         return mScanStatus;
     }
 
+    // When mAutoContribute is false the scan is left in-flight, so a second
+    // ProxyScanRequest sees the aggregator busy and ContributeScanResults() stands in for
+    // the driver's own scan-completion callback.
+    if (mAutoContribute)
+    {
+        ContributeScanResults();
+    }
+    return Status::Success;
+}
+
+void CommissioningProxyMockTransport::FailPendingMessage(uint16_t sessionId, Status status)
+{
+    mHost->Sessions().DispatchMessageFailure(sessionId, status);
+}
+
+void CommissioningProxyMockTransport::ContributeScanResults()
+{
     static const uint8_t kAddr1[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 };
     static const uint8_t kAddr2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 };
     static const uint8_t kExt1[]  = { 0x10, 0x20, 0x30 };
@@ -105,13 +116,7 @@ Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
     results[1].transport.Set(mType);
 
     // The aggregator deep-copies, so the local backing storage need not outlive this.
-    // When mAutoContribute is false the scan is left in-flight (no Contribute), so a
-    // second ProxyScanRequest sees the aggregator busy.
-    if (mAutoContribute)
-    {
-        mHost->ScanAggregator().Contribute(Span<const ScanResult>(results.data(), results.size()));
-    }
-    return Status::Success;
+    mHost->ScanAggregator().Contribute(Span<const ScanResult>(results.data(), results.size()));
 }
 
 } // namespace CommissioningProxy

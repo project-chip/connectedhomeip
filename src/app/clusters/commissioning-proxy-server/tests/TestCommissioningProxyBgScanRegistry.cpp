@@ -367,6 +367,81 @@ TEST(TestCommissioningProxyBgScanRegistry, LifetimeTimerArmFailureRejectsAndClea
     EXPECT_EQ(hw.clearCount, 1);
 }
 
+// Refreshing a node's request cancels the fabric's lifetime timer so it can be re-armed
+// at the new deadline. If the re-arm fails the old timer is already gone, so keeping the
+// fabric registered would scan unbounded — the fabric SHALL be released instead.
+TEST(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureReleasesTheFabric)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(hw.startCount, 1);
+
+    // Node 1 refreshes its own request with a new timeout; re-arming the fabric's
+    // lifetime fails, so the fabric goes — node 2's request included.
+    timers.FailNextStart();
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 45), Status::Failure);
+
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1); // nothing is left to scan for
+    EXPECT_EQ(hw.clearCount, 1);
+
+    // No timer survived the release: running past every deadline changes nothing.
+    timers.AdvanceClock(System::Clock::Seconds16(120));
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1);
+
+    // The freed slot carries no request into the next fabric to claim it.
+    EXPECT_EQ(reg.Start(kFabric2, kNode3, kPaf, k2g4, kNoTimeout), Status::Success);
+    EXPECT_EQ(reg.Stop(kFabric2, kNode2, kPaf, k5g), Status::NotFound);
+}
+
+// Releasing a fabric on a re-arm failure must not disturb another fabric's scan; only the
+// bands the released requests were the last to want stop being cached.
+TEST(TestCommissioningProxyBgScanRegistry, RefreshTimerArmFailureKeepsOtherFabricScanning)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric2, kNode2, kPaf, k2g4, kNoTimeout), Status::Success);
+
+    timers.FailNextStart();
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k5g, 45), Status::Failure);
+
+    EXPECT_FALSE(reg.IsEmpty()); // fabric 2 still wants the radio
+    EXPECT_EQ(hw.stopCount, 0);
+    EXPECT_EQ(hw.clearCount, 1);
+    EXPECT_EQ(hw.lastClearedBands.Raw(), k5g.Raw()); // fabric 2 still scans 2G4
+}
+
+// A fabric released because its lifetime could not be re-armed takes its surviving
+// requests' bands with it, so their cached results are dropped too — even when another
+// fabric keeps the radio running.
+TEST(TestCommissioningProxyBgScanRegistry, ReArmFailureOnStopClearsTheReleasedFabricsBands)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric2, kNode3, kPaf, k2g4, kNoTimeout), Status::Success);
+
+    // Node 1 stopping shortens fabric 1 to node 2's deadline; the re-arm fails, so
+    // fabric 1 is released and node 2's 5G results are no longer wanted by anyone.
+    timers.FailNextStart();
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kPaf, k2g4), Status::Success);
+
+    EXPECT_FALSE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 0);
+    EXPECT_EQ(hw.lastClearedBands.Raw(), k5g.Raw());
+}
+
 // Dropping a fabric because its lifetime could not be re-armed must take the fabric's
 // surviving requests with it: the next fabric to occupy the freed slot cannot inherit
 // requests it never made.
