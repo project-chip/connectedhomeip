@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
@@ -25,17 +27,6 @@ namespace reporting {
 
 using namespace System::Clock;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
-
-namespace {
-System::Clock::Timeout GetRemainingTimeout(const System::Clock::Timestamp & targetTimestamp, const System::Clock::Timestamp & now)
-{
-    if (targetTimestamp > now)
-    {
-        return std::chrono::duration_cast<System::Clock::Timeout>(targetTimestamp - now);
-    }
-    return System::Clock::Milliseconds32(0);
-}
-} // namespace
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
@@ -72,16 +63,13 @@ void ReportSchedulerImpl::DeferReports(System::Clock::Timeout aDelay, Span<const
     mNodesPool.ForEachActiveObject([now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
         VerifyOrReturnValue(node->PathListsContainAnyEndpoint(targetedEndpoints), Loop::Continue);
 
-        System::Clock::Timeout remaining = GetRemainingTimeout(node->GetMaxTimestamp(), now);
-        System::Clock::Timeout delay     = aDelay;
+        Timestamp target = now + aDelay;
         if (node->GetDeferralEndTimestamp() > now)
         {
-            System::Clock::Timeout remainingDeferral = node->GetDeferralEndTimestamp() - now;
-            delay                                    = delay < remainingDeferral ? delay : remainingDeferral;
+            target = std::min(target, node->GetDeferralEndTimestamp());
         }
-        System::Clock::Timeout effectiveDelay = delay < remaining ? delay : remaining;
-        const Timestamp newDeferralEnd        = now + effectiveDelay;
-        node->SetDeferralEndTimestamp(newDeferralEnd);
+        Timestamp maxAllowed = std::max(now, node->GetMaxTimestamp());
+        node->SetDeferralEndTimestamp(std::min(target, maxAllowed));
         return Loop::Continue;
     });
     RescheduleAllReports();
