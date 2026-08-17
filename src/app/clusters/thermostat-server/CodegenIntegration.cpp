@@ -59,14 +59,12 @@ ThermostatCluster::OptionalAttributes BaseIntegrationDelegate::GetOptionalAttrib
     optionalAttributes.RemoteSensing         = emberAfContainsAttribute(endpointId, Thermostat::Id, RemoteSensing::Id);
     optionalAttributes.ThermostatRunningMode = features.Has(Thermostat::Feature::kAutoMode) &&
         emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningMode::Id);
-    optionalAttributes.TemperatureSetpointHold =
-        emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id);
+    optionalAttributes.TemperatureSetpointHold = emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHold::Id);
     optionalAttributes.TemperatureSetpointHoldDuration =
         emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id);
-    optionalAttributes.ThermostatRunningState =
-        emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningState::Id);
-    optionalAttributes.SetpointChangeSource = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSource::Id);
-    optionalAttributes.SetpointChangeAmount = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeAmount::Id);
+    optionalAttributes.ThermostatRunningState = emberAfContainsAttribute(endpointId, Thermostat::Id, ThermostatRunningState::Id);
+    optionalAttributes.SetpointChangeSource   = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSource::Id);
+    optionalAttributes.SetpointChangeAmount   = emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeAmount::Id);
     optionalAttributes.SetpointChangeSourceTimestamp =
         emberAfContainsAttribute(endpointId, Thermostat::Id, SetpointChangeSourceTimestamp::Id);
     optionalAttributes.SetpointHoldExpiryTimestamp =
@@ -218,8 +216,7 @@ ThermostatCluster::DefaultValues BaseIntegrationDelegate::LoadDefaultValues(Endp
 
     if (emberAfContainsAttribute(endpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id))
     {
-        if (auto status =
-                TemperatureSetpointHoldDuration::GetDefault(endpointId, defaultValues.temperatureSetpointHoldDuration);
+        if (auto status = TemperatureSetpointHoldDuration::GetDefault(endpointId, defaultValues.temperatureSetpointHoldDuration);
             status != Status::Success)
         {
             defaultValues.temperatureSetpointHoldDuration = 0;

@@ -39,8 +39,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const Config & config, Thermostat::Delegate & delegate)
-    : DefaultServerCluster({ endpointId, Thermostat::Id }), mFeatures(features), mConfig(config), mDelegate(delegate)
+ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                                     Thermostat::Delegate & delegate) :
+    DefaultServerCluster({ endpointId, Thermostat::Id }),
+    mFeatures(features), mConfig(config), mDelegate(delegate)
 {
     mAtomicWriteSession.SetDelegate(this);
 }
