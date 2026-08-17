@@ -128,6 +128,7 @@ void ThreadMeshcopCommissionProxy::SetState(State state)
 
 void ThreadMeshcopCommissionProxy::OnHeader(chip::Dnssd::ConstHeaderRef & header)
 {
+    mCurrentPacketIsResponse = header.GetFlags().IsResponse();
     ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
@@ -140,12 +141,11 @@ void ThreadMeshcopCommissionProxy::OnQuery(const chip::Dnssd::QueryData & data)
     }
 
     ChipLogDetail(Controller, "mDNS query: %s", chip::Dnssd::QNameString(data.GetName()).c_str());
-    mNodeData.Set<Dnssd::CommissionNodeData>();
 }
 
 void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section, const chip::Dnssd::ResourceData & data)
 {
-    if (mState != State::kDiscovering)
+    if (mState != State::kDiscovering || !mCurrentPacketIsResponse)
     {
         return;
     }
@@ -185,23 +185,20 @@ void ThreadMeshcopCommissionProxy::OnResource(chip::Dnssd::ResourceType section,
         }
         Platform::CopyString(commissionData.instanceName, fullName.c_str());
 
-        mServicePort = srv.GetPort();
-
-        if (mProxyFd == -1)
-        {
-            CHIP_ERROR err = CreateProxySocket(commissionData);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
-                SetState(State::kAborted);
-            }
-        }
+        mServicePort               = srv.GetPort();
+        mCurrentPacketHasMatterSrv = true;
         break;
     }
 
-    case chip::Dnssd::QType::TXT:
+    case chip::Dnssd::QType::TXT: {
+        if (!name.EndsWith(kMatterCServiceSuffix))
+        {
+            break;
+        }
+
         chip::Dnssd::ParseTxtRecord(data.GetData(), this);
         break;
+    }
 
     default:
         break;
@@ -316,11 +313,20 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
     }
 
     mNodeData.Set<Dnssd::CommissionNodeData>();
-    mDnsPacket = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
+    mServicePort               = 0;
+    mCurrentPacketIsResponse   = false;
+    mCurrentPacketHasMatterSrv = false;
+    mDnsPacket                 = chip::Dnssd::BytesRange(payload.data(), payload.data() + payload.size());
 
     if (!chip::Dnssd::ParsePacket(mDnsPacket, this))
     {
         ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
+        return;
+    }
+
+    if (!mCurrentPacketIsResponse || !mCurrentPacketHasMatterSrv || mServicePort == 0)
+    {
+        ChipLogDetail(Controller, "Ignoring incomplete joiner mDNS announcement");
         return;
     }
 
@@ -332,6 +338,15 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         ChipLogProgress(Controller, "Discriminator mismatch (Expected %u, Got %u). Ignoring announcement.",
                         mExpectedDiscriminator.GetLongValue(), discoveredDiscriminator);
         return;
+    }
+
+    if (mProxyFd == -1) {
+        if (CreateProxySocket(commissionData) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
+            SetState(State::kAborted);
+            return;
+        }
     }
 
     mDiscoveredNodePromise.set_value(mNodeData);
