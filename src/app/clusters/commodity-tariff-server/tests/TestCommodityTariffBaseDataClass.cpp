@@ -414,58 +414,14 @@ TEST_F(TestCommodityTariffBaseDataClass, UpdateAbort)
 struct TestResourceStruct
 {
     uint32_t id;
-    CharSpan label;                             // Managed by labelBuffer RAII
+    DataModel::Nullable<CharSpan> label;        // Managed by labelBuffer RAII
     DataModel::List<const uint32_t> nestedList; // Managed by listBuffer RAII
-
-    Platform::ScopedMemoryBufferWithSize<char> labelBuffer;
-    Platform::ScopedMemoryBufferWithSize<uint32_t> listBuffer;
-
-    CHIP_ERROR fillLabel(const CharSpan & aLabel)
-    {
-        labelBuffer.CopyFromSpan(aLabel);
-        if (!aLabel.empty())
-        {
-            VerifyOrReturnError(labelBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-        }
-        label = CharSpan(labelBuffer.Get(), aLabel.size());
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR fillList(const DataModel::List<const uint32_t> & aList)
-    {
-        Span<const uint32_t> tmpSpan = Span<const uint32_t>(aList.data(), aList.size());
-        listBuffer.CopyFromSpan(tmpSpan);
-        if (!tmpSpan.empty())
-        {
-            VerifyOrReturnError(listBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-        }
-
-        nestedList = DataModel::List<const uint32_t>(listBuffer.Get(), tmpSpan.size());
-        return CHIP_NO_ERROR;
-    }
-
-    void Cleanup()
-    {
-        if (labelBuffer.Get())
-        {
-            labelBuffer.Free();
-            label = CharSpan();
-        }
-        if (listBuffer.Get())
-        {
-            listBuffer.Free();
-            nestedList = DataModel::List<const uint32_t>();
-        }
-
-        id = 0;
-    }
-
-    ~TestResourceStruct() noexcept { Cleanup(); }
 
     // Proper equality operator
     bool operator==(const TestResourceStruct & other) const
     {
-        return id == other.id && this->label.data_equal(other.label) && this->nestedList.data_equal(other.nestedList);
+        return id == other.id && this->label.Value().data_equal(other.label.Value()) &&
+            this->nestedList.data_equal(other.nestedList);
     }
 
     // Proper inequality operator - should use content comparison, not pointer comparison
@@ -478,10 +434,28 @@ using ComplexType = DataModel::Nullable<DataModel::List<TestResourceStruct>>;
 template <>
 CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, StructType & output)
 {
-    output.id = input.id;
+    output.label.SetNull();
 
-    ReturnErrorOnFailure(output.fillLabel(input.label));
-    ReturnErrorOnFailure(output.fillList(input.nestedList));
+    // Handle label (nullable CharSpan) - NEEDS MEMORY ALLOCATION
+    if (!input.label.IsNull())
+    {
+        ReturnErrorOnFailure(SpanCopier::CopyToNullable(input.label.Value(), output.label));
+    }
+
+    if (!input.nestedList.empty())
+    {
+        Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+        buffer.CopyFromSpan(input.nestedList);
+        VerifyOrReturnError(buffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        size_t size       = buffer.AllocatedSize();
+        output.nestedList = DataModel::List<const uint32_t>(buffer.Release(), size);
+    }
+    else
+    {
+        output.nestedList = DataModel::List<uint32_t>();
+    }
+
+    output.id = input.id;
 
     return CHIP_NO_ERROR;
 }
@@ -495,7 +469,18 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::ValidateNewValue()
 template <>
 void CTC_BaseDataClass<ComplexType>::CleanupStruct(StructType & value)
 {
-    value.Cleanup();
+    // Free label memory allocated in CopyData()
+    if (!value.label.IsNull() && value.label.Value().data())
+    {
+        Platform::MemoryFree(const_cast<char *>(value.label.Value().data()));
+        value.label.SetNull();
+    }
+
+    if (!value.nestedList.empty() && value.nestedList.data())
+    {
+        Platform::MemoryFree(const_cast<uint32_t *>(value.nestedList.data()));
+        value.nestedList = DataModel::List<const uint32_t>();
+    }
 }
 
 #define TEST_STR_SAMPLE_0 "test1"
@@ -538,36 +523,48 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
     EXPECT_EQ(data.GetValue().Value().size(), 2ul);
     EXPECT_EQ(data.GetValue().Value()[0].id, 1u);
 
-    EXPECT_EQ(data.GetValue().Value()[0].label.size(), strlen(TEST_STR_SAMPLE_0));
-    EXPECT_EQ(memcmp(data.GetValue().Value()[0].label.data(), TEST_STR_SAMPLE_0, data.GetValue().Value()[0].label.size()), 0);
-    EXPECT_NE(data.GetValue().Value()[0].label.data(), ListEntries[0].label.data());
-    EXPECT_EQ(data.GetValue().Value()[0].label.data(), data.GetValue().Value()[0].labelBuffer.Get());
+    EXPECT_EQ(data.GetValue().Value()[0].label.Value().size(), strlen(TEST_STR_SAMPLE_0));
+    EXPECT_EQ(
+        memcmp(data.GetValue().Value()[0].label.Value().data(), TEST_STR_SAMPLE_0, data.GetValue().Value()[0].label.Value().size()),
+        0);
+    EXPECT_NE(data.GetValue().Value()[0].label.Value().data(), ListEntries[0].label.Value().data());
 
-    EXPECT_EQ(data.GetValue().Value()[1].label.size(), strlen(TEST_STR_SAMPLE_1));
-    EXPECT_EQ(memcmp(data.GetValue().Value()[1].label.data(), TEST_STR_SAMPLE_1, data.GetValue().Value()[1].label.size()), 0);
-    EXPECT_NE(data.GetValue().Value()[1].label.data(), ListEntries[1].label.data());
-    EXPECT_EQ(data.GetValue().Value()[1].label.data(), data.GetValue().Value()[1].labelBuffer.Get());
+    EXPECT_EQ(data.GetValue().Value()[1].label.Value().size(), strlen(TEST_STR_SAMPLE_1));
+    EXPECT_EQ(
+        memcmp(data.GetValue().Value()[1].label.Value().data(), TEST_STR_SAMPLE_1, data.GetValue().Value()[1].label.Value().size()),
+        0);
+    EXPECT_NE(data.GetValue().Value()[1].label.Value().data(), ListEntries[1].label.Value().data());
 
     EXPECT_EQ(data.GetValue().Value()[0].nestedList.size(), 2ul);
     EXPECT_EQ((data.GetValue().Value()[0].nestedList)[0], 100u);
     EXPECT_EQ((data.GetValue().Value()[0].nestedList)[1], 200u);
     EXPECT_NE(data.GetValue().Value()[0].nestedList.data(), ListEntries[0].nestedList.data());
-    EXPECT_EQ(data.GetValue().Value()[0].nestedList.data(), data.GetValue().Value()[0].listBuffer.Get());
 }
 
 #define TEST_STR_SAMPLE_2 "dynamic_content"
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTransition)
 {
-    CTC_BaseDataClass<ComplexType> data(1);
-    CharSpan testCharSpan = CharSpan::fromCharString(TEST_STR_SAMPLE_2);
+    constexpr uint32_t IDs[] = { 100, 200 };
 
-    // First set non-null with resources
-    EXPECT_EQ(data.CreateNewListValue(1), CHIP_NO_ERROR);
-    data.GetNewValue().Value()[0].id = 1;
-    EXPECT_EQ(data.GetNewValue().Value()[0].fillLabel(testCharSpan), CHIP_NO_ERROR);
+    TestResourceStruct ListEntries[] = { {
+                                             .id         = 1,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
+                                             .nestedList = DataModel::List<const uint32_t>(IDs),
+                                         },
+                                         {
+                                             .id         = 2,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
+                                             .nestedList = DataModel::List<const uint32_t>(),
+                                         } };
 
-    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
+    ComplexType sourceValue;
+    TestResourceDataClass data;
+
+    sourceValue.SetNonNull(ListEntries);
+
+    EXPECT_EQ(data.SetNewValue(sourceValue), CHIP_NO_ERROR);
+
     EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
@@ -584,26 +581,25 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTrans
 
 TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRejectionCleanup)
 {
-    constexpr uint32_t mItemsCount = 3;
-    CTC_BaseDataClass<ComplexType> data(1);
+    constexpr uint32_t IDs[] = { 100, 200 };
 
-    // Create resource-intensive update but reject it
-    EXPECT_EQ(data.CreateNewListValue(3), CHIP_NO_ERROR);
+    TestResourceStruct ListEntries[] = { {
+                                             .id         = 1,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_0),
+                                             .nestedList = DataModel::List<const uint32_t>(IDs),
+                                         },
+                                         {
+                                             .id         = 2,
+                                             .label      = CharSpan::fromCharString(TEST_STR_SAMPLE_1),
+                                             .nestedList = DataModel::List<const uint32_t>(),
+                                         } };
 
-    for (uint32_t i = 0; i < mItemsCount; i++)
-    {
-        char tmpStrBuf[32] = { '\0' };
-        snprintf(tmpStrBuf, sizeof(tmpStrBuf), "resource_%" PRIu32, i);
-        CharSpan tmpCharSpan = CharSpan::fromCharString(tmpStrBuf);
+    ComplexType sourceValue;
+    TestResourceDataClass data;
 
-        data.GetNewValue().Value()[i].id = i;
-        EXPECT_EQ(data.GetNewValue().Value()[i].fillLabel(tmpCharSpan), CHIP_NO_ERROR);
-    }
+    sourceValue.SetNonNull(ListEntries);
 
-    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(data.HasNewValue());
-    EXPECT_FALSE(data.HasValue());
+    EXPECT_EQ(data.SetNewValue(sourceValue), CHIP_NO_ERROR);
 
     EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
 
