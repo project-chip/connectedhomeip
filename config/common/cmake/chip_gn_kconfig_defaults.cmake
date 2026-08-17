@@ -52,6 +52,7 @@ if(CONFIG_OPENTHREAD)
     matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_CHIP_OPENTHREAD_FTD)
     matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OT_ENDPOINT)
     matter_add_gn_arg_bool ("chip_system_config_use_sockets" NOT CONFIG_CHIP_USE_OT_ENDPOINT AND NOT CONFIG_CHIP_WITH_LWIP)
+    matter_add_gn_arg_bool ("chip_openthread_border_router" CONFIG_OPENTHREAD_BORDER_ROUTER)
 endif()
 
 if(CONFIG_DEBUG)
