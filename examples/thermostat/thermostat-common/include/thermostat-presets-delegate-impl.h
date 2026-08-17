@@ -1,0 +1,90 @@
+/*
+ *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+
+#include <app/clusters/thermostat-server/PresetStructWithOwnedMembers.h>
+#include <app/clusters/thermostat-server/ThermostatClusterPresets.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
+
+static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
+
+// TODO: #34556 Support multiple presets/schedules of each type.
+// We will support only one preset of each preset/schedule type.
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
+
+// For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
+// kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
+static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+
+class ThermostatPresetsDelegate : public ThermostatPresets::Delegate
+{
+public:
+    ThermostatPresetsDelegate(EndpointId endpoint);
+
+    // ThermostatPresets::Delegate methods
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
+    CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
+    uint8_t GetNumberOfPresets() override;
+    CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+    CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) override;
+    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
+    void InitializePendingPresets() override;
+    CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) override;
+    CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+    CHIP_ERROR CommitPendingPresets() override;
+    void ClearPendingPresetList() override;
+
+private:
+    EndpointId mEndpointId;
+
+    /**
+     * @brief Initializes the presets array with some sample presets for testing.
+     */
+    void InitializePresets();
+
+    /**
+     * @brief Initializes the schedules types array with example schedule types.
+     */
+    void InitializeScheduleTypes();
+
+    uint8_t mNumberOfPresets;
+    Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
+    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
+    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
+
+    uint8_t mNextFreeIndexInPendingPresetsList;
+    uint8_t mNextFreeIndexInPresetsList;
+
+    uint8_t mActivePresetHandleData[kPresetHandleSize];
+    size_t mActivePresetHandleDataSize;
+    bool mActivePresetHandleIsNull = true;
+};
+
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

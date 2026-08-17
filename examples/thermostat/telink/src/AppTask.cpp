@@ -31,6 +31,8 @@ constexpr uint16_t kThermostatUpdateTimerPeriodMs = 30000; // 30s timer period
 
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
 } // namespace
 
@@ -42,8 +44,7 @@ CHIP_ERROR AppTask::Init(void)
 
     ReturnErrorOnFailure(InitCommonParts());
 
-    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, gThermostatDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)

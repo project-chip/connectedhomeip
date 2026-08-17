@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "../include/thermostat-delegate-impl.h"
+#include "../include/thermostat-presets-delegate-impl.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
@@ -27,8 +27,21 @@ using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
-// Presets Implementation
-void ThermostatDelegate::InitializePresets()
+ThermostatPresetsDelegate::ThermostatPresetsDelegate(EndpointId endpoint)
+    : mEndpointId(endpoint)
+{
+    // Initialize Presets state
+    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList                 = 0;
+    mNextFreeIndexInPendingPresetsList          = 0;
+
+    InitializePresets();
+
+    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
+    mActivePresetHandleDataSize = 0;
+}
+
+void ThermostatPresetsDelegate::InitializePresets()
 {
     PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
     static_assert(MATTER_ARRAY_SIZE(presetScenarioEnumArray) <= MATTER_ARRAY_SIZE(mPresets));
@@ -53,7 +66,7 @@ void ThermostatDelegate::InitializePresets()
     mNextFreeIndexInPresetsList = index;
 }
 
-CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
+CHIP_ERROR ThermostatPresetsDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
 {
     static PresetTypeStruct::Type presetTypes[] = {
         { .presetScenario     = PresetScenarioEnum::kOccupied,
@@ -83,12 +96,12 @@ CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStru
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-uint8_t ThermostatDelegate::GetNumberOfPresets()
+uint8_t ThermostatPresetsDelegate::GetNumberOfPresets()
 {
     return mNumberOfPresets;
 }
 
-CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
+CHIP_ERROR ThermostatPresetsDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
     if (index < mNextFreeIndexInPresetsList)
     {
@@ -98,7 +111,7 @@ CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOw
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
+CHIP_ERROR ThermostatPresetsDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
 {
     if (!mActivePresetHandleIsNull)
     {
@@ -113,7 +126,7 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
+CHIP_ERROR ThermostatPresetsDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
     bool newIsNull = newActivePresetHandle.IsNull();
     ByteSpan oldHandle(mActivePresetHandleData, mActivePresetHandleDataSize);
@@ -151,7 +164,7 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
+std::optional<System::Clock::Milliseconds16> ThermostatPresetsDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
 {
     switch (attributeId)
     {
@@ -164,7 +177,7 @@ std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWri
     }
 }
 
-void ThermostatDelegate::InitializePendingPresets()
+void ThermostatPresetsDelegate::InitializePendingPresets()
 {
     mNextFreeIndexInPendingPresetsList = 0;
     for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
@@ -174,7 +187,7 @@ void ThermostatDelegate::InitializePendingPresets()
     }
 }
 
-CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
+CHIP_ERROR ThermostatPresetsDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
 {
     if (mNextFreeIndexInPendingPresetsList < MATTER_ARRAY_SIZE(mPendingPresets))
     {
@@ -194,7 +207,7 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithO
     return CHIP_ERROR_WRITE_FAILED;
 }
 
-CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
+CHIP_ERROR ThermostatPresetsDelegate::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
 {
     if (index < mNextFreeIndexInPendingPresetsList)
     {
@@ -204,7 +217,7 @@ CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStruc
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
+CHIP_ERROR ThermostatPresetsDelegate::CommitPendingPresets()
 {
     mNextFreeIndexInPresetsList = 0;
     for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
@@ -216,7 +229,7 @@ CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
     return CHIP_NO_ERROR;
 }
 
-void ThermostatDelegate::ClearPendingPresetList()
+void ThermostatPresetsDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
 }

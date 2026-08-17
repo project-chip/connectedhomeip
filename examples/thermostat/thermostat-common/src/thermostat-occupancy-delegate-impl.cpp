@@ -16,17 +16,17 @@
  *    limitations under the License.
  */
 
-#include "../include/thermostat-delegate-impl.h"
+#include "../include/thermostat-occupancy-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app::Clusters::Thermostat;
 
-BitMask<OccupancyBitmap> ThermostatDelegate::GetOccupancy() const
+BitMask<OccupancyBitmap> ThermostatOccupancyDelegate::GetOccupancy() const
 {
     return mOccupancy;
 }
 
-Protocols::InteractionModel::Status ThermostatDelegate::SetOccupancy(BitMask<OccupancyBitmap> occupancy)
+Protocols::InteractionModel::Status ThermostatOccupancyDelegate::SetOccupancy(BitMask<OccupancyBitmap> occupancy)
 {
     mOccupancy = occupancy;
     return Protocols::InteractionModel::Status::Success;

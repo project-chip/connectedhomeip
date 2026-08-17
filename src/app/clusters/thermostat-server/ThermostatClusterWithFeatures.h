@@ -65,6 +65,9 @@ static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraAr
     }
 }
 
+template <typename Target, typename... Args>
+inline constexpr bool kArgsHasDelegate = (std::is_base_of_v<Target, std::decay_t<Args>> || ...);
+
 } // namespace
 
 template <typename... Delegates>
@@ -77,14 +80,16 @@ public:
 
     static_assert(!kHasSuggestions || kHasPresets, "Suggestions feature requires Presets feature");
 
-    template <typename... DelegateArgs>
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
-                                  DelegateArgs &... delegates) :
+                                  Delegates &... delegates) :
         ThermostatCluster(aEndpointId, features, config, FindDelegate<Thermostat::Delegate>(delegates...)),
         mPresets(MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
         mSuggestions(MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
         mOccupancy(MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
-    {}
+    {
+        static_assert(kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
+                      "Missing Thermostat::Delegate in constructor arguments");
+    }
 
     bool IsOccupied() const override
     {
@@ -96,7 +101,7 @@ public:
     }
 
     template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
-    Protocols::InteractionModel::Status SetOccupied(DataModel::Nullable<bool> occupied)
+    Protocols::InteractionModel::Status SetOccupied(BitMask<OccupancyBitmap> occupied)
     {
         return mOccupancy.SetOccupied(occupied);
     }
@@ -144,7 +149,7 @@ public:
             if (status.IsSuccess() && IsActiveSetpoint(request.path.mAttributeId))
             {
                 ChipLogProgress(Zcl, "Setting active preset to null");
-                mPresets.SetActivePreset(std::nullopt);
+                mPresets.SetActivePreset(DataModel::NullNullable);
             }
         }
         return status;
@@ -236,10 +241,14 @@ public:
     }
 
 private:
-    [[no_unique_address]] std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
-    [[no_unique_address]] std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
-    [[no_unique_address]] std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasPresets, ThermostatPresets, std::monostate> mPresets;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasSuggestions, ThermostatSuggestions, std::monostate> mSuggestions;
+    CHIP_NO_UNIQUE_ADDRESS std::conditional_t<kHasOccupancy, ThermostatOccupancy, std::monostate> mOccupancy;
 };
+
+template <typename... DelegateArgs>
+ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &,
+                              DelegateArgs &...) -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
 
 using DefaultThermostatCluster =
     ThermostatClusterWithFeatures<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;

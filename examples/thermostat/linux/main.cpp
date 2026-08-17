@@ -25,6 +25,9 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
+#include "thermostat-occupancy-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -73,13 +76,15 @@ static Identify gIdentify1 = {
 
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
-    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, gThermostatDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate,
+                                     gSuggestionsDelegate);
 }
 
 void ApplicationShutdown()
