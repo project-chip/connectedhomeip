@@ -146,8 +146,9 @@ uint8_t ThermostatSensorsDelegate::GetNumberOfSensorScheduleTransitions()
     return mNumberOfSensorScheduleTransitions;
 }
 
-CHIP_ERROR ThermostatSensorsDelegate::GetSensorScheduleTransitionAtIndex(size_t index,
-                                                                          SensorScheduleTransitionStructWithOwnedMembers & transition)
+CHIP_ERROR
+ThermostatSensorsDelegate::GetSensorScheduleTransitionAtIndex(size_t index,
+                                                              SensorScheduleTransitionStructWithOwnedMembers & transition)
 {
     if (index < mNextFreeIndexInSensorScheduleTransitionsList)
     {
@@ -159,7 +160,7 @@ CHIP_ERROR ThermostatSensorsDelegate::GetSensorScheduleTransitionAtIndex(size_t 
 
 CHIP_ERROR
 ThermostatSensorsDelegate::GetPendingSensorScheduleTransitionAtIndex(size_t index,
-                                                                      SensorScheduleTransitionStructWithOwnedMembers & transition)
+                                                                     SensorScheduleTransitionStructWithOwnedMembers & transition)
 {
     if (index < mNextFreeIndexInPendingSensorScheduleTransitionsList)
     {
@@ -185,7 +186,8 @@ void ThermostatSensorsDelegate::ClearPendingSensorScheduleTransitions()
 }
 
 CHIP_ERROR
-ThermostatSensorsDelegate::AppendToPendingSensorScheduleTransitions(const SensorScheduleTransitionStructWithOwnedMembers & transition)
+ThermostatSensorsDelegate::AppendToPendingSensorScheduleTransitions(
+    const SensorScheduleTransitionStructWithOwnedMembers & transition)
 {
     if (mNextFreeIndexInPendingSensorScheduleTransitionsList < MATTER_ARRAY_SIZE(mPendingSensorScheduleTransitions))
     {
