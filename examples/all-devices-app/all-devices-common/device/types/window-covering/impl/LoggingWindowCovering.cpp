@@ -41,6 +41,23 @@ void LoggingWindowCovering::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 CHIP_ERROR LoggingWindowCovering::HandleMovement(Clusters::WindowCovering::WindowCoveringType type)
 {
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%u", static_cast<unsigned>(type));
+    auto & cluster = WindowCoveringCluster();
+    if (type == Clusters::WindowCovering::WindowCoveringType::Lift)
+    {
+        auto target = cluster.GetTargetPositionLiftPercent100ths();
+        if (!target.IsNull())
+        {
+            cluster.SetCurrentPositionLiftPercent100ths(target);
+        }
+    }
+    else if (type == Clusters::WindowCovering::WindowCoveringType::Tilt)
+    {
+        auto target = cluster.GetTargetPositionTiltPercent100ths();
+        if (!target.IsNull())
+        {
+            cluster.SetCurrentPositionTiltPercent100ths(target);
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -48,6 +65,30 @@ CHIP_ERROR LoggingWindowCovering::HandleStopMotion()
 {
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleStopMotion");
     return CHIP_NO_ERROR;
+}
+
+void LoggingWindowCovering::OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift)
+{
+    if (newTargetLift.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionLiftChanged -> NULL");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionLiftChanged -> %u", newTargetLift.Value());
+    }
+}
+
+void LoggingWindowCovering::OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt)
+{
+    if (newTargetTilt.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionTiltChanged -> NULL");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionTiltChanged -> %u", newTargetTilt.Value());
+    }
 }
 
 } // namespace app

@@ -57,6 +57,18 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
             Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt))
         .WithOptionalAttributes(optionals);
     mWindowCoveringCluster.Create(endpoint, config);
+
+    // Initialize default position values for simulation if they are currently null/uninitialized
+    auto & cluster = mWindowCoveringCluster.Cluster();
+    if (cluster.GetCurrentPositionLiftPercent100ths().IsNull())
+    {
+        cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    }
+    if (cluster.GetCurrentPositionTiltPercent100ths().IsNull())
+    {
+        cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    }
+
     ReturnErrorOnFailure(provider.AddCluster(mWindowCoveringCluster.Registration()));
 
     // Groups is optional (Active, O) per the Window Covering device type, but we implement it
