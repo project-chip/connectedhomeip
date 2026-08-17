@@ -84,16 +84,6 @@ class TC_IDM_1_5(IDMBaseTest):
             TestStep(5, "TH measures the time delta (Delta t_2) between receiving the InvokeResponse in Step 4 and receiving the subsequent ReportDataMessage. Verify Delta t_2 < 150 ms.")
         ]
 
-    def _find_test_endpoint(self) -> int:
-        if self.matter_test_config.endpoint is not None:
-            return self.matter_test_config.endpoint
-
-        for endpoint_id, clusters in self.endpoints.items():
-            if endpoint_id != 0 and Clusters.OnOff in clusters:
-                return endpoint_id
-
-        return 1
-
     @async_test_body
     async def test_TC_IDM_1_5(self):
         dev_ctrl = self.default_controller
@@ -101,41 +91,53 @@ class TC_IDM_1_5(IDMBaseTest):
 
         self.print_step(0, "Commissioning - already done")
 
-        endpoint = self._find_test_endpoint()
-        log.info("Testing with OnOff cluster on endpoint %d", endpoint)
-
-        # Check if OnOff cluster exists on chosen endpoint
-        if endpoint not in self.endpoints or Clusters.OnOff not in self.endpoints[endpoint]:
-            self.skip_all_client_clusters("OnOff cluster not found on DUT")
-            return
+        # GeneralCommissioning cluster is mandatory on Endpoint 0 for all Matter devices
+        endpoint = 0
+        target_attribute = Clusters.GeneralCommissioning.Attributes.Breadcrumb
 
         report_queue: queue.Queue = queue.Queue()
-        tracker = AttributeReportTracker(Clusters.OnOff.Attributes.OnOff, report_queue)
+        tracker = AttributeReportTracker(target_attribute, report_queue)
 
         self.step(1)
-        log.info("Establishing subscription to OnOff attribute with MaxInterval=60s")
+        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=60s")
+        sub_start_time = time.monotonic()
         subscription = await dev_ctrl.ReadAttribute(
             nodeid=dut_node_id,
-            attributes=[(endpoint, Clusters.OnOff.Attributes.OnOff)],
+            attributes=[(endpoint, target_attribute)],
             reportInterval=(0, 60),
             keepSubscriptions=False,
             autoResubscribe=False
         )
         subscription.SetAttributeUpdateCallback(tracker)
 
-        # Drain prime report from subscription establishment
+        # Synchronously await and drain prime report from subscription establishment
         try:
             prime_report = await asyncio.to_thread(report_queue.get, timeout=5.0)
             log.info("Initial prime report received: %r", prime_report)
         except queue.Empty:
-            log.warning("No prime report received upon subscription establishment")
+            asserts.fail("No prime report received upon subscription establishment")
+
+        # Give DUT 1.0s to process StatusResponse ACK and enter quiet active state
+        log.info("Waiting 1 second for subscription to settle before Step 2")
+        await asyncio.sleep(1.0)
+
+        sub_elapsed_sec = time.monotonic() - sub_start_time
+        remaining_sub_window_sec = 60.0 - sub_elapsed_sec
+        log.info("Subscription established in %.2f s; remaining window before periodic report: %.2f s",
+                 sub_elapsed_sec, remaining_sub_window_sec)
+
+        asserts.assert_greater_equal(
+            remaining_sub_window_sec, 30.0,
+            f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
+            f"({remaining_sub_window_sec:.2f} s) to safely measure DelayReportData"
+        )
 
         self.step(2)
         # Drain any residual queue items before measuring
         while not report_queue.empty():
             report_queue.get_nowait()
 
-        cmd = Clusters.OnOff.Commands.Toggle()
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=200, DelayJitterWindowMs=500)")
 
         await dev_ctrl.SendCommand(
@@ -171,11 +173,12 @@ class TC_IDM_1_5(IDMBaseTest):
         while not report_queue.empty():
             report_queue.get_nowait()
 
-        log.info("Sending second InvokeRequestMessage without DelayReportData to toggle back")
+        log.info("Sending second InvokeRequestMessage without DelayReportData to change Breadcrumb to 2")
+        cmd_2 = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
         await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
-            payload=Clusters.OnOff.Commands.Toggle()
+            payload=cmd_2
         )
         invoke_recv_time_2 = time.monotonic()
 
@@ -191,6 +194,14 @@ class TC_IDM_1_5(IDMBaseTest):
         asserts.assert_less(
             delta_t_2_ms, 150.0,
             f"Delta t_2 ({delta_t_2_ms:.2f} ms) was not sent promptly without delay (expected < 150 ms)"
+        )
+
+        # Cleanup: Disarm fail-safe and reset Breadcrumb
+        log.info("Cleaning up: disarming fail-safe")
+        await dev_ctrl.SendCommand(
+            nodeId=dut_node_id,
+            endpoint=endpoint,
+            payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         )
 
 
