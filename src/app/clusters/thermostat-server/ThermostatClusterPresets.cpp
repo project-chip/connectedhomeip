@@ -305,21 +305,6 @@ std::optional<DataModel::ActionReturnStatus> ThermostatPresets::ReadAttribute(co
         ReturnErrorOnFailure(mDelegate.GetActivePresetHandle(activePresetHandle));
         return encoder.Encode(activePresetHandle);
     }
-    case ScheduleTypes::Id: {
-        return encoder.EncodeList([this](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                ScheduleTypeStruct::Type scheduleType;
-                auto err = mDelegate.GetScheduleTypeAtIndex(i, scheduleType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(scheduleType));
-            }
-        });
-    }
     default:
         return std::nullopt;
     }

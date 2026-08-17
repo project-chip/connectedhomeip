@@ -93,15 +93,6 @@ public:
         virtual CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & activePresetHandle) = 0;
 
         /**
-         * @brief Get the ScheduleType at a given index in the ScheduleTypes attribute
-         *
-         * @param[in] index The index of the schedule type in the list.
-         * @param[out] scheduleType The schedule type  at the given index in the list.
-         * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the schedule types list.
-         */
-        virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
-
-        /**
          * @brief Copies existing presets to the pending preset list
          */
         virtual void InitializePendingPresets() = 0;

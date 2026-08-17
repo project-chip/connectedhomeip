@@ -87,6 +87,8 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
 
 } // namespace
 
@@ -293,8 +295,7 @@ void AppTask::InitServer(intptr_t arg)
         return;
     }
 
-    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, gThermostatDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);

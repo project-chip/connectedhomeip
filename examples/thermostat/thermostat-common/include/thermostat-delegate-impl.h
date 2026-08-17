@@ -33,31 +33,12 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
-static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
 
-static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
-
-// TODO: #34556 Support multiple presets/schedules of each type.
-// We will support only one preset of each preset/schedule type.
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
-static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
-
-// For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
-// kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
-static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
-
-static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
-
-class ThermostatDelegate : public Delegate,
-                           public ThermostatPresets::Delegate,
-                           public ThermostatSuggestions::Delegate,
-                           public ThermostatOccupancy::Delegate
+class ThermostatDelegate : public Delegate
 {
 public:
     ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr);
-    ~ThermostatDelegate() override;
 
     SystemModeEnum GetSystemMode() const override;
     bool SetSystemMode(SystemModeEnum systemMode) override;
@@ -85,37 +66,6 @@ public:
     Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints) override;
     Protocols::InteractionModel::Status SaveSetpoint(const Setpoint & oldSetpoint, const Setpoint & newSetpoint) override;
 
-    // ThermostatOccupancy::Delegate methods
-    BitMask<OccupancyBitmap> GetOccupancy() const override;
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupancy) override;
-
-    // ThermostatPresets::Delegate methods
-    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
-    CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
-    uint8_t GetNumberOfPresets() override;
-    CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
-    CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) override;
-    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
-    void InitializePendingPresets() override;
-    CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) override;
-    CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
-    CHIP_ERROR CommitPendingPresets() override;
-    void ClearPendingPresetList() override;
-    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
-
-    // ThermostatSuggestions::Delegate methods
-    uint8_t GetMaxThermostatSuggestions() override;
-    uint8_t GetNumberOfThermostatSuggestions() override;
-    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
-                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
-    void GetCurrentThermostatSuggestion(
-        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
-    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() override;
-    CHIP_ERROR AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) override;
-    CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t indexToRemove) override;
-    CHIP_ERROR GetUniqueID(uint8_t & uniqueID) override;
-    CHIP_ERROR ReEvaluateCurrentSuggestion() override;
-
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
@@ -134,59 +84,6 @@ private:
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
 
-    // Occupancy state
-    BitMask<OccupancyBitmap> mOccupancy{ OccupancyBitmap::kOccupied };
-
-    /**
-     * @brief Initializes the presets array with some sample presets for testing.
-     */
-    void InitializePresets();
-
-    /**
-     * @brief Initializes the schedules types array with example schedule types.
-     */
-    void InitializeScheduleTypes();
-
-    uint8_t mNumberOfPresets;
-    Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
-    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
-    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
-
-    uint8_t mNextFreeIndexInPendingPresetsList;
-    uint8_t mNextFreeIndexInPresetsList;
-
-    uint8_t mActivePresetHandleData[kPresetHandleSize];
-    size_t mActivePresetHandleDataSize;
-    bool mActivePresetHandleIsNull = true;
-
-    uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
-    Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
-
-    /**
-     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
-     * field. If there are no entries or an error occurs, returns the value in the MaxThermostatSuggestions attribute as an
-     * invalid index.
-     *
-     */
-    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
-    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
-    static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
-    void CancelExpirationTimer();
-    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
-        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
-    void SetCurrentThermostatSuggestion(size_t index);
-    bool HaveSuggestionWithID(uint8_t uniqueIDToFind);
-
-    uint8_t mMaxThermostatSuggestions;
-    ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
-    uint8_t mNextFreeIndexInThermostatSuggestionsList;
-    uint8_t mUniqueID;
-
-    // TODO: #39949 - This information should be stored in the cluster instance.
-    size_t mIndexOfCurrentSuggestion;
-    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
-
-    bool mIsExpirationTimerRunning = false;
 };
 
 } // namespace Thermostat

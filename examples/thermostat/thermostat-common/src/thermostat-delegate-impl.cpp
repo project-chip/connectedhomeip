@@ -39,29 +39,6 @@ ThermostatDelegate::ThermostatDelegate(EndpointId endpoint, AttributePersistence
 {
     mEndpointId = endpoint;
     mProvider   = provider;
-
-    // Initialize Presets state
-    mNumberOfPresets                            = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList                 = 0;
-    mNextFreeIndexInPendingPresetsList          = 0;
-    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
-
-    InitializePresets();
-    InitializeScheduleTypes();
-
-    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
-    mActivePresetHandleDataSize = 0;
-
-    // Initialize Suggestions state
-    mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
-    mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
-    mNextFreeIndexInThermostatSuggestionsList = 0;
-    mUniqueID                                 = 0;
-}
-
-ThermostatDelegate::~ThermostatDelegate()
-{
-    CancelExpirationTimer();
 }
 
 SystemModeEnum ThermostatDelegate::GetSystemMode() const
@@ -327,27 +304,4 @@ Protocols::InteractionModel::Status ThermostatDelegate::SaveSetpoint(const Setpo
     }
 
     return Status::Success;
-}
-
-void ThermostatDelegate::InitializeScheduleTypes()
-{
-    static_assert(MATTER_ARRAY_SIZE(mScheduleTypes) == 2);
-
-    mScheduleTypes[0] = { .systemMode           = SystemModeEnum::kHeat,
-                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
-                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
-
-    mScheduleTypes[1] = { .systemMode           = SystemModeEnum::kCool,
-                          .numberOfSchedules    = mMaxNumberOfSchedulesAllowedPerScheduleType,
-                          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) };
-}
-
-CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
-{
-    if (index < MATTER_ARRAY_SIZE(mScheduleTypes))
-    {
-        scheduleType = mScheduleTypes[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }

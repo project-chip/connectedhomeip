@@ -126,6 +126,12 @@ void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
         integrationDelegate);
 }
 
+template <typename... DelegateArgs>
+void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
+{
+    ServerInit<ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>, DelegateArgs...>(endpointId, delegates...);
+}
+
 template <typename ClusterT>
 void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {

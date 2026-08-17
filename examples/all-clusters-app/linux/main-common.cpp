@@ -37,6 +37,10 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
+#include "thermostat-occupancy-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
+
 #include "tls-client-management-instance.h"
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 
@@ -187,6 +191,8 @@ LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 
 static EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint, gThermostatPresetsDelegate);
 
 } // namespace
 
@@ -212,8 +218,8 @@ void ApplicationInit()
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
-    Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, gThermostatDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gThermostatPresetsDelegate,
+                                     gThermostatSuggestionsDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };
