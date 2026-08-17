@@ -241,6 +241,12 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
     auto handle = std::unique_ptr<CastingPlayerHandle>(new CastingPlayerHandle{ player });
     env->CallVoidMethod(jMatterCastingPlayer, setNativeCastingPlayerId, reinterpret_cast<jlong>(handle.get()));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() setNativeCastingPlayer threw");
+        env->ExceptionClear();
+        return jMatterCastingPlayer; // unique_ptr destructor frees the handle
+    }
     handle.release();
 
     return jMatterCastingPlayer;
