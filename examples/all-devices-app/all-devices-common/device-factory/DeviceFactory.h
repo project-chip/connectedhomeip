@@ -21,7 +21,6 @@
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
 #include <app_config/enabled_devices.h>
-#include <platform/PlatformManager.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -67,6 +66,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/PlatformManager.h>
 
 #include <functional>
 #include <map>
@@ -377,7 +377,7 @@ private:
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager,
-                                                           mContext->bindingTable, mContext->bindingManager);
+                                                          mContext->bindingTable, mContext->bindingManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)

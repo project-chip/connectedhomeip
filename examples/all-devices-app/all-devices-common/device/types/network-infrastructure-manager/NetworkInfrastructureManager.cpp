@@ -37,12 +37,10 @@ constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
 
 NetworkInfrastructureManager::NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                                             DeviceLayer::PlatformManager & platformManager,
-                                                             FailSafeContext & failSafeContext) :
+                                                           DeviceLayer::PlatformManager & platformManager,
+                                                           FailSafeContext & failSafeContext) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mThreadNetworkDirectoryStorage(storage),
-    mTimerDelegate(timerDelegate),
-    mPlatformManager(platformManager),
+    mThreadNetworkDirectoryStorage(storage), mTimerDelegate(timerDelegate), mPlatformManager(platformManager),
     mFailSafeContext(failSafeContext)
 {}
 
@@ -190,7 +188,7 @@ void NetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDat
 
     mActivateDatasetCallback = callback;
     mActivateDatasetSequence = sequenceNum;
-    err = mTimerDelegate.StartTimer(&mActiveDatasetTimerContext, System::Clock::Seconds32(1));
+    err                      = mTimerDelegate.StartTimer(&mActiveDatasetTimerContext, System::Clock::Seconds32(1));
     if (err != CHIP_NO_ERROR)
     {
         mActivateDatasetCallback = nullptr;
@@ -221,8 +219,8 @@ CHIP_ERROR NetworkInfrastructureManager::SetPendingDataset(const Thread::Operati
 
 void NetworkInfrastructureManager::OnActiveDatasetTimerFired()
 {
-    auto * callback           = mActivateDatasetCallback;
-    auto sequenceNum          = mActivateDatasetSequence;
+    auto * callback          = mActivateDatasetCallback;
+    auto sequenceNum         = mActivateDatasetSequence;
     mActivateDatasetCallback = nullptr;
     if (callback)
     {

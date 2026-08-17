@@ -35,10 +35,7 @@ const ClusterId kClientClusters[] = { OnOff::Id, Identify::Id };
 OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager,
                                    Clusters::Binding::Table & bindingTable, Clusters::Binding::Manager & bindingManager) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)),
-    mTimerDelegate(timerDelegate),
-    mPlatformManager(platformManager),
-    mBindingTable(bindingTable),
-    mBindingManager(bindingManager)
+    mTimerDelegate(timerDelegate), mPlatformManager(platformManager), mBindingTable(bindingTable), mBindingManager(bindingManager)
 {}
 
 CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
