@@ -121,7 +121,8 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             asserts.assert_equal(capture_response.imageCodec, selected_cap.imageCodec, "Image codec mismatch")
             asserts.assert_equal(capture_response.resolution, selected_cap.resolution, "Image resolution mismatch")
             if capture_response.imageCodec == cluster.Enums.ImageCodecEnum.kJpeg:
-                asserts.assert_true(capture_response.data.startswith(b'\xff\xd8'), "Captured image does not start with JPEG SOI marker")
+                asserts.assert_true(capture_response.data.startswith(b'\xff\xd8'),
+                                    "Captured image does not start with JPEG SOI marker")
                 asserts.assert_true(capture_response.data.endswith(b'\xff\xd9'), "Captured image does not end with JPEG EOI marker")
         except InteractionModelError as e:
             asserts.fail(f"CaptureSnapshot failed: {e}")
