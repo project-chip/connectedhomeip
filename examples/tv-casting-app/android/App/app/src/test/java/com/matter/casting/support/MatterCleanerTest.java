@@ -83,13 +83,15 @@ public class MatterCleanerTest {
               throw new RuntimeException("test exception");
             });
     enqueueFirst();
-    assertTrue("first action was not processed within timeout", firstProcessed.await(2, TimeUnit.SECONDS));
+    assertTrue(
+        "first action was not processed within timeout", firstProcessed.await(2, TimeUnit.SECONDS));
 
     // Thread must still be alive — a second action should fire normally.
     CountDownLatch secondProcessed = new CountDownLatch(1);
     MatterCleaner.getInstance().register(new Object(), secondProcessed::countDown);
     enqueueFirst();
-    assertTrue("second action was not called within timeout", secondProcessed.await(2, TimeUnit.SECONDS));
+    assertTrue(
+        "second action was not called within timeout", secondProcessed.await(2, TimeUnit.SECONDS));
   }
 
   // ---------------------------------------------------------------------------
