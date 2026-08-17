@@ -41,7 +41,7 @@ constexpr uint16_t kMaxExpirationInMinutes = 1440;
 CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatSuggestions::Delegate & delegate)
 {
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    CHIP_ERROR err                                = chip::System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    CHIP_ERROR err = chip::System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     ReturnErrorOnFailure(err);
 
     size_t suggestionCount = delegate.GetNumberOfThermostatSuggestions();

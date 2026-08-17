@@ -102,13 +102,13 @@ public:
         DefaultValues defaultValues;
         FabricTable & fabricTable;
 
-        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable)
-            : optionalAttributes(optionalAttributes), defaultValues(defaultValues), fabricTable(fabricTable)
-        {
-        }
+        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable) :
+            optionalAttributes(optionalAttributes), defaultValues(defaultValues), fabricTable(fabricTable)
+        {}
     };
 
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config, Thermostat::Delegate & delegate);
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
+                      Thermostat::Delegate & delegate);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;

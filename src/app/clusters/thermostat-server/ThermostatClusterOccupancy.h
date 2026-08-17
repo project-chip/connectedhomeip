@@ -47,15 +47,9 @@ public:
     std::optional<DataModel::ActionReturnStatus> ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder);
 
-    bool IsOccupied() const
-    {
-        return mDelegate.GetOccupancy().Has(OccupancyBitmap::kOccupied);
-    }
+    bool IsOccupied() const { return mDelegate.GetOccupancy().Has(OccupancyBitmap::kOccupied); }
 
-    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied)
-    {
-        return mDelegate.SetOccupancy(occupied);
-    }
+    Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied) { return mDelegate.SetOccupancy(occupied); }
 
 private:
     Delegate & mDelegate;

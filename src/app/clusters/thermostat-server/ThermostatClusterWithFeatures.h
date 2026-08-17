@@ -28,7 +28,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-namespace  {
+namespace {
 
 template <typename TargetDelegate, typename First, typename... Rest>
 constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
@@ -65,7 +65,7 @@ static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraAr
     }
 }
 
-} // namespace 
+} // namespace
 
 template <typename... Delegates>
 class ThermostatClusterWithFeatures : public ThermostatCluster
