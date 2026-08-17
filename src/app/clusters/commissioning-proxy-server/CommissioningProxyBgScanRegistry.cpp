@@ -188,7 +188,13 @@ void CommissioningProxyBgScanRegistry::RecomputeFabricLifetime(FabricIndex fabri
     {
         // The fabric would otherwise scan unbounded. Nothing here can reject the command
         // that got us here (it has already been applied), so drop the fabric instead.
+        // The requests go with it: a freed slot must carry no request, or the next fabric
+        // to claim it inherits them.
         ChipLogError(AppServer, "BgScan: could not re-arm lifetime for fabricIndex=%u; dropping it", fabricIndex);
+        for (auto & slot : state.requests)
+        {
+            slot.inUse = false;
+        }
         state.inUse = false;
         return;
     }
@@ -275,11 +281,8 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
     // Arming can fail, so it happens before the table is touched. The old timer is
     // cancelled only once the new one is running.
     const bool hadTimer = fabric->inUse && fabric->lifetime.armed;
-    LifetimeCtx staged;
     if (needTimer)
     {
-        staged.registry    = this;
-        staged.fabricIndex = fabricIndex;
         // Cancel first: a context can hold only one timer, and this reuses the slot's.
         if (hadTimer)
         {

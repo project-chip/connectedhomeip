@@ -367,6 +367,32 @@ TEST(TestCommissioningProxyBgScanRegistry, LifetimeTimerArmFailureRejectsAndClea
     EXPECT_EQ(hw.clearCount, 1);
 }
 
+// Dropping a fabric because its lifetime could not be re-armed must take the fabric's
+// surviving requests with it: the next fabric to occupy the freed slot cannot inherit
+// requests it never made.
+TEST(TestCommissioningProxyBgScanRegistry, LifetimeReArmFailureDropsTheFabricsRequests)
+{
+    MockHardwareControl hw;
+    CommissioningProxyMockTimer timers;
+    CommissioningProxyBgScanRegistry reg(hw, timers);
+
+    EXPECT_EQ(reg.Start(kFabric1, kNode1, kPaf, k2g4, 30), Status::Success);
+    EXPECT_EQ(reg.Start(kFabric1, kNode2, kPaf, k5g, 60), Status::Success);
+
+    // Node 1 stopping shortens the fabric to node 2's deadline, so the lifetime is
+    // re-armed — and that failing drops the fabric, node 2's request included.
+    timers.FailNextStart();
+    EXPECT_EQ(reg.Stop(kFabric1, kNode1, kPaf, k2g4), Status::Success);
+    EXPECT_TRUE(reg.IsEmpty());
+    EXPECT_EQ(hw.stopCount, 1);
+
+    // Another fabric takes the freed slot; node 2's request is not part of it.
+    EXPECT_EQ(reg.Start(kFabric2, kNode3, kPaf, k2g4, kNoTimeout), Status::Success);
+    EXPECT_EQ(reg.Stop(kFabric2, kNode2, kPaf, k5g), Status::NotFound);
+    EXPECT_EQ(reg.Stop(kFabric2, kNode3, kPaf, k2g4), Status::Success);
+    EXPECT_TRUE(reg.IsEmpty());
+}
+
 // Spec: the proxy keeps per-fabric records and scans "until the timeout fires or
 // ProxyBackGroundScanStopRequest is received for that fabric". Each fabric's lifetime
 // is therefore independent: expiring one must not disturb another.

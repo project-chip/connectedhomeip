@@ -397,8 +397,9 @@ if (handler != nullptr)
 
 When the build enables BLE (`CONFIG_NETWORK_LAYER_BLE`) the driver
 (`CommissioningProxyBleTransport`) drives a BTP connection through
-`chip::Ble::BleLayer`. The Linux example
-(`examples/all-devices-app/all-devices-common/devices/commissioning-proxy/CommissioningProxyBleTransport.cpp`)
+`chip::Ble::BleLayer`. The Linux example driver, landing with the example-app
+change later in this series,
+(`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/CommissioningProxyBleTransport.cpp`)
 shows the full integration:
 
 -   `Connect()` — on the first BLE connect the proxy flips its own BLE role from
