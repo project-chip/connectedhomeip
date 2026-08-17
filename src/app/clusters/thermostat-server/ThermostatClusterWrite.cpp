@@ -134,9 +134,8 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         SetAttributeValue(mTemperatureSetpointHoldDuration, requestedTemperatureSetpointHoldDuration,
                           TemperatureSetpointHoldDuration::Id);
         AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.StoreNativeEndianValue(
-            { request.path.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
-            requestedTemperatureSetpointHoldDuration);
+        return persistence.StoreNativeEndianValue({ request.path.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+                                                  requestedTemperatureSetpointHoldDuration);
     }
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));

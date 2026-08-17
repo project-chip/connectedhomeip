@@ -40,7 +40,8 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
         break;
     }
     case UnoccupiedHeatingSetpoint::Id: {
-        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kHeat, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp),
+                                    newTemp);
         break;
     }
     case OccupiedCoolingSetpoint::Id: {
@@ -49,7 +50,8 @@ void ThermostatCluster::GenerateSetpointEvent(AttributeId attributeId, temperatu
         break;
     }
     case UnoccupiedCoolingSetpoint::Id: {
-        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp), newTemp);
+        GenerateSetpointChangeEvent(mPath.mEndpointId, SystemModeEnum::kCool, BitMask<OccupancyBitmap>(), MakeOptional(oldTemp),
+                                    newTemp);
         break;
     }
     }

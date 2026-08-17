@@ -321,8 +321,8 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             // needs to keep track of a pending preset list now.
             for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
             {
-                auto & attributeStatus = attributeStatuses[i];
-                auto beginStatus       = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
+                auto & attributeStatus     = attributeStatuses[i];
+                auto beginStatus           = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
                 attributeStatus.statusCode = to_underlying(beginStatus);
                 if (beginStatus != Status::Success)
                 {
