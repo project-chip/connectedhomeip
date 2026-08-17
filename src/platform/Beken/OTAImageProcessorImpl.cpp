@@ -206,6 +206,15 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (!imageProcessor->readHeader) // First block received, process header
     {
+        // the header copy below reads sizeof(ota_data_struct_t) bytes from the block, so reject a
+        // first block that is too small before it reads past the end of the allocation
+        if (block.size() < sizeof(ota_data_struct_t))
+        {
+            ChipLogError(SoftwareUpdate, "First block smaller than OTA image header");
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            return;
+        }
+
         ota_data_struct_t * tempBuf = (ota_data_struct_t *) chip::Platform::MemoryAlloc(sizeof(ota_data_struct_t));
 
         if (NULL == tempBuf)

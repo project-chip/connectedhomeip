@@ -415,6 +415,15 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         // first block received, get STM_Header
         uint8_t STMHeader[STM_HEADER_SIZE];
 
+        // the header copy below and the length math that follows assume the block holds a full
+        // STM header; a shorter first block would read past mBlock and underflow the size subtraction
+        if (imageProcessor->mBlock.size() < STM_HEADER_SIZE)
+        {
+            ChipLogError(SoftwareUpdate, "First block smaller than STM header");
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_DECODE_FAILED);
+            return;
+        }
+
         memcpy(STMHeader, reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()), sizeof(STMHeader));
 
         memset(tempBUF, TEMPBUF_PADDING, TEMPBUF_SIZE);
