@@ -99,12 +99,12 @@ public:
 
     struct Config
     {
-        OptionalAttributes optionalAttributes;
-        DefaultValues defaultValues;
-        FabricTable & fabricTable;
+        OptionalAttributes mOptionalAttributes;
+        DefaultValues mDefaultValues;
+        FabricTable & mFabricTable;
 
         Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable) :
-            optionalAttributes(optionalAttributes), defaultValues(defaultValues), fabricTable(fabricTable)
+            mOptionalAttributes(optionalAttributes), mDefaultValues(defaultValues), mFabricTable(fabricTable)
         {}
     };
 

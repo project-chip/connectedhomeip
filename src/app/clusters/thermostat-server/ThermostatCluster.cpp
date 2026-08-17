@@ -51,7 +51,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (auto status = mConfig.fabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
+    if (auto status = mConfig.mFabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
     }
@@ -63,7 +63,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     mAtomicWriteSession.ResetAtomicWrite();
     mAtomicWriteSession.SetDelegate(nullptr);
     DefaultServerCluster::Shutdown(type);
-    mConfig.fabricTable.RemoveFabricDelegate(this);
+    mConfig.mFabricTable.RemoveFabricDelegate(this);
     ChipLogProgress(Zcl, "Shutting down thermostat server cluster on endpoint %d", mPath.mEndpointId);
 }
 
@@ -427,19 +427,19 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     case SystemMode::Id:
         return true;
     case OutdoorTemperature::Id:
-        return mConfig.optionalAttributes.OutdoorTemperature;
+        return mConfig.mOptionalAttributes.OutdoorTemperature;
     case Occupancy::Id:
         return mFeatures.Has(Feature::kOccupancy);
     case AbsMinHeatSetpointLimit::Id:
-        return mConfig.optionalAttributes.AbsMinHeatSetpointLimit;
+        return mConfig.mOptionalAttributes.AbsMinHeatSetpointLimit;
     case AbsMaxHeatSetpointLimit::Id:
-        return mConfig.optionalAttributes.AbsMaxHeatSetpointLimit;
+        return mConfig.mOptionalAttributes.AbsMaxHeatSetpointLimit;
     case AbsMinCoolSetpointLimit::Id:
-        return mConfig.optionalAttributes.AbsMinCoolSetpointLimit;
+        return mConfig.mOptionalAttributes.AbsMinCoolSetpointLimit;
     case AbsMaxCoolSetpointLimit::Id:
-        return mConfig.optionalAttributes.AbsMaxCoolSetpointLimit;
+        return mConfig.mOptionalAttributes.AbsMaxCoolSetpointLimit;
     case LocalTemperatureCalibration::Id:
-        return mConfig.optionalAttributes.LocalTemperatureCalibration;
+        return mConfig.mOptionalAttributes.LocalTemperatureCalibration;
     case OccupiedCoolingSetpoint::Id:
         return mFeatures.Has(Feature::kCooling);
     case OccupiedHeatingSetpoint::Id:
@@ -449,33 +449,33 @@ bool ThermostatCluster::HasAttribute(AttributeId attributeId)
     case UnoccupiedCoolingSetpoint::Id:
         return mFeatures.Has(Feature::kCooling) && mFeatures.Has(Feature::kOccupancy);
     case MinHeatSetpointLimit::Id:
-        return mConfig.optionalAttributes.MinHeatSetpointLimit;
+        return mConfig.mOptionalAttributes.MinHeatSetpointLimit;
     case MaxHeatSetpointLimit::Id:
-        return mConfig.optionalAttributes.MaxHeatSetpointLimit;
+        return mConfig.mOptionalAttributes.MaxHeatSetpointLimit;
     case MinCoolSetpointLimit::Id:
-        return mConfig.optionalAttributes.MinCoolSetpointLimit;
+        return mConfig.mOptionalAttributes.MinCoolSetpointLimit;
     case MaxCoolSetpointLimit::Id:
-        return mConfig.optionalAttributes.MaxCoolSetpointLimit;
+        return mConfig.mOptionalAttributes.MaxCoolSetpointLimit;
     case MinSetpointDeadBand::Id:
         return mFeatures.Has(Feature::kAutoMode);
     case RemoteSensing::Id:
-        return mConfig.optionalAttributes.RemoteSensing;
+        return mConfig.mOptionalAttributes.RemoteSensing;
     case ThermostatRunningMode::Id:
-        return mConfig.optionalAttributes.ThermostatRunningMode;
+        return mConfig.mOptionalAttributes.ThermostatRunningMode;
     case TemperatureSetpointHold::Id:
-        return mConfig.optionalAttributes.TemperatureSetpointHold;
+        return mConfig.mOptionalAttributes.TemperatureSetpointHold;
     case TemperatureSetpointHoldDuration::Id:
-        return mConfig.optionalAttributes.TemperatureSetpointHoldDuration;
+        return mConfig.mOptionalAttributes.TemperatureSetpointHoldDuration;
     case ThermostatRunningState::Id:
-        return mConfig.optionalAttributes.ThermostatRunningState;
+        return mConfig.mOptionalAttributes.ThermostatRunningState;
     case SetpointChangeSource::Id:
-        return mConfig.optionalAttributes.SetpointChangeSource;
+        return mConfig.mOptionalAttributes.SetpointChangeSource;
     case SetpointChangeAmount::Id:
-        return mConfig.optionalAttributes.SetpointChangeAmount;
+        return mConfig.mOptionalAttributes.SetpointChangeAmount;
     case SetpointChangeSourceTimestamp::Id:
-        return mConfig.optionalAttributes.SetpointChangeSourceTimestamp;
+        return mConfig.mOptionalAttributes.SetpointChangeSourceTimestamp;
     case SetpointHoldExpiryTimestamp::Id:
-        return mConfig.optionalAttributes.SetpointHoldExpiryTimestamp;
+        return mConfig.mOptionalAttributes.SetpointHoldExpiryTimestamp;
     case PresetTypes::Id:
     case NumberOfPresets::Id:
     case ActivePresetHandle::Id:
