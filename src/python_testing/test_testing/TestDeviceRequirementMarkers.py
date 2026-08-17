@@ -313,6 +313,9 @@ class TestDeviceRequirementMarkers(unittest.TestCase):
                          f"MatterBaseTest: {offenders}")
 
 
+_MATTER_TESTING_LOGGER = "matter.testing.matter_testing"
+
+
 def _make_stub(loop, case_reachable: bool = False):
     """Minimal stand-in for a MatterBaseTest instance, avoiding the heavy Mobly class setup.
 
@@ -434,9 +437,13 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
         loop = asyncio.new_event_loop()
         try:
             stub = _make_stub(loop, case_reachable=True)
-            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)):
+            # assertLogs keeps the expected diagnostic out of this suite's own output, and doubles
+            # as a check that the CASE override is reported rather than applied silently.
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="WARNING") as logs:
                 # Would raise before the CASE confirmation was added.
                 MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            self.assertIn("reachable over CASE", "\n".join(logs.output))
             stub.default_controller.GetConnectedDevice.assert_awaited_once()
             self.assertFalse(stub.default_controller.GetConnectedDevice.await_args.kwargs["allowPASE"],
                              "the confirmation must not fall back to PASE, which would mask an "
@@ -463,8 +470,39 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
         try:
             stub = _make_stub(loop, case_reachable=True)
             with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="WARNING"), \
                     self.assertRaises(signals.TestFailure):
                 MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=False)
+        finally:
+            loop.close()
+
+    def test_dnssd_probe_failure_falls_through_to_case(self):
+        """Regression: is_commissioned imports mdns_discovery, which ships in src/python_testing
+        rather than in the matter package, so tests under test_testing/ hit ModuleNotFoundError.
+        An unavailable DNS-SD probe is inconclusive and must defer to CASE, not fail setup."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=True)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(side_effect=ModuleNotFoundError("No module named 'mdns_discovery'"))), \
+                    self.assertLogs(_MATTER_TESTING_LOGGER, level="INFO") as logs:
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
+            self.assertIn("mdns_discovery", "\n".join(logs.output),
+                          "the unusable probe should be named in the log so the cause is diagnosable")
+            stub.default_controller.GetConnectedDevice.assert_awaited_once()
+        finally:
+            loop.close()
+
+    def test_dnssd_probe_failure_with_unreachable_dut_still_fails(self):
+        """A broken DNS-SD probe must not turn into a free pass: with no CASE session either, the
+        precondition still has to fail."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=False)
+            with mock.patch.object(matter_testing_module, "is_commissioned",
+                                   new=mock.AsyncMock(side_effect=ModuleNotFoundError("No module named 'mdns_discovery'"))), \
+                    self.assertRaises(signals.TestFailure):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
         finally:
             loop.close()
 
