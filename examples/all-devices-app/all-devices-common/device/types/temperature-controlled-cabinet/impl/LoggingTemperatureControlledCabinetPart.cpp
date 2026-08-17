@@ -25,7 +25,7 @@ LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart
 LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
                                                                                  const char * name) :
     TemperatureControlledCabinetPart(timerDelegate, config, mOpStateDelegate, *this),
-    mName(name)
+    mName(name), mOpStateDelegate(timerDelegate)
 {}
 
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)

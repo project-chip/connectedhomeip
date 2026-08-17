@@ -21,13 +21,14 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/PlatformManager.h>
 
 namespace chip::app {
 
 class OnOffLightSwitch : public SingleEndpoint
 {
 public:
-    explicit OnOffLightSwitch(TimerDelegate & timerDelegate);
+    OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager);
     ~OnOffLightSwitch() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -43,6 +44,7 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
+    DeviceLayer::PlatformManager & mPlatformManager;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
 };

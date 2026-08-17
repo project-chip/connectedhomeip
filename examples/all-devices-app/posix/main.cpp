@@ -314,6 +314,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .timerDelegate          = gTimerDelegate,                         //
         .storageDelegate        = *initParams.persistentStorageDelegate,  //
         .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = DeviceLayer::PlatformMgr(),
     });
 
     RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);

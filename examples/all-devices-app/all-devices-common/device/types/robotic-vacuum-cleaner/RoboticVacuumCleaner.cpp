@@ -20,8 +20,8 @@
 
 namespace chip::app {
 
-RoboticVacuumCleaner::RoboticVacuumCleaner() :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1))
+RoboticVacuumCleaner::RoboticVacuumCleaner(TimerDelegate & timerDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)), mDelegate(timerDelegate)
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,

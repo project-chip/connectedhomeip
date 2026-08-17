@@ -27,6 +27,8 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/TimerDelegate.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
@@ -44,7 +46,8 @@ private:
 class NetworkInfrastructureManager : public SingleEndpoint, public Clusters::ThreadBorderRouterManagementDelegate
 {
 public:
-    NetworkInfrastructureManager(PersistentStorageDelegate & storage);
+    NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
+                                 DeviceLayer::PlatformManager & platformManager);
     ~NetworkInfrastructureManager() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -88,8 +91,34 @@ protected:
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
 
 private:
-    static void ActivateActiveDataset(System::Layer *, void * context);
-    static void ActivatePendingDataset(System::Layer *, void * context);
+    class ActiveDatasetTimerContext : public TimerContext
+    {
+    public:
+        ActiveDatasetTimerContext(NetworkInfrastructureManager & manager) : mManager(manager) {}
+        void TimerFired() override { mManager.OnActiveDatasetTimerFired(); }
+
+    private:
+        NetworkInfrastructureManager & mManager;
+    };
+
+    class PendingDatasetTimerContext : public TimerContext
+    {
+    public:
+        PendingDatasetTimerContext(NetworkInfrastructureManager & manager) : mManager(manager) {}
+        void TimerFired() override { mManager.OnPendingDatasetTimerFired(); }
+
+    private:
+        NetworkInfrastructureManager & mManager;
+    };
+
+    void OnActiveDatasetTimerFired();
+    void OnPendingDatasetTimerFired();
+
+    TimerDelegate & mTimerDelegate;
+    DeviceLayer::PlatformManager & mPlatformManager;
+
+    ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };
+    PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };
 
     AttributeChangeCallback * mAttributeChangeCallback = nullptr;
     Thread::OperationalDataset mActiveDataset;

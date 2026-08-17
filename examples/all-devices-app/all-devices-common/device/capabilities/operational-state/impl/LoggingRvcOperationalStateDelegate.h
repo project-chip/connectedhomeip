@@ -24,7 +24,7 @@ namespace chip::app::Clusters::OperationalState {
 class LoggingRvcOperationalStateDelegate : public EmulatedOperationalStateDelegate
 {
 public:
-    LoggingRvcOperationalStateDelegate() = default;
+    explicit LoggingRvcOperationalStateDelegate(TimerDelegate & timerDelegate) : EmulatedOperationalStateDelegate(timerDelegate) {}
 
     void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
 };

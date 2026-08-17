@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app_config/enabled_devices.h>
+#include <platform/PlatformManager.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -92,6 +93,7 @@ public:
         TimerDelegate & timerDelegate;
         PersistentStorageDelegate & storageDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        DeviceLayer::PlatformManager & platformManager;
     };
 
     static DeviceFactory & GetInstance()
@@ -315,8 +317,10 @@ private:
         {
             RegisterCreator("dishwasher", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<EmulatedDishwasher>(
-                    EmulatedDishwasher::Context{ .diagnosticDataProvider = mContext->diagnosticDataProvider });
+                return std::make_unique<EmulatedDishwasher>(EmulatedDishwasher::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
@@ -347,7 +351,8 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NetworkInfrastructureManager>(mContext->storageDelegate);
+                return std::make_unique<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
+                                                                      mContext->platformManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -365,7 +370,7 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate);
+                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
@@ -514,14 +519,19 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", []() { return std::make_unique<EmulatedLaundryDryer>(); });
+            RegisterCreator("laundry-dryer", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<EmulatedLaundryDryer>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
             RegisterCreator("laundry-washer", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<EmulatedLaundryWasher>(
-                    EmulatedLaundryWasher::Context{ .diagnosticDataProvider = mContext->diagnosticDataProvider });
+                return std::make_unique<EmulatedLaundryWasher>(EmulatedLaundryWasher::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
@@ -535,8 +545,10 @@ private:
         {
             RegisterCreator("microwave-oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<EmulatedMicrowaveOven>(
-                    EmulatedMicrowaveOven::Context{ .diagnosticDataProvider = mContext->diagnosticDataProvider });
+                return std::make_unique<EmulatedMicrowaveOven>(EmulatedMicrowaveOven::Context{
+                    .timerDelegate          = mContext->timerDelegate,
+                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
@@ -555,7 +567,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleaner>(); });
+            RegisterCreator("robotic-vacuum-cleaner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<RoboticVacuumCleaner>(mContext->timerDelegate);
+            });
         }
 
         // at least one device type MUST be enabled

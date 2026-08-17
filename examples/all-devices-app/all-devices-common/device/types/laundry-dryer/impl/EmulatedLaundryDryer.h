@@ -18,13 +18,15 @@
 
 #include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/laundry-dryer/LaundryDryer.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
 class EmulatedLaundryDryer : public LaundryDryer
 {
 public:
-    EmulatedLaundryDryer() : LaundryDryer(mOpStateDelegate) {}
+    explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate) : LaundryDryer(mOpStateDelegate), mOpStateDelegate(timerDelegate)
+    {}
     ~EmulatedLaundryDryer() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override

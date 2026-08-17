@@ -18,6 +18,7 @@
 
 #include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/dishwasher/Dishwasher.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
@@ -26,6 +27,7 @@ class EmulatedDishwasher : public Dishwasher
 public:
     struct Context
     {
+        TimerDelegate & timerDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -34,7 +36,8 @@ public:
             .operationalStateDelegate = mOpStateDelegate,
             .modeDelegate             = mModeDelegate,
             .diagnosticDataProvider   = context.diagnosticDataProvider,
-        })
+        }),
+        mOpStateDelegate(context.timerDelegate)
     {}
 
     ~EmulatedDishwasher() override = default;

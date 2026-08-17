@@ -20,6 +20,7 @@
 
 #include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/microwave-oven/MicrowaveOven.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
@@ -107,6 +108,7 @@ class EmulatedMicrowaveOven : public MicrowaveOven
 public:
     struct Context
     {
+        TimerDelegate & timerDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -118,7 +120,7 @@ public:
             .modeDelegate               = mModeDelegate,
             .diagnosticDataProvider     = context.diagnosticDataProvider,
         }),
-        mControlIntegrationDelegate(OperationalState())
+        mOpStateDelegate(context.timerDelegate), mControlIntegrationDelegate(OperationalState())
     {}
 
     ~EmulatedMicrowaveOven() override = default;

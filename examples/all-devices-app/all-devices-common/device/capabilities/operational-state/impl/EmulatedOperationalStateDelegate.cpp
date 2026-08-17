@@ -18,7 +18,6 @@
 #include "EmulatedOperationalStateDelegate.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app::Clusters::OperationalState {
 
@@ -29,25 +28,23 @@ EmulatedOperationalStateDelegate::~EmulatedOperationalStateDelegate()
 
 void EmulatedOperationalStateDelegate::CancelTimer()
 {
-    DeviceLayer::SystemLayer().CancelTimer(OnOperationTimerComplete, this);
+    mTimerDelegate.CancelTimer(this);
 }
 
 void EmulatedOperationalStateDelegate::StartEmulatedOperationTimer()
 {
     CancelTimer();
     mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
-    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kEmulatedOperationDurationSec),
-                                                       OnOperationTimerComplete, this));
+    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kEmulatedOperationDurationSec)));
 }
 
-void EmulatedOperationalStateDelegate::OnOperationTimerComplete(System::Layer * systemLayer, void * appState)
+void EmulatedOperationalStateDelegate::TimerFired()
 {
-    auto * self = static_cast<EmulatedOperationalStateDelegate *>(appState);
     ChipLogProgress(Zcl, "EmulatedOperationalStateDelegate: Emulated operation timer finished. Reverting state to Stopped.");
-    self->mCountdownTime.SetNull();
-    if (self->mCluster)
+    mCountdownTime.SetNull();
+    if (mCluster)
     {
-        LogErrorOnFailure(self->mCluster->SetOperationalState(OperationalStateEnum::kStopped));
+        LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kStopped));
     }
 }
 

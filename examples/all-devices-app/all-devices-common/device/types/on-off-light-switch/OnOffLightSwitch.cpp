@@ -32,8 +32,10 @@ namespace {
 const ClusterId kClientClusters[] = { OnOff::Id, Identify::Id };
 } // namespace
 
-OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)), mTimerDelegate(timerDelegate)
+OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate, DeviceLayer::PlatformManager & platformManager) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)),
+    mTimerDelegate(timerDelegate),
+    mPlatformManager(platformManager)
 {}
 
 CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -51,7 +53,7 @@ CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataM
         BindingCluster::Context{
             .bindingTable    = Binding::Table::GetInstance(),
             .bindingManager  = Binding::Manager::GetInstance(),
-            .platformManager = DeviceLayer::PlatformMgr(),
+            .platformManager = mPlatformManager,
         },
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));

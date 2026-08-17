@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
-#include <system/SystemLayer.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters::OperationalState {
 
@@ -32,11 +32,14 @@ namespace chip::app::Clusters::OperationalState {
  * Upon timer expiration, it automatically reverts the operational state back to Stopped and clears
  * the countdown duration.
  */
-class EmulatedOperationalStateDelegate : public OperationalStateCluster::Delegate
+class EmulatedOperationalStateDelegate : public OperationalStateCluster::Delegate, public TimerContext
 {
 public:
-    EmulatedOperationalStateDelegate() = default;
+    explicit EmulatedOperationalStateDelegate(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
     ~EmulatedOperationalStateDelegate() override;
+
+    // -- TimerContext Interface Implementation --
+    void TimerFired() override;
 
     // -- Delegate Interface Implementation --
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
@@ -62,9 +65,9 @@ public:
 protected:
     static constexpr uint32_t kEmulatedOperationDurationSec = 30;
 
-    static void OnOperationTimerComplete(System::Layer * systemLayer, void * appState);
     void CancelTimer();
 
+    TimerDelegate & mTimerDelegate;
     OperationalStateCluster * mCluster = nullptr;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };

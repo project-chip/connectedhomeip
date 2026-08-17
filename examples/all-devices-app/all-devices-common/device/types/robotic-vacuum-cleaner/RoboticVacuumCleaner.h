@@ -20,13 +20,14 @@
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/capabilities/operational-state/impl/LoggingRvcOperationalStateDelegate.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
 class RoboticVacuumCleaner : public SingleEndpoint
 {
 public:
-    RoboticVacuumCleaner();
+    explicit RoboticVacuumCleaner(TimerDelegate & timerDelegate);
     ~RoboticVacuumCleaner() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

@@ -18,6 +18,7 @@
 
 #include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/laundry-washer/LaundryWasher.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
@@ -26,6 +27,7 @@ class EmulatedLaundryWasher : public LaundryWasher
 public:
     struct Context
     {
+        TimerDelegate & timerDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
@@ -35,7 +37,8 @@ public:
             .controlsDelegate         = mControlsDelegate,
             .modeDelegate             = mModeDelegate,
             .diagnosticDataProvider   = context.diagnosticDataProvider,
-        })
+        }),
+        mOpStateDelegate(context.timerDelegate)
     {}
 
     ~EmulatedLaundryWasher() override = default;
