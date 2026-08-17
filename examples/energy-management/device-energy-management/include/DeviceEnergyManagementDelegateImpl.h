@@ -181,8 +181,7 @@ public:
      */
     chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
                                                                       const DataModel::Nullable<int64_t> maxPower,
-                                                                      uint32_t duration,
-                                                                      AdjustmentCauseEnum cause) override;
+                                                                      uint32_t duration, AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for CancelPowerRangeAdjustRequest

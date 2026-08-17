@@ -117,7 +117,7 @@ private:
     DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                       CommandHandler * handler);
     DataModel::ActionReturnStatus HandlePowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler);
+                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
     DataModel::ActionReturnStatus HandleCancelPowerRangeAdjustRequest(const DataModel::InvokeRequest & request,
                                                                       TLV::TLVReader & input_arguments, CommandHandler * handler);
 

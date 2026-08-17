@@ -198,7 +198,7 @@ void SetTestEventTrigger_StartTimeAdjustment()
     // Latest end time, in UTC, for the entire Forecast which is > sForecastStruct.endTime
     sForecastStruct.latestEndTime = Optional<uint32_t>(matterEpoch * 3 + 60);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_StartTimeAdjustmentClear()
@@ -212,12 +212,12 @@ void SetTestEventTrigger_StartTimeAdjustmentClear()
     sForecastStruct.earliestStartTime = NullOptional;
     sForecastStruct.latestEndTime     = NullOptional;
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum optOutState)
 {
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetOptOutState(optOutState);
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetOptOutState(optOutState);
 }
 
 void SetTestEventTrigger_Pausable()
@@ -231,7 +231,7 @@ void SetTestEventTrigger_PausableNextSlot()
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
     sForecastStruct.activeSlotNumber.SetNonNull(1);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_Forecast()
@@ -249,7 +249,7 @@ void SetTestEventTrigger_ForecastClear()
     sForecastStruct.activeSlotNumber.SetNull();
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>();
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ForecastAdjustment()
@@ -265,7 +265,7 @@ void SetTestEventTrigger_ForecastAdjustment()
 
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, 2);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ForecastAdjustmentNextSlot()
@@ -273,7 +273,7 @@ void SetTestEventTrigger_ForecastAdjustmentNextSlot()
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
     sForecastStruct.activeSlotNumber.SetNonNull(sForecastStruct.activeSlotNumber.Value() + 1);
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ConstraintBasedAdjustment()
