@@ -120,7 +120,8 @@ public class MatterCastingPlayerGetConnectionStateTest {
   }
 
   // ---------------------------------------------------------------------------
-  // Null — native returns null, getConnectionState() must not throw exception but return NOT_CONNECTED
+  // Null — native returns null, getConnectionState() must not throw exception but return
+  // NOT_CONNECTED
   // ---------------------------------------------------------------------------
 
   @Test
@@ -144,9 +145,9 @@ public class MatterCastingPlayerGetConnectionStateTest {
       "GARBAGE",
       "0",
       "-1",
-      "not_connected",       // wrong case
-      " NOT_CONNECTED ",     // extra whitespace
-      "NOT_CONNECTED\n",     // trailing newline
+      "not_connected", // wrong case
+      " NOT_CONNECTED ", // extra whitespace
+      "NOT_CONNECTED\n", // trailing newline
     };
 
     for (String input : inputs) {
