@@ -70,8 +70,8 @@ The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
 registered `CommissioningProxyTransport` driver whose `GetTransportType()`
 matches the request's transport bit. A **BLE** (BTP) driver ships today; the
-**Wi-Fi PAF** (PAFTP) driver follows in a later PR. See the transport integration
-sections below.
+**Wi-Fi PAF** (PAFTP) driver follows in a later PR. See the transport
+integration sections below.
 
 ## Features
 
@@ -419,9 +419,9 @@ matches the connection against the active session map, and calls
 
 ## Wi-Fi PAF Transport Integration (planned)
 
-No Wi-Fi PAF driver ships yet; this section describes the shape the one landing in
-a later PR takes, and is the reference for anyone writing a PAF driver against
-this cluster in the meantime.
+No Wi-Fi PAF driver ships yet; this section describes the shape the one landing
+in a later PR takes, and is the reference for anyone writing a PAF driver
+against this cluster in the meantime.
 
 When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
 driver (`CommissioningProxyPafTransport`) interacts with
