@@ -227,7 +227,7 @@ TEST_F(TestCommodityPriceCluster, GeneratedCommandsWithForecastRequestOnly)
 
 TEST_F(TestCommodityPriceCluster, ReadTariffUnitInitialValue)
 {
-    TariffUnit::TypeInfo::DecodableType tariffUnit;
+    TariffUnit::TypeInfo::DecodableType tariffUnit = Globals::TariffUnitEnum::kUnknownEnumValue;
     ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
     EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKWh);
 }
@@ -272,7 +272,7 @@ TEST_F(TestCommodityPriceCluster, SetTariffUnitUpdatesTheAttribute)
 {
     ASSERT_EQ(mCluster.SetTariffUnit(Globals::TariffUnitEnum::kKVAh), CHIP_NO_ERROR);
 
-    TariffUnit::TypeInfo::DecodableType tariffUnit;
+    TariffUnit::TypeInfo::DecodableType tariffUnit = Globals::TariffUnitEnum::kUnknownEnumValue;
     ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
     EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKVAh);
     EXPECT_TRUE(mTester.IsAttributeDirty(TariffUnit::Id));
@@ -282,7 +282,7 @@ TEST_F(TestCommodityPriceCluster, SetTariffUnitRejectsAnUnknownValue)
 {
     EXPECT_EQ(mCluster.SetTariffUnit(static_cast<Globals::TariffUnitEnum>(0x02)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    TariffUnit::TypeInfo::DecodableType tariffUnit;
+    TariffUnit::TypeInfo::DecodableType tariffUnit = Globals::TariffUnitEnum::kUnknownEnumValue;
     ASSERT_EQ(mTester.ReadAttribute(TariffUnit::Id, tariffUnit), CHIP_NO_ERROR);
     EXPECT_EQ(tariffUnit, Globals::TariffUnitEnum::kKWh);
 }
@@ -364,6 +364,7 @@ TEST_F(TestCommodityPriceCluster, SetCurrentPriceGeneratesAPriceChangeEvent)
     ASSERT_TRUE(generatedEvent.has_value());
 
     Events::PriceChange::DecodableType event;
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): checked above
     ASSERT_EQ(generatedEvent->GetEventData(event), CHIP_NO_ERROR);
     ASSERT_FALSE(event.currentPrice.IsNull());
     EXPECT_EQ(event.currentPrice.Value().periodStart, kPeriodStart);
@@ -519,6 +520,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestReturnsWhatWasAskedFor)
     auto result = mTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
@@ -544,6 +546,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutDetailsStripsThe
     auto result = mTester.Invoke(Commands::GetDetailedPriceRequest::Type{});
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     EXPECT_EQ(currentPrice.Value().periodStart, kPeriodStart);
@@ -561,6 +564,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithDescriptionOnly)
     auto result = mTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     const auto & currentPrice = result.response->currentPrice;
     ASSERT_FALSE(currentPrice.IsNull());
     ASSERT_TRUE(currentPrice.Value().description.HasValue());
@@ -575,6 +579,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedPriceRequestWithoutAPrice)
 
     auto result = mTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     EXPECT_TRUE(result.response->currentPrice.IsNull());
 }
 
@@ -608,6 +613,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestReturnsWhatWasAskedF
     auto result = mTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     ASSERT_TRUE(forecast.Next());
     EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
@@ -634,6 +640,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutDetailsStrips
     auto result = mTester.Invoke(Commands::GetDetailedForecastRequest::Type{});
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     ASSERT_TRUE(forecast.Next());
     EXPECT_EQ(forecast.GetValue().periodStart, kPeriodStart);
@@ -650,6 +657,7 @@ TEST_F(TestCommodityPriceCluster, GetDetailedForecastRequestWithoutAForecast)
     auto result = mTester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access): IsSuccess() implies a response
     auto forecast = result.response->priceForecast.begin();
     EXPECT_FALSE(forecast.Next());
     EXPECT_EQ(forecast.GetStatus(), CHIP_NO_ERROR);
