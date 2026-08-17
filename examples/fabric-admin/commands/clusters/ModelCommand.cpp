@@ -87,12 +87,11 @@ void ModelCommand::CheckPeerICDType()
 
     app::ICDClientInfo info;
     auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
-    auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
-    if (iter == nullptr)
+    AutoRelease iter(CHIPCommand::sICDClientStorage.IterateICDClientInfo());
+    if (iter.IsNull())
     {
         return;
     }
-    AutoRelease clientInfoIteratorWrapper(iter);
 
     while (iter->Next(info))
     {

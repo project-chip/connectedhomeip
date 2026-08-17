@@ -173,15 +173,14 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCountMultipleFabric)
     EXPECT_EQ(manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3)), CHIP_NO_ERROR);
     EXPECT_EQ(manager.StoreEntry(clientInfo3), CHIP_NO_ERROR);
     // Make sure iterator counts correctly
-    auto * iterator = manager.IterateICDClientInfo();
+    AutoRelease iterator(manager.IterateICDClientInfo());
     EXPECT_EQ(iterator->Count(), 3u);
-    iterator->Release();
+    iterator.Release();
 
     // Delete all and verify iterator counts 0
     EXPECT_EQ(manager.DeleteEntry(ScopedNodeId(nodeId1, fabricId1)), CHIP_NO_ERROR);
-    iterator = manager.IterateICDClientInfo();
-    ASSERT_NE(iterator, nullptr);
-    AutoRelease clientInfoIteratorWrapper(iterator);
+    iterator.Set(manager.IterateICDClientInfo());
+    ASSERT_FALSE(iterator.IsNull());
     EXPECT_EQ(iterator->Count(), 2u);
 
     EXPECT_EQ(manager.DeleteEntry(ScopedNodeId(nodeId2, fabricId1)), CHIP_NO_ERROR);
@@ -244,15 +243,14 @@ TEST_F(TestDefaultICDClientStorage, TestClientInfoCountMultipleFabricWithRemovin
     EXPECT_EQ(manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3)), CHIP_NO_ERROR);
     EXPECT_EQ(manager.StoreEntry(clientInfo3), CHIP_NO_ERROR);
     // Make sure iterator counts correctly
-    auto * iterator = manager.IterateICDClientInfo();
+    AutoRelease iterator(manager.IterateICDClientInfo());
     EXPECT_EQ(iterator->Count(), 3u);
-    iterator->Release();
+    iterator.Release();
 
     EXPECT_EQ(manager.DeleteAllEntries(fabricId1), CHIP_NO_ERROR);
 
-    iterator = manager.IterateICDClientInfo();
-    ASSERT_NE(iterator, nullptr);
-    AutoRelease clientInfoIteratorWrapper(iterator);
+    iterator.Set(manager.IterateICDClientInfo());
+    ASSERT_FALSE(iterator.IsNull());
     EXPECT_EQ(iterator->Count(), 1u);
 
     EXPECT_EQ(manager.DeleteAllEntries(fabricId2), CHIP_NO_ERROR);
