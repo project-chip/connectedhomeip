@@ -49,6 +49,13 @@ private:
 class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
 {
 public:
+    static constexpr uint16_t kWattRating     = 1000;
+    static constexpr uint32_t kMaxCookTimeSec = 3600;
+    static constexpr uint8_t kPowerSettingNum = 100;
+    static constexpr uint8_t kMinPowerNum     = 10;
+    static constexpr uint8_t kMaxPowerNum     = 100;
+    static constexpr uint8_t kPowerStepNum    = 10;
+
     void SetOperationalStateDelegate(Clusters::OperationalState::EmulatedOperationalStateDelegate * opStateDelegate)
     {
         mOpStateDelegate = opStateDelegate;
@@ -68,7 +75,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalcookTimeSec) override
+    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) override
     {
         return Protocols::InteractionModel::Status::Success;
     }
@@ -77,19 +84,19 @@ public:
     {
         if (index == 0)
         {
-            wattSetting = 1000;
+            wattSetting = kWattRating;
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    uint32_t GetMaxCookTimeSec() const override { return 3600; }
-    uint8_t GetPowerSettingNum() const override { return 100; }
-    uint8_t GetMinPowerNum() const override { return 10; }
-    uint8_t GetMaxPowerNum() const override { return 100; }
-    uint8_t GetPowerStepNum() const override { return 10; }
+    uint32_t GetMaxCookTimeSec() const override { return kMaxCookTimeSec; }
+    uint8_t GetPowerSettingNum() const override { return kPowerSettingNum; }
+    uint8_t GetMinPowerNum() const override { return kMinPowerNum; }
+    uint8_t GetMaxPowerNum() const override { return kMaxPowerNum; }
+    uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
     uint8_t GetCurrentWattIndex() const override { return 0; }
-    uint16_t GetWattRating() const override { return 1000; }
+    uint16_t GetWattRating() const override { return kWattRating; }
 
 private:
     Clusters::OperationalState::EmulatedOperationalStateDelegate * mOpStateDelegate = nullptr;
