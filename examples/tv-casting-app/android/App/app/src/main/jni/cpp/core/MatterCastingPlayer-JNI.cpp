@@ -292,7 +292,8 @@ JNI_METHOD(jstring, getConnectionStateNative)
     memory::Strong<CastingPlayer> castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     if (castingPlayer == nullptr)
     {
-        ChipLogError(AppServer, "MatterCastingPlayer-JNI::getConnectionStateNative() castingPlayer == nullptr, returning NOT_CONNECTED");
+        ChipLogError(AppServer,
+                     "MatterCastingPlayer-JNI::getConnectionStateNative() castingPlayer == nullptr, returning NOT_CONNECTED");
         LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("NOT_CONNECTED"_span, jstr_obj));
         return static_cast<jstring>(jstr_obj);
     }
