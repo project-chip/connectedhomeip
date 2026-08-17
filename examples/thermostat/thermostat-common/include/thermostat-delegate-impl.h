@@ -33,8 +33,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-
-
 class ThermostatDelegate : public Delegate
 {
 public:
@@ -83,7 +81,6 @@ private:
     TemperatureSetpointHoldEnum mTemperatureSetpointHold = TemperatureSetpointHoldEnum::kSetpointHoldOff;
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration;
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
-
 };
 
 } // namespace Thermostat

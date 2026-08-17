@@ -247,8 +247,8 @@ private:
 };
 
 template <typename... DelegateArgs>
-ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &,
-                              DelegateArgs &...) -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
+ThermostatClusterWithFeatures(EndpointId, BitFlags<Thermostat::Feature>, const ThermostatCluster::Config &, DelegateArgs &...)
+    -> ThermostatClusterWithFeatures<std::decay_t<DelegateArgs>...>;
 
 using DefaultThermostatCluster =
     ThermostatClusterWithFeatures<ThermostatPresets::Delegate, ThermostatSuggestions::Delegate, ThermostatOccupancy::Delegate>;

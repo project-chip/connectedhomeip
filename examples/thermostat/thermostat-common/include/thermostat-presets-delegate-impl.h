@@ -34,7 +34,7 @@ static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
 
 // TODO: #34556 Support multiple presets/schedules of each type.
 // We will support only one preset of each preset/schedule type.
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
 
 // For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
 // kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
