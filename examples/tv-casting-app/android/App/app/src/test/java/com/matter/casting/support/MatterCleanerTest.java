@@ -46,16 +46,20 @@ public class MatterCleanerTest {
 
   @Test
   public void register_addsToLiveRefs() {
-    MatterCleaner.getInstance().register(new Object(), () -> {});
+    Object obj = new Object();
+    MatterCleaner.getInstance().register(obj, () -> {});
     assertEquals(1, MatterCleaner.LegacyCleanerHolder.LIVE_REFS.size());
+    assertNotNull(obj);
   }
 
   @Test
   public void register_actionCalledWhenRefEnqueued() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    MatterCleaner.getInstance().register(new Object(), latch::countDown);
+    Object obj = new Object();
+    MatterCleaner.getInstance().register(obj, latch::countDown);
 
     enqueueFirst();
+    assertNotNull(obj);
 
     assertTrue("action was not called within timeout", latch.await(2, TimeUnit.SECONDS));
   }
@@ -63,10 +67,12 @@ public class MatterCleanerTest {
   @Test
   public void register_liveRefsEmptiedAfterCleanup() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    MatterCleaner.getInstance().register(new Object(), latch::countDown);
+    Object obj = new Object();
+    MatterCleaner.getInstance().register(obj, latch::countDown);
     assertEquals(1, MatterCleaner.LegacyCleanerHolder.LIVE_REFS.size());
 
     enqueueFirst();
+    assertNotNull(obj);
 
     assertTrue("action was not called within timeout", latch.await(2, TimeUnit.SECONDS));
     assertEquals(0, MatterCleaner.LegacyCleanerHolder.LIVE_REFS.size());
@@ -75,21 +81,25 @@ public class MatterCleanerTest {
   @Test
   public void register_cleanupThreadSurvivesThrowingAction() throws Exception {
     CountDownLatch firstProcessed = new CountDownLatch(1);
+    Object obj1 = new Object();
     MatterCleaner.getInstance()
         .register(
-            new Object(),
+            obj1,
             () -> {
               firstProcessed.countDown();
               throw new RuntimeException("test exception");
             });
     enqueueFirst();
+    assertNotNull(obj1);
     assertTrue(
         "first action was not processed within timeout", firstProcessed.await(2, TimeUnit.SECONDS));
 
     // Thread must still be alive — a second action should fire normally.
     CountDownLatch secondProcessed = new CountDownLatch(1);
-    MatterCleaner.getInstance().register(new Object(), secondProcessed::countDown);
+    Object obj2 = new Object();
+    MatterCleaner.getInstance().register(obj2, secondProcessed::countDown);
     enqueueFirst();
+    assertNotNull(obj2);
     assertTrue(
         "second action was not called within timeout", secondProcessed.await(2, TimeUnit.SECONDS));
   }
