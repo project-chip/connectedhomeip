@@ -213,7 +213,7 @@ void ApplicationInit()
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, &gThermostatDelegate);
+        gThermostatEndpoint, gThermostatDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
                                                                    Clusters::UnitLocalization::TempUnitEnum::kCelsius };

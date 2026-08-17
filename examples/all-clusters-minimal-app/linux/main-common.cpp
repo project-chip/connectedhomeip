@@ -88,7 +88,7 @@ void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, &gThermostatDelegate);
+        gThermostatEndpoint, gThermostatDelegate);
 }
 
 void ApplicationShutdown()

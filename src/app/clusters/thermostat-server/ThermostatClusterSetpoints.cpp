@@ -242,7 +242,7 @@ Protocols::InteractionModel::Status ThermostatCluster::SaveSetpoint(Setpoint & o
     VerifyOrReturnValue(oldSetpoint.AttributeId() == newSetpoint.AttributeId(), Status::InvalidCommand);
     VerifyOrReturnValue(oldSetpoint.Temperature() != newSetpoint.Temperature(), Status::Success);
 
-    auto status = mDelegate->SaveSetpoint(oldSetpoint, newSetpoint);
+    auto status = mDelegate.SaveSetpoint(oldSetpoint, newSetpoint);
     if (status != Status::Success)
     {
         return status;

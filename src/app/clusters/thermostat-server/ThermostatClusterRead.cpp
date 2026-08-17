@@ -36,13 +36,6 @@ namespace Thermostat {
 DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
-    bool localTemperatureNotExposedSupported = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "ThermostatDelegate is null");
-        return Status::Failure;
-    }
-
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
@@ -60,17 +53,17 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ThermostatRunningMode::Id:
         return encoder.Encode(GetRunningMode());
     case RemoteSensing::Id:
-        if (localTemperatureNotExposedSupported)
+        if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
         {
-            BitMask<RemoteSensingBitmap> valueRemoteSensing = mDelegate->GetRemoteSensing();
+            BitMask<RemoteSensingBitmap> valueRemoteSensing = mDelegate.GetRemoteSensing();
             valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
             return encoder.Encode(valueRemoteSensing);
         }
-        return encoder.Encode(mDelegate->GetRemoteSensing());
+        return encoder.Encode(mDelegate.GetRemoteSensing());
     case ControlSequenceOfOperation::Id:
-        return encoder.Encode(mDelegate->GetControlSequenceOfOperation());
+        return encoder.Encode(mDelegate.GetControlSequenceOfOperation());
     case LocalTemperatureCalibration::Id:
-        return encoder.Encode(mDelegate->GetLocalTemperatureCalibration());
+        return encoder.Encode(mDelegate.GetLocalTemperatureCalibration());
     case OccupiedHeatingSetpoint::Id:
     case OccupiedCoolingSetpoint::Id:
     case UnoccupiedHeatingSetpoint::Id:
@@ -86,15 +79,15 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case MinSetpointDeadBand::Id:
         return ReadSetpointAttribute(request, encoder);
     case TemperatureSetpointHold::Id:
-        return encoder.Encode(mDelegate->GetTemperatureSetpointHold());
+        return encoder.Encode(mDelegate.GetTemperatureSetpointHold());
     case TemperatureSetpointHoldDuration::Id:
-        return encoder.Encode(mDelegate->GetTemperatureSetpointHoldDuration());
+        return encoder.Encode(mDelegate.GetTemperatureSetpointHoldDuration());
     case Schedules::Id: {
         // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     case SetpointHoldExpiryTimestamp::Id: {
-        return encoder.Encode(mDelegate->GetSetpointHoldExpiryTimestamp());
+        return encoder.Encode(mDelegate.GetSetpointHoldExpiryTimestamp());
     }
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));

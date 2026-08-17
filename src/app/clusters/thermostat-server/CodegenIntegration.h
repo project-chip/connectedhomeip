@@ -47,10 +47,16 @@ protected:
 };
 
 template <std::size_t Size, typename Cluster>
-class IntegrationDelegate : public BaseIntegrationDelegate {
-public:
-    // Declared and defined in one single place
+struct ClusterStorage
+{
     inline static std::array<LazyRegisteredServerCluster<Cluster>, Size> mClusters = {};
+};
+
+template <std::size_t Size, typename Cluster, typename... Delegates>
+class IntegrationDelegate : public BaseIntegrationDelegate
+{
+public:
+    explicit IntegrationDelegate(Delegates &... delegates) : mDelegates(delegates...) {}
 
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
@@ -59,23 +65,37 @@ public:
         const ThermostatCluster::OptionalAttributes optionalAttributes = GetOptionalAttributes(endpointId, features);
         const ThermostatCluster::DefaultValues defaultValues           = LoadDefaultValues(endpointId, features);
 
+        ThermostatCluster::Config config(optionalAttributes, defaultValues, Server::GetInstance().GetFabricTable());
+
         ChipLogProgress(Zcl, "Creating thermostat cluster for endpoint %d", endpointId);
-        mClusters[clusterInstanceIndex].Create(endpointId, features, optionalAttributes, defaultValues,
-                                               Server::GetInstance().GetFabricTable());
-        return mClusters[clusterInstanceIndex].Registration();
+        if constexpr (sizeof...(Delegates) > 0)
+        {
+            std::apply(
+                [&](auto &... dels) {
+                    ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Create(endpointId, features, config, dels...);
+                },
+                mDelegates);
+        }
+        return ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(mClusters[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &mClusters[clusterInstanceIndex].Cluster();
+        if (!ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].IsConstructed())
+        {
+            return nullptr;
+        }
+        return &ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { mClusters[clusterInstanceIndex].Destroy(); }
-
-    Cluster * FindClusterOnEndpoint(EndpointId endpointId)
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
-        for (auto & cluster : mClusters)
+        ClusterStorage<Size, Cluster>::mClusters[clusterInstanceIndex].Destroy();
+    }
+
+    static Cluster * FindClusterOnEndpoint(EndpointId endpointId)
+    {
+        for (auto & cluster : ClusterStorage<Size, Cluster>::mClusters)
         {
             if (cluster.IsConstructed() && cluster.Cluster().GetPaths()[0].mEndpointId == endpointId)
             {
@@ -85,23 +105,14 @@ public:
         return nullptr;
     }
 
-    template <typename DelegateT>
-    Protocols::InteractionModel::Status SetDelegate(EndpointId endpoint, DelegateT * delegate)
-    {
-        Cluster * cluster = FindClusterOnEndpoint(endpoint);
-        if (cluster == nullptr)
-        {
-            ChipLogError(Zcl, "No thermostat cluster found for endpoint %d", endpoint);
-            return Protocols::InteractionModel::Status::Failure;
-        }
-        cluster->SetDelegate(delegate);
-    }
+private:
+    std::tuple<Delegates &...> mDelegates;
 };
 
-template <typename Cluster, typename DelegateT>
-void ServerInit(EndpointId endpointId, DelegateT * delegate)
+template <typename ClusterT, typename... DelegateArgs>
+void ServerInit(EndpointId endpointId, DelegateArgs &... delegates)
 {
-    IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
+    IntegrationDelegate<kThermostatEndpointCount, ClusterT, DelegateArgs...> integrationDelegate(delegates...);
 
     CodegenClusterIntegration::RegisterServer(
         {
@@ -113,17 +124,12 @@ void ServerInit(EndpointId endpointId, DelegateT * delegate)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
-    auto cluster = integrationDelegate.FindClusterOnEndpoint(endpointId);
-    if (cluster != nullptr)
-    {
-        cluster->SetDelegate(delegate);
-    }
 }
 
-template <typename Cluster>
+template <typename ClusterT>
 void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShutdownType)
 {
-    IntegrationDelegate<kThermostatEndpointCount, Cluster> integrationDelegate;
+    IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
         {
@@ -138,8 +144,7 @@ void ServerShutdown(EndpointId endpointId, MatterClusterShutdownType clusterShut
 template <typename ClusterT>
 ClusterT * FindClusterOnEndpoint(EndpointId endpointId)
 {
-    IntegrationDelegate<kThermostatEndpointCount, ClusterT> integrationDelegate;
-    return integrationDelegate.FindClusterOnEndpoint(endpointId);
+    return IntegrationDelegate<kThermostatEndpointCount, ClusterT>::FindClusterOnEndpoint(endpointId);
 }
 
 } // namespace chip::app::Clusters::Thermostat

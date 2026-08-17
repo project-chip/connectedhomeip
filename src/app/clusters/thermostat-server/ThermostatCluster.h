@@ -97,8 +97,19 @@ public:
         DefaultValues() = default;
     };
 
-    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const OptionalAttributes & optionalAttributes,
-                      const DefaultValues & defaultValues, FabricTable & fabricTable);
+    struct Config
+    {
+        OptionalAttributes optionalAttributes;
+        DefaultValues defaultValues;
+        FabricTable & fabricTable;
+
+        Config(OptionalAttributes optionalAttributes, DefaultValues defaultValues, FabricTable & fabricTable)
+            : optionalAttributes(optionalAttributes), defaultValues(defaultValues), fabricTable(fabricTable)
+        {
+        }
+    };
+
+    ThermostatCluster(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config, Thermostat::Delegate & delegate);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -125,8 +136,6 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     EndpointId Endpoint() const { return mPath.mEndpointId; }
-    void SetDelegate(Thermostat::Delegate * delegate);
-    Thermostat::Delegate * GetDelegate() const { return mDelegate; }
 
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
     Protocols::InteractionModel::Status OnAtomicWritePrecommit(AttributeId attributeId) override;
@@ -169,10 +178,9 @@ public:
 
 protected:
     BitFlags<Thermostat::Feature> mFeatures;
-    OptionalAttributes mOptionalAttributes;
-    const DefaultValues mDefaultValues;
-    FabricTable & mFabricTable;
-    Thermostat::Delegate * mDelegate = nullptr;
+    Config mConfig;
+
+    Thermostat::Delegate & mDelegate;
     AtomicWriteSession mAtomicWriteSession;
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,

@@ -294,7 +294,7 @@ void AppTask::InitServer(intptr_t arg)
     }
 
     Clusters::Thermostat::ServerInit<Clusters::Thermostat::DefaultThermostatCluster, Clusters::Thermostat::ThermostatDelegate>(
-        gThermostatEndpoint, &gThermostatDelegate);
+        gThermostatEndpoint, gThermostatDelegate);
 
     static RealtekObserver sRealtekObserver;
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sRealtekObserver);
