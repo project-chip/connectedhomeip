@@ -50,8 +50,8 @@ public final class MatterCleaner {
   /**
    * Registers a cleanup action to run when {@code obj} becomes phantom-reachable.
    *
-   * <p>The {@code action} must not hold a reference to {@code obj}, directly or indirectly, as
-   * this would prevent the object from ever becoming phantom-reachable.
+   * <p>The {@code action} must not hold a reference to {@code obj}, directly or indirectly, as this
+   * would prevent the object from ever becoming phantom-reachable.
    *
    * @param obj the object whose reachability triggers the action
    * @param action the cleanup action; must not capture {@code obj}
@@ -82,8 +82,7 @@ public final class MatterCleaner {
    */
   static final class LegacyCleanerHolder {
     static final ReferenceQueue<Object> QUEUE = new ReferenceQueue<>();
-    static final Set<CleanupRef> LIVE_REFS =
-        Collections.newSetFromMap(new ConcurrentHashMap<>());
+    static final Set<CleanupRef> LIVE_REFS = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     static final class CleanupRef extends PhantomReference<Object> {
       final Runnable action;
