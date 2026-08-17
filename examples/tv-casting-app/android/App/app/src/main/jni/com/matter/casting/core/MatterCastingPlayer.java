@@ -327,7 +327,6 @@ public class MatterCastingPlayer implements CastingPlayer {
 
   /**
    * @brief Get CastingPlayer's current ConnectionState.
-   *
    * @return Current ConnectionState, or NOT_CONNECTED if the native player is no longer valid.
    */
   @Override
@@ -335,7 +334,10 @@ public class MatterCastingPlayer implements CastingPlayer {
     try {
       return ConnectionState.valueOf(getConnectionStateNative());
     } catch (IllegalArgumentException | NullPointerException e) {
-      Log.w(TAG, "getConnectionState(): native returned invalid state, defaulting to NOT_CONNECTED: " + e.getMessage());
+      Log.w(
+          TAG,
+          "getConnectionState(): native returned invalid state, defaulting to NOT_CONNECTED: "
+              + e.getMessage());
       return ConnectionState.NOT_CONNECTED;
     }
   }
