@@ -157,8 +157,14 @@ public class MatterCastingPlayer implements CastingPlayer {
    * @param nativePtr pointer to the native heap allocation backing this casting player
    */
   void setNativeCastingPlayer(long nativePtr) {
-    this._cppCastingPlayer = nativePtr;
-    MatterCleaner.getInstance().register(this, () -> nativeReleaseCastingPlayer(nativePtr));
+    try {
+      // Register cleanup before assigning so _cppCastingPlayer stays 0 if registration fails.
+      MatterCleaner.getInstance().register(this, () -> nativeReleaseCastingPlayer(nativePtr));
+      this._cppCastingPlayer = nativePtr;
+    } catch (RuntimeException e) {
+      this._cppCastingPlayer = 0;
+      throw e;
+    }
   }
 
   private static native void nativeReleaseCastingPlayer(long nativePtr);
