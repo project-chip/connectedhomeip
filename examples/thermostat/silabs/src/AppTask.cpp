@@ -44,6 +44,8 @@
 #include <platform/PlatformError.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-presets-delegate-impl.h>
+#include <thermostat-suggestions-delegate-impl.h>
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 #include "Si70xxSensor.h"

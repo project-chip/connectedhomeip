@@ -22,6 +22,8 @@
 #include <app/clusters/thermostat-server/AttributeAccessorShim.h>
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-presets-delegate-impl.h>
+#include <thermostat-suggestions-delegate-impl.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 

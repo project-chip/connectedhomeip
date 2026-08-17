@@ -41,6 +41,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <thermostat-delegate-impl.h>
+#include <thermostat-presets-delegate-impl.h>
+#include <thermostat-suggestions-delegate-impl.h>
 
 #include "matter_ble.h"
 #include <os_mem.h>

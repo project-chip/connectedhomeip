@@ -37,7 +37,6 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
-#include "thermostat-occupancy-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 

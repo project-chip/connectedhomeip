@@ -32,6 +32,8 @@
 #include <transport/raw/PeerAddress.h>
 
 #include "thermostat-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 #include <Options.h>
 

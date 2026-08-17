@@ -25,7 +25,6 @@
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
 #include "thermostat-delegate-impl.h"
-#include "thermostat-occupancy-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
