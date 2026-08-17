@@ -862,6 +862,13 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerRangeAdj
         return Status::ConstraintError;
     }
 
+    if (!commandData.minPower.IsNull() && !commandData.maxPower.IsNull() &&
+        commandData.minPower.Value() > commandData.maxPower.Value())
+    {
+        ChipLogError(Zcl, "DEM: MinPower is greater than MaxPower");
+        return Status::ConstraintError;
+    }
+
     // Call delegate to start the power range adjustment
     // The delegate is responsible for validating the power range and updating the PowerRangeAdjustment attribute
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.PowerRangeAdjustRequest(commandData.minPower, commandData.maxPower,
@@ -887,6 +894,8 @@ DeviceEnergyManagementCluster::HandleCancelPowerRangeAdjustRequest(const DataMod
 
     CancelPowerRangeAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
 
     // Call delegate to cancel the power range adjustment
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerRangeAdjustRequest()).GetUnderlyingError());

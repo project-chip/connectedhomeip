@@ -805,28 +805,29 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
                                                                const DataModel::Nullable<int64_t> maxPower, uint32_t duration,
                                                                AdjustmentCauseEnum cause)
 {
-    ChipLogDetail(AppServer, "PowerRangeAdjustRequest: minPower=%ld, maxPower=%ld, duration=%u, cause=%d",
-                  minPower.IsNull() ? 0 : minPower.Value(), maxPower.IsNull() ? 0 : maxPower.Value(), duration,
-                  to_underlying(cause));
+    ChipLogDetail(AppServer, "PowerRangeAdjustRequest: minPower=%lld, maxPower=%lld, duration=%u, cause=%d",
+                  static_cast<long long>(minPower.IsNull() ? 0 : minPower.Value()),
+                  static_cast<long long>(maxPower.IsNull() ? 0 : maxPower.Value()), duration, to_underlying(cause));
 
     // If a timer is running, cancel it so we can start it with the new duration
     if (mPowerRangeAdjustmentInProgress)
     {
         DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
     }
-    else
+
+    // Record when this PowerRangeAdjustment starts (each request restarts the session window)
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(mPowerRangeAdjustmentStartTimeUtc);
+    if (err != CHIP_NO_ERROR)
     {
-        // Record when this PowerRangeAdjustment starts
-        CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(mPowerRangeAdjustmentStartTimeUtc);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
-            return Status::Failure;
-        }
+        ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
+        HandlePowerRangeAdjustRequestFailure();
+        return Status::Failure;
     }
 
     // Calculate the end time for the power range adjustment
     uint32_t endTimeUtc = mPowerRangeAdjustmentStartTimeUtc + duration;
+
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kPowerAdjustActive);
 
     // Update the PowerRangeAdjustment attribute
     Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
