@@ -939,6 +939,9 @@ void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustTimerExpiry()
     // The PowerRangeAdjustment is no longer in progress
     mPowerRangeAdjustmentInProgress = false;
 
+    // Update the ESA state back to online
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+
     // Generate a PowerRangeAdjustEnd event
     TEMPORARY_RETURN_IGNORED GeneratePowerRangeAdjustEndEvent(CauseEnum::kNormalCompletion);
 
@@ -947,11 +950,10 @@ void DeviceEnergyManagementDelegate::HandlePowerRangeAdjustTimerExpiry()
 
     MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
 
-    // Update the appliance that the power range adjustment is complete
+    // Notify the appliance that the power range adjustment is complete
     if (mpDEMManufacturerDelegate != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(
-            CauseEnum::kNormalCompletion);
+        TEMPORARY_RETURN_IGNORED mpDEMManufacturerDelegate->HandleDeviceEnergyManagementPowerRangeAdjustCompletion();
     }
 }
 
