@@ -503,12 +503,11 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             if event.Header.EventId == self.ota_req.Events.VersionApplied.event_id:
                 logger.info("Version AppliedEvent Found")
                 version_applied_event_data = event.Data
-        asserts.assert_is_not_none(version_applied_event, "Failed to read the VersionAppliedEvent")
+        asserts.assert_is_not_none(version_applied_event_data, "Failed to read the VersionAppliedEvent")
         # Need to read the events and filter by VersionAppliedEvent
         asserts.assert_equal(self.expected_software_version, version_applied_event_data.softwareVersion,
                              f"Software version from VersionAppliedEvent is not {self.expected_software_version}")
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from VersionApplied Event is None")
-
         self.terminate_provider()
 
 
