@@ -44,7 +44,8 @@ public:
 
     // -- OperationalState::Delegate Interface --
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index,
+                                          Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
     void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
@@ -53,7 +54,8 @@ public:
 
     // -- LaundryWasherControls::Delegate Interface --
     CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) override;
-    CHIP_ERROR GetSupportedRinseAtIndex(size_t index, Clusters::LaundryWasherControls::NumberOfRinsesEnum & supportedRinse) override;
+    CHIP_ERROR GetSupportedRinseAtIndex(size_t index,
+                                        Clusters::LaundryWasherControls::NumberOfRinsesEnum & supportedRinse) override;
 
     // -- ModeBase::AppDelegate Interface --
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
@@ -68,8 +70,7 @@ private:
 
     static constexpr CharSpan kSpinSpeeds[] = { "Off"_span, "Low"_span, "Medium"_span, "High"_span };
     static constexpr Clusters::LaundryWasherControls::NumberOfRinsesEnum kRinses[] = {
-        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNone,
-        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNormal,
+        Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNone, Clusters::LaundryWasherControls::NumberOfRinsesEnum::kNormal,
         Clusters::LaundryWasherControls::NumberOfRinsesEnum::kExtra
     };
 

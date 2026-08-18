@@ -63,7 +63,8 @@ void LoggingTemperatureControlledCabinetPart::TimerFired()
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(
+    size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -72,8 +73,8 @@ CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(s
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
         Clusters::OperationalState::GenericOperationalState(
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
-        Clusters::OperationalState::GenericOperationalState(
-            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        Clusters::OperationalState::GenericOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kError),
+                                                            MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))

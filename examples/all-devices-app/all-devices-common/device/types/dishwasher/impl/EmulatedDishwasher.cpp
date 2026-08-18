@@ -63,7 +63,8 @@ void EmulatedDishwasher::TimerFired()
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR EmulatedDishwasher::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR EmulatedDishwasher::GetOperationalStateAtIndex(size_t index,
+                                                          Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -72,8 +73,8 @@ CHIP_ERROR EmulatedDishwasher::GetOperationalStateAtIndex(size_t index, Clusters
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
         Clusters::OperationalState::GenericOperationalState(
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
-        Clusters::OperationalState::GenericOperationalState(
-            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        Clusters::OperationalState::GenericOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kError),
+                                                            MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
@@ -148,7 +149,7 @@ CHIP_ERROR EmulatedDishwasher::GetModeValueByIndex(uint8_t modeIndex, uint8_t & 
 }
 
 CHIP_ERROR EmulatedDishwasher::GetModeTagsByIndex(uint8_t modeIndex,
-                                                   DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
+                                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kLabels), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
 

@@ -24,8 +24,7 @@
 namespace chip::app {
 
 RoboticVacuumCleaner::RoboticVacuumCleaner(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)),
-    mTimerDelegate(timerDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoboticVacuumCleaner, 1)), mTimerDelegate(timerDelegate)
 {}
 
 RoboticVacuumCleaner::~RoboticVacuumCleaner()
@@ -81,7 +80,8 @@ void RoboticVacuumCleaner::TimerFired()
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR RoboticVacuumCleaner::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR RoboticVacuumCleaner::GetOperationalStateAtIndex(size_t index,
+                                                            Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -90,8 +90,8 @@ CHIP_ERROR RoboticVacuumCleaner::GetOperationalStateAtIndex(size_t index, Cluste
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
         Clusters::OperationalState::GenericOperationalState(
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
-        Clusters::OperationalState::GenericOperationalState(
-            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        Clusters::OperationalState::GenericOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kError),
+                                                            MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))

@@ -57,7 +57,8 @@ void EmulatedLaundryDryer::TimerFired()
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR EmulatedLaundryDryer::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR EmulatedLaundryDryer::GetOperationalStateAtIndex(size_t index,
+                                                            Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -66,8 +67,8 @@ CHIP_ERROR EmulatedLaundryDryer::GetOperationalStateAtIndex(size_t index, Cluste
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
         Clusters::OperationalState::GenericOperationalState(
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
-        Clusters::OperationalState::GenericOperationalState(
-            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        Clusters::OperationalState::GenericOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kError),
+                                                            MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))

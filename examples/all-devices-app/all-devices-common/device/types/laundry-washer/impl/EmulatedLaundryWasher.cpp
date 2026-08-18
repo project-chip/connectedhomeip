@@ -64,7 +64,8 @@ void EmulatedLaundryWasher::TimerFired()
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR EmulatedLaundryWasher::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR EmulatedLaundryWasher::GetOperationalStateAtIndex(size_t index,
+                                                             Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -73,8 +74,8 @@ CHIP_ERROR EmulatedLaundryWasher::GetOperationalStateAtIndex(size_t index, Clust
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
         Clusters::OperationalState::GenericOperationalState(
             to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
-        Clusters::OperationalState::GenericOperationalState(
-            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+        Clusters::OperationalState::GenericOperationalState(to_underlying(Clusters::OperationalState::OperationalStateEnum::kError),
+                                                            MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
@@ -141,7 +142,8 @@ CHIP_ERROR EmulatedLaundryWasher::GetSpinSpeedAtIndex(size_t index, MutableCharS
     return CopyCharSpanToMutableCharSpan(kSpinSpeeds[index], spinSpeed);
 }
 
-CHIP_ERROR EmulatedLaundryWasher::GetSupportedRinseAtIndex(size_t index, Clusters::LaundryWasherControls::NumberOfRinsesEnum & supportedRinse)
+CHIP_ERROR EmulatedLaundryWasher::GetSupportedRinseAtIndex(size_t index,
+                                                           Clusters::LaundryWasherControls::NumberOfRinsesEnum & supportedRinse)
 {
     VerifyOrReturnError(index < MATTER_ARRAY_SIZE(kRinses), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     supportedRinse = kRinses[index];
@@ -162,7 +164,7 @@ CHIP_ERROR EmulatedLaundryWasher::GetModeValueByIndex(uint8_t modeIndex, uint8_t
 }
 
 CHIP_ERROR EmulatedLaundryWasher::GetModeTagsByIndex(uint8_t modeIndex,
-                                                      DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
+                                                     DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kModeTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);

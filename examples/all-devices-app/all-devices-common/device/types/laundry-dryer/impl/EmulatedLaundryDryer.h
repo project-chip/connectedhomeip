@@ -21,9 +21,7 @@
 
 namespace chip::app {
 
-class EmulatedLaundryDryer : public LaundryDryer,
-                             public Clusters::OperationalState::Delegate,
-                             public TimerContext
+class EmulatedLaundryDryer : public LaundryDryer, public Clusters::OperationalState::Delegate, public TimerContext
 {
 public:
     explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate);
@@ -36,7 +34,8 @@ public:
 
     // -- OperationalState::Delegate Interface --
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index,
+                                          Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
     void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
