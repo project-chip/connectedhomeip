@@ -91,6 +91,10 @@ _available_devices = [
     "DISHWASHER",
   ],
   [
+    "doorbell",
+    "DOORBELL",
+  ],
+  [
     "extractor-hood",
     "EXTRACTOR_HOOD",
   ],

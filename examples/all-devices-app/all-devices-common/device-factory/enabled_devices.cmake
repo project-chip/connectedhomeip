@@ -165,6 +165,7 @@ foreach(_key
         dimmable-light
         dimmable-plug-in-unit
         dishwasher
+        doorbell
         extractor-hood
         fan
         flow-sensor
