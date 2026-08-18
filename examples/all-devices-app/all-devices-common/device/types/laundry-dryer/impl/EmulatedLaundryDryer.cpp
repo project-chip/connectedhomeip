@@ -37,16 +37,38 @@ void EmulatedLaundryDryer::Unregister(CodeDrivenDataModelProvider & provider)
     LaundryDryer::Unregister(provider);
 }
 
+DataModel::Nullable<uint32_t> EmulatedLaundryDryer::GetCountdownTime()
+{
+    if (mOperationalState != Clusters::OperationalState::OperationalStateEnum::kRunning)
+    {
+        return mCountdownTime;
+    }
+
+    // Per Matter Operational State Specification Section 1.14.5.1 (CountdownTime Attribute):
+    // Standard 1-second countdown progress at 1 unit/sec SHALL NOT trigger attribute reporting to prevent
+    // network flooding. Therefore, CountdownTime is dynamically computed on read from the target completion timestamp,
+    // avoiding 1-second timers or reporting spam.
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+    if (now >= mOperationEndTime)
+    {
+        return DataModel::MakeNullable<uint32_t>(0);
+    }
+
+    auto remainingSec = std::chrono::duration_cast<System::Clock::Seconds32>(mOperationEndTime - now).count();
+    return DataModel::MakeNullable<uint32_t>(static_cast<uint32_t>(remainingSec));
+}
+
 void EmulatedLaundryDryer::CancelTimer()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-void EmulatedLaundryDryer::StartEmulatedOperationTimer()
+void EmulatedLaundryDryer::StartEmulatedOperationTimer(uint32_t durationSec)
 {
     CancelTimer();
-    mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
-    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kEmulatedOperationDurationSec)));
+    mOperationEndTime = System::SystemClock().GetMonotonicTimestamp() + System::Clock::Seconds32(durationSec);
+    mCountdownTime    = DataModel::MakeNullable<uint32_t>(durationSec);
+    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(durationSec)));
 }
 
 void EmulatedLaundryDryer::TimerFired()
@@ -95,6 +117,7 @@ CHIP_ERROR EmulatedLaundryDryer::GetOperationalPhaseAtIndex(size_t index, Mutabl
 void EmulatedLaundryDryer::HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "EmulatedLaundryDryer: Pause command received.");
+    mCountdownTime = GetCountdownTime();
     CancelTimer();
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kPaused;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kPaused));
@@ -106,7 +129,8 @@ void EmulatedLaundryDryer::HandleResumeStateCallback(Clusters::OperationalState:
     ChipLogProgress(Zcl, "EmulatedLaundryDryer: Resume command received.");
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
-    StartEmulatedOperationTimer();
+    uint32_t remainingSec = mCountdownTime.IsNull() ? kEmulatedOperationDurationSec : mCountdownTime.Value();
+    StartEmulatedOperationTimer(remainingSec);
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 

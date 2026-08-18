@@ -42,7 +42,7 @@ public:
     void TimerFired() override;
 
     // -- OperationalState::Delegate Interface --
-    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
     CHIP_ERROR GetOperationalStateAtIndex(size_t index,
                                           Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
@@ -73,11 +73,12 @@ private:
     static constexpr CharSpan kLabels[] = { "Normal"_span, "Heavy"_span, "Light"_span };
 
     void CancelTimer();
-    void StartEmulatedOperationTimer();
+    void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
     TimerDelegate & mTimerDelegate;
     Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
+    System::Clock::Timestamp mOperationEndTime{};
 };
 
 } // namespace chip::app
