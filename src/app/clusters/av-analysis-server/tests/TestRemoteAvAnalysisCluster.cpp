@@ -75,7 +75,7 @@ public:
 
     Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
 
-    CHIP_ERROR VerifyZoneIDsAreValid(DataModel::DecodableList<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyZoneIDsAreValid(std::vector<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
 
     bool CanAddContextTriggers() { return true; }
 

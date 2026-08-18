@@ -157,25 +157,29 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisCluster::InvokeCommand(co
 }
 
 // Context detection
-CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, 
-    std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext)
+CHIP_ERROR AvAnalysisCluster::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList)
 {
-    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, aTriggeringContext);
+    return mLogic.AnalysisSessionStart(aSessionId, aZoneList, mContext);
 }
-    
+
+CHIP_ERROR AvAnalysisCluster::InitialTriggeringContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext)
+{
+    return mLogic.InitialTriggeringContextDetected(aSessionId, aTriggeringContext, mContext);
+}
+
 CHIP_ERROR AvAnalysisCluster::NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext)
 {
-    return mLogic.NewContextDetected(aSessionId, aNewContext);
+    return mLogic.NewContextDetected(aSessionId, aNewContext, mContext);
 }
     
 CHIP_ERROR AvAnalysisCluster::ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext)
 {
-    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext);
+    return mLogic.ContextNoLongerDetected(aSessionId, aOldContext, mContext);
 }
    
 CHIP_ERROR AvAnalysisCluster::AnalysisSessionEnd(uint16_t aSessionId)
 {
-    return mLogic.AnalysisSessionEnd(aSessionId);
+    return mLogic.AnalysisSessionEnd(aSessionId, mContext);
 }
 
 
