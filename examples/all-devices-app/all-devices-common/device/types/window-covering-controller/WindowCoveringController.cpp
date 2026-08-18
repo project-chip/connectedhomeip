@@ -34,7 +34,8 @@ const ClusterId kClientClusters[] = { WindowCovering::Id, Identify::Id, Groups::
 } // namespace
 
 WindowCoveringController::WindowCoveringController(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCoveringController, 1)), mTimerDelegate(timerDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWindowCoveringController, 1)),
+    mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR WindowCoveringController::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
