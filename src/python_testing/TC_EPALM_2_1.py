@@ -338,10 +338,10 @@ class TC_EPALM_2_1(MatterBaseTest):
             matter_asserts.assert_valid_int64(
                 s.nominalDischargeCurrent, 'NominalDischargeCurrent must be an int64')
             asserts.assert_greater_equal(s.nominalDischargeCurrent, 1)
-        if s.maximumDishargeCurrent is not None:
+        if s.maximumDischargeCurrent is not None:
             matter_asserts.assert_valid_int64(
-                s.maximumDishargeCurrent, 'MaximumDishargeCurrent must be an int64')
-            asserts.assert_greater_equal(s.maximumDishargeCurrent, 1)
+                s.maximumDischargeCurrent, 'MaximumDischargeCurrent must be an int64')
+            asserts.assert_greater_equal(s.maximumDischargeCurrent, 1)
         if s.ratedShortCircuitCurrent is not None:
             matter_asserts.assert_valid_int64(
                 s.ratedShortCircuitCurrent, 'RatedShortCircuitCurrent must be an int64')
