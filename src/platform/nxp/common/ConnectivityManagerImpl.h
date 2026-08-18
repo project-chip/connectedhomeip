@@ -93,8 +93,8 @@ public:
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_ENABLE_OPENTHREAD
-    Inet::InterfaceId GetExternalInterface();
-    Inet::InterfaceId GetThreadInterface();
+    Inet::InterfaceId _GetExternalInterface();
+    Inet::InterfaceId _GetThreadInterface();
     const char * GetHostName() { return sInstance.mHostname; }
 #endif
 
@@ -146,6 +146,10 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
     void UpdateInternetConnectivityState(void);
+#endif
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    void UpdateLwipDefaultNetIf();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

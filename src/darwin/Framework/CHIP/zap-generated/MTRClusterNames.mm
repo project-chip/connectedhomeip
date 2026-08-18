@@ -4460,6 +4460,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ActiveMessageIDs";
             break;
 
+        case MTRAttributeIDTypeClusterMessagesAttributeSupportedLanguageCodesID:
+            result = @"SupportedLanguageCodes";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeSupportedMimeTypesID:
+            result = @"SupportedMimeTypes";
+            break;
+
         case MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -6216,6 +6224,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
         case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
             result = @"Mode";
             break;
@@ -6258,6 +6270,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
             result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondPumpEnabledID:
+            result = @"CondPumpEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondRunCountID:
+            result = @"CondRunCount";
             break;
 
         case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
@@ -8500,6 +8520,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AvailableTextTracks";
             break;
 
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableCommandsID:
+            result = @"AvailableCommands";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeContentInfoID:
+            result = @"ContentInfo";
+            break;
+
         case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8828,6 +8856,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster AccountLogin attributes
+        case MTRAttributeIDTypeClusterAccountLoginAttributeOAuthLoggedInID:
+            result = @"OAuthLoggedIn";
+            break;
+
         case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -13071,6 +13103,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Logout";
             break;
 
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIID:
+            result = @"GetDeviceAuthURI";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15515,6 +15551,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"GetSetupPINResponse";
             break;
 
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIResponseID:
+            result = @"GetDeviceAuthURIResponse";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -16954,6 +16994,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterMessagesEventMessageCompleteID:
             result = @"MessageComplete";
+            break;
+
+        case MTREventIDTypeClusterMessagesEventMessageNotPresentedID:
+            result = @"MessageNotPresented";
             break;
 
         default:

@@ -69,7 +69,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:200
+            image: ghcr.io/project-chip/chip-build-efr32:206
         steps:
             - name: Checkout
               uses: actions/checkout@v7

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/ambient-context-sensing-server/AmbientContextSensingDelegate.h>
 
 namespace chip::app::Clusters::AmbientContextSensing {
 
