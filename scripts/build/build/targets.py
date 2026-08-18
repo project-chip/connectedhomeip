@@ -395,7 +395,6 @@ def BuildEfr32Target():
     target.AppendModifier(
         'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
     target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
     target.AppendModifier('additional-data-advertising',
@@ -725,6 +724,7 @@ def BuildStm32Target():
     # board
     target.AppendFixedTargets([
         TargetPart('STM32WB5MM-DK', board=stm32Board.STM32WB55XX),
+        TargetPart('STM32WBA65I-DK1', board=stm32Board.STM32WBA6XX),
     ])
 
     # apps

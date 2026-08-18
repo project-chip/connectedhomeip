@@ -477,7 +477,7 @@ def verify_platform_args(platform_args):
     ]
     difference = set(required_args) - set(platform_args)
     if difference:
-        raise ValueError("Required arguments missing: %s" % difference)
+        raise ValueError(f"Required arguments missing: {difference}")
 
 
 def create_platform(platform_args):

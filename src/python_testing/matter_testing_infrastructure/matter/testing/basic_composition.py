@@ -181,6 +181,10 @@ class BasicCompositionTests(MatterBaseTest):
             LOGGER.info("###########################################################")
 
         if self.test_from_file:
+            # File-mode runs have no DUT: skip the pre-test DUT-state capture used by
+            # teardown cleanup and the background wildcard subscription, both gated on
+            # requires_dut in setup_test.
+            self.requires_dut = False
             cache = JsonToMatterTlv(self.test_from_file)
             self.endpoints = cache.GetUpdatedAttributeCache()
             self.endpoints_tlv = cache.attributeTLVCache
