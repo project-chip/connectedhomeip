@@ -64,7 +64,7 @@ device advertises on uses the proxy as a tunnel. The flow is:
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
 4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel an
-   in-flight connect); the proxy tears the transport connection down.
+   in-flight connect; the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
@@ -231,8 +231,9 @@ void ApplicationInit()
 }
 ```
 
-A complete working example (device wiring plus the BLE and Wi-Fi PAF drivers)
-lands with the example-app change later in this series.
+For a complete working example of the device wiring plus the BLE and Wi-Fi PAF
+drivers, see
+`examples/all-devices-app/all-devices-common/device/types/commissioning-proxy/`.
 
 ## Codegen integration
 
@@ -444,7 +445,7 @@ The cluster tracks proxy state internally:
 
 State transitions:
 
-```
+```text
 ProxyConnectRequest ──► transport connect success ──► kState_CPConnected
 kState_CPConnected  ──► ProxyDisconnectRequest    ──► kState_CPDisconnected
 ```

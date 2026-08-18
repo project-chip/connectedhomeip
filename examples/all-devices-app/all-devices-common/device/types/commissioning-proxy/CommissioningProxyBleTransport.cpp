@@ -876,6 +876,17 @@ bool IsConnectPending()
 
 void Shutdown()
 {
+    // Stop any foreground scan first. Its timer outlives the cluster otherwise, and
+    // OnScanTimer would then hand results to sHost — a cluster that no longer exists —
+    // and call ResumeBleBgScanIfNeeded(), restarting the radio after teardown.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnScanTimer, nullptr);
+    if (sScanInProgress)
+    {
+        (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+        sScanInProgress = false;
+    }
+    sScanResults.clear();
+
     // Move the map out first so sEndpoints is empty when Close() fires
     // OnEndPointConnectionClosed synchronously — FindSessionId returns false and
     // the callbacks are no-ops rather than erasing the iterator mid-iteration.
@@ -895,8 +906,33 @@ void Shutdown()
     if (sPendingConnect != nullptr)
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(OnConnectTimeout, nullptr);
-        auto * ctx                      = sPendingConnect;
-        sPendingConnect                 = nullptr;
+        auto * ctx      = sPendingConnect;
+        sPendingConnect = nullptr;
+
+        // Stop the BleLayer's in-flight scan/connect, so no later OnConnectFound /
+        // OnConnectError reaches the torn-down transport.
+        if (auto * layer = GetBleLayer())
+        {
+            CHIP_ERROR cancelErr = layer->CancelBleIncompleteConnection();
+            if (cancelErr != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(AppServer, "Shutdown: CancelBleIncompleteConnection: %" CHIP_ERROR_FORMAT, cancelErr.Format());
+            }
+        }
+
+        // A BTP handshake in flight has an endpoint that is not yet in sEndpoints, so
+        // the loop above did not close it.  Leave sBtpHandshakeEndpoint set as in
+        // OnConnectTimeout: OnEndPointConnectionClosed matches it to suppress forwarding
+        // the close to mOriginalTransport, and clears it.
+        if (ctx->endpoint != nullptr)
+        {
+            ctx->endpoint->Close();
+        }
+        else
+        {
+            sBtpHandshakeEndpoint = nullptr;
+        }
+
         chip::app::CommandHandler * cmd = ctx->handle.Get();
         if (cmd != nullptr)
         {
@@ -904,11 +940,15 @@ void Shutdown()
         }
         delete ctx;
     }
-    sBtpHandshakeEndpoint = nullptr;
 
     // Tear down the background scan: cancel every per-fabric lifetime timer and stop
     // the hardware scan if the registry currently owns it.
     sBgScan.Shutdown();
+
+    // Last: the cluster is going away, so drop the pointer to it. Every callback above
+    // null-checks sHost, and any that still reaches the platform (a scan result already
+    // queued through ScheduleWork) must find null rather than a destroyed cluster.
+    sHost = nullptr;
 }
 
 } // namespace Ble

@@ -231,6 +231,11 @@ CommissioningProxyCluster::HandleProxyConnectRequest(const DataModel::InvokeRequ
     // Only a single transport SHALL be selected per spec
     VerifyOrReturnError(HasExactlyOneBitSet(commandData.transport.Raw()), Status::InvalidCommand);
 
+    // Transport must not contain reserved (undefined) bits. Checked before the supported
+    // set below so a reserved bit is rejected the same way here as it is on the scan
+    // commands, rather than being reported as an unsupported transport.
+    VerifyOrReturnError((commandData.transport.Raw() & ~kValidTransportBits) == 0, Status::InvalidCommand);
+
     // Spec: Discriminator field constraint is "0 to 4095" (12-bit); any other
     // field being invalid SHALL return InvalidCommand. Matches the validation in
     // AdministratorCommissioning / JointFabricAdministrator.

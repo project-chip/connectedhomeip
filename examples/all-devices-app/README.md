@@ -269,27 +269,27 @@ compiled in the device type still starts, but every proxy command fails.
 
 To build with both BLE and WiFi-PAF on Linux x86-64 run:
 
-```
-$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
+```bash
+./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
 ```
 
 To cross-compile for a Raspberry Pi (ARM64), build inside the cross-compile
 container, which supplies the aarch64 sysroot. The ARM and ARM64 boards accept
 `-clang` or `-nodeps` target variants:
 
-```
+```bash
 # From the root of your checkout, on the host:
-$ docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
+docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
     ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
 
 # Then, inside the container:
-$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"
+./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"
 ```
 
 To start the app as a proxy over WiFi-PAF on channel 6 (2437 MHz) on endpoint 5:
 
-```
-$ ./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 --wifi --wifipaf freq_list=2437
+```bash
+./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 --wifi --wifipaf freq_list=2437
 ```
 
 The cluster's attributes and commands can then be exercised on endpoint 5.

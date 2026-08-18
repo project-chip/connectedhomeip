@@ -101,25 +101,29 @@ public:
     void SetBgScanStartStatus(Protocols::InteractionModel::Status s) { mBgScanStartStatus = s; }
     /// True once BgScanStart() succeeded and no BgScanStop() has followed.
     bool BgScanRunning() const { return mBgScanRunning; }
-    unsigned BgScanStopCount() const { return mBgScanStopCount; }
+    uint32_t BgScanStopCount() const { return mBgScanStopCount; }
     void SetBgScanStopStatus(Protocols::InteractionModel::Status s) { mBgScanStopStatus = s; }
     void SetSendMessageError(CHIP_ERROR e) { mSendMessageError = e; }
     // When true (default), a successful SendMessage synchronously delivers a null
     // ProxyMessageResponse back through the session manager. Set false to leave the
-    // request pending (e.g. to exercise the BUSY path on a second request).
+    // request pending, as a commissionee that never replies would (e.g. to exercise the
+    // BUSY path on a second request, or the session's response timeout).
     void SetAutoRespond(bool a) { mAutoRespond = a; }
     // When true (default), a successful Scan synchronously contributes results to the
     // aggregator. Set false to leave the foreground scan in-flight (e.g. to exercise
     // the concurrent-scan BUSY path on a second ProxyScanRequest).
     void SetAutoContribute(bool a) { mAutoContribute = a; }
-    // When true, a successful SendMessage synchronously delivers a TIMEOUT failure for
-    // the pending ProxyMessageRequest (models the commissionee never replying).
-    void SetSendMessageTimeout(bool t) { mSendMessageTimeout = t; }
+    /// Deliver this transport's two scan results to the aggregator now, standing in for
+    /// the driver's own scan-completion callback. Pairs with SetAutoContribute(false).
+    void ContributeScanResults();
+    /// Report an asynchronous failure for @p sessionId's pending ProxyMessageRequest, as a
+    /// driver does when its transport connection drops mid-exchange.
+    void FailPendingMessage(uint16_t sessionId, Protocols::InteractionModel::Status status);
 
     uint16_t LastSessionId() const { return mLastSessionId; }
     uint8_t OnAllSessionsClosedCount() const { return mOnAllSessionsClosedCount; }
     bool CancelCalled() const { return mCancelCalled; }
-    unsigned FabricRemovedCount() const { return mFabricRemovedCount; }
+    uint32_t FabricRemovedCount() const { return mFabricRemovedCount; }
     FabricIndex LastRemovedFabric() const { return mLastRemovedFabric; }
     FabricIndex LastCancelFabric() const { return mLastCancelFabric; }
 
@@ -131,20 +135,19 @@ private:
     Protocols::InteractionModel::Status mDisconnectStatus  = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mScanStatus        = Protocols::InteractionModel::Status::Success;
     bool mBgScanRunning                                    = false;
-    unsigned mBgScanStopCount                              = 0;
+    uint32_t mBgScanStopCount                              = 0;
     Protocols::InteractionModel::Status mBgScanStartStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mBgScanStopStatus  = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mSendMessageError                           = CHIP_NO_ERROR;
     bool mAutoRespond                                      = true;
     bool mAutoContribute                                   = true;
-    bool mSendMessageTimeout                               = false;
     bool mConnectPending                                   = false;
     uint16_t mLastSessionId                                = 0;
     uint8_t mOnAllSessionsClosedCount                      = 0;
     bool mCancelCalled                                     = false;
     FabricIndex mLastCancelFabric                          = kUndefinedFabricIndex;
     FabricIndex mPendingConnectFabric                      = kUndefinedFabricIndex;
-    unsigned mFabricRemovedCount                           = 0;
+    uint32_t mFabricRemovedCount                           = 0;
     FabricIndex mLastRemovedFabric                         = kUndefinedFabricIndex;
 };
 
