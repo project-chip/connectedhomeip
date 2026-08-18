@@ -91,6 +91,7 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     payload["Location"]            = GetOtaProviderExample().GetLocation();
     payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
     payload["UserConsentNeeded"]   = GetOtaProviderExample().GetUserConsentNeeded();
+    payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
 
     const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 

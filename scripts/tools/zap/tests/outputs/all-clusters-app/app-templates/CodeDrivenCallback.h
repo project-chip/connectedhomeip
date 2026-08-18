@@ -136,6 +136,10 @@ void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterLaundryDryerControlsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterLaundryDryerControlsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -217,6 +221,10 @@ void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpoi
 void MatterEnergyEvseClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterEnergyPreferenceClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterEnergyPreferenceClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
