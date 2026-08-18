@@ -248,6 +248,7 @@ public:
 
     ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
     {
+        mCount = 0;
         ScopedMemoryBuffer<T>::Calloc(elementCount);
         if (this->Get() != nullptr)
         {
@@ -258,6 +259,7 @@ public:
 
     ScopedMemoryBufferWithSize & Alloc(size_t elementCount)
     {
+        mCount = 0;
         ScopedMemoryBuffer<T>::Alloc(elementCount);
         if (this->Get() != nullptr)
         {
