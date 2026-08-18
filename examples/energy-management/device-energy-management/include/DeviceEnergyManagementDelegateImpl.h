@@ -300,6 +300,9 @@ private:
     // Method to handle PowerRangeAdjustRequest failure
     void HandlePowerRangeAdjustRequestFailure();
 
+    // Method to cancel a PowerRangeAdjustRequest
+    CHIP_ERROR CancelPowerRangeAdjustRequestAndGenerateEvent(CauseEnum cause);
+
     // Method to generate a PowerRangeAdjustEnd event
     CHIP_ERROR GeneratePowerRangeAdjustEndEvent(CauseEnum cause);
 

@@ -996,6 +996,43 @@ CHIP_ERROR DeviceEnergyManagementDelegate::GeneratePowerRangeAdjustEndEvent(Caus
 }
 
 /**
+ * @brief Handles the cancelation of a PowerRangeAdjust operation
+ *
+ * This function needs to notify the appliance that the power range adjustment should be cancelled.
+ *
+ * It should:
+ *   1) cancel any active power range adjustment timer
+ *   2) generate a PowerRangeAdjustEnd event with the specified cause
+ *   3) notify the manufacturer delegate with the specified cause
+ */
+CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerRangeAdjustRequestAndGenerateEvent(CauseEnum cause)
+{
+    DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
+
+    TEMPORARY_RETURN_IGNORED SetESAState(ESAStateEnum::kOnline);
+
+    mPowerRangeAdjustmentInProgress = false;
+
+    CHIP_ERROR err = GeneratePowerRangeAdjustEndEvent(cause);
+
+    // Clear the PowerRangeAdjustment attribute
+    mPowerRangeAdjustment.SetNull();
+
+    // Report the attribute change
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
+
+    // Notify the appliance that the power range adjustment has been cancelled
+    if (mpDEMManufacturerDelegate != nullptr)
+    {
+        // It is expected the mpDEMManufacturerDelegate will update the forecast with new expected end time
+        // as a consequence of the cancel request.
+        err = mpDEMManufacturerDelegate->HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(cause);
+    }
+
+    return err;
+}
+
+/**
  * @brief Delegate handler for CancelPowerRangeAdjustRequest
  *
  * This function needs to notify the appliance that the current power range adjustment should be
@@ -1013,34 +1050,15 @@ Status DeviceEnergyManagementDelegate::CancelPowerRangeAdjustRequest()
         return Status::Failure;
     }
 
-    DeviceLayer::SystemLayer().CancelTimer(PowerRangeAdjustTimerExpiry, this);
+    Status status = Status::Success;
 
-    mPowerRangeAdjustmentInProgress = false;
-
-    CHIP_ERROR err = GeneratePowerRangeAdjustEndEvent(CauseEnum::kCancelled);
+    CHIP_ERROR err = CancelPowerRangeAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kCancelled);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(AppServer, "Unable to generate PowerRangeAdjustEnd event: %" CHIP_ERROR_FORMAT, err.Format());
+        status = Status::Failure;
     }
 
-    // Clear the PowerRangeAdjustment attribute
-    mPowerRangeAdjustment.SetNull();
-
-    // Report the attribute change
-    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerRangeAdjustment::Id);
-
-    // If manufacturer delegate exists, notify it of the cancellation
-    if (mpDEMManufacturerDelegate != nullptr)
-    {
-        CHIP_ERROR error =
-            mpDEMManufacturerDelegate->HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum::kCancelled);
-        if (error != CHIP_NO_ERROR)
-        {
-            return Status::Failure;
-        }
-    }
-
-    return Status::Success;
+    return status;
 }
 
 // ------------------------------------------------------------------
@@ -1263,6 +1281,20 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             newValue == OptOutStateEnum::kOptOut)
         {
             err = CancelPauseRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
+        }
+    }
+
+    // Cancel any outstanding PowerRangeAdjustment if necessary
+    if (mPowerRangeAdjustmentInProgress)
+    {
+        if (!mPowerRangeAdjustment.IsNull() &&
+            ((newValue == OptOutStateEnum::kLocalOptOut &&
+              mPowerRangeAdjustment.Value().cause == PowerAdjustReasonEnum::kLocalOptimizationAdjustment) ||
+             (newValue == OptOutStateEnum::kGridOptOut &&
+              mPowerRangeAdjustment.Value().cause == PowerAdjustReasonEnum::kGridOptimizationAdjustment) ||
+             newValue == OptOutStateEnum::kOptOut))
+        {
+            err = CancelPowerRangeAdjustRequestAndGenerateEvent(DeviceEnergyManagement::CauseEnum::kUserOptOut);
         }
     }
 
