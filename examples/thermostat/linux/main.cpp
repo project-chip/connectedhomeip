@@ -84,8 +84,8 @@ void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate,
-                                     gSuggestionsDelegate, gSensorsDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate,
+                                     gSensorsDelegate);
 }
 
 using ThermostatClusterType =
