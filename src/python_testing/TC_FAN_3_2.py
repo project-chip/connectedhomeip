@@ -53,6 +53,7 @@
 
 import logging
 import operator
+import time
 from enum import Enum
 from typing import Any
 
@@ -193,6 +194,43 @@ class TC_FAN_3_2(MatterBaseTest):
         for sub in self.subscriptions:
             await sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
+    def wait_for_latest_report_value(self, sub: AttributeSubscriptionHandler, expected_value: Any, timeout_sec: float = 10.0) -> None:
+        """Blocks until the subscription's most recent queued report carries expected_value.
+
+        Peeks at the queue instead of consuming it, so the queued reports remain
+        available for the count and progression verifications performed after
+        the write loop.
+        """
+        end_time = time.monotonic() + timeout_sec
+        while time.monotonic() < end_time:
+            reports = sub.attribute_queue.queue
+            if reports and reports[-1].value == expected_value:
+                return
+            time.sleep(0.05)
+        asserts.fail(
+            f"[FC] Timed out waiting for a {sub._expected_attribute.__name__} attribute report of value {expected_value}")
+
+    async def wait_for_triggered_reports(self, value_written: int) -> None:
+        """Blocks until the reports triggered by a successful SpeedSetting write are delivered.
+
+        Waits for the SpeedSetting report of the written value, then reads back FanMode and
+        PercentSetting and waits for their reports of the read values when the read shows the
+        write cascaded into them.
+        """
+        attr = Clusters.FanControl.Attributes
+        subs = {sub._expected_attribute: sub for sub in self.subscriptions}
+        self.wait_for_latest_report_value(subs[attr.SpeedSetting], value_written)
+
+        fan_mode_read = await self.read_setting(attr.FanMode)
+        if fan_mode_read != self.last_fan_mode:
+            self.wait_for_latest_report_value(subs[attr.FanMode], fan_mode_read)
+            self.last_fan_mode = fan_mode_read
+
+        percent_setting_read = await self.read_setting(attr.PercentSetting)
+        if percent_setting_read != self.last_percent_setting:
+            self.wait_for_latest_report_value(subs[attr.PercentSetting], percent_setting_read)
+            self.last_percent_setting = percent_setting_read
+
     def log_results(self) -> None:
         for sub in self.subscriptions:
             log.info("[FC] - %s Sub -", sub._expected_attribute.__name__)
@@ -258,6 +296,11 @@ class TC_FAN_3_2(MatterBaseTest):
         # Get the range of values to write
         value_range = range(1, self.speed_max + 1) if order == OrderEnum.Ascending else range(self.speed_max - 1, -1, -1)
 
+        # Baseline for detecting when a SpeedSetting write
+        # triggers a FanMode or PercentSetting update
+        self.last_fan_mode = await self.read_setting(attr.FanMode)
+        self.last_percent_setting = await self.read_setting(attr.PercentSetting)
+
         # Logging the scenario being tested
         self.log_scenario(value_range, order)
 
@@ -267,6 +310,8 @@ class TC_FAN_3_2(MatterBaseTest):
         for value_to_write in value_range:
             write_status = await self.write_and_verify_attribute(attr.SpeedSetting, value_to_write,
                                                                  _SPEED_ALLOWED_WRITE_STATUSES)
+            if write_status == Status.Success:
+                await self.wait_for_triggered_reports(value_to_write)
             if not invalid_in_state_occurred:
                 if write_status == Status.InvalidInState:
                     invalid_in_state_occurred = True
