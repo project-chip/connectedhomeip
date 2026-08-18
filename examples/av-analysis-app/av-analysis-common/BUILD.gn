@@ -28,6 +28,7 @@ source_set("av-analysis-node-lib") {
   public_configs = [ ":config" ]
 
   sources = [
+    "include/analysis-delegate.h",
     "include/av-analysis-node-app.h",
     "src/av-analysis-node-app.cpp",
   ]
