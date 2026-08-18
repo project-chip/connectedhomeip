@@ -42,7 +42,7 @@ constexpr uint16_t kDefaultMinResolutionHeight          = 480;
 constexpr uint16_t kDefaultMaxResolutionWidth           = 1920;
 constexpr uint16_t kDefaultMaxResolutionHeight          = 1080;
 constexpr uint32_t kDefaultMinBitRateBps                = 500000;
-constexpr uint32_t kDefaultMaxBitRateBps                = 4000000;
+constexpr uint32_t kDefaultMaxBitRateBps                = 2000000;
 constexpr uint16_t kDefaultKeyFrameIntervalMilliseconds = 4000;
 
 } // namespace
