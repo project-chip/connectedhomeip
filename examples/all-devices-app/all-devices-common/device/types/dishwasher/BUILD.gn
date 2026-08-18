@@ -33,10 +33,10 @@ source_set("dishwasher") {
 }
 
 source_set("emulated") {
-  sources = [ "impl/EmulatedDishwasher.h" ]
-
-  public_deps = [
-    ":dishwasher",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
+  sources = [
+    "impl/EmulatedDishwasher.cpp",
+    "impl/EmulatedDishwasher.h",
   ]
+
+  public_deps = [ ":dishwasher" ]
 }
