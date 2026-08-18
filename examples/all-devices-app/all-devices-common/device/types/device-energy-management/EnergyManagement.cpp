@@ -112,8 +112,7 @@ Protocols::InteractionModel::Status EnergyManagement::CancelRequest()
 
 Protocols::InteractionModel::Status EnergyManagement::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
                                                                               const DataModel::Nullable<int64_t> maxPower,
-                                                                              const uint32_t duration,
-                                                                              AdjustmentCauseEnum cause)
+                                                                              const uint32_t duration, AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
