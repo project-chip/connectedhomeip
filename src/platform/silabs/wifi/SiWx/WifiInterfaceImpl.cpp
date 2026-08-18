@@ -1064,7 +1064,8 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
 
     if (!ssid.empty())
     {
-        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value, sizeof(sNetworkScanCallbackContext.ssid.value));
+        chip::MutableByteSpan requestedSsidSpan(sNetworkScanCallbackContext.ssid.value,
+                                                sizeof(sNetworkScanCallbackContext.ssid.value));
         ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
         sNetworkScanCallbackContext.ssid.length = static_cast<uint8_t>(ssid.size());
         requestedSsidPtr                        = &sNetworkScanCallbackContext.ssid;
