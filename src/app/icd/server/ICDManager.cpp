@@ -102,7 +102,8 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
-    mOperationalState = OperationalState::ActiveMode;
+    mOperationalState              = OperationalState::ActiveMode;
+    mPendingCheckInOnNetworkAttach = false;
     mStateObserverPool.ReleaseAll();
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -542,6 +543,14 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        ChipLogProgress(AppServer, "ICDManager: Thread network not attached on periodic idle wake-up. Deferring ActiveMode until attached.");
+        pICDManager->mPendingCheckInOnNetworkAttach = true;
+        return;
+    }
+#endif
     pICDManager->UpdateOperationState(OperationalState::ActiveMode);
 }
 
@@ -758,8 +767,15 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         if (mPendingCheckInOnNetworkAttach || mOperationalState == OperationalState::ActiveMode)
         {
             ChipLogProgress(AppServer, "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode and Check-In.");
+            bool wasPendingCheckIn          = mPendingCheckInOnNetworkAttach;
             mPendingCheckInOnNetworkAttach = false;
             UpdateOperationState(OperationalState::ActiveMode);
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+            if (wasPendingCheckIn && mOperationalState == OperationalState::ActiveMode)
+            {
+                SendCheckInMsgs();
+            }
+#endif
         }
     }
 }

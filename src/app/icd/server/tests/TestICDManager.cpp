@@ -1385,5 +1385,28 @@ TEST_F(TestICDManager, TestDeferredCheckInWhenAlreadyInActiveMode)
     ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCommissioningWindowOpen);
 }
 
+TEST_F(TestICDManager, TestDeferredActiveModeOnPeriodicIdleWakeUp)
+{
+    // Ensure we start in IdleMode
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Advance clock past IdleModeDuration to trigger periodic OnIdleModeDone
+    // In test environment (where Thread is not attached), this should defer ActiveMode
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration());
+
+    // OperationalState should remain IdleMode due to Thread unattached deferral
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Simulate Thread Connectivity Established event
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
+    AdvanceClockAndRunEventLoop(100_ms);
+
+    // ActiveMode should now be triggered upon Thread attach!
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+}
+
 } // namespace app
 } // namespace chip
