@@ -181,7 +181,8 @@ static chip::BitFlags<WiFiSecurityBitmap> ConvertSlWifiSecurityToBitmap(const sl
  *
  *        For SL_WIFI_SCAN_TYPE_EXTENDED, results are not in the callback; fetch via sl_wifi_get_stored_scan_results.
  */
-sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_code, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
+sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_code, sl_wifi_scan_result_t * result,
+                                   uint32_t result_length, void * arg)
 {
     VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, SL_STATUS_INVALID_HANDLE);
     if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
@@ -212,8 +213,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
             return SL_STATUS_OK;
         }
 
-        uint16_t resultCount = 0;
-        sl_status_t status   = SL_STATUS_OK;
+        uint16_t resultCount      = 0;
+        sl_status_t status        = SL_STATUS_OK;
         const uint16_t maxResults = static_cast<uint16_t>(result_length / sizeof(sl_wifi_extended_scan_result_t));
 
         if (maxResults == 0)
@@ -225,7 +226,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
             return SL_STATUS_OK;
         }
 
-        sl_wifi_extended_scan_result_t * scanResults = static_cast<sl_wifi_extended_scan_result_t *>(chip::Platform::MemoryAlloc(result_length));
+        sl_wifi_extended_scan_result_t * scanResults =
+            static_cast<sl_wifi_extended_scan_result_t *>(chip::Platform::MemoryAlloc(result_length));
         if (scanResults == nullptr)
         {
             wfx_rsi.scan_cb(nullptr);
@@ -279,7 +281,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
                     currentScanResult.signal.type     = chip::DeviceLayer::NetworkCommissioning::WirelessSignalType::kdBm;
                     currentScanResult.channel         = static_cast<uint16_t>(scanResults[i].rf_channel);
                     currentScanResult.wiFiBand        = WiFiBandEnum::k2g4;
-                    currentScanResult.security        = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(scanResults[i].security_mode));
+                    currentScanResult.security =
+                        ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(scanResults[i].security_mode));
 
                     wfx_rsi.scan_cb(&currentScanResult);
                 }
