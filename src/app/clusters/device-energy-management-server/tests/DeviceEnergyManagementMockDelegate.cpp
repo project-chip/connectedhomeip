@@ -171,9 +171,10 @@ Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelRe
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(
-    const DataModel::Nullable<int64_t> minPower, const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
-    AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                            const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
+                                                            AdjustmentCauseEnum cause)
 {
     mESAState = ESAStateEnum::kPowerAdjustActive;
 
