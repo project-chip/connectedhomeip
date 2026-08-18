@@ -36,6 +36,7 @@ source_set("clusters") {
     "closure-control-server",
     "closure-dimension-server",
     "commissioner-control-server",
+    "commodity-price-server",
     "concentration-measurement-server",
     "descriptor",
     "device-energy-management-server",
