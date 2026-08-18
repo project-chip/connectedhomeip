@@ -261,7 +261,10 @@ The compiled-in transport(s) follow this build configuration:
     (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
     in, the cluster advertises the `WiFiNetworkInterface` feature and the
     `WiFiBand` attribute; the supported bands are derived from the `freq_list`
-    passed via `--wifipaf`.
+    passed via `--wifipaf`. Note that WiFi-PAF scanning does not work on a stock
+    host: it needs a `wpa_supplicant` built with `CONFIG_NAN_USD` and the
+    `discovery_only` patch. See
+    [wpa_supplicant with the Matter NAN patch](all-devices-common/device/types/commissioning-proxy/README.md#2-wpa_supplicant-with-the-matter-nan-patch-proxy-device).
 -   **BLE** is included when `chip_config_network_layer_ble` is true.
 
 The `-no-ble` build variants disable the BLE transport. With no transport

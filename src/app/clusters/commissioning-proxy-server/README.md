@@ -63,8 +63,9 @@ device advertises on uses the proxy as a tunnel. The flow is:
    by `SessionID`; the proxy forwards it over the transport and returns the
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
-4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel an
-   in-flight connect; the proxy tears the transport connection down.
+4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` with the
+   `SessionID` to close an established session, or with a null `SessionID` to
+   cancel an in-flight connect; the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
@@ -339,13 +340,19 @@ public:
     // foreground scan; the registry then defers and retries on resume.
     CHIP_ERROR StartHardwareScan() override { return StartMyPlatformScan(OnBgScanDiscovery); }
     void StopHardwareScan() override { StopMyPlatformScan(); }
-    void ClearCachedResults() override { sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle); }
+    // bands == 0 means the whole transport stopped; otherwise only those bands did.
+    // BLE results carry no band, so BLE always receives 0.
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
+    {
+        sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle, bands);
+    }
 };
 
 // Declared before the registry so it outlives it: the registry's destructor may
 // call back into these hooks.
 MyBleBgScanHardware sHardware;
-CommissioningProxyBgScanRegistry sBgScan(sHardware);
+DefaultTimerDelegate sTimerDelegate;
+CommissioningProxyBgScanRegistry sBgScan(sHardware, sTimerDelegate);
 
 Status MyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex, NodeId nodeId)
 {

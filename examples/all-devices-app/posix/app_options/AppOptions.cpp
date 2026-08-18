@@ -281,6 +281,12 @@ OptionSet * AppOptions::GetOptions()
         result += "  --dac_provider <path>\n";
         result += "       Path to JSON file containing device attestation credentials\n\n";
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
+        result += "       Enable Wi-Fi PAF via wpa_supplicant.\n";
+        result += "       Give an empty string if not setting freq_list: \"\"\n\n";
+#endif
+
         return result;
     }();
 

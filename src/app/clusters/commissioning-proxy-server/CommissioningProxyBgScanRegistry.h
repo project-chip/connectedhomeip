@@ -194,8 +194,9 @@ private:
     FabricState * FindFabric(FabricIndex fabricIndex);
     bool AnyFabricInUse() const;
 
-    /// By value on purpose: the caller passes its own LifetimeCtx member, which this
-    /// deletes. A reference would dangle for the rest of the body.
+    /// Takes the fabric index by value, not the firing LifetimeCtx: that context is a
+    /// member of the fabric slot this call releases, so the slot is looked up again here
+    /// rather than held as a reference that would dangle for the rest of the body.
     void OnLifetimeExpiry(FabricIndex fabricIndex);
     void CancelLifetime(FabricState & state);
     void OnBecameEmpty(); // stop hardware if owned, then clear cache
