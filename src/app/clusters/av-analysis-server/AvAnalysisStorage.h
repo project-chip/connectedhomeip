@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <algorithm>
 #include <vector>
 #include <unordered_set>
 
@@ -152,16 +153,19 @@ public:
     
     void RemoveTrackedContext(std::vector<Structs::TrackedContext::Type> aTrackedContext)
     {
-        // Remove the provided contexts from our current set     
-        std::erase_if(mTrackedContexts, [&](const Structs::TrackedContext::Type& context1) {
-            for (const auto& context2 : aTrackedContext) {
-                if (context1.identifiedContext.namespaceID == context2.identifiedContext.namespaceID && 
-                    context1.identifiedContext.tag == context2.identifiedContext.tag) {
-                    return true; // Match found, remove it
-                }
-            }
-            return false;
-        });
+        // Remove the provided contexts from our current set
+        mTrackedContexts.erase(
+            std::remove_if(mTrackedContexts.begin(), mTrackedContexts.end(),
+                [&](const Structs::TrackedContext::Type & context1) {
+                    for (const auto & context2 : aTrackedContext) {
+                        if (context1.identifiedContext.namespaceID == context2.identifiedContext.namespaceID &&
+                            context1.identifiedContext.tag == context2.identifiedContext.tag) {
+                            return true; // Match found, remove it
+                        }
+                    }
+                    return false;
+                }),
+            mTrackedContexts.end());
     }
     
     const std::vector<Structs::TrackedContext::Type>& GetTrackedContexts() const { return mTrackedContexts; }
