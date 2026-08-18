@@ -94,6 +94,21 @@ static chip::BitMask<CapabilitiesBitmap> ReadSupportedTransports(ClusterTester &
         }                                                                                                                          \
     } while (0)
 
+// Convenience: skip a test that needs more than one concurrent session when this build
+// reserves fewer.  CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS sizes the session table
+// at compile time and the default is the spec minimum of 1, so the multi-session paths
+// (per-fabric isolation, distinct session ids, staying Connected until the last session
+// closes) are only reachable in a build that raises it.
+#define SKIP_IF_MAX_SESSIONS_BELOW(needed)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS < (needed))                                                               \
+        {                                                                                                                          \
+            GTEST_SKIP() << "Build reserves " << CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS                                      \
+                         << " proxy session(s), this case needs " << (needed);                                                     \
+        }                                                                                                                          \
+    } while (0)
+
 // =============================================================================
 // Feature Tests
 // =============================================================================
@@ -870,9 +885,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
 // request is forwarded to the transport driver and (for the mock) succeeds.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSucceeds)
 {
+    SKIP_IF_MAX_SESSIONS_BELOW(2);
+
     TestServerClusterContext context;
-    static_assert(CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 1,
-                  "a second concurrent connect must still be below the MaxSessions gate");
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -880,7 +895,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
     ClusterTester tester(cluster);
     SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
 
-    // First connect establishes one session.
+    // First connect establishes one session, leaving at least one slot free.
     EXPECT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
 
     // Second connect is still below MaxSessions, so the gate passes and it succeeds.
@@ -944,6 +959,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
 // remaining) SHALL do so.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionStateTransition)
 {
+    SKIP_IF_MAX_SESSIONS_BELOW(2);
+
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
@@ -2351,6 +2368,8 @@ TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_DropsSessionsAndDriver
 // Another fabric's session SHALL survive.
 TEST_F(TestCommissioningProxyCluster, TestOnFabricRemoved_LeavesOtherFabricsAlone)
 {
+    SKIP_IF_MAX_SESSIONS_BELOW(2);
+
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);
@@ -2632,6 +2651,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WrongFabricEstabli
 // With MaxSessions >= 2, two connects SHALL each get a distinct, non-zero SessionId.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHaveDistinctSessionIds)
 {
+    SKIP_IF_MAX_SESSIONS_BELOW(2);
+
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
     RegisterMocks(cluster);

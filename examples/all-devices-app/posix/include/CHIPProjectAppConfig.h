@@ -33,9 +33,9 @@
 // It is not merely a preference: the transport drivers track a single in-flight connect in
 // one static (sPendingConnect in CommissioningProxyBleTransport.cpp) and rely on
 // MaxSessions == 1 to make it unique, so a larger value here would let the cluster accept
-// a second concurrent connect the driver cannot represent. The SDK default is deliberately
-// higher so the cluster's own unit tests exercise its multi-session paths; a product that
-// wants those paths must raise this and give its drivers per-session connect state.
+// a second concurrent connect the driver cannot represent. This matches the SDK default,
+// but it is restated here because the driver constraint is this app's, not the cluster's:
+// raising it means giving the drivers per-session connect state first.
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
 
 // include the CHIPProjectConfig from config/standalone

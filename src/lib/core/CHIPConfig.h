@@ -2092,16 +2092,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *        number of concurrent proxy sessions the cluster reserves storage for. The
  *        attribute is Fixed quality, so this is the device's advertised value.
  *
- *        The spec makes supporting a single session mandatory and multiple sessions
- *        optional, so a product may set this to 1. The default stays above 1 because the
- *        unit tests must exercise the whole cluster: the session-id allocator, the
- *        per-session fabric checks and the "state stays Connected until the last session
- *        closes" transition only exist above 1, and a default of 1 would compile that
- *        coverage out rather than run it. Keep it above 1 unless a product overrides it.
+ *        A value of 1 means the proxy can commission only one device at a time; supporting
+ *        multiple concurrent sessions is optional. The default is that mandatory minimum
+ *        because every additional session costs fixed storage on every platform that
+ *        compiles the cluster: one SessionSlot plus one PendingMessage pool entry, used or
+ *        not. Products that want concurrent commissioning override this.
  */
 #ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
-#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 4
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+
+// Zero would declare a zero-length array, which compiles silently and leaves the cluster
+// with no usable session slots. The upper bound is the width of the MaxSessions attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS is not allowed to be a number less than 1 or greater than 255"
+#endif
 
 /**
  * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
@@ -2114,6 +2119,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS 10
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
 
+// Zero would declare a zero-length array, which compiles silently and leaves the cache
+// with no usable entries. The upper bound is the width of the MaxCachedResults attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
 /**
  * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
  *
@@ -2124,6 +2135,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+
+// Zero would declare a zero-length array, which compiles silently and leaves no room for
+// any request. The upper bound is the width of the uint8_t per-fabric request count.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC < 1 ||                                                          \
+    CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC > 255
+#error                                                                                                                             \
+    "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC is not allowed to be a number less than 1 or greater than 255"
+#endif
 
 /**
  * @def CHIP_CONFIG_MAX_NUM_ZONES
