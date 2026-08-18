@@ -34,11 +34,11 @@ class ElectricalDistributionCluster : public DefaultServerCluster
 public:
     struct StartupConfiguration
     {
-        ElectricalDistribution::Attributes::MaxContinuousCurrent::TypeInfo::Type maxContinuousCurrent;
-        ElectricalDistribution::Attributes::MaxVoltage::TypeInfo::Type maxVoltage;
-        ElectricalDistribution::Attributes::NumberOfPoles::TypeInfo::Type numberOfPoles;
-        ElectricalDistribution::Attributes::EndOfLife::TypeInfo::Type endOfLife;
-        ElectricalDistribution::Attributes::ServiceEntranceRated::TypeInfo::Type serviceEntranceRated;
+        Attributes::MaxContinuousCurrent::TypeInfo::Type maxContinuousCurrent;
+        Attributes::MaxVoltage::TypeInfo::Type maxVoltage;
+        Attributes::NumberOfPoles::TypeInfo::Type numberOfPoles;
+        Attributes::EndOfLife::TypeInfo::Type endOfLife;
+        Attributes::ServiceEntranceRated::TypeInfo::Type serviceEntranceRated;
     };
 
     ElectricalDistributionCluster(EndpointId endpointId, const StartupConfiguration & config);
@@ -49,14 +49,14 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /// Update the EndOfLife attribute value (emits an attribute-changed notification).
-    CHIP_ERROR SetEndOfLife(const ElectricalDistribution::Attributes::EndOfLife::TypeInfo::Type & endOfLife);
+    CHIP_ERROR SetEndOfLife(const Attributes::EndOfLife::TypeInfo::Type & endOfLife);
 
 protected:
-    ElectricalDistribution::Attributes::MaxContinuousCurrent::TypeInfo::Type mMaxContinuousCurrent;
-    ElectricalDistribution::Attributes::MaxVoltage::TypeInfo::Type mMaxVoltage;
-    ElectricalDistribution::Attributes::NumberOfPoles::TypeInfo::Type mNumberOfPoles;
-    ElectricalDistribution::Attributes::EndOfLife::TypeInfo::Type mEndOfLife;
-    ElectricalDistribution::Attributes::ServiceEntranceRated::TypeInfo::Type mServiceEntranceRated;
+    Attributes::MaxContinuousCurrent::TypeInfo::Type mMaxContinuousCurrent;
+    Attributes::MaxVoltage::TypeInfo::Type mMaxVoltage;
+    Attributes::NumberOfPoles::TypeInfo::Type mNumberOfPoles;
+    Attributes::EndOfLife::TypeInfo::Type mEndOfLife;
+    Attributes::ServiceEntranceRated::TypeInfo::Type mServiceEntranceRated;
 };
 
 } // namespace chip::app::Clusters::ElectricalDistribution

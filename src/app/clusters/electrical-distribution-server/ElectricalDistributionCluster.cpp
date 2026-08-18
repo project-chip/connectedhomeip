@@ -46,7 +46,7 @@ DataModel::ActionReturnStatus ElectricalDistributionCluster::ReadAttribute(const
     case ServiceEntranceRated::Id:
         return encoder.Encode(mServiceEntranceRated);
     case ClusterRevision::Id:
-        return encoder.Encode(ElectricalDistribution::kRevision);
+        return encoder.Encode(kRevision);
     case FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     default:
@@ -58,7 +58,7 @@ CHIP_ERROR ElectricalDistributionCluster::Attributes(const ConcreteClusterPath &
                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(ElectricalDistribution::Attributes::kMandatoryMetadata), {});
+    return listBuilder.Append(Span(kMandatoryMetadata), {});
 }
 
 CHIP_ERROR ElectricalDistributionCluster::SetEndOfLife(const EndOfLife::TypeInfo::Type & endOfLife)
@@ -66,8 +66,7 @@ CHIP_ERROR ElectricalDistributionCluster::SetEndOfLife(const EndOfLife::TypeInfo
     // EndOfLife is nullable, so null is a legal value. A non-null value must name a known enum
     // member: kUnknownEnumValue is the decode sentinel for values this build does not recognise,
     // and storing it would let an out-of-spec value be transmitted on a subsequent read.
-    VerifyOrReturnError(endOfLife.IsNull() ||
-                            EnsureKnownEnumValue(endOfLife.Value()) != ElectricalDistribution::EndOfLifeEnum::kUnknownEnumValue,
+    VerifyOrReturnError(endOfLife.IsNull() || EnsureKnownEnumValue(endOfLife.Value()) != EndOfLifeEnum::kUnknownEnumValue,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
     SetAttributeValue(mEndOfLife, endOfLife, EndOfLife::Id);
