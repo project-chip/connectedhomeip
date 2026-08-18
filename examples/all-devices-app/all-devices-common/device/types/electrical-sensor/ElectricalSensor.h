@@ -29,12 +29,11 @@ namespace chip::app {
 class ElectricalSensor : public SingleEndpoint
 {
     using ElectricalEnergyMeasurementClusterT = Clusters::ElectricalEnergyMeasurement::ElectricalEnergyMeasurementCluster;
-    using ElectricalPowerMeasurementClusterT = Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster;
-    using PowerTopologyClusterT = Clusters::PowerTopology::PowerTopologyCluster;
+    using ElectricalPowerMeasurementClusterT  = Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster;
+    using PowerTopologyClusterT               = Clusters::PowerTopology::PowerTopologyCluster;
 
 public:
-    ElectricalSensor(TimerDelegate & timerDelegate,
-                     Clusters::ElectricalEnergyMeasurement::Delegate & electricalEnergyDelegate,
+    ElectricalSensor(TimerDelegate & timerDelegate, Clusters::ElectricalEnergyMeasurement::Delegate & electricalEnergyDelegate,
                      Clusters::ElectricalPowerMeasurement::Delegate & electricalPowerDelegate,
                      Clusters::PowerTopology::Delegate & powerTopologyDelegate);
     ~ElectricalSensor() override = default;
@@ -49,7 +48,6 @@ public:
     PowerTopologyClusterT & PowerTopologyCluster();
 
 protected:
-
     TimerDelegate & mTimerDelegate;
     Clusters::ElectricalEnergyMeasurement::Delegate & mElectricalEnergyDelegate;
     Clusters::ElectricalPowerMeasurement::Delegate & mElectricalPowerDelegate;

@@ -28,46 +28,41 @@ ElectricalSensor::ElectricalSensor(TimerDelegate & timerDelegate,
                                    Clusters::ElectricalPowerMeasurement::Delegate & electricalPowerDelegate,
                                    Clusters::PowerTopology::Delegate & powerTopologyDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kElectricalSensor, 1)),
-    mTimerDelegate(timerDelegate), mElectricalEnergyDelegate(electricalEnergyDelegate), mElectricalPowerDelegate(electricalPowerDelegate),
-    mPowerTopologyDelegate(powerTopologyDelegate)
+    mTimerDelegate(timerDelegate), mElectricalEnergyDelegate(electricalEnergyDelegate),
+    mElectricalPowerDelegate(electricalPowerDelegate), mPowerTopologyDelegate(powerTopologyDelegate)
 {}
 
 CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                       EndpointComposition composition)
+                                      EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // ElectricalEnergyMeasurement Cluster
 
     {
-        const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange {
-            .rangeMin = 0,
-            .rangeMax = 10,
-            .percentMax = MakeOptional(100)
+        const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
+            .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(100)
         };
 
-        const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy {
-            .measurementType = Clusters::detail::MeasurementTypeEnum::kElectricalEnergy,
-            .measured        = 0,
+        const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
+            .measurementType  = Clusters::detail::MeasurementTypeEnum::kElectricalEnergy,
+            .measured         = 0,
             .minMeasuredValue = 0,
             .maxMeasuredValue = 10,
-            .accuracyRanges = Span(&kAccuracyRange, 1)
+            .accuracyRanges   = Span(&kAccuracyRange, 1)
         };
 
         ElectricalEnergyMeasurementClusterT::Config config{
-            .endpointId         = endpoint,
-            .featureFlags       = BitMask<ElectricalEnergyMeasurement::Feature>(
-                ElectricalEnergyMeasurement::Feature::kImportedEnergy,
-                ElectricalEnergyMeasurement::Feature::kExportedEnergy,
-                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
-                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
-                ElectricalEnergyMeasurement::Feature::kApparentEnergy,
-                ElectricalEnergyMeasurement::Feature::kReactiveEnergy
-            ),
-            .optionalAttributes = ElectricalEnergyMeasurementClusterT::OptionalAttributesSet(ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
-            .accuracyStruct     = kAccuracy,
-            .delegate           = mElectricalEnergyDelegate,
-            .timerDelegate      = mTimerDelegate,
+            .endpointId   = endpoint,
+            .featureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
+                ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                ElectricalEnergyMeasurement::Feature::kApparentEnergy, ElectricalEnergyMeasurement::Feature::kReactiveEnergy),
+            .optionalAttributes = ElectricalEnergyMeasurementClusterT::OptionalAttributesSet(
+                ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
+            .accuracyStruct = kAccuracy,
+            .delegate       = mElectricalEnergyDelegate,
+            .timerDelegate  = mTimerDelegate,
         };
 
         mElectricalEnergyMeasurementCluster.Create(config);
@@ -78,16 +73,14 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     {
         ElectricalPowerMeasurementClusterT::Config config{
-            .endpointId         = endpoint,
-            .delegate           = mElectricalPowerDelegate,
-            .features           = BitMask<ElectricalPowerMeasurement::Feature>(
-                ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-                ElectricalPowerMeasurement::Feature::kPolyphasePower,
-                ElectricalPowerMeasurement::Feature::kDirectCurrent,
-                ElectricalPowerMeasurement::Feature::kHarmonics,
-                ElectricalPowerMeasurement::Feature::kPowerQuality
-            ),
-            .optionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
+            .endpointId = endpoint,
+            .delegate   = mElectricalPowerDelegate,
+            .features   = BitMask<ElectricalPowerMeasurement::Feature>(
+                ElectricalPowerMeasurement::Feature::kAlternatingCurrent, ElectricalPowerMeasurement::Feature::kPolyphasePower,
+                ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kHarmonics,
+                ElectricalPowerMeasurement::Feature::kPowerQuality),
+            .optionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
+                ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
         };
         mElectricalPowerMeasurementCluster.Create(config);
         ReturnErrorOnFailure(provider.AddCluster(mElectricalPowerMeasurementCluster.Registration()));
@@ -97,12 +90,10 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     {
         PowerTopologyClusterT::Config config{
-            .endpointId         = endpoint,
-            .delegate           = mPowerTopologyDelegate,
-            .features           = BitMask<PowerTopology::Feature>(
-                PowerTopology::Feature::kNodeTopology,
-                PowerTopology::Feature::kElectricalCircuit
-            ),
+            .endpointId = endpoint,
+            .delegate   = mPowerTopologyDelegate,
+            .features =
+                BitMask<PowerTopology::Feature>(PowerTopology::Feature::kNodeTopology, PowerTopology::Feature::kElectricalCircuit),
         };
         mPowerTopologyCluster.Create(config);
         ReturnErrorOnFailure(provider.AddCluster(mPowerTopologyCluster.Registration()));

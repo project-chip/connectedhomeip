@@ -24,25 +24,24 @@ namespace chip::app {
 /**
  * Simulated electrical sensor that minimally impements and logs on delegate calls
  */
-class LoggingElectricalSensor : public ElectricalSensor, public TimerContext,
+class LoggingElectricalSensor : public ElectricalSensor,
+                                public TimerContext,
                                 public Clusters::ElectricalEnergyMeasurement::Delegate,
                                 public Clusters::ElectricalPowerMeasurement::Delegate,
                                 public Clusters::PowerTopology::Delegate
 {
 public:
-    explicit LoggingElectricalSensor(TimerDelegate & timerDelegate) :
-        ElectricalSensor(timerDelegate, *this, *this, *this)
-    {};
+    explicit LoggingElectricalSensor(TimerDelegate & timerDelegate) : ElectricalSensor(timerDelegate, *this, *this, *this){};
     ~LoggingElectricalSensor() override = default;
 
     // Clusters::ElectricalEnergyMeasurement::Delegate implementation
 
-    constexpr static auto msg = "%s device: %s cluster: %s called";
-    constexpr static auto msgWithIndex = "%s device: %s cluster: %s called with index %u";
-    constexpr static auto device = "ElectricalSensor";
+    constexpr static auto msg                      = "%s device: %s cluster: %s called";
+    constexpr static auto msgWithIndex             = "%s device: %s cluster: %s called with index %u";
+    constexpr static auto device                   = "ElectricalSensor";
     constexpr static auto energyMeasurementCluster = "ElectricalEnergyMeasurement";
-    constexpr static auto powerMeasurementCluster = "ElectricalPowerMeasurement";
-    constexpr static auto powerTopologyCluster = "PowerTopology";
+    constexpr static auto powerMeasurementCluster  = "ElectricalPowerMeasurement";
+    constexpr static auto powerTopologyCluster     = "PowerTopology";
 
     DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override
     {
@@ -83,7 +82,8 @@ public:
         ChipLogProgress(DeviceLayer, msg, device, powerMeasurementCluster, "StartAccuracyRead");
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetAccuracyByIndex(uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override
+    CHIP_ERROR GetAccuracyByIndex(uint8_t index,
+                                  Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override
     {
         ChipLogProgress(DeviceLayer, msgWithIndex, device, powerMeasurementCluster, "GetAccuracyByIndex", index);
         val = {};
@@ -100,7 +100,8 @@ public:
         ChipLogProgress(DeviceLayer, msg, device, powerMeasurementCluster, "StartRangesRead");
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetRangeByIndex(uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
+    CHIP_ERROR GetRangeByIndex(uint8_t index,
+                               Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, msgWithIndex, device, powerMeasurementCluster, "GetRangeByIndex", index);
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -116,7 +117,8 @@ public:
         ChipLogProgress(DeviceLayer, msg, device, powerMeasurementCluster, "StartHarmonicCurrentsRead");
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
+    CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t index,
+                                          Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, msgWithIndex, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex", index);
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -132,7 +134,8 @@ public:
         ChipLogProgress(DeviceLayer, msg, device, powerMeasurementCluster, "StartHarmonicPhasesRead");
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t index, Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
+    CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t index,
+                                        Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, msgWithIndex, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex", index);
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
