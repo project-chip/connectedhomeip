@@ -192,8 +192,8 @@ Status ModeSelectCluster::UpdateOnMode(DataModel::Nullable<uint8_t> newOnMode)
     VerifyOrReturnValue(SetAttributeValue(mOnMode, newOnMode, OnMode::Id), Status::Success);
 
     AttributePersistence persistence{ mContext->attributeStorage };
-    LogErrorOnFailure(persistence.StoreNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id), mOnMode));
+    LogErrorOnFailure(
+        persistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id), mOnMode));
     return Status::Success;
 }
 
