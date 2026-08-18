@@ -51,7 +51,7 @@ import queue
 import time
 
 from mobly import asserts
-from TC_SUTestBase import SoftwareUpdateBaseTest
+from support_modules.su_support import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
