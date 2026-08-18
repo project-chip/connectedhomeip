@@ -16,94 +16,17 @@
 
 #pragma once
 
-#include <optional>
-
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/microwave-oven/MicrowaveOven.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class EmulatedMicrowaveOvenControlIntegrationDelegate : public Clusters::MicrowaveOvenControl::IntegrationDelegate
-{
-public:
-    explicit EmulatedMicrowaveOvenControlIntegrationDelegate(Clusters::OperationalState::OperationalStateCluster & opStateCluster) :
-        mOpStateCluster(opStateCluster)
-    {}
-
-    uint8_t GetCurrentOperationalState() const override { return mOpStateCluster.GetCurrentOperationalState(); }
-    CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override
-    {
-        mode = 0;
-        return CHIP_NO_ERROR;
-    }
-    bool IsSupportedMode(uint8_t mode) const override { return mode == 0 || mode == 1; }
-    bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override
-    {
-        return commandId == Clusters::OperationalState::Commands::Start::Id;
-    }
-
-private:
-    Clusters::OperationalState::OperationalStateCluster & mOpStateCluster;
-};
-
-class EmulatedMicrowaveOvenControlDelegate : public Clusters::MicrowaveOvenControl::AppDelegate
-{
-public:
-    static constexpr uint16_t kWattRating     = 1000;
-    static constexpr uint32_t kMaxCookTimeSec = 3600;
-    static constexpr uint8_t kPowerSettingNum = 100;
-    static constexpr uint8_t kMinPowerNum     = 10;
-    static constexpr uint8_t kMaxPowerNum     = 100;
-    static constexpr uint8_t kPowerStepNum    = 10;
-
-    void SetOperationalStateDelegate(Clusters::OperationalState::EmulatedOperationalStateDelegate * opStateDelegate)
-    {
-        mOpStateDelegate = opStateDelegate;
-    }
-
-    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                           bool startAfterSetting,
-                                                                           Optional<uint8_t> powerSettingNum,
-                                                                           Optional<uint8_t> wattSettingIndex) override
-    {
-        if (startAfterSetting && mOpStateDelegate != nullptr)
-        {
-            Clusters::OperationalState::GenericOperationalError err(
-                to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
-            mOpStateDelegate->HandleStartStateCallback(err);
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) override
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override
-    {
-        if (index == 0)
-        {
-            wattSetting = kWattRating;
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    uint32_t GetMaxCookTimeSec() const override { return kMaxCookTimeSec; }
-    uint8_t GetPowerSettingNum() const override { return kPowerSettingNum; }
-    uint8_t GetMinPowerNum() const override { return kMinPowerNum; }
-    uint8_t GetMaxPowerNum() const override { return kMaxPowerNum; }
-    uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
-    uint8_t GetCurrentWattIndex() const override { return 0; }
-    uint16_t GetWattRating() const override { return kWattRating; }
-
-private:
-    Clusters::OperationalState::EmulatedOperationalStateDelegate * mOpStateDelegate = nullptr;
-};
-
-class EmulatedMicrowaveOven : public MicrowaveOven
+class EmulatedMicrowaveOven : public MicrowaveOven,
+                              public Clusters::OperationalState::Delegate,
+                              public Clusters::MicrowaveOvenControl::IntegrationDelegate,
+                              public Clusters::MicrowaveOvenControl::AppDelegate,
+                              public Clusters::ModeBase::AppDelegate,
+                              public TimerContext
 {
 public:
     struct Context
@@ -112,38 +35,74 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
     };
 
-    explicit EmulatedMicrowaveOven(const Context & context) :
-        MicrowaveOven(MicrowaveOven::Config{
-            .operationalStateDelegate   = mOpStateDelegate,
-            .controlIntegrationDelegate = mControlIntegrationDelegate,
-            .controlAppDelegate         = mControlAppDelegate,
-            .modeDelegate               = mModeDelegate,
-            .diagnosticDataProvider     = context.diagnosticDataProvider,
-        }),
-        mOpStateDelegate(context.timerDelegate), mControlIntegrationDelegate(OperationalState())
-    {}
+    explicit EmulatedMicrowaveOven(const Context & context);
+    ~EmulatedMicrowaveOven() override;
 
-    ~EmulatedMicrowaveOven() override = default;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
+    // -- TimerContext Interface --
+    void TimerFired() override;
+
+    // -- OperationalState::Delegate Interface --
+    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
+    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+
+    // -- MicrowaveOvenControl::IntegrationDelegate Interface --
+    uint8_t GetCurrentOperationalState() const override { return to_underlying(mOperationalState); }
+    CHIP_ERROR GetNormalOperatingMode(uint8_t & mode) const override;
+    bool IsSupportedMode(uint8_t mode) const override;
+    bool IsSupportedOperationalStateCommand(EndpointId endpointId, CommandId commandId) const override;
+
+    // -- MicrowaveOvenControl::AppDelegate Interface --
+    Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
+                                                                           bool startAfterSetting,
+                                                                           Optional<uint8_t> powerSettingNum,
+                                                                           Optional<uint8_t> wattSettingIndex) override;
+    Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) override
     {
-        ReturnErrorOnFailure(MicrowaveOven::Register(endpoint, provider, composition));
-        mOpStateDelegate.SetCluster(&OperationalState());
-        mControlAppDelegate.SetOperationalStateDelegate(&mOpStateDelegate);
-        return CHIP_NO_ERROR;
+        return Protocols::InteractionModel::Status::Success;
     }
+    CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override;
+    uint32_t GetMaxCookTimeSec() const override { return kMaxCookTimeSec; }
+    uint8_t GetPowerSettingNum() const override { return kPowerSettingNum; }
+    uint8_t GetMinPowerNum() const override { return kMinPowerNum; }
+    uint8_t GetMaxPowerNum() const override { return kMaxPowerNum; }
+    uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
+    uint8_t GetCurrentWattIndex() const override { return 0; }
+    uint16_t GetWattRating() const override { return kWattRating; }
 
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        mOpStateDelegate.SetCluster(nullptr);
-        MicrowaveOven::Unregister(provider);
-    }
+    // -- ModeBase::AppDelegate Interface --
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override;
+    void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
 private:
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mOpStateDelegate;
-    EmulatedMicrowaveOvenControlIntegrationDelegate mControlIntegrationDelegate;
-    EmulatedMicrowaveOvenControlDelegate mControlAppDelegate;
-    MicrowaveOvenModeDelegate mModeDelegate;
+    static constexpr uint16_t kWattRating                   = 1000;
+    static constexpr uint32_t kMaxCookTimeSec               = 3600;
+    static constexpr uint8_t kPowerSettingNum               = 100;
+    static constexpr uint8_t kMinPowerNum                   = 10;
+    static constexpr uint8_t kMaxPowerNum                   = 100;
+    static constexpr uint8_t kPowerStepNum                  = 10;
+    static constexpr uint32_t kEmulatedOperationDurationSec = 30;
+
+    static constexpr CharSpan kModeLabels[]    = { "Normal"_span, "Defrost"_span };
+    static constexpr uint16_t kModeTagValues[] = { to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kNormal),
+                                                   to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kDefrost) };
+
+    void CancelTimer();
+    void StartEmulatedOperationTimer();
+
+    TimerDelegate & mTimerDelegate;
+    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
+    DataModel::Nullable<uint32_t> mCountdownTime;
 };
 
 } // namespace chip::app
