@@ -40,7 +40,7 @@ void LoggingWindowCovering::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 
 CHIP_ERROR LoggingWindowCovering::HandleMovement(Clusters::WindowCovering::WindowCoveringType type)
 {
-    ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%u", static_cast<unsigned>(type));
+    ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%" PRIu16, static_cast<unsigned>(type));
     auto & cluster = WindowCoveringCluster();
     if (type == Clusters::WindowCovering::WindowCoveringType::Lift)
     {
@@ -75,7 +75,7 @@ void LoggingWindowCovering::OnTargetPositionLiftChanged(DataModel::Nullable<Perc
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionLiftChanged -> %u", newTargetLift.Value());
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionLiftChanged -> %" PRIu16, newTargetLift.Value());
     }
 }
 
@@ -87,7 +87,7 @@ void LoggingWindowCovering::OnTargetPositionTiltChanged(DataModel::Nullable<Perc
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionTiltChanged -> %u", newTargetTilt.Value());
+        ChipLogProgress(DeviceLayer, "WindowCovering: OnTargetPositionTiltChanged -> %" PRIu16, newTargetTilt.Value());
     }
 }
 
