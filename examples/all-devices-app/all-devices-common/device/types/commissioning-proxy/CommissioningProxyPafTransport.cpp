@@ -210,7 +210,7 @@ public:
             {
                 if (sHost != nullptr)
                 {
-                    sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
+                    sHost->Sessions().DispatchMessageResponse(sid, chip::ByteSpan(msg->Start(), msg->DataLength()));
                 }
                 return CHIP_NO_ERROR;
             }
@@ -443,6 +443,16 @@ static void OnConnectSuccess(void * /*context*/)
         return;
     }
 
+    if (ctx->cluster == nullptr)
+    {
+        ChipLogError(AppServer, "OnConnectSuccess: cluster gone at connect complete; tearing down PAF session");
+        // Same teardown as the cmd/pPafInfo failure above: the session is up but cannot
+        // be tracked, so release it rather than leak its pool slot, PAFTP endpoint and
+        // NAN subscribe.  (The timeout timer was already cancelled, so cancelTimer=false.)
+        FailPendingConnect(ctx, chip::Protocols::InteractionModel::Status::Failure, /*cancelTimer=*/false);
+        return;
+    }
+
     uint16_t sessionId   = ctx->cluster->Sessions().AllocSessionId();
     sSessions[sessionId] = *pPafInfo;
     ctx->cluster->Sessions().RegisterSession(sessionId, CapabilitiesBitmap::kWiFiPAF, ctx->fabricIndex);
@@ -450,14 +460,11 @@ static void OnConnectSuccess(void * /*context*/)
     ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAF connected, proxy session %u (disc %u peer_id %u)", sessionId,
                     ctx->discriminator, pPafInfo->peer_id);
 
-    if (ctx->cluster)
+    CHIP_ERROR stateErr =
+        ctx->cluster->SetCPState(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
+    if (stateErr != CHIP_NO_ERROR)
     {
-        CHIP_ERROR stateErr =
-            ctx->cluster->SetCPState(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
-        if (stateErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "OnConnectSuccess: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
-        }
+        ChipLogError(AppServer, "OnConnectSuccess: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
     }
 
     chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Type response;
@@ -523,6 +530,10 @@ static void OnScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::
     {
         sHost->ScanAggregator().Contribute(chip::Span<const ScanResultT>(out.data(), out.size()));
     }
+
+    // The one-shot scan has released the NAN subscribe slot; resume a background
+    // scan that was paused to make room for it.
+    OnAllSessionsClosed();
 }
 
 } // namespace
@@ -741,10 +752,16 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     // would corrupt a live PAFTP session (see ProxyConnectRequest above).
     sScanInProgress = true;
 
+    // The one-shot scan and the background scan share the single NAN subscribe slot.
+    // Pause any running background scan so WiFiPAFScan below does not fail with BUSY;
+    // OnScanDone resumes it when the foreground scan completes.
+    sBgScan.Pause();
+
     CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnScanDone, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         sScanInProgress = false;
+        OnAllSessionsClosed();
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 

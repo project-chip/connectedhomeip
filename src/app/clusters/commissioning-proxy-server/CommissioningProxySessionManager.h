@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Pool.h>
+#include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -109,7 +110,7 @@ public:
 
     /// Forward a commissionee reply as a ProxyMessageResponse. No-op if nothing is
     /// pending for @p sessionId.
-    void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length);
+    void DispatchMessageResponse(uint16_t sessionId, ByteSpan data);
 
     /// Fail a pending ProxyMessageRequest (e.g. session dropped mid-message).
     void DispatchMessageFailure(uint16_t sessionId, Protocols::InteractionModel::Status status);

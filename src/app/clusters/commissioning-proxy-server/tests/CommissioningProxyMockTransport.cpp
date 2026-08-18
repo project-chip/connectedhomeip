@@ -66,7 +66,7 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
     // session's response timer can resolve it.
     if (mAutoRespond)
     {
-        mHost->Sessions().DispatchMessageResponse(sessionId, nullptr, 0);
+        mHost->Sessions().DispatchMessageResponse(sessionId, ByteSpan());
     }
 
     return CHIP_NO_ERROR;

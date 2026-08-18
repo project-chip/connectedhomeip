@@ -237,6 +237,21 @@ public:
         ChipLogProgress(AppServer, "ProxyBleDelegate: installed (original=%p)", (void *) mOriginalTransport);
     }
 
+    void Uninstall()
+    {
+        auto * layer = GetBleLayer();
+        if (layer == nullptr)
+        {
+            return;
+        }
+        if (layer->mBleTransport == this)
+        {
+            layer->mBleTransport = mOriginalTransport;
+            ChipLogProgress(AppServer, "ProxyBleDelegate: uninstalled");
+        }
+        mOriginalTransport = nullptr;
+    }
+
     void OnBleConnectionComplete(BLEEndPoint * endpoint) override
     {
         // Central role: BleLayer just wrapped a new L2CAP connection in an
@@ -362,7 +377,7 @@ public:
             // synchronously, so msg can be released when this scope returns.
             if (sHost != nullptr)
             {
-                sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
+                sHost->Sessions().DispatchMessageResponse(sid, chip::ByteSpan(msg->Start(), msg->DataLength()));
             }
             return;
         }
@@ -944,6 +959,10 @@ void Shutdown()
     // Tear down the background scan: cancel every per-fabric lifetime timer and stop
     // the hardware scan if the registry currently owns it.
     sBgScan.Shutdown();
+
+    // Restore BleLayer::mBleTransport so a later BLE event reaches the proxy app's own
+    // delegate rather than this module after the cluster is gone.
+    sProxyBleDelegate.Uninstall();
 
     // Last: the cluster is going away, so drop the pointer to it. Every callback above
     // null-checks sHost, and any that still reaches the platform (a scan result already

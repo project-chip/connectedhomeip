@@ -208,7 +208,7 @@ void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
     mPendingPool.ReleaseObject(pm);
 }
 
-void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
+void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, ByteSpan data)
 {
     SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr || slot->pending == nullptr)
@@ -225,7 +225,7 @@ void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionI
     {
         Commands::ProxyMessageResponse::Type response;
         response.sessionID = sessionId;
-        response.message.SetNonNull(ByteSpan(data, length));
+        response.message.SetNonNull(data);
         cmd->AddResponse(pm->path, response);
     }
     mPendingPool.ReleaseObject(pm);
