@@ -73,14 +73,14 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
     def desc_TC_SU_2_3(self) -> str:
         return "[TC-SU-2.3] Transfer of Software Update Images between DUT and TH/OTA-P"
 
-    def pics_TC_SU_2_3(self):
+    def pics_TC_SU_2_3(self) -> list[TestStep]:
         """Return the PICS definitions associated with this test."""
         return [
             "MCORE.OTA.RequestorConsent",
             "MCORE.OTA.Resume"
         ]
 
-    async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0):
+    async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0) -> Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition:
         """
         Wait for a StateTransition event whose newState matches target_state.
         Any other StateTransition events that arrive before the target one
@@ -101,7 +101,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             if getattr(data, "newState", None) == target_state:
                 return data
 
-    async def wait_for_requestor_state_or_none(self, event_cb, target_state, timeout_sec=120.0):
+    async def wait_for_requestor_state_or_none(self, event_cb, target_state, timeout_sec=120.0) -> Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition | None:
         """
         Same semantics as wait_for_requestor_state, but returns None when
         the deadline expires instead of failing the test. Useful when the
@@ -120,6 +120,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             data = ev.Data
             if getattr(data, "newState", None) == target_state:
                 return data
+        return None
 
     def steps_TC_SU_2_3(self) -> list[TestStep]:
         return [
