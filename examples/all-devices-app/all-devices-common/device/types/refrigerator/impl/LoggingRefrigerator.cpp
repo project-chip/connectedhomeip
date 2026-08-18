@@ -22,8 +22,8 @@ LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate) : Loggin
 
 LoggingRefrigerator::LoggingRefrigerator(TimerDelegate & timerDelegate, Config config) :
     Refrigerator(timerDelegate, mLoggingCabinet,
-                 Refrigerator::Config{ .operationalStateDelegate = mOpStateDelegate, .cabinetConfig = config.cabinetConfig }),
-    mOpStateDelegate(timerDelegate), mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
+                 Refrigerator::Config{ .operationalStateDelegate = mLoggingCabinet, .cabinetConfig = config.cabinetConfig }),
+    mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
 {}
 
 } // namespace chip::app
