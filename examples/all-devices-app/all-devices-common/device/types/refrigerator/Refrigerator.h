@@ -27,7 +27,7 @@ public:
     struct Config
     {
         Clusters::OperationalState::OperationalStateCluster::Delegate & operationalStateDelegate;
-        TemperatureControlledCabinetPart::Config cabinetConfig;
+        TemperatureControlledCabinetPart::Config cabinetConfig{};
     };
 
     Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config);

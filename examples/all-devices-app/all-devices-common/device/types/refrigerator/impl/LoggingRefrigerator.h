@@ -26,7 +26,22 @@ class LoggingRefrigerator : public Refrigerator
 public:
     struct Config
     {
-        TemperatureControlledCabinetPart::Config cabinetConfig;
+        // Safe food storage defaults representing a typical domestic refrigerator:
+        // - 4°C is the globally recommended safe temperature to prevent food spoilage.
+        // - 1°C to 7°C represents the typical safe operating boundaries.
+        // - 0.1°C steps provide precise temperature adjustment.
+        // Note: Temperature values are represented in 0.01°C steps.
+        static constexpr TemperatureControlledCabinetPart::Config DefaultCabinetConfig()
+        {
+            return {
+                .temperatureSetpoint = 400, // 4.00 °C
+                .minTemperature      = 100, // 1.00 °C
+                .maxTemperature      = 700, // 7.00 °C
+                .step                = 10,  // 0.10 °C
+            };
+        }
+
+        TemperatureControlledCabinetPart::Config cabinetConfig = DefaultCabinetConfig();
     };
 
     explicit LoggingRefrigerator(TimerDelegate & timerDelegate);
