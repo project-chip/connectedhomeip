@@ -150,6 +150,7 @@ class HostApp(Enum):
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
     CAMERA_CONTROLLER = auto()
+    AV_ANALYSIS_APP = auto()
     JF_CONTROL = auto()
     JF_ADMIN = auto()
     CLOSURE = auto()
@@ -263,6 +264,8 @@ class HostApp(Enum):
             return 'camera-app/linux'
         if self == HostApp.CAMERA_CONTROLLER:
             return 'camera-controller'
+        if self == HostApp.AV_ANALYSIS_APP:
+            return 'av-analysis-app/linux'
         if self == HostApp.JF_CONTROL:
             return 'jf-control-app'
         if self == HostApp.JF_ADMIN:
@@ -410,6 +413,9 @@ class HostApp(Enum):
         elif self == HostApp.CAMERA_CONTROLLER:
             yield 'chip-camera-controller'
             yield 'chip-camera-controller.map'
+        elif self == HostApp.AV_ANALYSIS_APP:
+            yield 'chip-av-analysis-app'
+            yield 'chip-av-analysis-app.map'
         elif self == HostApp.JF_CONTROL:
             yield 'jfc-app'
         elif self == HostApp.JF_ADMIN:
