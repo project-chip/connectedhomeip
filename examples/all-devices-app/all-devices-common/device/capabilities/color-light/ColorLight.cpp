@@ -23,9 +23,9 @@ namespace app {
 
 ColorLight::ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
                        const Conformance & conformance) :
-    SingleEndpoint(deviceTypes), mContext(context), mConformance(conformance), mOnOffDelegate(delegates.onOff),
-    mLevelControlDelegate(delegates.levelControl), mEffectDelegate(delegates.effect), mColorDelegate(delegates.color),
-    mIdentifyDelegate(delegates.identify)
+    SingleEndpoint(deviceTypes),
+    mContext(context), mConformance(conformance), mOnOffDelegate(delegates.onOff), mLevelControlDelegate(delegates.levelControl),
+    mEffectDelegate(delegates.effect), mColorDelegate(delegates.color), mIdentifyDelegate(delegates.identify)
 {}
 
 Clusters::OnOffLightingCluster & ColorLight::GetOnOffCluster()
