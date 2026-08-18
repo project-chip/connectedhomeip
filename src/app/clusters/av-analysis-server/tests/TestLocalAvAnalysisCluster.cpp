@@ -72,18 +72,18 @@ const std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> t
 // Define the test tracked contexts for the event framework
 const std::vector<app::Clusters::AvAnalysis::Structs::TrackedContext::Type> testTrackedContext = {
     { .identifiedContextID = 0,
-      .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x49), .tag = static_cast<uint8_t>(0x0B)},
+      .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x49), .tag = static_cast<uint8_t>(0x0B) },
       .startTime           = 0,
       .endTime             = DataModel::NullNullable }
 };
 
 const std::vector<app::Clusters::AvAnalysis::Structs::TrackedContext::Type> testAdditionalTrackedContext = {
     { .identifiedContextID = 0,
-      .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x4B), .tag = static_cast<uint8_t>(0x09)},
+      .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x4B), .tag = static_cast<uint8_t>(0x09) },
       .startTime           = 0,
       .endTime             = DataModel::NullNullable }
 };
-    
+
 const std::vector<uint16_t> testZoneIDList = { static_cast<uint16_t>(0x01), static_cast<uint16_t>(0x02),
                                                static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04) };
 
@@ -865,12 +865,13 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     {
         FAIL();
     }
-    
+
     // 1. Session Start Event
     uint16_t mSessionId;
 
-    ASSERT_EQ(mServer.GetLogic().AnalysisSessionStart(mSessionId, DataModel::NullNullable, &mClusterTester.GetServerClusterContext()),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        mServer.GetLogic().AnalysisSessionStart(mSessionId, DataModel::NullNullable, &mClusterTester.GetServerClusterContext()),
+        CHIP_NO_ERROR);
     auto analysisStartEvent = mClusterTester.GetNextGeneratedEvent();
     if (!analysisStartEvent.has_value())
     {
@@ -885,37 +886,40 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
         FAIL() << "Expected Zones to be Null";
         return;
     }
-    
+
     // 2a. Initial Perceived Context Event - Invalid Session ID
     uint16_t invalidSessionID = 99;
-    ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(invalidSessionID, testTrackedContext, &mClusterTester.GetServerClusterContext()),
+    ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(invalidSessionID, testTrackedContext,
+                                                                  &mClusterTester.GetServerClusterContext()),
               CHIP_ERROR_NOT_FOUND);
-              
+
     // 2b. Initial Perceived Context Event
-     ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(mSessionId, testTrackedContext, &mClusterTester.GetServerClusterContext()),
-              CHIP_NO_ERROR);   
+    ASSERT_EQ(mServer.GetLogic().InitialTriggeringContextDetected(mSessionId, testTrackedContext,
+                                                                  &mClusterTester.GetServerClusterContext()),
+              CHIP_NO_ERROR);
     auto perceivedContextEvent = mClusterTester.GetNextGeneratedEvent();
     if (!perceivedContextEvent.has_value())
     {
         FAIL() << "Expected perceivedContextEvent to have a value";
         return;
     }
-    
+
     Events::PerceivedContext::DecodableType perceivedContextData;
     ASSERT_EQ(perceivedContextEvent->GetEventData(perceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(perceivedContextData.sessionID, 0);
-    
+
     // Verify that the event contains only a new identified context, and that it has one value.
     ASSERT_TRUE(perceivedContextData.newIdentifiedContexts.HasValue());
     ASSERT_FALSE(perceivedContextData.currentIdentifiedContexts.HasValue());
     ASSERT_FALSE(perceivedContextData.expiredContexts.HasValue());
 
     // Starting with element count, should be one
-    size_t count;                                                                                                                                                                       
-    CHIP_ERROR err = perceivedContextData.newIdentifiedContexts.Value().ComputeSize(&count);                                                                                                                                 
-    if (err != CHIP_NO_ERROR) {       
-        FAIL() << "Error in computing the size of the elements in a PerceivedContext Event";                                                                                                                                                                                                                                            
-    }  
+    size_t count;
+    CHIP_ERROR err = perceivedContextData.newIdentifiedContexts.Value().ComputeSize(&count);
+    if (err != CHIP_NO_ERROR)
+    {
+        FAIL() << "Error in computing the size of the elements in a PerceivedContext Event";
+    }
     ASSERT_EQ(count, static_cast<size_t>(1));
 
     // Ensure the identifiedContext matches the test context
@@ -929,31 +933,33 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     }
 
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
-    bool are_equal =
-        std::equal(testTrackedContext.begin(), testTrackedContext.end(), initialEventContexts.begin(), initialEventContexts.end(),
-                   [](const auto & tc1, const auto & tc2) { return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID && 
-                                                            tc1.identifiedContext.tag == tc2.identifiedContext.tag; });
+    bool are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), initialEventContexts.begin(),
+                                initialEventContexts.end(), [](const auto & tc1, const auto & tc2) {
+                                    return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                        tc1.identifiedContext.tag == tc2.identifiedContext.tag;
+                                });
     ASSERT_TRUE(are_equal);
-    
-    // 3. Updated context 
-    ASSERT_EQ(mServer.GetLogic().NewContextDetected(mSessionId, testAdditionalTrackedContext, &mClusterTester.GetServerClusterContext()),
-              CHIP_NO_ERROR);   
+
+    // 3. Updated context
+    ASSERT_EQ(
+        mServer.GetLogic().NewContextDetected(mSessionId, testAdditionalTrackedContext, &mClusterTester.GetServerClusterContext()),
+        CHIP_NO_ERROR);
     auto secondPerceivedContextEvent = mClusterTester.GetNextGeneratedEvent();
     if (!secondPerceivedContextEvent.has_value())
     {
         FAIL() << "Expected perceivedContextEvent to have a value";
         return;
     }
-    
+
     Events::PerceivedContext::DecodableType secondPerceivedContextData;
     ASSERT_EQ(secondPerceivedContextEvent->GetEventData(secondPerceivedContextData), CHIP_NO_ERROR);
-    ASSERT_EQ(secondPerceivedContextData.sessionID, 0);    
-    
+    ASSERT_EQ(secondPerceivedContextData.sessionID, 0);
+
     // Verify that the event contains a new and current identified context only
     ASSERT_TRUE(secondPerceivedContextData.newIdentifiedContexts.HasValue());
     ASSERT_TRUE(secondPerceivedContextData.currentIdentifiedContexts.HasValue());
     ASSERT_FALSE(secondPerceivedContextData.expiredContexts.HasValue());
-    
+
     // Ensure the new and current identifiedContexts matches the test contexts
     // Create vectors of the values for the new values and the current values then compare
     std::vector<Structs::TrackedContext::Type> currentEventContexts;
@@ -962,48 +968,50 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     {
         currentEventContexts.push_back(aCurrentContextIterator.GetValue());
     }
-    
+
     std::vector<Structs::TrackedContext::Type> newEventContexts;
     auto aNewContextIterator = secondPerceivedContextData.newIdentifiedContexts.Value().begin();
     while (aNewContextIterator.Next())
     {
         newEventContexts.push_back(aNewContextIterator.GetValue());
     }
-    
+
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value for the two
     // event fields
-    are_equal =
-        std::equal(testTrackedContext.begin(), testTrackedContext.end(), currentEventContexts.begin(), currentEventContexts.end(),
-                   [](const auto & tc1, const auto & tc2) { return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID && 
-                                                            tc1.identifiedContext.tag == tc2.identifiedContext.tag; });
+    are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), currentEventContexts.begin(),
+                           currentEventContexts.end(), [](const auto & tc1, const auto & tc2) {
+                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                   tc1.identifiedContext.tag == tc2.identifiedContext.tag;
+                           });
     ASSERT_TRUE(are_equal);
-    
-    are_equal =
-        std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), newEventContexts.begin(), newEventContexts.end(),
-                   [](const auto & tc1, const auto & tc2) { return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID && 
-                                                            tc1.identifiedContext.tag == tc2.identifiedContext.tag; });
+
+    are_equal = std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), newEventContexts.begin(),
+                           newEventContexts.end(), [](const auto & tc1, const auto & tc2) {
+                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                   tc1.identifiedContext.tag == tc2.identifiedContext.tag;
+                           });
     ASSERT_TRUE(are_equal);
-        
+
     // 4. Deleted Context
     ASSERT_EQ(mServer.GetLogic().ContextNoLongerDetected(mSessionId, testTrackedContext, &mClusterTester.GetServerClusterContext()),
-              CHIP_NO_ERROR);   
-              
+              CHIP_NO_ERROR);
+
     auto thirdPerceivedContextEvent = mClusterTester.GetNextGeneratedEvent();
     if (!thirdPerceivedContextEvent.has_value())
     {
         FAIL() << "Expected perceivedContextEvent to have a value";
         return;
     }
-    
+
     Events::PerceivedContext::DecodableType thirdPerceivedContextData;
     ASSERT_EQ(thirdPerceivedContextEvent->GetEventData(thirdPerceivedContextData), CHIP_NO_ERROR);
-    ASSERT_EQ(thirdPerceivedContextData.sessionID, 0);    
-    
+    ASSERT_EQ(thirdPerceivedContextData.sessionID, 0);
+
     // Verify that the event contains a current and expired identified context only
     ASSERT_FALSE(thirdPerceivedContextData.newIdentifiedContexts.HasValue());
     ASSERT_TRUE(thirdPerceivedContextData.currentIdentifiedContexts.HasValue());
     ASSERT_TRUE(thirdPerceivedContextData.expiredContexts.HasValue());
-    
+
     // Ensure the expired and current identifiedContexts matches the test contexts
     // Create vectors of the values for the new values and the current values then compare
     currentEventContexts.clear();
@@ -1012,42 +1020,43 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     {
         currentEventContexts.push_back(aCurrentContextIterator.GetValue());
     }
-    
+
     std::vector<Structs::TrackedContext::Type> expiredEventContexts;
     auto aExpiredContextIterator = thirdPerceivedContextData.expiredContexts.Value().begin();
     while (aExpiredContextIterator.Next())
     {
         expiredEventContexts.push_back(aExpiredContextIterator.GetValue());
-    }    
+    }
 
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value for the two
     // event fields
-    are_equal =
-        std::equal(testTrackedContext.begin(), testTrackedContext.end(), expiredEventContexts.begin(), expiredEventContexts.end(),
-                   [](const auto & tc1, const auto & tc2) { return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID && 
-                                                            tc1.identifiedContext.tag == tc2.identifiedContext.tag; });
+    are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), expiredEventContexts.begin(),
+                           expiredEventContexts.end(), [](const auto & tc1, const auto & tc2) {
+                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                   tc1.identifiedContext.tag == tc2.identifiedContext.tag;
+                           });
     ASSERT_TRUE(are_equal);
-    
-    are_equal =
-        std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), currentEventContexts.begin(), currentEventContexts.end(),
-                   [](const auto & tc1, const auto & tc2) { return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID && 
-                                                            tc1.identifiedContext.tag == tc2.identifiedContext.tag; });
+
+    are_equal = std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), currentEventContexts.begin(),
+                           currentEventContexts.end(), [](const auto & tc1, const auto & tc2) {
+                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                   tc1.identifiedContext.tag == tc2.identifiedContext.tag;
+                           });
     ASSERT_TRUE(are_equal);
-    
+
     // 5. End Session
-    ASSERT_EQ(mServer.GetLogic().AnalysisSessionEnd(mSessionId, &mClusterTester.GetServerClusterContext()),
-              CHIP_NO_ERROR);   
-              
+    ASSERT_EQ(mServer.GetLogic().AnalysisSessionEnd(mSessionId, &mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
     auto endSessionEvent = mClusterTester.GetNextGeneratedEvent();
     if (!endSessionEvent.has_value())
     {
         FAIL() << "Expected endSessionEvent to have a value";
         return;
     }
-    
+
     Events::AnalysisSessionEnd::DecodableType endSessionData;
     ASSERT_EQ(endSessionEvent->GetEventData(endSessionData), CHIP_NO_ERROR);
-    ASSERT_EQ(endSessionData.sessionID, 0);        
+    ASSERT_EQ(endSessionData.sessionID, 0);
 }
 
 } // namespace

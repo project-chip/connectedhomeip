@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -130,41 +130,43 @@ public:
     void SetZoneIDs(chip::Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIDs) { mZoneIDs = aZoneIDs; }
 };
 
-struct ActiveAmbientContextSession 
+struct ActiveAmbientContextSession
 {
 private:
     uint16_t mSessionId;
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
-    
+
 public:
     virtual ~ActiveAmbientContextSession() = default;
     ActiveAmbientContextSession() {}
-        
+
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
-    
+
     void AddTrackedContext(std::vector<Structs::TrackedContext::Type> aTrackedContext)
     {
         // Update the current set of tracked contexts with those newly provided
         //
-        mTrackedContexts.insert(mTrackedContexts.end(), aTrackedContext.begin(), aTrackedContext.end());        
+        mTrackedContexts.insert(mTrackedContexts.end(), aTrackedContext.begin(), aTrackedContext.end());
     }
-    
+
     void RemoveTrackedContext(std::vector<Structs::TrackedContext::Type> aTrackedContext)
     {
-        // Remove the provided contexts from our current set     
-        std::erase_if(mTrackedContexts, [&](const Structs::TrackedContext::Type& context1) {
-            for (const auto& context2 : aTrackedContext) {
-                if (context1.identifiedContext.namespaceID == context2.identifiedContext.namespaceID && 
-                    context1.identifiedContext.tag == context2.identifiedContext.tag) {
+        // Remove the provided contexts from our current set
+        std::erase_if(mTrackedContexts, [&](const Structs::TrackedContext::Type & context1) {
+            for (const auto & context2 : aTrackedContext)
+            {
+                if (context1.identifiedContext.namespaceID == context2.identifiedContext.namespaceID &&
+                    context1.identifiedContext.tag == context2.identifiedContext.tag)
+                {
                     return true; // Match found, remove it
                 }
             }
             return false;
         });
     }
-    
-    const std::vector<Structs::TrackedContext::Type>& GetTrackedContexts() const { return mTrackedContexts; }
+
+    const std::vector<Structs::TrackedContext::Type> & GetTrackedContexts() const { return mTrackedContexts; }
 };
 
 } // namespace AvAnalysis
