@@ -26,6 +26,7 @@
 
 #include "thermostat-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
+#include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
 
 using namespace chip;
@@ -77,18 +78,21 @@ constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+static Clusters::Thermostat::ThermostatSensorsDelegate gSensorsDelegate(gThermostatEndpoint);
 
 void ApplicationInit()
 {
     ChipLogProgress(Zcl, "Thermostat application init");
 
-    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate, gSuggestionsDelegate);
+    Clusters::Thermostat::ServerInit(gThermostatEndpoint, gThermostatDelegate, gPresetsDelegate,
+                                     gSuggestionsDelegate, gSensorsDelegate);
 }
 
 using ThermostatClusterType =
     Clusters::Thermostat::ThermostatClusterWithFeatures<Clusters::Thermostat::ThermostatDelegate,
                                                         Clusters::Thermostat::ThermostatPresetsDelegate,
-                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate>;
+                                                        Clusters::Thermostat::ThermostatSuggestionsDelegate,
+                                                        Clusters::Thermostat::ThermostatSensorsDelegate>;
 
 void ApplicationShutdown()
 {
