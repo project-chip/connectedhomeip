@@ -112,27 +112,23 @@ CHIP_ERROR ElectricalProtectionAlarmCluster::ClearAllAlarms()
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::SetState(AlarmBitmask newState)
 {
-    const uint32_t oldRaw = mState.Raw();
     // An alarm can only be active if its bit is both supported and enabled by the mask; the Alarm
     // Base cluster requires State to reflect the Mask, so a masked-out (disabled) alarm stays inactive.
-    const uint32_t newRaw = static_cast<uint32_t>(newState.Raw() & mSupported.Raw() & mMask.Raw());
+    const AlarmBitmask effectiveState = (newState & mSupported & mMask);
+    const AlarmBitmask oldState       = mState;
 
-    if (newRaw == oldRaw)
+    if (!SetAttributeValue(mState, effectiveState, State::Id))
     {
         return CHIP_NO_ERROR; // no transition: no report, no event
     }
 
-    AlarmBitmask effectiveState;
-    effectiveState.SetRaw(newRaw);
-    SetAttributeValue(mState, effectiveState, State::Id);
-
     if (mContext != nullptr)
     {
         ElectricalProtectionAlarm::Events::Notify::Type event;
-        event.active.SetRaw(static_cast<uint32_t>(newRaw & ~oldRaw));
-        event.inactive.SetRaw(static_cast<uint32_t>(oldRaw & ~newRaw));
-        event.state.SetRaw(newRaw);
-        event.mask = mMask;
+        event.active   = AlarmBitmask(effectiveState).Clear(oldState);
+        event.inactive = AlarmBitmask(oldState).Clear(effectiveState);
+        event.state    = effectiveState;
+        event.mask     = mMask;
         mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
     }
 
