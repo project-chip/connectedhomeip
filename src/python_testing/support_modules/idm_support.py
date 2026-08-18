@@ -610,14 +610,15 @@ class IDMBaseTest(BasicCompositionTests):
                     f"Returned attributes don't match AttributeList for cluster {cluster.id} on endpoint {endpoint}")
         return read_request
 
-    async def read_endpoint_all_clusters(self, endpoint):
+    async def read_endpoint_all_clusters(self, endpoint: int) -> dict:
         """Read all attributes from all clusters on an endpoint.
 
         Args:
             endpoint: Endpoint to read from
 
         Returns:
-            Read response dictionary
+            The codegen-parsed attributes mapping from the read response, keyed by
+            endpoint, then cluster class, then attribute class.
         """
         # Use Read (not ReadAttribute): ReadAttribute returns only the codegen-parsed dict,
         # whereas Read returns a response object that also carries tlvAttributes.
