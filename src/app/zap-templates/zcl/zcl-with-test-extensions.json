@@ -434,6 +434,11 @@
             "MeasuredValue"
         ],
         "Joint Fabric Datastore": ["Status"],
+        "Laundry Dryer Controls": [
+            "ClusterRevision",
+            "SelectedDrynessLevel",
+            "FeatureMap"
+        ],
         "Laundry Washer Controls": [
             "ClusterRevision",
             "SpinSpeeds",
