@@ -5,9 +5,9 @@ to be derived from by alarm clusters such as Dishwasher Alarm and Refrigerator
 Alarm.
 
 The code-driven implementation lives in this directory (`AlarmBaseCluster`,
-`Delegate`, and tests). Concrete clusters subclass `AlarmBaseCluster` and provide
-cluster-specific event generation (for example `DishwasherAlarmCluster` and
-`RefrigeratorAlarmCluster`).
+`Delegate`, and tests). Concrete clusters subclass `AlarmBaseCluster` and
+provide cluster-specific event generation (for example `DishwasherAlarmCluster`
+and `RefrigeratorAlarmCluster`).
 
 ## Fixed attributes: Supported and Latch
 
@@ -19,11 +19,13 @@ build time), not changed at runtime through the server application API.
 
 For that reason, the code-driven Alarm Base implementation:
 
-- Initializes `Supported` and `Latch` once from `AlarmBaseCluster::Config`
-  (`.supported` and `.latch`) when the cluster is created.
-- Stores them as `const` members on `AlarmBaseCluster` (`mSupported`, `mLatch`).
-- Exposes **read-only** accessors: `GetSupportedValue()` and `GetLatchValue()`.
-- Does **not** implement `WriteAttribute` for these attributes.
+-   Initializes `Supported` and `Latch` once from `AlarmBaseCluster::Config`
+    (`.supported` and `.latch`) when the cluster is created.
+-   Stores them as `const` members on `AlarmBaseCluster` (`mSupported`,
+    `mLatch`).
+-   Exposes **read-only** accessors: `GetSupportedValue()` and
+    `GetLatchValue()`.
+-   Does **not** implement `WriteAttribute` for these attributes.
 
 ### Removed setters
 
@@ -34,9 +36,9 @@ fixed attributes, which does not match the Alarm Base specification.
 
 Mutable runtime state remains available through:
 
-- `SetMaskValue()` / `GetMaskValue()`
-- `SetStateValue()` / `GetStateValue()`
-- `ResetLatchedAlarms()` (when the Reset feature is enabled)
+-   `SetMaskValue()` / `GetMaskValue()`
+-   `SetStateValue()` / `GetStateValue()`
+-   `ResetLatchedAlarms()` (when the Reset feature is enabled)
 
 To change Supported or Latch for a product, update the cluster configuration in
 the data model (ZAP / `.matter`) and ensure `CodegenIntegration` passes the
