@@ -633,6 +633,7 @@ class IDMBaseTest(BasicCompositionTests):
         server_list_id = Clusters.Descriptor.Attributes.ServerList.attribute_id
         attribute_list_id = Clusters.Descriptor.Attributes.AttributeList.attribute_id
 
+        asserts.assert_in(endpoint, tlv_attributes, f"Endpoint {endpoint} not in output")
         asserts.assert_in(Clusters.Descriptor.id, tlv_attributes[endpoint], "Descriptor cluster not in output")
         asserts.assert_in(server_list_id, tlv_attributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
 
@@ -649,6 +650,8 @@ class IDMBaseTest(BasicCompositionTests):
             # their AttributeList cannot be validated against a known attribute set here.
             if global_attribute_ids.cluster_id_type(cluster_id) != global_attribute_ids.ClusterIdType.kStandard:
                 continue
+            asserts.assert_in(attribute_list_id, tlv_attributes[endpoint][cluster_id],
+                              f"AttributeList not in output for cluster {cluster_id}")
             returned_attrs = sorted(tlv_attributes[endpoint][cluster_id].keys())
             attr_list = sorted(tlv_attributes[endpoint][cluster_id][attribute_list_id])
             asserts.assert_equal(
