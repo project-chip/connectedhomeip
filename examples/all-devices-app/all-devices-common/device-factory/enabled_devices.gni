@@ -70,7 +70,7 @@ _available_devices = [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],
-   [
+  [
     "contact-sensor",
     "CONTACT_SENSOR",
   ],
