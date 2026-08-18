@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/oven/Oven.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>

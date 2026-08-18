@@ -39,8 +39,5 @@ source_set("emulated") {
     "impl/EmulatedMicrowaveOven.h",
   ]
 
-  public_deps = [
-    ":microwave-oven",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
-  ]
+  public_deps = [ ":microwave-oven" ]
 }
