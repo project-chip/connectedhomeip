@@ -65,6 +65,9 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestMatterTestingSupport.py",
         "test_testing/TestMatterDeviceGraph.py",
         "test_testing/TestDecorators.py",
+        # Controller-lifecycle unit test: creates and shuts down fabric admins locally and
+        # never performs DUT I/O. test_metadata.yaml and CI both run it with no app.
+        "test_testing/TestCreateNewController.py",
     ],
     MatterTestCommissionedDevice: [
         "test_testing/TestBatchInvoke.py",
@@ -77,7 +80,6 @@ _EXPECTED_BY_MARKER: dict[type, list[str]] = {
         "test_testing/TestTimeSyncTrustedTimeSource.py",
         "test_testing/test_manufacturer_specific_cluster.py",
         "test_testing/test_ota_version.py",
-        "test_testing/TestCreateNewController.py",
         "test_testing/TestCommissioningTimeSync.py",
         "test_testing/TestCleanupFramework.py",
         # Representatives of the support-module bases: mixed bases carry the marker on the

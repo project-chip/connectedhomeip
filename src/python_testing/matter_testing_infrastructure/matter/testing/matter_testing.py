@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import asyncio
-import concurrent.futures
 import inspect
 import json
 import logging
@@ -513,6 +512,31 @@ class TestCleanupConfig:
     def disabled(cls) -> TestCleanupConfig:
         """Returns a config with all cleanup steps disabled."""
         return cls(**{f.name: False for f in fields(cls)})
+
+
+_blocking_probe_loop_lock = threading.Lock()
+_blocking_probe_loop: asyncio.AbstractEventLoop | None = None
+
+
+def _shared_blocking_probe_loop() -> asyncio.AbstractEventLoop:
+    """A long-lived worker loop for driving coroutines from sync code nested in a running loop.
+
+    Deliberately created once and never closed. Chip controller callbacks bind to whichever
+    loop drove the call -- both AsyncioCallableHandle and GetConnectedDevice's
+    DeviceAvailableClosure capture asyncio.get_running_loop() and later signal it with
+    call_soon_threadsafe from the CHIP thread -- and that can fire well after the call itself
+    timed out. Driving each probe on a throwaway asyncio.run() loop closes the loop the moment
+    the probe returns, so those late callbacks raise "Event loop is closed" out of a ctypes
+    callback. A single daemon-threaded loop kept for the process lifetime absorbs them.
+    """
+    global _blocking_probe_loop
+    with _blocking_probe_loop_lock:
+        if _blocking_probe_loop is None:
+            loop = asyncio.new_event_loop()
+            threading.Thread(target=loop.run_forever, name="matter-blocking-probe",
+                             daemon=True).start()
+            _blocking_probe_loop = loop
+        return _blocking_probe_loop
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -1853,8 +1877,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         except RuntimeError:
             return self.event_loop.run_until_complete(coro)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            return executor.submit(asyncio.run, coro).result()
+        return asyncio.run_coroutine_threadsafe(coro, _shared_blocking_probe_loop()).result()
 
     async def _resolve_dut_commissioned(self) -> bool:
         """Whether the DUT is commissioned on this fabric: DNS-SD first, then CASE.
