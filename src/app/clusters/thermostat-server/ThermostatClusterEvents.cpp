@@ -94,7 +94,7 @@ void ThermostatCluster::GenerateOccupancyChangeEvent(Optional<BitMask<OccupancyB
 }
 
 void ThermostatCluster::GenerateSetpointChangeEvent(SystemModeEnum systemMode, BitMask<OccupancyBitmap> occupancy,
-                                                     Optional<temperature> previousSetpoint, temperature currentSetpoint)
+                                                    Optional<temperature> previousSetpoint, temperature currentSetpoint)
 {
     Events::SetpointChange::Type event;
     EventNumber eventNumber;
