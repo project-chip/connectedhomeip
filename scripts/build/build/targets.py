@@ -55,6 +55,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-light',
     'dimmable-plug-in-unit',
     'dishwasher',
+    'electrical-sensor',
     'extractor-hood',
     'fan',
     'flow-sensor',
