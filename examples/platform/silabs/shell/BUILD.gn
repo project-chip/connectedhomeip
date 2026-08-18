@@ -56,6 +56,8 @@ source_set("im") {
   sources = [
     "./im/IMShellCommands.cpp",
     "./im/IMShellCommands.h",
+    "${chip_root}/examples/platform/silbs/subscription/SubscriptionManager.cpp",
+    "${chip_root}/examples/platform/silbs/subscription/SubscriptionManager.h",
   ]
 
   public_configs = [ ":im-shell-config" ]

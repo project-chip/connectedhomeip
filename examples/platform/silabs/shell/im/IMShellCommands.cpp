@@ -17,25 +17,23 @@
 
 #include "IMShellCommands.h"
 
-#include <app/InteractionModelEngine.h>
-#include <app/ReadClient.h>
-#include <app/ReadPrepareParams.h>
+#include "../../subscription/SubscriptionManager.h"
+
 #include <app/server/Server.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OnOff/AttributeIds.h>
 #include <clusters/OnOff/ClusterId.h>
 #include <credentials/FabricTable.h>
-#include <lib/core/ScopedNodeId.h>
 #include <lib/shell/Command.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
+using chip::Silabs::SubscriptionManager;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -46,27 +44,14 @@ namespace {
 Engine sShellIMSubCommands;
 
 // ----------------------------------------------------------------------------
-// Subscription callback and state
+// Shell-side subscription delegate (formats events to the shell stream)
 // ----------------------------------------------------------------------------
 
-constexpr uint16_t kDefaultMinIntervalSeconds = 0;
-constexpr uint16_t kDefaultMaxIntervalSeconds = 60;
-constexpr uint8_t kMaxSubscriptions           = 10;
-
-struct SubscriptionInfo
-{
-    ReadClient * client     = nullptr;
-    NodeId nodeId           = 0;
-    ClusterId clusterId     = 0;
-    AttributeId attributeId = 0;
-};
-
-SubscriptionInfo sSubscriptions[kMaxSubscriptions];
-
-class SubscriptionCallback : public ReadClient::Callback
+class ShellSubscriptionDelegate : public SubscriptionManager::Delegate
 {
 public:
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
+    void OnAttributeData(SubscriptionManager::Handle /*handle*/, const SubscriptionManager::Info & /*info*/,
+                         const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         if (!aStatus.IsSuccess())
         {
@@ -128,47 +113,25 @@ public:
         }
     }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionManager::Handle /*handle*/, const SubscriptionManager::Info & /*info*/,
+                                   SubscriptionId aSubscriptionId) override
     {
         streamer_printf(streamer_get(), "IM: Subscription established (id=0x%" PRIX32 ")\r\n", aSubscriptionId);
     }
 
-    void OnError(CHIP_ERROR aError) override
+    void OnError(SubscriptionManager::Handle /*handle*/, const SubscriptionManager::Info & /*info*/, CHIP_ERROR aError) override
     {
         streamer_printf(streamer_get(), "IM: Subscription error: %s\r\n", ErrorStr(aError));
     }
 
-    void OnDone(ReadClient * apReadClient) override
+    void OnSubscriptionTerminated(SubscriptionManager::Handle /*handle*/,
+                                  const SubscriptionManager::Info & /*info*/) override
     {
         streamer_printf(streamer_get(), "IM: Subscription terminated\r\n");
-
-        for (uint8_t i = 0; i < kMaxSubscriptions; i++)
-        {
-            if (sSubscriptions[i].client == apReadClient)
-            {
-                sSubscriptions[i].client      = nullptr;
-                sSubscriptions[i].nodeId      = 0;
-                sSubscriptions[i].clusterId   = 0;
-                sSubscriptions[i].attributeId = 0;
-                break;
-            }
-        }
-
-        Platform::Delete(apReadClient);
-    }
-
-    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override
-    {
-        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
-        {
-            Platform::Delete(aReadPrepareParams.mpAttributePathParamsList);
-            aReadPrepareParams.mpAttributePathParamsList    = nullptr;
-            aReadPrepareParams.mAttributePathParamsListSize = 0;
-        }
     }
 };
 
-SubscriptionCallback sSubscriptionCallback;
+ShellSubscriptionDelegate sShellSubscriptionDelegate;
 
 // ----------------------------------------------------------------------------
 // Shell handlers
@@ -213,108 +176,61 @@ CHIP_ERROR SubscribeHandler(int argc, char ** argv)
         argc == 5, CHIP_ERROR_INVALID_ARGUMENT,
         streamer_printf(streamer_get(), "Usage: im subscribe <fabricIndex> <nodeId> <endpointId> <clusterId> <attributeId>\r\n"););
 
-    // Find a free slot
-    uint8_t freeSlot = kMaxSubscriptions;
-    for (uint8_t i = 0; i < kMaxSubscriptions; i++)
-    {
-        if (sSubscriptions[i].client == nullptr)
-        {
-            freeSlot = i;
-            break;
-        }
-    }
+    SubscriptionManager::Info info;
 
-    if (freeSlot >= kMaxSubscriptions)
-    {
-        streamer_printf(streamer_get(), "Maximum subscriptions (%u) reached. No free slots available.\r\n", kMaxSubscriptions);
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    FabricIndex fabricIndex = 0;
-    NodeId nodeId           = 0;
-    EndpointId endpointId   = 0;
-    ClusterId clusterId     = 0;
-    AttributeId attributeId = 0;
-
-    VerifyOrReturnError(ArgParser::ParseInt(argv[0], fabricIndex), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(ArgParser::ParseInt(argv[0], info.fabricIndex), CHIP_ERROR_INVALID_ARGUMENT,
                         streamer_printf(streamer_get(), "Invalid fabricIndex\r\n"););
-    VerifyOrReturnError(ArgParser::ParseInt(argv[1], nodeId), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(ArgParser::ParseInt(argv[1], info.nodeId), CHIP_ERROR_INVALID_ARGUMENT,
                         streamer_printf(streamer_get(), "Invalid nodeId\r\n"););
-    VerifyOrReturnError(ArgParser::ParseInt(argv[2], endpointId), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(ArgParser::ParseInt(argv[2], info.endpointId), CHIP_ERROR_INVALID_ARGUMENT,
                         streamer_printf(streamer_get(), "Invalid endpointId\r\n"););
-    VerifyOrReturnError(ArgParser::ParseInt(argv[3], clusterId), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(ArgParser::ParseInt(argv[3], info.clusterId), CHIP_ERROR_INVALID_ARGUMENT,
                         streamer_printf(streamer_get(), "Invalid clusterId\r\n"););
-    VerifyOrReturnError(ArgParser::ParseInt(argv[4], attributeId), CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(ArgParser::ParseInt(argv[4], info.attributeId), CHIP_ERROR_INVALID_ARGUMENT,
                         streamer_printf(streamer_get(), "Invalid attributeId\r\n"););
 
-    const FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
-    const FabricInfo * fabricInfo   = fabricTable.FindFabricWithIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX,
-                        streamer_printf(streamer_get(), "Fabric index %u not found\r\n", fabricIndex););
-
-    auto * pathParams = Platform::New<AttributePathParams>(endpointId, clusterId, attributeId);
-    VerifyOrReturnError(pathParams != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ReadPrepareParams readParams;
-    readParams.mpAttributePathParamsList    = pathParams;
-    readParams.mAttributePathParamsListSize = 1;
-    readParams.mMinIntervalFloorSeconds     = kDefaultMinIntervalSeconds;
-    readParams.mMaxIntervalCeilingSeconds   = kDefaultMaxIntervalSeconds;
-    readParams.mKeepSubscriptions           = true;
-    readParams.mIsFabricFiltered            = true;
-
-    auto * readClient = Platform::New<ReadClient>(InteractionModelEngine::GetInstance(), nullptr, sSubscriptionCallback,
-                                                  ReadClient::InteractionType::Subscribe);
-    if (readClient == nullptr)
+    SubscriptionManager::Handle handle = SubscriptionManager::kInvalidHandle;
+    CHIP_ERROR err                     = SubscriptionManager::Instance().Subscribe(info, &handle);
+    if (err == CHIP_ERROR_INVALID_FABRIC_INDEX)
     {
-        Platform::Delete(pathParams);
-        return CHIP_ERROR_NO_MEMORY;
+        streamer_printf(streamer_get(), "Fabric index %u not found\r\n", info.fabricIndex);
+        return err;
     }
-
-    ScopedNodeId peer(nodeId, fabricIndex);
-
-    CHIP_ERROR err = readClient->SendAutoResubscribeRequest(peer, std::move(readParams));
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        streamer_printf(streamer_get(), "No free subscription slots (max %u) or allocation failed\r\n",
+                        SubscriptionManager::kMaxSubscriptions);
+        return err;
+    }
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(streamer_get(), "Failed to send subscribe request: %s\r\n", ErrorStr(err));
-        Platform::Delete(readClient);
         return err;
     }
-
-    sSubscriptions[freeSlot].client      = readClient;
-    sSubscriptions[freeSlot].nodeId      = nodeId;
-    sSubscriptions[freeSlot].clusterId   = clusterId;
-    sSubscriptions[freeSlot].attributeId = attributeId;
 
     streamer_printf(streamer_get(),
                     "Subscribing to node 0x" ChipLogFormatX64 " on fabric %u ep=%u cluster=0x%08" PRIX32 " attr=0x%08" PRIX32
                     " (slot %u)\r\n",
-                    ChipLogValueX64(nodeId), fabricIndex, endpointId, clusterId, attributeId, freeSlot);
+                    ChipLogValueX64(info.nodeId), info.fabricIndex, info.endpointId, info.clusterId, info.attributeId, handle);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SubscriptionsHandler(int argc, char ** argv)
 {
-    uint8_t activeCount = 0;
+    SubscriptionManager & manager = SubscriptionManager::Instance();
 
-    for (uint8_t i = 0; i < kMaxSubscriptions; i++)
+    streamer_printf(streamer_get(), "Active subscriptions: %u/%u\r\n", manager.ActiveCount(),
+                    SubscriptionManager::kMaxSubscriptions);
+
+    for (SubscriptionManager::Handle i = 0; i < SubscriptionManager::kMaxSubscriptions; i++)
     {
-        if (sSubscriptions[i].client != nullptr)
-        {
-            activeCount++;
-        }
-    }
-
-    streamer_printf(streamer_get(), "Active subscriptions: %u/%u\r\n", activeCount, kMaxSubscriptions);
-
-    for (uint8_t i = 0; i < kMaxSubscriptions; i++)
-    {
-        if (sSubscriptions[i].client != nullptr)
+        const SubscriptionManager::Info * info = manager.GetInfo(i);
+        if (info != nullptr)
         {
             streamer_printf(streamer_get(),
                             "  [%u] NodeId=0x" ChipLogFormatX64 " Cluster=0x%08" PRIX32 " Attribute=0x%08" PRIX32 "\r\n", i,
-                            ChipLogValueX64(sSubscriptions[i].nodeId), sSubscriptions[i].clusterId, sSubscriptions[i].attributeId);
+                            ChipLogValueX64(info->nodeId), info->clusterId, info->attributeId);
         }
     }
 
@@ -337,6 +253,8 @@ void RegisterCommands()
 
     sShellIMSubCommands.RegisterCommands(sIMSubCommands, MATTER_ARRAY_SIZE(sIMSubCommands));
     Engine::Root().RegisterCommands(&sIMCmd, 1);
+
+    SubscriptionManager::Instance().SetDelegate(&sShellSubscriptionDelegate);
 }
 
 } // namespace IMShellCommands
