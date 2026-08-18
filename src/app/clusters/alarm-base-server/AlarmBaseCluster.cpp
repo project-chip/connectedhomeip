@@ -22,12 +22,11 @@
 #include <clusters/RefrigeratorAlarm/Events.h>
 #include <clusters/RefrigeratorAlarm/Metadata.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AlarmBase;
 using namespace chip::app::Clusters::AlarmBase::Attributes;
 using chip::Protocols::InteractionModel::Status;
+
+namespace chip::app::Clusters {
 
 AlarmBaseCluster::AlarmBaseCluster(EndpointId endpointId, ClusterId clusterId, const Config & config) :
     DefaultServerCluster({ endpointId, clusterId }), mFeature(config.feature), mClusterRevision(config.clusterRevision),
@@ -239,7 +238,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
 
     if (!mSupported.HasAll(alarms))
     {
-        return Status::Failure;
+        return Status::InvalidCommand;
     }
 
     if (!mDelegate.ResetAlarms(alarms))
@@ -247,12 +246,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleReset(AlarmMap alarms)
         return Status::Failure;
     }
 
-    if (ResetLatchedAlarms(alarms) != Status::Success)
-    {
-        return Status::Failure;
-    }
-
-    return Status::Success;
+    return ResetLatchedAlarms(alarms);
 }
 
 DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmMap mask)
@@ -272,10 +266,7 @@ DataModel::ActionReturnStatus AlarmBaseCluster::HandleModifyEnabledAlarms(AlarmM
         return Status::Failure;
     }
 
-    if (SetMaskValue(mask) != Status::Success)
-    {
-        return Status::Failure;
-    }
-
-    return Status::Success;
+    return SetMaskValue(mask);
 }
+
+} // namespace chip::app::Clusters
