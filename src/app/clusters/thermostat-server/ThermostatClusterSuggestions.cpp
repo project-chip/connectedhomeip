@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "ThermostatClusterSuggestions.h"
 #include "ThermostatCluster.h"
 #include "ThermostatClusterPresets.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
@@ -94,6 +95,27 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
 }
 
 } // anonymous namespace
+
+CHIP_ERROR RemoveThermostatSuggestionsForRemovedPresets(Delegate * delegate, bool & didRemoveAnEntry)
+{
+    didRemoveAnEntry = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Walk backwards so removing an entry does not shift the indices of entries not yet visited.
+    for (int i = static_cast<int>(delegate->GetNumberOfThermostatSuggestions()) - 1; i >= 0; i--)
+    {
+        ThermostatSuggestionStructWithOwnedMembers suggestion;
+        CHIP_ERROR err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
+        ReturnErrorOnFailure(err);
+
+        if (!IsPresetHandlePresentInPresets(delegate, suggestion.GetPresetHandle()))
+        {
+            ReturnErrorOnFailure(delegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i)));
+            didRemoveAnEntry = true;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AddThermostatSuggestion::DecodableType & commandData)

@@ -33,6 +33,7 @@ app_config_dependent_sources = [
   "ThermostatClusterSetpoints.cpp",
   "ThermostatClusterSetpoints.h",
   "ThermostatClusterSuggestions.cpp",
+  "ThermostatClusterSuggestions.h",
   "ThermostatDelegate.h",
   "ThermostatSuggestionStructWithOwnedMembers.cpp",
   "ThermostatSuggestionStructWithOwnedMembers.h",

@@ -35,6 +35,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/ThermostatClusterSetpoints.cpp"
     "${CLUSTER_DIR}/ThermostatClusterSetpoints.h"
     "${CLUSTER_DIR}/ThermostatClusterSuggestions.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterSuggestions.h"
     "${CLUSTER_DIR}/ThermostatCluster.cpp"
     "${CLUSTER_DIR}/ThermostatCluster.h"
     "${CLUSTER_DIR}/ThermostatDelegate.h"

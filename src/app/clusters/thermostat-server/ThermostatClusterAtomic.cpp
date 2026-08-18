@@ -16,8 +16,10 @@
  */
 
 #include "ThermostatCluster.h"
+#include "ThermostatClusterSuggestions.h"
 
 #include <app/GlobalAttributes.h>
+#include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -542,13 +544,26 @@ void ThermostatAttrAccess::CommitAtomicWrite(CommandHandler * commandObj, const 
             CHIP_ERROR err;
             switch (attributeStatus.attributeID)
             {
-            case Presets::Id:
+            case Presets::Id: {
                 err = delegate->CommitPendingPresets();
                 if (err != CHIP_NO_ERROR)
                 {
                     statusCode = Status::InvalidInState;
+                    break;
                 }
+                // Per spec, removing a preset that is referenced by a ThermostatSuggestions entry or by
+                // CurrentThermostatSuggestion must cascade: prune the stale suggestion entries and re-evaluate
+                // CurrentThermostatSuggestion. This is best-effort, matching AddThermostatSuggestion/
+                // RemoveThermostatSuggestion, since the Presets commit above has already taken effect.
+                bool removedAThermostatSuggestion = false;
+                TEMPORARY_RETURN_IGNORED RemoveThermostatSuggestionsForRemovedPresets(delegate, removedAThermostatSuggestion);
+                if (removedAThermostatSuggestion)
+                {
+                    MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
+                }
+                TEMPORARY_RETURN_IGNORED delegate->ReEvaluateCurrentSuggestion();
                 break;
+            }
             case Schedules::Id:
                 break;
             default:
