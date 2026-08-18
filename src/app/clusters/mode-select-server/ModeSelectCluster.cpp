@@ -89,9 +89,9 @@ void ModeSelectCluster::ApplyStartupModeLogic()
     {
         // First boot or stale persisted value: initialize to first available mode.
         SetAttributeValue(mCurrentMode, modes[0].mode, CurrentMode::Id);
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id),
-            ByteSpan(reinterpret_cast<const uint8_t *>(&mCurrentMode), sizeof(mCurrentMode))));
+        AttributePersistence persistence{ mContext->attributeStorage };
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode));
     }
 
     if (!mStartUpMode.IsNull())
@@ -163,39 +163,37 @@ bool ModeSelectCluster::IsSupportedMode(uint8_t mode) const
 
 Status ModeSelectCluster::UpdateCurrentMode(uint8_t newMode)
 {
-    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
+    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
     VerifyOrReturnValue(IsSupportedMode(newMode), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mCurrentMode, newMode, CurrentMode::Id), Status::Success);
 
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mCurrentMode), sizeof(mCurrentMode))));
+    AttributePersistence persistence{ mContext->attributeStorage };
+    LogErrorOnFailure(persistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id), mCurrentMode));
     return Status::Success;
 }
 
 Status ModeSelectCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> newStartUpMode)
 {
-    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
+    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
     VerifyOrReturnValue(newStartUpMode.IsNull() || IsSupportedMode(newStartUpMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mStartUpMode, newStartUpMode, StartUpMode::Id), Status::Success);
 
-    // Null sentinel for nullable uint8 is 0xFF per Matter spec.
-    uint8_t storageVal = mStartUpMode.IsNull() ? static_cast<uint8_t>(0xFF) : mStartUpMode.Value();
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id), ByteSpan(&storageVal, sizeof(storageVal))));
+    AttributePersistence persistence{ mContext->attributeStorage };
+    LogErrorOnFailure(persistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id), mStartUpMode));
     return Status::Success;
 }
 
 Status ModeSelectCluster::UpdateOnMode(DataModel::Nullable<uint8_t> newOnMode)
 {
-    VerifyOrReturnValue(mContext != nullptr, Status::Busy);
+    VerifyOrReturnValue(mContext != nullptr, Status::InvalidInState);
     VerifyOrReturnValue(newOnMode.IsNull() || IsSupportedMode(newOnMode.Value()), Status::ConstraintError);
     VerifyOrReturnValue(SetAttributeValue(mOnMode, newOnMode, OnMode::Id), Status::Success);
 
-    // Null sentinel for nullable uint8 is 0xFF per Matter spec.
-    uint8_t storageVal = mOnMode.IsNull() ? static_cast<uint8_t>(0xFF) : mOnMode.Value();
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id),
-                                                            ByteSpan(&storageVal, sizeof(storageVal))));
+    AttributePersistence persistence{ mContext->attributeStorage };
+    LogErrorOnFailure(persistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, OnMode::Id), mOnMode));
     return Status::Success;
 }
 
