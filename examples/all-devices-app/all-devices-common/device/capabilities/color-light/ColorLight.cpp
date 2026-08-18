@@ -21,8 +21,11 @@
 namespace chip {
 namespace app {
 
-ColorLight::ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
-    SingleEndpoint(deviceTypes), mContext(context)
+ColorLight::ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
+                       const Conformance & conformance) :
+    SingleEndpoint(deviceTypes), mContext(context), mConformance(conformance), mOnOffDelegate(delegates.onOff),
+    mLevelControlDelegate(delegates.levelControl), mEffectDelegate(delegates.effect), mColorDelegate(delegates.color),
+    mIdentifyDelegate(delegates.identify)
 {}
 
 Clusters::OnOffLightingCluster & ColorLight::GetOnOffCluster()
@@ -67,14 +70,37 @@ Clusters::DynamicLightingCluster & ColorLight::GetDynamicLightingCluster()
     return mDynamicLightingCluster.Cluster();
 }
 
-CHIP_ERROR ColorLight::RegisterIdentify(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+// Creates every cluster the leaf device types require, in an order the clusters themselves impose:
+// Identify and ScenesManagement before On/Off and Groups, On/Off before Level Control and Color
+// Control, because each of those points at the one before it.
+//
+// The element requirements both device types share are satisfied here (they are mandatory in the
+// 0x010C table and the 0x010D table alike):
+//
+//   Identify       TriggerEffect command     the Identify delegate's IsTriggerEffectEnabled()
+//   Scenes Mgmt    CopyScene command         supportsCopyScene below
+//   On/Off         Lighting feature          the On/Off feature map below
+//   Level Control  OnOff feature             Config::WithOnOff()
+//   Level Control  Lighting feature          Config::WithLighting(), which also applies the
+//                  MinLevel 1 / MaxLevel 254 the table constrains them to
+//   Color Control  RemainingTime attribute   always advertised by ColorControlCluster
+//
+// The Level Control features are not set directly: the two builders above are what apply them, and
+// assigning Config::mFeatureMap afterwards would overwrite the bits they set while keeping the
+// MinLevel/MaxLevel and On/Off wiring they also install.
+//
+// Color Control's feature map is the one requirement that differs per device type, so it comes from
+// the leaf's Conformance.
+CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate));
-    return provider.AddCluster(mIdentifyCluster.Registration());
-}
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
 
-CHIP_ERROR ColorLight::RegisterScenesManagement(EndpointId endpoint, CodeDrivenDataModelProvider & provider, bool supportsCopyScene)
-{
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
     mScenesTableProvider.SetEndpoint(endpoint);
     mScenesManagementCluster.Create(endpoint,
                                     Clusters::ScenesManagementCluster::Context{
@@ -82,55 +108,25 @@ CHIP_ERROR ColorLight::RegisterScenesManagement(EndpointId endpoint, CodeDrivenD
                                         .fabricTable        = &mContext.fabricTable,
                                         .features           = {},
                                         .sceneTableProvider = mScenesTableProvider,
-                                        .supportsCopyScene  = supportsCopyScene,
+                                        .supportsCopyScene  = true,
                                     });
-    return provider.AddCluster(mScenesManagementCluster.Registration());
-}
+    ReturnErrorOnFailure(provider.AddCluster(mScenesManagementCluster.Registration()));
 
-CHIP_ERROR ColorLight::RegisterOnOff(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                     std::optional<BitMask<Clusters::OnOff::Feature>> featureMap)
-{
-    // The scenes integration cannot come from the caller: the cluster it points at is created by
-    // RegisterScenesManagement(), which must already have run.
-    VerifyOrReturnError(mScenesManagementCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    mOnOffCluster.Create(endpoint,
+                         Clusters::OnOffLightingCluster::Context{
+                             .timerDelegate             = mContext.timerDelegate,
+                             .effectDelegate            = mEffectDelegate,
+                             .scenesIntegrationDelegate = &mScenesManagementCluster.Cluster(),
+                             .featureMap                = BitMask<Clusters::OnOff::Feature>(Clusters::OnOff::Feature::kLighting),
+                         });
+    mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
+    ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    Clusters::OnOffLightingCluster::Context onOffContext{
-        .timerDelegate             = mContext.timerDelegate,
-        .effectDelegate            = mDriver,
-        .scenesIntegrationDelegate = &mScenesManagementCluster.Cluster(),
-    };
-    if (featureMap.has_value())
-    {
-        onOffContext.featureMap = *featureMap;
-    }
-
-    mOnOffCluster.Create(endpoint, onOffContext);
-    mOnOffCluster.Cluster().AddDelegate(&mDriver);
-    return provider.AddCluster(mOnOffCluster.Registration());
-}
-
-CHIP_ERROR ColorLight::RegisterLevelControl(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                            std::optional<BitMask<Clusters::LevelControl::Feature>> featureMap)
-{
-    VerifyOrReturnError(mOnOffCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-
-    Clusters::LevelControlCluster::Config config(mContext.timerDelegate, mDriver);
-    // WithLighting() also applies the MinLevel/MaxLevel the Lighting feature mandates, which
-    // setting the feature bit alone would not.
-    config.WithOnOff(mOnOffCluster.Cluster()).WithLighting(DataModel::Nullable<uint8_t>());
-    if (featureMap.has_value())
-    {
-        config.mFeatureMap = *featureMap;
-    }
-
-    mLevelControlCluster.Create(endpoint, config);
+    Clusters::LevelControlCluster::Config levelConfig(mContext.timerDelegate, mLevelControlDelegate);
+    levelConfig.WithOnOff(mOnOffCluster.Cluster()).WithLighting(DataModel::Nullable<uint8_t>());
+    mLevelControlCluster.Create(endpoint, levelConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
-    return provider.AddCluster(mLevelControlCluster.Registration());
-}
-
-CHIP_ERROR ColorLight::RegisterGroups(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-{
-    VerifyOrReturnError(mScenesManagementCluster.IsConstructed() && mIdentifyCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
     mGroupsCluster.Create(endpoint,
                           Clusters::GroupsCluster::Context{
@@ -138,56 +134,41 @@ CHIP_ERROR ColorLight::RegisterGroups(EndpointId endpoint, CodeDrivenDataModelPr
                               .scenesIntegration   = &mScenesManagementCluster.Cluster(),
                               .identifyIntegration = &mIdentifyCluster.Cluster(),
                           });
-    return provider.AddCluster(mGroupsCluster.Registration());
-}
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
-CHIP_ERROR ColorLight::RegisterColorControl(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                            std::optional<BitMask<Clusters::ColorControl::Feature>> featureMap,
-                                            Clusters::ColorControl::ColorValue initialColor)
-{
-    VerifyOrReturnError(mOnOffCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-
-    Clusters::ColorControlCluster::Config config(mDriver);
-    config.onOff = &mOnOffCluster.Cluster();
+    Clusters::ColorControlCluster::Config colorConfig(mColorDelegate);
+    colorConfig.onOff = &mOnOffCluster.Cluster();
     // The ColorValue variant defaults to XY; the leaf picks the mode matching its feature map.
-    config.mColorValue = initialColor;
-    if (featureMap.has_value())
-    {
-        config.mFeatures = *featureMap;
-    }
+    colorConfig.mColorValue = mConformance.initialColor;
+    colorConfig.mFeatures   = mConformance.colorFeatures;
+    mColorControlCluster.Create(endpoint, colorConfig);
+    ReturnErrorOnFailure(provider.AddCluster(mColorControlCluster.Registration()));
 
-    mColorControlCluster.Create(endpoint, config);
-    return provider.AddCluster(mColorControlCluster.Registration());
-}
-
-CHIP_ERROR ColorLight::RegisterDynamicLighting(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-{
     mDynamicLightingCluster.Create(endpoint);
-    return provider.AddCluster(mDynamicLightingCluster.Registration());
-}
+    ReturnErrorOnFailure(provider.AddCluster(mDynamicLightingCluster.Registration()));
 
-void ColorLight::RegisterSceneHandlers()
-{
-    Clusters::ScopedSceneTable table(mScenesTableProvider);
-    if (mOnOffCluster.IsConstructed())
+    // Scenes are enabled, so the scenable clusters must be registered as handlers to be able to
+    // save and recall scenes.
     {
+        Clusters::ScopedSceneTable table(mScenesTableProvider);
         table->RegisterHandler(&mOnOffCluster.Cluster());
-    }
-    if (mLevelControlCluster.IsConstructed())
-    {
         table->RegisterHandler(&mLevelControlCluster.Cluster());
-    }
-    if (mColorControlCluster.IsConstructed())
-    {
         table->RegisterHandler(&mColorControlCluster.Cluster());
     }
+
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
-void ColorLight::UnregisterAll(CodeDrivenDataModelProvider & provider)
+void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
 {
     // Disconnection (below) is strictly separated from destruction (further down): everything that
     // points at another cluster is unhooked while all cluster objects are still fully constructed,
     // so destruction order can never leave a dangling pointer behind.
+    //
+    // Every cluster is checked for construction because a failed Register() rolls back through
+    // here, having created only part of the endpoint.
     //
     // === PHASE 1: DISCONNECTION ===
 
@@ -195,9 +176,9 @@ void ColorLight::UnregisterAll(CodeDrivenDataModelProvider & provider)
     UnregisterDescriptor(provider);
 
     // Unregister the scene handlers from the scene table. All three are registered together by
-    // RegisterSceneHandlers(), so On/Off being in the handler list means the other two are as well
-    // (it is the only one of them whose IsInList() is unambiguous: LevelControl is also an
-    // OnOffDelegate, which carries a second intrusive list node).
+    // Register(), so On/Off being in the handler list means the other two are as well (it is the
+    // only one of them whose IsInList() is unambiguous: LevelControl is also an OnOffDelegate,
+    // which carries a second intrusive list node).
     if (mOnOffCluster.IsConstructed() && mOnOffCluster.Cluster().IsInList())
     {
         Clusters::ScopedSceneTable table(mScenesTableProvider);
@@ -215,14 +196,14 @@ void ColorLight::UnregisterAll(CodeDrivenDataModelProvider & provider)
     // Remove the delegates from the On/Off cluster.
     if (mOnOffCluster.IsConstructed())
     {
-        mOnOffCluster.Cluster().RemoveDelegate(&mDriver);
+        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         if (mLevelControlCluster.IsConstructed())
         {
             mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
         }
     }
 
-    // === PHASE 2: DESTRUCTION (reverse of the helper order in a leaf's Register) ===
+    // === PHASE 2: DESTRUCTION (reverse of the creation order in Register) ===
 
     if (mDynamicLightingCluster.IsConstructed())
     {

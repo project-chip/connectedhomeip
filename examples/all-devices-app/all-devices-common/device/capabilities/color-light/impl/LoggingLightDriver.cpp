@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include <device/capabilities/color-light/LoggingLightDriver.h>
+#include <device/capabilities/color-light/impl/LoggingLightDriver.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -23,6 +24,14 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
+
+// Passing *this as every delegate is safe: ColorLight only stores the references, and nothing calls
+// through them before Register() runs.
+LoggingLightDriver::LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                                       const Conformance & conformance) :
+    ColorLight(deviceTypes, context,
+               Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .color = *this, .identify = *this }, conformance)
+{}
 
 // OnOffDelegate
 
@@ -69,6 +78,11 @@ void LoggingLightDriver::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> d
 }
 
 // OnOffEffectDelegate
+//
+// OnOffEffectDelegate::TriggerEffect checks the EffectIdentifier but casts the EffectVariant
+// straight from the wire without validating it, so an unrecognized variant reaches these methods
+// and only they can reject it. ConstraintError is the status the SDK uses for a command field whose
+// value is outside the range its type allows.
 
 DataModel::ActionReturnStatus LoggingLightDriver::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum effect)
 {
@@ -84,8 +98,8 @@ DataModel::ActionReturnStatus LoggingLightDriver::TriggerDelayedAllOff(OnOff::De
         ChipLogProgress(DeviceLayer, "DelayedAllOff: SlowFade");
         break;
     default:
-        ChipLogProgress(DeviceLayer, "DelayedAllOff: UNKNOWN/INVALID");
-        break;
+        ChipLogError(DeviceLayer, "DelayedAllOff: unknown variant %u", to_underlying(effect));
+        return Status::ConstraintError;
     }
     return Status::Success;
 }
@@ -98,8 +112,8 @@ DataModel::ActionReturnStatus LoggingLightDriver::TriggerDyingLight(OnOff::Dying
         ChipLogProgress(DeviceLayer, "DyingLight: FadeOff");
         break;
     default:
-        ChipLogProgress(DeviceLayer, "DyingLight: UNKNOWN/INVALID");
-        break;
+        ChipLogError(DeviceLayer, "DyingLight: unknown variant %u", to_underlying(effect));
+        return Status::ConstraintError;
     }
     return Status::Success;
 }
@@ -109,6 +123,62 @@ DataModel::ActionReturnStatus LoggingLightDriver::TriggerDyingLight(OnOff::Dying
 void LoggingLightDriver::OnColorCTChanged(uint16_t mireds)
 {
     ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorCTChanged() -> %u mireds", mireds);
+}
+
+void LoggingLightDriver::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver: Identify START");
+}
+
+void LoggingLightDriver::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver: Identify STOP");
+}
+
+void LoggingLightDriver::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
+{
+    StringBuilder<64> msg;
+
+    switch (cluster.GetEffectIdentifier())
+    {
+    case Identify::EffectIdentifierEnum::kBlink:
+        msg.Add("BlinkEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kBreathe:
+        msg.Add("BreatheEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kOkay:
+        msg.Add("OkayEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kChannelChange:
+        msg.Add("ChannelChangeEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kFinishEffect:
+        msg.Add("FinishEffect");
+        break;
+    case Identify::EffectIdentifierEnum::kStopEffect:
+        msg.Add("StopEffect");
+        break;
+    default:
+        msg.AddFormat("UnknownEffect(%d)", static_cast<int>(cluster.GetEffectIdentifier()));
+        break;
+    }
+    msg.Add(" / ");
+    switch (cluster.GetEffectVariant())
+    {
+    case Identify::EffectVariantEnum::kDefault:
+        msg.Add("DefaultVariant");
+        break;
+    default:
+        msg.AddFormat("UnknownVariant(%d)", static_cast<int>(cluster.GetEffectVariant()));
+        break;
+    }
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver: TriggerEffect: %s", msg.c_str());
+}
+
+bool LoggingLightDriver::IsTriggerEffectEnabled() const
+{
+    return true;
 }
 
 } // namespace app

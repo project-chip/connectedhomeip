@@ -21,8 +21,6 @@ source_set("color-light") {
   sources = [
     "ColorLight.cpp",
     "ColorLight.h",
-    "LoggingLightDriver.cpp",
-    "LoggingLightDriver.h",
   ]
 
   public_deps = [
@@ -38,5 +36,21 @@ source_set("color-light") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices",
+  ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingLightDriver.cpp",
+    "impl/LoggingLightDriver.h",
+  ]
+
+  public_deps = [
+    ":color-light",
+    "${chip_root}/src/app/clusters/color-control-server",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/level-control",
+    "${chip_root}/src/app/clusters/on-off-server",
+    "${chip_root}/src/lib/support",
   ]
 }

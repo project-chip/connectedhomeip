@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <device/capabilities/color-light/ColorLight.h>
+#include <device/capabilities/color-light/impl/LoggingLightDriver.h>
 
 namespace chip {
 namespace app {
@@ -25,19 +25,16 @@ namespace app {
 /**
  * Color Temperature Light (device type 0x010C).
  *
- * Registers the ColorLight cluster set with the conformance this device type requires: On/Off
- * with Lighting, Level Control with OnOff + Lighting, and Color Control with ColorTemperature
- * only. The feature tables backing those live in ColorTemperatureLight.cpp.
+ * Registers the ColorLight cluster set with the conformance this device type requires. Everything
+ * it shares with the Extended Color Light is applied by ColorLight::Register(); what this device
+ * type adds - Color Control with ColorTemperature only - is the Conformance passed from
+ * ColorTemperatureLight.cpp.
  */
-class ColorTemperatureLight : public ColorLight
+class ColorTemperatureLight : public LoggingLightDriver
 {
 public:
     explicit ColorTemperatureLight(const Context & context);
     ~ColorTemperatureLight() override = default;
-
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
 };
 
 } // namespace app
