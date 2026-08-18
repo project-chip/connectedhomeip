@@ -740,6 +740,12 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     VerifyOrReturn(blockEOFMsg.BlockCounter == mLastQueryNum, PrepareStatusReport(StatusCode::kBadBlockCounter));
     VerifyOrReturn(blockEOFMsg.DataLength <= mTransferMaxBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
 
+    if (IsTransferLengthDefinite())
+    {
+        VerifyOrReturn(mNumBytesProcessed + blockEOFMsg.DataLength <= mTransferLength,
+                       PrepareStatusReport(StatusCode::kLengthMismatch));
+    }
+
     mBlockEventData.Data         = blockEOFMsg.Data;
     mBlockEventData.Length       = blockEOFMsg.DataLength;
     mBlockEventData.IsEof        = true;

@@ -699,6 +699,66 @@ TEST_F(TestBdxTransferSession, TestSendAcceptRejectsOversizeBlockSize)
     EXPECT_LE(initiatingSender.GetTransferBlockSize(), proposedBlockSize);
 }
 
+// Regression test for the final-block path of a definite-length transfer. For a transfer with a definite length the
+// running total of received data must never exceed the negotiated Length (the TransferInit MaxLength). HandleBlock
+// enforces this, but HandleBlockEOF did not, so a peer could push a BlockEOF whose data ran the total past the
+// declared Length and have the receiver accept it. The receiver must instead reject it with a LengthMismatch
+// StatusReport, matching the non-final Block path. AcceptTransfer/PrepareBlock clamp on the sending side, so this
+// injects a raw BlockEOF to exercise the receiving side.
+TEST_F(TestBdxTransferSession, TestBlockEOFRejectsOversizeDefiniteLength)
+{
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingSender;
+    TransferSession respondingReceiver;
+
+    uint16_t maxBlockSize          = 256;
+    uint64_t definiteLength        = 128; // negotiated Length (upper bound on the transfer)
+    size_t oversizeDataLength      = 200; // <= maxBlockSize but > definiteLength -> length violation
+    TransferControlFlags driveMode = TransferControlFlags::kSenderDrive;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = maxBlockSize;
+    initOptions.StartOffset      = 0;
+    initOptions.Length           = definiteLength;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    initOptions.Metadata         = nullptr;
+    initOptions.MetadataLength   = 0;
+
+    BitFlags<TransferControlFlags> responderControl;
+    responderControl.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingSender, TransferRole::kSender, initOptions, respondingReceiver,
+                              responderControl, maxBlockSize);
+
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode  = driveMode;
+    acceptData.MaxBlockSize = maxBlockSize;
+    acceptData.StartOffset  = 0;
+    // Length is not carried in a SendAccept; the sender reports its own negotiated Length in the AcceptReceived event.
+    acceptData.Length         = definiteLength;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+    SendAndVerifyAcceptMsg(outEvent, respondingReceiver, TransferRole::kReceiver, acceptData, initiatingSender, initOptions);
+
+    // Inject a BlockEOF whose data alone exceeds the negotiated Length.
+    uint8_t fakeData[256] = { 0 };
+    BlockEOF blockEOF;
+    blockEOF.BlockCounter = 0;
+    blockEOF.Data         = fakeData;
+    blockEOF.DataLength   = oversizeDataLength;
+
+    EXPECT_EQ(SendRawBdxMessage(blockEOF, MessageType::BlockEOF, respondingReceiver), CHIP_NO_ERROR);
+
+    // The receiver must reject with a LengthMismatch StatusReport rather than surfacing the oversize block.
+    respondingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyStatusReport(outEvent.MsgData, StatusCode::kLengthMismatch);
+}
+
 // Test that a TransferSession will emit kTransferTimeout if the specified timeout is exceeded while waiting for a response.
 TEST_F(TestBdxTransferSession, TestTimeout)
 {
