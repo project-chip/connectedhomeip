@@ -20,7 +20,9 @@
 
 namespace chip::app {
 
-LaundryDryer::LaundryDryer() : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryDryer, 1)) {}
+LaundryDryer::LaundryDryer(Clusters::OperationalState::OperationalStateCluster::Delegate & opStateDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryDryer, 1)), mDelegate(opStateDelegate)
+{}
 
 CHIP_ERROR LaundryDryer::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -29,7 +31,6 @@ CHIP_ERROR LaundryDryer::Register(EndpointId endpoint, CodeDrivenDataModelProvid
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mOperationalStateCluster.Create(endpoint, &mDelegate);
-    mDelegate.SetCluster(&mOperationalStateCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
