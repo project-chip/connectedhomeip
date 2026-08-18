@@ -128,16 +128,21 @@ public:
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
-                               
+
     // Active context tracking and events
-    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList, ServerClusterContext * aContext);
-        
-    CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext, ServerClusterContext * aContext);
-    
-    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext, ServerClusterContext * aContext);
-    
-    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext, ServerClusterContext * aContext);
-    
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+                                    ServerClusterContext * aContext);
+
+    CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
+                                                std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext,
+                                                ServerClusterContext * aContext);
+
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext,
+                                  ServerClusterContext * aContext);
+
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext,
+                                       ServerClusterContext * aContext);
+
     CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext);
 
 private:
