@@ -103,8 +103,7 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
         return Status::ConstraintError;
     }
 
-    if (commandData.expirationInMinutes < kMinExpirationInMinutes ||
-        commandData.expirationInMinutes > kMaxExpirationInMinutes)
+    if (commandData.expirationInMinutes < kMinExpirationInMinutes || commandData.expirationInMinutes > kMaxExpirationInMinutes)
     {
         return Status::ConstraintError;
     }
