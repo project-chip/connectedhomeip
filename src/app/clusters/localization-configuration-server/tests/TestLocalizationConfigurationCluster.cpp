@@ -22,6 +22,7 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
@@ -61,8 +62,11 @@ public:
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
     SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
 
+    void SetSimulateIteratorAllocFailure(bool fail) { mSimulateIteratorAllocFailure = fail; }
+
     SupportedLocalesIterator * IterateSupportedLocales() override
     {
+        VerifyOrReturnValue(!mSimulateIteratorAllocFailure, nullptr);
         return chip::Platform::New<MockSupportedLocalesIterator>(mSupportedLocales);
     }
 
@@ -97,6 +101,7 @@ private:
     };
 
     std::vector<CharSpan> mSupportedLocales;
+    bool mSimulateIteratorAllocFailure = false;
 };
 
 class MockLocalizationConfigurationCluster : public LocalizationConfigurationCluster
@@ -193,6 +198,32 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
                                             LocalizationConfiguration::Attributes::ActiveLocale::kMetadataEntry,
                                             LocalizationConfiguration::Attributes::SupportedLocales::kMetadataEntry,
                                         }));
+}
+
+TEST_F(TestLocalizationConfigurationCluster, IteratorAllocationFailure)
+{
+    // A null iterator (allocation failure) must be treated as "no supported locales"
+    // on every path, never dereferenced.
+    std::vector<CharSpan> supportedLocales = { "en-US"_span, "es-ES"_span };
+    mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
+    mDeviceInfoProvider->SetSimulateIteratorAllocFailure(true);
+
+    // Constructor can neither validate the initial locale nor find a default:
+    // ActiveLocale stays empty.
+    LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, "en-US"_span);
+    EXPECT_TRUE(cluster.GetActiveLocale().empty());
+
+    // No locale can be validated, so any write is rejected.
+    DataModel::ActionReturnStatus status = cluster.SetActiveLocale("es-ES"_span);
+    EXPECT_EQ(status, Status::ConstraintError);
+
+    // Reading SupportedLocales encodes an empty list.
+    Testing::ClusterTester tester(cluster);
+    DataModel::DecodableList<CharSpan> locales;
+    ASSERT_EQ(tester.ReadAttribute(SupportedLocales::Id, locales), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(locales.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
 }
 
 TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
