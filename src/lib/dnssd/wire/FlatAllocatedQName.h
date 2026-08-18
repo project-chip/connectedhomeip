@@ -19,8 +19,8 @@
 
 #include "QName.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// A void* implementation that stores QNames as
 ///   [ptr array] [name1] #0 [name2] #0 .... [namen] #0
@@ -115,5 +115,5 @@ inline FullQName BuildFromArray(void * storage, char const * const * parts, size
 
 } // namespace FlatAllocatedQName
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

@@ -16,8 +16,8 @@
  */
 #include "RecordWriter.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 SerializedQNameIterator RecordWriter::PreviousName(size_t index) const
 {
@@ -141,5 +141,5 @@ void RecordWriter::RememberWrittenQnameOffset(size_t offset)
     }
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip
