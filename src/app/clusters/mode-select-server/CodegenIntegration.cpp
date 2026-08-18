@@ -52,8 +52,7 @@ ModeSelect::SupportedModesManager * sSupportedModesManager = nullptr;
 class SupportedModesManagerDelegate : public ModeSelectCluster::Delegate
 {
 public:
-    SupportedModesManagerDelegate() = default;
-    explicit SupportedModesManagerDelegate(EndpointId endpointId) : mEndpointId(endpointId) {}
+    void SetEndpointId(EndpointId endpointId) { mEndpointId = endpointId; }
 
     Span<const ModeSelect::Structs::ModeOptionStruct::Type> GetSupportedModes() const override
     {
@@ -95,7 +94,7 @@ public:
     {
         VerifyOrDie(clusterInstanceIndex < kMaxClusterCount);
         ModeSelectEntry & entry = gEntries[clusterInstanceIndex];
-        entry.delegate          = SupportedModesManagerDelegate(endpointId);
+        entry.delegate.SetEndpointId(endpointId);
 
         ModeSelectCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
