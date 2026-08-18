@@ -16,29 +16,24 @@
 
 #pragma once
 
-#include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
+#include <device/types/laundry-dryer/LaundryDryer.h>
 #include <lib/support/TimerDelegate.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app {
 
-class LoggingTemperatureControlledCabinetPart : public TemperatureControlledCabinetPart,
-                                                public Clusters::OperationalState::Delegate,
-                                                public Clusters::IdentifyDelegate,
-                                                public TimerContext
+class EmulatedLaundryDryer : public LaundryDryer, public Clusters::OperationalState::Delegate, public TimerContext
 {
 public:
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name);
-    LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config, const char * name);
-    ~LoggingTemperatureControlledCabinetPart() override;
+    explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate);
+    ~EmulatedLaundryDryer() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // TimerContext Interface
+    // -- TimerContext Interface --
     void TimerFired() override;
 
-    // OperationalState::Delegate Interface
-    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    // -- OperationalState::Delegate Interface --
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
     CHIP_ERROR GetOperationalStateAtIndex(size_t index,
                                           Clusters::OperationalState::GenericOperationalState & operationalState) override;
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
@@ -47,22 +42,16 @@ public:
     void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
-    // IdentifyDelegate Interface
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override { return true; }
-
 private:
     static constexpr uint32_t kEmulatedOperationDurationSec = 30;
 
     void CancelTimer();
-    void StartEmulatedOperationTimer();
+    void StartEmulatedOperationTimer(uint32_t durationSec = kEmulatedOperationDurationSec);
 
-    const char * mName;
     TimerDelegate & mTimerDelegate;
     Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     DataModel::Nullable<uint32_t> mCountdownTime;
+    System::Clock::Timestamp mOperationEndTime{};
 };
 
 } // namespace chip::app
