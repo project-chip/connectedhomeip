@@ -804,12 +804,14 @@ class IDMBaseTest(BasicCompositionTests):
         return violations
 
     def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
-        """Generate an in-range value for a sibling field, or None to keep the class default.
+        """Generate an in-range value for a sibling field, or None if none can be generated.
 
-        Only static constraints are considered; fields whose bounds depend on
-        unresolved attribute references keep their class defaults, which may cause
-        the DUT to report CONSTRAINT_ERROR for the sibling rather than the target
-        field. That still exercises constraint validation, just less precisely.
+        Only static constraints are considered; no value can be generated for fields
+        whose bounds depend on unresolved attribute references, or whose types are out
+        of scope here (enum/bitmap/struct/list). A None return for an unconstrained
+        field is harmless (its class default cannot violate anything), but for a
+        constrained field it means the default may itself be out of range, so callers
+        must not attribute a CONSTRAINT_ERROR to the field under test.
         """
         constraints = field.constraints
         if constraints is None or not constraints.has_constraints():
@@ -839,7 +841,9 @@ class IDMBaseTest(BasicCompositionTests):
         Sends one Invoke per violated bound, with all sibling fields set to
         in-range values, and expects CONSTRAINT_ERROR for each. Returns True if
         every generated violation was properly rejected, False if any was not,
-        and None if no violation could be generated for this field.
+        and None if the field could not be tested: no violation could be generated
+        for it, or a constrained required sibling could not be given a valid value
+        (which would make a CONSTRAINT_ERROR ambiguous).
         """
         target_label = self._command_field_label(info.command_class, info.field.value)
         if target_label is None:
@@ -862,8 +866,18 @@ class IDMBaseTest(BasicCompositionTests):
             if sibling_label is None:
                 continue
             valid_value = self._generate_valid_command_field_value(sibling)
-            if valid_value is not None:
-                base_kwargs[sibling_label] = valid_value
+            if valid_value is None:
+                # A required sibling that is itself constrained keeps its generated
+                # class default, which may violate the sibling's own bounds. The DUT
+                # would then return CONSTRAINT_ERROR for the sibling and the target
+                # field would be wrongly credited with enforcing its constraint, so
+                # skip the field rather than report an unobserved pass.
+                if sibling.constraints is not None and sibling.constraints.has_constraints():
+                    log.warning("Skipping %s: cannot generate a valid value for constrained "
+                                "required field %s", info.path_str, sibling_label)
+                    return None
+                continue
+            base_kwargs[sibling_label] = valid_value
 
         timed_request_timeout_ms = 65535 if info.command_class.must_use_timed_invoke else None
         all_enforced = True
