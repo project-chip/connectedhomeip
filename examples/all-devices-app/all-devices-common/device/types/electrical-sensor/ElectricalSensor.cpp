@@ -41,7 +41,7 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
     {
         const static Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange{
-            .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(uint8_t{100})
+            .rangeMin = 0, .rangeMax = 10, .percentMax = MakeOptional(uint8_t{ 100 })
         };
 
         const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccuracy{
