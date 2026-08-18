@@ -376,8 +376,8 @@ private:
     KeepActiveFlags mKeepActiveFlags{ 0 };
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
-    OperationalState mOperationalState = OperationalState::ActiveMode;
-    bool mTransitionToIdleCalled       = false;
+    OperationalState mOperationalState  = OperationalState::ActiveMode;
+    bool mTransitionToIdleCalled        = false;
     bool mPendingCheckInOnNetworkAttach = false;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     uint8_t mOpenExchangeContextCount = 0;

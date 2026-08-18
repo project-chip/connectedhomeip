@@ -1324,8 +1324,8 @@ TEST_F(TestICDManager, TestDeferredActiveModeOnThreadAttach)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Simulate Thread Connectivity Established event
-    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
-                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
 
     // Case 1: Post event when no network activity/subscription report was deferred
     // Background Thread attach events should NOT wake up the ICD to ActiveMode
@@ -1355,8 +1355,8 @@ TEST_F(TestICDManager, TestActiveModeExtensionOnThreadReattach)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Simulate Thread re-attachment event arriving mid-exchange (e.g. after instant MAC failure & re-attach post Hub reboot)
-    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
-                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
     AdvanceClockAndRunEventLoop(100_ms);
 
@@ -1374,8 +1374,8 @@ TEST_F(TestICDManager, TestDeferredCheckInWhenAlreadyInActiveMode)
     ICDNotifier::GetInstance().NotifySubscriptionReport();
 
     // Connectivity established event should process pending Check-In even though device is already in ActiveMode
-    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
-                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
     AdvanceClockAndRunEventLoop(100_ms);
 
@@ -1399,8 +1399,8 @@ TEST_F(TestICDManager, TestDeferredActiveModeOnPeriodicIdleWakeUp)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Simulate Thread Connectivity Established event
-    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
-                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    DeviceLayer::ChipDeviceEvent event{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                        .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     EXPECT_EQ(CHIP_NO_ERROR, DeviceLayer::PlatformMgr().PostEvent(&event));
     AdvanceClockAndRunEventLoop(100_ms);
 
