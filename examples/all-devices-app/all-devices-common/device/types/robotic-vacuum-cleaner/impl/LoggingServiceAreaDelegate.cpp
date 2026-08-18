@@ -84,7 +84,14 @@ bool LoggingServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t
         return false;
     }
 
-    auto mapId = tempArea.mapID.Value();
+    if (tempArea.mapID.IsNull())
+    {
+        locationStatus = SelectAreasStatus::kInvalidSet;
+        CopyCharSpanToMutableCharSpanWithTruncation("all selected areas must be in the same map"_span, statusText);
+        return false;
+    }
+
+    const uint32_t mapId = tempArea.mapID.Value();
 
     for (const auto & areaId : selectedAreas.SubSpan(1))
     {
@@ -95,7 +102,7 @@ bool LoggingServiceAreaDelegate::IsValidSelectAreasSet(const Span<const uint32_t
             return false;
         }
 
-        if (tempArea.mapID.Value() != mapId)
+        if (tempArea.mapID.IsNull() || tempArea.mapID.Value() != mapId)
         {
             locationStatus = SelectAreasStatus::kInvalidSet;
             CopyCharSpanToMutableCharSpanWithTruncation("all selected areas must be in the same map"_span, statusText);

@@ -363,14 +363,22 @@ class TC_SEAR_1_2(MatterBaseTest):
             if not self.is_ci:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
+            if self.check_pics("SEAR.S.F02"):
+                await self.read_and_validate_supported_maps(step=21)
+
             await self.read_and_validate_supported_areas(step=21)
             old_supported_areas = self.areaid_list
 
             test_step = "Manually intervene to add one or more entries to the SupportedAreas list"
             self.print_step("22", test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "AddArea", "EndpointId": self.endpoint,
-                                       "AreaId": 42, "MapId": 1, "LocationName": "NewTestArea1"})
+                add_area_cmd = {"Name": "AddArea", "EndpointId": self.endpoint,
+                                "AreaId": 42, "LocationName": "NewTestArea1"}
+                if self.check_pics("SEAR.S.F02"):
+                    asserts.assert_true(len(self.mapid_list) > 0,
+                                        "SupportedMaps must not be empty when adding an area with a map")
+                    add_area_cmd["MapId"] = self.mapid_list[0]
+                self.write_to_app_pipe(add_area_cmd)
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
