@@ -75,6 +75,18 @@ die() {
     exit 1
 }
 
+# Digest the registry currently serves for a tag, empty if it serves none.
+# Always succeeds: an unknown tag is an answer, not an error, and the callers
+# run under set -e where a non-zero status would abort the script.
+remote_digest() {
+    # Parse the Digest line rather than asking for it with --format: older
+    # buildx ignores the flag and prints the whole human readable record, which
+    # still compares as non-empty and so silently defeats any comparison
+    # between two of these. The unformatted output has carried a "Digest:" line
+    # across versions.
+    docker buildx imagetools inspect "$1" 2>/dev/null | awk '$1 == "Digest:" { print $2; exit }'
+}
+
 set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
@@ -92,11 +104,13 @@ PUSH=false
 SKIP_BUILD=false
 SQUASH=false
 CLEAR=false
+NO_CACHE=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-cache)
             BUILD_ARGS+=("$1")
+            NO_CACHE=true
             shift
             ;;
         --latest)
@@ -155,20 +169,56 @@ awk 'toupper($1) == "FROM" && $2 ~ /project-chip\// {
     sort -u | while read -r dep; do
     dep_dir=$(find "$IMAGES_ROOT" -maxdepth 2 -type d -name "$dep" | head -1)
     [[ -n $dep_dir ]] || die "cannot locate a directory for parent image '$dep' under $IMAGES_ROOT"
-    # Only build the parent if it is not already present. Without this, a
-    # build-all run rebuilds the base image once per dependent image, and any
-    # --no-cache is forwarded into each of those rebuilds.
-    # $VERSION is what the parent will be tagged with too: every image reads the
+    # Prefer a parent that already exists over building one. Locally that avoids
+    # rebuilding the base image once per dependent image during a build-all run;
+    # in CI, where each image builds on its own runner, it avoids rebuilding the
+    # base for every image in the matrix.
+    #
+    # Building is the fallback rather than the default, since the tag is missing
+    # exactly when a change has not been published yet, which is the case on a
+    # pull request that bumps a version file.
+    #
+    # $VERSION is what the parent would be tagged with too: every image reads the
     # same DOCKER_BUILD_VERSION when set, and the per-image version files match.
     if docker image inspect "$GHCR_ORG/$ORG/$dep:$VERSION" >/dev/null 2>&1; then
-        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present, not rebuilding"
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION already present"
+    elif docker pull "$GHCR_ORG/$ORG/$dep:$VERSION"; then
+        echo "$me: pulled parent $GHCR_ORG/$ORG/$dep:$VERSION"
     else
+        echo "$me: parent $GHCR_ORG/$ORG/$dep:$VERSION not published, building it"
         (cd "$dep_dir" && ./build.sh "${ORIG_ARGS[@]}")
     fi
 done
 
+BUILT=false
 if [ "$SKIP_BUILD" = false ]; then
-    docker build "${BUILD_ARGS[@]}" --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+    # An image that already exists at this version does not need building. These
+    # images fetch SDKs and toolchains from vendor servers while they build, so
+    # a build that does not happen is also an unrelated vendor outage that
+    # cannot fail the run. --no-cache means a rebuild was asked for explicitly.
+    if [ "$NO_CACHE" = false ] && docker image inspect "$GHCR_ORG/$ORG/$IMAGE:$VERSION" >/dev/null 2>&1; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already present, not rebuilding"
+    elif [ "$NO_CACHE" = false ] && docker pull "$GHCR_ORG/$ORG/$IMAGE:$VERSION"; then
+        echo "$me: $GHCR_ORG/$ORG/$IMAGE:$VERSION already published, not rebuilding"
+    else
+        # Seed the layer cache from the previous version. Most of what changes
+        # between versions is one step, so the layers before it are often still
+        # valid. Only meaningful for numeric versions, and only once the
+        # previous image carries inline cache metadata, which is why the build
+        # below records it for next time.
+        CACHE_ARGS=()
+        # 10# forces base ten: bash reads a leading zero as octal, so "08" and
+        # "09" are errors and "010" would quietly mean 8. There is also no
+        # predecessor to version zero.
+        if [[ $VERSION =~ ^[0-9]+$ ]] && ((10#$VERSION > 0)); then
+            PREVIOUS="$GHCR_ORG/$ORG/$IMAGE:$((10#$VERSION - 1))"
+            if [ "$NO_CACHE" = false ] && docker pull "$PREVIOUS"; then
+                CACHE_ARGS=(--cache-from "$PREVIOUS")
+            fi
+        fi
+        docker build "${BUILD_ARGS[@]}" "${CACHE_ARGS[@]}" --build-arg BUILDKIT_INLINE_CACHE=1 --platform="$TARGET_PLATFORM_TYPE" --build-arg TARGETPLATFORM="$TARGET_PLATFORM_TYPE" --build-arg VERSION="$VERSION" -t "$GHCR_ORG/$ORG/$IMAGE:$VERSION" .
+        BUILT=true
+    fi
     docker image prune --force
 fi
 
@@ -182,9 +232,37 @@ if [ "$SQUASH" = true ]; then
 fi
 
 if [ "$PUSH" = true ]; then
-    docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":"$VERSION"
+    IMAGE_REF="$GHCR_ORG/$ORG/$IMAGE"
+
+    # Only push what the registry does not already serve.
+    #
+    # Ask the registry rather than inferring it from the build being skipped. A
+    # runner with a persistent image cache can hold an image from an earlier run
+    # whose push failed, so "we did not build it" does not mean "it is
+    # published", and treating the two as equivalent would stop publishing
+    # silently while the job stayed green.
+    #
+    # An unknown tag, or no buildx, leaves the digest empty and the push goes
+    # ahead, so a failure to answer errs towards publishing.
+    VERSION_DIGEST=""
+    if [ "$BUILT" = false ]; then
+        VERSION_DIGEST=$(remote_digest "$IMAGE_REF:$VERSION")
+    fi
+
+    if [ "$VERSION_DIGEST" != "" ]; then
+        echo "$me: $IMAGE_REF:$VERSION already published, not pushing"
+    else
+        docker push "$IMAGE_REF:$VERSION"
+    fi
+
     if [ "$LATEST" = true ]; then
-        docker push "$GHCR_ORG"/"$ORG"/"$IMAGE":latest
+        # latest moves, so compare digests rather than just existence: the
+        # version tag can be published while latest still points at an older one.
+        if [ "$VERSION_DIGEST" != "" ] && [ "$(remote_digest "$IMAGE_REF:latest")" = "$VERSION_DIGEST" ]; then
+            echo "$me: $IMAGE_REF:latest already points at $VERSION, not pushing"
+        else
+            docker push "$IMAGE_REF:latest"
+        fi
     fi
 fi
 

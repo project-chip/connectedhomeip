@@ -22,8 +22,8 @@
 #include <lib/dnssd/wire/BytesRange.h>
 #include <lib/dnssd/wire/QName.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class TxtRecordDelegate
 {
@@ -79,6 +79,6 @@ bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr);
 /// https://tools.ietf.org/html/rfc1035 (included in base RFC)
 bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, SerializedQNameIterator * name);
 
-} // namespace Minimal
+} // namespace Dnssd
 
-} // namespace mdns
+} // namespace chip

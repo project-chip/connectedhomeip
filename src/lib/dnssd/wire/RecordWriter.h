@@ -22,8 +22,8 @@
 
 #include <optional>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /**
  * Handles writing into mdns packets.
@@ -135,5 +135,5 @@ private:
     void RememberWrittenQnameOffset(size_t offset);
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

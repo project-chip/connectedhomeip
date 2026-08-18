@@ -98,9 +98,8 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
                 // If startup value modified the state, make sure we also persist it.
                 // In practice this means "toggle" will flip it on every reboot.
                 mOnOff = targetState;
-                LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                    ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                    ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+                LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+                    ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id), mOnOff));
             }
         }
     }
@@ -238,12 +237,9 @@ CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::Star
 
     if (mContext != nullptr)
     {
-        NumericAttributeTraits<OnOff::StartUpOnOffEnum>::StorageType storageValue;
-        DataModel::NullableToStorage(mStartUpOnOff, storageValue);
-
+        AttributePersistence persistence(mContext->attributeStorage);
         ReturnErrorOnFailure(
-            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OnOff::Id, Attributes::StartUpOnOff::Id },
-                                                  { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+            persistence.StoreNativeEndianValue({ mPath.mEndpointId, OnOff::Id, Attributes::StartUpOnOff::Id }, mStartUpOnOff));
     }
 
     return CHIP_NO_ERROR;

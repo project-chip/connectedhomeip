@@ -68,16 +68,16 @@ public:
         }
     }
 
-    mdns::Minimal::SerializedQNameIterator Serialized() const
+    chip::Dnssd::SerializedQNameIterator Serialized() const
     {
-        return mdns::Minimal::SerializedQNameIterator(
-            mdns::Minimal::BytesRange(mSerializedQNameBuffer, mSerializedQNameBuffer + mSerializedBufferSize),
+        return chip::Dnssd::SerializedQNameIterator(
+            chip::Dnssd::BytesRange(mSerializedQNameBuffer, mSerializedQNameBuffer + mSerializedBufferSize),
             mSerializedQNameBuffer);
     }
 
-    mdns::Minimal::FullQName Full() const
+    chip::Dnssd::FullQName Full() const
     {
-        mdns::Minimal::FullQName result;
+        chip::Dnssd::FullQName result;
 
         result.names     = mStrings;
         result.nameCount = N;
