@@ -23,7 +23,7 @@
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/RefrigeratorAlarm/Events.h>
 #include <lib/support/CodeUtils.h>
 
 constexpr chip::EndpointId kRefEndpointId = REFRIGERATOR_ENDPOINT;

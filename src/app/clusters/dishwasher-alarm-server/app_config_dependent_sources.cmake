@@ -18,6 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/DishwasherAlarmCluster.cpp"
     "${CLUSTER_DIR}/DishwasherAlarmCluster.h"
     "${CLUSTER_DIR}/dishwasher-alarm-delegate.h"
     "${CLUSTER_DIR}/dishwasher-alarm-server.h"

@@ -38,7 +38,6 @@ using namespace chip::Testing;
 using Status            = Protocols::InteractionModel::Status;
 using ClusterStatusCode = Protocols::InteractionModel::ClusterStatusCode;
 
-constexpr ClusterId kDishwasherClusterId   = DishwasherAlarm::Id;
 constexpr ClusterId kRefrigeratorClusterId = RefrigeratorAlarm::Id;
 
 class TestAlarmDelegate : public AlarmBase::Delegate
@@ -60,6 +59,28 @@ public:
     AlarmMap mLastResetAlarms{};
     bool mAllowModify = true;
     bool mAllowReset  = true;
+};
+
+class TestDishwasherAlarmCluster : public AlarmBaseCluster
+{
+public:
+    TestDishwasherAlarmCluster(EndpointId endpointId, const AlarmBaseCluster::Config & config) :
+        AlarmBaseCluster(endpointId, DishwasherAlarm::Id, config)
+    {}
+
+protected:
+    void SendNotifyEvent(AlarmMap, AlarmMap, AlarmMap, AlarmMap) override {}
+};
+
+class TestRefrigeratorAlarmCluster : public AlarmBaseCluster
+{
+public:
+    TestRefrigeratorAlarmCluster(EndpointId endpointId, const AlarmBaseCluster::Config & config) :
+        AlarmBaseCluster(endpointId, RefrigeratorAlarm::Id, config)
+    {}
+
+protected:
+    void SendNotifyEvent(AlarmMap, AlarmMap, AlarmMap, AlarmMap) override {}
 };
 
 struct TestAlarmBaseCluster : public ::testing::Test
@@ -102,7 +123,7 @@ struct TestAlarmBaseCluster : public ::testing::Test
 
 TEST_F(TestAlarmBaseCluster, DishwasherAttributeListWithResetFeature)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -117,7 +138,7 @@ TEST_F(TestAlarmBaseCluster, DishwasherAttributeListWithResetFeature)
 
 TEST_F(TestAlarmBaseCluster, RefrigeratorAttributeListWithoutResetFeature)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kRefrigeratorClusterId, MakeRefrigeratorConfig());
+    TestRefrigeratorAlarmCluster cluster(kRootEndpointId, MakeRefrigeratorConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -131,7 +152,7 @@ TEST_F(TestAlarmBaseCluster, RefrigeratorAttributeListWithoutResetFeature)
 
 TEST_F(TestAlarmBaseCluster, ReadInitialAttributes)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -154,7 +175,7 @@ TEST_F(TestAlarmBaseCluster, ReadInitialAttributes)
 
 TEST_F(TestAlarmBaseCluster, SetStateValueHonorsSupportedAndMask)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -175,7 +196,7 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
 {
     AlarmBaseCluster::Config config = MakeDishwasherConfig();
     config.latch                    = AlarmMap(0x1);
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, config);
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, config);
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -198,7 +219,7 @@ TEST_F(TestAlarmBaseCluster, SetStateValueHonorsLatchUnlessIgnored)
 
 TEST_F(TestAlarmBaseCluster, ResetLatchedAlarmsClearsStateBits)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -213,7 +234,7 @@ TEST_F(TestAlarmBaseCluster, ResetLatchedAlarmsClearsStateBits)
 
 TEST_F(TestAlarmBaseCluster, AcceptedCommandsWithResetAndModify)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -226,7 +247,7 @@ TEST_F(TestAlarmBaseCluster, AcceptedCommandsWithResetAndModify)
 
 TEST_F(TestAlarmBaseCluster, RefrigeratorHasNoCommands)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kRefrigeratorClusterId, MakeRefrigeratorConfig());
+    TestRefrigeratorAlarmCluster cluster(kRootEndpointId, MakeRefrigeratorConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -237,7 +258,7 @@ TEST_F(TestAlarmBaseCluster, RefrigeratorHasNoCommands)
 
 TEST_F(TestAlarmBaseCluster, ModifyEnabledAlarmsCommandUpdatesMask)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -252,7 +273,7 @@ TEST_F(TestAlarmBaseCluster, ModifyEnabledAlarmsCommandUpdatesMask)
 
 TEST_F(TestAlarmBaseCluster, ResetCommandClearsRequestedAlarms)
 {
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -271,7 +292,7 @@ TEST_F(TestAlarmBaseCluster, ResetCommandClearsRequestedAlarms)
 TEST_F(TestAlarmBaseCluster, DelegateCanRejectModifyEnabledAlarms)
 {
     delegate.mAllowModify = false;
-    AlarmBaseCluster cluster(kRootEndpointId, kDishwasherClusterId, MakeDishwasherConfig());
+    TestDishwasherAlarmCluster cluster(kRootEndpointId, MakeDishwasherConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 

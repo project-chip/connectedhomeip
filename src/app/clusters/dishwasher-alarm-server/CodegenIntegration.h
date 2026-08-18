@@ -44,7 +44,6 @@ public:
 
     Protocols::InteractionModel::Status ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
-protected:
     bool HasResetFeature(EndpointId endpoint);
 
 private:

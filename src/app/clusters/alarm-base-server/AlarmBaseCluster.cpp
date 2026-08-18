@@ -18,9 +18,6 @@
 
 #include <app/clusters/alarm-base-server/AlarmBaseCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/DishwasherAlarm/Events.h>
-#include <clusters/RefrigeratorAlarm/Events.h>
-#include <clusters/RefrigeratorAlarm/Metadata.h>
 
 using namespace chip::app::Clusters::AlarmBase;
 using namespace chip::app::Clusters::AlarmBase::Attributes;
@@ -128,34 +125,6 @@ Status AlarmBaseCluster::ResetLatchedAlarms(const AlarmMap alarms)
     return SetStateValue(state, true);
 }
 
-void AlarmBaseCluster::SendNotifyEvent(AlarmMap becameActive, AlarmMap becameInactive, AlarmMap newState, AlarmMap mask)
-{
-    VerifyOrReturn(mContext != nullptr);
-
-    if (mPath.mClusterId == DishwasherAlarm::Id)
-    {
-        DishwasherAlarm::Events::Notify::Type event{
-            .active   = BitMask<DishwasherAlarm::AlarmBitmap>(becameActive.Raw()),
-            .inactive = BitMask<DishwasherAlarm::AlarmBitmap>(becameInactive.Raw()),
-            .state    = BitMask<DishwasherAlarm::AlarmBitmap>(newState.Raw()),
-            .mask     = BitMask<DishwasherAlarm::AlarmBitmap>(mask.Raw()),
-        };
-        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-        return;
-    }
-
-    if (mPath.mClusterId == RefrigeratorAlarm::Id)
-    {
-        RefrigeratorAlarm::Events::Notify::Type event{
-            .active   = BitMask<RefrigeratorAlarm::AlarmBitmap>(becameActive.Raw()),
-            .inactive = BitMask<RefrigeratorAlarm::AlarmBitmap>(becameInactive.Raw()),
-            .state    = BitMask<RefrigeratorAlarm::AlarmBitmap>(newState.Raw()),
-            .mask     = BitMask<RefrigeratorAlarm::AlarmBitmap>(mask.Raw()),
-        };
-        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    }
-}
-
 DataModel::ActionReturnStatus AlarmBaseCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
 {
@@ -168,10 +137,6 @@ DataModel::ActionReturnStatus AlarmBaseCluster::ReadAttribute(const DataModel::R
     case Mask::Id:
         return encoder.Encode(mMask);
     case Latch::Id:
-        if (!HasResetFeature())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mLatch);
     case State::Id:
         return encoder.Encode(mState);

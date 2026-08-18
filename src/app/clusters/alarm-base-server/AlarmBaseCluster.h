@@ -67,6 +67,10 @@ public:
 
     bool HasResetFeature() const { return mFeature.Has(AlarmBase::Feature::kReset); }
 
+protected:
+    virtual void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
+                                 AlarmBase::AlarmMap mask) = 0;
+
 private:
     const BitMask<AlarmBase::Feature> mFeature;
     const uint32_t mClusterRevision;
@@ -77,9 +81,6 @@ private:
     const AlarmBase::AlarmMap mLatch;
     AlarmBase::AlarmMap mState{};
     const AlarmBase::AlarmMap mSupported;
-
-    void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
-                         AlarmBase::AlarmMap mask);
 
     DataModel::ActionReturnStatus HandleReset(AlarmBase::AlarmMap alarms);
 

@@ -31,6 +31,10 @@ public:
     RefrigeratorAlarmCluster(EndpointId endpointId, const Config & config) :
         AlarmBaseCluster(endpointId, RefrigeratorAlarm::Id, config)
     {}
+
+protected:
+    void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,
+                         AlarmBase::AlarmMap mask) override;
 };
 
 } // namespace chip::app::Clusters

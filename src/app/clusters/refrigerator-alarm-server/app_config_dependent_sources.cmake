@@ -18,6 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/RefrigeratorAlarmCluster.cpp"
     "${CLUSTER_DIR}/RefrigeratorAlarmCluster.h"
     "${CLUSTER_DIR}/refrigerator-alarm-server.h"
 )
