@@ -906,8 +906,33 @@ void Shutdown()
     if (sPendingConnect != nullptr)
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(OnConnectTimeout, nullptr);
-        auto * ctx                      = sPendingConnect;
-        sPendingConnect                 = nullptr;
+        auto * ctx      = sPendingConnect;
+        sPendingConnect = nullptr;
+
+        // Stop the BleLayer's in-flight scan/connect, so no later OnConnectFound /
+        // OnConnectError reaches the torn-down transport.
+        if (auto * layer = GetBleLayer())
+        {
+            CHIP_ERROR cancelErr = layer->CancelBleIncompleteConnection();
+            if (cancelErr != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(AppServer, "Shutdown: CancelBleIncompleteConnection: %" CHIP_ERROR_FORMAT, cancelErr.Format());
+            }
+        }
+
+        // A BTP handshake in flight has an endpoint that is not yet in sEndpoints, so
+        // the loop above did not close it.  Leave sBtpHandshakeEndpoint set as in
+        // OnConnectTimeout: OnEndPointConnectionClosed matches it to suppress forwarding
+        // the close to mOriginalTransport, and clears it.
+        if (ctx->endpoint != nullptr)
+        {
+            ctx->endpoint->Close();
+        }
+        else
+        {
+            sBtpHandshakeEndpoint = nullptr;
+        }
+
         chip::app::CommandHandler * cmd = ctx->handle.Get();
         if (cmd != nullptr)
         {
@@ -915,7 +940,6 @@ void Shutdown()
         }
         delete ctx;
     }
-    sBtpHandshakeEndpoint = nullptr;
 
     // Tear down the background scan: cancel every per-fabric lifetime timer and stop
     // the hardware scan if the registry currently owns it.

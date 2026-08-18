@@ -181,6 +181,11 @@ void BLEManagerImpl::_Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
     DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Drop proxy-scan ownership while the adapter is still usable, so a later
+    // StartProxyScan is not refused with CHIP_ERROR_BUSY by a stale forwarder.
+    (void) StopProxyScan();
+#endif
     mDeviceScanner.Shutdown();
     mBLEAdvertisement.Shutdown();
     mEndpoint.Shutdown();
@@ -330,6 +335,11 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
         {
             // Shutdown all BLE operations and release resources
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+            // As in _Shutdown: release proxy-scan ownership so proxy scanning can
+            // recover once an adapter is available again.
+            (void) StopProxyScan();
+#endif
             mDeviceScanner.Shutdown();
             mBLEAdvertisement.Shutdown();
             mEndpoint.Shutdown();
@@ -943,6 +953,10 @@ CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * conte
 
 CHIP_ERROR BLEManagerImpl::StopProxyScan()
 {
+    // No proxy scan of ours to stop: leave any internal scan and the scanner's
+    // delegate alone.
+    VerifyOrReturnError(sProxyScanForwarder != nullptr, CHIP_NO_ERROR);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mDeviceScanner.IsScanning())
     {
