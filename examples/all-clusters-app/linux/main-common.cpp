@@ -38,6 +38,7 @@
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
 #include "tls-client-management-instance.h"
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>

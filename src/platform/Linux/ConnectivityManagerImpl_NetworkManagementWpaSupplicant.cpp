@@ -430,6 +430,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
                              return self->_OnWpaInterfaceScanDone(iface, success);
                          }),
                          this);
+        PostWpaInterfaceProxyReady();
     }
     else
     {

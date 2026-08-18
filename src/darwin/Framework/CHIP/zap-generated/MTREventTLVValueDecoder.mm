@@ -3265,6 +3265,33 @@ static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::
 
         return value;
     }
+    case Events::MessageNotPresented::Id: {
+        Events::MessageNotPresented::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMessagesClusterMessageNotPresentedEvent new];
+
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.messageID);
+            value.messageID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.removedFromQueue];
+            value.removedFromQueue = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Messages event.
         break;

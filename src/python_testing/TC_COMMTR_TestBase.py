@@ -15,8 +15,6 @@
 #    limitations under the License.
 
 
-from typing import Optional
-
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -55,7 +53,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
                 tariffComponentID, 'TariffComponentID field of MeteredQuantityStruct must have uint32 type.')
         matter_asserts.assert_valid_int64(struct.quantity, 'Quantity field of MeteredQuantityStruct must be int64')
 
-    async def check_maximum_metered_quantities_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_maximum_metered_quantities_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate the MaximumMeteredQuantities attribute.
 
         Args:
@@ -71,7 +69,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         if self.MaximumMeteredQuantities is not NullValue:
             matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities must be uint16')
 
-    async def check_metered_quantity_attribute(self, endpoint: int, attribute_value: Optional[list[Clusters.CommodityMetering.Structs.MeteredQuantityStruct]] = None) -> None:
+    async def check_metered_quantity_attribute(self, endpoint: int, attribute_value: list[Clusters.CommodityMetering.Structs.MeteredQuantityStruct] | None = None) -> None:
         """Validate the MeteredQuantity attribute.
 
         Args:
@@ -102,7 +100,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
             for item in attribute_value:
                 await self.checkMeteredQuantityStruct(struct=item)
 
-    async def check_metered_quantity_timestamp_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
+    async def check_metered_quantity_timestamp_attribute(self, endpoint: int, attribute_value: int | None = None) -> None:
         """Validate the MeteredQuantityTimestamp attribute.
 
         Args:
@@ -118,7 +116,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         if attribute_value is not NullValue:
             matter_asserts.assert_valid_uint32(attribute_value, 'MeteredQuantityTimestamp must be uint32')
 
-    async def check_tariff_unit_attribute(self, endpoint: int, attribute_value: Optional[Globals.Enums.TariffUnitEnum] = None) -> None:
+    async def check_tariff_unit_attribute(self, endpoint: int, attribute_value: Globals.Enums.TariffUnitEnum | None = None) -> None:
         """Validate the TariffUnit attribute.
 
         Args:

@@ -13,3 +13,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+
+# Workaround: the nxp_iot_agent module has an if() with an unquoted
+# $ENV{CONFIG_EL2GO_SIGN_USING_NXPIMAGE} that CMake >= 4.4.0 rejects when unset
+# ("Unknown arguments specified"). Seed a value before find_package(Zephyr) so
+# the token is non-empty; the guarded path stays disabled. Remove once fixed upstream.
+if(NOT DEFINED ENV{CONFIG_EL2GO_SIGN_USING_NXPIMAGE})
+    set(ENV{CONFIG_EL2GO_SIGN_USING_NXPIMAGE} "n")
+endif()

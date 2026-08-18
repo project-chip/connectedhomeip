@@ -9755,6 +9755,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             Messages(0L),
             ActiveMessageIDs(1L),
+            SupportedLanguageCodes(2L),
+            SupportedMimeTypes(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -9782,7 +9784,8 @@ public class ClusterIDMapping {
         public enum Event {
             MessageQueued(0L),
             MessagePresented(1L),
-            MessageComplete(2L),;
+            MessageComplete(2L),
+            MessageNotPresented(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9822,7 +9825,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),LanguageCode(7),MessageURI(8),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;
@@ -13234,17 +13237,20 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Mode(0L),
-            SystemState(1L),
-            UserSetpoint(2L),
-            MinSetpoint(3L),
-            MaxSetpoint(4L),
-            Step(5L),
-            TargetSetpoint(6L),
-            MistType(7L),
-            Continuous(8L),
-            Sleep(9L),
-            Optimal(10L),
+            SupportedModes(0L),
+            Mode(1L),
+            SystemState(2L),
+            UserSetpoint(3L),
+            MinSetpoint(4L),
+            MaxSetpoint(5L),
+            Step(6L),
+            TargetSetpoint(7L),
+            MistType(8L),
+            Continuous(9L),
+            Sleep(10L),
+            Optimal(11L),
+            CondPumpEnabled(12L),
+            CondRunCount(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

@@ -40,6 +40,8 @@ constexpr uint8_t kMaxSimultaneousDetectionLimit = 10;
 constexpr uint16_t kMinObjectCount               = 1;
 constexpr uint8_t kMaxPredictedACType            = 100;
 constexpr uint8_t kMaxPredictedActivity          = 20;
+constexpr uint8_t kMinCrowdCount                 = 1;
+constexpr uint8_t kMaxCrowdCount                 = 254;
 
 struct AmbientContextSensed : public IntrusiveListNodeBase<>
 {
@@ -76,8 +78,6 @@ class AmbientContextSensingDelegate
 public:
     virtual ~AmbientContextSensingDelegate() = default;
 
-    static AmbientContextSensingDelegate & GetInstance();
-
     // Buffer to keep the AmbientContextTypeSupported attribute passed from the caller
     virtual SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) = 0;
 
@@ -85,14 +85,12 @@ public:
     virtual CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) = 0;
 
     // Return the stored PredictedActivity
-    virtual Span<PredictActivity> & GetPredictedActivity() = 0;
+    virtual PredictActivity * GetPredictedActivityBuf() = 0;
 
-    // Retrieve the id of an available AmbientContextType from delegate and mark it as allocated
-    virtual DetectFuncResult FindAndUseAvailableDetection() = 0;
-    // Get the pointer of the space from the returned id in FindAndUseAvailableDetection()
-    virtual AmbientContextSensed * GetAllocedDetection(const uint8_t id) = 0;
-    // Return the space by passing the id
-    virtual CHIP_ERROR DelDetection(const uint8_t & id) = 0;
+    // Get the pointer of the structure from the delegate module
+    virtual AmbientContextSensed * AllocDetection() = 0;
+    // Release the space of the structure
+    virtual CHIP_ERROR DelDetection(AmbientContextSensed * pitem) = 0;
 
     // Return the current epoch
     virtual uint64_t GetEpochNow() = 0;
