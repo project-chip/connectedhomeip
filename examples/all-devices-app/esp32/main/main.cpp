@@ -243,6 +243,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
                 .eventManagement            = EventManagement::GetInstance(),                          //
                 .timerDelegate              = gTimerDelegate,                                          //
+                .minGuaranteedSubscriptionsPerFabric =
+                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

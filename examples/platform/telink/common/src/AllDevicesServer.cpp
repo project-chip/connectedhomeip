@@ -102,6 +102,8 @@ RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initPar
         .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = EventManagement::GetInstance(),
         .timerDelegate              = gTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 }
 

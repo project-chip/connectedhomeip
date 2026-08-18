@@ -56,6 +56,7 @@ public:
         if (cluster == nullptr)
         {
             CancelTimer();
+            mCountdownTime.SetNull();
         }
         mCluster = cluster;
     }

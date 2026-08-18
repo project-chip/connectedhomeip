@@ -168,6 +168,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = chip::app::EventManagement::GetInstance(),
         .timerDelegate              = sTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_ENABLE_OPENTHREAD
