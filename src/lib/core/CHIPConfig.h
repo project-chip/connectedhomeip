@@ -2102,6 +2102,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
 
+// Zero would declare a zero-length array, which compiles silently and leaves the cluster
+// with no usable session slots. The upper bound is the width of the MaxSessions attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
 /**
  * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
  *
@@ -2113,6 +2119,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS 10
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
 
+// Zero would declare a zero-length array, which compiles silently and leaves the cache
+// with no usable entries. The upper bound is the width of the MaxCachedResults attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
 /**
  * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
  *
@@ -2123,6 +2135,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
 #define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
 #endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+
+// Zero would declare a zero-length array, which compiles silently and leaves no room for
+// any request. The upper bound is the width of the uint8_t per-fabric request count.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC < 1 ||                                                          \
+    CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC > 255
+#error                                                                                                                             \
+    "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC is not allowed to be a number less than 1 or greater than 255"
+#endif
 
 /**
  * @def CHIP_CONFIG_MAX_NUM_ZONES
