@@ -202,8 +202,9 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
 
 TEST_F(TestLocalizationConfigurationCluster, IteratorAllocationFailure)
 {
-    // A null iterator (allocation failure) must be treated as "no supported locales"
-    // on every path, never dereferenced.
+    // A null iterator (allocation failure) is currently indistinguishable from
+    // "no supported locales"; this test pins that behavior and verifies the
+    // iterator is never dereferenced.
     std::vector<CharSpan> supportedLocales = { "en-US"_span, "es-ES"_span };
     mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
     mDeviceInfoProvider->SetSimulateIteratorAllocFailure(true);
@@ -213,7 +214,8 @@ TEST_F(TestLocalizationConfigurationCluster, IteratorAllocationFailure)
     LocalizationConfigurationCluster cluster(*mDeviceInfoProvider, "en-US"_span);
     EXPECT_TRUE(cluster.GetActiveLocale().empty());
 
-    // No locale can be validated, so any write is rejected.
+    // TODO(#73612): ConstraintError is the current behaviour, but the spec reserves
+    // it for a value not present in SupportedLocales. Should be ResourceExhausted.
     DataModel::ActionReturnStatus status = cluster.SetActiveLocale("es-ES"_span);
     EXPECT_EQ(status, Status::ConstraintError);
 
