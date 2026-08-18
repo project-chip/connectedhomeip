@@ -170,8 +170,8 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
-        contact-sensor
         color-temperature-light
+        contact-sensor
         cooktop
         device-energy-management
         dimmable-light

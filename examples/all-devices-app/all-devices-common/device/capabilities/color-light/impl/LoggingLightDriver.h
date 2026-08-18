@@ -17,27 +17,32 @@
 
 #pragma once
 
-#include <app/clusters/color-control-server/ColorControlDelegate.h>
-#include <app/clusters/level-control/LevelControlDelegate.h>
-#include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <app/clusters/on-off-server/OnOffEffectDelegate.h>
+#include <device/capabilities/color-light/ColorLight.h>
 
 namespace chip {
 namespace app {
 
 /**
- * The output side of a color temperature light: every state change the On/Off, Level Control and
- * Color Control clusters push towards the hardware arrives here.
+ * A ColorLight whose output side only logs, so the device can be exercised without anything behind
+ * it. It supplies itself as every delegate ColorLight needs.
  *
- * This implementation only logs, so the device can be exercised without anything behind it. A real
- * product swaps it for one that drives the PWM/LED channels.
+ * A real product does not use this: it implements the delegate interfaces against its PWM/LED
+ * channels and hands them to ColorLight, which is why ColorLight itself knows nothing about this
+ * class.
  */
-class LoggingLightDriver : public Clusters::OnOffDelegate,
+class LoggingLightDriver : public ColorLight,
+                           public Clusters::OnOffDelegate,
                            public Clusters::LevelControlDelegate,
                            public Clusters::OnOffEffectDelegate,
-                           public Clusters::ColorControlDelegate
+                           public Clusters::ColorControlDelegate,
+                           public Clusters::IdentifyDelegate
 {
 public:
+    LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                       const Conformance & conformance);
+    ~LoggingLightDriver() override = default;
+
+protected:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
@@ -52,10 +57,17 @@ public:
     DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum effect) override;
     DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum effect) override;
 
-    // ColorControlDelegate. Only the color temperature output is implemented: this device type
-    // advertises the ColorTemperature feature alone, so the cluster never asks for a conversion
-    // between the color representations.
+    // ColorControlDelegate. Only the color temperature output is implemented: the device types
+    // built on this advertise no more than one color representation at a time that needs driving,
+    // so the cluster never asks for a conversion between representations.
     void OnColorCTChanged(uint16_t mireds) override;
+
+    // IdentifyDelegate. TriggerEffect is mandatory for both device types built on this driver
+    // (Color Temperature Light 0x010C and Extended Color Light 0x010D), so it is always enabled.
+    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
+    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
+    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
+    bool IsTriggerEffectEnabled() const override;
 };
 
 } // namespace app

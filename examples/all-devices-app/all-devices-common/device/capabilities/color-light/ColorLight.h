@@ -18,39 +18,35 @@
 #pragma once
 
 #include <app/clusters/color-control-server/ColorControlCluster.h>
+#include <app/clusters/color-control-server/ColorControlDelegate.h>
 #include <app/clusters/dynamic-lighting-server/DynamicLightingCluster.h>
 #include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
+#include <app/clusters/level-control/LevelControlDelegate.h>
+#include <app/clusters/on-off-server/OnOffDelegate.h>
+#include <app/clusters/on-off-server/OnOffEffectDelegate.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/capabilities/color-light/LoggingLightDriver.h>
 #include <lib/support/TimerDelegate.h>
-
-#include <optional>
 
 namespace chip {
 namespace app {
 
-/**
- * ColorLight is the capability baseline for a dimmable light whose color is controllable.
- *
- * In the Matter Device Library that capability is shared by several leaf device types, such as
- * Color Temperature Light (0x010C) and Extended Color Light (0x010D). They register the same
- * clusters and wire them together the same way, but each has its own conformance table: the
- * features every cluster must advertise differ per device type.
- *
- * This class owns the clusters, the delegates behind them and the scene table provider, and
- * exposes one Register* helper per cluster. A leaf device type composes those helpers in its own
- * Register(), which is where its (compile-time) feature tables live - macros do not cross
- * translation units, so the conformance table and the code that applies it stay in the same file.
- *
- * Teardown is NOT split up: UnregisterAll() disconnects and destroys every cluster this class
- * owns, in the reverse of the order the helpers create them. Leaves call it from Unregister().
- */
+//   ColorLight is the capability baseline for a dimmable light whose color is controllable.
+
+//   In the Matter Device Library that capability is shared by several leaf device types, such as
+//   Color Temperature Light (0x010C) and Extended Color Light (0x010D). Their element requirements
+//   are identical except for the Color Control feature map, so Register() applies the shared ones
+//   (the table above its definition lists them) and a leaf supplies only its Conformance.
+
+//   This class owns the clusters, the delegates behind them and the scene table provider, and both
+//   builds and tears the endpoint down. A leaf device type is therefore just a constructor: it
+//   names its device type and passes its Conformance.
+
 class ColorLight : public SingleEndpoint
 {
 public:
@@ -64,10 +60,24 @@ public:
         TimerDelegate & timerDelegate;
     };
 
+    /// The output side of the light: what the clusters push state changes into. This class only
+    /// wires them up, so a product supplies its own implementations here and reuses everything
+    /// else. LoggingLightDriver is one such implementation.
+    struct Delegates
+    {
+        Clusters::OnOffDelegate & onOff;
+        Clusters::LevelControlDelegate & levelControl;
+        Clusters::OnOffEffectDelegate & effect;
+        Clusters::ColorControlDelegate & color;
+        Clusters::IdentifyDelegate & identify;
+    };
+
     ~ColorLight() override = default;
 
-    // Cluster getters for the application and tests. Only valid once the matching cluster has
-    // been registered.
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // Cluster getters for the application and tests. Only valid once Register() has run.
     Clusters::OnOffLightingCluster & GetOnOffCluster();
     Clusters::LevelControlCluster & GetLevelControlCluster();
     Clusters::IdentifyCluster & GetIdentifyCluster();
@@ -77,42 +87,20 @@ public:
     Clusters::DynamicLightingCluster & GetDynamicLightingCluster();
 
 protected:
-    ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
+    /// The only part of the Device Library conformance that differs between the leaves built on
+    /// this class. It belongs to the device type, not to the application, which is why it is a
+    /// constructor argument of the leaf rather than a field of Context.
+    struct Conformance
+    {
+        BitMask<Clusters::ColorControl::Feature> colorFeatures;
 
-    /// Registration helpers, one per cluster. A leaf's Register() calls RegisterDescriptor()
-    /// first, then these, then AddEndpoint(mEndpointRegistration).
-    ///
-    /// Order matters where clusters point at each other: Identify and ScenesManagement before
-    /// On/Off and Groups, On/Off before Level Control and Color Control.
-    ///
-    /// Every feature map argument is optional: std::nullopt leaves the cluster's own default in
-    /// place, which is what a leaf compiled with its device type macro turned off wants.
-    CHIP_ERROR RegisterIdentify(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
+        /// The mode the endpoint powers up in. Its variant alternative must be one colorFeatures
+        /// advertises: CTColor with kColorTemperature, XYColor with kXy.
+        Clusters::ColorControl::ColorValue initialColor;
+    };
 
-    /// supportsCopyScene advertises the CopyScene command, which both lighting device types list as
-    /// mandatory; a leaf whose conformance table does not require it passes false.
-    CHIP_ERROR RegisterScenesManagement(EndpointId endpoint, CodeDrivenDataModelProvider & provider, bool supportsCopyScene = true);
-    CHIP_ERROR RegisterOnOff(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                             std::optional<BitMask<Clusters::OnOff::Feature>> featureMap = std::nullopt);
-    CHIP_ERROR RegisterLevelControl(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                    std::optional<BitMask<Clusters::LevelControl::Feature>> featureMap = std::nullopt);
-    CHIP_ERROR RegisterGroups(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
-
-    /// initialColor selects the mode the endpoint powers up in, so its variant alternative must be
-    /// one the feature map advertises (CTColor for a color temperature light, XYColor for an
-    /// extended color light).
-    CHIP_ERROR RegisterColorControl(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                    std::optional<BitMask<Clusters::ColorControl::Feature>> featureMap = std::nullopt,
-                                    Clusters::ColorControl::ColorValue initialColor = Clusters::ColorControl::CTColor{});
-    CHIP_ERROR RegisterDynamicLighting(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
-
-    /// Registers the scenable clusters (On/Off, Level Control, Color Control) with the endpoint's
-    /// scene table. Call after those three are registered; skips any that are not.
-    void RegisterSceneHandlers();
-
-    /// Reverse of everything above: unhooks the scene handlers and delegates while all clusters are
-    /// still alive, then removes and destroys each registered cluster in reverse creation order.
-    void UnregisterAll(CodeDrivenDataModelProvider & provider);
+    ColorLight(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
+               const Conformance & conformance);
 
 private:
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
@@ -131,9 +119,14 @@ private:
     };
 
     const Context mContext;
+    const Conformance mConformance;
 
-    /// Owns the four delegates the clusters push state changes into.
-    LoggingLightDriver mDriver;
+    Clusters::OnOffDelegate & mOnOffDelegate;
+    Clusters::LevelControlDelegate & mLevelControlDelegate;
+    Clusters::OnOffEffectDelegate & mEffectDelegate;
+    Clusters::ColorControlDelegate & mColorDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+
     DefaultScenesManagementTableProvider mScenesTableProvider;
 
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;

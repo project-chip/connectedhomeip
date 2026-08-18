@@ -23,5 +23,5 @@ source_set("extended-color-light") {
     "ExtendedColorLight.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light" ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light:logging" ]
 }
