@@ -171,6 +171,47 @@ Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelRe
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(
+    const DataModel::Nullable<int64_t> minPower, const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
+    AdjustmentCauseEnum cause)
+{
+    mESAState = ESAStateEnum::kPowerAdjustActive;
+
+    // Create and set the PowerRangeAdjustment attribute
+    Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
+    powerRangeAdjustment.minPower = minPower;
+    powerRangeAdjustment.maxPower = maxPower;
+
+    // Map cause to PowerAdjustReasonEnum
+    switch (cause)
+    {
+    case AdjustmentCauseEnum::kLocalOptimization:
+        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+        break;
+    case AdjustmentCauseEnum::kGridOptimization:
+        powerRangeAdjustment.cause = PowerAdjustReasonEnum::kGridOptimizationAdjustment;
+        break;
+    default:
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
+    powerRangeAdjustment.endTime = 3600; // Dummy end time
+    mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status DeviceEnergyManagementMockDelegate::CancelPowerRangeAdjustRequest()
+{
+    // Reset ESAState to Online
+    mESAState = ESAStateEnum::kOnline;
+
+    // Clear PowerRangeAdjustment attribute
+    mPowerRangeAdjustment.SetNull();
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
 ESATypeEnum DeviceEnergyManagementMockDelegate::GetESAType()
 {
     return mESAType;
@@ -210,6 +251,11 @@ DeviceEnergyManagementMockDelegate::GetPowerAdjustmentCapability()
 const DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagementMockDelegate::GetForecast()
 {
     return mForecast;
+}
+
+const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & DeviceEnergyManagementMockDelegate::GetPowerRangeAdjustment()
+{
+    return mPowerRangeAdjustment;
 }
 
 CHIP_ERROR DeviceEnergyManagementMockDelegate::SetESAState(ESAStateEnum state)
