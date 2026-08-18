@@ -87,7 +87,8 @@ public:
     CHIP_ERROR GetAccuracyByIndex(uint8_t index,
                                   Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetAccuracyByIndex", static_cast<size_t>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetAccuracyByIndex",
+                        static_cast<size_t>(index));
         val = {};
         return index == 0 ? CHIP_NO_ERROR : CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -105,7 +106,8 @@ public:
     CHIP_ERROR GetRangeByIndex(uint8_t index,
                                Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetRangeByIndex", static_cast<size_t>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetRangeByIndex",
+                        static_cast<size_t>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndRangesRead() override
@@ -122,7 +124,8 @@ public:
     CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t index,
                                           Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex", static_cast<size_t>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex",
+                        static_cast<size_t>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndHarmonicCurrentsRead() override
@@ -139,7 +142,8 @@ public:
     CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t index,
                                         Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex", static_cast<size_t>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex",
+                        static_cast<size_t>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndHarmonicPhasesRead() override
