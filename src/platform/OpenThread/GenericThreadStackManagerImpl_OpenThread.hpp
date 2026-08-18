@@ -1076,7 +1076,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
         }
 
 #else
-        auto err = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+        auto err      = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
 
         ChipLogProgress(DeviceLayer, "Thread Discovery restarted, no delay: %s", chip::ErrorStr(err));
 #endif
