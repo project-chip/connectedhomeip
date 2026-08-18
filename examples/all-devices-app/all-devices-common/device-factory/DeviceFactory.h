@@ -92,6 +92,7 @@
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering-controller/WindowCoveringController.h>
 #include <device/types/window-covering/WindowCoveringVariants.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
