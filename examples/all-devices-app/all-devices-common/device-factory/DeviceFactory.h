@@ -574,10 +574,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<RoboticVacuumCleaner>(mContext->timerDelegate);
-            });
+            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleaner>(); });
         }
 
         // at least one device type MUST be enabled
