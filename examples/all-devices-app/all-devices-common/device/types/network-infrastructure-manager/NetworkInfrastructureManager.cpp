@@ -36,15 +36,18 @@ namespace {
 constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
 
-NetworkInfrastructureManager::NetworkInfrastructureManager(PersistentStorageDelegate & storage) :
+NetworkInfrastructureManager::NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
+                                                           DeviceLayer::PlatformManager & platformManager,
+                                                           FailSafeContext & failSafeContext) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mThreadNetworkDirectoryStorage(storage)
+    mThreadNetworkDirectoryStorage(storage), mTimerDelegate(timerDelegate), mPlatformManager(platformManager),
+    mFailSafeContext(failSafeContext)
 {}
 
 NetworkInfrastructureManager::~NetworkInfrastructureManager()
 {
-    DeviceLayer::SystemLayer().CancelTimer(ActivateActiveDataset, this);
-    DeviceLayer::SystemLayer().CancelTimer(ActivatePendingDataset, this);
+    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
 }
 
 CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -56,8 +59,7 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // 1. Thread Border Router Management
-    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(), mBreadCrumbTracker,
-                                                          DeviceLayer::PlatformMgr());
+    ThreadBorderRouterManagementCluster::Config tbrConfig(*this, mFailSafeContext, mBreadCrumbTracker, mPlatformManager);
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
@@ -186,7 +188,7 @@ void NetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDat
 
     mActivateDatasetCallback = callback;
     mActivateDatasetSequence = sequenceNum;
-    err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
+    err                      = mTimerDelegate.StartTimer(&mActiveDatasetTimerContext, System::Clock::Seconds32(1));
     if (err != CHIP_NO_ERROR)
     {
         mActivateDatasetCallback = nullptr;
@@ -212,28 +214,29 @@ CHIP_ERROR NetworkInfrastructureManager::SetPendingDataset(const Thread::Operati
     ReturnErrorOnFailure(mPendingDataset.Init(pendingDataset.AsByteSpan()));
     uint32_t delayTimerMillis;
     ReturnErrorOnFailure(mPendingDataset.GetDelayTimer(delayTimerMillis));
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayTimerMillis), ActivatePendingDataset, this);
+    return mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis));
 }
 
-void NetworkInfrastructureManager::ActivateActiveDataset(System::Layer *, void * context)
+void NetworkInfrastructureManager::OnActiveDatasetTimerFired()
 {
-    auto * self                    = static_cast<NetworkInfrastructureManager *>(context);
-    auto * callback                = self->mActivateDatasetCallback;
-    auto sequenceNum               = self->mActivateDatasetSequence;
-    self->mActivateDatasetCallback = nullptr;
-    callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
-}
-
-void NetworkInfrastructureManager::ActivatePendingDataset(System::Layer *, void * context)
-{
-    auto * self = static_cast<NetworkInfrastructureManager *>(context);
-    TEMPORARY_RETURN_IGNORED self->mActiveDataset.Init(self->mPendingDataset.AsByteSpan());
-    self->mPendingDataset.Clear();
-    if (self->mAttributeChangeCallback)
+    auto * callback          = mActivateDatasetCallback;
+    auto sequenceNum         = mActivateDatasetSequence;
+    mActivateDatasetCallback = nullptr;
+    if (callback)
     {
-        self->mAttributeChangeCallback->ReportAttributeChanged(
+        callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+    }
+}
+
+void NetworkInfrastructureManager::OnPendingDatasetTimerFired()
+{
+    TEMPORARY_RETURN_IGNORED mActiveDataset.Init(mPendingDataset.AsByteSpan());
+    mPendingDataset.Clear();
+    if (mAttributeChangeCallback)
+    {
+        mAttributeChangeCallback->ReportAttributeChanged(
             Clusters::ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        self->mAttributeChangeCallback->ReportAttributeChanged(
+        mAttributeChangeCallback->ReportAttributeChanged(
             Clusters::ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
 }

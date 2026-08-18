@@ -14,57 +14,73 @@
  *    limitations under the License.
  */
 
-#include "LoggingTemperatureControlledCabinetPart.h"
+#include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app {
 
-LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name) :
-    LoggingTemperatureControlledCabinetPart(timerDelegate, Config{}, name)
+EmulatedLaundryDryer::EmulatedLaundryDryer(TimerDelegate & timerDelegate) :
+    LaundryDryer(static_cast<Clusters::OperationalState::Delegate &>(*this)), mTimerDelegate(timerDelegate)
 {}
 
-LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
-                                                                                 const char * name) :
-    TemperatureControlledCabinetPart(timerDelegate, config, static_cast<Clusters::OperationalState::Delegate &>(*this),
-                                     static_cast<Clusters::IdentifyDelegate &>(*this)),
-    mName(name), mTimerDelegate(timerDelegate)
-{}
-
-LoggingTemperatureControlledCabinetPart::~LoggingTemperatureControlledCabinetPart()
+EmulatedLaundryDryer::~EmulatedLaundryDryer()
 {
     CancelTimer();
 }
 
-void LoggingTemperatureControlledCabinetPart::Unregister(CodeDrivenDataModelProvider & provider)
+void EmulatedLaundryDryer::Unregister(CodeDrivenDataModelProvider & provider)
 {
     CancelTimer();
     mCountdownTime.SetNull();
-    TemperatureControlledCabinetPart::Unregister(provider);
+    LaundryDryer::Unregister(provider);
 }
 
-void LoggingTemperatureControlledCabinetPart::CancelTimer()
+DataModel::Nullable<uint32_t> EmulatedLaundryDryer::GetCountdownTime()
+{
+    if (mOperationalState != Clusters::OperationalState::OperationalStateEnum::kRunning)
+    {
+        return mCountdownTime;
+    }
+
+    // Per Matter Operational State Specification Section 1.14.5.1 (CountdownTime Attribute):
+    // Standard 1-second countdown progress at 1 unit/sec SHALL NOT trigger attribute reporting to prevent
+    // network flooding. Therefore, CountdownTime is dynamically computed on read from the target completion timestamp,
+    // avoiding 1-second timers or reporting spam.
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+    if (now >= mOperationEndTime)
+    {
+        return DataModel::MakeNullable<uint32_t>(0);
+    }
+
+    auto remainingSec = std::chrono::duration_cast<System::Clock::Seconds32>(mOperationEndTime - now).count();
+    return DataModel::MakeNullable<uint32_t>(static_cast<uint32_t>(remainingSec));
+}
+
+void EmulatedLaundryDryer::CancelTimer()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-void LoggingTemperatureControlledCabinetPart::StartEmulatedOperationTimer()
+void EmulatedLaundryDryer::StartEmulatedOperationTimer(uint32_t durationSec)
 {
     CancelTimer();
-    mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
-    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kEmulatedOperationDurationSec)));
+    mOperationEndTime = System::SystemClock().GetMonotonicTimestamp() + System::Clock::Seconds32(durationSec);
+    mCountdownTime    = DataModel::MakeNullable<uint32_t>(durationSec);
+    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(durationSec)));
 }
 
-void LoggingTemperatureControlledCabinetPart::TimerFired()
+void EmulatedLaundryDryer::TimerFired()
 {
-    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Emulated operation timer finished.", mName);
+    ChipLogProgress(Zcl, "EmulatedLaundryDryer: Emulated operation timer finished. Reverting state to Stopped.");
     mCountdownTime.SetNull();
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
 }
 
-CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(
-    size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR EmulatedLaundryDryer::GetOperationalStateAtIndex(size_t index,
+                                                            Clusters::OperationalState::GenericOperationalState & operationalState)
 {
     static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
         Clusters::OperationalState::GenericOperationalState(
@@ -86,7 +102,7 @@ CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+CHIP_ERROR EmulatedLaundryDryer::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     static constexpr CharSpan kSupportedPhases[] = { "Starting"_span, "Operating"_span, "Finishing"_span };
 
@@ -98,56 +114,43 @@ CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalPhaseAtIndex(s
     return CopyCharSpanToMutableCharSpan(kSupportedPhases[index], operationalPhase);
 }
 
-void LoggingTemperatureControlledCabinetPart::HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+void EmulatedLaundryDryer::HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Pause command received.", mName);
+    ChipLogProgress(Zcl, "EmulatedLaundryDryer: Pause command received.");
+    mCountdownTime = GetCountdownTime();
     CancelTimer();
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kPaused;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kPaused));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 
-void LoggingTemperatureControlledCabinetPart::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+void EmulatedLaundryDryer::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Resume command received.", mName);
+    ChipLogProgress(Zcl, "EmulatedLaundryDryer: Resume command received.");
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
+    uint32_t remainingSec = mCountdownTime.IsNull() ? kEmulatedOperationDurationSec : mCountdownTime.Value();
+    StartEmulatedOperationTimer(remainingSec);
+    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+}
+
+void EmulatedLaundryDryer::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "EmulatedLaundryDryer: Start command received.");
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
     StartEmulatedOperationTimer();
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
 }
 
-void LoggingTemperatureControlledCabinetPart::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+void EmulatedLaundryDryer::HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Start command received.", mName);
-    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
-    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
-    StartEmulatedOperationTimer();
-    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
-}
-
-void LoggingTemperatureControlledCabinetPart::HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err)
-{
-    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Stop command received.", mName);
+    ChipLogProgress(Zcl, "EmulatedLaundryDryer: Stop command received.");
     CancelTimer();
     mCountdownTime.SetNull();
     mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
     LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
     err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
-}
-
-void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStart", mName);
-}
-
-void LoggingTemperatureControlledCabinetPart::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnIdentifyStop", mName);
-}
-
-void LoggingTemperatureControlledCabinetPart::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
-{
-    ChipLogProgress(DeviceLayer, "TempCabinet (%s): OnTriggerEffect", mName);
 }
 
 } // namespace chip::app

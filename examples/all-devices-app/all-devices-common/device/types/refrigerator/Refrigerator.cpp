@@ -22,7 +22,7 @@ namespace chip::app {
 
 Refrigerator::Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRefrigerator, 1)),
-    mCabinet(timerDelegate, config.cabinetConfig, cabinetIdentify)
+    mCabinet(timerDelegate, config.cabinetConfig, config.operationalStateDelegate, cabinetIdentify)
 {}
 
 CHIP_ERROR Refrigerator::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

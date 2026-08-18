@@ -25,6 +25,11 @@ namespace chip::app {
 class LoggingOven : public Oven
 {
 public:
+    struct Config
+    {
+        TemperatureControlledCabinetPart::Config cavityConfig;
+    };
+
     explicit LoggingOven(TimerDelegate & timerDelegate);
     LoggingOven(TimerDelegate & timerDelegate, Config config);
     ~LoggingOven() override = default;

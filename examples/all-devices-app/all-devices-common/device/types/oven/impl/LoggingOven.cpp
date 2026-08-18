@@ -18,10 +18,11 @@
 
 namespace chip::app {
 
-LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config::Default()) {}
+LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDelegate, Config{}) {}
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) :
-    Oven(timerDelegate, mLoggingSurface, mLoggingCavity, mLoggingSurface, config),
+    Oven(timerDelegate, mLoggingSurface, mLoggingCavity, mLoggingSurface,
+         Oven::Config{ .cavityOperationalStateDelegate = mLoggingCavity, .cavityConfig = config.cavityConfig }),
     mLoggingCavity(timerDelegate, config.cavityConfig, "Cavity"), mLoggingSurface(timerDelegate, "Top Surface")
 {}
 
