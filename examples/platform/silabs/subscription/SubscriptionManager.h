@@ -68,14 +68,11 @@ public:
         virtual ~Delegate() = default;
 
         virtual void OnAttributeData(Handle /*handle*/, const Info & /*info*/,
-                                     const chip::app::ConcreteDataAttributePath & /*path*/,
-                                     chip::TLV::TLVReader * /*data*/,
+                                     const chip::app::ConcreteDataAttributePath & /*path*/, chip::TLV::TLVReader * /*data*/,
                                      const chip::app::StatusIB & /*status*/)
         {}
 
-        virtual void OnSubscriptionEstablished(Handle /*handle*/, const Info & /*info*/,
-                                               chip::SubscriptionId /*subscriptionId*/)
-        {}
+        virtual void OnSubscriptionEstablished(Handle /*handle*/, const Info & /*info*/, chip::SubscriptionId /*subscriptionId*/) {}
 
         virtual void OnError(Handle /*handle*/, const Info & /*info*/, CHIP_ERROR /*error*/) {}
 
@@ -94,8 +91,7 @@ public:
      * @param minIntervalSeconds Min reporting interval floor.
      * @param maxIntervalSeconds Max reporting interval ceiling.
      */
-    CHIP_ERROR Subscribe(const Info & info, Handle * outHandle = nullptr,
-                         uint16_t minIntervalSeconds = kDefaultMinIntervalSeconds,
+    CHIP_ERROR Subscribe(const Info & info, Handle * outHandle = nullptr, uint16_t minIntervalSeconds = kDefaultMinIntervalSeconds,
                          uint16_t maxIntervalSeconds = kDefaultMaxIntervalSeconds);
 
     uint8_t ActiveCount() const;

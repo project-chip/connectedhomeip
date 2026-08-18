@@ -124,8 +124,7 @@ public:
         streamer_printf(streamer_get(), "IM: Subscription error: %s\r\n", ErrorStr(aError));
     }
 
-    void OnSubscriptionTerminated(SubscriptionManager::Handle /*handle*/,
-                                  const SubscriptionManager::Info & /*info*/) override
+    void OnSubscriptionTerminated(SubscriptionManager::Handle /*handle*/, const SubscriptionManager::Info & /*info*/) override
     {
         streamer_printf(streamer_get(), "IM: Subscription terminated\r\n");
     }
