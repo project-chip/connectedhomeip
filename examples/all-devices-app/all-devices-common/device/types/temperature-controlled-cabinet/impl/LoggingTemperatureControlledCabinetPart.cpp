@@ -16,6 +16,8 @@
 
 #include "LoggingTemperatureControlledCabinetPart.h"
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip::app {
 
 LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name) :
@@ -24,9 +26,113 @@ LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart
 
 LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
                                                                                  const char * name) :
-    TemperatureControlledCabinetPart(timerDelegate, config, mOpStateDelegate, *this),
-    mName(name), mOpStateDelegate(timerDelegate)
+    TemperatureControlledCabinetPart(timerDelegate, config, static_cast<Clusters::OperationalState::Delegate &>(*this),
+                                     static_cast<Clusters::IdentifyDelegate &>(*this)),
+    mName(name), mTimerDelegate(timerDelegate)
 {}
+
+LoggingTemperatureControlledCabinetPart::~LoggingTemperatureControlledCabinetPart()
+{
+    CancelTimer();
+}
+
+void LoggingTemperatureControlledCabinetPart::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    CancelTimer();
+    mCountdownTime.SetNull();
+    TemperatureControlledCabinetPart::Unregister(provider);
+}
+
+void LoggingTemperatureControlledCabinetPart::CancelTimer()
+{
+    mTimerDelegate.CancelTimer(this);
+}
+
+void LoggingTemperatureControlledCabinetPart::StartEmulatedOperationTimer()
+{
+    CancelTimer();
+    mCountdownTime = DataModel::MakeNullable<uint32_t>(kEmulatedOperationDurationSec);
+    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kEmulatedOperationDurationSec)));
+}
+
+void LoggingTemperatureControlledCabinetPart::TimerFired()
+{
+    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Emulated operation timer finished.", mName);
+    mCountdownTime.SetNull();
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
+}
+
+CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState)
+{
+    static const Clusters::OperationalState::GenericOperationalState kSupportedStates[] = {
+        Clusters::OperationalState::GenericOperationalState(
+            to_underlying(Clusters::OperationalState::OperationalStateEnum::kStopped), MakeOptional("Stopped"_span)),
+        Clusters::OperationalState::GenericOperationalState(
+            to_underlying(Clusters::OperationalState::OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
+        Clusters::OperationalState::GenericOperationalState(
+            to_underlying(Clusters::OperationalState::OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
+        Clusters::OperationalState::GenericOperationalState(
+            to_underlying(Clusters::OperationalState::OperationalStateEnum::kError), MakeOptional("Error"_span)),
+    };
+
+    if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    operationalState = kSupportedStates[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingTemperatureControlledCabinetPart::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+{
+    static constexpr CharSpan kSupportedPhases[] = { "Starting"_span, "Operating"_span, "Finishing"_span };
+
+    if (index >= MATTER_ARRAY_SIZE(kSupportedPhases))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return CopyCharSpanToMutableCharSpan(kSupportedPhases[index], operationalPhase);
+}
+
+void LoggingTemperatureControlledCabinetPart::HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Pause command received.", mName);
+    CancelTimer();
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kPaused;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kPaused));
+    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+}
+
+void LoggingTemperatureControlledCabinetPart::HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Resume command received.", mName);
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
+    StartEmulatedOperationTimer();
+    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+}
+
+void LoggingTemperatureControlledCabinetPart::HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Start command received.", mName);
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kRunning;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kRunning));
+    StartEmulatedOperationTimer();
+    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+}
+
+void LoggingTemperatureControlledCabinetPart::HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    ChipLogProgress(Zcl, "LoggingTemperatureControlledCabinetPart (%s): Stop command received.", mName);
+    CancelTimer();
+    mCountdownTime.SetNull();
+    mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
+    LogErrorOnFailure(OperationalState().SetOperationalState(Clusters::OperationalState::OperationalStateEnum::kStopped));
+    err.Set(to_underlying(Clusters::OperationalState::ErrorStateEnum::kNoError));
+}
 
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {

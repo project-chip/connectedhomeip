@@ -22,9 +22,8 @@ LoggingOven::LoggingOven(TimerDelegate & timerDelegate) : LoggingOven(timerDeleg
 
 LoggingOven::LoggingOven(TimerDelegate & timerDelegate, Config config) :
     Oven(timerDelegate, mLoggingSurface, mLoggingCavity, mLoggingSurface,
-         Oven::Config{ .cavityOperationalStateDelegate = mCavityOpStateDelegate, .cavityConfig = config.cavityConfig }),
-    mCavityOpStateDelegate(timerDelegate), mLoggingCavity(timerDelegate, config.cavityConfig, "Cavity"),
-    mLoggingSurface(timerDelegate, "Top Surface")
+         Oven::Config{ .cavityOperationalStateDelegate = mLoggingCavity, .cavityConfig = config.cavityConfig }),
+    mLoggingCavity(timerDelegate, config.cavityConfig, "Cavity"), mLoggingSurface(timerDelegate, "Top Surface")
 {}
 
 } // namespace chip::app

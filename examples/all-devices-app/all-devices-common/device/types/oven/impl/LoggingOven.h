@@ -35,22 +35,7 @@ public:
     LoggingOven(TimerDelegate & timerDelegate, Config config);
     ~LoggingOven() override = default;
 
-    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override
-    {
-        ReturnErrorOnFailure(Oven::Register(allocator, provider, composition));
-        mCavityOpStateDelegate.SetCluster(&Cavity().OperationalState());
-        return CHIP_NO_ERROR;
-    }
-
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        mCavityOpStateDelegate.SetCluster(nullptr);
-        Oven::Unregister(provider);
-    }
-
 private:
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mCavityOpStateDelegate;
     LoggingTemperatureControlledCabinetPart mLoggingCavity;
     LoggingCookSurfacePart mLoggingSurface;
 };
