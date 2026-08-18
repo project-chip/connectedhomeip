@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,13 +95,29 @@ class TC_FAN_3_2(MatterBaseTest):
                 TestStep(5, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
                 TestStep(6, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in ascending order, from 1 to SpeedMax.",
-                         "[FC] For each SpeedSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is Off due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequentially in ascending order (each new value greater than the previous one)."),
+                         """[FC] For each SpeedSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE.
+                         After all updates have been performed, verify:
+                           - If no INVALID_IN_STATE write status was returned during the SpeedSetting updates:
+                             * Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received
+                               for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1
+                               (since the first FanMode is Off due to initialization).
+                             * Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting.
+                             * The value of the attribute reports from the subscription of each attribute came in sequentially in ascending order
+                               (each new value greater than the previous one)."""),
                 TestStep(7, "[FC] Initialize the DUT to `FanMode` High.",
                          "[FC] * Read back and verify the written value. * The DUT shall return either SUCCESS or INVALID_IN_STATE."),
                 TestStep(8, "[FC] Individually subscribe to the PercentSetting, PercentCurrent, FanMode, SpeedSetting, and SpeedCurrent attributes.",
                          "[FC] This will receive updates for the attributes when the SpeedSetting attribute is updated."),
                 TestStep(9, "[FC] Update the value of the `SpeedSetting` attribute iteratively, in descending order, from SpeedMax - 1 to 0.",
-                         "[FC] For each SpeedSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE. After all updates have been performed, verify: If no INVALID_IN_STATE write status was returned during the SpeedSetting updates: -- Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1 (since the first FanMode is High due to initialization). -- Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting. * The value of the attribute reports from the subscription of each attribute came in sequentially in descending order (each new value less than the previous one)."),
+                         """[FC] For each SpeedSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE.
+                         After all updates have been performed, verify:
+                           - If no INVALID_IN_STATE write status was returned during the SpeedSetting updates:
+                             * Verify that if the number of reports received for SpeedSetting is greater than or equal to the number of reports received
+                               for FanMode, then the number of reports received for FanMode should be equal to the number of available FanModes - 1
+                               (since the first FanMode is High due to initialization).
+                             * Verify that the number of reports received for PercentSetting matches the number of reports received for SpeedSetting.
+                             * The value of the attribute reports from the subscription of each attribute came in sequentially in descending order
+                             (each new value less than the previous one)."""),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
