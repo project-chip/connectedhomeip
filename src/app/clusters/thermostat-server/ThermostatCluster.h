@@ -129,7 +129,7 @@ public:
 
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    EndpointId Endpoint() { return mPath.mEndpointId; }
+    EndpointId Endpoint() const { return mPath.mEndpointId; }
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
 
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override;
