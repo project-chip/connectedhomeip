@@ -55,6 +55,19 @@ public:
      */
     CHIP_ERROR Init(CASESessionManager * aCASESessionManager, EndpointId aCameraEndpoint);
 
+    /**
+     * Declares whether the camera's CameraAVStreamManagement cluster has the Watermark and
+     * OnScreenDisplay features. VideoStreamAllocate requires the WatermarkEnabled/OSDEnabled fields
+     * to be present exactly when the respective feature is supported (feature-conditional
+     * conformance), so the client must know them. Defaults to absent.
+     * TODO: discover from the camera's FeatureMap instead of configuration.
+     */
+    void SetCameraVideoTraits(bool aHasWatermark, bool aHasOSD)
+    {
+        mCameraHasWatermark = aHasWatermark;
+        mCameraHasOSD       = aHasOSD;
+    }
+
     // AvAnalysisCameraClient
     CHIP_ERROR RequestVideoStreamAllocation(const ScopedNodeId & aCameraNode, Callback & aCallback) override;
     CHIP_ERROR RequestVideoStreamDeallocation(const ScopedNodeId & aCameraNode, uint16_t aAnalysisStreamId,
@@ -95,6 +108,8 @@ private:
 
     CASESessionManager * mCASESessionManager = nullptr;
     EndpointId mCameraEndpoint               = kInvalidEndpointId;
+    bool mCameraHasWatermark                 = false;
+    bool mCameraHasOSD                       = false;
 
     PendingRequest mPendingRequest = PendingRequest::kNone;
     uint16_t mPendingStreamId      = 0;

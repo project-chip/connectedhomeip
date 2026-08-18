@@ -122,6 +122,16 @@ CHIP_ERROR DefaultAvAnalysisCameraClient::SendPendingCommand(Messaging::Exchange
         request.maxBitRate           = kDefaultMaxBitRateBps;
         request.keyFrameInterval     = kDefaultKeyFrameIntervalMilliseconds;
 
+        // Feature-conditional fields: present exactly when the camera supports the feature
+        if (mCameraHasWatermark)
+        {
+            request.watermarkEnabled = MakeOptional(false);
+        }
+        if (mCameraHasOSD)
+        {
+            request.OSDEnabled = MakeOptional(false);
+        }
+
         CommandPathParams commandPath = { mCameraEndpoint, CameraAvStreamManagement::Id, Commands::VideoStreamAllocate::Id,
                                           CommandPathFlags::kEndpointIdValid };
         ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, request));
