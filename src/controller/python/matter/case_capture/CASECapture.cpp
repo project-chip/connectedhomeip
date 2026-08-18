@@ -254,8 +254,7 @@ public:
             // unmarked so the Python side sees an incomplete record.
             if ((record->marks & PYCHIP_CASE_TIMING_MARK_SIGMA3_SENT) != 0)
             {
-                Mark(*record, &PychipCaseTimingRecord::statusReportReceivedUs, PYCHIP_CASE_TIMING_MARK_STATUS_REPORT_RECEIVED,
-                     now);
+                Mark(*record, &PychipCaseTimingRecord::statusReportReceivedUs, PYCHIP_CASE_TIMING_MARK_STATUS_REPORT_RECEIVED, now);
 
                 // The timestamp is kept whether the peer accepted or rejected Sigma3, since
                 // the time to a rejection is still a real measurement. The codes are what
@@ -492,7 +491,7 @@ private:
 
     // Ignored if the field was already set: an MRP retransmission or a duplicate delivery
     // must not move the timestamp of the first occurrence.
-    static void Mark(PychipCaseTimingRecord & record, uint64_t PychipCaseTimingRecord::* field, uint8_t bit, uint64_t now)
+    static void Mark(PychipCaseTimingRecord & record, uint64_t PychipCaseTimingRecord::*field, uint8_t bit, uint64_t now)
     {
         VerifyOrReturn((record.marks & bit) == 0);
         record.*field = now;
