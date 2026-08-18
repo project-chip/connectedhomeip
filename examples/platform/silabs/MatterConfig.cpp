@@ -42,7 +42,6 @@
 #include <sl_watchdog_manager.h>
 #endif // SL_CATALOG_WATCHDOG_MANAGER_PRESENT
 
-
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "pigweed_rpc/Rpc.h"
 #endif
@@ -162,7 +161,6 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
 
-    
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack()); // Only need to register on state change callback
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
