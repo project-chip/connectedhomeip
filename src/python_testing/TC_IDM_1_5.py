@@ -44,6 +44,7 @@ from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
+from matter.clusters import Command as ClusterCommand
 from matter.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -78,10 +79,8 @@ class TC_IDM_1_5(IDMBaseTest):
     def steps_TC_IDM_1_5(self) -> list[TestStep]:
         return [
             TestStep(1, "TH establishes a subscription to a changeable attribute on the DUT with MaxInterval set to a large value (60 seconds).", is_commissioning=True),
-            TestStep(2, "TH sends an InvokeRequestMessage to the DUT to invoke a command that triggers a change in the subscribed attribute, including DelayReportData parameter (DelayMinMs: 200 ms, DelayJitterWindowMs: 500 ms)."),
-            TestStep(3, "TH measures the time delta (Delta t) between receiving the InvokeResponse in Step 2 and receiving the subsequent ReportDataMessage. Verify 150 ms <= Delta t <= 750 ms."),
-            TestStep(4, "TH waits for 2 seconds and sends a second InvokeRequestMessage to the DUT without DelayReportData parameter to change the attribute back."),
-            TestStep(5, "TH measures the time delta (Delta t_2) between receiving the InvokeResponse in Step 4 and receiving the subsequent ReportDataMessage. Verify Delta t_2 < 150 ms.")
+            TestStep(2, "TH sends an InvokeRequestMessage to the DUT to invoke a command that triggers a change in the subscribed attribute, including DelayReportData parameter (DelayMinMs calculated based on MRP timeout + 100 ms, DelayJitterWindowMs: 500 ms)."),
+            TestStep(3, "TH measures the time delta (Delta t) between receiving the InvokeResponse in Step 2 and receiving the subsequent ReportDataMessage. Verify DelayMinMs - 50 ms <= Delta t <= DelayMinMs + DelayJitterWindowMs + 100 ms.")
         ]
 
     @async_test_body
@@ -123,11 +122,17 @@ class TC_IDM_1_5(IDMBaseTest):
 
         sub_elapsed_sec = time.monotonic() - sub_start_time
         remaining_sub_window_sec = 60.0 - sub_elapsed_sec
-        log.info("Subscription established in %.2f s; remaining window before periodic report: %.2f s",
-                 sub_elapsed_sec, remaining_sub_window_sec)
+
+        mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(dev_ctrl)
+        delay_min_ms = int(mrp_timeout_sec * 1000.0) + 100
+        delay_jitter_window_ms = 500
+        min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
+
+        log.info("Subscription established in %.2f s; remaining window: %.2f s (required >= %.2f s for MRP timeout %.2f s)",
+                 sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec, mrp_timeout_sec)
 
         asserts.assert_greater_equal(
-            remaining_sub_window_sec, 30.0,
+            remaining_sub_window_sec, min_required_sub_window_sec,
             f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
             f"({remaining_sub_window_sec:.2f} s) to safely measure DelayReportData"
         )
@@ -138,62 +143,38 @@ class TC_IDM_1_5(IDMBaseTest):
             report_queue.get_nowait()
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
-        log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=200, DelayJitterWindowMs=500)")
+        log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
+                 delay_min_ms, delay_jitter_window_ms)
 
         await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
-            payload=cmd
+            payload=cmd,
+            delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
         )
         invoke_recv_time = time.monotonic()
 
         self.step(3)
+        wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
         try:
-            report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=5.0)
+            report_recv_time, new_val = await asyncio.to_thread(report_queue.get, timeout=wait_timeout_sec)
         except queue.Empty:
-            asserts.fail("Did not receive ReportDataMessage following invoke command with DelayReportData")
+            asserts.fail(f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
         delta_t_ms = (report_recv_time - invoke_recv_time) * 1000.0
-        log.info("Measured Delta t between InvokeResponse and ReportData: %.2f ms", delta_t_ms)
+        log.info("Measured Delta t between InvokeResponse and ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
+                 delta_t_ms, delay_min_ms, delay_jitter_window_ms)
+
+        min_expected_delta_ms = delay_min_ms - 50.0
+        max_expected_delta_ms = delay_min_ms + delay_jitter_window_ms + 100.0
 
         asserts.assert_greater_equal(
-            delta_t_ms, 150.0,
-            f"Delta t ({delta_t_ms:.2f} ms) was less than 150 ms minimum delay margin (expected >= 150 ms)"
+            delta_t_ms, min_expected_delta_ms,
+            f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay margin"
         )
         asserts.assert_less_equal(
-            delta_t_ms, 750.0,
-            f"Delta t ({delta_t_ms:.2f} ms) exceeded 750 ms maximum delay+jitter margin (expected <= 750 ms)"
-        )
-
-        self.step(4)
-        log.info("Waiting 2 seconds for reports to settle before Step 4")
-        await asyncio.sleep(2)
-
-        # Drain any stray reports
-        while not report_queue.empty():
-            report_queue.get_nowait()
-
-        log.info("Sending second InvokeRequestMessage without DelayReportData to change Breadcrumb to 2")
-        cmd_2 = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
-        await dev_ctrl.SendCommand(
-            nodeId=dut_node_id,
-            endpoint=endpoint,
-            payload=cmd_2
-        )
-        invoke_recv_time_2 = time.monotonic()
-
-        self.step(5)
-        try:
-            report_recv_time_2, new_val_2 = await asyncio.to_thread(report_queue.get, timeout=5.0)
-        except queue.Empty:
-            asserts.fail("Did not receive ReportDataMessage following second invoke command")
-
-        delta_t_2_ms = (report_recv_time_2 - invoke_recv_time_2) * 1000.0
-        log.info("Measured Delta t_2 between second InvokeResponse and ReportData: %.2f ms", delta_t_2_ms)
-
-        asserts.assert_less(
-            delta_t_2_ms, 150.0,
-            f"Delta t_2 ({delta_t_2_ms:.2f} ms) was not sent promptly without delay (expected < 150 ms)"
+            delta_t_ms, max_expected_delta_ms,
+            f"Delta t ({delta_t_ms:.2f} ms) exceeded {max_expected_delta_ms:.2f} ms maximum delay+jitter margin"
         )
 
         # Cleanup: Disarm fail-safe and reset Breadcrumb

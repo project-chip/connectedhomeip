@@ -37,11 +37,13 @@ extern "C" {
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload);
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload,
+                                             uint16_t delayMinMs, uint16_t delayJitterWindowMs);
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
-                                                   chip::python::PyInvokeRequestData * batchCommandData, size_t length);
+                                                   chip::python::PyInvokeRequestData * batchCommandData, size_t length,
+                                                   uint16_t delayMinMs, uint16_t delayJitterWindowMs);
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
@@ -196,7 +198,8 @@ private:
 PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                       uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                       python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides,
-                                      python::PyInvokeRequestData * batchCommandData, size_t length)
+                                      python::PyInvokeRequestData * batchCommandData, size_t length,
+                                      uint16_t delayMinMs, uint16_t delayJitterWindowMs)
 {
     CommandSender::ConfigParameters config;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -244,6 +247,14 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), isTimedRequest, suppressResponse);
+
+    if (delayMinMs > 0 || delayJitterWindowMs > 0)
+    {
+        InvokeRequestMessage::DelayReportData delayReportData;
+        delayReportData.delayMinMs          = delayMinMs;
+        delayReportData.delayJitterWindowMs = delayJitterWindowMs;
+        sender->SetDelayReportData(delayReportData);
+    }
 
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
 
@@ -352,7 +363,8 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint32_t interactionTimeoutMs,
-                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload)
+                                             uint16_t busyWaitMs, bool suppressResponse, bool allowLargePayload,
+                                             uint16_t delayMinMs, uint16_t delayJitterWindowMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -365,6 +377,14 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse, allowLargePayload);
+
+    if (delayMinMs > 0 || delayJitterWindowMs > 0)
+    {
+        InvokeRequestMessage::DelayReportData delayReportData;
+        delayReportData.delayMinMs          = delayMinMs;
+        delayReportData.delayJitterWindowMs = delayJitterWindowMs;
+        sender->SetDelayReportData(delayReportData);
+    }
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };
@@ -404,22 +424,22 @@ exit:
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint32_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
-                                                   python::PyInvokeRequestData * batchCommandData, size_t length)
+                                                   python::PyInvokeRequestData * batchCommandData, size_t length,
+                                                   uint16_t delayMinMs, uint16_t delayJitterWindowMs)
 {
     python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides = nullptr;
     return SendBatchCommandsInternal(appContext, device, timedRequestTimeoutMs, interactionTimeoutMs, busyWaitMs, suppressResponse,
-                                     testOnlyOverrides, batchCommandData, length);
+                                     testOnlyOverrides, batchCommandData, length, delayMinMs, delayJitterWindowMs);
 }
 
-PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                           uint32_t interactionTimeoutMs, uint16_t busyWaitMs,
-                                                           bool suppressResponse,
-                                                           python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
-                                                           python::PyInvokeRequestData * batchCommandData, size_t length)
+PyChipError pychip_CommandSender_TestOnlySendBatchCommands(
+    void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs, uint32_t interactionTimeoutMs, uint16_t busyWaitMs,
+    bool suppressResponse, python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
+    python::PyInvokeRequestData * batchCommandData, size_t length, uint16_t delayMinMs, uint16_t delayJitterWindowMs)
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     return SendBatchCommandsInternal(appContext, device, timedRequestTimeoutMs, interactionTimeoutMs, busyWaitMs, suppressResponse,
-                                     &testOnlyOverrides, batchCommandData, length);
+                                     &testOnlyOverrides, batchCommandData, length, delayMinMs, delayJitterWindowMs);
 #else
     return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
 #endif
