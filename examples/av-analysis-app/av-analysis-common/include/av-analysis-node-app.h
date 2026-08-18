@@ -18,6 +18,11 @@
 
 #pragma once
 
+#include "analysis-delegate.h"
+
+#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+#include <app/clusters/av-analysis-server/DefaultAvAnalysisCameraClient.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -34,8 +39,17 @@ public:
     void Shutdown();
 
 private:
+    // Maximum number of concurrently established analysis streams (MaxAnalysisStreamCount, Fixed)
+    static constexpr uint8_t kMaxAnalysisStreams = 2;
+
+    // Endpoint on the camera node hosting the CameraAVStreamManagement cluster
+    static constexpr EndpointId kCameraAvStreamManagementEndpoint = 1;
+
     EndpointId mEndpointId = kInvalidEndpointId;
 
+    AnalysisDelegate mAnalysisDelegate;
+    Clusters::DefaultAvAnalysisCameraClient mCameraClient;
+    LazyRegisteredServerCluster<Clusters::AvAnalysisCluster> mAvAnalysisServer;
 };
 
 } // namespace app
