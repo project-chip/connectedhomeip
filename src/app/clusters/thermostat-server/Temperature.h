@@ -33,7 +33,7 @@ constexpr temperature kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is t
 constexpr temperature kDefaultDeadBand        = 200; // 2.0C is the default; this changed from 2.5C in revision 8 of this cluster
 constexpr temperature kDefaultHeatingSetpoint = 2000;
 constexpr temperature kDefaultCoolingSetpoint = 2600;
-constexpr temperature kDefaultLocalTemperatureCalibration = 0;
+constexpr int8_t kDefaultLocalTemperatureCalibration = 0;
 
 constexpr uint16_t kMaxTemperatureSetpointHoldDurationSec = 1440;
 

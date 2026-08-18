@@ -26,7 +26,8 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
+#include <cstdint>
 
 #include <app-common/zap-generated/cluster-objects.h>
 

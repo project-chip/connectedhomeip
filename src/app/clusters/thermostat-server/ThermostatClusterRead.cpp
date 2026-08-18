@@ -163,7 +163,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case NumberOfScheduleTransitionPerDay::Id:
         // TODO: implement number of schedules
         return Status::UnsupportedAttribute;
-        break;
     case ActivePresetHandle::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -180,7 +179,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ActiveScheduleHandle::Id:
         // TODO: implement active schedule handle
         return Status::UnsupportedAttribute;
-        break;
     case Presets::Id: {
         VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 

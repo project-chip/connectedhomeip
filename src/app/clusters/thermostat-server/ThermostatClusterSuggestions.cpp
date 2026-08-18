@@ -37,6 +37,9 @@ namespace Thermostat {
 
 namespace {
 
+constexpr uint16_t kMinExpirationInMinutes = 30;
+constexpr uint16_t kMaxExpirationInMinutes = 1440;
+
 CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -100,7 +103,8 @@ ThermostatCluster::AddThermostatSuggestion(CommandHandler * commandObj, const Co
         return Status::ConstraintError;
     }
 
-    if (commandData.expirationInMinutes < 30 || commandData.expirationInMinutes > 1440)
+    if (commandData.expirationInMinutes < kMinExpirationInMinutes ||
+        commandData.expirationInMinutes > kMaxExpirationInMinutes)
     {
         return Status::ConstraintError;
     }
@@ -210,7 +214,7 @@ ThermostatCluster::RemoveThermostatSuggestion(CommandHandler * commandObj, const
     NotifyAttributeChanged(ThermostatSuggestions::Id);
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
-    TEMPORARY_RETURN_IGNORED RemoveExpiredSuggestions(mDelegate);
+    LogErrorOnFailure(RemoveExpiredSuggestions(mDelegate));
     ReEvaluateCurrentSuggestion();
 
     return Status::Success;

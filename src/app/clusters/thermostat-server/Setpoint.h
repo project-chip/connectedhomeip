@@ -20,7 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/Optional.h>
-#include <protocols/interaction_model/Constants.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 
 #include "Temperature.h"
 

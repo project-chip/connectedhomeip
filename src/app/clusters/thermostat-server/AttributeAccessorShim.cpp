@@ -259,7 +259,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 
 // These attributes are deprecated, and only in "use" by ThermostaticRadiatorValveManager, and will be removed in the future
 namespace PICoolingDemand {
+namespace {
 uint8_t piCoolingDemand = 0;
+}
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 {
     *value = piCoolingDemand;
@@ -273,7 +275,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 } // namespace PICoolingDemand
 
 namespace PIHeatingDemand {
+namespace {
 uint8_t piHeatingDemand = 0;
+}
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 {
     *value = piHeatingDemand;

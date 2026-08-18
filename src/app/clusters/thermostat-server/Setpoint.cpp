@@ -81,12 +81,9 @@ CHIP_ERROR OptionalSetpoint::Decode(chip::TLV::TLVReader & reader)
         return CHIP_NO_ERROR;
     }
     temperature temp;
-    CHIP_ERROR error = reader.Get(temp);
-    if (error == CHIP_NO_ERROR)
-    {
-        mTemperature.SetValue(temp);
-    }
-    return error;
+    ReturnErrorOnFailure(reader.Get(temp));
+    mTemperature.SetValue(temp);
+    return CHIP_NO_ERROR;
 }
 
 temperature OptionalSetpoint::Temperature() const

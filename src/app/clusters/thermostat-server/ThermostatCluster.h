@@ -46,7 +46,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-class ThermostatCluster : public DefaultServerCluster, chip::FabricTable::Delegate, AtomicWriteSession::Delegate
+class ThermostatCluster : public DefaultServerCluster, private chip::FabricTable::Delegate, private AtomicWriteSession::Delegate
 {
 
 public:
