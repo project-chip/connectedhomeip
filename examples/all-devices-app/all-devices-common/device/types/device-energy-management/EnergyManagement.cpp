@@ -110,6 +110,19 @@ Protocols::InteractionModel::Status EnergyManagement::CancelRequest()
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status EnergyManagement::PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                              const DataModel::Nullable<int64_t> maxPower,
+                                                                              const uint32_t duration,
+                                                                              AdjustmentCauseEnum cause)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status EnergyManagement::CancelPowerRangeAdjustRequest()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
 ESATypeEnum EnergyManagement::GetESAType()
 {
     return ESATypeEnum::kEvse;
@@ -148,6 +161,11 @@ const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & EnergyMa
 const DataModel::Nullable<Structs::ForecastStruct::Type> & EnergyManagement::GetForecast()
 {
     return mForecast;
+}
+
+const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & EnergyManagement::GetPowerRangeAdjustment()
+{
+    return mPowerRangeAdjustment;
 }
 
 CHIP_ERROR EnergyManagement::SetESAState(ESAStateEnum state)

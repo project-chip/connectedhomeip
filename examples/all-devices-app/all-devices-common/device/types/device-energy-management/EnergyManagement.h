@@ -50,6 +50,11 @@ public:
         const DataModel::DecodableList<Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::Type> & constraints,
         Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status CancelRequest() override;
+    Protocols::InteractionModel::Status PowerRangeAdjustRequest(const DataModel::Nullable<int64_t> minPower,
+                                                                const DataModel::Nullable<int64_t> maxPower,
+                                                                const uint32_t duration,
+                                                                Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
+    Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() override;
 
     Clusters::DeviceEnergyManagement::ESATypeEnum GetESAType() override;
     bool GetESACanGenerate() override;
@@ -60,6 +65,8 @@ public:
     const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> &
     GetPowerAdjustmentCapability() override;
     const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> & GetForecast() override;
+    const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> &
+    GetPowerRangeAdjustment() override;
     CHIP_ERROR SetESAState(Clusters::DeviceEnergyManagement::ESAStateEnum state) override;
 
     // Public getters for programmatic control
@@ -72,6 +79,7 @@ private:
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
+    DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::DeviceEnergyManagementCluster> mDemCluster;
