@@ -38,7 +38,7 @@ public:
 
     // define instead of constexpr static auto because the latter failes on Darwin.
 #define MSG "%s device: %s cluster: %s called"
-#define MSG_WITH_INDEX "%s device: %s cluster: %s called with index %" PRIu8
+#define MSG_WITH_INDEX "%s device: %s cluster: %s called with index %hhu"
 
     constexpr static auto device                   = "ElectricalSensor";
     constexpr static auto energyMeasurementCluster = "ElectricalEnergyMeasurement";
