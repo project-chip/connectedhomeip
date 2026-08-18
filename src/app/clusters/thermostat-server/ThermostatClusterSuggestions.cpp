@@ -42,6 +42,43 @@ namespace Thermostat {
 
 namespace {
 
+/**
+ * @brief Determines whether a preset handle still exists in the Presets attribute list.
+ *
+ * Unlike IsPresetHandlePresentInPresets(), which treats a GetPresetAtIndex() enumeration error the same as "not
+ * found", this distinguishes the two so callers that take a destructive action (e.g. removing a thermostat
+ * suggestion) on "not found" do not do so on a transient enumeration error.
+ *
+ * @param[in]  delegate The delegate to use.
+ * @param[in]  presetHandle The preset handle to look for.
+ * @param[out] exists Set to true if a preset with this handle is present in the Presets attribute list, false
+ *             otherwise.
+ *
+ * @return CHIP_NO_ERROR if the Presets attribute list was enumerated successfully, an error code if not.
+ */
+CHIP_ERROR PresetHandleStillExists(Delegate * delegate, const ByteSpan & presetHandle, bool & exists)
+{
+    exists = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    PresetStructWithOwnedMembers preset;
+    for (uint8_t i = 0; true; i++)
+    {
+        CHIP_ERROR err = delegate->GetPresetAtIndex(i, preset);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().data_equal(presetHandle))
+        {
+            exists = true;
+            return CHIP_NO_ERROR;
+        }
+    }
+}
+
 CHIP_ERROR RemoveExpiredSuggestions(Delegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -108,7 +145,11 @@ CHIP_ERROR RemoveThermostatSuggestionsForRemovedPresets(Delegate * delegate, boo
         CHIP_ERROR err = delegate->GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
         ReturnErrorOnFailure(err);
 
-        if (!IsPresetHandlePresentInPresets(delegate, suggestion.GetPresetHandle()))
+        bool presetStillExists = false;
+        err                    = PresetHandleStillExists(delegate, suggestion.GetPresetHandle(), presetStillExists);
+        ReturnErrorOnFailure(err);
+
+        if (!presetStillExists)
         {
             ReturnErrorOnFailure(delegate->RemoveFromThermostatSuggestionsList(static_cast<size_t>(i)));
             didRemoveAnEntry = true;
