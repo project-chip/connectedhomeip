@@ -105,7 +105,7 @@ void LoggingRvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperat
     ChipLogProgress(Zcl, "LoggingRvcOperationalStateDelegate: Resume command received.");
     if (!mCluster)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
         return;
     }
 

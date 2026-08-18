@@ -35,6 +35,7 @@ executable("all-devices-app") {
     "PosixSpeaker.cpp",
     "RoboticVacuumCleanerNamedPipe.cpp",
     "include/CHIPProjectAppConfig.h",
+    "include/RoboticVacuumCleanerNamedPipe.h",
     "main.cpp",
   ]
 
