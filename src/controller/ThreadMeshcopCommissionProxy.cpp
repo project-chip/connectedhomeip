@@ -340,7 +340,8 @@ void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t
         return;
     }
 
-    if (mProxyFd == -1) {
+    if (mProxyFd == -1)
+    {
         if (CreateProxySocket(commissionData) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
