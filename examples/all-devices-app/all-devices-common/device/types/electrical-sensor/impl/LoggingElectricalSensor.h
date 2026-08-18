@@ -25,7 +25,6 @@ namespace chip::app {
  * Simulated electrical sensor that minimally impements and logs on delegate calls
  */
 class LoggingElectricalSensor : public ElectricalSensor,
-                                public TimerContext,
                                 public Clusters::ElectricalEnergyMeasurement::Delegate,
                                 public Clusters::ElectricalPowerMeasurement::Delegate,
                                 public Clusters::PowerTopology::Delegate
