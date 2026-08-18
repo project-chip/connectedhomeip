@@ -403,7 +403,7 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensor>(); });
         }
-        if contexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
+        if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
             RegisterCreator("electrical-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
