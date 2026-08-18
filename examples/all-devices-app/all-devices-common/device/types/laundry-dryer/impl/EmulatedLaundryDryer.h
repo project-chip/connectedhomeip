@@ -16,34 +16,42 @@
 
 #pragma once
 
-#include <device/capabilities/operational-state/impl/EmulatedOperationalStateDelegate.h>
 #include <device/types/laundry-dryer/LaundryDryer.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class EmulatedLaundryDryer : public LaundryDryer
+class EmulatedLaundryDryer : public LaundryDryer,
+                             public Clusters::OperationalState::Delegate,
+                             public TimerContext
 {
 public:
-    explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate) : LaundryDryer(mOpStateDelegate), mOpStateDelegate(timerDelegate)
-    {}
-    ~EmulatedLaundryDryer() override = default;
+    explicit EmulatedLaundryDryer(TimerDelegate & timerDelegate);
+    ~EmulatedLaundryDryer() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
-    {
-        ReturnErrorOnFailure(LaundryDryer::Register(endpoint, provider, composition));
-        mOpStateDelegate.SetCluster(&OperationalState());
-        return CHIP_NO_ERROR;
-    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        mOpStateDelegate.SetCluster(nullptr);
-        LaundryDryer::Unregister(provider);
-    }
+    // -- TimerContext Interface --
+    void TimerFired() override;
+
+    // -- OperationalState::Delegate Interface --
+    DataModel::Nullable<uint32_t> GetCountdownTime() override { return mCountdownTime; }
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, Clusters::OperationalState::GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
+    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
 private:
-    Clusters::OperationalState::EmulatedOperationalStateDelegate mOpStateDelegate;
+    static constexpr uint32_t kEmulatedOperationDurationSec = 30;
+
+    void CancelTimer();
+    void StartEmulatedOperationTimer();
+
+    TimerDelegate & mTimerDelegate;
+    Clusters::OperationalState::OperationalStateEnum mOperationalState = Clusters::OperationalState::OperationalStateEnum::kStopped;
+    DataModel::Nullable<uint32_t> mCountdownTime;
 };
 
 } // namespace chip::app

@@ -63,6 +63,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/impl/EmulatedLaundryDryer.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-washer/LaundryWasher.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/LightSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/light-sensor/impl/IncreasingLightSensor.cpp"
