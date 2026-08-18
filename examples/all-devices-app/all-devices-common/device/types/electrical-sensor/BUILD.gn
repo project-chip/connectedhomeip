@@ -34,9 +34,7 @@ source_set("electrical-sensor") {
 }
 
 source_set("logging") {
-  sources = [
-    "impl/LoggingElectricalSensor.h",
-  ]
+  sources = [ "impl/LoggingElectricalSensor.h" ]
 
   public_deps = [ ":electrical-sensor" ]
 }
