@@ -34,10 +34,10 @@ source_set("laundry-washer") {
 }
 
 source_set("emulated") {
-  sources = [ "impl/EmulatedLaundryWasher.h" ]
-
-  public_deps = [
-    ":laundry-washer",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
+  sources = [
+    "impl/EmulatedLaundryWasher.cpp",
+    "impl/EmulatedLaundryWasher.h",
   ]
+
+  public_deps = [ ":laundry-washer" ]
 }
