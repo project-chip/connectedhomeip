@@ -29,47 +29,6 @@
 
 namespace chip::app {
 
-class MicrowaveOvenModeDelegate : public Clusters::ModeBase::AppDelegate
-{
-public:
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override
-    {
-        VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kLabels), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-        return CopyCharSpanToMutableCharSpan(kLabels[modeIndex], label);
-    }
-
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override
-    {
-        VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kLabels), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-        value = modeIndex;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override
-    {
-        VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kTagValues), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-        VerifyOrReturnError(modeTags.size() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
-
-        modeTags[0].mfgCode.ClearValue();
-        modeTags[0].value = kTagValues[modeIndex];
-        modeTags.reduce_size(1);
-        return CHIP_NO_ERROR;
-    }
-
-    void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
-    {
-        response.status = to_underlying(Clusters::ModeBase::StatusCode::kSuccess);
-    }
-
-private:
-    static constexpr CharSpan kLabels[]    = { "Normal"_span, "Defrost"_span };
-    static constexpr uint16_t kTagValues[] = { to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kNormal),
-                                               to_underlying(Clusters::MicrowaveOvenMode::ModeTag::kDefrost) };
-};
-
 class MicrowaveOven : public SingleEndpoint
 {
 public:
