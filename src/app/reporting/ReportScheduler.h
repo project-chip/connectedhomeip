@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <app/ReadHandler.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
@@ -151,8 +152,8 @@ public:
             mScheduler->ReportTimerCallback();
         }
 
-        Timestamp GetMinTimestamp() const { return mMinTimestamp > mDeferralEndTimestamp ? mMinTimestamp : mDeferralEndTimestamp; }
-        Timestamp GetMaxTimestamp() const { return mMaxTimestamp > mDeferralEndTimestamp ? mMaxTimestamp : mDeferralEndTimestamp; }
+        Timestamp GetMinTimestamp() const { return std::max(mMinTimestamp, mDeferralEndTimestamp); }
+        Timestamp GetMaxTimestamp() const { return std::max(mMaxTimestamp, mDeferralEndTimestamp); }
 
         Timestamp GetDeferralEndTimestamp() const { return mDeferralEndTimestamp; }
         void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }
