@@ -269,7 +269,6 @@ JNI_METHOD(void, removeFabric)
 JNI_METHOD(void, nativeReleaseCastingPlayer)
 (JNIEnv * env, jclass clazz, jlong ptr)
 {
-    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::nativeReleaseCastingPlayer()");
     delete reinterpret_cast<support::CastingPlayerHandle *>(ptr);
 }
