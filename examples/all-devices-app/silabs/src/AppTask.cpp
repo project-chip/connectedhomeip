@@ -38,6 +38,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
@@ -167,6 +168,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .dacProvider                = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement            = chip::app::EventManagement::GetInstance(),
         .timerDelegate              = sTimerDelegate,
+        .minGuaranteedSubscriptionsPerFabric =
+            chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -190,10 +193,15 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
-        .groupDataProvider = *groupDataProvider,
-        .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
-        .timerDelegate     = sTimerDelegate,
-        .storageDelegate   = storage,
+        .groupDataProvider      = *groupDataProvider,
+        .fabricTable            = chip::Server::GetInstance().GetFabricTable(),
+        .timerDelegate          = sTimerDelegate,
+        .storageDelegate        = storage,
+        .diagnosticDataProvider = chip::DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager        = chip::DeviceLayer::PlatformMgr(),
+        .failSafeContext        = chip::Server::GetInstance().GetFailSafeContext(),
+        .bindingTable           = chip::app::Clusters::Binding::Table::GetInstance(),
+        .bindingManager         = chip::app::Clusters::Binding::Manager::GetInstance(),
     });
 
     std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();

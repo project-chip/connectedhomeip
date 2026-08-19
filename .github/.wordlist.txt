@@ -1223,6 +1223,7 @@ ProductLabel
 ProductName
 ProductURL
 programmatically
+proguard
 proto
 protobuf
 protos
