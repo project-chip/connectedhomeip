@@ -17,7 +17,7 @@
 
 #include "IMShellCommands.h"
 
-#include "../../subscription/SubscriptionManager.h"
+#include "subscription/SubscriptionManager.h"
 
 #include <app/server/Server.h>
 #include <clusters/OccupancySensing/AttributeIds.h>

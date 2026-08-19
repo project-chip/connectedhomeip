@@ -98,7 +98,7 @@ CHIP_ERROR SubscriptionManager::Subscribe(const Info & info, Handle * outHandle,
     CHIP_ERROR err = readClient->SendAutoResubscribeRequest(peer, std::move(readParams));
     if (err != CHIP_NO_ERROR)
     {
-        // ReadClient takes ownership of paths only on success; clean up on failure.
+        // On failure, ReadClient has already invoked OnDeallocatePaths, which freed pathParams.
         Platform::Delete(readClient);
         return err;
     }
