@@ -112,6 +112,28 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
 
 } // anonymous namespace
 
+Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId))
+{
+    return ExecuteAtomicAction(attributeStatuses, action, Optional<Status>());
+}
+
+Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId), Optional<Status> statusOverride)
+{
+    Status status = Status::Success;
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+    {
+        auto & attributeStatus = attributeStatuses[i];
+        auto actionStatus      = std::invoke(action, mDelegate, attributeStatus.attributeID);
+
+        attributeStatus.statusCode = to_underlying(statusOverride.ValueOr(actionStatus));
+        if (actionStatus != Status::Success)
+        {
+            status = Status::Failure;
+        }
+    }
+    return status;
+}
+
 bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
 {
 
@@ -154,7 +176,7 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, Optional<Att
 }
 
 bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
-                                       Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+                                       AtomicAttributes & attributeStatuses)
 {
 
     if (mState != State::Open)
@@ -319,33 +341,12 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
             // This is a valid request to open an atomic write. Tell the delegate it
             // needs to keep track of a pending preset list now.
-            for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+            status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteBegin);
+            if (status != Status::Success || ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
             {
-                auto & attributeStatus     = attributeStatuses[i];
-                auto beginStatus           = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
-                attributeStatus.statusCode = to_underlying(beginStatus);
-                if (beginStatus != Status::Success)
-                {
-                    status = Status::Failure;
-                }
-            }
-            if (status == Status::Success)
-            {
-                if (ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
-                {
-                    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-                    {
-                        auto & attributeStatus = attributeStatuses[i];
-                        mDelegate->OnAtomicWriteRollback(attributeStatus.attributeID);
-                        attributeStatus.statusCode = to_underlying(Status::Failure);
-                    }
-                    ResetAtomicWrite();
-                    status = Status::Failure;
-                }
-            }
-            else
-            {
+                ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback, MakeOptional(Status::Failure));
                 ResetAtomicWrite();
+                status = Status::Failure;
             }
         }
     }
@@ -376,30 +377,11 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
         return Status::InvalidInState;
     }
 
-    status = Status::Success;
-    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-    {
-        auto & attributeStatus     = attributeStatuses[i];
-        auto statusCode            = mDelegate->OnAtomicWritePrecommit(attributeStatus.attributeID);
-        attributeStatus.statusCode = to_underlying(statusCode);
-        if (statusCode != Status::Success)
-        {
-            status = Status::Failure;
-        }
-    }
+    status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWritePrecommit);
 
     if (status == Status::Success)
     {
-        for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-        {
-            auto & attributeStatus     = attributeStatuses[i];
-            auto statusCode            = mDelegate->OnAtomicWriteCommit(attributeStatus.attributeID);
-            attributeStatus.statusCode = to_underlying(statusCode);
-            if (statusCode != Status::Success)
-            {
-                status = Status::Failure;
-            }
-        }
+        status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteCommit);
     }
 
     ResetAtomicWrite();
@@ -432,10 +414,7 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
     ResetAtomicWrite();
 
-    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-    {
-        attributeStatuses[i].statusCode = to_underlying(mDelegate->OnAtomicWriteRollback(attributeStatuses[i].attributeID));
-    }
+    ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback);
 
     SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
     return std::nullopt;
