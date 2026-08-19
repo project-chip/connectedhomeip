@@ -296,8 +296,8 @@ void SetTestEventTrigger_PowerRangeAdjustment()
                   sSavedAbsMaxPowerMw);
 
     // Set test values: AbsMinPower=1kW (1000000 mW), AbsMaxPower=7.6kW (76000000 mW)
-    constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000;   // 1 kW
-    constexpr int64_t TEST_ABS_MAX_POWER_MW = 76000000;  // 7.6 kW
+    constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000;  // 1 kW
+    constexpr int64_t TEST_ABS_MAX_POWER_MW = 76000000; // 7.6 kW
 
     CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(TEST_ABS_MIN_POWER_MW);
     if (err != CHIP_NO_ERROR)
@@ -313,7 +313,7 @@ void SetTestEventTrigger_PowerRangeAdjustment()
         ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMaxPower: %" CHIP_ERROR_FORMAT,
                      err.Format());
         // Restore the min power on failure
-        TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetAbsMinPower(sSavedAbsMinPowerMw);
+        TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
         return;
     }
 
