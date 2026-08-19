@@ -17,12 +17,12 @@
 
 from .bluetooth import BluetoothMock
 from .dbus import DBusTestSystemBus
-from .namespace import IsolatedNetworkNamespace, ensure_network_namespace_availability, ensure_private_state
+from .namespace import IsolatedNetworkNamespace, ensure_namespace_availability, ensure_private_state
 from .thread import ThreadBorderRouter
 from .wifi import WpaSupplicantMock
 
 __all__ = [
-    "ensure_network_namespace_availability",
+    "ensure_namespace_availability",
     "ensure_private_state",
     "BluetoothMock",
     "DBusTestSystemBus",

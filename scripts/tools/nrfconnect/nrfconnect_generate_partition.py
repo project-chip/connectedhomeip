@@ -70,7 +70,7 @@ class PartitionCreator:
 
         """
         if len(data) > self._length:
-            raise ValueError("generated CBOR file exceeds declared maximum partition size! {} > {}".format(len(data), self._length))
+            raise ValueError(f"generated CBOR file exceeds declared maximum partition size! {len(data)} > {self._length}")
         self._ih.putsz(self._offset, data)
         self._ih.write_hex_file(self._output + ".hex", True)
         self._data_ready = True
@@ -169,7 +169,7 @@ def main():
     cbor_data = partition_creator.generate_cbor()
     try:
         if not args.raw:
-            print("Generating .hex file: {}.hex with offset: {} and size: {}".format(args.output, hex(args.offset), hex(args.size)))
+            print(f"Generating .hex file: {args.output}.hex with offset: {hex(args.offset)} and size: {hex(args.size)}")
         if partition_creator.create_hex(cbor_data) and partition_creator.create_bin():
             if not args.raw:
                 print_flashing_help()

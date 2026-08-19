@@ -169,7 +169,9 @@ bool OTAImageProcessorImpl::VerifyPatchHeader(void * imgHeaderData)
     return true;
 }
 
-esp_err_t OTAImageProcessorImpl::VerifyHeaderData(const uint8_t * buf, size_t size, int * index)
+// Accumulates incoming delta OTA patch data until a complete patch header is buffered,
+// then validates it via VerifyPatchHeader.
+esp_err_t OTAImageProcessorImpl::DeltaOTAVerifyHeaderData(const uint8_t * buf, size_t size, int * index)
 {
     static char patchHeader[PATCH_HEADER_SIZE];
     static int headerDataRead = 0;
@@ -185,12 +187,11 @@ esp_err_t OTAImageProcessorImpl::VerifyHeaderData(const uint8_t * buf, size_t si
         {
             *index = PATCH_HEADER_SIZE - headerDataRead;
             memcpy(patchHeader + headerDataRead, buf, *index);
+            headerDataRead = 0;
             if (!VerifyPatchHeader(patchHeader))
             {
-                headerDataRead = 0;
                 return ESP_ERR_INVALID_VERSION;
             }
-            headerDataRead      = 0;
             patchHeaderVerified = true;
         }
     }
@@ -259,13 +260,12 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
             memcpy(headerData + headerDataRead, buf, index);
 
             esp_image_header_t * header = (esp_image_header_t *) headerData;
+            headerDataRead              = 0;
             if (!VerifyChipId(header->chip_id))
             {
-                headerDataRead = 0;
                 return ESP_ERR_INVALID_VERSION;
             }
             imageProcessor->chipIdVerified = true;
-            headerDataRead                 = 0;
 
             // Write data in headerData buffer.
             esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, headerData, IMG_HEADER_LEN);
@@ -499,7 +499,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 #ifdef CONFIG_ENABLE_DELTA_OTA
 
     int index = 0;
-    err       = imageProcessor->VerifyHeaderData(blockToWrite.data(), blockToWrite.size(), &index);
+    err       = imageProcessor->DeltaOTAVerifyHeaderData(blockToWrite.data(), blockToWrite.size(), &index);
 
     if (err != ESP_OK)
     {

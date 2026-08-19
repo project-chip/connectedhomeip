@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include <app/DeviceProxy.h>
+#include <clusters/IcdManagement/Commands.h>
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
@@ -32,6 +34,24 @@ public:
     CHIP_ERROR ParseICDInfo(Controller::ReadCommissioningInfo & info) { return mCommissioner->ParseICDInfo(info); }
 
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
+
+    void SetCommissioningStage(Controller::CommissioningStage stage) { mCommissioner->mCommissioningStage = stage; }
+
+    void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
+
+    static void OnICDManagementRegisterClientResponse(
+        Controller::DeviceCommissioner * commissioner,
+        const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnICDManagementRegisterClientResponse(commissioner, data);
+    }
+
+    static void
+    OnICDManagementStayActiveResponse(Controller::DeviceCommissioner * commissioner,
+                                      const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
+    {
+        Controller::DeviceCommissioner::OnICDManagementStayActiveResponse(commissioner, data);
+    }
 
 private:
     Controller::DeviceCommissioner * mCommissioner = nullptr;

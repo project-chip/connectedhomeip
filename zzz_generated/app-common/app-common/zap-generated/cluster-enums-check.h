@@ -101,6 +101,7 @@
 #include <clusters/LevelControl/EnumsCheck.h>
 #include <clusters/LocalizationConfiguration/EnumsCheck.h>
 #include <clusters/LowPower/EnumsCheck.h>
+#include <clusters/MediaFileManagement/EnumsCheck.h>
 #include <clusters/MediaInput/EnumsCheck.h>
 #include <clusters/MediaPlayback/EnumsCheck.h>
 #include <clusters/Messages/EnumsCheck.h>

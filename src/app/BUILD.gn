@@ -48,7 +48,7 @@ declare_args() {
   # enable time sync client for use in `time-synchronization-server` (if linked)
   # TODO: this should probably be migrated to be time-synchronization-server specific
   #       if the cluster build targets are decoupled as stand-alone units.
-  time_sync_enable_tsc_feature = 1
+  time_sync_enable_tsc_feature = chip_enable_read_client
 
   # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
   # pointers should do so (allows InteractionModelEngine decoupling and less usage
@@ -61,6 +61,10 @@ declare_args() {
   # for files that chip_data_model requires.
   chip_app_data_model_target = "${chip_root}/examples/*"
 }
+
+assert(
+    !time_sync_enable_tsc_feature || chip_enable_read_client,
+    "Time Synchronization TSC feature requires chip_enable_read_client to be enabled.")
 
 buildconfig_header("app_buildconfig") {
   header = "AppBuildConfig.h"

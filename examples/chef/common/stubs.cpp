@@ -518,6 +518,13 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
  */
 void RefrigeratorTemperatureControlledCabinetInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME,
+               "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
     EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
     EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
@@ -597,6 +604,12 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
  */
 void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_oven_temperaturecontrolledcabinet_cooktop_cooksurface_738dd18832"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
     EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
     EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
@@ -620,11 +633,16 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
 }
 
 /**
- * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b. To not have this initialiser affect
- * new generic switch chef app, use a different set of endpoints.
+ * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b.
  */
 void GenericSwitchInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_genericswitch_9866e35d0b"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     if (!DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId) ||
         !DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId) ||
         !DeviceTypes::EndpointHasDeviceType(3, Device::kGenericSwitchDeviceTypeId))
@@ -648,11 +666,16 @@ void GenericSwitchInit()
 }
 
 /**
- * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396. To not have this initialiser affect
- * new laundry dryer chef apps, use a different endpoint.
+ * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396.
  */
 void LaundryDryerInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_laundrydryer_01796fe396"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
     called = true;
@@ -666,11 +689,16 @@ void LaundryDryerInit()
 }
 
 /*
- * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
- * initialiser affect new apps video player device types, use different endpoints.
+ * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7.
  */
 void CastingvideoplayerContentappInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_castingvideoplayer_contentapp_34699714e7"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
     called = true;
@@ -719,11 +747,16 @@ void CastingvideoplayerContentappInit()
 }
 
 /*
- * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
- * affect new water heater applications, use different endpoints.
+ * This initializer is for the water heater application rootnode_waterheater_21bd13d651.
  */
 void WaterHeaterInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_waterheater_21bd13d651"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
     called = true;
@@ -746,10 +779,16 @@ void WaterHeaterInit()
 }
 
 /**
- * This initializer is for the chime application.
+ * This initializer is for the chime application rootnode_chime_9991598b3f.
  */
 void ChimeInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_chime_9991598b3f"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
     called = true;
@@ -770,6 +809,12 @@ void ChimeInit()
 
 void SmokeCoAlarmInit()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_smokecoalarm_686fe0dcb8"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
 #if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
     {
@@ -785,6 +830,11 @@ void SmokeCoAlarmInit()
 
 void InitModeSelect()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_modeselect_6860d3a65a"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
 #if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kModeSelectDeviceTypeId))
     {
@@ -802,7 +852,7 @@ void InitModeSelect()
 
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
+    ChipLogProgress(NotSpecified, "Chef Application Init for sample: %s !!!", CONFIG_CHEF_SAMPLE_NAME);
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();

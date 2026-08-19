@@ -55,11 +55,14 @@ log = logging.getLogger(__name__)
 
 
 class TC_CGEN_2_2(MatterBaseTest):
+    # Disables framework wildcard subscription from running during test to avoid
+    # issue noticed in https://github.com/project-chip/connectedhomeip/issues/72732
+    disable_wildcard_subscription = True
 
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
-    default_failsafe = 1
+    default_failsafe = 20
     RUN_TEST_CI = "CI Test"
     RUN_TEST_CERT = "Cert Test"
 
