@@ -62,29 +62,18 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release, replacing functionality previously in Groups and Group Key Management clusters and addressing issues with application of those clusters (TCR 11433)"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0065" name="Groupcast">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0065" name="Groupcast"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="GC" scope="Node"/>
   <features>
     <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="SD" name="Sender" summary="Supports sending multicast message to a targeted group of nodes">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="PGA" name="PerGroup" summary="Supports PerGroup multicast addresses">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -172,10 +161,7 @@ Davis, CA 95616, USA
       <entry type="MembershipStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
@@ -183,10 +169,7 @@ Davis, CA 95616, USA
     <attribute id="0x0001" name="MaxMembershipCount" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <constraint>
         <min value="10"/>
       </constraint>
@@ -194,10 +177,7 @@ Davis, CA 95616, USA
     <attribute id="0x0002" name="MaxMcastAddrCount" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <constraint>
         <min value="1"/>
       </constraint>
@@ -205,26 +185,17 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="UsedMcastAddrCount" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="FabricUnderTest" type="fabric-idx">
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="JoinGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
         <constraint>
@@ -266,10 +237,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="LeaveGroup" direction="commandToServer" response="LeaveGroupResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
@@ -285,10 +253,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="LeaveGroupResponse" direction="responseFromServer">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
@@ -302,10 +267,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="UpdateGroupKey" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
         <constraint>
@@ -327,12 +289,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="ConfigureAuxiliaryACL" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="LN"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="LN"/>
+      </mandatoryConform>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
@@ -342,10 +301,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="GroupcastTesting" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="TestOperation" type="GroupcastTestingEnum">
         <mandatoryConform/>
       </field>
@@ -363,10 +319,7 @@ Davis, CA 95616, USA
   <events>
     <event id="0x00" name="GroupcastTesting" priority="info">
       <access readPrivilege="admin" fabricSensitive="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <field id="0" name="SourceIpAddress" type="ipv6adr">
         <optionalConform/>
         <constraint>
