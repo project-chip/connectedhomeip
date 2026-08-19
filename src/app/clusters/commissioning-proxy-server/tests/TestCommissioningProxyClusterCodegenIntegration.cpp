@@ -36,8 +36,8 @@
 // mock_ember suites purely because it shares that build constraint.
 // =============================================================================
 
+#include "CommissioningProxyMockTransport.h"
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <pw_unit_test/framework.h>
 
@@ -45,7 +45,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommissioningProxy;
-using namespace chip::Testing;
 
 // Mock function for linking
 void InitDataModelHandler() {}
@@ -60,8 +59,6 @@ struct TestCommissioningProxyClusterCodegenIntegration : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     void SetUp() override {}
-
-    TestServerClusterContext mContext;
 };
 
 TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestInstanceLifecycle)
@@ -101,13 +98,41 @@ TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestInstanceLifecycle)
         // Test initialization
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
+        // A cluster with no optional features still registers
+        auto * registeredCluster =
+            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id));
+        EXPECT_NE(registeredCluster, nullptr);
+
         // Verify no features are enabled
         EXPECT_FALSE(instance.HasFeature(Feature::kBackgroundScan));
         EXPECT_FALSE(instance.HasFeature(Feature::kWiFiNetworkInterface));
 
         // Test shutdown
         instance.Shutdown();
+
+        auto * unregisteredCluster =
+            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id));
+        EXPECT_EQ(unregisteredCluster, nullptr);
     }
+}
+
+// The wrapper's RegisterTransport() must reach the cluster it wraps: the cluster reports a
+// transport as supported only while a driver for that transport bit is registered.
+TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestRegisterTransportReachesWrappedCluster)
+{
+    CommissioningProxyMockTransport mockBle(CapabilitiesBitmap::kBle);
+    Instance instance(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>()));
+
+    instance.RegisterTransport(mockBle);
+    EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
+
+    // Init() registers &mCluster.Cluster(), so the registered interface is this cluster.
+    auto * registered = static_cast<CommissioningProxyCluster *>(
+        CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id)));
+    ASSERT_NE(registered, nullptr);
+    EXPECT_TRUE(registered->GetSupportedTransports().Has(CapabilitiesBitmap::kBle));
+
+    instance.Shutdown();
 }
 
 } // namespace

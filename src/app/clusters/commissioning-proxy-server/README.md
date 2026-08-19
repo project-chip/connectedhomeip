@@ -319,7 +319,7 @@ The driver supplies the only transport-specific parts via `HardwareControl`:
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)                 |
 | `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                          |
-| `ClearCachedResults()` | Drop this transport's cached results (`host->ScanCache().ClearTransport(...)`) whenever the last record is removed |
+| `ClearCachedResults()` | Drop cached results for the bands that stopped (`host->ScanCache().ClearTransport(<transport>, bands)`); 0 = all   |
 
 `StartHardwareScan()` returns `CHIP_NO_ERROR` when the scan is running,
 `CHIP_ERROR_BUSY` when the radio is currently held — the registry keeps the
@@ -332,21 +332,39 @@ to it:
 
 ```cpp
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
+#include <platform/DefaultTimerDelegate.h>
 
+// The registry drives these hooks from its own lifetime timer and from resume, i.e.
+// outside the driver's call stack, so the hardware object holds its own host pointer.
+// MyBleTransport::SetHost() hands it over: mHost = cluster; sHardware.SetHost(cluster);
 class MyBleBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
 {
 public:
+    void SetHost(CommissioningProxyCluster * host) { mHost = host; }
+
     // Returns CHIP_ERROR_BUSY when the single scanner is held by a connect or a
     // foreground scan; the registry then defers and retries on resume.
     CHIP_ERROR StartHardwareScan() override { return StartMyPlatformScan(OnBgScanDiscovery); }
     void StopHardwareScan() override { StopMyPlatformScan(); }
-    void ClearCachedResults() override { sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle); }
+
+    // bands == 0 means the transport stopped entirely; BLE always receives 0.
+    void ClearCachedResults(BitMask<WiFiBandBitmap> bands) override
+    {
+        if (mHost != nullptr)
+        {
+            mHost->ScanCache().ClearTransport(CapabilitiesBitmap::kBle, bands);
+        }
+    }
+
+private:
+    CommissioningProxyCluster * mHost = nullptr;
 };
 
 // Declared before the registry so it outlives it: the registry's destructor may
 // call back into these hooks.
 MyBleBgScanHardware sHardware;
-CommissioningProxyBgScanRegistry sBgScan(sHardware);
+chip::app::DefaultTimerDelegate sBgScanTimerDelegate;
+CommissioningProxyBgScanRegistry sBgScan(sHardware, sBgScanTimerDelegate);
 
 Status MyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex, NodeId nodeId)
 {
