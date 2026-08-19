@@ -67,8 +67,8 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif //defined(QR_CODE_ENABLED) && (QR_CODE_ENABLED)
-#endif //defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
+#endif // defined(QR_CODE_ENABLED) && (QR_CODE_ENABLED)
+#endif // defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
 
     return CHIP_NO_ERROR;
 }
