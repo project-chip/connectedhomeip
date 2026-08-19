@@ -61,6 +61,12 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out);
 // via the maxRecords argument to pychip_case_timing_start when capturing more.
 #define PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS 64
 
+// Largest capacity pychip_case_timing_start will accept. The records are allocated up front, so
+// this bounds that allocation to roughly 640 kB and keeps a mistyped capacity from exhausting
+// memory. A request above it is rejected rather than silently reduced, so a caller never
+// believes it has more room than it does.
+#define PYCHIP_CASE_TIMING_MAX_RECORDS 4096
+
 // Bits set in PychipCaseTimingRecord::marks, indicating which timestamps are valid.
 #define PYCHIP_CASE_TIMING_MARK_SIGMA1_SENT 0x01u
 #define PYCHIP_CASE_TIMING_MARK_SIGMA2_RECEIVED 0x02u
@@ -117,7 +123,8 @@ struct PychipCaseTimingRecord
 };
 
 // Register the timing backend and clear any previously captured records. maxRecords sets how
-// many handshakes to retain; pass 0 for PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS.
+// many handshakes to retain; pass 0 for PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS. Returns
+// CHIP_ERROR_INVALID_ARGUMENT if it exceeds PYCHIP_CASE_TIMING_MAX_RECORDS.
 PyChipError pychip_case_timing_start(uint32_t maxRecords);
 
 // Unregister the backend. Captured records remain readable until the next start.

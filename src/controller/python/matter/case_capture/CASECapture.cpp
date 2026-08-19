@@ -285,6 +285,11 @@ public:
         VerifyOrReturn(pending != nullptr);
         pending->startUs = NowUs();
         pending->done    = false;
+        // The slot is kept after a handshake claims it, so that its address still maps back to
+        // a node id. A fresh lookup starts a new span in it, so clear the claim as well or
+        // ClaimOldestDiscovery would skip it and every later handshake for this peer would
+        // report no discovery.
+        pending->used = false;
     }
 
     void LogNodeDiscovered(chip::Tracing::NodeDiscoveredInfo & info) override
@@ -544,6 +549,10 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out)
 
 PyChipError pychip_case_timing_start(uint32_t maxRecords)
 {
+    // Rejected here rather than on the main loop, so an oversized request cannot reach the
+    // allocation and take the process down with a bad_alloc the caller cannot handle.
+    VerifyOrReturnError(maxRecords <= PYCHIP_CASE_TIMING_MAX_RECORDS, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
     const uint32_t capacity = (maxRecords == 0) ? PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS : maxRecords;
     chip::MainLoopWork::ExecuteInMainLoop([capacity] {
         gTimingBackend.Reset(capacity);

@@ -340,7 +340,10 @@ def StartTiming(max_records: int = TIMING_CAPACITY_DEFAULT) -> None:
     max_records is how many handshakes to retain, and TIMING_CAPACITY_DEFAULT takes the native
     default from PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS. Raise it when capturing more
     handshakes than that between calls, for instance a long run of concurrent establishments
-    with no reset in between; GetDroppedCount reports whether the capacity was exceeded."""
+    with no reset in between; GetDroppedCount reports whether the capacity was exceeded.
+
+    Raises if max_records exceeds the native ceiling PYCHIP_CASE_TIMING_MAX_RECORDS, rather
+    than silently retaining fewer than asked for."""
     _GetTimingLibraryHandle().pychip_case_timing_start(max_records).raise_on_error()
 
 
