@@ -81,8 +81,8 @@ ClustersWithShutdownFunctions:
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
     - Door Lock
-    - Mode Select
     - Laundry Dryer Controls
+    - Mode Select
     - Pump Configuration and Control
     - Thermostat
     - Thermostat User Interface Configuration
