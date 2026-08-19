@@ -302,7 +302,7 @@ void SetTestEventTrigger_PowerRangeAdjustment()
     CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(TEST_ABS_MIN_POWER_MW);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMinPower: " CHIP_ERROR_FORMAT,
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMinPower: %" CHIP_ERROR_FORMAT,
                      err.Format());
         return;
     }
@@ -310,10 +310,10 @@ void SetTestEventTrigger_PowerRangeAdjustment()
     err = GetDEMDelegate()->SetAbsMaxPower(TEST_ABS_MAX_POWER_MW);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMaxPower: " CHIP_ERROR_FORMAT,
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMaxPower: %" CHIP_ERROR_FORMAT,
                      err.Format());
         // Restore the min power on failure
-        GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
+        TEMPORARY_RETURN_IGNORED GetDEMDelegate() -> SetAbsMinPower(sSavedAbsMinPowerMw);
         return;
     }
 
@@ -328,7 +328,7 @@ void SetTestEventTrigger_PowerRangeAdjustmentClear()
     CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMinPower: " CHIP_ERROR_FORMAT,
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMinPower: %" CHIP_ERROR_FORMAT,
                      err.Format());
         return;
     }
@@ -336,7 +336,7 @@ void SetTestEventTrigger_PowerRangeAdjustmentClear()
     err = GetDEMDelegate()->SetAbsMaxPower(sSavedAbsMaxPowerMw);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMaxPower: " CHIP_ERROR_FORMAT,
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMaxPower: %" CHIP_ERROR_FORMAT,
                      err.Format());
         return;
     }
