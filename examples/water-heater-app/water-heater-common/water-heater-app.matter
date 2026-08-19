@@ -2157,7 +2157,7 @@ cluster DeviceEnergyManagement = 152 {
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
 cluster PowerTopology = 156 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kNodeTopology = 0x1;
@@ -3042,7 +3042,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WaterHeaterMode {
