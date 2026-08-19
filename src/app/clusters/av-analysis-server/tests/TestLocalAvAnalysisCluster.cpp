@@ -880,7 +880,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     }
     Events::AnalysisSessionStart::DecodableType startData;
     ASSERT_EQ(analysisStartEvent->GetEventData(startData), CHIP_NO_ERROR);
-    ASSERT_EQ(startData.sessionID, 0);
+    ASSERT_EQ(startData.sessionID, mSessionId);
     if (!startData.triggeredZones.IsNull())
     {
         FAIL() << "Expected Zones to be Null";
@@ -906,7 +906,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
 
     Events::PerceivedContext::DecodableType perceivedContextData;
     ASSERT_EQ(perceivedContextEvent->GetEventData(perceivedContextData), CHIP_NO_ERROR);
-    ASSERT_EQ(perceivedContextData.sessionID, 0);
+    ASSERT_EQ(perceivedContextData.sessionID, mSessionId);
 
     // Verify that the event contains only a new identified context, and that it has one value.
     ASSERT_TRUE(perceivedContextData.newIdentifiedContexts.HasValue());
@@ -935,7 +935,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     // No == exists for the Struct, and creating one fails due to the Struct structure, check value by value
     bool are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), initialEventContexts.begin(),
                                 initialEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                                    return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                                    return tc1.identifiedContextID == tc2.identifiedContextID &&
+                                        tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                         tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                                 });
     ASSERT_TRUE(are_equal);
@@ -953,7 +954,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
 
     Events::PerceivedContext::DecodableType secondPerceivedContextData;
     ASSERT_EQ(secondPerceivedContextEvent->GetEventData(secondPerceivedContextData), CHIP_NO_ERROR);
-    ASSERT_EQ(secondPerceivedContextData.sessionID, 0);
+    ASSERT_EQ(secondPerceivedContextData.sessionID, mSessionId);
 
     // Verify that the event contains a new and current identified context only
     ASSERT_TRUE(secondPerceivedContextData.newIdentifiedContexts.HasValue());
@@ -980,14 +981,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     // event fields
     are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), currentEventContexts.begin(),
                            currentEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                               return tc1.identifiedContextID == tc2.identifiedContextID &&
+                                   tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                    tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                            });
     ASSERT_TRUE(are_equal);
 
     are_equal = std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), newEventContexts.begin(),
                            newEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                               return tc1.identifiedContextID == tc2.identifiedContextID &&
+                                   tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                    tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                            });
     ASSERT_TRUE(are_equal);
@@ -1005,7 +1008,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
 
     Events::PerceivedContext::DecodableType thirdPerceivedContextData;
     ASSERT_EQ(thirdPerceivedContextEvent->GetEventData(thirdPerceivedContextData), CHIP_NO_ERROR);
-    ASSERT_EQ(thirdPerceivedContextData.sessionID, 0);
+    ASSERT_EQ(thirdPerceivedContextData.sessionID, mSessionId);
 
     // Verify that the event contains a current and expired identified context only
     ASSERT_FALSE(thirdPerceivedContextData.newIdentifiedContexts.HasValue());
@@ -1032,14 +1035,16 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     // event fields
     are_equal = std::equal(testTrackedContext.begin(), testTrackedContext.end(), expiredEventContexts.begin(),
                            expiredEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                               return tc1.identifiedContextID == tc2.identifiedContextID &&
+                                   tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                    tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                            });
     ASSERT_TRUE(are_equal);
 
     are_equal = std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), currentEventContexts.begin(),
                            currentEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                               return tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
+                               return tc1.identifiedContextID == tc2.identifiedContextID && 
+                                   tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                    tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                            });
     ASSERT_TRUE(are_equal);
@@ -1056,7 +1061,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
 
     Events::AnalysisSessionEnd::DecodableType endSessionData;
     ASSERT_EQ(endSessionEvent->GetEventData(endSessionData), CHIP_NO_ERROR);
-    ASSERT_EQ(endSessionData.sessionID, 0);
+    ASSERT_EQ(endSessionData.sessionID, mSessionId);
 }
 
 } // namespace
