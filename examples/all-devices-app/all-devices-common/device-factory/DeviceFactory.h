@@ -34,8 +34,8 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/Dishwasher.h>
-#include <device/types/extended-color-light/ExtendedColorLight.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/extended-color-light/ExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
