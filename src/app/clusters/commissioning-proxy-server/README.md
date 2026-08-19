@@ -315,11 +315,11 @@ overlapped, and `NOT_FOUND` only when the fabric has no record at all.
 
 The driver supplies the only transport-specific parts via `HardwareControl`:
 
-| Hook                   | Contract                                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)                 |
-| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                          |
-| `ClearCachedResults()` | Drop cached results for the bands that stopped (`host->ScanCache().ClearTransport(<transport>, bands)`); 0 = all   |
+| Hook                   | Contract                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `StartHardwareScan()`  | Start or resume the hardware scan, wiring the driver's own discovery callback (return codes below)               |
+| `StopHardwareScan()`   | Stop the hardware scan; called only while the registry owns the radio, never while paused                        |
+| `ClearCachedResults()` | Drop cached results for the bands that stopped (`host->ScanCache().ClearTransport(<transport>, bands)`); 0 = all |
 
 `StartHardwareScan()` returns `CHIP_NO_ERROR` when the scan is running,
 `CHIP_ERROR_BUSY` when the radio is currently held — the registry keeps the
