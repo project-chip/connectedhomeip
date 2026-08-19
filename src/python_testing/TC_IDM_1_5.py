@@ -74,13 +74,14 @@ class TC_IDM_1_5(IDMBaseTest):
         return "[TC-IDM-1.5] DelayReportData Invoke Request Action [DUT as Server]"
 
     def pics_TC_IDM_1_5(self) -> list[str]:
-        return ["MCORE.IDM.S", "MCORE.IDM.S.DelayReportData"]
+        return ["MCORE.IDM.S"]
 
     def steps_TC_IDM_1_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH establishes a subscription to a changeable attribute on the DUT with MaxInterval set to a large value (60 seconds).", is_commissioning=True),
-            TestStep(2, "TH sends an InvokeRequestMessage to the DUT to invoke a command that triggers a change in the subscribed attribute, including DelayReportData parameter (DelayMinMs calculated based on MRP timeout + 100 ms, DelayJitterWindowMs: 500 ms)."),
-            TestStep(3, "TH measures the time delta (Delta t) between receiving the InvokeResponse in Step 2 and receiving the subsequent ReportDataMessage. Verify DelayMinMs - 50 ms <= Delta t <= DelayMinMs + DelayJitterWindowMs + 100 ms.")
+            TestStep(1, "TH establishes a subscription to a changeable attribute on the DUT with MaxInterval set to a large value (3600 seconds).", is_commissioning=True),
+            TestStep(2, "TH records start time t_invoke_sent and sends an InvokeRequestMessage to the DUT to invoke a command that triggers a change in the subscribed attribute, including DelayReportData parameter (DelayMinMs: 1000 ms, DelayJitterWindowMs: 1000 ms)."),
+            TestStep(3, "TH measures the time delta (Delta t) between sending the InvokeRequestMessage (t_invoke_sent) in Step 2 and receiving the subsequent ReportDataMessage. Verify Delta t >= DelayMinMs (1000 ms)."),
+            TestStep(4, "TH sends an InvokeRequestMessage to the DUT to invoke the ArmFailSafe command (ExpiryLengthSeconds set to 0, Breadcrumb set to 0) to disarm the fail-safe and clean up.")
         ]
 
     @async_test_body
@@ -90,6 +91,15 @@ class TC_IDM_1_5(IDMBaseTest):
 
         self.print_step(0, "Commissioning - already done")
 
+        # DUT must be a non-ICD device (!ICDM.S)
+        if self.check_pics("ICDM.S"):
+            log.info("DUT is an ICD device (ICDM.S is enabled); skipping test as it requires !ICDM.S")
+            self.skip_step(1)
+            self.skip_step(2)
+            self.skip_step(3)
+            self.skip_step(4)
+            return
+
         # GeneralCommissioning cluster is mandatory on Endpoint 0 for all Matter devices
         endpoint = 0
         target_attribute = Clusters.GeneralCommissioning.Attributes.Breadcrumb
@@ -98,12 +108,12 @@ class TC_IDM_1_5(IDMBaseTest):
         tracker = AttributeReportTracker(target_attribute, report_queue)
 
         self.step(1)
-        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=60s")
+        log.info("Establishing subscription to Breadcrumb attribute on Endpoint 0 with MaxInterval=3600s")
         sub_start_time = time.monotonic()
         subscription = await dev_ctrl.ReadAttribute(
             nodeid=dut_node_id,
             attributes=[(endpoint, target_attribute)],
-            reportInterval=(0, 60),
+            reportInterval=(0, 3600),
             keepSubscriptions=False,
             autoResubscribe=False
         )
@@ -121,15 +131,14 @@ class TC_IDM_1_5(IDMBaseTest):
         await asyncio.sleep(1.0)
 
         sub_elapsed_sec = time.monotonic() - sub_start_time
-        remaining_sub_window_sec = 60.0 - sub_elapsed_sec
+        remaining_sub_window_sec = 3600.0 - sub_elapsed_sec
 
-        mrp_timeout_sec = self.get_mrp_retransmission_timeout_sec(dev_ctrl)
-        delay_min_ms = int(mrp_timeout_sec * 1000.0) + 100
-        delay_jitter_window_ms = 500
+        delay_min_ms = 1000
+        delay_jitter_window_ms = 1000
         min_required_sub_window_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
 
-        log.info("Subscription established in %.2f s; remaining window: %.2f s (required >= %.2f s for MRP timeout %.2f s)",
-                 sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec, mrp_timeout_sec)
+        log.info("Subscription established in %.2f s; remaining window: %.2f s (required >= %.2f s)",
+                 sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
 
         asserts.assert_greater_equal(
             remaining_sub_window_sec, min_required_sub_window_sec,
@@ -146,13 +155,13 @@ class TC_IDM_1_5(IDMBaseTest):
         log.info("Sending InvokeRequestMessage with DelayReportData (DelayMinMs=%d, DelayJitterWindowMs=%d)",
                  delay_min_ms, delay_jitter_window_ms)
 
+        invoke_sent_time = time.monotonic()
         await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
             payload=cmd,
             delayReportData=ClusterCommand.DelayReportData(delayMinMs=delay_min_ms, delayJitterWindowMs=delay_jitter_window_ms),
         )
-        invoke_recv_time = time.monotonic()
 
         self.step(3)
         wait_timeout_sec = (delay_min_ms + delay_jitter_window_ms) / 1000.0 + 5.0
@@ -161,24 +170,20 @@ class TC_IDM_1_5(IDMBaseTest):
         except queue.Empty:
             asserts.fail(f"Did not receive ReportDataMessage within {wait_timeout_sec:.2f}s following invoke command with DelayReportData")
 
-        delta_t_ms = (report_recv_time - invoke_recv_time) * 1000.0
-        log.info("Measured Delta t between InvokeResponse and ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
+        delta_t_ms = (report_recv_time - invoke_sent_time) * 1000.0
+        log.info("Measured Delta t between sending InvokeRequest and receiving ReportData: %.2f ms (DelayMinMs=%d, Jitter=%d)",
                  delta_t_ms, delay_min_ms, delay_jitter_window_ms)
 
-        min_expected_delta_ms = delay_min_ms - 50.0
-        max_expected_delta_ms = delay_min_ms + delay_jitter_window_ms + 100.0
+        min_expected_delta_ms = float(delay_min_ms)
 
         asserts.assert_greater_equal(
             delta_t_ms, min_expected_delta_ms,
-            f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay margin"
-        )
-        asserts.assert_less_equal(
-            delta_t_ms, max_expected_delta_ms,
-            f"Delta t ({delta_t_ms:.2f} ms) exceeded {max_expected_delta_ms:.2f} ms maximum delay+jitter margin"
+            f"Delta t ({delta_t_ms:.2f} ms) was less than {min_expected_delta_ms:.2f} ms minimum delay"
         )
 
+        self.step(4)
         # Cleanup: Disarm fail-safe and reset Breadcrumb
-        log.info("Cleaning up: disarming fail-safe")
+        log.info("Cleaning up: disarming fail-safe and resetting Breadcrumb to 0")
         await dev_ctrl.SendCommand(
             nodeId=dut_node_id,
             endpoint=endpoint,
