@@ -277,7 +277,6 @@ JNI_METHOD(void, nativeReleaseCastingPlayer)
 JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
-    char error_str[50];
     jobject jstr_obj = nullptr;
 
     if (NULL == env)
@@ -311,8 +310,9 @@ JNI_METHOD(jstring, getConnectionStateNative)
         LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("CONNECTED"_span, jstr_obj));
         break;
     default:
-        snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), jstr_obj));
+        ChipLogError(AppServer, "MatterCastingPlayer-JNI::getConnectionStateNative() unexpected state: %d, returning NOT_CONNECTED",
+                     state);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF("NOT_CONNECTED"_span, jstr_obj));
         break;
     }
     return static_cast<jstring>(jstr_obj);
