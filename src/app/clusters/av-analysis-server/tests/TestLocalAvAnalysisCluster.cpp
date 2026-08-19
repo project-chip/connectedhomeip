@@ -1043,7 +1043,7 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
 
     are_equal = std::equal(testAdditionalTrackedContext.begin(), testAdditionalTrackedContext.end(), currentEventContexts.begin(),
                            currentEventContexts.end(), [](const auto & tc1, const auto & tc2) {
-                               return tc1.identifiedContextID == tc2.identifiedContextID && 
+                               return tc1.identifiedContextID == tc2.identifiedContextID &&
                                    tc1.identifiedContext.namespaceID == tc2.identifiedContext.namespaceID &&
                                    tc1.identifiedContext.tag == tc2.identifiedContext.tag;
                            });
