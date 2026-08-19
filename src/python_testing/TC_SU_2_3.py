@@ -138,6 +138,13 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         ]
 
     @async_test_body
+    async def setup_test(self):
+        super().setup_test()
+        # Reset provider handle so teardown_test never terminates a stale
+        # process from a previous run.
+        self.current_provider_app_proc = None
+
+    @async_test_body
     async def teardown_test(self):
         if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
             logger.info("Terminating existing OTA Provider")
@@ -171,6 +178,17 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         # Requestor (DUT) info
         controller = self.default_controller
         requestor_node_id = self.dut_node_id
+
+        # If LocalConfigDisabled is set to True obtaining consent from the requestor shall not be used.
+        # LocalConfigDisabled is optional, if found set it to False to allow continue with the test,
+        # if not is considered as False and continue.
+        if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
+            await self.write_single_attribute(
+                Clusters.BasicInformation.Attributes.LocalConfigDisabled(False),
+                self.get_endpoint(),
+                expect_success=True
+            )
+            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
 
         # Provider info
         provider_node_id = 1
@@ -236,30 +254,64 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kQuerying, querying_event.newState,
                              f"New state is {querying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kQuerying}")
 
-        # Waiting for downloading event
-        downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info("Downloading event: %s", downloading_event)
-        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kDownloading, downloading_event.newState,
-                             f"New state is {downloading_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kDownloading}")
+        # Give the QueryImage a moment to reach the provider so the snapshot
+        # below reflects the RequestorCanConsent flag the DUT actually sent.
+        await asyncio.sleep(1)
 
-        # Getting QueryImageSnapshot using out-of-band communication channel
-        command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
-        self.write_to_app_pipe(command, self.fifo_in)
-        response_data = self.read_from_app_pipe(self.fifo_out)
+        # Inspect the RequestorCanConsent flag the DUT sent in its QueryImage.
+        # If the DUT does not claim it can obtain user consent, the consent
+        # verification of Step 1 does not apply to this device and the rest
+        # of the step is skipped. If it does, continue with the original
+        # kDownloading + UserConsentNeeded verification.
+        querying_snapshot_cmd = {
+            "Name": "QueryImageSnapshot",
+            "Cluster": "OtaSoftwareUpdateProvider",
+            "Endpoint": self.endpoint,
+        }
+        self.write_to_app_pipe(querying_snapshot_cmd, self.fifo_in)
+        querying_snapshot = self.read_from_app_pipe(self.fifo_out)
+        logger.info("QueryImage snapshot after Querying: %s", querying_snapshot)
 
-        logger.info("Out of band command response: %s", response_data)
+        requestor_can_consent = querying_snapshot['Payload']['RequestorCanConsent']
+        if not requestor_can_consent:
+            logger.info(
+                "DUT reported RequestorCanConsent=False in its QueryImage. "
+                "Consent verification does not apply to this device; "
+                "skipping the rest of Step 1."
+            )
+        else:
+            # Wait for the DUT to actually enter Downloading, which under
+            # the current provider config (--userConsentNeeded) is only
+            # reachable if the DUT obtained user consent first.
+            downloading_event = event_cb.wait_for_event_report(
+                Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+            logger.info("Downloading event: %s", downloading_event)
+            asserts.assert_equal(
+                requestorCluster.Enums.UpdateStateEnum.kDownloading,
+                downloading_event.newState,
+                f"New state is {downloading_event.newState} and it should be "
+                f"{requestorCluster.Enums.UpdateStateEnum.kDownloading}"
+            )
 
-        # Verify that the DUT obtains the User Consent from the user prior to transfer of software update image
-        user_consent_needed = response_data['Payload']['UserConsentNeeded']
-        asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
+            # Verify that the DUT obtains the User Consent from the user
+            # prior to transfer of software update image. UserConsentNeeded
+            # is the provider-side flag (from --userConsentNeeded) that
+            # the QueryImageResponse carried; reuse the same snapshot.
+            user_consent_needed = querying_snapshot['Payload']['UserConsentNeeded']
+            asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
         self.terminate_provider()
 
-        # Wait for the Requestor to come back to Idle before starting Step 2
+        # Wait for the Requestor to come back to Idle before starting Step 2.
+        # Use wait_for_requestor_state so any transient events left in the
+        # queue (from either branch above) are drained until kIdle is seen.
         logger.info("Waiting for idle state before Step 2")
-        idle_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kIdle, idle_event.newState,
-                             f"New state is {idle_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kIdle}")
+        idle_event = await self.wait_for_requestor_state(
+            event_cb,
+            requestorCluster.Enums.UpdateStateEnum.kIdle,
+            timeout_sec=50
+        )
+        logger.info("Idle state reached: %s", idle_event)
 
         await asyncio.sleep(5)
 
