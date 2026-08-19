@@ -2013,6 +2013,7 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
 
     return global_data_types, problems
 
+
 @dataclass
 class XmlDataModel:
     clusters: dict[uint, XmlCluster]
@@ -2038,6 +2039,7 @@ def build_xml_data_model(data_model_directory: Union[PrebuiltDataModelDirectory,
         global_data_types=global_data_types,
         problems=all_problems,
     )
+
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
