@@ -866,8 +866,6 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
         }
     }
 
-    // Remember we have a timer running so we don't generate a PowerRangeAdjustStart event should another request come
-    // in before this timer expires
     mPowerRangeAdjustmentInProgress = true;
 
     err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(duration), PowerRangeAdjustTimerExpiry, this);
@@ -879,7 +877,8 @@ Status DeviceEnergyManagementDelegate::PowerRangeAdjustRequest(const DataModel::
     }
 
     // Unlike PowerAdjustRequest, we always generate a PowerRangeAdjustStart event, even if one is already in progress.
-    // This is because the new request may have different min/max power values and/or a different duration.
+    // This is because the new request may have different min/max power values and/or a different duration and these
+    // tend to be long lived periods unlike PowerAdjust requests.
     Events::PowerRangeAdjustStart::Type event;
     EventNumber eventNumber;
     event.adjustment = powerRangeAdjustment;

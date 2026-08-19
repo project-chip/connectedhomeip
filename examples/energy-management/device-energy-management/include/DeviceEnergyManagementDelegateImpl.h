@@ -170,8 +170,8 @@ public:
     /**
      * @brief Handler for PowerRangeAdjustRequest
      *
-     *   If the ESA supports PRA, and the ESAState is Online, then the ESA SHALL attempt to adjust its
-     *   power operation to stay within the requested power range for the requested duration.
+     *   If the ESA supports PRA, and the ESAState is Online or PowerAdjustActive, then the ESA SHALL attempt to
+     *   adjust its power operation to stay within the requested power range for the requested duration.
      *
      * @param minPower Minimum power in mW that the ESA can operate at during the adjustment period.
      * @param maxPower Maximum power in mW that the ESA can operate at during the adjustment period.
