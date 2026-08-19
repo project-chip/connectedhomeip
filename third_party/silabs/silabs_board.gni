@@ -205,6 +205,9 @@ if (is_si917_board) {
 } else if (silabs_board == "BRD4118A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IL136"
+} else if (silabs_board == "BRD4120A") {
+  silabs_family = "efr32mg26"
+  silabs_mcu = "EFR32MG26B410F3200IM68"
 } else if (silabs_board == "BRD2608A") {
   silabs_family = "efr32mg26"
   silabs_mcu = "EFR32MG26B510F3200IM68"
@@ -213,6 +216,11 @@ if (is_si917_board) {
   show_qr_code = false
   disable_lcd = true
   sl_enable_rgb_led = true
+
+  # Series 3 ----------
+} else if (silabs_board == "BRD4407A") {
+  silabs_family = "simg301"
+  silabs_mcu = "SIMG301M104LIL"
 
   # Custom Board ----------
 } else if (silabs_board == "CUSTOM") {
