@@ -85,6 +85,13 @@ BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * 
             MTR_LOG_ERROR("Attribute report contains an entry that claims to be both data and error: %@", item);
             return NO;
         }
+
+        // MTRLocalReceiptTimeKey is optional, but if present it must be an NSDate.
+        id localReceiptTime = item[MTRLocalReceiptTimeKey];
+        if (localReceiptTime != nil && !MTR_SAFE_CAST(localReceiptTime, NSDate)) {
+            MTR_LOG_ERROR("Attribute report contains an entry whose local receipt time is not an NSDate: %@", item);
+            return NO;
+        }
     }
 
     return YES;
