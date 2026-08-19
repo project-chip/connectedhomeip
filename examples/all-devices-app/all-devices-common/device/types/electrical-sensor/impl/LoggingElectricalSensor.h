@@ -37,7 +37,8 @@ public:
 
     // define instead of constexpr static auto because the latter failes on Darwin.
 #define MSG "%s device: %s cluster: %s called"
-#define MSG_WITH_INDEX "%s device: %s cluster: %s called with index %lu"
+    // for the index format specifier we use the largest unsigned type a size_t can be, and cast everything to it.
+#define MSG_WITH_INDEX "%s device: %s cluster: %s called with index %llu"
 
     constexpr static auto device                   = "ElectricalSensor";
     constexpr static auto energyMeasurementCluster = "ElectricalEnergyMeasurement";
@@ -87,7 +88,7 @@ public:
                                   Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val) override
     {
         ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetAccuracyByIndex",
-                        static_cast<size_t>(index));
+                        static_cast<unsigned long long>(index));
         val = {};
         return index == 0 ? CHIP_NO_ERROR : CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -106,7 +107,7 @@ public:
                                Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetRangeByIndex",
-                        static_cast<size_t>(index));
+                        static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndRangesRead() override
@@ -124,7 +125,7 @@ public:
                                           Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicCurrentsByIndex",
-                        static_cast<size_t>(index));
+                        static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndHarmonicCurrentsRead() override
@@ -142,7 +143,7 @@ public:
                                         Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type &) override
     {
         ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerMeasurementCluster, "GetHarmonicPhasesByIndex",
-                        static_cast<size_t>(index));
+                        static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR EndHarmonicPhasesRead() override
@@ -221,12 +222,12 @@ public:
 
     CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex", index);
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex", static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex", index);
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex", static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 #undef MSG
