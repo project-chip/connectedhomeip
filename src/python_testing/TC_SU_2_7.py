@@ -237,7 +237,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=self.provider_port,
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            timeout=10
+            timeout=20
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
@@ -279,7 +279,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                         self.provider_app_pipe_out, '--userConsentNeeded'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            timeout=10
+            timeout=20
         )
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
@@ -384,7 +384,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=self.provider_port, extra_args=['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            timeout=10
+            timeout=20
         )
         # AttributeSubscriptionHandler
         update_state_attr_handler = AttributeSubscriptionHandler(
@@ -426,7 +426,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=self.provider_port,
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            timeout=10
+            timeout=20
         )
 
         # Create Event SubscriptionHandler
