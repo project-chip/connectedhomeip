@@ -82,9 +82,10 @@ public:
 
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                   Delegates &... delegates) :
-        ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...) ),
+        ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...)),
         mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
-        mSuggestions(detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
+        mSuggestions(
+            detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
         mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
     {
         static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
