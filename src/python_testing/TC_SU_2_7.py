@@ -380,7 +380,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             ota_image_path=self.ota_image,
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
-            port=self.provider_port, extra_args=['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'],
+            port=self.provider_port, extra_args=['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '60'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             timeout=20
