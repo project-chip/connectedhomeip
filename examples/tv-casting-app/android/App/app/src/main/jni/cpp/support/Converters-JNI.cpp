@@ -239,6 +239,10 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
 
     // Store a heap-allocated handle containing a weak_ptr so the Java long field never
     // holds a dangling raw pointer if the C++ CastingPlayer is destroyed.
+    // Note: Each call allocates a new CastingPlayerHandle. During discovery, repeated callbacks
+    // for the same player create short-lived wrappers collected by GC after stopDiscovery().
+    // A CastingPlayer* -> Java GlobalRef cache would avoid this but requires explicit
+    // eviction on player removal; not warranted at home-network scale.
     auto handle = std::unique_ptr<CastingPlayerHandle>(new CastingPlayerHandle{ player });
     env->CallVoidMethod(jMatterCastingPlayer, setNativeCastingPlayerId, reinterpret_cast<jlong>(handle.get()));
     if (env->ExceptionCheck())
