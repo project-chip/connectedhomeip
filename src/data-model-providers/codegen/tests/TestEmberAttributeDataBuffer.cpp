@@ -143,22 +143,6 @@ bool IsEqual<CharSpan>(const CharSpan & a, const CharSpan & b)
 }
 
 template <typename T>
-bool IsEqual(const std::optional<T> & a, const std::optional<T> & b)
-{
-    if (a.has_value() != b.has_value())
-    {
-        return false;
-    }
-
-    if (!a.has_value())
-    {
-        return true;
-    }
-
-    return IsEqual(*a, *b);
-}
-
-template <typename T>
 bool IsEqual(const DataModel::Nullable<T> & a, const DataModel::Nullable<T> & b)
 {
     if (a.IsNull() != b.IsNull())
