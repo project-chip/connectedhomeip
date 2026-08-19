@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 
 import("//build_overrides/freertos.gni")
+
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
@@ -25,8 +26,15 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_build}/python.gni")
 
-import("${mbedtls_root}/mbedtls.gni")
 import("ti_simplelink_board.gni")
+
+if (ti_simplelink_device_family == "cc13x4_26x4" ||
+    ti_simplelink_device_family == "cc32xx") {
+  import("${mbedtls_root}/mbedtls.gni")
+}
+
+import("${build_root}/config/compiler/compiler.gni")
+
 declare_args() {
   # Location of the TI SimpleLink SDK.
 
@@ -36,6 +44,11 @@ declare_args() {
   } else if (ti_simplelink_device_family == "cc32xx") {
     ti_simplelink_sdk_root =
         "${chip_root}/third_party/ti_simplelink_sdk/repo_cc32xx"
+  } else if (ti_simplelink_device_family == "cc35xx") {
+    ti_simplelink_sdk_root =
+        "${chip_root}/third_party/ti_simplelink_sdk/repo_cc35xx"
+    ti_simplelink_wifi_toolbox_root = ""
+    ti_simplelink_wifi_sdk_root = ""
   }
 
   ti_sysconfig_root = ""
@@ -47,14 +60,62 @@ declare_args() {
 assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
 assert(ti_sysconfig_root != "", "ti_sysconfig_root must be specified")
 
+if (ti_simplelink_device_family == "cc35xx") {
+  assert(ti_simplelink_wifi_toolbox_root != "",
+         "ti_simplelink_wifi_toolbox_root must be specified")
+  assert(ti_simplelink_wifi_sdk_root != "",
+         "ti_simplelink_wifi_sdk_root must be specified")
+}
+
 template("ti_sysconfig") {
   assert(ti_sysconfig_root != "", "must be specified")
   assert(ti_simplelink_sdk_root != "",
          "ti_simplelink_sdk_root must be specified")
 
   output_dir = "${target_gen_dir}/${target_name}"
+
+  if (defined(invoker.outputs)) {
+    # Explicit mode: use the caller-provided output list (all platforms)
+    _sysconfig_outputs = invoker.outputs
+  } else if (ti_simplelink_device_family == "cc35xx") {
+    # Dynamic mode (cc35xx): query SysConfig for generated .c/.h files
+    # at GN generation time, matching how TI SDK makefiles use
+    # --listGeneratedFiles instead of hardcoding output filenames.
+    assert(defined(invoker.sources) && invoker.sources != [],
+           "ti_sysconfig sources must be defined for dynamic output query")
+
+    _query_args = [
+      rebase_path(ti_sysconfig_root),
+      "-s",
+      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json"),
+      "-s",
+      rebase_path(ti_simplelink_wifi_toolbox_root + "/.metadata/product.json"),
+      "-o",
+      ".",
+      "--compiler",
+      "gcc",
+      "--board",
+      "/ti/boards/" + ti_simplelink_board,
+      "--rtos",
+      "freertos",
+    ]
+    foreach(_src, invoker.sources) {
+      _query_args += [ rebase_path(_src) ]
+    }
+
+    _sysconfig_outputs =
+        exec_script("${ti_simplelink_sdk_build_root}/list_sysconfig_outputs.py",
+                    _query_args,
+                    "list lines",
+                    invoker.sources)
+  } else {
+    assert(defined(invoker.outputs),
+           "ti_sysconfig requires explicit outputs for non-cc35xx platforms")
+    _sysconfig_outputs = invoker.outputs
+  }
+
   gen_outputs = []
-  foreach(output, invoker.outputs) {
+  foreach(output, _sysconfig_outputs) {
     gen_outputs += [ output_dir + "/" + output ]
   }
 
@@ -80,8 +141,35 @@ template("ti_sysconfig") {
     defines = [ "CC32XXWARE" ]
   }
 
-  config("${target_name}_config") {
+  config("cc35xx_${target_name}_config") {
+    ldflags = [
+      "-nostartfiles",
+      "-fno-exceptions",
+      "-fno-unwind-tables",
+      "-znoexecstack",
+    ]
+    cflags = [ "-Wno-sign-compare" ]
+    cflags_cc = [ "-Wno-register" ]
+    defines = [ "DeviceFamily_CC35XX" ]
+
+    # For cc35xx, ti_freertos_config.c uses relative includes:
+    # - <../list.c> needs freertos/include (../ goes up to find kernel sources)
+    # - <dpl/AppHooks_freertos.c> needs kernel/freertos
+    # - <ti/posix/freertos/clock.c> needs source (via main config)
+    # - portmacro.h needs portable layer directory
+    # NOTE: TI POSIX headers added directly to sysconfig source_set to avoid
+    # propagating to other targets (would conflict with newlib headers)
     include_dirs = [
+      "${ti_simplelink_sdk_root}/source/third_party/freertos/include",
+      "${ti_simplelink_sdk_root}/source/third_party/freertos/portable/GCC/ARM_CM33_NTZ/non_secure",
+      "${ti_simplelink_sdk_root}/kernel/freertos",
+    ]
+  }
+
+  config("${target_name}_config") {
+    include_dirs = []
+
+    include_dirs += [
       output_dir,
       "${ti_simplelink_sdk_root}/source",
     ]
@@ -90,6 +178,7 @@ template("ti_sysconfig") {
                            [
                              "cflags",
                              "ldflags",
+                             "cflags_c",
                            ])
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -132,6 +221,14 @@ template("ti_sysconfig") {
         "--scriptArgs",
         silk_log_define,
       ]
+      if (ti_simplelink_device_family == "cc35xx") {
+        args += [
+          "-s",
+          rebase_path(
+              ti_simplelink_wifi_toolbox_root + "/.metadata/product.json",
+              root_build_dir),
+        ]
+      }
     } else {
       args = [
         ti_sysconfig_root,
@@ -165,6 +262,27 @@ template("ti_sysconfig") {
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }
+
+    # For cc35xx, ti_freertos_config.c is a unity build that includes POSIX sources.
+    # TI's POSIX headers are incompatible with newlib's pthread type definitions.
+    # Define the newlib header guard to prevent it from defining pthread types,
+    # allowing TI's POSIX to define them instead. Also disable -Wshadow for unity build.
+    # Add TI POSIX include dir ONLY for this source_set to avoid propagation.
+    if (ti_simplelink_device_family == "cc35xx") {
+      configs -= [ "${build_root}/config/compiler:std_default" ]
+      configs += [ ":sdk_posix_config" ]
+      cflags_c = [
+        "-Wno-shadow",  # Unity build causes variable shadowing across included
+                        # files
+        "-D_SYS__PTHREADTYPES_H_",  # Prevent newlib from defining pthread types
+        "-O3",  # Override -Os: prevents underflow bug in localProgramStart
+                # ramfunc copy
+      ]
+      include_dirs = [
+        "${ti_simplelink_sdk_root}/source/ti/posix/gcc",  # TI POSIX headers for
+                                                          # ti_freertos_config.c
+      ]
+    }
   }
 }
 
@@ -188,7 +306,6 @@ template("ti_simplelink_sdk") {
         "/source/ti/drivers/lib/gcc/${ti_simplelink_isa}/drivers_${ti_simplelink_soc_family}.a",
         "--src-path-driverlib",
         "/source/ti/devices/${ti_simplelink_device_family_driverlib}/driverlib/bin/gcc/driverlib.lib",
-
         "--dest-path",
         rebase_path(target_gen_dir),
       ]
@@ -239,6 +356,39 @@ template("ti_simplelink_sdk") {
     ]
   }
 
+  config("cc35xx_sdk_config") {
+    defines = [
+      "RAM_CONTAINER",
+      "CC35XX",
+    ]
+
+    # SDK core libs (drivers_cc35xx.a, driverlib.a, secure_drivers, hsmddk, mbedtls)
+    # are provided by SysConfig-generated ti_utils_build_linker.cmd.genlibs file,
+    # which is passed to the linker in ti_simplelink_executable.gni.
+    # Only WiFi/BLE related libs that aren't in genlibs are listed here.
+    libs = [
+      # WiFi stack libraries
+      "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_platform/cc35xx/lib/gcc/wifi_platform_cc35xx.a",
+      "${ti_simplelink_sdk_root}/source/ti/net/wifi_stack/lib/gcc/wifi_stack.a",
+      "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_host_driver/lib/gcc/wifi_host_driver.a",
+      "${ti_simplelink_sdk_root}/source/third_party/hostap/lib/gcc/hostap.a",
+
+      # BLE interface library
+      "${ti_simplelink_sdk_root}/source/ti/net/ble_interface/lib/gcc/ble_interface.a",
+    ]
+    include_dirs = [
+      #"${ti_simplelink_sdk_root}/source/third_party/psa_crypto",
+      "${ti_simplelink_sdk_root}/source/ti/devices/cc35xx/inc",
+      "${ti_simplelink_sdk_root}/source/ti/devices/cc35xx/driverlib",
+      "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_host_driver/inc_adapt",
+      "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_host_driver/inc_common",
+      "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_platform/cc35xx/inc_common",
+      "${ti_simplelink_sdk_root}/source/ti/net/wifi_stack/inc_common",
+    ]
+
+    ldflags = [ "-fno-lto" ]
+  }
+
   if (ti_simplelink_device_family == "cc13x4_26x4") {
     config("external_library_config") {
       libs = [
@@ -257,8 +407,12 @@ template("ti_simplelink_sdk") {
     include_dirs = [
       "${ti_simplelink_sdk_root}/source",
       "${ti_simplelink_sdk_root}/source/third_party/CMSIS/Include",
-      "${chip_root}/third_party/mbedtls/repo/include",
     ]
+
+    if (ti_simplelink_device_family == "cc13x4_26x4" ||
+        ti_simplelink_device_family == "cc32xx") {
+      include_dirs += [ "${chip_root}/third_party/mbedtls/repo/include" ]
+    }
 
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -273,16 +427,23 @@ template("ti_simplelink_sdk") {
 
     cflags = [ "-Wno-sign-compare" ]
 
-    sources = [
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/MutexP_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/QueueP_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SemaphoreP_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/StaticAllocs_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SwiP_freertos.c",
-      "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SystemP_freertos.c",
-    ]
+    # For cc35xx, all DPL, FreeRTOS kernel, and POSIX sources are compiled
+    # via the SysConfig-generated ti_freertos_config.c unity build file.
+    # Only include_dirs, public_deps, and public_configs are needed here.
+    if (ti_simplelink_device_family != "cc35xx") {
+      sources = [
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/MutexP_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/QueueP_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SemaphoreP_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/StaticAllocs_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SwiP_freertos.c",
+        "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SystemP_freertos.c",
+      ]
+    } else {
+      sources = []
+    }
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       sources += [
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
@@ -299,8 +460,14 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC32XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc32xx_gcc.c",
       ]
+    } else if (ti_simplelink_device_family == "cc35xx") {
+      # Keep include_dirs for header visibility; sources come from
+      # ti_freertos_config.c via the sysconfig source_set.
+      include_dirs += [
+        "${ti_simplelink_sdk_root}/kernel/freertos/",
+        "${ti_simplelink_sdk_root}/kernel/freertos/exception",
+      ]
     }
-
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       sources += [ "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimestampPCC26XX_freertos.c" ]
     }
@@ -331,20 +498,30 @@ template("ti_simplelink_sdk") {
     # POSIX-like porting layer is incompatable with the gnu definitions from -std=gnu11
     configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
-    sources = [
-      "${chip_root}/src/platform/ti/cc13xx_26xx/memory.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_cond.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_mutex.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_rwlock.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sched.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/semaphore.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sleep.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
-    ]
+
+    # For cc35xx, POSIX sources are compiled via ti_freertos_config.c.
+    if (ti_simplelink_device_family != "cc35xx") {
+      sources = [
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_cond.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_mutex.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_rwlock.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sched.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/semaphore.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sleep.c",
+        "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
+      ]
+    } else {
+      sources = []
+    }
+
+    if (ti_simplelink_device_family == "cc13x4_26x4" ||
+       ti_simplelink_device_family == "cc32xx") {
+      sources += [ "${chip_root}/src/platform/ti/cc13xx_26xx/memory.c" ]
+    }
 
     public_deps = [
       ":${sdk_target_name}_dpl",
@@ -354,7 +531,8 @@ template("ti_simplelink_sdk") {
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
-  if (ti_simplelink_device_family == "cc13x4_26x4") {
+  if (ti_simplelink_device_family == "cc13x4_26x4" ||
+      ti_simplelink_device_family == "cc35xx") {
     source_set("${sdk_target_name}_nvocmp") {
       defines = [ "NVOCMP_POSIX_MUTEX" ]
       cflags = [
@@ -372,13 +550,38 @@ template("ti_simplelink_sdk") {
       ]
 
       configs -= [ "${build_root}/config/compiler:std_default" ]
+      configs -=
+          [ "${build_root}/config/compiler:warnings_default" ]  # removed for
+                                                                # -Wshadow
       configs += [ ":${sdk_target_name}_posix_config" ]
-      sources = [
-        "${chip_root}/src/platform/ti/cc13xx_26xx/nvocmp.c",
-        "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
-      ]
+      if (ti_simplelink_device_family == "cc13x4_26x4") {
+        sources = [ "${chip_root}/src/platform/ti/cc13xx_26xx/nvocmp.c" ]
+      } else if (ti_simplelink_device_family == "cc35xx") {
+        sources =
+            [ "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp_cc35xx.c" ]
+        defines += [ "NVOCMP_NVPAGES=8" ]
+      }
+      sources += [ "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c" ]
+
+      include_dirs = [ "${ti_simplelink_sdk_root}/source/ti/common/nv" ]
 
       public_configs = [ ":${sdk_target_name}_config" ]
+    }
+  }
+
+  if (ti_simplelink_device_family == "cc35xx") {
+    source_set("${sdk_target_name}_hif") {
+      sources = [ "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_platform/cc35xx/plat/hif.c" ]
+
+      include_dirs = [
+        "${ti_simplelink_sdk_root}/source",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_host_driver/inc_adapt",
+        "${ti_simplelink_sdk_root}/source/ti/drivers/net/wifi/wifi_host_driver/inc_common",
+      ]
+
+      defines = [ "DeviceFamily_CC35XX" ]
+
+      cflags = [ "-Og" ]
     }
   }
 
@@ -423,7 +626,6 @@ template("ti_simplelink_sdk") {
       ]
       defines += [ "CC13X2P" ]
     }
-
     defines += [
       "ONE_BLE_LIB_SIZE_OPTIMIZATION",
       "NVOCMP_NVPAGES=12",
@@ -609,6 +811,12 @@ template("ti_simplelink_sdk") {
         ":build_external_library",
       ]
     }
+    if (ti_simplelink_device_family == "cc35xx") {
+      public_deps += [
+        ":${sdk_target_name}_hif",
+        ":${sdk_target_name}_nvocmp",
+      ]
+    }
     if (defined(invoker.public_configs)) {
       public_configs = invoker.public_configs
       if (ti_simplelink_device_family == "cc13x4_26x4") {
@@ -621,7 +829,8 @@ template("ti_simplelink_sdk") {
 template("freertos_target") {
   freertos_target_name = target_name
 
-  if (ti_simplelink_device_family == "cc13x4_26x4") {
+  if (ti_simplelink_device_family == "cc13x4_26x4" ||
+      ti_simplelink_device_family == "cc35xx") {
     _freertos_root = "${freertos_root}"
   } else {
     _freertos_root = "${freertos_root}/repo"
@@ -632,21 +841,33 @@ template("freertos_target") {
   }
 
   source_set(freertos_target_name) {
-    forward_variables_from(invoker, "*")
-
-    if (!defined(sources)) {
+    # For cc35xx, exclude invoker.sources since port.c/portasm.c are in
+    # the SysConfig-generated ti_freertos_portable_config.c unity build.
+    if (ti_simplelink_device_family == "cc35xx") {
+      forward_variables_from(invoker, "*", [ "sources" ])
       sources = []
+    } else {
+      forward_variables_from(invoker, "*")
+
+      if (!defined(sources)) {
+        sources = []
+      }
     }
 
-    sources += [
-      "${_freertos_root}/croutine.c",
-      "${_freertos_root}/event_groups.c",
-      "${_freertos_root}/list.c",
-      "${_freertos_root}/queue.c",
-      "${_freertos_root}/stream_buffer.c",
-      "${_freertos_root}/tasks.c",
-      "${_freertos_root}/timers.c",
-    ]
+    # For cc35xx, all FreeRTOS sources (kernel + portable) are compiled via
+    # SysConfig-generated unity build files (ti_freertos_config.c and
+    # ti_freertos_portable_config.c). No sources added for cc35xx.
+    if (ti_simplelink_device_family != "cc35xx") {
+      sources += [
+        "${_freertos_root}/croutine.c",
+        "${_freertos_root}/event_groups.c",
+        "${_freertos_root}/list.c",
+        "${_freertos_root}/queue.c",
+        "${_freertos_root}/stream_buffer.c",
+        "${_freertos_root}/tasks.c",
+        "${_freertos_root}/timers.c",
+      ]
+    }
 
     if (!defined(configs)) {
       configs = []
