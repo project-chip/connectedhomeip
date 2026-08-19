@@ -188,7 +188,8 @@ class TC_HSTAT_2_3(MatterBaseTest, HSTATBase):
         asserts.assert_equal(reportsReceived[0], dut_MaxSetpoint, "First report value is not MaxSetpoint")
         if (dut_MaxSetpoint - dut_MinSetpoint) > dut_Step:
             asserts.assert_equal(len(reportsReceived), 2, "2 reports expected")
-            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step, "Second report value is not dut_MinSetpoint+dut_Step")
+            asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step,
+                                 "Second report value is not dut_MinSetpoint+dut_Step")
 
         self.step(15)
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
