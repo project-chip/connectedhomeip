@@ -82,7 +82,12 @@ static_library("lib") {
 
   output_dir = "${root_out_dir}/lib"
 
-  complete_static_lib = true
+  # TODO: Remove the condition once pigweed fix is upstreamed https://github.com/project-chip/connectedhomeip/issues/73278
+  if (chip_device_platform == "efr32" || chip_device_platform == "SiWx917") {
+    complete_static_lib = false
+  } else {
+    complete_static_lib = true
+  }
 }
 
 # This version of libCHIP is only meant for internal use by some test drivers
@@ -96,5 +101,10 @@ static_library("with-stdio-logging") {
 
   output_dir = "${root_out_dir}/lib"
 
-  complete_static_lib = true
+  # TODO: Remove the condition once pigweed fix is upstreamed https://github.com/project-chip/connectedhomeip/issues/73278
+  if (chip_device_platform == "efr32" || chip_device_platform == "SiWx917") {
+    complete_static_lib = false
+  } else {
+    complete_static_lib = true
+  }
 }

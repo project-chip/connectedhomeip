@@ -272,14 +272,6 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
 
     uint8_t currentMode = 0;
     ModeSelect::Attributes::CurrentMode::Get(commandPath.mEndpointId, &currentMode);
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    if (currentMode != commandData.newMode)
-    {
-        //  the scene has been changed (the value of CurrentMode has changed) so
-        //  the current scene as described in the scene table is invalid
-        ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-    }
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     Status status = ChangeToMode(commandPath.mEndpointId, commandData.newMode);
 
