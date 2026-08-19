@@ -156,6 +156,15 @@ bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
     return false;
 }
 
+bool AtomicWriteSession::InAtomicWrite(FabricIndex fabricIndex)
+{
+    if (mState != State::Open)
+    {
+        return false;
+    }
+    return mNodeId.GetFabricIndex() == fabricIndex;
+}
+
 bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, Optional<AttributeId> attributeId)
 {
     if (!InAtomicWrite(attributeId))
