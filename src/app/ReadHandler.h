@@ -268,9 +268,21 @@ public:
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
+     * For ICD publishers, this is set to the IdleModeDuration defined in the ICD Management Cluster.
+     * If the new max interval is less than the idle mode duration for an ICD device, the function will return
+     * CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        if (aMaxInterval < mMaxInterval)
+        {
+            ChipLogProgress(DataManagement,
+                            "Fail to set MaxReportingInterval to %d as it is less than the current MaxInterval %d for ICD device",
+                            aMaxInterval, mMaxInterval);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval),
