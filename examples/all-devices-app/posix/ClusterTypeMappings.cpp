@@ -50,9 +50,9 @@ const char * GetClusterTypeName<chip::app::Clusters::BooleanStateCluster>()
 }
 
 template <>
-const char * GetClusterTypeName<chip::app::Clusters::BasicInformationCluster>()
+const char * GetClusterTypeName<chip::app::Clusters::BasicInformationClusterWithDeviceLocation>()
 {
-    return "chip::app::Clusters::BasicInformationCluster";
+    return "chip::app::Clusters::BasicInformationClusterWithDeviceLocation";
 }
 
 chip::app::ServerClusterInterface *
