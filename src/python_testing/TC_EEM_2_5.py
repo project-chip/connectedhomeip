@@ -44,7 +44,6 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
