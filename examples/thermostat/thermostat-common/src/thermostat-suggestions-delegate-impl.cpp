@@ -146,6 +146,10 @@ CHIP_ERROR ThermostatSuggestionsDelegate::RemoveFromThermostatSuggestionsList(si
         CancelExpirationTimer();
         SetCurrentThermostatSuggestion(GetMaxThermostatSuggestions());
     }
+    else if (mIndexOfCurrentSuggestion < mNextFreeIndexInThermostatSuggestionsList && indexToRemove < mIndexOfCurrentSuggestion)
+    {
+        SetCurrentThermostatSuggestion(mIndexOfCurrentSuggestion - 1);
+    }
     mNextFreeIndexInThermostatSuggestionsList--;
     return CHIP_NO_ERROR;
 }

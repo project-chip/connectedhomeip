@@ -80,6 +80,7 @@ Status RemoveFromThermostatSuggestionsList(chip::app::Clusters::Thermostat::Ther
         {
             return Status::NotFound;
         }
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, Status::Failure);
 
         if (suggestion.GetUniqueID() == uniqueIDToRemove)
         {

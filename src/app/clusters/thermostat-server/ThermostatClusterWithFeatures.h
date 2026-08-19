@@ -28,7 +28,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-namespace {
+namespace detail {
 
 template <typename TargetDelegate, typename First, typename... Rest>
 constexpr decltype(auto) FindDelegate(First && first, Rest &&... rest)
@@ -68,7 +68,7 @@ static auto MakeFeature(const std::tuple<DelegateArgs &...> & delegates, ExtraAr
 template <typename Target, typename... Args>
 inline constexpr bool kArgsHasDelegate = (std::is_base_of_v<Target, std::decay_t<Args>> || ...);
 
-} // namespace
+} // namespace detail
 
 template <typename... Delegates>
 class ThermostatClusterWithFeatures : public ThermostatCluster
@@ -82,12 +82,12 @@ public:
 
     ThermostatClusterWithFeatures(EndpointId aEndpointId, BitFlags<Thermostat::Feature> features, const Config & config,
                                   Delegates &... delegates) :
-        ThermostatCluster(aEndpointId, features, config, FindDelegate<Thermostat::Delegate>(delegates...)),
-        mPresets(MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
-        mSuggestions(MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
-        mOccupancy(MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
+        ThermostatCluster(aEndpointId, features, config, detail::FindDelegate<Thermostat::Delegate>(delegates...) ),
+        mPresets(detail::MakeFeature<kHasPresets, ThermostatPresets>(std::forward_as_tuple(delegates...), *this)),
+        mSuggestions(detail::MakeFeature<kHasSuggestions, ThermostatSuggestions>(std::forward_as_tuple(delegates...), *this, mPresets)),
+        mOccupancy(detail::MakeFeature<kHasOccupancy, ThermostatOccupancy>(std::forward_as_tuple(delegates...)))
     {
-        static_assert(kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
+        static_assert(detail::kArgsHasDelegate<Thermostat::Delegate, Delegates...>,
                       "Missing Thermostat::Delegate in constructor arguments");
     }
 

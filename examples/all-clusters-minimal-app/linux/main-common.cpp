@@ -45,7 +45,7 @@ namespace {
 static LowPowerManager lowPowerManager;
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
-static EndpointId gThermostatEndpoint(1);
+constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,

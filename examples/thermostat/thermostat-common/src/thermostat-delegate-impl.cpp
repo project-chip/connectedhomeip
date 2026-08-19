@@ -35,12 +35,6 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace Protocols::InteractionModel;
 using namespace System::Clock;
 
-ThermostatDelegate::ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider)
-{
-    mEndpointId = endpoint;
-    mProvider   = provider;
-}
-
 SystemModeEnum ThermostatDelegate::GetSystemMode() const
 {
     return mSystemMode;

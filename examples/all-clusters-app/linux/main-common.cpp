@@ -188,7 +188,7 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
-static EndpointId gThermostatEndpoint(1);
+constexpr EndpointId gThermostatEndpoint(1);
 static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
 static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
