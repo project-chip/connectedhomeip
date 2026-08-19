@@ -217,7 +217,7 @@ CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustReques
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
+CHIP_ERROR DishwasherManager::HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
 {
     // Currently not implemented by our dishwasher app
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

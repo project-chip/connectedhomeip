@@ -176,8 +176,6 @@ DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nul
                                                             const DataModel::Nullable<int64_t> maxPower, const uint32_t duration,
                                                             AdjustmentCauseEnum cause)
 {
-    mESAState = ESAStateEnum::kPowerAdjustActive;
-
     // Create and set the PowerRangeAdjustment attribute
     Structs::PowerRangeAdjustStruct::Type powerRangeAdjustment;
     powerRangeAdjustment.minPower = minPower;
@@ -196,8 +194,12 @@ DeviceEnergyManagementMockDelegate::PowerRangeAdjustRequest(const DataModel::Nul
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    powerRangeAdjustment.endTime = 3600; // Dummy end time
+    // Set endTime based on duration (in seconds from now)
+    powerRangeAdjustment.endTime = duration;
     mPowerRangeAdjustment.SetNonNull(powerRangeAdjustment);
+
+    // Only update state after successful validation
+    mESAState = ESAStateEnum::kPowerAdjustActive;
 
     return Protocols::InteractionModel::Status::Success;
 }

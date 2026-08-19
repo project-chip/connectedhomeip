@@ -1005,7 +1005,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::GeneratePowerRangeAdjustEndEvent(Caus
 }
 
 /**
- * @brief Handles the cancelation of a PowerRangeAdjust operation
+ * @brief Handles the cancellation of a PowerRangeAdjust operation
  *
  * This function needs to notify the appliance that the power range adjustment should be cancelled.
  *
