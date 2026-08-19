@@ -59,7 +59,9 @@ AudioControlDelegate * GetDelegate(EndpointId endpointId)
     for (const auto & entry : gDelegateTable)
     {
         if (entry.endpointId == endpointId)
+        {
             return entry.delegate;
+        }
     }
     return nullptr;
 }

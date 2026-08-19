@@ -104,34 +104,45 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DefaultStepSize::Id), mDefaultStepSize,
         mDefaultStepSize);
+    // Guard against a corrupted/stale KVS value: a step size of 0 would make IncreaseVolume/
+    // DecreaseVolume fail permanently whenever the command omits an explicit stepSize.
+    mDefaultStepSize = std::max<uint16_t>(mDefaultStepSize, 1);
 
     const auto defaultSetVolumePolicy = mSetVolumeUnmutePolicy;
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id), mSetVolumeUnmutePolicy,
         defaultSetVolumePolicy);
     if (mSetVolumeUnmutePolicy >= UnmutePolicyEnum::kUnknownEnumValue)
+    {
         mSetVolumeUnmutePolicy = defaultSetVolumePolicy;
+    }
 
     const auto defaultIncreaseVolumePolicy = mIncreaseVolumeUnmutePolicy;
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::IncreaseVolumeUnmutePolicy::Id),
         mIncreaseVolumeUnmutePolicy, defaultIncreaseVolumePolicy);
     if (mIncreaseVolumeUnmutePolicy >= UnmutePolicyEnum::kUnknownEnumValue)
+    {
         mIncreaseVolumeUnmutePolicy = defaultIncreaseVolumePolicy;
+    }
 
     const auto defaultIncreaseVolumeVolume = mIncreaseVolumeUnmuteVolume;
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::IncreaseVolumeUnmuteVolume::Id),
         mIncreaseVolumeUnmuteVolume, defaultIncreaseVolumeVolume);
     if (mIncreaseVolumeUnmuteVolume >= UnmuteVolumeEnum::kUnknownEnumValue)
+    {
         mIncreaseVolumeUnmuteVolume = defaultIncreaseVolumeVolume;
+    }
 
     const auto defaultDecreaseVolumePolicy = mDecreaseVolumeUnmutePolicy;
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DecreaseVolumeUnmutePolicy::Id),
         mDecreaseVolumeUnmutePolicy, defaultDecreaseVolumePolicy);
     if (mDecreaseVolumeUnmutePolicy >= UnmutePolicyEnum::kUnknownEnumValue)
+    {
         mDecreaseVolumeUnmutePolicy = defaultDecreaseVolumePolicy;
+    }
 
     // SoftMuted is non-volatile per spec and must be restored on startup regardless of whether
     // StartUpMuted is supported.
@@ -366,7 +377,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         uint16_t value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         if (value == mMaxUserVolume)
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         return SetMaxUserVolume(value);
     }
     case DefaultStepSize::Id: {
@@ -376,7 +389,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         VerifyOrReturnError(value >= 1 && effectiveMax > mMinDeviceVolume && value <= effectiveMax - mMinDeviceVolume,
                             Status::ConstraintError);
         if (!SetAttributeValue(mDefaultStepSize, value, DefaultStepSize::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreDefaultStepSize();
         return CHIP_NO_ERROR;
     }
@@ -385,7 +400,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mSetVolumeUnmutePolicy, value, SetVolumeUnmutePolicy::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreSetVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
@@ -394,7 +411,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mIncreaseVolumeUnmutePolicy, value, IncreaseVolumeUnmutePolicy::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreIncreaseVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
@@ -403,7 +422,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value != UnmuteVolumeEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mIncreaseVolumeUnmuteVolume, value, IncreaseVolumeUnmuteVolume::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreIncreaseVolumeUnmuteVolume();
         return CHIP_NO_ERROR;
     }
@@ -412,7 +433,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value != UnmutePolicyEnum::kUnknownEnumValue, Status::ConstraintError);
         if (!SetAttributeValue(mDecreaseVolumeUnmutePolicy, value, DecreaseVolumeUnmutePolicy::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreDecreaseVolumeUnmutePolicy();
         return CHIP_NO_ERROR;
     }
@@ -420,7 +443,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         DataModel::Nullable<bool> value{};
         ReturnErrorOnFailure(decoder.Decode(value));
         if (!SetAttributeValue(mStartUpMuted, value, StartUpMuted::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreStartUpMuted();
         return CHIP_NO_ERROR;
     }
@@ -433,7 +458,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
             VerifyOrReturnError(value.Value() >= mMinDeviceVolume && value.Value() <= effectiveMax, Status::ConstraintError);
         }
         if (!SetAttributeValue(mStartUpVolume, value, StartUpVolume::Id))
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         StoreStartUpVolume();
         return CHIP_NO_ERROR;
     }
@@ -442,7 +469,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
         if (value == mBass)
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         {
             Status s = mDelegate.HandleBassChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
@@ -456,7 +485,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
         if (value == mMid)
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         {
             Status s = mDelegate.HandleMidChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
@@ -470,7 +501,9 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value >= mMinCorrection && value <= mMaxCorrection, Status::ConstraintError);
         if (value == mTreble)
+        {
             return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        }
         {
             Status s = mDelegate.HandleTrebleChanged(value);
             VerifyOrReturnError(s == Status::Success, s);
@@ -560,9 +593,13 @@ Status AudioControlCluster::ApplyUnmutePolicy(UnmutePolicyEnum policy, uint16_t 
     VerifyOrReturnError(s == Status::Success, s);
 
     if (SetAttributeValue(mVolume, newVolume, Volume::Id))
+    {
         StoreVolume();
+    }
     if (SetAttributeValue(mSoftMuted, newSoftMuted, SoftMuted::Id))
+    {
         StoreSoftMuted();
+    }
     return Status::Success;
 }
 
@@ -594,7 +631,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleMute()
     Status s = mDelegate.HandleVolumeAndMuteChange(mVolume, true);
     VerifyOrReturnError(s == Status::Success, s);
     if (SetAttributeValue(mSoftMuted, true, SoftMuted::Id))
+    {
         StoreSoftMuted();
+    }
     return Status::Success;
 }
 
@@ -603,7 +642,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleUnmute()
     Status s = mDelegate.HandleVolumeAndMuteChange(mVolume, false);
     VerifyOrReturnError(s == Status::Success, s);
     if (SetAttributeValue(mSoftMuted, false, SoftMuted::Id))
+    {
         StoreSoftMuted();
+    }
     return Status::Success;
 }
 
@@ -613,7 +654,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleToggleMuted()
     Status s                = mDelegate.HandleVolumeAndMuteChange(mVolume, newSoftMuted);
     VerifyOrReturnError(s == Status::Success, s);
     if (SetAttributeValue(mSoftMuted, newSoftMuted, SoftMuted::Id))
+    {
         StoreSoftMuted();
+    }
     return Status::Success;
 }
 
@@ -636,7 +679,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleSetVolume(chip::TLV::TL
         Status s = mDelegate.HandleVolumeAndMuteChange(mVolume, true);
         VerifyOrReturnError(s == Status::Success, s);
         if (SetAttributeValue(mSoftMuted, true, SoftMuted::Id))
+        {
             StoreSoftMuted();
+        }
         return Status::Success;
     }
 
@@ -646,7 +691,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleSetVolume(chip::TLV::TL
         Status s = mDelegate.HandleVolumeAndMuteChange(req.newVolume, false);
         VerifyOrReturnError(s == Status::Success, s);
         if (SetAttributeValue(mVolume, req.newVolume, Volume::Id))
+        {
             StoreVolume();
+        }
         return Status::Success;
     }
 
@@ -704,7 +751,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
         Status s = mDelegate.HandleVolumeAndMuteChange(requestedVolume, false);
         VerifyOrReturnError(s == Status::Success, s);
         if (SetAttributeValue(mVolume, requestedVolume, Volume::Id))
+        {
             StoreVolume();
+        }
         return Status::Success;
     }
 
@@ -735,9 +784,13 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
         Status s = mDelegate.HandleVolumeAndMuteChange(mMinDeviceVolume, true);
         VerifyOrReturnError(s == Status::Success, s);
         if (SetAttributeValue(mVolume, mMinDeviceVolume, Volume::Id))
+        {
             StoreVolume();
+        }
         if (SetAttributeValue(mSoftMuted, true, SoftMuted::Id))
+        {
             StoreSoftMuted();
+        }
         return Status::Success;
     }
 
@@ -749,7 +802,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
         Status s = mDelegate.HandleVolumeAndMuteChange(requestedVolume, false);
         VerifyOrReturnError(s == Status::Success, s);
         if (SetAttributeValue(mVolume, requestedVolume, Volume::Id))
+        {
             StoreVolume();
+        }
         return Status::Success;
     }
 
@@ -764,7 +819,9 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
 CHIP_ERROR AudioControlCluster::SetSoftMuted(bool softMuted)
 {
     if (SetAttributeValue(mSoftMuted, softMuted, SoftMuted::Id))
+    {
         StoreSoftMuted();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -779,7 +836,9 @@ CHIP_ERROR AudioControlCluster::SetVolume(uint16_t volume)
 {
     VerifyOrReturnError(volume >= mMinDeviceVolume && volume <= EffectiveMaxVolume(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (SetAttributeValue(mVolume, volume, Volume::Id))
+    {
         StoreVolume();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -798,7 +857,9 @@ CHIP_ERROR AudioControlCluster::SetMaxUserVolume(uint16_t maxUserVolume)
     }
 
     if (SetAttributeValue(mMaxUserVolume, maxUserVolume, MaxUserVolume::Id))
+    {
         StoreMaxUserVolume();
+    }
 
     if (mVolume > maxUserVolume)
     {
@@ -821,7 +882,9 @@ CHIP_ERROR AudioControlCluster::SetBass(int16_t bass)
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(bass >= mMinCorrection && bass <= mMaxCorrection, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (SetAttributeValue(mBass, bass, Bass::Id))
+    {
         StoreBass();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -831,7 +894,9 @@ CHIP_ERROR AudioControlCluster::SetMid(int16_t mid)
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(mid >= mMinCorrection && mid <= mMaxCorrection, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (SetAttributeValue(mMid, mid, Mid::Id))
+    {
         StoreMid();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -841,7 +906,9 @@ CHIP_ERROR AudioControlCluster::SetTreble(int16_t treble)
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(treble >= mMinCorrection && treble <= mMaxCorrection, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (SetAttributeValue(mTreble, treble, Treble::Id))
+    {
         StoreTreble();
+    }
     return CHIP_NO_ERROR;
 }
 

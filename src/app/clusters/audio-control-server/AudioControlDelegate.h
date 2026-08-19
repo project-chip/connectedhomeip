@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters {

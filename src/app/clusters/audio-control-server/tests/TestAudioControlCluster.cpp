@@ -3235,6 +3235,28 @@ TEST_F(TestAudioControlCluster, StartupCorruptedMaxUserVolumeKvsClampedToValidRa
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestAudioControlCluster, StartupCorruptedDefaultStepSizeKvsClampedToOne)
+{
+    // Simulate a corrupted/stale KVS value of 0 for DefaultStepSize. Without clamping, an
+    // IncreaseVolume/DecreaseVolume command that omits an explicit stepSize would fail
+    // VerifyOrReturnError(stepSize >= 1, ...) forever, with no command-level way to repair it.
+    const uint16_t corruptValue = 0;
+    auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, DefaultStepSize::Id);
+    ASSERT_EQ(testContext.StorageDelegate().SyncSetKeyValue(key.KeyName(), &corruptValue, sizeof(corruptValue)), CHIP_NO_ERROR);
+
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
+                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    // Default step clamped to 1: 50 -> 51, rather than a permanent ConstraintError.
+    EXPECT_TRUE(tester.Invoke(IncreaseVolume::Type{}).IsSuccess());
+    EXPECT_EQ(cluster.GetVolume(), 51u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintError)
 {
     // SoftMuted=TRUE so the command goes through ApplyUnmutePolicy (not the fast path).
