@@ -19,6 +19,7 @@ package com.matter.casting.support;
 
 import android.os.Build;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.VisibleForTesting;
 import java.lang.ref.Cleaner;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -80,6 +81,7 @@ public final class MatterCleaner {
    * referent is collected. Without this, the phantom reference itself could be collected before its
    * referent and never enqueued.
    */
+  @VisibleForTesting
   static final class LegacyCleanerHolder {
     static final ReferenceQueue<Object> QUEUE = new ReferenceQueue<>();
     static final Set<CleanupRef> LIVE_REFS = Collections.newSetFromMap(new ConcurrentHashMap<>());
