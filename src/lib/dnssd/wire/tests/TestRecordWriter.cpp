@@ -23,7 +23,7 @@
 
 namespace {
 
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace chip::Encoding::BigEndian;
 
 TEST(TestRecordWriter, BasicWriteTest)

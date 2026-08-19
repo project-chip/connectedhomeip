@@ -104,6 +104,15 @@ stm32:
     - "config/stm32/**"
     - "third_party/st/**"
 
+tizen:
+  maintainers:
+    - dr-venkman
+  paths:
+    - "src/platform/Tizen/**"
+    - "examples/platform/tizen/**"
+    - "examples/**/tizen/**"
+    - "config/tizen/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -117,15 +126,6 @@ stm32:
 #     - "examples/**/nrfconnect/**"
 #     - "config/nrfconnect/**"
 # 
-# tizen:
-#   maintainers:
-#     - enkiusz
-#     - arkq
-#   paths:
-#     - "src/platform/Tizen/**"
-#     - "examples/platform/tizen/**"
-#     - "examples/**/tizen/**"
-#     - "config/tizen/**"
 # 
 # asr:
 #   maintainers:

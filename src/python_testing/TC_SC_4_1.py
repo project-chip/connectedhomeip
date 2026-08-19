@@ -92,7 +92,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#341-tc-sc-41-commissionable-node-discovery-dut_commissionee
 '''
 
-TCP_PICS_STR = "MCORE.SC.TCP"
+TCP_PICS_STR = "MCORE.SC.S.TCP"
 ROOT_NODE_ENDPOINT_ID = 0
 
 # Timeout for a single subtype PTR browse:

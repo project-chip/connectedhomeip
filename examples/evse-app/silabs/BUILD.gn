@@ -83,6 +83,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -107,6 +108,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/customer",
       "${examples_common_plat_dir}/freertos_config",
     ]
 
@@ -133,6 +135,7 @@ silabs_executable("evse-app") {
 
   sources = [
     # Actual application code
+    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "src/AppTask.cpp",
 
     # EVSE Common, will be moved to evse-common when we have code driven clusters for evse
