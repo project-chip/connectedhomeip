@@ -101,6 +101,7 @@ source_set("clusters") {
     "webrtc-transport-requestor-server",
     "wifi-network-diagnostics-server",
     "wifi-network-management-server",
+    "window-covering-server",
     "zone-management-server",
 
     # keep-sorted: end
