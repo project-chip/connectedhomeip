@@ -44,7 +44,6 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, BitFlags<Thermostat:
     DefaultServerCluster({ endpointId, Thermostat::Id }),
     mFeatures(features), mConfig(config), mDelegate(delegate)
 {
-    mAtomicWriteSession.SetDelegate(this);
 }
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
@@ -55,6 +54,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     {
         ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
     }
+    mAtomicWriteSession.SetDelegate(this);
     return CHIP_NO_ERROR;
 }
 
@@ -305,7 +305,10 @@ Status ThermostatCluster::SetRunningState(BitMask<RelayStateBitmap> runningState
 
 void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    mAtomicWriteSession.ResetAtomicWrite();
+    if (mAtomicWriteSession.InAtomicWrite(fabricIndex))
+    {
+        mAtomicWriteSession.ResetAtomicWrite();
+    }
 }
 
 CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,

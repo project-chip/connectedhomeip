@@ -130,6 +130,15 @@ public:
     bool InAtomicWrite(Optional<AttributeId> attributeId = NullOptional);
 
     /**
+     * @brief Checks if the thermostat cluster has an atomic write open, filtered by fabric index
+     *
+     * @param fabricIndex The fabric index to filter on
+     * @return true if the endpoint has an open atomic write
+     * @return false if the endpoint does not have an open atomic write
+     */
+    bool InAtomicWrite(FabricIndex fabricIndex);
+
+    /**
      * @brief Checks if a thermostat cluster has an atomic write open for a given subject descriptor, optionally filtered by an
      * attribute ID
      *
