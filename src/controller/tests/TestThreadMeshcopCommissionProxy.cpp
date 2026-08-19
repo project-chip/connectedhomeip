@@ -17,10 +17,11 @@
 
 #include <controller/ThreadMeshcopCommissionProxy.h>
 
+#include <json/json.h>
 #include <pw_unit_test/framework.h>
 
 #include <cstdint>
-#include <string>
+#include <sstream>
 #include <vector>
 
 namespace chip {
@@ -70,7 +71,13 @@ void SendJoinerPacket(ThreadMeshcopCommissionProxy & proxy, const uint8_t (&pack
 
 bool LastDiscoveryIsValid(ThreadMeshcopCommissionProxy & proxy)
 {
-    return proxy.GetLastDiscoveryDiagnosticJson().find("\"valid\" : true") != std::string::npos;
+    Json::Value root;
+    std::string errors;
+    std::istringstream diagnostic(proxy.GetLastDiscoveryDiagnosticJson());
+    bool parsed = Json::parseFromStream(Json::CharReaderBuilder(), diagnostic, &root, &errors);
+
+    EXPECT_TRUE(parsed);
+    return parsed && root["valid"].asBool();
 }
 
 TEST(TestThreadMeshcopCommissionProxy, WaitsForCompleteResponseAfterSrvQuery)
