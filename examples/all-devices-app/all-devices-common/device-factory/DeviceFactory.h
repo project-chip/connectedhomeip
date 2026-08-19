@@ -217,7 +217,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -242,17 +242,6 @@ private:
                                                      "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
-        {
-            RegisterCreator("contact-sensor", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
-            });
-            RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
-                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensor &>(device));
-            });
-        }
         if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
         {
             RegisterCreator("color-temperature-light", [this]() {
@@ -264,15 +253,15 @@ private:
                 });
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
-            RegisterCreator("extended-color-light", [this]() {
+            RegisterCreator("contact-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ExtendedColorLight>(ExtendedColorLight::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<BooleanStateSensor>(
+                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+            });
+            RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensor &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -351,6 +340,17 @@ private:
                 return std::make_unique<EmulatedDishwasher>(EmulatedDishwasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
+        {
+            RegisterCreator("extended-color-light", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<ExtendedColorLight>(ExtendedColorLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
                 });
             });
         }

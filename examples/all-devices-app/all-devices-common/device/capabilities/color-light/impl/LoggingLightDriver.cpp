@@ -130,19 +130,21 @@ void LoggingLightDriver::OnColorCTChanged(uint16_t mireds)
     ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnColorCTChanged() -> %u mireds", mireds);
 }
 
-// Both conversions leave their out-params untouched, so the cluster keeps the fallback it passed
-// in. A product replaces them with its own calibration.
+// Neither of these converts. They leave the out-params as the cluster initialized them, which is
+// the startup default of the attribute being asked for and not a value derived from the active
+// color: a mode switch or an inactive-mode read therefore reports that default. §3.2.7 defines no
+// fallback for this, so a product must replace both with its own calibration.
 
 void LoggingLightDriver::ConvertXYToMireds(uint16_t x, uint16_t y, uint16_t & outMireds)
 {
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertXYToMireds(x=%u, y=%u): no conversion, staying at %u mireds", x, y,
-                    outMireds);
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertXYToMireds(x=%u, y=%u): no conversion supplied, leaving %u mireds", x,
+                    y, outMireds);
 }
 
 void LoggingLightDriver::ConvertMiredsToXY(uint16_t mireds, uint16_t & outX, uint16_t & outY)
 {
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertMiredsToXY(%u mireds): no conversion, staying at x=%u y=%u", mireds,
-                    outX, outY);
+    ChipLogProgress(DeviceLayer, "LoggingLightDriver::ConvertMiredsToXY(%u mireds): no conversion supplied, leaving x=%u y=%u",
+                    mireds, outX, outY);
 }
 
 void LoggingLightDriver::OnIdentifyStart(Clusters::IdentifyCluster & cluster)

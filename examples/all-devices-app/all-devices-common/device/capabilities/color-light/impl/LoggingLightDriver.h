@@ -60,7 +60,9 @@ protected:
     // ColorControlDelegate. Both representations these device types advertise are driven. The
     // XY <-> mireds conversions are deliberately not supplied: the mapping between representations
     // is a product calibration, not something an example can specify. They are overridden only to
-    // log that the cluster asked, which leaves its documented fallback in place.
+    // log that the cluster asked and to leave the out-params alone, so the value the cluster ends
+    // up with is CurrentX/CurrentY's or ColorTemperatureMireds' startup default rather than
+    // anything derived from the active color.
     void OnColorXYChanged(uint16_t x, uint16_t y) override;
     void OnColorCTChanged(uint16_t mireds) override;
     void ConvertXYToMireds(uint16_t x, uint16_t y, uint16_t & outMireds) override;

@@ -29,8 +29,9 @@ namespace app {
 //
 // Only the two mandatory features are advertised. Both being advertised, the cluster already asks
 // the delegate to convert between XY and mireds on every mode switch and on every read of the
-// inactive mode's attribute; LoggingLightDriver supplies no conversion, so the cluster's fallback
-// stands. Adding HueSaturation / EnhancedHue / ColorLoop would add the remaining conversion pairs.
+// inactive mode's attribute. LoggingLightDriver does not convert, so those report the target
+// attribute's startup default instead of the active color; a product ships a calibration there.
+// Adding HueSaturation / EnhancedHue / ColorLoop would add the remaining conversion pairs.
 ExtendedColorLight::ExtendedColorLight(const Context & context) :
     LoggingLightDriver(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtendedColorLight, 1), context,
                        Conformance{
