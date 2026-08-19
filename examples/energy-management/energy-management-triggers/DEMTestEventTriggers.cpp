@@ -32,6 +32,10 @@ namespace {
 constexpr uint16_t MAX_SLOTS             = 10;
 constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
+// Saved power adjustment values for restore on clear trigger
+int64_t sSavedAbsMinPowerMw = 0;
+int64_t sSavedAbsMaxPowerMw = 0;
+
 chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
 
@@ -283,12 +287,62 @@ void SetTestEventTrigger_ConstraintBasedAdjustment()
 
 void SetTestEventTrigger_PowerRangeAdjustment()
 {
-    // TODO: Implement this test event trigger
+    ChipLogProgress(Support, "[PowerRangeAdjustment-Test-Event] => Set AbsMinPower=1kW, AbsMaxPower=7.6kW for testing");
+
+    // Save the current power adjustment limits for restoration later
+    sSavedAbsMinPowerMw = GetDEMDelegate()->GetAbsMinPower();
+    sSavedAbsMaxPowerMw = GetDEMDelegate()->GetAbsMaxPower();
+    ChipLogDetail(Support, "Saved AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
+                  sSavedAbsMaxPowerMw);
+
+    // Set test values: AbsMinPower=1kW (1000000 mW), AbsMaxPower=7.6kW (76000000 mW)
+    constexpr int64_t TEST_ABS_MIN_POWER_MW = 1000000;   // 1 kW
+    constexpr int64_t TEST_ABS_MAX_POWER_MW = 76000000;  // 7.6 kW
+
+    CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(TEST_ABS_MIN_POWER_MW);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMinPower: " CHIP_ERROR_FORMAT,
+                     err.Format());
+        return;
+    }
+
+    err = GetDEMDelegate()->SetAbsMaxPower(TEST_ABS_MAX_POWER_MW);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustment failed to set AbsMaxPower: " CHIP_ERROR_FORMAT,
+                     err.Format());
+        // Restore the min power on failure
+        GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
+        return;
+    }
+
+    ChipLogDetail(Support, "Set AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", TEST_ABS_MIN_POWER_MW,
+                  TEST_ABS_MAX_POWER_MW);
 }
 
 void SetTestEventTrigger_PowerRangeAdjustmentClear()
 {
-    // TODO: Implement this test event trigger
+    ChipLogProgress(Support, "[PowerRangeAdjustmentClear-Test-Event] => Restore AbsMinPower and AbsMaxPower to saved values");
+
+    CHIP_ERROR err = GetDEMDelegate()->SetAbsMinPower(sSavedAbsMinPowerMw);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMinPower: " CHIP_ERROR_FORMAT,
+                     err.Format());
+        return;
+    }
+
+    err = GetDEMDelegate()->SetAbsMaxPower(sSavedAbsMaxPowerMw);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "SetTestEventTrigger_PowerRangeAdjustmentClear failed to restore AbsMaxPower: " CHIP_ERROR_FORMAT,
+                     err.Format());
+        return;
+    }
+
+    ChipLogDetail(Support, "Restored AbsMinPower=% " PRId64 " mW, AbsMaxPower=% " PRId64 " mW", sSavedAbsMinPowerMw,
+                  sSavedAbsMaxPowerMw);
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
