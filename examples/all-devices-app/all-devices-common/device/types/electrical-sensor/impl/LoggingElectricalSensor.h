@@ -222,12 +222,14 @@ public:
 
     CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex", static_cast<unsigned long long>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetAvailableEndpointAtIndex",
+                        static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override
     {
-        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex", static_cast<unsigned long long>(index));
+        ChipLogProgress(DeviceLayer, MSG_WITH_INDEX, device, powerTopologyCluster, "GetActiveEndpointAtIndex",
+                        static_cast<unsigned long long>(index));
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 #undef MSG
