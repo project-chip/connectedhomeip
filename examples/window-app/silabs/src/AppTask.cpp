@@ -59,16 +59,16 @@ CHIP_ERROR AppTask::AppInit()
         return err;
     }
 
-#if SL_MATTER_DISPLAY_ENABLED
+#if defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
     GetLCD().SetCustomUI(WindowManager::DrawUI);
     GetLCD().WriteDemoUI(false);
-#if SL_MATTER_QR_CODE_ENABLED
+#if defined(QR_CODE_ENABLED) && (QR_CODE_ENABLED)
     if (BaseApplication::sIsProvisioned != true)
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // SL_MATTER_QR_CODE_ENABLED
-#endif // SL_MATTER_DISPLAY_ENABLED
+#endif // defined(QR_CODE_ENABLED) && (QR_CODE_ENABLED)
+#endif // defined(DISPLAY_ENABLED) && (DISPLAY_ENABLED)
 
     return CHIP_NO_ERROR;
 }
@@ -97,14 +97,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     SILABS_LOG("App Task started");
 
     WindowManager::sWindow.UpdateLED();
-<<<<<<< HEAD
-#ifdef DISPLAY_ENABLED
-    WindowManager::sWindow.UpdateLCD();
-#endif // DISPLAY_ENABLED
-    =======
->>>>>>> ae1da97b84 ([Silabs] Fix LCD Update after Commissioning (#73440))
-
-        while (true)
+    while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
         while (eventReceived == osOK)
