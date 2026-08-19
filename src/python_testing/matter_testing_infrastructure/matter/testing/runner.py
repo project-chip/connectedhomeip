@@ -461,12 +461,13 @@ def run_tests_no_exit(
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
                 # Populate XML data model
-                if stored_global_wildcard:
+                if stored_global_wildcard is None:
                     try:
                         spec_version = stored_global_wildcard.attributes[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
                         dm_directory = dm_from_spec_version(spec_version)
                         data_model = build_xml_data_model(dm_directory)
                         test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+                        LOGGER.info("Data model: %s", data_model)
                     except Exception:
                         LOGGER.warning("Could not populate data model from device spec version")
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
