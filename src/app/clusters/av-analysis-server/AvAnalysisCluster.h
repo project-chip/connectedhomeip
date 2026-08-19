@@ -80,7 +80,7 @@ public:
     /**
      * @param  aZoneIDs  the set of ZoneIDs to be validated against what is defined in the Zone Management Cluster instance
      */
-    virtual CHIP_ERROR VerifyZoneIDsAreValid(std::vector<uint16_t> aZoneIDs) = 0;
+    virtual CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t>& aZoneIDs) = 0;
 
     /**
      * Allows the delegate to determine whether or not resources exist to add additional context triggers.
@@ -181,46 +181,46 @@ public:
      * provide the session ID to be used over the lifetime of the session.  The server will generate the AnalysisSessionStart event.
      *
      * @param aSessionId the server will manage all session Ids
-     * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not avaiable, or
+     * @param aZoneList  the list of Zones that are relevant for the session, Null is used when this information is not available, or
      * all zones
      */
     CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList);
 
     /**
      * Invoked by the delegate to furnish details of the event that triggered the session. The server will generate a
-     * PerceivedContext event with the inital context
+     * PerceivedContext event with the initial context
      *
      * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
      * @param aTriggeringContext the set (could be more than one) of contexts that triggered the session.
      *                           This will be validated against the set of known, enabled contexts by the server.
      */
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
-                                                std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext);
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aTriggeringContext);
 
     /**
      * Invoked by the delegate for all newly detected analysis contexts as part of the current session. The server will generate a
      * PerceivedContext event with the new context and the current contexts previously informed.
      *
-     * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
-     * @param aTriggeringContext the set (could be more than one) of contexts that are newly detected for the session.
-     *                           This will be validated against the set of known, enabled contexts by the server.    *
+     * @param aSessionId  the sessionId for the current session, the method will fail if this is not known by the server
+     * @param aNewContext the set (could be more than one) of contexts that are newly detected for the session.
+     *                    This will be validated against the set of known, enabled contexts by the server.
      */
-    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext);
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aNewContext);
 
     /**
      * Invoked by the delegate when a previously detected context is no longer present (e.g. a detected package has been
-     * retrieved). The server will generate a PerceivedContext event with the expired contextand the current contexts previously
+     * retrieved). The server will generate a PerceivedContext event with the expired context and the current contexts previously
      * informed.
      *
-     * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server
-     * @param aTriggeringContext the set (could be more than one) of contexts that are no longer detected as part of the session.
-     *                           This will be validated against the set of known, active contexts that are part of the session by
-     * the server.    *      *
+     * @param aSessionId  the sessionId for the current session, the method will fail if this is not known by the server
+     * @param aOldContext the set (could be more than one) of contexts that are no longer detected as part of the session.
+     *                    This will be validated against the set of known, active contexts that are part of the session by
+     * the server.
      */
-    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext);
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aOldContext);
 
     /**
-     * Invoked by the delegate to indictae the conclusion of an analysis session that has been triggered. It is up to the
+     * Invoked by the delegate to indicate the conclusion of an analysis session that has been triggered. It is up to the
      * delegate to determine the criteria for determing that a session has concluded.
      *
      * @param aSessionId         the sessionId for the current session, the method will fail if this is not known by the server

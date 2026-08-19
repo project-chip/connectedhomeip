@@ -78,7 +78,7 @@ const std::vector<app::Clusters::AvAnalysis::Structs::TrackedContext::Type> test
 };
 
 const std::vector<app::Clusters::AvAnalysis::Structs::TrackedContext::Type> testAdditionalTrackedContext = {
-    { .identifiedContextID = 0,
+    { .identifiedContextID = 1,
       .identifiedContext   = { .namespaceID = static_cast<uint8_t>(0x4B), .tag = static_cast<uint8_t>(0x09) },
       .startTime           = 0,
       .endTime             = DataModel::NullNullable }
@@ -109,7 +109,7 @@ public:
 
     Protocols::InteractionModel::Status RemoveAnalysisStream() { return Status::Success; }
 
-    CHIP_ERROR VerifyZoneIDsAreValid(std::vector<uint16_t> aZoneIDs) { return CHIP_NO_ERROR; }
+    CHIP_ERROR VerifyZoneIDsAreValid(const std::vector<uint16_t>& aZoneIDs) { return CHIP_NO_ERROR; }
 
     bool CanAddContextTriggers() { return true; }
 

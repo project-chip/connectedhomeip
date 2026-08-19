@@ -134,12 +134,12 @@ public:
 struct ActiveAmbientContextSession
 {
 private:
-    uint16_t mSessionId;
+    uint16_t mSessionId = 0;
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
 
 public:
     virtual ~ActiveAmbientContextSession() = default;
-    ActiveAmbientContextSession() {}
+    ActiveAmbientContextSession() = default;
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }

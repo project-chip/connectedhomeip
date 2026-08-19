@@ -742,7 +742,7 @@ bool AvAnalysisServerLogic::ZoneIDListContains(const DataModel::DecodableList<ui
     return false;
 }
 
-CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>>& aZoneList,
                                                        ServerClusterContext * aContext)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -784,7 +784,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionStart(uint16_t & aSessionId, Da
 }
 
 CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
-    uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext, ServerClusterContext * aContext)
+    uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aTriggeringContext, ServerClusterContext * aContext)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -821,7 +821,7 @@ CHIP_ERROR AvAnalysisServerLogic::InitialTriggeringContextDetected(
 }
 
 CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
-                                                     std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext,
+                                                     const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aNewContext,
                                                      ServerClusterContext * aContext)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -862,7 +862,7 @@ CHIP_ERROR AvAnalysisServerLogic::NewContextDetected(uint16_t aSessionId,
 }
 
 CHIP_ERROR AvAnalysisServerLogic::ContextNoLongerDetected(uint16_t aSessionId,
-                                                          std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext,
+                                                          const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aOldContext,
                                                           ServerClusterContext * aContext)
 {
     VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -941,7 +941,7 @@ CHIP_ERROR AvAnalysisServerLogic::AnalysisSessionEnd(uint16_t aSessionId, Server
     return CHIP_NO_ERROR;
 }
 
-bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(std::vector<AvAnalysis::Structs::TrackedContext::Type> aContext)
+bool AvAnalysisServerLogic::IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aContext)
 {
     // Are the contexts part of our active set
     bool notFound = false;

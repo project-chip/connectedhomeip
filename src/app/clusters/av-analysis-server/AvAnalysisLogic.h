@@ -130,17 +130,17 @@ public:
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
     // Active context tracking and events
-    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, DataModel::Nullable<std::vector<uint16_t>> aZoneList,
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>>& aZoneList,
                                     ServerClusterContext * aContext);
 
     CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
-                                                std::vector<AvAnalysis::Structs::TrackedContext::Type> aTriggeringContext,
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aTriggeringContext,
                                                 ServerClusterContext * aContext);
 
-    CHIP_ERROR NewContextDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aNewContext,
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aNewContext,
                                   ServerClusterContext * aContext);
 
-    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, std::vector<AvAnalysis::Structs::TrackedContext::Type> aOldContext,
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aOldContext,
                                        ServerClusterContext * aContext);
 
     CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext);
@@ -172,7 +172,7 @@ private:
      * Command and event handler helper methods
      */
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
-    bool IsContextPartOfActiveContextTriggers(std::vector<AvAnalysis::Structs::TrackedContext::Type> aContext);
+    bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type>& aContext);
 
     /**
      * Helper functions to handle persistent data and the KVS.
