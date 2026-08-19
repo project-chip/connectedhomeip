@@ -44,8 +44,8 @@
 static_assert(CONFIG_BUILD_FOR_HOST_UNIT_TEST,
               "CASECapture.cpp requires CONFIG_BUILD_FOR_HOST_UNIT_TEST; this file is only valid for the Python test build.");
 
-static_assert(chip::Transport::PeerAddress::kMaxToStringSize <= PYCHIP_CASE_TIMING_PEER_ADDR_LEN,
-              "PychipCaseTimingRecord::peerAddress is too small to hold a rendered PeerAddress.");
+static_assert(chip::Transport::PeerAddress::kMaxToStringSize <= PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH,
+              "PychipCASEHandshakeMetricsRecord::peerTransportAddress is too small to hold a rendered PeerAddress.");
 
 namespace {
 
@@ -150,20 +150,20 @@ CaseReceivedMessageObserver gCaseObserver;
 // little endian, per StatusReport::Parse. The tracing hooks hand over the payload with the
 // packet and payload headers already settled, so it starts at generalCode. Offsets are derived
 // from the field widths rather than written out, so they cannot drift apart.
-constexpr size_t kStatusReportGeneralCodeOffset  = 0;
-constexpr size_t kStatusReportProtocolIdOffset   = kStatusReportGeneralCodeOffset + sizeof(uint16_t);
-constexpr size_t kStatusReportProtocolCodeOffset = kStatusReportProtocolIdOffset + sizeof(uint32_t);
-constexpr size_t kStatusReportMinSize            = kStatusReportProtocolCodeOffset + sizeof(uint16_t);
+constexpr size_t kStatusReportGeneralCodeByteOffset  = 0;
+constexpr size_t kStatusReportProtocolIdByteOffset   = kStatusReportGeneralCodeByteOffset + sizeof(uint16_t);
+constexpr size_t kStatusReportProtocolCodeByteOffset = kStatusReportProtocolIdByteOffset + sizeof(uint32_t);
+constexpr size_t kStatusReportMinimumSizeBytes       = kStatusReportProtocolCodeByteOffset + sizeof(uint16_t);
 
-bool ParseStatusCodes(const chip::ByteSpan & payload, uint16_t & generalCode, uint16_t & protocolCode)
+bool ParseStatusReportCodes(const chip::ByteSpan & payload, uint16_t & generalCode, uint16_t & protocolCode)
 {
-    VerifyOrReturnValue(payload.size() >= kStatusReportMinSize, false);
-    generalCode  = chip::Encoding::LittleEndian::Get16(payload.data() + kStatusReportGeneralCodeOffset);
-    protocolCode = chip::Encoding::LittleEndian::Get16(payload.data() + kStatusReportProtocolCodeOffset);
+    VerifyOrReturnValue(payload.size() >= kStatusReportMinimumSizeBytes, false);
+    generalCode  = chip::Encoding::LittleEndian::Get16(payload.data() + kStatusReportGeneralCodeByteOffset);
+    protocolCode = chip::Encoding::LittleEndian::Get16(payload.data() + kStatusReportProtocolCodeByteOffset);
     return true;
 }
 
-bool IsStatusSuccess(uint16_t generalCode, uint16_t protocolCode)
+bool IsStatusReportSuccess(uint16_t generalCode, uint16_t protocolCode)
 {
     return generalCode == chip::to_underlying(chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess) &&
         protocolCode == chip::Protocols::SecureChannel::kProtocolCodeSuccess;
@@ -174,7 +174,7 @@ bool IsStatusSuccess(uint16_t generalCode, uint16_t protocolCode)
 // the received-message observer above because they report both directions: the handshake
 // runs over an unauthenticated session, so every Sigma message reaches
 // LogMessageSend/LogMessageReceived with its payload header intact.
-class CaseTimingBackend : public chip::Tracing::Backend
+class CASEHandshakeMetricsBackend : public chip::Tracing::Backend
 {
 public:
     void LogMessageSend(chip::Tracing::MessageSendInfo & info) override
@@ -184,7 +184,7 @@ public:
 
         using chip::Protocols::SecureChannel::MsgType;
         const auto opcode  = static_cast<MsgType>(info.payloadHeader->GetMessageType());
-        const uint64_t now = NowUs();
+        const uint64_t now = CurrentTimestampUs();
 
         // On the way out this node is the source; on the way in it is the destination.
         const uint16_t exchangeId = info.payloadHeader->GetExchangeID();
@@ -193,16 +193,17 @@ public:
         if (opcode == MsgType::CASE_Sigma1)
         {
             // A Sigma1 leaving the node begins a new handshake.
-            StartRecord(now, exchangeId, localId);
+            BeginCASEHandshakeRecord(now, exchangeId, localId);
             return;
         }
 
-        PychipCaseTimingRecord * record = FindRecord(exchangeId, localId);
+        PychipCASEHandshakeMetricsRecord * record = FindCASEHandshakeRecord(exchangeId, localId);
         VerifyOrReturn(record != nullptr);
 
         if (opcode == MsgType::CASE_Sigma3)
         {
-            Mark(*record, &PychipCaseTimingRecord::sigma3SentUs, PYCHIP_CASE_TIMING_MARK_SIGMA3_SENT, now);
+            RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::sigma3SentTimestampUs,
+                            PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA3_SENT, now);
         }
         else if (opcode == MsgType::StatusReport)
         {
@@ -211,10 +212,24 @@ public:
             // report is normal on the resumption path and is not an error.
             uint16_t generalCode  = 0;
             uint16_t protocolCode = 0;
-            VerifyOrReturn(ParseStatusCodes(info.payload, generalCode, protocolCode));
-            if (!IsStatusSuccess(generalCode, protocolCode))
+            VerifyOrReturn(ParseStatusReportCodes(info.payload, generalCode, protocolCode));
+            if (!IsStatusReportSuccess(generalCode, protocolCode))
             {
-                record->marks = static_cast<uint8_t>(record->marks | PYCHIP_CASE_TIMING_MARK_LOCAL_FAILURE);
+                record->recordedFields =
+                    static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_THIS_NODE_REJECTED_PEER);
+
+                // Keep the codes, not just the fact of a rejection. They are already decoded
+                // here, and without them the record carries LOCAL_FAILURE with both code
+                // fields left at zero - which this struct documents as meaning success. The
+                // inbound path owns these fields once it has decoded a report of its own, so
+                // only fill them in while they are still unset.
+                if ((record->recordedFields & PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES) == 0)
+                {
+                    record->statusReportGeneralCode  = generalCode;
+                    record->statusReportProtocolCode = protocolCode;
+                    record->recordedFields =
+                        static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES);
+                }
             }
         }
     }
@@ -226,47 +241,54 @@ public:
 
         using chip::Protocols::SecureChannel::MsgType;
         const auto opcode  = static_cast<MsgType>(info.payloadHeader->GetMessageType());
-        const uint64_t now = NowUs();
+        const uint64_t now = CurrentTimestampUs();
 
-        PychipCaseTimingRecord * record =
-            FindRecord(info.payloadHeader->GetExchangeID(), NodeIdOrUndefined(info.packetHeader->GetDestinationNodeId()));
+        PychipCASEHandshakeMetricsRecord * record = FindCASEHandshakeRecord(
+            info.payloadHeader->GetExchangeID(), NodeIdOrUndefined(info.packetHeader->GetDestinationNodeId()));
         VerifyOrReturn(record != nullptr);
 
         // The peer is not known when Sigma1 goes out, so identity is learned from the first
-        // message it sends back.
-        if (record->peerAddress[0] == kPeerAddressUnknown && info.peerAddress != nullptr)
+        // message it sends back. That address is also what ties the handshake to the discovery
+        // that resolved it, which is the only exact correlation available: pairing them any
+        // earlier could only guess, and would mis-assign spans when concurrent lookups finish
+        // in a different order from the handshakes they belong to.
+        if (record->peerTransportAddress[0] == kPeerAddressNotYetKnown && info.peerAddress != nullptr)
         {
-            info.peerAddress->ToString(record->peerAddress, sizeof(record->peerAddress));
-            record->peerNodeId = NodeIdForAddress(*info.peerAddress);
+            info.peerAddress->ToString(record->peerTransportAddress, sizeof(record->peerTransportAddress));
+            RecordPeerIdentityAndDiscovery(*record, *info.peerAddress);
         }
 
         switch (opcode)
         {
         case MsgType::CASE_Sigma2:
-            Mark(*record, &PychipCaseTimingRecord::sigma2ReceivedUs, PYCHIP_CASE_TIMING_MARK_SIGMA2_RECEIVED, now);
+            RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::sigma2ReceivedTimestampUs,
+                            PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RECEIVED, now);
             break;
         case MsgType::CASE_Sigma2Resume:
-            Mark(*record, &PychipCaseTimingRecord::sigma2ResumeReceivedUs, PYCHIP_CASE_TIMING_MARK_SIGMA2_RESUME_RECEIVED, now);
+            RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::sigma2ResumeReceivedTimestampUs,
+                            PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RESUME_RECEIVED, now);
             break;
         case MsgType::StatusReport:
             // Only the report closing out Sigma3 is of interest. A StatusReport arriving at
             // any other point belongs to an exchange this record is not timing, and is left
             // unmarked so the Python side sees an incomplete record.
-            if ((record->marks & PYCHIP_CASE_TIMING_MARK_SIGMA3_SENT) != 0)
+            if ((record->recordedFields & PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA3_SENT) != 0)
             {
-                Mark(*record, &PychipCaseTimingRecord::statusReportReceivedUs, PYCHIP_CASE_TIMING_MARK_STATUS_REPORT_RECEIVED, now);
+                RecordTimestamp(*record, &PychipCASEHandshakeMetricsRecord::statusReportReceivedTimestampUs,
+                                PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_RECEIVED, now);
 
                 // The timestamp is kept whether the peer accepted or rejected Sigma3, since
                 // the time to a rejection is still a real measurement. The codes are what
                 // tell the two apart.
                 uint16_t generalCode  = 0;
                 uint16_t protocolCode = 0;
-                if ((record->marks & PYCHIP_CASE_TIMING_MARK_STATUS_PARSED) == 0 &&
-                    ParseStatusCodes(info.payload, generalCode, protocolCode))
+                if ((record->recordedFields & PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES) == 0 &&
+                    ParseStatusReportCodes(info.payload, generalCode, protocolCode))
                 {
-                    record->statusGeneralCode  = generalCode;
-                    record->statusProtocolCode = protocolCode;
-                    record->marks              = static_cast<uint8_t>(record->marks | PYCHIP_CASE_TIMING_MARK_STATUS_PARSED);
+                    record->statusReportGeneralCode  = generalCode;
+                    record->statusReportProtocolCode = protocolCode;
+                    record->recordedFields =
+                        static_cast<uint8_t>(record->recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES);
                 }
             }
             break;
@@ -277,17 +299,17 @@ public:
 
     // Operational discovery runs to completion before Sigma1 goes out, so there is no record
     // to mark yet. Spans are held here, keyed by peer so that concurrent lookups do not
-    // overwrite each other, and attached by StartRecord.
+    // overwrite each other, and are attached by RecordPeerIdentityAndDiscovery once the peer's first
+    // reply identifies which lookup the handshake came from.
     void LogNodeLookup(chip::Tracing::NodeLookupInfo & info) override
     {
         VerifyOrReturn(info.request != nullptr);
-        PendingDiscovery * pending = FindOrAddPending(info.request->GetPeerId());
-        VerifyOrReturn(pending != nullptr);
-        pending->startUs = NowUs();
-        pending->done    = false;
+        PendingDeviceDiscovery * pending = FindOrCreateDiscoveryForPeer(info.request->GetPeerId());
+        pending->startUs                 = CurrentTimestampUs();
+        pending->done                    = false;
         // The slot is kept after a handshake claims it, so that its address still maps back to
         // a node id. A fresh lookup starts a new span in it, so clear the claim as well or
-        // ClaimOldestDiscovery would skip it and every later handshake for this peer would
+        // RecordPeerIdentityAndDiscovery would skip it and every later handshake for this peer would
         // report no discovery.
         pending->used = false;
     }
@@ -297,9 +319,9 @@ public:
         // Intermediate results and retries also arrive here; only completion ends the span.
         VerifyOrReturn(info.type == chip::Tracing::DiscoveryInfoType::kResolutionDone);
         VerifyOrReturn(info.peerId != nullptr);
-        PendingDiscovery * pending = FindPending(*info.peerId);
-        VerifyOrReturn(pending != nullptr && pending->startUs != kPendingSlotFree);
-        pending->doneUs = NowUs();
+        PendingDeviceDiscovery * pending = FindDiscoveryForPeer(*info.peerId);
+        VerifyOrReturn(pending != nullptr && pending->startUs != kDiscoverySlotUnused);
+        pending->doneUs = CurrentTimestampUs();
         pending->done   = true;
         // Remember which address belongs to which node, so a handshake can name its peer
         // from the address its replies arrive from.
@@ -310,45 +332,45 @@ public:
         }
     }
 
-    void Reset(uint32_t maxRecords)
+    void ResetWithCapacity(uint32_t maxCASEHandshakes)
     {
-        mRecords.assign(maxRecords, PychipCaseTimingRecord{});
-        ClearCounters();
+        mCASEHandshakeRecords.assign(maxCASEHandshakes, PychipCASEHandshakeMetricsRecord{});
+        ClearRecordsAndDiscoveries();
     }
 
     // Clears the captured records but keeps whatever capacity the last start asked for.
-    void ResetKeepingCapacity()
+    void ClearRecordsKeepingCapacity()
     {
-        std::fill(mRecords.begin(), mRecords.end(), PychipCaseTimingRecord{});
-        ClearCounters();
+        std::fill(mCASEHandshakeRecords.begin(), mCASEHandshakeRecords.end(), PychipCASEHandshakeMetricsRecord{});
+        ClearRecordsAndDiscoveries();
     }
 
     // Copies only the records actually captured, so a large capacity costs nothing to read.
-    void CopyRecords(PychipCaseTimingRecord * out, uint32_t capacity, uint32_t & written, uint32_t & available,
-                     uint32_t & dropped) const
+    void CopyCASEHandshakeRecords(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t & written,
+                                  uint32_t & available, uint32_t & dropped) const
     {
-        available = mCount;
-        dropped   = mDropped;
-        written   = std::min(capacity, mCount);
+        available = mRecordedCASEHandshakeCount;
+        dropped   = mDroppedCASEHandshakeCount;
+        written   = std::min(capacity, mRecordedCASEHandshakeCount);
         if (out != nullptr && written > 0)
         {
-            std::memcpy(out, mRecords.data(), written * sizeof(PychipCaseTimingRecord));
+            std::memcpy(out, mCASEHandshakeRecords.data(), written * sizeof(PychipCASEHandshakeMetricsRecord));
         }
     }
 
 private:
-    void ClearCounters()
+    void ClearRecordsAndDiscoveries()
     {
-        mCount   = 0;
-        mDropped = 0;
-        for (auto & pending : mPending)
+        mRecordedCASEHandshakeCount = 0;
+        mDroppedCASEHandshakeCount  = 0;
+        for (auto & pending : mPendingDiscoveries)
         {
-            pending = PendingDiscovery{};
+            pending = PendingDeviceDiscovery{};
         }
     }
 
     // An operational discovery span waiting to be attached to the handshake that follows it.
-    struct PendingDiscovery
+    struct PendingDeviceDiscovery
     {
         chip::PeerId peer;
         chip::Transport::PeerAddress address;
@@ -363,15 +385,15 @@ private:
     // being resolved concurrently, so this bounds how many parallel lookups can be attributed.
     // Exceeding it costs only the discovery figure: the handshake is still timed, and reports no
     // discovery rather than a wrong one.
-    static constexpr size_t kPendingDiscoveryMax = 8;
+    static constexpr size_t kMaxConcurrentDeviceDiscoveries = 8;
 
     // A slot is free when no lookup has stamped a start time into it.
-    static constexpr uint64_t kPendingSlotFree = 0;
+    static constexpr uint64_t kDiscoverySlotUnused = 0;
 
     // peerAddress holds a C string, so an empty first byte means the peer has not been seen yet.
-    static constexpr char kPeerAddressUnknown = '\0';
+    static constexpr char kPeerAddressNotYetKnown = '\0';
 
-    static uint64_t NowUs() { return chip::System::SystemClock().GetMonotonicMicroseconds64().count(); }
+    static uint64_t CurrentTimestampUs() { return chip::System::SystemClock().GetMonotonicMicroseconds64().count(); }
 
     // A CASE packet header carries a node id in only one direction, so the absent case is
     // mapped to kUndefinedNodeId and takes part in record matching like any other value.
@@ -382,12 +404,12 @@ private:
 
     // Locates the handshake a message belongs to. Searching newest first means a reused
     // exchange id resolves to the current handshake rather than a finished one.
-    PychipCaseTimingRecord * FindRecord(uint16_t exchangeId, chip::NodeId localNodeId)
+    PychipCASEHandshakeMetricsRecord * FindCASEHandshakeRecord(uint16_t exchangeId, chip::NodeId localEphemeralNodeId)
     {
-        for (uint32_t i = mCount; i > 0; i--)
+        for (uint32_t i = mRecordedCASEHandshakeCount; i > 0; i--)
         {
-            PychipCaseTimingRecord & record = mRecords[i - 1];
-            if (record.exchangeId == exchangeId && record.localNodeId == localNodeId)
+            PychipCASEHandshakeMetricsRecord & record = mCASEHandshakeRecords[i - 1];
+            if (record.exchangeId == exchangeId && record.localEphemeralNodeId == localEphemeralNodeId)
             {
                 return &record;
             }
@@ -395,11 +417,11 @@ private:
         return nullptr;
     }
 
-    PendingDiscovery * FindPending(const chip::PeerId & peer)
+    PendingDeviceDiscovery * FindDiscoveryForPeer(const chip::PeerId & peer)
     {
-        for (auto & pending : mPending)
+        for (auto & pending : mPendingDiscoveries)
         {
-            if (pending.startUs != kPendingSlotFree && pending.peer == peer)
+            if (pending.startUs != kDiscoverySlotUnused && pending.peer == peer)
             {
                 return &pending;
             }
@@ -407,113 +429,123 @@ private:
         return nullptr;
     }
 
-    // Maps a peer's transport address back to the node id that discovery resolved it from.
-    // kUndefinedNodeId when the address was never discovered in this capture, e.g. it was cached.
-    chip::NodeId NodeIdForAddress(const chip::Transport::PeerAddress & address) const
+    // Names the handshake's peer and, when the same lookup produced that peer's address,
+    // hands the discovery span to this record. Both stay unset when the address was never
+    // resolved in this capture, e.g. it was already cached: no duration is better than one
+    // belonging to a different handshake.
+    void RecordPeerIdentityAndDiscovery(PychipCASEHandshakeMetricsRecord & record, const chip::Transport::PeerAddress & address)
     {
-        for (const auto & pending : mPending)
+        for (auto & pending : mPendingDiscoveries)
         {
-            if (pending.hasAddress && pending.address == address)
+            if (!pending.hasAddress || !(pending.address == address))
             {
-                return pending.peer.GetNodeId();
+                continue;
             }
+
+            record.peerNodeId = pending.peer.GetNodeId();
+            // Claimed so a later handshake to the same peer waits for its own lookup rather
+            // than reusing this span.
+            if (pending.done && !pending.used)
+            {
+                pending.used                         = true;
+                record.discoveryStartedTimestampUs   = pending.startUs;
+                record.discoveryCompletedTimestampUs = pending.doneUs;
+                record.recordedFields =
+                    static_cast<uint8_t>(record.recordedFields | PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_DEVICE_DISCOVERY);
+            }
+            return;
         }
-        return chip::kUndefinedNodeId;
     }
 
-    PendingDiscovery * FindOrAddPending(const chip::PeerId & peer)
+    // Returns the slot tracking this peer, allocating or evicting one as needed. Never null,
+    // so a lookup is always recorded.
+    PendingDeviceDiscovery * FindOrCreateDiscoveryForPeer(const chip::PeerId & peer)
     {
-        if (PendingDiscovery * existing = FindPending(peer))
+        if (PendingDeviceDiscovery * existing = FindDiscoveryForPeer(peer))
         {
             return existing;
         }
-        for (auto & pending : mPending)
+        for (auto & pending : mPendingDiscoveries)
         {
-            if (pending.startUs == kPendingSlotFree)
+            if (pending.startUs == kDiscoverySlotUnused)
             {
-                pending      = PendingDiscovery{};
+                pending      = PendingDeviceDiscovery{};
                 pending.peer = peer;
                 return &pending;
             }
         }
-        // All slots taken. Recycle the one already claimed by a handshake, since its span
-        // has been copied into that record; its address mapping is the only loss.
-        for (auto & pending : mPending)
+
+        // All slots taken, so one has to go. Prefer a slot a handshake already took its span
+        // from, since only the address mapping is lost.
+        PendingDeviceDiscovery * victim = nullptr;
+        for (auto & pending : mPendingDiscoveries)
         {
             if (pending.used)
             {
-                pending      = PendingDiscovery{};
-                pending.peer = peer;
-                return &pending;
+                victim = &pending;
+                break;
             }
         }
-        return nullptr; // Every slot is an in-flight lookup; this one goes unrecorded.
-    }
 
-    // Claims the oldest finished discovery. The peer a handshake is for is not known when
-    // Sigma1 goes out, so under concurrency this pairs by completion order rather than by
-    // peer. Exact for one handshake at a time.
-    PendingDiscovery * ClaimOldestDiscovery()
-    {
-        PendingDiscovery * oldest = nullptr;
-        for (auto & pending : mPending)
+        // Otherwise evict the slot that has been waiting longest. A lookup that never resolved
+        // holds its slot forever, so without this a run of unreachable peers would starve every
+        // later handshake of its discovery time and its peer id.
+        if (victim == nullptr)
         {
-            if (pending.done && !pending.used && (oldest == nullptr || pending.doneUs < oldest->doneUs))
+            for (auto & pending : mPendingDiscoveries)
             {
-                oldest = &pending;
+                if (victim == nullptr || pending.startUs < victim->startUs)
+                {
+                    victim = &pending;
+                }
             }
         }
-        return oldest;
+
+        *victim      = PendingDeviceDiscovery{};
+        victim->peer = peer;
+        return victim;
     }
 
-    void StartRecord(uint64_t now, uint16_t exchangeId, chip::NodeId localNodeId)
+    void BeginCASEHandshakeRecord(uint64_t now, uint16_t exchangeId, chip::NodeId localEphemeralNodeId)
     {
-        if (mCount >= mRecords.size())
+        if (mRecordedCASEHandshakeCount >= mCASEHandshakeRecords.size())
         {
-            mDropped++;
+            mDroppedCASEHandshakeCount++;
             return;
         }
-        PychipCaseTimingRecord & record = mRecords[mCount];
-        record                          = PychipCaseTimingRecord{};
-        record.sigma1SentUs             = now;
-        record.exchangeId               = exchangeId;
-        record.localNodeId              = localNodeId;
-        record.marks                    = PYCHIP_CASE_TIMING_MARK_SIGMA1_SENT;
+        PychipCASEHandshakeMetricsRecord & record = mCASEHandshakeRecords[mRecordedCASEHandshakeCount];
+        record                                    = PychipCASEHandshakeMetricsRecord{};
+        record.sigma1SentTimestampUs              = now;
+        record.exchangeId                         = exchangeId;
+        record.localEphemeralNodeId               = localEphemeralNodeId;
+        record.recordedFields                     = PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA1_SENT;
 
-        // Attach the discovery that preceded this handshake, if there was one. Consumed
-        // rather than copied, so a later handshake that reused a cached address reports no
-        // discovery instead of repeating these timestamps.
-        if (PendingDiscovery * pending = ClaimOldestDiscovery())
-        {
-            pending->used           = true;
-            record.discoveryStartUs = pending->startUs;
-            record.discoveryDoneUs  = pending->doneUs;
-            record.marks            = static_cast<uint8_t>(record.marks | PYCHIP_CASE_TIMING_MARK_DISCOVERY);
-        }
-
-        mCount++;
+        // Discovery is not attached here: which peer this handshake is for is still unknown.
+        // It is attached once the peer replies and its address identifies the lookup.
+        mRecordedCASEHandshakeCount++;
     }
 
     // Ignored if the field was already set: an MRP retransmission or a duplicate delivery
     // must not move the timestamp of the first occurrence.
-    static void Mark(PychipCaseTimingRecord & record, uint64_t PychipCaseTimingRecord::*field, uint8_t bit, uint64_t now)
+    static void RecordTimestamp(PychipCASEHandshakeMetricsRecord & record, uint64_t PychipCASEHandshakeMetricsRecord::* field,
+                                uint8_t bit, uint64_t now)
     {
-        VerifyOrReturn((record.marks & bit) == 0);
-        record.*field = now;
-        record.marks  = static_cast<uint8_t>(record.marks | bit);
+        VerifyOrReturn((record.recordedFields & bit) == 0);
+        record.*field         = now;
+        record.recordedFields = static_cast<uint8_t>(record.recordedFields | bit);
     }
 
     // Heap-allocated so the capture size is the caller's choice rather than a compile-time
     // constant. Acceptable here because this file is host-test-only, per the static_assert
     // above; it is not part of any device build.
-    std::vector<PychipCaseTimingRecord> mRecords;
-    uint32_t mCount   = 0;
-    uint32_t mDropped = 0;
-    PendingDiscovery mPending[kPendingDiscoveryMax]{};
+    std::vector<PychipCASEHandshakeMetricsRecord> mCASEHandshakeRecords;
+    uint32_t mRecordedCASEHandshakeCount = 0;
+    uint32_t mDroppedCASEHandshakeCount  = 0;
+    PendingDeviceDiscovery mPendingDiscoveries[kMaxConcurrentDeviceDiscoveries]{};
 };
 
-CaseTimingBackend gTimingBackend;
-bool gTimingRegistered = false;
+CASEHandshakeMetricsBackend gCASEHandshakeMetricsBackend;
+bool gCASEHandshakeMetricsBackendRegistered = false;
 
 } // namespace
 
@@ -547,44 +579,45 @@ PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_timing_start(uint32_t maxRecords)
+PyChipError pychip_case_handshake_metrics_start_capture(uint32_t maxCASEHandshakes)
 {
     // Rejected here rather than on the main loop, so an oversized request cannot reach the
     // allocation and take the process down with a bad_alloc the caller cannot handle.
-    VerifyOrReturnError(maxRecords <= PYCHIP_CASE_TIMING_MAX_RECORDS, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(maxCASEHandshakes <= PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY,
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    const uint32_t capacity = (maxRecords == 0) ? PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS : maxRecords;
+    const uint32_t capacity = (maxCASEHandshakes == 0) ? PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY : maxCASEHandshakes;
     chip::MainLoopWork::ExecuteInMainLoop([capacity] {
-        gTimingBackend.Reset(capacity);
-        if (!gTimingRegistered)
+        gCASEHandshakeMetricsBackend.ResetWithCapacity(capacity);
+        if (!gCASEHandshakeMetricsBackendRegistered)
         {
-            chip::Tracing::Register(gTimingBackend);
-            gTimingRegistered = true;
+            chip::Tracing::Register(gCASEHandshakeMetricsBackend);
+            gCASEHandshakeMetricsBackendRegistered = true;
         }
     });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_timing_stop(void)
+PyChipError pychip_case_handshake_metrics_stop_capture(void)
 {
     chip::MainLoopWork::ExecuteInMainLoop([] {
-        if (gTimingRegistered)
+        if (gCASEHandshakeMetricsBackendRegistered)
         {
-            chip::Tracing::Unregister(gTimingBackend);
-            gTimingRegistered = false;
+            chip::Tracing::Unregister(gCASEHandshakeMetricsBackend);
+            gCASEHandshakeMetricsBackendRegistered = false;
         }
     });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_timing_reset(void)
+PyChipError pychip_case_handshake_metrics_reset_capture(void)
 {
-    chip::MainLoopWork::ExecuteInMainLoop([] { gTimingBackend.ResetKeepingCapacity(); });
+    chip::MainLoopWork::ExecuteInMainLoop([] { gCASEHandshakeMetricsBackend.ClearRecordsKeepingCapacity(); });
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_case_timing_get_records(PychipCaseTimingRecord * out, uint32_t capacity, uint32_t * written,
-                                           uint32_t * available, uint32_t * dropped)
+PyChipError pychip_case_handshake_metrics_get_records(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t * written,
+                                                      uint32_t * available, uint32_t * dropped)
 {
     VerifyOrReturnError(written != nullptr && available != nullptr && dropped != nullptr,
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
@@ -594,7 +627,7 @@ PyChipError pychip_case_timing_get_records(PychipCaseTimingRecord * out, uint32_
     uint32_t availableCount = 0;
     uint32_t droppedCount   = 0;
     chip::MainLoopWork::ExecuteInMainLoop(
-        [&] { gTimingBackend.CopyRecords(out, capacity, writtenCount, availableCount, droppedCount); });
+        [&] { gCASEHandshakeMetricsBackend.CopyCASEHandshakeRecords(out, capacity, writtenCount, availableCount, droppedCount); });
 
     *written   = writtenCount;
     *available = availableCount;

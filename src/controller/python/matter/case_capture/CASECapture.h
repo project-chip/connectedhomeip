@@ -52,86 +52,88 @@ PyChipError pychip_case_capture_set_observer(chip::Controller::DeviceCommissione
 PyChipError pychip_case_capture_reset(void);
 PyChipError pychip_case_capture_get_snapshot(PychipCaseCaptureSnapshot * out);
 
-// Handshake timing. Independent of the header capture above: it observes the messages
+// CASE handshake metrics. Independent of the header capture above: it observes the messages
 // through the tracing hooks in SessionManager, which report both directions, and so can
 // time the outbound Sigma1/Sigma3 that the inbound-only observer cannot see.
 
-// Handshakes retained per capture session when the caller does not ask for a specific
+// CASE handshakes retained per capture session when the caller does not ask for a specific
 // capacity. Enough for a batch of concurrent handshakes without reserving much; override it
-// via the maxRecords argument to pychip_case_timing_start when capturing more.
-#define PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS 64
+// via the maxCASEHandshakes argument to pychip_case_handshake_metrics_start_capture when capturing more.
+#define PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY 64
 
-// Largest capacity pychip_case_timing_start will accept. The records are allocated up front, so
+// Largest capacity pychip_case_handshake_metrics_start_capture will accept. The records are allocated up front, so
 // this bounds that allocation to roughly 640 kB and keeps a mistyped capacity from exhausting
 // memory. A request above it is rejected rather than silently reduced, so a caller never
 // believes it has more room than it does.
-#define PYCHIP_CASE_TIMING_MAX_RECORDS 4096
+#define PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY 4096
 
-// Bits set in PychipCaseTimingRecord::marks, indicating which timestamps are valid.
-#define PYCHIP_CASE_TIMING_MARK_SIGMA1_SENT 0x01u
-#define PYCHIP_CASE_TIMING_MARK_SIGMA2_RECEIVED 0x02u
-#define PYCHIP_CASE_TIMING_MARK_SIGMA3_SENT 0x04u
-#define PYCHIP_CASE_TIMING_MARK_STATUS_REPORT_RECEIVED 0x08u
-#define PYCHIP_CASE_TIMING_MARK_SIGMA2_RESUME_RECEIVED 0x10u
-#define PYCHIP_CASE_TIMING_MARK_DISCOVERY 0x20u
+// Bits set in PychipCASEHandshakeMetricsRecord::recordedFields, indicating which timestamps are valid.
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA1_SENT 0x01u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RECEIVED 0x02u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA3_SENT 0x04u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_RECEIVED 0x08u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_SIGMA2_RESUME_RECEIVED 0x10u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_DEVICE_DISCOVERY 0x20u
 // The closing StatusReport's body decoded, so the status*Code fields below are valid.
-#define PYCHIP_CASE_TIMING_MARK_STATUS_PARSED 0x40u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES 0x40u
 // This node sent a StatusReport carrying a failure, i.e. it rejected the peer.
-#define PYCHIP_CASE_TIMING_MARK_LOCAL_FAILURE 0x80u
+#define PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_THIS_NODE_REJECTED_PEER 0x80u
 
 // Room for a PeerAddress rendered as text, e.g. "UDP:[fe80::1%wlan0]:5540". Sized above
 // Transport::PeerAddress::kMaxToStringSize rather than set to it, so the Python mirror stays a
 // plain literal; CASECapture.cpp static_asserts that it is still large enough.
-#define PYCHIP_CASE_TIMING_PEER_ADDR_LEN 80
+#define PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH 80
 
 // One initiator-side CASE handshake. Timestamps are monotonic microseconds from
 // System::SystemClock(), taken as the message crosses the transport layer. A field is
-// only meaningful when its corresponding bit is set in `marks`.
+// only meaningful when its corresponding bit is set in `recordedFields`.
 // Layout must match the ctypes mirror in case_capture/__init__.py.
-struct PychipCaseTimingRecord
+struct PychipCASEHandshakeMetricsRecord
 {
-    uint64_t sigma1SentUs;
-    uint64_t sigma2ReceivedUs;
-    uint64_t sigma3SentUs;
-    uint64_t statusReportReceivedUs;
-    uint64_t sigma2ResumeReceivedUs;
-    // Operational discovery preceding this handshake. Captured before Sigma1 is sent and
-    // attached to the handshake that followed it.
-    uint64_t discoveryStartUs;
-    uint64_t discoveryDoneUs;
+    uint64_t sigma1SentTimestampUs;
+    uint64_t sigma2ReceivedTimestampUs;
+    uint64_t sigma3SentTimestampUs;
+    uint64_t statusReportReceivedTimestampUs;
+    uint64_t sigma2ResumeReceivedTimestampUs;
+    // Operational discovery that resolved this handshake's peer. Recorded before Sigma1 is
+    // sent, then attached once the peer replies and its address identifies which lookup it
+    // came from. Left unset when the address was not resolved during this capture, so a span
+    // is never attributed to the wrong handshake.
+    uint64_t discoveryStartedTimestampUs;
+    uint64_t discoveryCompletedTimestampUs;
     // Identifies which handshake a message belongs to, so concurrent handshakes stay
-    // separate. localNodeId is this node's ephemeral initiator id for the handshake, which
+    // separate. localEphemeralNodeId is this node's ephemeral initiator id for the handshake, which
     // distinguishes controllers whose exchange id counters could otherwise collide.
-    uint64_t localNodeId;
+    uint64_t localEphemeralNodeId;
     // Which peer this handshake is with. Learned from the first message the peer sends, so
     // it stays zero on a handshake that never got a reply. Resolved from the discovery that
     // produced the peer's address; zero when the address was already cached.
     uint64_t peerNodeId;
     // Codes carried by the StatusReport that closed Sigma3. Valid only when
-    // PYCHIP_CASE_TIMING_MARK_STATUS_PARSED is set. Both zero means success.
-    uint16_t statusGeneralCode;
-    uint16_t statusProtocolCode;
-    // The exchange carrying this handshake. Together with localNodeId it identifies the
+    // PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_STATUS_REPORT_CODES is set. Both zero means success.
+    uint16_t statusReportGeneralCode;
+    uint16_t statusReportProtocolCode;
+    // The exchange carrying this handshake. Together with localEphemeralNodeId it identifies the
     // handshake, which is how a message is routed to its own record while others are in flight.
     uint16_t exchangeId;
-    // Bitmask of PYCHIP_CASE_TIMING_MARK_*, saying which fields above have been filled in.
-    uint8_t marks;
+    // Bitmask of PYCHIP_CASE_HANDSHAKE_METRICS_RECORDED_*, saying which fields above have been filled in.
+    uint8_t recordedFields;
     // The peer's transport address, empty until the peer sends its first message. Always
     // available even when peerNodeId is not, so it is the reliable way to tell two DUTs
     // apart.
-    char peerAddress[PYCHIP_CASE_TIMING_PEER_ADDR_LEN];
+    char peerTransportAddress[PYCHIP_CASE_HANDSHAKE_METRICS_PEER_ADDRESS_MAX_LENGTH];
 };
 
-// Register the timing backend and clear any previously captured records. maxRecords sets how
-// many handshakes to retain; pass 0 for PYCHIP_CASE_TIMING_DEFAULT_MAX_RECORDS. Returns
-// CHIP_ERROR_INVALID_ARGUMENT if it exceeds PYCHIP_CASE_TIMING_MAX_RECORDS.
-PyChipError pychip_case_timing_start(uint32_t maxRecords);
+// Register the metrics backend and clear any previously captured records. maxCASEHandshakes sets how
+// many handshakes to retain; pass 0 for PYCHIP_CASE_HANDSHAKE_METRICS_DEFAULT_CAPACITY. Returns
+// CHIP_ERROR_INVALID_ARGUMENT if it exceeds PYCHIP_CASE_HANDSHAKE_METRICS_MAX_CAPACITY.
+PyChipError pychip_case_handshake_metrics_start_capture(uint32_t maxCASEHandshakes);
 
-// Unregister the backend. Captured records remain readable until the next start.
-PyChipError pychip_case_timing_stop(void);
+// Unregister the backend. Captured records stay readable until the next start.
+PyChipError pychip_case_handshake_metrics_stop_capture(void);
 
 // Discard all captured records without unregistering.
-PyChipError pychip_case_timing_reset(void);
+PyChipError pychip_case_handshake_metrics_reset_capture(void);
 
 // Copies up to `capacity` records into `out`, oldest first.
 //
@@ -143,7 +145,7 @@ PyChipError pychip_case_timing_reset(void);
 //   dropped   handshakes seen after the capture filled up, and therefore not recorded
 //
 // `out` may be null when `capacity` is 0, to query the counts alone.
-PyChipError pychip_case_timing_get_records(PychipCaseTimingRecord * out, uint32_t capacity, uint32_t * written,
-                                           uint32_t * available, uint32_t * dropped);
+PyChipError pychip_case_handshake_metrics_get_records(PychipCASEHandshakeMetricsRecord * out, uint32_t capacity, uint32_t * written,
+                                                      uint32_t * available, uint32_t * dropped);
 
 } // extern "C"
