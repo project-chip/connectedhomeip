@@ -145,6 +145,45 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
     return true;
 }
 
+/**
+ * Determine whether the certificate is a PDC Identity, and if so whether it is valid.
+ *
+ * PDC Identities cannot be validated via ChipCertificateSet: they carry neither a Subject
+ * Key Id nor an Authority Key Id extension, both of which it requires. They are also
+ * self-contained, so there is no chain to validate; instead the fixed set of values the
+ * specification mandates is checked, along with the self-signature.
+ *
+ * @param outIsValid  Set to the result of validating the identity, but only if the
+ *                    certificate is a PDC Identity, i.e. if this function returns true.
+ *
+ * @return true if the certificate is a PDC Identity, false if it is some other type.
+ */
+bool CheckNetworkIdentity(const char * fileNameOrStr, bool * outIsValid)
+{
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
+    VerifyOrReturnValue(ReadCert(fileNameOrStr, cert), false);
+
+    uint8_t chipCertBuf[kMaxCHIPCertLength];
+    MutableByteSpan chipCert(chipCertBuf);
+    VerifyOrReturnValue(X509ToChipCert(cert.get(), chipCert), false);
+
+    // The certificate type is determined from the Subject DN; the remaining requirements are
+    // what ValidateChipNetworkIdentity() then checks.
+    ChipCertificateData certData;
+    CertType certType;
+    VerifyOrReturnValue(DecodeChipCert(chipCert, certData) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(certData.mSubjectDN.GetCertType(certType) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(certType == CertType::kNetworkIdentity, false);
+
+    CHIP_ERROR err = ValidateChipNetworkIdentity(chipCert);
+    if (err != CHIP_NO_ERROR)
+    {
+        fprintf(stderr, "Failed PDC Identity validation: %s\n", chip::ErrorStr(err));
+    }
+    *outIsValid = (err == CHIP_NO_ERROR);
+    return true;
+}
+
 } // namespace
 
 bool Cmd_ValidateCert(int argc, char * argv[])
@@ -168,6 +207,17 @@ bool Cmd_ValidateCert(int argc, char * argv[])
 
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
+
+    // A PDC Identity is self-contained, so it is only validated when given on its own,
+    // without any additional certificates that would imply a chain to validate.
+    if (gNumCertFileNames == 0)
+    {
+        bool isValidIdentity;
+        if (CheckNetworkIdentity(gTargetCertFileName, &isValidIdentity))
+        {
+            ExitNow(res = isValidIdentity);
+        }
+    }
 
     err = certSet.Init(kMaxCerts);
     if (err != CHIP_NO_ERROR)

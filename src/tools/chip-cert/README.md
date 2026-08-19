@@ -42,7 +42,7 @@ This directory contains various command handler for the 'chip-cert' tool that:
 -   generate CHIP certificate
 -   convert CHIP certificate format
 -   convert CHIP private key format
--   validate CHIP certificate chain
+-   validate CHIP certificate chain or PDC identity
 -   resign CHIP certificate
 -   print CHIP certificate
 -   generate CHIP attestation certificates
@@ -167,6 +167,27 @@ attestation certificate chain that was just created:
 
 ```
 openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-Cert.pem
+```
+
+## PDC Identity Usage Examples
+
+Example commands to generate a PDC identity (a constrained self-signed certificate):
+
+```
+./chip-cert gen-cert --type p --out-key identity-key.pem --out identity.pem --out-format x509-pem
+```
+
+PDC Identities are usually transferred in (compact) TLV format. Convert to TLV (hex):
+
+```
+./chip-cert convert-cert -x identity.pem identity.hex
+```
+
+Either format validates as a self-signed identity:
+
+```
+./chip-cert validate-cert identity.pem && echo OK
+./chip-cert validate-cert identity.hex && echo OK
 ```
 
 ## Command Reference
